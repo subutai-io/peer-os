@@ -251,6 +251,22 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
 
     @Override
+    public void start() throws PeerException
+    {
+        Peer peer = getPeer();
+        peer.startContainer( this );
+    }
+
+
+    @Override
+    public void stop() throws PeerException
+    {
+        Peer peer = getPeer();
+        peer.stopContainer( this );
+    }
+
+
+    @Override
     public void updateHostInfo( final HostInfo hostInfo )
     {
         super.updateHostInfo( hostInfo );

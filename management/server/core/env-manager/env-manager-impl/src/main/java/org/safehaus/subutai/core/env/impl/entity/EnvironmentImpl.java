@@ -25,8 +25,14 @@ import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.env.api.Environment;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.EnvironmentStatus;
+import org.safehaus.subutai.core.env.api.build.Topology;
 import org.safehaus.subutai.core.env.api.exception.ContainerHostNotFoundException;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentModificationException;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.commons.net.util.SubnetUtils;
 
@@ -42,6 +48,8 @@ import com.google.gson.reflect.TypeToken;
 @Access( AccessType.FIELD )
 public class EnvironmentImpl implements Environment, Serializable
 {
+    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentImpl.class.getName() );
+
     @Id
     @Column( name = "environment_id" )
     private String environmentId;
@@ -76,6 +84,8 @@ public class EnvironmentImpl implements Environment, Serializable
 
     @Transient
     private DataService dataService;
+    @Transient
+    private EnvironmentManager environmentManager;
 
 
     protected EnvironmentImpl()
@@ -251,15 +261,45 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public void removeContainer( UUID containerId ) throws ContainerHostNotFoundException
+    @Override
+    public void destroyContainer( ContainerHost containerHost, boolean async )
+            throws EnvironmentNotFoundException, EnvironmentModificationException
+    {
+        environmentManager.destroyContainer( containerHost, async, false );
+    }
+
+
+    @Override
+    public void growEnvironment( final Topology topology, boolean async ) throws EnvironmentModificationException
+    {
+        try
+        {
+            environmentManager.growEnvironment( getId(), topology, async );
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            //this should not happen
+            LOG.error( String.format( "Error growing environment %s", getName() ), e );
+        }
+    }
+
+
+    public void removeContainer( UUID containerId )
     {
         Preconditions.checkNotNull( containerId );
 
-        ContainerHost container = getContainerHostById( containerId );
+        try
+        {
+            ContainerHost container = getContainerHostById( containerId );
 
-        containers.remove( container );
+            containers.remove( container );
 
-        dataService.update( this );
+            dataService.update( this );
+        }
+        catch ( ContainerHostNotFoundException e )
+        {
+            LOG.warn( String.format( "Failed to remove container %s because it does not exist", containerId ), e );
+        }
     }
 
 
@@ -291,7 +331,41 @@ public class EnvironmentImpl implements Environment, Serializable
     public void setDataService( final DataService dataService )
     {
         this.dataService = dataService;
+    }
 
-        dataService.update( this );
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
+        this.environmentManager = environmentManager;
+    }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof EnvironmentImpl ) )
+        {
+            return false;
+        }
+
+        final EnvironmentImpl that = ( EnvironmentImpl ) o;
+
+        if ( environmentId != null ? !environmentId.equals( that.environmentId ) : that.environmentId != null )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return environmentId != null ? environmentId.hashCode() : 0;
     }
 }

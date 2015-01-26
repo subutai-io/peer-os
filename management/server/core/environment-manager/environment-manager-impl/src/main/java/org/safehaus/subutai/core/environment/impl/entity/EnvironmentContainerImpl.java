@@ -226,6 +226,20 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
 
     @Override
+    public void start() throws PeerException
+    {
+        getPeer().startContainer( this );
+    }
+
+
+    @Override
+    public void stop() throws PeerException
+    {
+        getPeer().stopContainer( this );
+    }
+
+
+    @Override
     public Peer getPeer()
     {
         return this.peer;

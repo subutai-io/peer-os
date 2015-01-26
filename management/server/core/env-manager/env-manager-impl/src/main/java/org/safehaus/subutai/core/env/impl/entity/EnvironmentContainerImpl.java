@@ -49,6 +49,9 @@ import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.env.api.Environment;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentModificationException;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -102,6 +105,8 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     private Peer peer;
     @Transient
     private DataService<String, EnvironmentContainerImpl> dataService;
+    @Transient
+    private EnvironmentManager environmentManager;
 
 
     protected EnvironmentContainerImpl()
@@ -157,6 +162,12 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public void setPeer( final Peer peer )
     {
         this.peer = peer;
+    }
+
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
+        this.environmentManager = environmentManager;
     }
 
 
@@ -226,7 +237,34 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     @Override
     public void dispose() throws PeerException
     {
+        try
+        {
+            environmentManager.destroyContainer( this, false, false );
+        }
+        catch ( EnvironmentNotFoundException | EnvironmentModificationException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    public void destroy() throws PeerException
+    {
         getPeer().destroyContainer( this );
+    }
+
+
+    @Override
+    public void start() throws PeerException
+    {
+        getPeer().startContainer( this );
+    }
+
+
+    @Override
+    public void stop() throws PeerException
+    {
+        getPeer().stopContainer( this );
     }
 
 
@@ -604,5 +642,35 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public String getDomainName()
     {
         return domainName;
+    }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof EnvironmentContainerImpl ) )
+        {
+            return false;
+        }
+
+        final EnvironmentContainerImpl container = ( EnvironmentContainerImpl ) o;
+
+        if ( hostId != null ? !hostId.equals( container.hostId ) : container.hostId != null )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return hostId != null ? hostId.hashCode() : 0;
     }
 }

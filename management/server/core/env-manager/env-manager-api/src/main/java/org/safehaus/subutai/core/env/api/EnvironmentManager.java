@@ -43,65 +43,59 @@ public interface EnvironmentManager
      *
      * @param name - environment name
      * @param topology - {@code Topology}
+     * @param async - indicates whether environment is created synchronously or asynchronously to the calling party
      *
      * @return - created environment
      *
      * @throws EnvironmentCreationException - thrown if error occurs during environment creation
      */
-    public Environment createEnvironment( String name, Topology topology ) throws EnvironmentCreationException;
-
-    /**
-     * Creates environment based on a passed topology  asynchronously
-     *
-     * @param name - environment name
-     * @param topology - {@code Topology}
-     */
-    public void createEnvironmentAsync( String name, Topology topology );
+    public Environment createEnvironment( String name, Topology topology, boolean async )
+            throws EnvironmentCreationException;
 
 
     /**
-     * Destroys environment by id
+     * Destroys environment by id.
      *
      * @param environmentId - environment id
+     * @param async - indicates whether environment is destroyed synchronously or asynchronously to the calling party
+     * @param forceMetadataRemoval - if true, the call will remove environment metadata from database even if not all
+     * containers were destroyed, otherwise an exception is thrown when first error occurs
      *
      * @throws EnvironmentDestructionException - thrown if error occurs during environment destruction
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
-    public void destroyEnvironment( UUID environmentId )
+    public void destroyEnvironment( UUID environmentId, boolean async, boolean forceMetadataRemoval )
             throws EnvironmentDestructionException, EnvironmentNotFoundException;
 
-    /**
-     * Destroys environment by id asynchronously
-     *
-     * @param environmentId - environment id
-     *
-     * @throws EnvironmentNotFoundException - thrown if environment not found
-     */
-    public void destroyEnvironmentAsync( UUID environmentId ) throws EnvironmentNotFoundException;
 
     /**
      * Grows environment based on a passed topology
      *
      * @param environmentId - environment id
      * @param topology - {@code Topology}
+     * @param async - indicates whether environment is grown synchronously or asynchronously to the calling party
      *
      * @return - target environment
      *
      * @throws EnvironmentModificationException - thrown if error occurs during environment modification
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
-    public Environment growEnvironment( UUID environmentId, Topology topology )
+    public Environment growEnvironment( UUID environmentId, Topology topology, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
+
     /**
-     * Destroys container
+     * Destroys container. If this is the last container, the associated environment will be removed too
      *
      * @param containerHost - container to destroy
+     * @param async - indicates whether container is destroyed synchronously or asynchronously to the calling party
+     * @param forceMetadataRemoval - if true, the call will remove container metadata from database even if container
+     * was not destroyed due to some error, otherwise an exception is thrown
      *
      * @throws EnvironmentModificationException - thrown if error occurs during environment modification
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
-    public void destroyContainer( ContainerHost containerHost )
+    public void destroyContainer( ContainerHost containerHost, boolean async, boolean forceMetadataRemoval )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
 

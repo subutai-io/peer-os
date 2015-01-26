@@ -123,7 +123,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         RequestBuilder requestBuilder =
                 new RequestBuilder( String.format( "/usr/bin/lxc-start -n %s -d", container.getHostname() ) )
-                        .withTimeout( 180 );
+                        .withTimeout( 60 ).daemon();
         try
         {
             execute( requestBuilder );
@@ -323,7 +323,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         RequestBuilder requestBuilder =
                 new RequestBuilder( String.format( "/usr/bin/lxc-stop -n %s", container.getHostname() ) )
-                        .withTimeout( 180 );
+                        .withTimeout( 60 ).daemon();
         try
         {
             execute( requestBuilder );
@@ -574,8 +574,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
             else
             {
-                LOG.warn(
-                        String.format( "Template %s does not exists on %s.", template.getTemplateName(), hostname ) );
+                LOG.warn( String.format( "Template %s does not exists on %s.", template.getTemplateName(), hostname ) );
                 return false;
             }
         }

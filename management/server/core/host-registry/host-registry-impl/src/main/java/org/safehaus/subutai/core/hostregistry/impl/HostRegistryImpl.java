@@ -183,8 +183,6 @@ public class HostRegistryImpl implements HostRegistry
         }
         catch ( HostDisconnectedException e )
         {
-            LOG.debug( "Host not found among containers", e );
-
             return getResourceHostInfoById( hostId );
         }
     }
