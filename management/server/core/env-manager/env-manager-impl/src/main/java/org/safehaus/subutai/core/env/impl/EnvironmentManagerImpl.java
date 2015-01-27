@@ -632,4 +632,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         return blueprintDataService.getAll();
     }
+
+
+    @Override
+    public void setSshKey( final UUID environmentId, final String sshKey )
+            throws EnvironmentNotFoundException, EnvironmentManagerException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshKey ), "Invalid ssh key" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
+
+        environment.setPublicKey( sshKey );
+
+        //TODO apply key to all containers
+    }
 }

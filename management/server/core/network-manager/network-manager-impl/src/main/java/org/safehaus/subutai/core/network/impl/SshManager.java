@@ -48,7 +48,7 @@ public class SshManager
         {
             try
             {
-                commandUtil.execute( commands.getAppendSSHCommand( key ), host );
+                commandUtil.execute( commands.getAppendSshKeyCommand( key ), host );
             }
             catch ( CommandException e )
             {
@@ -59,21 +59,29 @@ public class SshManager
     }
 
 
-    public void execute() throws NetworkManagerException
+    public void replace( String oldKey, String newKey ) throws NetworkManagerException
     {
-        create();
-        read();
-        write();
-        config();
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( oldKey ), "Invalid old ssh key" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newKey ), "Invalid new ssh key" );
+
+        for ( ContainerHost host : containerHosts )
+        {
+            try
+            {
+                commandUtil.execute( commands.getReplaceSshKeyCommand( oldKey, newKey ), host );
+            }
+            catch ( CommandException e )
+            {
+                LOG.error( String.format( "Error in replace: %s", e.getMessage() ), e );
+                throw new NetworkManagerException( e );
+            }
+        }
     }
 
 
-    public void execute( ContainerHost containerHost ) throws NetworkManagerException
+    public void execute() throws NetworkManagerException
     {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-
-        create( containerHost );
-        containerHosts.add( containerHost );
+        create();
         read();
         write();
         config();
@@ -157,20 +165,6 @@ public class SshManager
                 LOG.error( String.format( "Error in config: %s", e.getMessage() ), e );
                 throw new NetworkManagerException( e );
             }
-        }
-    }
-
-
-    private void create( ContainerHost containerHost ) throws NetworkManagerException
-    {
-        try
-        {
-            commandUtil.execute( commands.getCreateSSHCommand(), containerHost );
-        }
-        catch ( CommandException e )
-        {
-            LOG.error( String.format( "Error in create: %s", e.getMessage() ), e );
-            throw new NetworkManagerException( e );
         }
     }
 }

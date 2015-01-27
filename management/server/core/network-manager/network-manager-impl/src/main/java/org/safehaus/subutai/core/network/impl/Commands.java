@@ -149,12 +149,22 @@ public class Commands
     }
 
 
-    public RequestBuilder getAppendSSHCommand( String key )
+    public RequestBuilder getAppendSshKeyCommand( String key )
     {
         return new RequestBuilder( String.format( "mkdir -p /root/.ssh && " +
                 "chmod 700 /root/.ssh && " +
                 "echo '%s' >> /root/.ssh/authorized_keys && " +
                 "chmod 644 /root/.ssh/authorized_keys", key ) );
+    }
+
+
+    public RequestBuilder getReplaceSshKeyCommand( String oldKey, String newKey )
+    {
+        return new RequestBuilder( String.format( "mkdir -p /root/.ssh && " +
+                "chmod 700 /root/.ssh && " +
+                "sed -i.old '/^%s$/d' /root/.ssh/authorized_keys ; " +
+                "echo '%s' >> /root/.ssh/authorized_keys && " +
+                "chmod 644 /root/.ssh/authorized_keys", oldKey, newKey ) );
     }
 
 

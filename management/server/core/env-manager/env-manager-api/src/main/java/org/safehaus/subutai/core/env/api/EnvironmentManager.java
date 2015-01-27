@@ -83,6 +83,19 @@ public interface EnvironmentManager
     public Environment growEnvironment( UUID environmentId, Topology topology, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
+    /**
+     * Assigns ssh key to environment and inserts it into authorized_keys file of all the containers within the
+     * environment
+     *
+     * @param environmentId - environment id
+     * @param sshKey - ssh key content
+     *
+     * @throws EnvironmentNotFoundException - thrown if environment not found
+     * @throws EnvironmentManagerException - thrown if error occurs during key insertion
+     */
+    public void setSshKey( UUID environmentId, String sshKey )
+            throws EnvironmentNotFoundException, EnvironmentManagerException;
+
 
     /**
      * Destroys container. If this is the last container, the associated environment will be removed too
