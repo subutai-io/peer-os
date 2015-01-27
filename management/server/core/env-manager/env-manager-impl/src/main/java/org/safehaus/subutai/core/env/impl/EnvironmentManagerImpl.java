@@ -328,7 +328,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
 
-        Set<ContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
+        final Set<ContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
+        final Set<ContainerHost> newContainers = Sets.newHashSet();
 
         final Semaphore semaphore = new Semaphore( 0 );
 
@@ -351,10 +352,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
                         configureSsh( environment.getContainerHosts() );
 
+                        if ( !Strings.isNullOrEmpty( environment.getPublicKey() ) )
+                        {
+                            setSshKey( environmentId, environment.getPublicKey() );
+                        }
+
                         //set container's transient fields
                         setContainersTransientFields( environment.getContainerHosts() );
+
+                        newContainers.addAll( environment.getContainerHosts() );
+
+                        newContainers.removeAll( oldContainers );
                     }
-                    catch ( EnvironmentBuildException | NetworkManagerException e )
+                    catch ( EnvironmentBuildException | NetworkManagerException | EnvironmentNotFoundException |
+                            EnvironmentManagerException e )
                     {
                         environment.setStatus( EnvironmentStatus.UNHEALTHY );
 
@@ -387,22 +398,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 {
                     throw resultHolder.getResult();
                 }
-
-                Set<ContainerHost> newContainers = Sets.newHashSet( environment.getContainerHosts() );
-
-                newContainers.removeAll( oldContainers );
-
-                return newContainers;
             }
             catch ( InterruptedException e )
             {
                 throw new EnvironmentModificationException( e );
             }
         }
-        else
-        {
-            return Sets.newHashSet();
-        }
+
+        return newContainers;
     }
 
 
