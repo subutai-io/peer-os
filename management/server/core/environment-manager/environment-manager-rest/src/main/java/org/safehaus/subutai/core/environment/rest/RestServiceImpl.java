@@ -221,7 +221,7 @@ public class RestServiceImpl implements RestService
             Set<ContainerHost> newContainers =
                     environmentManager.createAdditionalContainers( envId, ng, peerManager.getLocalPeer() );
 
-            return Response.ok( JsonUtil.toJson( newContainers ) ).build();
+            return Response.ok( JsonUtil.toJson( convertContainersToContainerJson( newContainers ) ) ).build();
         }
         catch ( EnvironmentManagerException e )
         {

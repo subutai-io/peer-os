@@ -116,6 +116,15 @@ public interface NetworkManager
                                                final String newSshKey ) throws NetworkManagerException;
 
     /**
+     * Removes supplied ssh key from authorized_keys file of given containers
+     *
+     * @param containers set of {@code ContainerHost}
+     * @param sshKey - ssh key to remove
+     */
+    public void removeSshKeyFromAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
+            throws NetworkManagerException;
+
+    /**
      * Registers containers in /etc/hosts of each other
      *
      * @param containers - set of {@code ContainerHost}

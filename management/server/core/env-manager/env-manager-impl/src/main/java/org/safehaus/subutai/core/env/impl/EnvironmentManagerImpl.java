@@ -639,11 +639,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             throws EnvironmentNotFoundException, EnvironmentManagerException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshKey ), "Invalid ssh key" );
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
 
+        String oldSshKey = environment.getPublicKey();
+
         environment.setPublicKey( sshKey );
+
+        //        if ( Strings.isNullOrEmpty( oldSshKey ) )
 
         //TODO apply key to all containers
     }
