@@ -216,11 +216,14 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            environmentManager
-                    .createAdditionalContainers( UUID.fromString( environmentId ), ng, peerManager.getLocalPeer() );
-            return Response.ok().build();
+            UUID envId = UUID.fromString( environmentId );
+
+            Set<ContainerHost> newContainers =
+                    environmentManager.createAdditionalContainers( envId, ng, peerManager.getLocalPeer() );
+
+            return Response.ok( JsonUtil.toJson( newContainers ) ).build();
         }
-        catch ( EnvironmentBuildException e )
+        catch ( EnvironmentManagerException e )
         {
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
