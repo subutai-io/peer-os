@@ -75,12 +75,12 @@ public interface EnvironmentManager
      * @param topology - {@code Topology}
      * @param async - indicates whether environment is grown synchronously or asynchronously to the calling party
      *
-     * @return - target environment
+     * @return - set of newly created {@code ContainerHost} or empty set if operation is async
      *
      * @throws EnvironmentModificationException - thrown if error occurs during environment modification
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
-    public Environment growEnvironment( UUID environmentId, Topology topology, boolean async )
+    public Set<ContainerHost> growEnvironment( UUID environmentId, Topology topology, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     /**

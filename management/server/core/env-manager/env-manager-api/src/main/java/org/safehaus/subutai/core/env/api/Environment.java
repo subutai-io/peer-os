@@ -33,7 +33,8 @@ public interface Environment
             throws EnvironmentNotFoundException, EnvironmentModificationException;
 
 
-    public void growEnvironment( Topology topology, boolean async ) throws EnvironmentModificationException;
+    public Set<ContainerHost> growEnvironment( Topology topology, boolean async )
+            throws EnvironmentModificationException;
 
 
     /**

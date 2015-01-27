@@ -312,14 +312,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public Environment growEnvironment( final UUID environmentId, final Topology topology, boolean async )
+    public Set<ContainerHost> growEnvironment( final UUID environmentId, final Topology topology, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         return growEnv( environmentId, topology, async );
     }
 
 
-    private Environment growEnv( final UUID environmentId, final Topology topology, boolean async )
+    private Set<ContainerHost> growEnv( final UUID environmentId, final Topology topology, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
@@ -327,6 +327,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
+
+        Set<ContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
 
         final Semaphore semaphore = new Semaphore( 0 );
 
@@ -385,14 +387,22 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 {
                     throw resultHolder.getResult();
                 }
+
+                Set<ContainerHost> newContainers = Sets.newHashSet( environment.getContainerHosts() );
+
+                newContainers.removeAll( oldContainers );
+
+                return newContainers;
             }
             catch ( InterruptedException e )
             {
                 throw new EnvironmentModificationException( e );
             }
         }
-
-        return environment;
+        else
+        {
+            return Sets.newHashSet();
+        }
     }
 
 
@@ -646,8 +656,27 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         environment.setPublicKey( sshKey );
 
-        //        if ( Strings.isNullOrEmpty( oldSshKey ) )
-
-        //TODO apply key to all containers
+        try
+        {
+            if ( Strings.isNullOrEmpty( sshKey ) && !Strings.isNullOrEmpty( oldSshKey ) )
+            {
+                //remove old key from containers
+                networkManager.removeSshKeyFromAuthorizedKeys( environment.getContainerHosts(), oldSshKey );
+            }
+            else if ( !Strings.isNullOrEmpty( sshKey ) && Strings.isNullOrEmpty( oldSshKey ) )
+            {
+                //insert new key to containers
+                networkManager.addSshKeyToAuthorizedKeys( environment.getContainerHosts(), sshKey );
+            }
+            else if ( !Strings.isNullOrEmpty( sshKey ) && !Strings.isNullOrEmpty( oldSshKey ) )
+            {
+                //replace old ssh key with new one
+                networkManager.replaceSshKeyInAuthorizedKeys( environment.getContainerHosts(), oldSshKey, sshKey );
+            }
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new EnvironmentManagerException( "Failed to set SSH key to environment containers", e );
+        }
     }
 }

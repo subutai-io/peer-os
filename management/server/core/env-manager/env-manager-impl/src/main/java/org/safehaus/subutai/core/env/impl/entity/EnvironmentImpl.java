@@ -205,16 +205,18 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public void growEnvironment( final Topology topology, boolean async ) throws EnvironmentModificationException
+    public Set<ContainerHost> growEnvironment( final Topology topology, boolean async )
+            throws EnvironmentModificationException
     {
         try
         {
-            environmentManager.growEnvironment( getId(), topology, async );
+            return environmentManager.growEnvironment( getId(), topology, async );
         }
         catch ( EnvironmentNotFoundException e )
         {
             //this should not happen
             LOG.error( String.format( "Error growing environment %s", getName() ), e );
+            throw new EnvironmentModificationException( e );
         }
     }
 
