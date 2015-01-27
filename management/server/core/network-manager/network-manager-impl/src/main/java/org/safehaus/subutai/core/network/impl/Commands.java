@@ -162,7 +162,8 @@ public class Commands
     {
         return new RequestBuilder( String.format( "mkdir -p /root/.ssh && " +
                 "chmod 700 /root/.ssh && " +
-                "sed -i.old '/^%s$/d' /root/.ssh/authorized_keys ; " +
+                "( grep -i -v \"%s\" /root/.ssh/authorized_keys > auth-keys-cleaned "
+                + " && mv auth-keys-cleaned /root/.ssh/authorized_keys ) ; " +
                 "echo '%s' >> /root/.ssh/authorized_keys && " +
                 "chmod 644 /root/.ssh/authorized_keys", oldKey, newKey ) );
     }
