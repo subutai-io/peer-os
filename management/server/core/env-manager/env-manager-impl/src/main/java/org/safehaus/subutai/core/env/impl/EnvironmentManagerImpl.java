@@ -312,14 +312,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public Environment growEnvironment( final UUID environmentId, final Topology topology, boolean async )
+    public Set<ContainerHost> growEnvironment( final UUID environmentId, final Topology topology, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         return growEnv( environmentId, topology, async );
     }
 
 
-    private Environment growEnv( final UUID environmentId, final Topology topology, boolean async )
+    private Set<ContainerHost> growEnv( final UUID environmentId, final Topology topology, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
@@ -327,6 +327,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
+
+        final Set<ContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
+        final Set<ContainerHost> newContainers = Sets.newHashSet();
 
         final Semaphore semaphore = new Semaphore( 0 );
 
@@ -349,10 +352,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
                         configureSsh( environment.getContainerHosts() );
 
+                        if ( !Strings.isNullOrEmpty( environment.getPublicKey() ) )
+                        {
+                            setSshKey( environmentId, environment.getPublicKey() );
+                        }
+
                         //set container's transient fields
                         setContainersTransientFields( environment.getContainerHosts() );
+
+                        newContainers.addAll( environment.getContainerHosts() );
+
+                        newContainers.removeAll( oldContainers );
                     }
-                    catch ( EnvironmentBuildException | NetworkManagerException e )
+                    catch ( EnvironmentBuildException | NetworkManagerException | EnvironmentNotFoundException |
+                            EnvironmentManagerException e )
                     {
                         environment.setStatus( EnvironmentStatus.UNHEALTHY );
 
@@ -392,7 +405,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
         }
 
-        return environment;
+        return newContainers;
     }
 
 
@@ -631,5 +644,42 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public Set<Blueprint> getBlueprints() throws EnvironmentManagerException
     {
         return blueprintDataService.getAll();
+    }
+
+
+    @Override
+    public void setSshKey( final UUID environmentId, final String sshKey )
+            throws EnvironmentNotFoundException, EnvironmentManagerException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
+
+        String oldSshKey = environment.getPublicKey();
+
+        environment.setPublicKey( sshKey );
+
+        try
+        {
+            if ( Strings.isNullOrEmpty( sshKey ) && !Strings.isNullOrEmpty( oldSshKey ) )
+            {
+                //remove old key from containers
+                networkManager.removeSshKeyFromAuthorizedKeys( environment.getContainerHosts(), oldSshKey );
+            }
+            else if ( !Strings.isNullOrEmpty( sshKey ) && Strings.isNullOrEmpty( oldSshKey ) )
+            {
+                //insert new key to containers
+                networkManager.addSshKeyToAuthorizedKeys( environment.getContainerHosts(), sshKey );
+            }
+            else if ( !Strings.isNullOrEmpty( sshKey ) && !Strings.isNullOrEmpty( oldSshKey ) )
+            {
+                //replace old ssh key with new one
+                networkManager.replaceSshKeyInAuthorizedKeys( environment.getContainerHosts(), oldSshKey, sshKey );
+            }
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new EnvironmentManagerException( "Failed to set SSH key to environment containers", e );
+        }
     }
 }
