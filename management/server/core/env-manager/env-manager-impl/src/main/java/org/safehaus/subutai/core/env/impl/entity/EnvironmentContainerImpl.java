@@ -121,8 +121,9 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     }
 
 
-    public EnvironmentContainerImpl( final Peer peer, final String nodeGroupName, final HostInfoModel hostInfo,
-                                     final Template template, int sshGroupId, int hostsGroupId, String domainName )
+    public EnvironmentContainerImpl( final UUID localPeerId, final Peer peer, final String nodeGroupName,
+                                     final HostInfoModel hostInfo, final Template template, int sshGroupId,
+                                     int hostsGroupId, String domainName )
     {
         Preconditions.checkNotNull( peer );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( nodeGroupName ) );
@@ -132,6 +133,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
 
         this.peer = peer;
+        this.creatorPeerId = localPeerId.toString();
         this.peerId = peer.getId().toString();
         this.hostId = hostInfo.getId().toString();
         this.hostname = hostInfo.getHostname();
