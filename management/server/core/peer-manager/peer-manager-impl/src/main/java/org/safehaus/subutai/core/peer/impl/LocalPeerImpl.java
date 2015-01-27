@@ -330,7 +330,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         Set<ContainerHost> result = new HashSet<>();
         for ( HostCloneTask hostCloneTask : hostCloneTasks )
         {
-            result.add( hostCloneTask.getResult().getValue() );
+            if ( hostCloneTask.getResult().getValue() != null )
+            {
+                result.add( hostCloneTask.getResult().getValue() );
+            }
         }
         return result;
     }
