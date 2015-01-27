@@ -2,13 +2,21 @@ package org.safehaus.subutai.core.identity.impl.entity;
 
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import org.safehaus.subutai.core.identity.api.User;
@@ -23,28 +31,26 @@ import org.safehaus.subutai.core.identity.api.User;
 public class UserEntity implements User
 {
     @Id
+    @GeneratedValue
     @Column( name = "user_id" )
     private Long id;
-    //
-    //    @OneToMany( mappedBy = "user", fetch = FetchType.EAGER,
-    //            targetEntity = RoleEntity.class )
-    //    List<Role> roles = new ArrayList();
 
-    @Column( name = "username" )
+    @ManyToMany( fetch = FetchType.EAGER, cascade = CascadeType.ALL )
+    @JoinTable( name = "subutai_users_roles", joinColumns = @JoinColumn( name = "user_name" ), inverseJoinColumns =
+    @JoinColumn( name = "role_name" ) )
+    Set<RoleEntity> roles = new HashSet();
+
+    @Column( name = "user_name" )
     public String username;
 
     @Column( name = "password" )
     public String password;
 
+    @Column( name = "salt" )
+    public String salt;
+
     @Column( name = "permissions" )
     public String permissions;
-
-    //
-    //    @Override
-    //    public List<Role> getRoles()
-    //    {
-    //        return roles;
-    //    }
 
 
     @Override
@@ -86,8 +92,39 @@ public class UserEntity implements User
     }
 
 
+    public String getUsername()
+    {
+        return username;
+    }
+
+
+    @Override
+    public void setUsername( final String username )
+    {
+        this.username = username;
+    }
+
+
+    public String getSalt()
+    {
+        return salt;
+    }
+
+
+    public void setSalt( final String salt )
+    {
+        this.salt = salt;
+    }
+
+
     public void setPermissions( final String permissions )
     {
         this.permissions = permissions;
+    }
+
+
+    public void addRole( final RoleEntity roleEntity )
+    {
+        roles.add( roleEntity );
     }
 }

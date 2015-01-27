@@ -27,14 +27,20 @@ public class RoleEntity implements Role
     @Column
     private String permissions;
 
-//    @ManyToOne
-//    private User user;
+    //    @ManyToOne
+    //    private User user;
 
 
     @Override
     public String getName()
     {
         return name;
+    }
+
+
+    public void setName( final String name )
+    {
+        this.name = name;
     }
 
 

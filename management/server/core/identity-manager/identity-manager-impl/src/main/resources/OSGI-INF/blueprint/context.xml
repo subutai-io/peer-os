@@ -12,13 +12,15 @@
 
   <bean id="identityManager" scope="singleton" class="org.safehaus.subutai.core.identity.impl.IdentityManagerImpl"
         init-method="init">
-    <!--  <property name="daoManager" ref="daoManagerSecurity" />-->
-    <property name="bundleContext" ref="blueprintBundleContext"></property>
+    <property name="daoManager" ref="daoManagerSecurity" />
+    <property name="securityManager" ref="securityManager" />
+
+    <property name="bundleContext" ref="blueprintBundleContext" />
   </bean>
 
   <service ref="identityManager" interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
 
-  <jaas:config name="karaf" rank="2">
+  <jaas:config name="karaf" rank="5">
     <jaas:module className="org.safehaus.subutai.core.identity.impl.ShiroLoginModule"
                  flags="sufficient" name="Subutai">
     </jaas:module>
@@ -29,4 +31,44 @@
     </service>
   -->
 
+  <!-- <bean id="sessionMgr"
+         class="org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO">
+     <property name="activeSessionsCacheName"
+               value="shiro-activeSessionCache" />
+   </bean>
+
+   <bean id="ehCacheMgr"
+         class="org.apache.shiro.cache.ehcache.EhCacheManager"
+         destroy-method="destroy">
+     <property name="cacheManagerConfigFile"
+               value="file:./etc/ehcache.xml" />
+   </bean>-->
+
+  <bean id="securityManager" class="org.apache.shiro.mgt.DefaultSecurityManager">
+    <!--    <property name="sessionManager.sessionDAO" ref="sessionMgr" />
+        <property
+            name="subjectDAO.sessionStorageEvaluator.sessionStorageEnabled"
+            value="false" />
+        <property name="sessionManager.sessionValidationSchedulerEnabled"
+                  value="false" />
+        <property name="cacheManager" ref="ehCacheMgr" />-->
+    <property name="realm" ref="subutaiJdbcRealm" />
+  </bean>
+
+  <bean id="sha256Matcher" class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+    <property name="hashAlgorithmName" value="SHA-256" />
+    <property name="hashIterations" value="1" />
+  </bean>
+
+  <bean id="subutaiJdbcRealm" class="org.safehaus.subutai.core.identity.impl.SubutaiJdbcRealm">
+    <property name="jndiDataSourceName" value="osgi:service/openjpa/securityManagerDS" />
+    <property name="permissionsLookupEnabled" value="false" />
+    <property name="authenticationQuery" value="select password, salt from subutai_user where user_name = ?" />
+    <property name="userRolesQuery" value="select role_name from subutai_users_roles where user_name = ?" />
+    <property name="permissionsQuery" value="select permission from subutai_roles_permissions where role_name = ?" />
+    <property name="credentialsMatcher" ref="sha256Matcher" />
+  </bean>
+
+  <service ref="securityManager"
+           interface="org.apache.shiro.mgt.SecurityManager" />
 </blueprint>

@@ -217,11 +217,13 @@
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-core</artifactId>
       <version>${org.apache.shiro.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-web</artifactId>
       <version>${org.apache.shiro.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.safehaus.subutai</groupId>

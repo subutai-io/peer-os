@@ -1,15 +1,11 @@
 package org.safehaus.subutai.core.peer.cli;
 
 
-import java.security.AccessControlContext;
-import java.security.AccessController;
 import java.security.Principal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Set;
 import java.util.UUID;
-
-import javax.security.auth.Subject;
 
 import org.safehaus.subutai.common.helper.UserIdMdcHelper;
 import org.safehaus.subutai.common.peer.ContainerHost;
@@ -25,6 +21,7 @@ import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.mgt.SecurityManager;
 
 
 @Command( scope = "peer", name = "hosts" )
@@ -33,6 +30,7 @@ public class HostsCommand extends OsgiCommandSupport
     DateFormat fmt = new SimpleDateFormat( "dd.MM.yy HH:mm:ss.SS" );
     private PeerManager peerManager;
     private IdentityManager identityManager;
+    private org.apache.shiro.mgt.SecurityManager securityManager;
 
 
     public void setPeerManager( final PeerManager peerManager )
@@ -47,24 +45,42 @@ public class HostsCommand extends OsgiCommandSupport
     }
 
 
+    public void setSecurityManager( final SecurityManager securityManager )
+    {
+        this.securityManager = securityManager;
+    }
+
+
     @Override
     protected Object doExecute() throws Exception
     {
+        //        for ( StackTraceElement ste : Thread.currentThread().getStackTrace() )
+        //        {
+        //            log.info( ste.toString() );
+        //        }
+
+
         boolean isSet = UserIdMdcHelper.isSet();
         String userId = UserIdMdcHelper.get();
-//        AccessControlContext acc = AccessController.getContext();
-//        Subject subject = Subject.getSubject( acc );
-//        Set<Principal> principals = subject.getPrincipals();
-//        String sessionId = getSessionId( principals );
-//        org.apache.shiro.subject.Subject requestSubject =
-//                new org.apache.shiro.subject.Subject.Builder().sessionId( sessionId ).buildSubject();
-        org.apache.shiro.subject.Subject sub = SecurityUtils.getSubject();
-//        SecurityUtils.setSecurityManager( identityManager.getSecurityManager() );
-        //        sub = SecurityUtils.getSubject();
+        //        AccessControlContext acc = AccessController.getContext();
+        //        Subject subject = Subject.getSubject( acc );
+        //        Set<Principal> principals = subject.getPrincipals();
+        //        String sessionId = getSessionId( principals );
+        //        org.apache.shiro.subject.Subject requestSubject =
+        //                new org.apache.shiro.subject.Subject.Builder().sessionId( sessionId ).buildSubject();
 
-        //        UsernamePasswordToken token = new UsernamePasswordToken( "admin", "secret" );
-        //        subject.login( token );
-        //        log.info( subject.toString() );
+
+        //        SecurityUtils.setSecurityManager( securityManager );
+        org.apache.shiro.subject.Subject sub = SecurityUtils.getSubject();
+
+        sub = identityManager.getSubject();
+
+        SecurityUtils.setSecurityManager( identityManager.getSecurityManager() );
+
+        sub = identityManager.getSubject();
+
+        sub = SecurityUtils.getSubject();
+
         LocalPeer localPeer = peerManager.getLocalPeer();
         //        localPeer.init();
         ManagementHost managementHost = localPeer.getManagementHost();

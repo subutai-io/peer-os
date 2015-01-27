@@ -9,11 +9,14 @@ import java.util.List;
  */
 public interface User
 {
-//    public List<Role> getRoles();
-
     public Long getId();
 
+    public void setUsername( String username );
+
     public String getPassword();
+
+    public void setPassword( String password );
+
 
     public List<String> getPermissions();
 }

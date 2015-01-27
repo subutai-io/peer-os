@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -17,7 +19,8 @@ import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
 import org.osgi.framework.BundleContext;
-import org.safehaus.subutai.common.helper.UserIdMdcHelper;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,9 +29,8 @@ import org.apache.karaf.jaas.boot.principal.RolePrincipal;
 import org.apache.karaf.jaas.boot.principal.UserPrincipal;
 import org.apache.karaf.jaas.config.JaasRealm;
 import org.apache.karaf.jaas.modules.encryption.EncryptionSupport;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.session.Session;
+import org.apache.shiro.authz.AuthorizationException;
 
 
 /**
@@ -54,6 +56,21 @@ public class ShiroLoginModule implements LoginModule
     protected boolean detailedLoginExcepion;
     protected BundleContext bundleContext;
     private EncryptionSupport encryptionSupport;
+
+
+    private IdentityManager getIdentityManager()
+    {
+        try
+        {
+            InitialContext ic = new InitialContext();
+            return ( IdentityManager ) ic.lookup( "osgi:service/identityManager" );
+        }
+        catch ( NamingException e )
+        {
+            LOGGER.error( "JNDI error while retrieving osgi:service/identityManager", e );
+            throw new AuthorizationException( e );
+        }
+    }
 
 
     public void initialize( Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
@@ -113,21 +130,32 @@ public class ShiroLoginModule implements LoginModule
         principals = new HashSet<Principal>();
 
 
-
         LOGGER.info( "************************" + user + " " + password );
         try
         {
-            org.apache.shiro.subject.Subject s = SecurityUtils.getSubject();
+            //            org.apache.shiro.subject.Subject s = SecurityUtils.getSubject();
             UsernamePasswordToken token = new UsernamePasswordToken( user, password );
 
+
+            //            for ( StackTraceElement ste : Thread.currentThread().getStackTrace() )
+            //            {
+            //                LOGGER.info( ste.toString() );
+            //            }
+
+
             LOGGER.info( "Trying authc..." );
-            s.login( token );
-            UserIdMdcHelper.set( s );
-            Session session = s.getSession();
+
+            IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+            LOGGER.info( identityManager.toString() );
+            identityManager.login( token );
+            //            s.login( token );
+            //            ThreadContext.bind( s );
+            //            UserIdMdcHelper.set( s );
+            //            Session session = s.getSession();
             LOGGER.info( "Login success." );
 
             principals.add( new UserPrincipal( user ) );
-            principals.add( new RolePrincipal( "session:" + session.getId().toString() ) );
+            //            principals.add( new RolePrincipal( "session:" + session.getId().toString() ) );
             principals.add( new RolePrincipal( "admin" ) );
             principals.add( new RolePrincipal( "manager" ) );
             principals.add( new RolePrincipal( "viewer" ) );
@@ -173,8 +201,16 @@ public class ShiroLoginModule implements LoginModule
     public boolean logout() throws LoginException
     {
         LOGGER.info( "Invoking logout." );
-
-        UserIdMdcHelper.unset();
+        try
+        {
+            IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+            identityManager.logout();
+        }
+        catch ( NamingException e )
+        {
+            e.printStackTrace();
+        }
+        //        UserIdMdcHelper.unset();
         subject.getPrincipals().removeAll( principals );
         principals.clear();
         return true;
