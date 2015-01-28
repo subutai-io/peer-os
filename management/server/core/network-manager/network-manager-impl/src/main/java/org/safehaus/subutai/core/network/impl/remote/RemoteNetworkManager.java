@@ -166,5 +166,21 @@ public class RemoteNetworkManager implements NetworkManager
     {
         throw new UnsupportedOperationException();
     }
+
+
+    @Override
+    public void replaceSshKeyInAuthorizedKeys( final Set<ContainerHost> containers, final String oldSshKey,
+                                               final String newSshKey ) throws NetworkManagerException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+
+    @Override
+    public void removeSshKeyFromAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
+            throws NetworkManagerException
+    {
+        throw new UnsupportedOperationException();
+    }
 }
 

@@ -55,6 +55,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
@@ -172,11 +173,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         result.addAll( environmentDataService.getAll() );
         for ( Environment environment : result )
         {
-            for ( ContainerHost containerHost : environment.getContainerHosts() )
-            {
-                containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
-                containerHost.setDataService( environmentContainerDataService );
-            }
+            setContainersTransientFields( environment.getContainerHosts() );
         }
         return result;
     }
@@ -186,11 +183,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public Environment getEnvironment( final String uuid )
     {
         Environment result = environmentDataService.find( uuid );
-        for ( ContainerHost containerHost : result.getContainerHosts() )
-        {
-            containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
-            containerHost.setDataService( environmentContainerDataService );
-        }
+        setContainersTransientFields( result.getContainerHosts() );
         return result;
     }
 
@@ -386,11 +379,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             throw new EnvironmentManagerException( "Environment not found" );
         }
-        for ( ContainerHost containerHost : result.getContainerHosts() )
-        {
-            containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
-            containerHost.setDataService( environmentContainerDataService );
-        }
+        setContainersTransientFields( result.getContainerHosts() );
         return result;
     }
 
@@ -399,12 +388,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public Environment getEnvironmentByUUID( final UUID environmentId )
     {
         Environment result = environmentDataService.find( environmentId.toString() );
-        for ( ContainerHost containerHost : result.getContainerHosts() )
+        setContainersTransientFields( result.getContainerHosts() );
+        return result;
+    }
+
+
+    private void setContainersTransientFields( Set<ContainerHost> containerHosts )
+    {
+        for ( ContainerHost containerHost : containerHosts )
         {
             containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
             containerHost.setDataService( environmentContainerDataService );
         }
-        return result;
     }
 
 
@@ -510,10 +505,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void createAdditionalContainers( final UUID id, final NodeGroup nodeGroup, final Peer peer )
+    public Set<ContainerHost> createAdditionalContainers( final UUID id, final NodeGroup nodeGroup, final Peer peer )
             throws EnvironmentBuildException
     {
-        Environment environment = null;
+        Set<ContainerHost> newContainers = Sets.newHashSet();
+
+        Environment environment;
         try
         {
             environment = findEnvironmentByID( id );
@@ -562,6 +559,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     EnvironmentContainerImpl environmentContainer =
                             new EnvironmentContainerImpl( peer.getId(), nodeGroup.getName(), hostInfoModel );
                     environment.addContainer( environmentContainer );
+                    newContainers.add( environmentContainer );
                 }
             }
             else
@@ -574,6 +572,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             throw new EnvironmentBuildException( e.getMessage() );
         }
+
+        setContainersTransientFields( newContainers );
+
+        return newContainers;
     }
 
 

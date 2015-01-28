@@ -107,7 +107,7 @@ public class NodeGroupBuilder implements Callable<Set<EnvironmentContainerImpl>>
 
                 for ( HostInfoModel newHost : newHosts )
                 {
-                    containers.add( new EnvironmentContainerImpl( peer, nodeGroup.getName(), newHost,
+                    containers.add( new EnvironmentContainerImpl( localPeerId, peer, nodeGroup.getName(), newHost,
                             templateRegistry.getTemplate( nodeGroup.getTemplateName() ), nodeGroup.getSshGroupId(),
                             nodeGroup.getHostsGroupId(), nodeGroup.getDomainName() ) );
                 }

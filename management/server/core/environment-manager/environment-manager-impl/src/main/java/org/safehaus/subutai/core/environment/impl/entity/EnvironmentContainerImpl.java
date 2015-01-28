@@ -582,4 +582,34 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     {
         getPeer().setDiskQuota( getId(), diskQuota );
     }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof EnvironmentContainerImpl ) )
+        {
+            return false;
+        }
+
+        final EnvironmentContainerImpl that = ( EnvironmentContainerImpl ) o;
+
+        if ( hostId != null ? !hostId.equals( that.hostId ) : that.hostId != null )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return hostId != null ? hostId.hashCode() : 0;
+    }
 }

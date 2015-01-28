@@ -7,8 +7,10 @@ package org.safehaus.subutai.core.environment.api;
 
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
@@ -60,7 +62,8 @@ public interface EnvironmentManager
 
     public EnvironmentBlueprint getEnvironmentBlueprint( UUID blueprintId ) throws EnvironmentManagerException;
 
-    public void createAdditionalContainers( UUID id, NodeGroup nodeGroup, Peer peer ) throws EnvironmentBuildException;
+    public Set<ContainerHost> createAdditionalContainers( UUID id, NodeGroup nodeGroup, Peer peer )
+            throws EnvironmentBuildException;
 
     public void destroyContainer( UUID containerId ) throws EnvironmentManagerException;
 
