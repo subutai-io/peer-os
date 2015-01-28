@@ -22,6 +22,7 @@ import com.vaadin.ui.VerticalLayout;
 
 public class EnvironmentForm
 {
+    private static final String SSH_KEY = "Ssh key";
     private final EnvironmentManager environmentManager;
     private static final String CONTAINERS = "Containers";
     private static final String NAME = "Name";
@@ -104,6 +105,7 @@ public class EnvironmentForm
         for ( final Environment environment : environmentManager.getEnvironments() )
         {
             final Button containersBtn = new Button( CONTAINERS );
+            containersBtn.setId( environment.getName() + "-containers" );
             containersBtn.addClickListener( new Button.ClickListener()
             {
                 @Override
@@ -126,11 +128,23 @@ public class EnvironmentForm
                 }
             } );
 
+            final Button sshKeyBtn = new Button( SSH_KEY );
+            sshKeyBtn.setId( environment.getName() + "-sshkey" );
+            sshKeyBtn.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( final Button.ClickEvent event )
+                {
+                    contentRoot.getUI().addWindow( new SshKeyWindow( environmentManager, environment ) );
+                }
+            } );
+
             boolean isEnvironmentUnderModification =
                     environment.getStatus().equals( EnvironmentStatus.UNDER_MODIFICATION );
 
             destroyBtn.setEnabled( !isEnvironmentUnderModification );
             containersBtn.setEnabled( !isEnvironmentUnderModification );
+            sshKeyBtn.setEnabled( !isEnvironmentUnderModification );
 
             Embedded icon = isEnvironmentUnderModification ? new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) ) :
                             environment.getStatus().equals( EnvironmentStatus.HEALTHY ) ?
@@ -139,7 +153,7 @@ public class EnvironmentForm
 
 
             environmentsTable.addItem( new Object[] {
-                    environment.getName(), icon, containersBtn, destroyBtn
+                    environment.getName(), icon, containersBtn, sshKeyBtn, destroyBtn
             }, null );
         }
         environmentsTable.refreshRowCache();
@@ -167,6 +181,7 @@ public class EnvironmentForm
         table.addContainerProperty( NAME, String.class, null );
         table.addContainerProperty( STATUS, Embedded.class, null );
         table.addContainerProperty( CONTAINERS, Button.class, null );
+        table.addContainerProperty( SSH_KEY, Button.class, null );
         table.addContainerProperty( DESTROY, Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
