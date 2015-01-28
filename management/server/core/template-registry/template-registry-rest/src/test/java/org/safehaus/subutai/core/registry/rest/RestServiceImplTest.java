@@ -344,7 +344,7 @@ public class RestServiceImplTest
         TemplateTree templateTree = mock( TemplateTree.class );
         when( templateTree.getRootTemplates() ).thenReturn( templates );
         when( templateTree.getChildrenTemplates( any( Template.class ) ) )
-                .thenReturn( Lists.newArrayList( mock( Template.class ) ) )
+                .thenReturn( Lists.newArrayList( TestUtils.getChildTemplate() ) )
                 .thenReturn( Collections.<Template>emptyList() );
         when( templateRegistry.getTemplateTree() ).thenReturn( templateTree );
 

@@ -19,11 +19,14 @@ import org.safehaus.subutai.core.registry.api.TemplateTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vaadin.data.Container;
+import org.apache.commons.lang3.tuple.Pair;
+
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
-import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.util.BeanContainer;
+import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.HierarchicalContainer;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -36,7 +39,6 @@ import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
@@ -58,8 +60,8 @@ public class TemplateRegistryComponent extends CustomComponent
     private GridLayout grid;
     private Table templateInfoTable;
     private Table changedFilesTable;
-    private TextArea packagesInstalled;
-    private TextArea packagesChanged;
+    //    private TextArea packagesInstalled;
+    //    private TextArea packagesChanged;
 
     private static final String TEMPLATE_PROPERTY = "Template Property";
     private static final String TEMPLATE_VALUE = "Value";
@@ -187,13 +189,40 @@ public class TemplateRegistryComponent extends CustomComponent
                         } );
                         try
                         {
-                            Container dataContainer = new BeanItemContainer<>( GitChangedFile.class );
+                            final BeanContainer<String, GitChangedFile> dataContainer =
+                                    new BeanContainer<>( GitChangedFile.class );
+                            dataContainer.setBeanIdProperty( "gitFilePath" );
+
+
                             List<GitChangedFile> changedFiles = registryManager.getChangedFiles( template );
-                            for ( final GitChangedFile changedFile : changedFiles )
-                            {
-                                dataContainer.addItem( changedFile );
-                            }
+
+                            dataContainer.addAll( changedFiles );
+
+
                             changedFilesTable.setContainerDataSource( dataContainer );
+                            changedFilesTable.addItemClickListener( new ItemClickEvent.ItemClickListener()
+                            {
+                                @Override
+                                public void itemClick( final ItemClickEvent event )
+                                {
+                                    BeanItem<GitChangedFile> file = dataContainer.getItem( event.getItemId() );
+
+                                    if ( file == null )
+                                    {
+                                        return;
+                                    }
+
+                                    GitChangedFile gitFile = file.getBean();
+                                    Pair<String, String> fileVersions = registryManager
+                                            .getChangedFileVersions( template.getParentTemplateName(),
+                                                    template.getTemplateName(), gitFile );
+                                    FileDiffModalView modalView =
+                                            new FileDiffModalView( gitFile.getGitFilePath(), new HorizontalLayout(),
+                                                    fileVersions.getLeft(), fileVersions.getRight() );
+
+                                    getUI().addWindow( modalView );
+                                }
+                            } );
                             //TODO instead of listing all changed files in TextArea list all of them in Table
                             //where all files will be shown with appropriate columns and implement user
                             //table row click listener, after that need to implement functionality to show diffs
@@ -221,7 +250,7 @@ public class TemplateRegistryComponent extends CustomComponent
         verticalLayout.setSizeFull();
 
         changedFilesTable = new Table( "Changed Files." );
-        changedFilesTable.setWidth( "50%" );
+        changedFilesTable.setWidth( "40%" );
         changedFilesTable.setImmediate( true );
 
         templateInfoTable = new Table( "Template Info" );
@@ -238,19 +267,19 @@ public class TemplateRegistryComponent extends CustomComponent
         verticalLayout.addComponent( templateInfoTable );
         verticalLayout.addComponent( changedFilesTable );
 
-        packagesInstalled = new TextArea( "Packages Installed" );
-        packagesInstalled.setValue( "" );
-        packagesInstalled.setReadOnly( true );
+        //        packagesInstalled = new TextArea( "Packages Installed" );
+        //        packagesInstalled.setValue( "" );
+        //        packagesInstalled.setReadOnly( true );
 
-        packagesChanged = new TextArea( "Packages Changed" );
-        packagesChanged.setValue( "" );
-        packagesChanged.setReadOnly( true );
+        //        packagesChanged = new TextArea( "Packages Changed" );
+        //        packagesChanged.setValue( "" );
+        //        packagesChanged.setReadOnly( true );
 
-        HorizontalLayout packagesLayout = new HorizontalLayout();
-        packagesLayout.addComponent( packagesInstalled );
-        packagesLayout.addComponent( packagesChanged );
+        //        HorizontalLayout packagesLayout = new HorizontalLayout();
+        //        packagesLayout.addComponent( packagesInstalled );
+        //        packagesLayout.addComponent( packagesChanged );
 
-        verticalLayout.addComponent( packagesLayout );
+        //        verticalLayout.addComponent( packagesLayout );
 
 
         Label confirmationLbl = new Label( "<font style='color:red'>some lines which were deleted</font><br/>"
@@ -279,9 +308,9 @@ public class TemplateRegistryComponent extends CustomComponent
             product = product + "\n";
             products.append( product );
         }
-        packagesInstalled.setReadOnly( false );
-        packagesInstalled.setValue( products.toString() );
-        packagesInstalled.setReadOnly( true );
+        //        packagesInstalled.setReadOnly( false );
+        //        packagesInstalled.setValue( products.toString() );
+        //        packagesInstalled.setReadOnly( true );
 
         StringBuilder packages = new StringBuilder();
         Set<String> diff = registryManager.getPackagesDiff( template );
@@ -289,9 +318,9 @@ public class TemplateRegistryComponent extends CustomComponent
         {
             packages.append( templatePackage ).append( "\n" );
         }
-        packagesChanged.setReadOnly( false );
-        packagesChanged.setValue( packages.toString() );
-        packagesChanged.setReadOnly( true );
+        //        packagesChanged.setReadOnly( false );
+        //        packagesChanged.setValue( packages.toString() );
+        //        packagesChanged.setReadOnly( true );
     }
 
 

@@ -6,7 +6,10 @@ package org.safehaus.subutai.common.quota;
  */
 public enum DiskPartition
 {
-    HOME( "diskHome" ), VAR( "diskVar" ), ROOT_FS( "diskRootfs" ), OPT( "diskOpt" );
+    HOME( "diskHome" ),
+    VAR( "diskVar" ),
+    ROOT_FS( "diskRootfs" ),
+    OPT( "diskOpt" );
 
     private String partitionName;
 

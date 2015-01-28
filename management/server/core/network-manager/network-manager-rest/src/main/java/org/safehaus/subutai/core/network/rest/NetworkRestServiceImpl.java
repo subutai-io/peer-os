@@ -61,9 +61,7 @@ public class NetworkRestServiceImpl implements NetworkRestService
         {
             N2NConnection n2nConn = JsonUtil.GSON.fromJson( n2n, N2NConnectionImpl.class );
             networkManager.setupN2NConnection( n2nConn.getSuperNodeIp(), n2nConn.getSuperNodePort(),
-                                               n2nConn.getInterfaceName(), n2nConn.getCommunityName(),
-                                               n2nConn.getLocalIp(),
-                                               keyFilePath );
+                    n2nConn.getInterfaceName(), n2nConn.getCommunityName(), n2nConn.getLocalIp(), keyFilePath );
             return Response.ok().build();
         }
         catch ( NetworkManagerException ex )
@@ -291,7 +289,5 @@ public class NetworkRestServiceImpl implements NetworkRestService
             return Response.serverError().entity( ex.getMessage() ).build();
         }
     }
-
-
 }
 

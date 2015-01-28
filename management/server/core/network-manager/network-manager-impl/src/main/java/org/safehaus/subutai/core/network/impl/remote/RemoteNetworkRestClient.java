@@ -167,7 +167,8 @@ class RemoteNetworkRestClient
     }
 
 
-    public void setContainerIp( String containerName, String ip, int netMask, int vlanId ) throws NetworkManagerException
+    public void setContainerIp( String containerName, String ip, int netMask, int vlanId )
+            throws NetworkManagerException
     {
         String path = String.format( "containers/%s/ip", containerName );
         Form form = new Form().set( "ip", ip ).set( "netMask", netMask ).set( "vLanId", vlanId );
@@ -225,7 +226,8 @@ class RemoteNetworkRestClient
     }
 
 
-    public void setupGatewayOnContainer( String containerName, String gatewayIp, String interfaceName ) throws NetworkManagerException
+    public void setupGatewayOnContainer( String containerName, String gatewayIp, String interfaceName )
+            throws NetworkManagerException
     {
         String path = String.format( "containers/%s/gateway", containerName );
         Form form = new Form().set( "gatewayIp", gatewayIp ).set( "interfaceName", interfaceName );
@@ -287,6 +289,5 @@ class RemoteNetworkRestClient
         httpConduit.setClient( httpClientPolicy );
         return client;
     }
-
 }
 

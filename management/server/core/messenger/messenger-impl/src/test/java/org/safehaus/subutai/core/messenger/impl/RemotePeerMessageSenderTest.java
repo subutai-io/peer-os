@@ -9,9 +9,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.exception.HTTPException;
-import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerInfo;
+import org.safehaus.subutai.common.util.RestUtil;
 
 import com.google.common.collect.Sets;
 

@@ -9,11 +9,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.core.broker.api.Broker;
 import org.safehaus.subutai.core.broker.api.BrokerException;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
-import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistryException;
@@ -183,8 +183,6 @@ public class HostRegistryImpl implements HostRegistry
         }
         catch ( HostDisconnectedException e )
         {
-            LOG.debug( "Host not found among containers", e );
-
             return getResourceHostInfoById( hostId );
         }
     }

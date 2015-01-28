@@ -6,7 +6,10 @@ package org.safehaus.subutai.common.quota;
  */
 public enum DiskQuotaUnit
 {
-    BYTE( "", "Bytes" ), KB( "K", "Kilobytes" ), MB( "M", "Megabytes" ), GB( "G", "Gigabytes" ),
+    BYTE( "", "Bytes" ),
+    KB( "K", "Kilobytes" ),
+    MB( "M", "Megabytes" ),
+    GB( "G", "Gigabytes" ),
     UNLIMITED( "none", "Unlimited" );
     private String acronym;
     private String name;

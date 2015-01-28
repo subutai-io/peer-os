@@ -30,6 +30,9 @@ public class GrowLocalEnvironmentCommand extends OsgiCommandSupport
     @Argument( name = "numberOfContainers", description = "Number of containers",
             index = 2, multiValued = false, required = true )
     private int numberOfContainers;
+    @Argument( name = "async", description = "asynchronous build",
+            index = 3, multiValued = false, required = false )
+    private boolean async = false;
 
     private final EnvironmentManager environmentManager;
     private final PeerManager peerManager;
@@ -56,7 +59,7 @@ public class GrowLocalEnvironmentCommand extends OsgiCommandSupport
 
         topology.addNodeGroupPlacement( peerManager.getLocalPeer(), nodeGroup );
 
-        environmentManager.growEnvironment( UUID.fromString( environmentId ), topology );
+        environmentManager.growEnvironment( UUID.fromString( environmentId ), topology, async );
 
         System.out.println( "Environment is grown " );
 

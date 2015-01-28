@@ -155,7 +155,7 @@ public class EnvironmentDAO
                     + "                             AS ebp WHERE ebp.source = :source and ebp.id=:id" );
             query.setParameter( "source", source );
             query.setParameter( "id", key );
-            EnvironmentBuildProcessEntity ebp = ( EnvironmentBuildProcessEntity ) query.getSingleResult();
+            EnvironmentBuildProcessEntity ebp = (EnvironmentBuildProcessEntity) query.getSingleResult();
 
             if ( ebp != null )
             {

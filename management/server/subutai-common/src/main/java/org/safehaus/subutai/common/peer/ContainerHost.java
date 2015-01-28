@@ -64,6 +64,10 @@ public interface ContainerHost extends Host
 
     void dispose() throws PeerException;
 
+    void start() throws PeerException;
+
+    void stop() throws PeerException;
+
     Peer getPeer();
 
 

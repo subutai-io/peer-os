@@ -34,7 +34,5 @@ class TunnelImpl implements Tunnel
     {
         this.tunnelIp = tunnelIp;
     }
-
-
 }
 

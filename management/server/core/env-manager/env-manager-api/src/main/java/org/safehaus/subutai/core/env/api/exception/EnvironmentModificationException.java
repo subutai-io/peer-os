@@ -7,4 +7,10 @@ public class EnvironmentModificationException extends Exception
     {
         super( cause );
     }
+
+
+    public EnvironmentModificationException( final String message )
+    {
+        super( message );
+    }
 }

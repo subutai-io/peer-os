@@ -23,6 +23,7 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
@@ -44,6 +45,7 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
+import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
@@ -79,9 +81,6 @@ import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -264,7 +263,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     public ContainerHost createContainer( final String hostName, final String templateName, final String cloneName,
                                           final UUID environmentId ) throws PeerException
     {
-        Subject subject = SecurityUtils.getSubject();
         Preconditions.checkNotNull( hostName, "Host name is null." );
         Preconditions.checkNotNull( environmentId, "Environment ID is null." );
         Preconditions.checkNotNull( templateName, "Template list is null." );
@@ -332,7 +330,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         Set<ContainerHost> result = new HashSet<>();
         for ( HostCloneTask hostCloneTask : hostCloneTasks )
         {
-            result.add( hostCloneTask.getResult().getValue() );
+            if ( hostCloneTask.getResult().getValue() != null )
+            {
+                result.add( hostCloneTask.getResult().getValue() );
+            }
         }
         return result;
     }
@@ -814,7 +815,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     @Override
     public void startContainer( final ContainerHost host ) throws PeerException
     {
-        Subject subject = SecurityUtils.getSubject();
         Host c = bindHost( host );
         ContainerHostEntity containerHost = ( ContainerHostEntity ) c;
         ResourceHost resourceHost = containerHost.getParent();
@@ -840,7 +840,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     @Override
     public void stopContainer( final ContainerHost host ) throws PeerException
     {
-        Subject subject = SecurityUtils.getSubject();
         Host c = bindHost( host.getHostId() );
         ContainerHostEntity containerHost = ( ContainerHostEntity ) c;
         ResourceHost resourceHost = containerHost.getParent();
@@ -886,19 +885,35 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     {
         try
         {
-            Host h = bindHost( host.getId() );
-
-            if ( h instanceof ContainerHost )
+            HostInfo hostInfo = hostRegistry.getHostInfoById( host.getId() );
+            if ( hostInfo instanceof ContainerHostInfo )
             {
-                return ContainerHostState.RUNNING.equals( ( ( ContainerHost ) h ).getState() );
+                return ContainerHostState.RUNNING.equals( ( ( ContainerHostInfo ) hostInfo ).getStatus() );
             }
 
+            Host h = bindHost( host.getId() );
             return !isTimedOut( h.getLastHeartbeat(), HOST_INACTIVE_TIME );
         }
-        catch ( PeerException e )
+        catch ( PeerException | HostDisconnectedException e )
         {
             return false;
         }
+
+        //        try
+        //        {
+        //            Host h = bindHost( host.getId() );
+        //
+        //            if ( h instanceof ContainerHost )
+        //            {
+        //                return ContainerHostState.RUNNING.equals( ( ( ContainerHost ) h ).getState() );
+        //            }
+        //
+        //            return !isTimedOut( h.getLastHeartbeat(), HOST_INACTIVE_TIME );
+        //        }
+        //        catch ( PeerException e )
+        //        {
+        //            return false;
+        //        }
     }
 
 

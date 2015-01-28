@@ -1,16 +1,23 @@
 package org.safehaus.subutai.core.env.ui.forms;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.build.Blueprint;
 import org.safehaus.subutai.core.env.api.build.NodeGroup;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
-import org.safehaus.subutai.core.env.ui.EnvironmentManagerComponent;
+import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
@@ -35,17 +42,20 @@ public class BlueprintForm
 
     private final VerticalLayout contentRoot;
     private final EnvironmentManager environmentManager;
-    private final EnvironmentManagerComponent environmentManagerComponent;
+    private final PeerManager peerManager;
+    private final TemplateRegistry templateRegistry;
     private TextArea blueprintTxtArea;
     private Table blueprintsTable;
-    private Button viewBlueprintsButton;
+    private Gson gson =
+            new GsonBuilder().setExclusionStrategies( new FieldExclusionStrategy( "id" ) ).setPrettyPrinting().create();
 
 
-    public BlueprintForm( EnvironmentManagerComponent environmentManagerComponent,
-                          EnvironmentManager environmentManager )
+    public BlueprintForm( EnvironmentManager environmentManager, PeerManager peerManager,
+                          TemplateRegistry templateRegistry )
     {
-        this.environmentManagerComponent = environmentManagerComponent;
         this.environmentManager = environmentManager;
+        this.peerManager = peerManager;
+        this.templateRegistry = templateRegistry;
         contentRoot = new VerticalLayout();
 
         contentRoot.setSpacing( true );
@@ -53,15 +63,15 @@ public class BlueprintForm
 
         blueprintTxtArea = getBlueprintTxtArea();
 
-        Button loadBlueprintButton = new Button( SAVE );
-        loadBlueprintButton.setId( "loadBlueprintButton" );
+        Button saveBlueprintBtn = new Button( SAVE );
+        saveBlueprintBtn.setId( "saveBlueprintButton" );
 
-        loadBlueprintButton.addClickListener( new Button.ClickListener()
+        saveBlueprintBtn.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                uploadAndSaveBlueprint();
+                saveBlueprint();
             }
         } );
 
@@ -72,9 +82,7 @@ public class BlueprintForm
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-
-
-                String blueprintStr = JsonUtil.toJson( getSampleBlueprint() );
+                String blueprintStr = gson.toJson( getSampleBlueprint() );
                 blueprintTxtArea.setValue( blueprintStr );
             }
         } );
@@ -82,14 +90,14 @@ public class BlueprintForm
         contentRoot.addComponent( blueprintTxtArea );
         HorizontalLayout buttons = new HorizontalLayout();
         buttons.setSpacing( true );
-        buttons.addComponent( loadBlueprintButton );
+        buttons.addComponent( saveBlueprintBtn );
         buttons.addComponent( putSampleBlueprint );
         contentRoot.addComponent( buttons );
 
         blueprintsTable = createBlueprintsTable( "Blueprints" );
         blueprintsTable.setId( "blueprintsTable" );
 
-        viewBlueprintsButton = new Button( VIEW_BLUEPRINTS );
+        final Button viewBlueprintsButton = new Button( VIEW_BLUEPRINTS );
         viewBlueprintsButton.setId( "viewBlueprintsButton" );
         viewBlueprintsButton.addClickListener( new Button.ClickListener()
         {
@@ -102,6 +110,8 @@ public class BlueprintForm
 
         contentRoot.addComponent( viewBlueprintsButton );
         contentRoot.addComponent( blueprintsTable );
+
+        updateBlueprintsTable();
     }
 
 
@@ -119,7 +129,7 @@ public class BlueprintForm
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
-                        blueprintTxtArea.setValue( JsonUtil.toJson( blueprint ) );
+                        blueprintTxtArea.setValue( gson.toJson( blueprint ) );
                     }
                 } );
                 final Button delete = new Button( DELETE );
@@ -167,9 +177,7 @@ public class BlueprintForm
 
     private void buildBlueprint( Blueprint blueprint )
     {
-        //TODO let user specify topology
-        //TODO create environment in background thread
-        environmentManagerComponent.focusEnvironmentForm();
+        contentRoot.getUI().addWindow( new TopologyWindow( blueprint, peerManager, environmentManager ) );
     }
 
 
@@ -209,7 +217,7 @@ public class BlueprintForm
     }
 
 
-    private void uploadAndSaveBlueprint()
+    private void saveBlueprint()
     {
         String content = blueprintTxtArea.getValue().trim();
         if ( content.length() > 0 )
@@ -217,9 +225,62 @@ public class BlueprintForm
             try
             {
                 Blueprint blueprint = JsonUtil.fromJson( content, Blueprint.class );
-                environmentManager.saveBlueprint( blueprint );
-                updateBlueprintsTable();
-                Notification.show( BLUEPRINT_SAVED );
+
+                if ( Strings.isNullOrEmpty( blueprint.getName() ) )
+                {
+                    Notification.show( "Invalid blueprint name", Notification.Type.ERROR_MESSAGE );
+                }
+                else if ( CollectionUtil.isCollectionEmpty( blueprint.getNodeGroups() ) )
+                {
+                    Notification.show( "Invalid node group set", Notification.Type.ERROR_MESSAGE );
+                }
+                else
+                {
+                    for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
+                    {
+                        if ( Strings.isNullOrEmpty( nodeGroup.getName() ) )
+                        {
+                            Notification.show( "Invalid node group name", Notification.Type.ERROR_MESSAGE );
+                            return;
+                        }
+                        else if ( Strings.isNullOrEmpty( nodeGroup.getDomainName() ) )
+                        {
+                            Notification.show( "Invalid domain name", Notification.Type.ERROR_MESSAGE );
+                            return;
+                        }
+                        else if ( nodeGroup.getNumberOfContainers() <= 0 )
+                        {
+                            Notification.show( "Invalid number of containers", Notification.Type.ERROR_MESSAGE );
+                            return;
+                        }
+                        else if ( Strings.isNullOrEmpty( nodeGroup.getTemplateName() ) )
+                        {
+                            Notification.show( "Invalid templateName", Notification.Type.ERROR_MESSAGE );
+                            return;
+                        }
+                        else if ( templateRegistry.getTemplate( nodeGroup.getTemplateName() ) == null )
+                        {
+                            Notification
+                                    .show( String.format( "Template %s does not exist", nodeGroup.getTemplateName() ),
+                                            Notification.Type.ERROR_MESSAGE );
+                            return;
+                        }
+                        else if ( nodeGroup.getContainerPlacementStrategy() == null )
+                        {
+                            Notification.show( "Invalid node container placement strategy",
+                                    Notification.Type.ERROR_MESSAGE );
+                            return;
+                        }
+                    }
+
+                    blueprint.setId( UUID.randomUUID() );
+
+                    environmentManager.saveBlueprint( blueprint );
+
+                    updateBlueprintsTable();
+
+                    Notification.show( BLUEPRINT_SAVED );
+                }
             }
             catch ( Exception e )
             {

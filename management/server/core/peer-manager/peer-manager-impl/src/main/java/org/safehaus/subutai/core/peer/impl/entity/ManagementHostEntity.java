@@ -16,9 +16,9 @@ import javax.persistence.Transient;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
-import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.peer.impl.Commands;
 
 

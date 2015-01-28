@@ -7,6 +7,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -15,8 +17,6 @@ import org.safehaus.subutai.core.environment.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.network.api.N2NConnection;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import org.apache.commons.net.util.SubnetUtils;
@@ -62,7 +62,7 @@ public class NetworkSetup
         {
             NetworkManager nm = defineNetworkManager( pi );
             nm.setupN2NConnection( n2n.getSuperNodeIp(), n2n.getSuperNodePort(), n2n.getInterfaceName(),
-                                   n2n.getCommunityName(), pi.getIp(), keyFilePath );
+                    n2n.getCommunityName(), pi.getIp(), keyFilePath );
         }
     }
 
@@ -162,9 +162,8 @@ public class NetworkSetup
 
     private NetworkManager defineNetworkManager( PeerInfo pi )
     {
-        return peerManager.getLocalPeerInfo().equals( pi )
-                ? networkManager
-                : networkManager.getRemoteManager( pi.getIp(), pi.getPort() );
+        return peerManager.getLocalPeerInfo().equals( pi ) ? networkManager :
+               networkManager.getRemoteManager( pi.getIp(), pi.getPort() );
     }
 
 

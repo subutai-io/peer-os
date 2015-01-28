@@ -5,7 +5,6 @@
     <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
     <class>org.safehaus.subutai.common.protocol.Template</class>
     <class>org.safehaus.subutai.common.protocol.TemplatePK</class>
-    <class>org.safehaus.subutai.common.datatypes.TemplateVersion</class>
     <!--<class>org.safehaus.subutai.common.protocol.Template.TemplatePK</class>-->
     <properties>
       <!--<property name="openjpa.ConnectionURL" value="jdbc:h2:mem:defaultDb;create=true" />-->
