@@ -102,13 +102,29 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public String getPublicKey()
+    public String getSshKey()
     {
         return publicKey;
     }
 
 
-    public void setPublicKey( final String publicKey )
+    @Override
+    public void setSshKey( final String sshKey, boolean async ) throws EnvironmentModificationException
+    {
+        try
+        {
+            environmentManager.setSshKey( getId(), sshKey, async );
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            //this should not happen
+            LOG.error( String.format( "Error setting ssh key to environment %s", getName() ), e );
+            throw new EnvironmentModificationException( e );
+        }
+    }
+
+
+    public void saveSshKey( final String publicKey )
     {
         this.publicKey = publicKey;
         dataService.update( this );

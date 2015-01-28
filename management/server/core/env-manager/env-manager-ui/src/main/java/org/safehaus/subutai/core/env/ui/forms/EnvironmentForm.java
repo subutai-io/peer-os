@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.env.ui.forms;
 
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -22,6 +24,8 @@ import com.vaadin.ui.VerticalLayout;
 
 public class EnvironmentForm
 {
+    private static final String SSH_KEY = "Ssh key";
+    private static final String DATE = "Date";
     private final EnvironmentManager environmentManager;
     private static final String CONTAINERS = "Containers";
     private static final String NAME = "Name";
@@ -104,6 +108,7 @@ public class EnvironmentForm
         for ( final Environment environment : environmentManager.getEnvironments() )
         {
             final Button containersBtn = new Button( CONTAINERS );
+            containersBtn.setId( environment.getName() + "-containers" );
             containersBtn.addClickListener( new Button.ClickListener()
             {
                 @Override
@@ -126,11 +131,23 @@ public class EnvironmentForm
                 }
             } );
 
+            final Button sshKeyBtn = new Button( SSH_KEY );
+            sshKeyBtn.setId( environment.getName() + "-sshkey" );
+            sshKeyBtn.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( final Button.ClickEvent event )
+                {
+                    contentRoot.getUI().addWindow( new SshKeyWindow( environment ) );
+                }
+            } );
+
             boolean isEnvironmentUnderModification =
                     environment.getStatus().equals( EnvironmentStatus.UNDER_MODIFICATION );
 
             destroyBtn.setEnabled( !isEnvironmentUnderModification );
             containersBtn.setEnabled( !isEnvironmentUnderModification );
+            sshKeyBtn.setEnabled( !isEnvironmentUnderModification );
 
             Embedded icon = isEnvironmentUnderModification ? new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) ) :
                             environment.getStatus().equals( EnvironmentStatus.HEALTHY ) ?
@@ -139,10 +156,19 @@ public class EnvironmentForm
 
 
             environmentsTable.addItem( new Object[] {
-                    environment.getName(), icon, containersBtn, destroyBtn
+                    environment.getName(), getCreationDate( environment.getCreationTimestamp() ), icon, containersBtn,
+                    sshKeyBtn, destroyBtn
             }, null );
         }
         environmentsTable.refreshRowCache();
+    }
+
+
+    private String getCreationDate( long ts )
+    {
+        SimpleDateFormat sdf = new SimpleDateFormat( "MMM dd,yyyy HH:mm" );
+        Date date = new Date( ts );
+        return sdf.format( date );
     }
 
 
@@ -165,8 +191,10 @@ public class EnvironmentForm
     {
         Table table = new Table( caption );
         table.addContainerProperty( NAME, String.class, null );
+        table.addContainerProperty( DATE, String.class, null );
         table.addContainerProperty( STATUS, Embedded.class, null );
         table.addContainerProperty( CONTAINERS, Button.class, null );
+        table.addContainerProperty( SSH_KEY, Button.class, null );
         table.addContainerProperty( DESTROY, Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
