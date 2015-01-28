@@ -173,11 +173,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         result.addAll( environmentDataService.getAll() );
         for ( Environment environment : result )
         {
-            for ( ContainerHost containerHost : environment.getContainerHosts() )
-            {
-                containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
-                containerHost.setDataService( environmentContainerDataService );
-            }
+            setContainersTransientFields( environment.getContainerHosts() );
         }
         return result;
     }
@@ -187,11 +183,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public Environment getEnvironment( final String uuid )
     {
         Environment result = environmentDataService.find( uuid );
-        for ( ContainerHost containerHost : result.getContainerHosts() )
-        {
-            containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
-            containerHost.setDataService( environmentContainerDataService );
-        }
+        setContainersTransientFields( result.getContainerHosts() );
         return result;
     }
 
@@ -387,11 +379,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             throw new EnvironmentManagerException( "Environment not found" );
         }
-        for ( ContainerHost containerHost : result.getContainerHosts() )
-        {
-            containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
-            containerHost.setDataService( environmentContainerDataService );
-        }
+        setContainersTransientFields( result.getContainerHosts() );
         return result;
     }
 
@@ -400,12 +388,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public Environment getEnvironmentByUUID( final UUID environmentId )
     {
         Environment result = environmentDataService.find( environmentId.toString() );
-        for ( ContainerHost containerHost : result.getContainerHosts() )
+        setContainersTransientFields( result.getContainerHosts() );
+        return result;
+    }
+
+
+    private void setContainersTransientFields( Set<ContainerHost> containerHosts )
+    {
+        for ( ContainerHost containerHost : containerHosts )
         {
             containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
             containerHost.setDataService( environmentContainerDataService );
         }
-        return result;
     }
 
 
@@ -578,6 +572,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             throw new EnvironmentBuildException( e.getMessage() );
         }
+
+        setContainersTransientFields( newContainers );
 
         return newContainers;
     }
