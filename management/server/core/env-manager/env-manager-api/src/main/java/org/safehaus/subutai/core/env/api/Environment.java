@@ -25,7 +25,7 @@ public interface Environment
 
     public long getCreationTimestamp();
 
-    public String getPublicKey();
+    public String getSshKey();
 
     public Set<ContainerHost> getContainerHosts();
 
@@ -35,6 +35,9 @@ public interface Environment
 
     public Set<ContainerHost> growEnvironment( Topology topology, boolean async )
             throws EnvironmentModificationException;
+
+
+    public void setSshKey( String sshKey, boolean async ) throws EnvironmentModificationException;
 
 
     /**

@@ -135,7 +135,7 @@ public class EnvironmentForm
                 @Override
                 public void buttonClick( final Button.ClickEvent event )
                 {
-                    contentRoot.getUI().addWindow( new SshKeyWindow( environmentManager, environment ) );
+                    contentRoot.getUI().addWindow( new SshKeyWindow( environment ) );
                 }
             } );
 

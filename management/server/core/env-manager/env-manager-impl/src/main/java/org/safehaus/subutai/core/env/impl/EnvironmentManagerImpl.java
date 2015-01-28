@@ -352,9 +352,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
                         configureSsh( environment.getContainerHosts() );
 
-                        if ( !Strings.isNullOrEmpty( environment.getPublicKey() ) )
+                        if ( !Strings.isNullOrEmpty( environment.getSshKey() ) )
                         {
-                            setSshKey( environmentId, environment.getPublicKey() );
+                            setSshKey( environmentId, environment.getSshKey(), false );
                         }
 
                         //set container's transient fields
@@ -365,7 +365,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                         newContainers.removeAll( oldContainers );
                     }
                     catch ( EnvironmentBuildException | NetworkManagerException | EnvironmentNotFoundException |
-                            EnvironmentManagerException e )
+                            EnvironmentModificationException e )
                     {
                         environment.setStatus( EnvironmentStatus.UNHEALTHY );
 
@@ -648,38 +648,78 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void setSshKey( final UUID environmentId, final String sshKey )
-            throws EnvironmentNotFoundException, EnvironmentManagerException
+    public void setSshKey( final UUID environmentId, final String sshKey, boolean async )
+            throws EnvironmentNotFoundException, EnvironmentModificationException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
 
-        String oldSshKey = environment.getPublicKey();
+        final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
 
-        environment.setPublicKey( sshKey );
+        final Semaphore semaphore = new Semaphore( 0 );
 
-        try
+        executor.submit( new Runnable()
         {
-            if ( Strings.isNullOrEmpty( sshKey ) && !Strings.isNullOrEmpty( oldSshKey ) )
+            @Override
+            public void run()
             {
-                //remove old key from containers
-                networkManager.removeSshKeyFromAuthorizedKeys( environment.getContainerHosts(), oldSshKey );
+                environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
+
+                String oldSshKey = environment.getSshKey();
+
+                environment.saveSshKey( sshKey );
+
+                try
+                {
+                    if ( Strings.isNullOrEmpty( sshKey ) && !Strings.isNullOrEmpty( oldSshKey ) )
+                    {
+                        //remove old key from containers
+                        networkManager.removeSshKeyFromAuthorizedKeys( environment.getContainerHosts(), oldSshKey );
+                    }
+                    else if ( !Strings.isNullOrEmpty( sshKey ) && Strings.isNullOrEmpty( oldSshKey ) )
+                    {
+                        //insert new key to containers
+                        networkManager.addSshKeyToAuthorizedKeys( environment.getContainerHosts(), sshKey );
+                    }
+                    else if ( !Strings.isNullOrEmpty( sshKey ) && !Strings.isNullOrEmpty( oldSshKey ) )
+                    {
+                        //replace old ssh key with new one
+                        networkManager
+                                .replaceSshKeyInAuthorizedKeys( environment.getContainerHosts(), oldSshKey, sshKey );
+                    }
+
+                    environment.setStatus( EnvironmentStatus.HEALTHY );
+                }
+                catch ( NetworkManagerException e )
+                {
+                    LOG.error( String.format( "Error setting ssh key to environment %s", environment.getName() ), e );
+                    environment.setStatus( EnvironmentStatus.UNHEALTHY );
+                    resultHolder.setResult( new EnvironmentModificationException( e ) );
+                }
+                finally
+                {
+                    semaphore.release();
+                }
             }
-            else if ( !Strings.isNullOrEmpty( sshKey ) && Strings.isNullOrEmpty( oldSshKey ) )
-            {
-                //insert new key to containers
-                networkManager.addSshKeyToAuthorizedKeys( environment.getContainerHosts(), sshKey );
-            }
-            else if ( !Strings.isNullOrEmpty( sshKey ) && !Strings.isNullOrEmpty( oldSshKey ) )
-            {
-                //replace old ssh key with new one
-                networkManager.replaceSshKeyInAuthorizedKeys( environment.getContainerHosts(), oldSshKey, sshKey );
-            }
-        }
-        catch ( NetworkManagerException e )
+        } );
+
+
+        if ( !async )
         {
-            throw new EnvironmentManagerException( "Failed to set SSH key to environment containers", e );
+            try
+            {
+                semaphore.acquire();
+
+                if ( resultHolder.getResult() != null )
+                {
+                    throw resultHolder.getResult();
+                }
+            }
+            catch ( InterruptedException e )
+            {
+                throw new EnvironmentModificationException( e );
+            }
         }
     }
 }

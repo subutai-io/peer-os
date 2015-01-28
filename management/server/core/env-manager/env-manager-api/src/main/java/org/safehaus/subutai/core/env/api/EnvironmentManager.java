@@ -89,12 +89,13 @@ public interface EnvironmentManager
      *
      * @param environmentId - environment id
      * @param sshKey - ssh key content
+     * @param async - indicates whether ssh key is applied synchronously or asynchronously to the calling party
      *
      * @throws EnvironmentNotFoundException - thrown if environment not found
-     * @throws EnvironmentManagerException - thrown if error occurs during key insertion
+     * @throws EnvironmentModificationException - thrown if error occurs during key insertion
      */
-    public void setSshKey( UUID environmentId, String sshKey )
-            throws EnvironmentNotFoundException, EnvironmentManagerException;
+    public void setSshKey( UUID environmentId, String sshKey, boolean async )
+            throws EnvironmentNotFoundException, EnvironmentModificationException;
 
 
     /**
