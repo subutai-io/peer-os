@@ -39,7 +39,7 @@ public class TopologyWindow extends Window
 
 
     public TopologyWindow( final Blueprint blueprint, final PeerManager peerManager,
-                           final EnvironmentManager environmentManager )
+                           final EnvironmentManager environmentManager, boolean grow )
     {
 
         this.blueprint = blueprint;
