@@ -1,10 +1,12 @@
 package org.safehaus.subutai.core.identity.impl;
 
 
+import java.io.Serializable;
+
 import org.osgi.framework.BundleContext;
 import org.safehaus.subutai.common.dao.DaoManager;
-import org.safehaus.subutai.common.helper.UserIdMdcHelper;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
+import org.safehaus.subutai.core.identity.impl.dao.RoleDataService;
 import org.safehaus.subutai.core.identity.impl.dao.UserDataService;
 import org.safehaus.subutai.core.identity.impl.entity.RoleEntity;
 import org.safehaus.subutai.core.identity.impl.entity.UserEntity;
@@ -17,7 +19,6 @@ import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.SimpleByteSource;
-import org.apache.shiro.util.ThreadContext;
 
 
 /**
@@ -33,16 +34,18 @@ public class IdentityManagerImpl implements IdentityManager
     private DaoManager daoManager;
     private BundleContext bundleContext;
     private SecurityManager securityManager;
-
-
-    public IdentityManagerImpl()
-    {
-        //        LOG.info( "Initializing security manager..." );
-        //        IniSecurityManagerFactory factory = new IniSecurityManagerFactory( "subutai-shiro.ini" );
-        //        org.apache.shiro.mgt.SecurityManager securityManager = factory.getInstance();
-        //        SecurityUtils.setSecurityManager( securityManager );
-        //        LOG.info( String.format( "Security manager initialized: %s", securityManager ) );
-    }
+    //    private Subject subject = null;
+    //    private Serializable sessionId = null;
+    //
+    //
+    //    public IdentityManagerImpl()
+    //    {
+    //        //        LOG.info( "Initializing security manager..." );
+    //        //        IniSecurityManagerFactory factory = new IniSecurityManagerFactory( "subutai-shiro.ini" );
+    //        //        org.apache.shiro.mgt.SecurityManager securityManager = factory.getInstance();
+    //        //        SecurityUtils.setSecurityManager( securityManager );
+    //        //        LOG.info( String.format( "Security manager initialized: %s", securityManager ) );
+    //    }
 
 
     public void setSecurityManager( final SecurityManager securityManager )
@@ -95,20 +98,9 @@ public class IdentityManagerImpl implements IdentityManager
         //        RealmSecurityManager r = ( RealmSecurityManager ) securityManager;
         //        r.setRealm( subutaiJdbcRealm );
 
-        RoleEntity roleEntity = new RoleEntity();
-        roleEntity.setName( "admin" );
-
-        String username = "karaf";
-        String password = "secret";
-        String salt = getSalt( username );
-        UserDataService userDataService = new UserDataService( daoManager.getEntityManagerFactory() );
-        UserEntity user = new UserEntity();
-        user.setUsername( username );
-        user.setPassword( simpleSaltedHash( password, new SimpleByteSource( salt ).getBytes() ) );
-        user.setSalt( salt );
-        user.addRole( roleEntity );
-        userDataService.persist( user );
-        LOG.info( String.format( "User: %s", user.getId() ) );
+        checkDefaultUser( "karaf" );
+        checkDefaultUser( "admin" );
+        checkDefaultUser( "timur" );
 
         //        RoleDataService roleDataService = new RoleDataService( daoManager.getEntityManagerFactory() );
         //        roleDataService.persist( roleEntity );
@@ -118,19 +110,34 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    //    public String getHex( byte[] raw )
-    //    {
-    //        if ( raw == null )
-    //        {
-    //            return null;
-    //        }
-    //        final StringBuilder hex = new StringBuilder( 2 * raw.length );
-    //        for ( final byte b : raw )
-    //        {
-    //            hex.append( HEXES.charAt( ( b & 0xF0 ) >> 4 ) ).append( HEXES.charAt( ( b & 0x0F ) ) );
-    //        }
-    //        return hex.toString();
-    //    }
+    private void checkDefaultUser( String username )
+    {
+
+        UserDataService userDataService = new UserDataService( daoManager.getEntityManagerFactory() );
+
+        if ( userDataService.findByUsername( username ) != null )
+        {
+            return;
+        }
+        RoleDataService roleDataService = new RoleDataService( daoManager.getEntityManagerFactory() );
+        RoleEntity roleEntity = roleDataService.find( "admin" );
+        if ( roleEntity == null )
+        {
+            roleEntity = new RoleEntity();
+            roleEntity.setName( "admin" );
+        }
+
+
+        String password = "secret";
+        String salt = getSalt( username );
+        UserEntity user = new UserEntity();
+        user.setUsername( username );
+        user.setPassword( simpleSaltedHash( password, new SimpleByteSource( salt ).getBytes() ) );
+        user.setSalt( salt );
+        //        user.addRole( roleEntity );
+        userDataService.persist( user );
+        LOG.info( String.format( "User: %s", user.getId() ) );
+    }
 
 
     public void setDaoManager( final DaoManager daoManager )
@@ -147,29 +154,39 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     @Override
-    public void login( final AuthenticationToken token )
+    public Subject login( final AuthenticationToken token )
     {
-        Subject subject = this.getSubject();
+        LOG.debug( String.format( "Login. Thread ID: %d %s", Thread.currentThread().getId(),
+                Thread.currentThread().getName() ) );
+        SecurityUtils.setSecurityManager( securityManager );
+        Subject subject = SecurityUtils.getSubject();
         subject.login( token );
-        LOG.info( String.format( "Principal: %s. Is authenticated?: %s", token.getPrincipal().toString(),
-                subject.isAuthenticated() ) );
-        ThreadContext.bind( subject );
+
+        return subject;
+
+        //        SecurityUtils.getSecurityManager().getSession( sessionId );
+        //
+        //        Subject s = new Subject.Builder( securityManager ).sessionId( sessionId ).buildSubject();
+        //        LOG.info( String.format( "Principal: %s. Is authenticated?: %s", token.getPrincipal().toString(),
+        //                subject.isAuthenticated() ) );
+        //        ThreadContext.bind( subject );
         //        UserIdMdcHelper.set( subject );
     }
 
 
     @Override
-    public Subject getSubject()
+    public Subject getSubject( Serializable sessionId )
     {
-        return SecurityUtils.getSubject();
+        Subject subject = new Subject.Builder( securityManager ).sessionId( sessionId ).buildSubject();
+        return subject;
     }
 
 
     @Override
-    public void logout()
+    public void logout( Serializable sessionId )
     {
-        UserIdMdcHelper.unset();
-        Subject subject = SecurityUtils.getSubject();
+        LOG.debug( String.format( "Logout. Thread ID: %d", Thread.currentThread().getId() ) );
+        Subject subject = this.getSubject( sessionId );
         subject.logout();
     }
 }

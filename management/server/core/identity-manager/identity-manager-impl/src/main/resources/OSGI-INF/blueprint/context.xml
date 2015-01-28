@@ -22,7 +22,7 @@
 
   <jaas:config name="karaf" rank="5">
     <jaas:module className="org.safehaus.subutai.core.identity.impl.ShiroLoginModule"
-                 flags="sufficient" name="Subutai">
+                 flags="required" name="Subutai">
     </jaas:module>
   </jaas:config>
   <!--
@@ -44,7 +44,7 @@
                value="file:./etc/ehcache.xml" />
    </bean>-->
 
-  <bean id="securityManager" class="org.apache.shiro.mgt.DefaultSecurityManager">
+  <bean id="securityManager" class="org.safehaus.subutai.core.identity.impl.SubutaiSecurityManager">
     <!--    <property name="sessionManager.sessionDAO" ref="sessionMgr" />
         <property
             name="subjectDAO.sessionStorageEvaluator.sessionStorageEnabled"
@@ -68,7 +68,6 @@
     <property name="permissionsQuery" value="select permission from subutai_roles_permissions where role_name = ?" />
     <property name="credentialsMatcher" ref="sha256Matcher" />
   </bean>
-
   <service ref="securityManager"
            interface="org.apache.shiro.mgt.SecurityManager" />
 </blueprint>

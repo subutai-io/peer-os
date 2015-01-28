@@ -1,34 +1,38 @@
 package org.safehaus.subutai.core.peer.cli;
 
 
+import java.security.AccessControlContext;
+import java.security.AccessController;
 import java.security.Principal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.helper.UserIdMdcHelper;
+import javax.security.auth.Subject;
+
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
+import org.safehaus.subutai.core.identity.api.ShiroPrincipal;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.SecurityManager;
 
 
 @Command( scope = "peer", name = "hosts" )
 public class HostsCommand extends OsgiCommandSupport
 {
+    private static Logger log = LoggerFactory.getLogger( HostsCommand.class );
     DateFormat fmt = new SimpleDateFormat( "dd.MM.yy HH:mm:ss.SS" );
     private PeerManager peerManager;
     private IdentityManager identityManager;
@@ -56,32 +60,44 @@ public class HostsCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
+
+        log.debug(
+                String.format( "Thread ID: %d %s", Thread.currentThread().getId(), Thread.currentThread().getName() ) );
         //        for ( StackTraceElement ste : Thread.currentThread().getStackTrace() )
         //        {
         //            log.info( ste.toString() );
         //        }
 
 
-        boolean isSet = UserIdMdcHelper.isSet();
-        String userId = UserIdMdcHelper.get();
-        //        AccessControlContext acc = AccessController.getContext();
-        //        Subject subject = Subject.getSubject( acc );
-        //        Set<Principal> principals = subject.getPrincipals();
-        //        String sessionId = getSessionId( principals );
+        AccessControlContext acc = AccessController.getContext();
+        Subject subject = Subject.getSubject( acc );
+        Set<Principal> principals = subject.getPrincipals();
+
+
+//        String sessionId = getSessionId( principals );
+
+
         //        org.apache.shiro.subject.Subject requestSubject =
         //                new org.apache.shiro.subject.Subject.Builder().sessionId( sessionId ).buildSubject();
 
 
         //        SecurityUtils.setSecurityManager( securityManager );
-        org.apache.shiro.subject.Subject sub = SecurityUtils.getSubject();
+//        org.apache.shiro.subject.Subject sub = identityManager.getSubject( sessionId );
 
-        sub = identityManager.getSubject();
 
-        SecurityUtils.setSecurityManager( identityManager.getSecurityManager() );
+        Set<ShiroPrincipal> shiroPrincipal = subject.getPrincipals( ShiroPrincipal.class );
 
-        sub = identityManager.getSubject();
+        org.apache.shiro.subject.Subject sub = shiroPrincipal.iterator().next().getSubject();
 
-        sub = SecurityUtils.getSubject();
+        System.out.println( String.format( "Is authn? %s %s %s", sub.isAuthenticated(), sub.getPrincipal(),
+                sub.getSession().getId() ) );
+        //        sub = identityManager.getSubject();
+        //
+        //        SecurityUtils.setSecurityManager( identityManager.getSecurityManager() );
+        //
+        //        sub = identityManager.getSubject();
+        //
+        //        sub = SecurityUtils.getSubject();
 
         LocalPeer localPeer = peerManager.getLocalPeer();
         //        localPeer.init();

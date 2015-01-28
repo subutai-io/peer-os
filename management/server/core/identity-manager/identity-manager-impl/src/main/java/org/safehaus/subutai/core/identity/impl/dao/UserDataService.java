@@ -5,7 +5,6 @@ import java.util.Collection;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
 import org.safehaus.subutai.common.protocol.api.DataService;
@@ -177,9 +176,6 @@ public class UserDataService implements DataService<Long, UserEntity>
 
             result = ( UserEntity ) query.getSingleResult();
             em.getTransaction().commit();
-        }
-        catch ( NoResultException ignore )
-        {
         }
         catch ( Exception e )
         {

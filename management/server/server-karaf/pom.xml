@@ -46,6 +46,14 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-features</artifactId>
+      <version>${org.apache.shiro.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-application</artifactId>
       <version>${project.version}</version>
@@ -65,14 +73,6 @@
       <groupId>org.apache.cxf.karaf</groupId>
       <artifactId>apache-cxf</artifactId>
       <version>${org.apache.cxf.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.shiro</groupId>
-      <artifactId>shiro-features</artifactId>
-      <version>${org.apache.shiro.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
       <scope>runtime</scope>
