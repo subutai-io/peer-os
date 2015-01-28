@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.core.env.api.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.build.Blueprint;
 import org.safehaus.subutai.core.env.api.build.NodeGroup;
@@ -36,10 +37,11 @@ public class TopologyWindow extends Window
     private final PeerManager peerManager;
     private Table placementTable;
     private Button buildBtn;
+    private ComboBox envCombo;
 
 
     public TopologyWindow( final Blueprint blueprint, final PeerManager peerManager,
-                           final EnvironmentManager environmentManager, boolean grow )
+                           final EnvironmentManager environmentManager, final boolean grow )
     {
 
         this.blueprint = blueprint;
@@ -68,7 +70,7 @@ public class TopologyWindow extends Window
 
         content.addComponent( placementTable );
 
-        buildBtn = new Button( "Build" );
+        buildBtn = new Button( grow ? "Grow" : "Build" );
         buildBtn.setEnabled( false );
         buildBtn.addClickListener( new Button.ClickListener()
         {
@@ -80,6 +82,10 @@ public class TopologyWindow extends Window
                 if ( placements == null )
                 {
                     Notification.show( "Failed to obtain topology", Notification.Type.ERROR_MESSAGE );
+                }
+                else if ( grow && envCombo.getValue() == null )
+                {
+                    Notification.show( "Please, select environment to grow" );
                 }
                 else
                 {
@@ -113,6 +119,21 @@ public class TopologyWindow extends Window
             }
         } );
 
+        if ( grow )
+        {
+            envCombo = new ComboBox( "Environments" );
+            envCombo.setId( "envCb" );
+            envCombo.setImmediate( true );
+            envCombo.setTextInputAllowed( false );
+            envCombo.setNullSelectionAllowed( false );
+            envCombo.setRequired( true );
+            for ( Environment environment : environmentManager.getEnvironments() )
+            {
+                envCombo.addItem( environment );
+                envCombo.setItemCaption( environment, environment.getName() );
+            }
+            content.addComponent( envCombo );
+        }
         content.addComponent( buildBtn );
         content.setComponentAlignment( buildBtn, Alignment.TOP_RIGHT );
 
