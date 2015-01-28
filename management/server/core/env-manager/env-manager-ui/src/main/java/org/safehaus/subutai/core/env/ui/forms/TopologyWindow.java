@@ -14,6 +14,8 @@ import org.safehaus.subutai.core.env.api.build.Blueprint;
 import org.safehaus.subutai.core.env.api.build.NodeGroup;
 import org.safehaus.subutai.core.env.api.build.Topology;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentModificationException;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import com.google.common.collect.Maps;
@@ -105,7 +107,7 @@ public class TopologyWindow extends Window
                         if ( grow )
                         {
                             Environment environment = ( Environment ) envCombo.getValue();
-                            Notification.show( environment.getName() );
+                            environmentManager.growEnvironment( environment.getId(), topology, true );
                             Notification.show( "Environment growth started" );
                         }
                         else
@@ -115,7 +117,8 @@ public class TopologyWindow extends Window
                             Notification.show( "Environment creation started" );
                         }
                     }
-                    catch ( EnvironmentCreationException e )
+                    catch ( EnvironmentModificationException | EnvironmentNotFoundException |
+                            EnvironmentCreationException e )
                     {
                         Notification.show( String.format( "Failed to %s environment: %s", grow ? "grow" : "create", e ),
                                 Notification.Type.ERROR_MESSAGE );
