@@ -102,14 +102,22 @@ public class TopologyWindow extends Window
 
                     try
                     {
-                        environmentManager
-                                .createEnvironment( String.format( "%s-%s", blueprint.getName(), UUID.randomUUID() ),
-                                        topology, true );
-                        Notification.show( "Environment creation started" );
+                        if ( grow )
+                        {
+                            Environment environment = ( Environment ) envCombo.getValue();
+                            Notification.show( environment.getName() );
+                            Notification.show( "Environment growth started" );
+                        }
+                        else
+                        {
+                            environmentManager.createEnvironment(
+                                    String.format( "%s-%s", blueprint.getName(), UUID.randomUUID() ), topology, true );
+                            Notification.show( "Environment creation started" );
+                        }
                     }
                     catch ( EnvironmentCreationException e )
                     {
-                        Notification.show( String.format( "Failed to create environment: %s", e ),
+                        Notification.show( String.format( "Failed to %s environment: %s", grow ? "grow" : "create", e ),
                                 Notification.Type.ERROR_MESSAGE );
                     }
 
