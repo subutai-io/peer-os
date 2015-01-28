@@ -36,8 +36,8 @@ public class SshKeyWindow extends Window
 
         boolean keyExists = !Strings.isNullOrEmpty( environment.getSshKey() );
         CheckBox keyExistsChk = new CheckBox( "Key exists" );
-        keyExistsChk.setReadOnly( true );
         keyExistsChk.setValue( keyExists );
+        keyExistsChk.setReadOnly( true );
 
         content.addComponent( keyExistsChk );
 
