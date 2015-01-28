@@ -1,8 +1,8 @@
 package org.safehaus.subutai.core.peer.cli;
 
 
-import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.common.peer.PeerInfo;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import org.apache.karaf.shell.commands.Command;

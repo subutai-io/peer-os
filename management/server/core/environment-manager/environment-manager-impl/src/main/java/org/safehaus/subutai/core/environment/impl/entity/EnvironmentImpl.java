@@ -22,10 +22,10 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentStatusEnum;
-import org.safehaus.subutai.common.peer.ContainerHost;
 
 import org.apache.commons.net.util.SubnetUtils;
 
@@ -293,5 +293,34 @@ public class EnvironmentImpl implements Environment, Serializable
         return JsonUtil.fromJson( peerVlanInfo, typeToken.getType() );
     }
 
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof EnvironmentImpl ) )
+        {
+            return false;
+        }
+
+        final EnvironmentImpl that = ( EnvironmentImpl ) o;
+
+        if ( environmentId != null ? !environmentId.equals( that.environmentId ) : that.environmentId != null )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return environmentId != null ? environmentId.hashCode() : 0;
+    }
 }
 

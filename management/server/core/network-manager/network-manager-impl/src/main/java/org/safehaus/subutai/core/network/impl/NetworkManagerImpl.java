@@ -8,16 +8,16 @@ import java.util.regex.Pattern;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Host;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.network.api.ContainerInfo;
 import org.safehaus.subutai.core.network.api.N2NConnection;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.network.api.Tunnel;
 import org.safehaus.subutai.core.network.impl.remote.RemoteNetworkManager;
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
-import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 
@@ -259,5 +259,44 @@ public class NetworkManagerImpl implements NetworkManager
         {
             throw new NetworkManagerException( e );
         }
+    }
+
+
+    @Override
+    public void exchangeSshKeys( final Set<ContainerHost> containers ) throws NetworkManagerException
+    {
+        new SshManager( containers ).execute();
+    }
+
+
+    @Override
+    public void addSshKeyToAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
+            throws NetworkManagerException
+    {
+        new SshManager( containers ).appendSshKey( sshKey );
+    }
+
+
+    @Override
+    public void replaceSshKeyInAuthorizedKeys( final Set<ContainerHost> containers, final String oldSshKey,
+                                               final String newSshKey ) throws NetworkManagerException
+    {
+        new SshManager( containers ).replaceSshKey( oldSshKey, newSshKey );
+    }
+
+
+    @Override
+    public void removeSshKeyFromAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
+            throws NetworkManagerException
+    {
+        new SshManager( containers ).removeSshKey( sshKey );
+    }
+
+
+    @Override
+    public void registerHosts( final Set<ContainerHost> containerHosts, final String domainName )
+            throws NetworkManagerException
+    {
+        new HostManager( containerHosts, domainName ).execute();
     }
 }

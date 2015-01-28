@@ -47,7 +47,7 @@ public class QuotaMemoryComponent extends VerticalLayout
         unitComboBox.setItemCaptionPropertyId( UNIT_LONG_NAME );
         unitComboBox.setItemCaptionMode( AbstractSelect.ItemCaptionMode.PROPERTY );
 
-        unitComboBox.select( defaultUnit.getShortName() );
+        unitComboBox.select( defaultUnit.getAcronym() );
 
         unitComboBox.setInputPrompt( "Select unit." );
         unitComboBox.setNullSelectionAllowed( false );
@@ -68,7 +68,7 @@ public class QuotaMemoryComponent extends VerticalLayout
                 performConversion( newUnit );
             }
         } );
-        unitComboBox.select( getUnitsEnum().getItem( MemoryUnit.BYTES.getShortName() ) );
+        unitComboBox.select( getUnitsEnum().getItem( MemoryUnit.BYTES.getAcronym() ) );
         addComponent( unitComboBox );
 
         setSizeFull();
@@ -102,12 +102,12 @@ public class QuotaMemoryComponent extends VerticalLayout
 
         for ( MemoryUnit anEnum : MemoryUnit.values() )
         {
-            Item item = units.addItem( anEnum.getShortName() );
+            Item item = units.addItem( anEnum.getAcronym() );
 
-            item.getItemProperty( UNIT_SHORT_NAME ).setValue( anEnum.getShortName() );
-            item.getItemProperty( UNIT_LONG_NAME ).setValue( anEnum.getLongName() );
+            item.getItemProperty( UNIT_SHORT_NAME ).setValue( anEnum.getAcronym() );
+            item.getItemProperty( UNIT_LONG_NAME ).setValue( anEnum.getName() );
 
-            LOGGER.info( anEnum.getShortName() + "  " + anEnum.getLongName() );
+            LOGGER.info( anEnum.getAcronym() + "  " + anEnum.getName() );
         }
         return units;
     }

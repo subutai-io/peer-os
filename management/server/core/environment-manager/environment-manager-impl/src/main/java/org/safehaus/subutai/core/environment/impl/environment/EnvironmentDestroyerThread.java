@@ -1,9 +1,9 @@
 package org.safehaus.subutai.core.environment.impl.environment;
 
 
-import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -16,7 +16,6 @@ import org.safehaus.subutai.core.tracker.api.Tracker;
 import com.google.gwt.thirdparty.guava.common.base.Strings;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -45,8 +44,8 @@ public class ProgressWindow
     public ProgressWindow( ExecutorService executor, Tracker tracker, UUID trackID, String source )
     {
 
-        final VerticalLayout l = new VerticalLayout();
-        window = new Window( "Operation progress", l );
+        final VerticalLayout layout = new VerticalLayout();
+        window = new Window( "Operation progress", layout );
         window.setImmediate( true );
         window.setModal( false );
         window.setResizable( true );
@@ -102,7 +101,7 @@ public class ProgressWindow
         content.addComponent( bottomContent );
         content.setComponentAlignment( bottomContent, Alignment.MIDDLE_RIGHT );
 
-        l.addComponent( content );
+        layout.addComponent( content );
         start();
     }
 

@@ -3,6 +3,8 @@ package org.safehaus.subutai.core.network.api;
 
 import java.util.Set;
 
+import org.safehaus.subutai.common.peer.ContainerHost;
+
 
 public interface NetworkManager
 {
@@ -86,5 +88,48 @@ public interface NetworkManager
 
 
     public NetworkManager getRemoteManager( String host, int port );
+
+    /**
+     * Enables passwordless ssh access between containers
+     *
+     * @param containers - set of {@code ContainerHost}
+     */
+    public void exchangeSshKeys( Set<ContainerHost> containers ) throws NetworkManagerException;
+
+    /**
+     * Adds supplied ssh key to authorized_keys file of given containers
+     *
+     * @param containers- set of {@code ContainerHost}
+     * @param sshKey - ssh key to add
+     */
+    public void addSshKeyToAuthorizedKeys( Set<ContainerHost> containers, String sshKey )
+            throws NetworkManagerException;
+
+    /**
+     * Replaces supplied old ssh key with new ssh key in authorized_keys file of given containers
+     *
+     * @param containers set of {@code ContainerHost}
+     * @param oldSshKey - old ssh key
+     * @param newSshKey - new ssh key
+     */
+    public void replaceSshKeyInAuthorizedKeys( final Set<ContainerHost> containers, final String oldSshKey,
+                                               final String newSshKey ) throws NetworkManagerException;
+
+    /**
+     * Removes supplied ssh key from authorized_keys file of given containers
+     *
+     * @param containers set of {@code ContainerHost}
+     * @param sshKey - ssh key to remove
+     */
+    public void removeSshKeyFromAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
+            throws NetworkManagerException;
+
+    /**
+     * Registers containers in /etc/hosts of each other
+     *
+     * @param containers - set of {@code ContainerHost}
+     * @param domainName - domain name e.g. "intra.lan"
+     */
+    public void registerHosts( Set<ContainerHost> containers, String domainName ) throws NetworkManagerException;
 }
 

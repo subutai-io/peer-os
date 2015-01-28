@@ -22,7 +22,17 @@ import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Host;
+import org.safehaus.subutai.common.peer.HostEvent;
+import org.safehaus.subutai.common.peer.HostEventListener;
+import org.safehaus.subutai.common.peer.HostInfoModel;
+import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.DiskPartition;
@@ -35,7 +45,7 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
@@ -44,20 +54,12 @@ import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.peer.api.CloneParam;
 import org.safehaus.subutai.core.peer.api.CommandUtil;
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.Host;
-import org.safehaus.subutai.common.peer.HostEvent;
-import org.safehaus.subutai.common.peer.HostEventListener;
-import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.HostKey;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.HostTask;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.Payload;
-import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
@@ -328,7 +330,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         Set<ContainerHost> result = new HashSet<>();
         for ( HostCloneTask hostCloneTask : hostCloneTasks )
         {
-            result.add( hostCloneTask.getResult().getValue() );
+            if ( hostCloneTask.getResult().getValue() != null )
+            {
+                result.add( hostCloneTask.getResult().getValue() );
+            }
         }
         return result;
     }
@@ -880,19 +885,35 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     {
         try
         {
-            Host h = bindHost( host.getId() );
-
-            if ( h instanceof ContainerHost )
+            HostInfo hostInfo = hostRegistry.getHostInfoById( host.getId() );
+            if ( hostInfo instanceof ContainerHostInfo )
             {
-                return ContainerHostState.RUNNING.equals( ( ( ContainerHost ) h ).getState() );
+                return ContainerHostState.RUNNING.equals( ( ( ContainerHostInfo ) hostInfo ).getStatus() );
             }
 
+            Host h = bindHost( host.getId() );
             return !isTimedOut( h.getLastHeartbeat(), HOST_INACTIVE_TIME );
         }
-        catch ( PeerException e )
+        catch ( PeerException | HostDisconnectedException e )
         {
             return false;
         }
+
+        //        try
+        //        {
+        //            Host h = bindHost( host.getId() );
+        //
+        //            if ( h instanceof ContainerHost )
+        //            {
+        //                return ContainerHostState.RUNNING.equals( ( ( ContainerHost ) h ).getState() );
+        //            }
+        //
+        //            return !isTimedOut( h.getLastHeartbeat(), HOST_INACTIVE_TIME );
+        //        }
+        //        catch ( PeerException e )
+        //        {
+        //            return false;
+        //        }
     }
 
 

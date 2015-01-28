@@ -66,7 +66,7 @@ public class Memory
     {
         if ( unit == MemoryUnit.NONE || value == null )
         {
-            return unit.getShortName();
+            return unit.getAcronym();
         }
         else if ( unit == MemoryUnit.BYTES )
         {
@@ -74,7 +74,7 @@ public class Memory
         }
         else
         {
-            return String.valueOf( value ) + unit.getShortName();
+            return String.valueOf( value ) + unit.getAcronym();
         }
     }
 }

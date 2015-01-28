@@ -22,7 +22,6 @@
     <module>git-manager</module>
     <module>lxc-quota-manager</module>
     <module>network-manager</module>
-    <module>security-manager</module>
     <module>peer-manager</module>
     <module>strategy-manager</module>
     <module>template-registry</module>
@@ -36,8 +35,10 @@
     <module>command-executor</module>
     <module>wol-manager</module>
     <module>key-manager</module>
+    <module>backup-manager</module>
     <module>plugin-manager</module>
     <module>env-manager</module>
+    <module>shiro-manager-parent</module>
   </modules>
 
 </project>

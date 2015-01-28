@@ -38,7 +38,7 @@ public class MemoryQuotaInfo extends QuotaInfo
     @Override
     public String getQuotaKey()
     {
-        return "memory.quota";
+        return "ram";
     }
 
 

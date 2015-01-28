@@ -364,7 +364,7 @@ public class MainUI extends UI implements ViewChangeListener
                                         String contextPath = VaadinService.getCurrentRequest().getContextPath();
                                         getUI().getPage().setLocation( contextPath );
                                         LOG.trace( "VaadinSession.close() called" );
-                                        getSession().close();
+                                        //                                        getSession().close();
                                         //                                        buildLoginView( true );
                                     }
                                 } );
@@ -386,6 +386,7 @@ public class MainUI extends UI implements ViewChangeListener
         {
             Button b =
                     new NativeButton( view.substring( 0, 1 ).toUpperCase() + view.substring( 1 ).replace( '-', ' ' ) );
+            b.setId( view.substring( 0, 1 ).toUpperCase() + view.substring( 1 ).replace( '-', ' ' ) );
             b.addStyleName( "icon-" + view );
             b.addClickListener( new Button.ClickListener()
             {

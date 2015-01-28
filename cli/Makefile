@@ -10,7 +10,7 @@ clean:
 	@rm -rf debian/subutai-cli
 
 package:
-	#@debian/update-version.sh
+	@debian/update-version.sh
 	dpkg-buildpackage -us -uc -rfakeroot
 	@if [ ! -d ${BUILD_DIR} ]; then mkdir ${BUILD_DIR}; fi
 	@mv ../*subutai-cli_* ${BUILD_DIR}

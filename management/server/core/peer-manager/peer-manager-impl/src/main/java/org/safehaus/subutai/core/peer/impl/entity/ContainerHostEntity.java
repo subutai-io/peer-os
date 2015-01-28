@@ -15,7 +15,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.common.quota.DiskPartition;
@@ -24,13 +29,8 @@ import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.common.host.ContainerHostState;
-import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
-import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.core.peer.api.HostKey;
-import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 
 import com.google.common.base.Preconditions;
@@ -247,6 +247,22 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     {
         Peer peer = getPeer();
         peer.destroyContainer( this );
+    }
+
+
+    @Override
+    public void start() throws PeerException
+    {
+        Peer peer = getPeer();
+        peer.startContainer( this );
+    }
+
+
+    @Override
+    public void stop() throws PeerException
+    {
+        Peer peer = getPeer();
+        peer.stopContainer( this );
     }
 
 

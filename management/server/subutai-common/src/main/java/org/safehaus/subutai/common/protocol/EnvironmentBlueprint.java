@@ -35,6 +35,12 @@ public class EnvironmentBlueprint
     }
 
 
+    public void setId( final UUID id )
+    {
+        this.id = id;
+    }
+
+
     public EnvironmentBlueprint( final String name, final String domainName, final boolean linkHosts,
                                  final boolean exchangeSshKeys )
     {
