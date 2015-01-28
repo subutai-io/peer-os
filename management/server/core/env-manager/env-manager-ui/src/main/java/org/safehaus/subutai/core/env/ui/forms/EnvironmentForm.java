@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.env.ui.forms;
 
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -23,6 +25,7 @@ import com.vaadin.ui.VerticalLayout;
 public class EnvironmentForm
 {
     private static final String SSH_KEY = "Ssh key";
+    private static final String DATE = "Date";
     private final EnvironmentManager environmentManager;
     private static final String CONTAINERS = "Containers";
     private static final String NAME = "Name";
@@ -153,10 +156,19 @@ public class EnvironmentForm
 
 
             environmentsTable.addItem( new Object[] {
-                    environment.getName(), icon, containersBtn, sshKeyBtn, destroyBtn
+                    environment.getName(), getCreationDate( environment.getCreationTimestamp() ), icon, containersBtn,
+                    sshKeyBtn, destroyBtn
             }, null );
         }
         environmentsTable.refreshRowCache();
+    }
+
+
+    private String getCreationDate( long ts )
+    {
+        SimpleDateFormat sdf = new SimpleDateFormat( "MMM dd,yyyy HH:mm" );
+        Date date = new Date( ts );
+        return sdf.format( date );
     }
 
 
@@ -179,6 +191,7 @@ public class EnvironmentForm
     {
         Table table = new Table( caption );
         table.addContainerProperty( NAME, String.class, null );
+        table.addContainerProperty( DATE, String.class, null );
         table.addContainerProperty( STATUS, Embedded.class, null );
         table.addContainerProperty( CONTAINERS, Button.class, null );
         table.addContainerProperty( SSH_KEY, Button.class, null );
