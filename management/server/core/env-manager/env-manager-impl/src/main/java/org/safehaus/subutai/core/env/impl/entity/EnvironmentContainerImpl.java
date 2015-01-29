@@ -53,6 +53,7 @@ import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentModificationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
@@ -674,5 +675,26 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public int hashCode()
     {
         return hostId != null ? hostId.hashCode() : 0;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        ContainerHostState state = ContainerHostState.UNKNOWN;
+        try
+        {
+            state = getState();
+        }
+        catch ( PeerException e )
+        {
+
+        }
+        return Objects.toStringHelper( this ).add( "hostId", hostId ).add( "hostname", hostname )
+                      .add( "nodeGroupName", nodeGroupName ).add( "creatorPeerId", creatorPeerId )
+                      .add( "templateName", templateName ).add( "environmentId", environment.getId() )
+                      .add( "sshGroupId", sshGroupId ).add( "hostsGroupId", hostsGroupId )
+                      .add( "domainName", domainName ).add( "tags", tags ).add( "templateArch", templateArch )
+                      .add( "hostArchitecture", hostArchitecture ).add( "state", state ).toString();
     }
 }
