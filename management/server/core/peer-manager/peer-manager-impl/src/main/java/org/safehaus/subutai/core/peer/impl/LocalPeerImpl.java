@@ -1175,7 +1175,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
     {
-        LOG.info( String.format( "Received heartbeat: %s", resourceHostInfo ) );
+        //        LOG.info( String.format( "Received heartbeat: %s", resourceHostInfo ) );
         if ( resourceHostInfo.getHostname().equals( "management" ) )
         {
             if ( managementHost == null )
