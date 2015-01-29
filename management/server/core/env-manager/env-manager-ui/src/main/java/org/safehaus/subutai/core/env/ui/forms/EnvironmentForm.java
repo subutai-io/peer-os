@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.safehaus.subutai.core.env.api.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.core.env.api.EnvironmentStatus;
+import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
 

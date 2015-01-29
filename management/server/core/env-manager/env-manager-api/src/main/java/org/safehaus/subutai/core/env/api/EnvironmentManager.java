@@ -5,8 +5,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.core.env.api.build.Blueprint;
-import org.safehaus.subutai.core.env.api.build.Topology;
+import org.safehaus.subutai.common.environment.Blueprint;
+import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
