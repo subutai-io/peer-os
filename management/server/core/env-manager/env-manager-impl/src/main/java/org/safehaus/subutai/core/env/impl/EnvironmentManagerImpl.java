@@ -13,10 +13,11 @@ import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.env.api.Environment;
+import org.safehaus.subutai.core.env.api.EnvironmentEventListener;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.core.env.api.EnvironmentStatus;
-import org.safehaus.subutai.core.env.api.build.Blueprint;
-import org.safehaus.subutai.core.env.api.build.Topology;
+import org.safehaus.subutai.common.environment.EnvironmentStatus;
+import org.safehaus.subutai.common.environment.Blueprint;
+import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.core.env.api.exception.ContainerHostNotFoundException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
@@ -55,6 +56,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private final NetworkManager networkManager;
     private final TopologyBuilder topologyBuilder;
     private final ExecutorService executor = Executors.newCachedThreadPool();
+
+    private Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
 
     //************* DaoManager ******************
     private final DaoManager daoManager;
@@ -164,6 +167,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                         configureHosts( environment.getContainerHosts() );
 
                         configureSsh( environment.getContainerHosts() );
+
+                        environment.setStatus( EnvironmentStatus.HEALTHY );
+
+                        setContainersTransientFields( environment.getContainerHosts() );
                     }
                     catch ( EnvironmentBuildException | NetworkManagerException e )
                     {
@@ -171,11 +178,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
                         throw new EnvironmentCreationException( e );
                     }
-
-                    environment.setStatus( EnvironmentStatus.HEALTHY );
-
-                    //set container's transient fields
-                    setContainersTransientFields( environment.getContainerHosts() );
+                    finally
+                    {
+                        try
+                        {
+                            notifyOnEnvironmentCreated( findEnvironment( environment.getId() ) );
+                        }
+                        catch ( EnvironmentNotFoundException e )
+                        {
+                            LOG.warn( "Error notifying on environment creation", e );
+                        }
+                    }
                 }
                 catch ( EnvironmentCreationException e )
                 {
@@ -249,6 +262,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                             ( ( EnvironmentContainerImpl ) container ).destroy();
 
                             environment.removeContainer( container.getId() );
+
+                            notifyOnContainerDestroyed( environment, container.getId() );
                         }
                         catch ( PeerException e )
                         {
@@ -265,12 +280,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                         }
                     }
 
-                    environmentDataService.remove( environmentId.toString() );
+                    removeEnvironment( environmentId );
                 }
-                catch ( EnvironmentDestructionException e )
+                catch ( EnvironmentDestructionException | EnvironmentNotFoundException e )
                 {
                     LOG.error( String.format( "Error destroying environment %s", environmentId ), e );
-                    resultHolder.setResult( e );
+
+                    resultHolder.setResult( new EnvironmentDestructionException( e ) );
                 }
                 finally
                 {
@@ -348,6 +364,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     {
                         topologyBuilder.build( environment, topology );
 
+                        newContainers.addAll( environment.getContainerHosts() );
+
+                        newContainers.removeAll( oldContainers );
+
+                        setContainersTransientFields( newContainers );
+
                         configureHosts( environment.getContainerHosts() );
 
                         configureSsh( environment.getContainerHosts() );
@@ -357,12 +379,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                             setSshKey( environmentId, environment.getSshKey(), false );
                         }
 
-                        //set container's transient fields
-                        setContainersTransientFields( environment.getContainerHosts() );
-
-                        newContainers.addAll( environment.getContainerHosts() );
-
-                        newContainers.removeAll( oldContainers );
+                        environment.setStatus( EnvironmentStatus.HEALTHY );
                     }
                     catch ( EnvironmentBuildException | NetworkManagerException | EnvironmentNotFoundException |
                             EnvironmentModificationException e )
@@ -371,8 +388,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
                         throw new EnvironmentModificationException( e );
                     }
-
-                    environment.setStatus( EnvironmentStatus.HEALTHY );
+                    finally
+                    {
+                        if ( !newContainers.isEmpty() )
+                        {
+                            notifyOnEnvironmentGrown( environment, newContainers );
+                        }
+                    }
                 }
                 catch ( EnvironmentModificationException e )
                 {
@@ -467,6 +489,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
                         environment.removeContainer( containerHost.getId() );
+
+                        notifyOnContainerDestroyed( environment, containerHost.getId() );
                     }
                     catch ( PeerException e )
                     {
@@ -530,6 +554,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         findEnvironment( environmentId );
 
         environmentDataService.remove( environmentId.toString() );
+
+        notifyOnEnvironmentDestroyed( environmentId );
     }
 
 
@@ -720,6 +746,88 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 throw new EnvironmentModificationException( e );
             }
+        }
+    }
+
+
+    public void registerListener( EnvironmentEventListener listener )
+    {
+        if ( listener != null )
+        {
+            listeners.add( listener );
+        }
+    }
+
+
+    public void unregisterListener( EnvironmentEventListener listener )
+    {
+        if ( listener != null )
+        {
+            listeners.remove( listener );
+        }
+    }
+
+
+    private void notifyOnEnvironmentCreated( final Environment environment )
+    {
+        for ( final EnvironmentEventListener listener : listeners )
+        {
+            executor.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    listener.onEnvironmentCreated( environment );
+                }
+            } );
+        }
+    }
+
+
+    private void notifyOnEnvironmentGrown( final Environment environment, final Set<ContainerHost> containers )
+    {
+        for ( final EnvironmentEventListener listener : listeners )
+        {
+            executor.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    listener.onEnvironmentGrown( environment, containers );
+                }
+            } );
+        }
+    }
+
+
+    private void notifyOnContainerDestroyed( final Environment environment, final UUID containerId )
+    {
+        for ( final EnvironmentEventListener listener : listeners )
+        {
+            executor.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    listener.onContainerDestroyed( environment, containerId );
+                }
+            } );
+        }
+    }
+
+
+    private void notifyOnEnvironmentDestroyed( final UUID environmentId )
+    {
+        for ( final EnvironmentEventListener listener : listeners )
+        {
+            executor.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    listener.onEnvironmentDestroyed( environmentId );
+                }
+            } );
         }
     }
 }

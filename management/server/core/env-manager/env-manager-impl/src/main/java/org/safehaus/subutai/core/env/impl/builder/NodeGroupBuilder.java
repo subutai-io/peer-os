@@ -11,7 +11,7 @@ import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.core.env.api.build.NodeGroup;
+import org.safehaus.subutai.common.environment.NodeGroup;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.exception.NodeGroupBuildException;
 import org.safehaus.subutai.core.peer.api.PeerManager;

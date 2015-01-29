@@ -10,7 +10,7 @@ import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.env.api.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.core.env.api.EnvironmentStatus;
+import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
 
 import com.vaadin.ui.Button;

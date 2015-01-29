@@ -7,4 +7,10 @@ public class EnvironmentCreationException extends Exception
     {
         super( cause );
     }
+
+
+    public EnvironmentCreationException( final String message )
+    {
+        super( message );
+    }
 }
