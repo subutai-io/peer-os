@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.env.api.build;
+package org.safehaus.subutai.common.environment;
 
 
 import java.util.Collections;

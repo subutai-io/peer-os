@@ -11,8 +11,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.core.env.api.build.NodeGroup;
-import org.safehaus.subutai.core.env.api.build.Topology;
+import org.safehaus.subutai.common.environment.NodeGroup;
+import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;

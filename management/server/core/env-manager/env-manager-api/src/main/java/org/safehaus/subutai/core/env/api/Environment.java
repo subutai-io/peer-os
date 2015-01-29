@@ -5,8 +5,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.core.env.api.build.Topology;
+import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.core.env.api.exception.ContainerHostNotFoundException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentModificationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
