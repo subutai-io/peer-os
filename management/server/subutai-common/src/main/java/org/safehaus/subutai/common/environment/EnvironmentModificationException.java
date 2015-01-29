@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.env.api.exception;
+package org.safehaus.subutai.common.environment;
 
 
 public class EnvironmentModificationException extends Exception

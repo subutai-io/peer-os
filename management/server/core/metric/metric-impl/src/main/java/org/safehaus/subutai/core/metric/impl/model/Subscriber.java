@@ -10,9 +10,6 @@ import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 
-/**
- * Created by talas on 12/12/14.
- */
 @Entity
 @Table( name = "monitor_subscriber" )
 @Access( AccessType.FIELD )

@@ -3,8 +3,6 @@ package org.safehaus.subutai.core.metric.api;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.core.metric.api.Metric;
-
 import com.google.common.base.Objects;
 
 
