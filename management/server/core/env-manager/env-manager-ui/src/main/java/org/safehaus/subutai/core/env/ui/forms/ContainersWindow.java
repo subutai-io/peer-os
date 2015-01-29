@@ -6,12 +6,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.safehaus.subutai.common.environment.Environment;
+import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
+import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.common.environment.EnvironmentStatus;
-import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
@@ -25,8 +25,8 @@ public class ContainersWindow extends Window
     private final EnvironmentManager environmentManager;
     private Environment environment;
     private Table containersTable;
-    private ScheduledExecutorService updater = Executors.newSingleThreadScheduledExecutor();
-    private ExecutorService taskExecutor = Executors.newSingleThreadExecutor();
+    private ScheduledExecutorService updater;
+    private ExecutorService taskExecutor;
 
 
     public ContainersWindow( final EnvironmentManager environmentManager, final Environment environment )
@@ -60,15 +60,24 @@ public class ContainersWindow extends Window
             public void detach( final DetachEvent event )
             {
                 updater.shutdown();
+                taskExecutor.shutdown();
             }
         } );
-
-        startTableUpdateThread();
+        addAttachListener( new AttachListener()
+        {
+            @Override
+            public void attach( final AttachEvent event )
+            {
+                startTableUpdateThread();
+            }
+        } );
     }
 
 
     private void startTableUpdateThread()
     {
+        taskExecutor = Executors.newSingleThreadExecutor();
+        updater = Executors.newSingleThreadScheduledExecutor();
         updater.scheduleWithFixedDelay( new Runnable()
         {
             @Override

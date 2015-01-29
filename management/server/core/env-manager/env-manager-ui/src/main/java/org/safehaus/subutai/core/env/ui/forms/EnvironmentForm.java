@@ -8,10 +8,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.safehaus.subutai.common.environment.Environment;
-import org.safehaus.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.common.environment.EnvironmentStatus;
-import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
 import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
+import org.safehaus.subutai.common.environment.EnvironmentStatus;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
 
 import com.vaadin.server.ClientConnector;
 import com.vaadin.server.ThemeResource;
@@ -38,7 +38,7 @@ public class EnvironmentForm
 
     private final VerticalLayout contentRoot;
     private Table environmentsTable;
-    private ScheduledExecutorService updater = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService updater;
 
 
     public EnvironmentForm( final EnvironmentManager environmentManager )
@@ -76,13 +76,20 @@ public class EnvironmentForm
                 updater.shutdown();
             }
         } );
-
-        startTableUpdateThread();
+        contentRoot.addAttachListener( new ClientConnector.AttachListener()
+        {
+            @Override
+            public void attach( final ClientConnector.AttachEvent event )
+            {
+                startTableUpdateThread();
+            }
+        } );
     }
 
 
     private void startTableUpdateThread()
     {
+        updater = Executors.newSingleThreadScheduledExecutor();
         updater.scheduleWithFixedDelay( new Runnable()
         {
             @Override
