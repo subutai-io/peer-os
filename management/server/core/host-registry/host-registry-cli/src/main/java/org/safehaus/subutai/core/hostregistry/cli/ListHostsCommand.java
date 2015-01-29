@@ -34,7 +34,6 @@ public class ListHostsCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Subject subject = SecurityUtils.getSubject();
         Set<ResourceHostInfo> resourceHostsInfo = hostRegistry.getResourceHostsInfo();
 
         for ( ResourceHostInfo resourceHostInfo : resourceHostsInfo )

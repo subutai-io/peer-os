@@ -86,6 +86,7 @@ public class UserEntity implements User
     //    }
 
 
+    @Override
     public void setPassword( final String password )
     {
         this.password = password;
@@ -127,4 +128,6 @@ public class UserEntity implements User
     {
         roles.add( roleEntity );
     }
+
+
 }

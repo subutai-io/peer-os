@@ -19,4 +19,6 @@ public interface User
 
 
     public List<String> getPermissions();
+
+    public void setSalt( String salt );
 }

@@ -73,31 +73,13 @@ public class HostsCommand extends OsgiCommandSupport
         Subject subject = Subject.getSubject( acc );
         Set<Principal> principals = subject.getPrincipals();
 
-
-//        String sessionId = getSessionId( principals );
-
-
-        //        org.apache.shiro.subject.Subject requestSubject =
-        //                new org.apache.shiro.subject.Subject.Builder().sessionId( sessionId ).buildSubject();
-
-
-        //        SecurityUtils.setSecurityManager( securityManager );
-//        org.apache.shiro.subject.Subject sub = identityManager.getSubject( sessionId );
-
-
         Set<ShiroPrincipal> shiroPrincipal = subject.getPrincipals( ShiroPrincipal.class );
 
         org.apache.shiro.subject.Subject sub = shiroPrincipal.iterator().next().getSubject();
 
         System.out.println( String.format( "Is authn? %s %s %s", sub.isAuthenticated(), sub.getPrincipal(),
                 sub.getSession().getId() ) );
-        //        sub = identityManager.getSubject();
-        //
-        //        SecurityUtils.setSecurityManager( identityManager.getSecurityManager() );
-        //
-        //        sub = identityManager.getSubject();
-        //
-        //        sub = SecurityUtils.getSubject();
+
 
         LocalPeer localPeer = peerManager.getLocalPeer();
         //        localPeer.init();

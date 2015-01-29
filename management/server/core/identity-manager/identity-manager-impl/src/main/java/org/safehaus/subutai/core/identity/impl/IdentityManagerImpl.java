@@ -6,6 +6,7 @@ import java.io.Serializable;
 import org.osgi.framework.BundleContext;
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
+import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.identity.impl.dao.RoleDataService;
 import org.safehaus.subutai.core.identity.impl.dao.UserDataService;
 import org.safehaus.subutai.core.identity.impl.entity.RoleEntity;
@@ -114,11 +115,13 @@ public class IdentityManagerImpl implements IdentityManager
     {
 
         UserDataService userDataService = new UserDataService( daoManager.getEntityManagerFactory() );
-
-        if ( userDataService.findByUsername( username ) != null )
+        User user = userDataService.findByUsername( username );
+        LOG.info( String.format( "User: [%s] [%s]", username, user ) );
+        if ( user != null )
         {
             return;
         }
+        LOG.info( String.format( "User not found. Adding new user: [%s] ", username ) );
         RoleDataService roleDataService = new RoleDataService( daoManager.getEntityManagerFactory() );
         RoleEntity roleEntity = roleDataService.find( "admin" );
         if ( roleEntity == null )
@@ -130,12 +133,12 @@ public class IdentityManagerImpl implements IdentityManager
 
         String password = "secret";
         String salt = getSalt( username );
-        UserEntity user = new UserEntity();
+        user = new UserEntity();
         user.setUsername( username );
         user.setPassword( simpleSaltedHash( password, new SimpleByteSource( salt ).getBytes() ) );
         user.setSalt( salt );
         //        user.addRole( roleEntity );
-        userDataService.persist( user );
+        userDataService.persist( ( UserEntity ) user );
         LOG.info( String.format( "User: %s", user.getId() ) );
     }
 

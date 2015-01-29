@@ -173,6 +173,7 @@ public class UserDataService implements DataService<Long, UserEntity>
         {
             em.getTransaction().begin();
             Query query = em.createQuery( "select u from UserEntity u where u.username = :username" );
+            query.setParameter( "username", username );
 
             result = ( UserEntity ) query.getSingleResult();
             em.getTransaction().commit();
