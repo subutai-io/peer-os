@@ -5,10 +5,9 @@ import java.util.Collection;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import org.safehaus.subutai.common.protocol.api.DataService;
-import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.identity.impl.entity.UserEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,17 +164,18 @@ public class UserDataService implements DataService<Long, UserEntity>
     }
 
 
-    public User findByUsername( final String username )
+    public UserEntity findByUsername( final String username )
     {
         UserEntity result = null;
         EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
-            Query query = em.createQuery( "select u from UserEntity u where u.username = :username" );
+            TypedQuery<UserEntity> query =
+                    em.createQuery( "select u from UserEntity u where u.username = :username", UserEntity.class );
             query.setParameter( "username", username );
 
-            result = ( UserEntity ) query.getSingleResult();
+            result = query.getSingleResult();
             em.getTransaction().commit();
         }
         catch ( Exception e )
