@@ -38,6 +38,7 @@ public class BlueprintForm
     private static final String BUILD = "Build";
     private static final String VIEW = "View";
     private static final String DELETE = "Delete";
+    private static final String GROW = "Grow";
 
 
     private final VerticalLayout contentRoot;
@@ -158,12 +159,24 @@ public class BlueprintForm
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
-                        buildBlueprint( blueprint );
+                        buildBlueprint( blueprint, false );
                     }
                 } );
 
+                final Button grow = new Button( GROW );
+                grow.setId( blueprint.getName() + "-grow" );
+                grow.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent event )
+                    {
+                        buildBlueprint( blueprint, true );
+                    }
+                } );
+
+
                 blueprintsTable.addItem( new Object[] {
-                        blueprint.getName(), view, delete, build
+                        blueprint.getName(), view, delete, build, grow
                 }, null );
             }
         }
@@ -175,9 +188,9 @@ public class BlueprintForm
     }
 
 
-    private void buildBlueprint( Blueprint blueprint )
+    private void buildBlueprint( Blueprint blueprint, boolean grow )
     {
-        contentRoot.getUI().addWindow( new TopologyWindow( blueprint, peerManager, environmentManager ) );
+        contentRoot.getUI().addWindow( new TopologyWindow( blueprint, peerManager, environmentManager, grow ) );
     }
 
 
@@ -188,6 +201,7 @@ public class BlueprintForm
         table.addContainerProperty( VIEW, Button.class, null );
         table.addContainerProperty( DELETE, Button.class, null );
         table.addContainerProperty( BUILD, Button.class, null );
+        table.addContainerProperty( GROW, Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setEnabled( true );
