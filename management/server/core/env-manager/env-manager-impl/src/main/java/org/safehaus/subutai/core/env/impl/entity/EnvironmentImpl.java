@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.net.util.SubnetUtils;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
@@ -395,5 +396,14 @@ public class EnvironmentImpl implements Environment, Serializable
         TypeToken<Map<UUID, Integer>> typeToken = new TypeToken<Map<UUID, Integer>>()
         {};
         return JsonUtil.fromJson( peerVlanInfo, typeToken.getType() );
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return Objects.toStringHelper( this ).add( "environmentId", environmentId ).add( "name", name )
+                      .add( "creationTimestamp", creationTimestamp ).add( "status", status )
+                      .add( "containers", containers ).toString();
     }
 }

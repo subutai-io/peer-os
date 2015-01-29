@@ -108,6 +108,8 @@ public class EnvironmentForm
         for ( final Environment environment : environmentManager.getEnvironments() )
         {
             final Button containersBtn = new Button( CONTAINERS );
+            final Button sshKeyBtn = new Button( SSH_KEY );
+            final Button destroyBtn = new Button( DESTROY );
             containersBtn.setId( environment.getName() + "-containers" );
             containersBtn.addClickListener( new Button.ClickListener()
             {
@@ -118,7 +120,6 @@ public class EnvironmentForm
                 }
             } );
 
-            final Button destroyBtn = new Button( DESTROY );
             destroyBtn.setId( environment.getName() + "-destroy" );
             destroyBtn.addClickListener( new Button.ClickListener()
             {
@@ -127,11 +128,11 @@ public class EnvironmentForm
                 {
                     destroyBtn.setEnabled( false );
                     containersBtn.setEnabled( false );
+                    sshKeyBtn.setEnabled( false );
                     destroyEnvironment( environment );
                 }
             } );
 
-            final Button sshKeyBtn = new Button( SSH_KEY );
             sshKeyBtn.setId( environment.getName() + "-sshkey" );
             sshKeyBtn.addClickListener( new Button.ClickListener()
             {
