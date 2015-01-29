@@ -1,5 +1,7 @@
-package org.safehaus.subutai.core.shiro.ui.tabs;
+package org.safehaus.subutai.core.identity.ui.tabs;
 
+
+import org.safehaus.subutai.core.identity.api.IdentityManager;
 
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.validator.AbstractStringValidator;
@@ -23,6 +25,14 @@ import com.vaadin.ui.VerticalLayout;
 public class UserRegistrationForm extends CustomComponent
 {
     private static final long serialVersionUID = -1770451668233870037L;
+
+    private IdentityManager identityManager;
+
+
+    public UserRegistrationForm( final IdentityManager identityManager )
+    {
+        this.identityManager = identityManager;
+    }
 
 
     public void init()
@@ -108,6 +118,8 @@ public class UserRegistrationForm extends CustomComponent
                     passwordField.validate();
                     repeatPasswordField.validate();
                     email.validate();
+                    identityManager.addUser( username.getValue(), nameSurname.getValue(), passwordField.getValue(),
+                            email.getValue() );
                 }
                 catch ( InvalidValueException e )
                 {

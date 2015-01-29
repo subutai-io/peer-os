@@ -1,10 +1,11 @@
-package org.safehaus.subutai.core.shiro.ui;
+package org.safehaus.subutai.core.identity.ui;
 
 
 import org.safehaus.subutai.common.protocol.Disposable;
-import org.safehaus.subutai.core.shiro.ui.tabs.RoleManagementForm;
-import org.safehaus.subutai.core.shiro.ui.tabs.UserManagementForm;
-import org.safehaus.subutai.core.shiro.ui.tabs.UserRegistrationForm;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
+import org.safehaus.subutai.core.identity.ui.tabs.RoleManagementForm;
+import org.safehaus.subutai.core.identity.ui.tabs.UserManagementForm;
+import org.safehaus.subutai.core.identity.ui.tabs.UserRegistrationForm;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
@@ -15,7 +16,7 @@ import com.vaadin.ui.themes.Runo;
 /**
  * Created by talas on 1/21/15.
  */
-public class ShiroManagerComponent extends CustomComponent implements Disposable
+public class IdentityManagerComponent extends CustomComponent implements Disposable
 {
 
     private UserManagementForm userManagementForm;
@@ -23,7 +24,7 @@ public class ShiroManagerComponent extends CustomComponent implements Disposable
     private RoleManagementForm roleManagementForm;
 
 
-    public ShiroManagerComponent( final ShiroManagerPortalModule portalModule )
+    public IdentityManagerComponent( final IdentityManagerPortalModule portalModule, IdentityManager identityManager )
     {
         setHeight( 100, Unit.PERCENTAGE );
 
@@ -34,8 +35,8 @@ public class ShiroManagerComponent extends CustomComponent implements Disposable
         TabSheet sheet = new TabSheet();
         sheet.setStyleName( Runo.TABSHEET_SMALL );
         sheet.setSizeFull();
-        userManagementForm = new UserManagementForm();
-        userRegistrationForm = new UserRegistrationForm();
+        userManagementForm = new UserManagementForm( identityManager );
+        userRegistrationForm = new UserRegistrationForm( identityManager );
         userRegistrationForm.init();
         roleManagementForm = new RoleManagementForm();
 

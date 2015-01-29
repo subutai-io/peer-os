@@ -2,6 +2,8 @@ package org.safehaus.subutai.core.identity.impl;
 
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.osgi.framework.BundleContext;
 import org.safehaus.subutai.common.dao.DaoManager;
@@ -35,17 +37,16 @@ public class IdentityManagerImpl implements IdentityManager
     private DaoManager daoManager;
     private BundleContext bundleContext;
     private SecurityManager securityManager;
-    //    private Subject subject = null;
-    //    private Serializable sessionId = null;
-    //
-    //
+    private UserDataService userDataService;
+
+
     //    public IdentityManagerImpl()
     //    {
-    //        //        LOG.info( "Initializing security manager..." );
-    //        //        IniSecurityManagerFactory factory = new IniSecurityManagerFactory( "subutai-shiro.ini" );
-    //        //        org.apache.shiro.mgt.SecurityManager securityManager = factory.getInstance();
-    //        //        SecurityUtils.setSecurityManager( securityManager );
-    //        //        LOG.info( String.format( "Security manager initialized: %s", securityManager ) );
+    //        LOG.info( "Initializing security manager..." );
+    //        IniSecurityManagerFactory factory = new IniSecurityManagerFactory( "subutai-shiro.ini" );
+    //        org.apache.shiro.mgt.SecurityManager securityManager = factory.getInstance();
+    //        SecurityUtils.setSecurityManager( securityManager );
+    //        LOG.info( String.format( "Security manager initialized: %s", securityManager ) );
     //    }
 
 
@@ -61,17 +62,9 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    private String getSalt( String username )
+    private String getSimpleSalt( String username )
     {
         return "random_salt_value_" + username;
-    }
-
-
-    private String simpleSaltedHash( String password, byte[] salt )
-    {
-        Sha256Hash sha256Hash = new Sha256Hash( password, salt );
-        String result = sha256Hash.toHex();
-        return result;
     }
 
 
@@ -99,6 +92,8 @@ public class IdentityManagerImpl implements IdentityManager
         //        RealmSecurityManager r = ( RealmSecurityManager ) securityManager;
         //        r.setRealm( subutaiJdbcRealm );
 
+        userDataService = new UserDataService( daoManager.getEntityManagerFactory() );
+
         checkDefaultUser( "karaf" );
         checkDefaultUser( "admin" );
         checkDefaultUser( "timur" );
@@ -114,7 +109,6 @@ public class IdentityManagerImpl implements IdentityManager
     private void checkDefaultUser( String username )
     {
 
-        UserDataService userDataService = new UserDataService( daoManager.getEntityManagerFactory() );
         User user = userDataService.findByUsername( username );
         LOG.info( String.format( "User: [%s] [%s]", username, user ) );
         if ( user != null )
@@ -132,10 +126,12 @@ public class IdentityManagerImpl implements IdentityManager
 
 
         String password = "secret";
-        String salt = getSalt( username );
+        String salt = getSimpleSalt( username );
         user = new UserEntity();
         user.setUsername( username );
-        user.setPassword( simpleSaltedHash( password, new SimpleByteSource( salt ).getBytes() ) );
+        user.setFullname( "Full name of: " + username );
+        user.setEmail( username + "@subutai.at" );
+        user.setPassword( saltedHash( password, new SimpleByteSource( salt ).getBytes() ) );
         user.setSalt( salt );
         //        user.addRole( roleEntity );
         userDataService.persist( ( UserEntity ) user );
@@ -188,8 +184,39 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public void logout( Serializable sessionId )
     {
-        LOG.debug( String.format( "Logout. Thread ID: %d", Thread.currentThread().getId() ) );
         Subject subject = this.getSubject( sessionId );
         subject.logout();
+    }
+
+
+    @Override
+    public List<User> getAllUsers()
+    {
+        List<User> result = new ArrayList<>();
+        result.addAll( userDataService.getAll() );
+        return result;
+    }
+
+
+    @Override
+    public boolean addUser( final String username, final String fullname, final String password, final String email )
+    {
+        String salt = getSimpleSalt( username );
+        UserEntity user = new UserEntity();
+        user.setUsername( username );
+        user.setEmail( email );
+        user.setFullname( fullname );
+        user.setSalt( salt );
+        user.setPassword( saltedHash( password, salt.getBytes() ) );
+        userDataService.persist( user );
+        return user.getId() != null;
+    }
+
+
+    private String saltedHash( String password, byte[] salt )
+    {
+        Sha256Hash sha256Hash = new Sha256Hash( password, salt );
+        String result = sha256Hash.toHex();
+        return result;
     }
 }

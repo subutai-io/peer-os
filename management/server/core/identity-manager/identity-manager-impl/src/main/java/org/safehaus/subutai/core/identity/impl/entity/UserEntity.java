@@ -43,6 +43,9 @@ public class UserEntity implements User
     @Column( name = "user_name" )
     public String username;
 
+    @Column( name = "full_name" )
+    public String fullname;
+
     @Column( name = "password" )
     public String password;
 
@@ -51,6 +54,9 @@ public class UserEntity implements User
 
     @Column( name = "permissions" )
     public String permissions;
+
+    @Column( name = "e_mail" )
+    public String email;
 
 
     @Override
@@ -130,4 +136,28 @@ public class UserEntity implements User
     }
 
 
+    public void setFullname( final String fullname )
+    {
+        this.fullname = fullname;
+    }
+
+
+    public void setEmail( final String email )
+    {
+        this.email = email;
+    }
+
+
+    @Override
+    public String getFullname()
+    {
+        return fullname;
+    }
+
+
+    @Override
+    public String getEmail()
+    {
+        return email;
+    }
 }

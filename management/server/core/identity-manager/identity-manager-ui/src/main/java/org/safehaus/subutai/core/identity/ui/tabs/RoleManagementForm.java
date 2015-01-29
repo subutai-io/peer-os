@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.shiro.ui.tabs;
+package org.safehaus.subutai.core.identity.ui.tabs;
 
 
 import org.safehaus.subutai.common.protocol.Disposable;

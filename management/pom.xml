@@ -51,7 +51,7 @@
     <org.mockito.version>1.9.5</org.mockito.version>
     <com.jayway.awaitility.version>1.5.0</com.jayway.awaitility.version>
     <junit.version>4.11</junit.version>
-<!--    <org.osgi.version>4.3.1</org.osgi.version>-->
+    <!--    <org.osgi.version>4.3.1</org.osgi.version>-->
 
     <vaadin-version>7.3.3</vaadin-version>
 
@@ -507,6 +507,11 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>identity-manager-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>identity-manager-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

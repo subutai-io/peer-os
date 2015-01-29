@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.shiro.ui;
+package org.safehaus.subutai.core.identity.ui;
 
 
 import java.io.File;

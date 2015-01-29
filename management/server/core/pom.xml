@@ -39,7 +39,7 @@
     <module>plugin-manager</module>
     <module>env-manager</module>
     <module>identity-manager</module>
-    <module>shiro-manager-parent</module>
+    <!--    <module>shiro-manager-parent</module>-->
   </modules>
 
 </project>

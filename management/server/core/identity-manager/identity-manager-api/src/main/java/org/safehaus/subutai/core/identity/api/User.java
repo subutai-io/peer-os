@@ -21,4 +21,14 @@ public interface User
     public List<String> getPermissions();
 
     public void setSalt( String salt );
+
+    public String getFullname();
+
+    public String getUsername();
+
+    public String getEmail();
+
+    public void setFullname( String fullname );
+
+    public void setEmail( String email );
 }
