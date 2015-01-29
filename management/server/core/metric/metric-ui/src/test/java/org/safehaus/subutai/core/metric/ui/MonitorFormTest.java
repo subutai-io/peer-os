@@ -8,15 +8,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
@@ -54,7 +53,7 @@ public class MonitorFormTest
     {
         when( serviceLocator.getService( Monitor.class ) ).thenReturn( monitor );
         when( serviceLocator.getService( EnvironmentManager.class ) ).thenReturn( environmentManager );
-        when( environmentManager.getEnvironments() ).thenReturn( Lists.<Environment>newArrayList() );
+        when( environmentManager.getEnvironments() ).thenReturn( Sets.<Environment>newHashSet() );
 
         monitorForm = new MonitorForm( serviceLocator );
         monitorForm.outputTxtArea = outputTextArea;

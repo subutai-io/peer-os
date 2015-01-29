@@ -24,18 +24,19 @@ import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.env.api.Environment;
+import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.core.env.api.EnvironmentStatus;
-import org.safehaus.subutai.core.env.api.build.Topology;
-import org.safehaus.subutai.core.env.api.exception.ContainerHostNotFoundException;
-import org.safehaus.subutai.core.env.api.exception.EnvironmentModificationException;
-import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
+import org.safehaus.subutai.common.environment.EnvironmentStatus;
+import org.safehaus.subutai.common.environment.Topology;
+import org.safehaus.subutai.common.environment.ContainerHostNotFoundException;
+import org.safehaus.subutai.common.environment.EnvironmentModificationException;
+import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.net.util.SubnetUtils;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
@@ -395,5 +396,14 @@ public class EnvironmentImpl implements Environment, Serializable
         TypeToken<Map<UUID, Integer>> typeToken = new TypeToken<Map<UUID, Integer>>()
         {};
         return JsonUtil.fromJson( peerVlanInfo, typeToken.getType() );
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return Objects.toStringHelper( this ).add( "environmentId", environmentId ).add( "name", name )
+                      .add( "creationTimestamp", creationTimestamp ).add( "status", status )
+                      .add( "containers", containers ).toString();
     }
 }

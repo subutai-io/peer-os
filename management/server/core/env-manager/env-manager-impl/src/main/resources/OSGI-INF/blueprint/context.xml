@@ -20,6 +20,13 @@
   </bean>
   <!-- ************************************************************************************************** -->
 
+  <reference-list id="eventLstnr"
+                  interface="org.safehaus.subutai.core.env.api.EnvironmentEventListener"
+                  availability="optional">
+    <reference-listener ref="environmentManager"
+                        bind-method="registerListener" unbind-method="unregisterListener" />
+  </reference-list>
+
   <bean id="environmentManager" scope="singleton" init-method="init"
         class="org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl">
     <argument ref="templateRegistry" />

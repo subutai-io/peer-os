@@ -8,14 +8,14 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.core.env.api.Environment;
+import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.core.env.api.build.Blueprint;
-import org.safehaus.subutai.core.env.api.build.NodeGroup;
-import org.safehaus.subutai.core.env.api.build.Topology;
+import org.safehaus.subutai.common.environment.Blueprint;
+import org.safehaus.subutai.common.environment.NodeGroup;
+import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
-import org.safehaus.subutai.core.env.api.exception.EnvironmentModificationException;
-import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
+import org.safehaus.subutai.common.environment.EnvironmentModificationException;
+import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import com.google.common.collect.Maps;

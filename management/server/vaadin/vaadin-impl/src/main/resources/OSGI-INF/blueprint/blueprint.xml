@@ -26,6 +26,7 @@
     <reference-listener ref="portalModuleService"
                         bind-method="registerModule" unbind-method="unregisterModule" />
   </reference-list>
+
   <bean id="portalModuleService"
         scope="singleton" activation="eager"
         class="org.safehaus.subutai.server.ui.impl.PortalModuleServiceImpl">
