@@ -102,9 +102,32 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public String getPublicKey()
+    public String getSshKey()
     {
         return publicKey;
+    }
+
+
+    @Override
+    public void setSshKey( final String sshKey, boolean async ) throws EnvironmentModificationException
+    {
+        try
+        {
+            environmentManager.setSshKey( getId(), sshKey, async );
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            //this should not happen
+            LOG.error( String.format( "Error setting ssh key to environment %s", getName() ), e );
+            throw new EnvironmentModificationException( e );
+        }
+    }
+
+
+    public void saveSshKey( final String publicKey )
+    {
+        this.publicKey = publicKey;
+        dataService.update( this );
     }
 
 
@@ -126,78 +149,6 @@ public class EnvironmentImpl implements Environment, Serializable
     public EnvironmentStatus getStatus()
     {
         return status;
-    }
-
-
-    @Override
-    public String getSubnetCidr()
-    {
-        return subnetCidr;
-    }
-
-
-    @Override
-    public Map<UUID, Integer> getPeerVlanInfo()
-    {
-        Map<UUID, Integer> map = deserializePeerVlanInfo();
-        return Collections.unmodifiableMap( map );
-    }
-
-
-    public void setPeerVlanInfo( UUID peerId, int vlanId )
-    {
-        Preconditions.checkNotNull( peerId );
-
-        Map<UUID, Integer> map = deserializePeerVlanInfo();
-        map.put( peerId, vlanId );
-        this.peerVlanInfo = JsonUtil.to( map );
-    }
-
-
-    @Override
-    public int getVni()
-    {
-        return vni;
-    }
-
-
-    public void setVni( int vni )
-    {
-        this.vni = vni;
-    }
-
-
-    public int getLastUsedIpIndex()
-    {
-        return lastUsedIpIndex;
-    }
-
-
-    public void setLastUsedIpIndex( int lastUsedIpIndex )
-    {
-        this.lastUsedIpIndex = lastUsedIpIndex;
-    }
-
-
-    public void setSubnetCidr( String subnetCidr )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( subnetCidr ) );
-
-        // this ctor checks CIDR notation format validity
-        SubnetUtils cidr = new SubnetUtils( subnetCidr );
-        this.subnetCidr = cidr.getInfo().getCidrSignature();
-    }
-
-
-    private Map<UUID, Integer> deserializePeerVlanInfo()
-    {
-        if ( Strings.isNullOrEmpty( peerVlanInfo ) )
-        {
-            return Maps.newHashMap();
-        }
-        TypeToken<Map<UUID, Integer>> typeToken = new TypeToken<Map<UUID, Integer>>()
-        {};
-        return JsonUtil.fromJson( peerVlanInfo, typeToken.getType() );
     }
 
 
@@ -270,16 +221,18 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public void growEnvironment( final Topology topology, boolean async ) throws EnvironmentModificationException
+    public Set<ContainerHost> growEnvironment( final Topology topology, boolean async )
+            throws EnvironmentModificationException
     {
         try
         {
-            environmentManager.growEnvironment( getId(), topology, async );
+            return environmentManager.growEnvironment( getId(), topology, async );
         }
         catch ( EnvironmentNotFoundException e )
         {
             //this should not happen
             LOG.error( String.format( "Error growing environment %s", getName() ), e );
+            throw new EnvironmentModificationException( e );
         }
     }
 
@@ -367,5 +320,80 @@ public class EnvironmentImpl implements Environment, Serializable
     public int hashCode()
     {
         return environmentId != null ? environmentId.hashCode() : 0;
+    }
+
+
+    //networking settings
+
+
+    @Override
+    public String getSubnetCidr()
+    {
+        return subnetCidr;
+    }
+
+
+    @Override
+    public Map<UUID, Integer> getPeerVlanInfo()
+    {
+        Map<UUID, Integer> map = deserializePeerVlanInfo();
+        return Collections.unmodifiableMap( map );
+    }
+
+
+    public void setPeerVlanInfo( UUID peerId, int vlanId )
+    {
+        Preconditions.checkNotNull( peerId );
+
+        Map<UUID, Integer> map = deserializePeerVlanInfo();
+        map.put( peerId, vlanId );
+        this.peerVlanInfo = JsonUtil.to( map );
+    }
+
+
+    @Override
+    public int getVni()
+    {
+        return vni;
+    }
+
+
+    public void setVni( int vni )
+    {
+        this.vni = vni;
+    }
+
+
+    public int getLastUsedIpIndex()
+    {
+        return lastUsedIpIndex;
+    }
+
+
+    public void setLastUsedIpIndex( int lastUsedIpIndex )
+    {
+        this.lastUsedIpIndex = lastUsedIpIndex;
+    }
+
+
+    public void setSubnetCidr( String subnetCidr )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( subnetCidr ) );
+
+        // this ctor checks CIDR notation format validity
+        SubnetUtils cidr = new SubnetUtils( subnetCidr );
+        this.subnetCidr = cidr.getInfo().getCidrSignature();
+    }
+
+
+    private Map<UUID, Integer> deserializePeerVlanInfo()
+    {
+        if ( Strings.isNullOrEmpty( peerVlanInfo ) )
+        {
+            return Maps.newHashMap();
+        }
+        TypeToken<Map<UUID, Integer>> typeToken = new TypeToken<Map<UUID, Integer>>()
+        {};
+        return JsonUtil.fromJson( peerVlanInfo, typeToken.getType() );
     }
 }

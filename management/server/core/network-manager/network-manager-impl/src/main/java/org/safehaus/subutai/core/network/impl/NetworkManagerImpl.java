@@ -273,7 +273,23 @@ public class NetworkManagerImpl implements NetworkManager
     public void addSshKeyToAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
             throws NetworkManagerException
     {
-        new SshManager( containers ).append(sshKey);
+        new SshManager( containers ).appendSshKey( sshKey );
+    }
+
+
+    @Override
+    public void replaceSshKeyInAuthorizedKeys( final Set<ContainerHost> containers, final String oldSshKey,
+                                               final String newSshKey ) throws NetworkManagerException
+    {
+        new SshManager( containers ).replaceSshKey( oldSshKey, newSshKey );
+    }
+
+
+    @Override
+    public void removeSshKeyFromAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
+            throws NetworkManagerException
+    {
+        new SshManager( containers ).removeSshKey( sshKey );
     }
 
 

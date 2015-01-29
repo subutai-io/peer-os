@@ -68,13 +68,4 @@ public class HostManager
             }
         }
     }
-
-
-    public void execute( ContainerHost containerHost ) throws NetworkManagerException
-    {
-        Preconditions.checkNotNull( containerHost, "Container is null" );
-
-        containerHosts.add( containerHost );
-        write();
-    }
 }

@@ -1,8 +1,10 @@
 package org.safehaus.subutai.core.env.cli;
 
 
+import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.UUIDUtil;
@@ -59,9 +61,23 @@ public class GrowLocalEnvironmentCommand extends OsgiCommandSupport
 
         topology.addNodeGroupPlacement( peerManager.getLocalPeer(), nodeGroup );
 
-        environmentManager.growEnvironment( UUID.fromString( environmentId ), topology, async );
+        Set<ContainerHost> newContainers =
+                environmentManager.growEnvironment( UUID.fromString( environmentId ), topology, async );
 
-        System.out.println( "Environment is grown " );
+        System.out.println( "New containers created:" );
+
+        for ( ContainerHost containerHost : newContainers )
+        {
+            System.out.println( "-----------------------------------------------------------------" );
+
+            System.out.println( String.format( "Container id %s", containerHost.getId() ) );
+            System.out.println( String.format( "Container hostname %s", containerHost.getHostname() ) );
+            System.out.println( String.format( "Environment id %s", containerHost.getEnvironmentId() ) );
+            System.out.println( String.format( "NodeGroup name %s", containerHost.getNodeGroupName() ) );
+            System.out.println( String.format( "Template name %s", containerHost.getTemplateName() ) );
+            System.out.println( String.format( "IP %s", containerHost.getIpByInterfaceName( "eth0" ) ) );
+            System.out.println( String.format( "Is connected %s", containerHost.isConnected() ) );
+        }
 
         return null;
     }
