@@ -40,6 +40,11 @@ public interface Peer
     Set<HostInfoModel> scheduleCloneContainers( UUID creatorPeerId, List<Template> templates, int quantity,
                                                 String strategyId, List<Criteria> criteria ) throws PeerException;
 
+    public Set<HostInfoModel> createContainers( final UUID environmentId, final UUID initiatorPeerId,
+                                                final UUID ownerId, final List<Template> templates,
+                                                final int numberOfContainers, final String strategyId,
+                                                final List<Criteria> criteria ) throws PeerException;
+
     public void startContainer( ContainerHost containerHost ) throws PeerException;
 
     public void stopContainer( ContainerHost containerHost ) throws PeerException;

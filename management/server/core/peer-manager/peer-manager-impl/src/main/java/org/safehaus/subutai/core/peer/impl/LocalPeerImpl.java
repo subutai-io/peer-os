@@ -186,6 +186,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             resourceHost.addListener( this );
             resourceHost.setPeer( this );
             ( ( ResourceHostEntity ) resourceHost ).setRegistry( templateRegistry );
+            ( ( ResourceHostEntity ) resourceHost ).setHostRegistry( hostRegistry );
         }
     }
 
@@ -570,7 +571,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         //create containers in parallel on each resource host
         for ( Map.Entry<ResourceHost, Set<String>> resourceHostDistribution : containerDistribution.entrySet() )
         {
-            ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) resourceHostDistribution.getValue();
+            ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) resourceHostDistribution.getKey();
 
             Set<CreateContainerTask> createContainerTasks = Sets.newHashSet();
             for ( String hostname : resourceHostDistribution.getValue() )

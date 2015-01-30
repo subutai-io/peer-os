@@ -27,6 +27,7 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.peer.api.CommandUtil;
 import org.safehaus.subutai.core.peer.api.ContainerState;
 import org.safehaus.subutai.core.peer.api.HostTask;
@@ -76,6 +77,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     CommandUtil commandUtil = new CommandUtil();
     @Transient
     TemplateRegistry registry;
+    @Transient
+    HostRegistry hostRegistry;
 
 
     private ResourceHostEntity()
@@ -375,9 +378,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    public ContainerHost getContainerHostByName( final String hostname )
+    public synchronized ContainerHost getContainerHostByName( final String hostname )
     {
+
         ContainerHost result = null;
+
         Iterator iterator = containersHosts.iterator();
 
         while ( result == null && iterator.hasNext() )
@@ -393,7 +398,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    public Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId )
+    public synchronized Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId )
     {
         Set<ContainerHost> result = new HashSet<>();
         for ( ContainerHost containerHost : getContainerHosts() )
@@ -420,7 +425,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    public ContainerHost getContainerHostById( final String id )
+    public synchronized ContainerHost getContainerHostById( final String id )
     {
         ContainerHost result = null;
         Iterator iterator = containersHosts.iterator();
@@ -673,6 +678,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public void setRegistry( final TemplateRegistry registry )
     {
         this.registry = registry;
+    }
+
+
+    public void setHostRegistry( final HostRegistry hostRegistry )
+    {
+        this.hostRegistry = hostRegistry;
     }
 
 
