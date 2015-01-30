@@ -210,9 +210,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    public synchronized Set<ContainerHost> getContainerHosts()
+    public Set<ContainerHost> getContainerHosts()
     {
-        return Sets.newConcurrentHashSet( containersHosts );
+        synchronized ( containersHosts )
+        {
+            return Sets.newConcurrentHashSet( containersHosts );
+        }
     }
 
 
