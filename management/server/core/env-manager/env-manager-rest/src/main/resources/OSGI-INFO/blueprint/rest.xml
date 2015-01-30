@@ -12,7 +12,7 @@
   </cxf:bus>
 
   <reference id="environmentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
+             interface="org.safehaus.subutai.core.env.api.EnvironmentManager" />
   <reference id="peerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
   <reference id="templateRegistry" availability="mandatory"

@@ -1,11 +1,13 @@
 package org.safehaus.subutai.core.peer.cli;
 
 
+import java.util.UUID;
+
+import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.quota.QuotaType;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import org.apache.karaf.shell.commands.Argument;
@@ -48,8 +50,10 @@ public class GetContainerQuotaCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
+
+
         Peer peer = peerManager.getPeer( peerId );
-        Environment environment = environmentManager.getEnvironment( environmentId );
+        Environment environment = environmentManager.findEnvironment( UUID.fromString( environmentId ) );
 
         ContainerHost targetContainer = environment.getContainerHostByHostname( containerName );
         if ( targetContainer == null )

@@ -48,10 +48,10 @@ import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.core.env.api.Environment;
+import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.core.env.api.exception.EnvironmentModificationException;
-import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
+import org.safehaus.subutai.common.environment.EnvironmentModificationException;
+import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;

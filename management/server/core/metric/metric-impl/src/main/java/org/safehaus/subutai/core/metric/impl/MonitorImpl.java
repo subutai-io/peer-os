@@ -3,7 +3,6 @@ package org.safehaus.subutai.core.metric.impl;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -14,6 +13,7 @@ import java.util.concurrent.Executors;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.dao.DaoManager;
+import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.peer.ContainerHost;
@@ -21,8 +21,7 @@ import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
@@ -511,14 +510,18 @@ public class MonitorImpl implements Monitor
         try
         {
             //find container's environment
-            List<Environment> environments = environmentManager.getEnvironments();
+            Set<Environment> environments = environmentManager.getEnvironments();
             ContainerHost containerHost = null;
+            outer:
             for ( Environment environment : environments )
             {
-                containerHost = environment.getContainerHostById( metric.getHostId() );
-                if ( containerHost != null )
+                for ( ContainerHost container : environment.getContainerHosts() )
                 {
-                    break;
+                    if ( container.getId().equals( metric.getHostId() ) )
+                    {
+                        containerHost = container;
+                        break outer;
+                    }
                 }
             }
 

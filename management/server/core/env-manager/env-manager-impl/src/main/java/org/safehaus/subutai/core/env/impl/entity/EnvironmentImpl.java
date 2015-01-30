@@ -24,13 +24,13 @@ import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.env.api.Environment;
+import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
-import org.safehaus.subutai.core.env.api.exception.ContainerHostNotFoundException;
-import org.safehaus.subutai.core.env.api.exception.EnvironmentModificationException;
-import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
+import org.safehaus.subutai.common.environment.ContainerHostNotFoundException;
+import org.safehaus.subutai.common.environment.EnvironmentModificationException;
+import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

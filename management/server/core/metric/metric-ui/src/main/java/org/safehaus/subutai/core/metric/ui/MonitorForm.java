@@ -5,9 +5,9 @@ import java.util.Set;
 
 import javax.naming.NamingException;
 
+import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;

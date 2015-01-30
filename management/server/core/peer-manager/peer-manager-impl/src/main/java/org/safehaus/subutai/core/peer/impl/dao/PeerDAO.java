@@ -1,19 +1,15 @@
 package org.safehaus.subutai.core.peer.impl.dao;
 
 
-import java.sql.Clob;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.util.GsonInterfaceAdapter;
-import org.safehaus.subutai.core.environment.api.exception.EnvironmentPersistenceException;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.impl.entity.PeerData;
 import org.slf4j.Logger;
@@ -23,9 +19,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
-
-import sun.rmi.runtime.Log;
 
 
 /**
@@ -39,7 +32,7 @@ public class PeerDAO
     private DaoManager daoManager;
 
 
-    public PeerDAO( final DaoManager daoManager) throws SQLException
+    public PeerDAO( final DaoManager daoManager ) throws SQLException
     {
         Preconditions.checkNotNull( daoManager, "DaoManager is null" );
 
@@ -48,6 +41,7 @@ public class PeerDAO
         gsonBuilder.registerTypeAdapter( ManagementHost.class, new GsonInterfaceAdapter<ManagementHost>() ).create();
         gson = gsonBuilder.create();
     }
+
 
     public boolean saveInfo( String source, String key, Object info )
     {
@@ -119,12 +113,12 @@ public class PeerDAO
             }*/
 
             Query query;
-            query = entityManager.createQuery( "SELECT pd FROM PeerData "
-                    + "                             AS pd WHERE pd.source = :source" );
-            query.setParameter( "source" ,source );
+            query = entityManager.createQuery(
+                    "SELECT pd FROM PeerData " + "                             AS pd WHERE pd.source = :source" );
+            query.setParameter( "source", source );
             List<PeerData> results = query.getResultList();
 
-            for (PeerData pd : results)
+            for ( PeerData pd : results )
             {
                 list.add( gson.fromJson( pd.getInfo(), clazz ) );
             }
@@ -174,12 +168,13 @@ public class PeerDAO
             }*/
 
             Query query;
-            query = entityManager.createQuery( "SELECT pd FROM PeerData AS pd WHERE pd.source = :source and pd.id=:id" );
-            query.setParameter( "source" ,source );
+            query = entityManager
+                    .createQuery( "SELECT pd FROM PeerData AS pd WHERE pd.source = :source and pd.id=:id" );
+            query.setParameter( "source", source );
             query.setParameter( "id", key );
-            PeerData pd = (PeerData) query.getSingleResult();
+            PeerData pd = ( PeerData ) query.getSingleResult();
 
-            if(pd !=null)
+            if ( pd != null )
             {
                 return gson.fromJson( pd.getInfo(), clazz );
             }
@@ -218,11 +213,10 @@ public class PeerDAO
             Query query;
             query = entityManager.createQuery( "delete FROM PeerData "
                     + "                         AS pd WHERE pd.source = :source and pd.id=:id" );
-            query.setParameter( "source" ,source );
-            query.setParameter( "id", key  );
+            query.setParameter( "source", source );
+            query.setParameter( "id", key );
             query.executeUpdate();
             daoManager.commitTransaction( entityManager );
-
         }
         catch ( Exception e )
         {
@@ -235,8 +229,6 @@ public class PeerDAO
             daoManager.closeEntityManager( entityManager );
             return true;
         }
-
-
     }
 
 

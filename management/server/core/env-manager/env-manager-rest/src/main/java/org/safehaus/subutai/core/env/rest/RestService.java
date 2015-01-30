@@ -34,7 +34,7 @@ public interface RestService
     public Response destroyContainer( @QueryParam( "containerId" ) String containerId );
 
     @POST
-    @Path( "nodeGroup" )
+    @Path( "grow" )
     public Response growEnvironment( @QueryParam( "environmentId" ) String environmentId,
                                      @QueryParam( "topology" ) String topologyJsonString );
 

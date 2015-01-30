@@ -19,13 +19,13 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.dao.DaoManager;
+import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.MonitorException;
@@ -39,7 +39,6 @@ import org.safehaus.subutai.core.peer.api.ResourceHost;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import static junit.framework.Assert.assertEquals;
@@ -166,7 +165,7 @@ public class MonitorImplTest
         when( containerHost.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID.toString() );
         when( containerHost.getId() ).thenReturn( HOST_ID );
         when( localPeer.getResourceHosts() ).thenReturn( Sets.newHashSet( resourceHost ) );
-        when( environmentManager.getEnvironments() ).thenReturn( Lists.newArrayList( environment ) );
+        when( environmentManager.getEnvironments() ).thenReturn( Sets.newHashSet( environment ) );
     }
 
 
@@ -286,7 +285,7 @@ public class MonitorImplTest
         String subscriberId = StringUtils.repeat( "s", 100 );
         when( alertListener.getSubscriberId() ).thenReturn( longSubscriberId );
         when( containerHost.getPeer() ).thenReturn( localPeer );
-        when( localPeer.getResourceHostByContainerId(HOST_ID.toString()) ).thenReturn( resourceHost );
+        when( localPeer.getResourceHostByContainerId( HOST_ID.toString() ) ).thenReturn( resourceHost );
         CommandResult commandResult = mock( CommandResult.class );
         when( commandResult.hasSucceeded() ).thenReturn( true );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
@@ -347,7 +346,6 @@ public class MonitorImplTest
     }
 
 
-
     @Test
     public void testGetContainerHostMetrics() throws Exception
     {
@@ -367,7 +365,6 @@ public class MonitorImplTest
         assertEquals( ENVIRONMENT_ID, metric.getEnvironmentId() );
         assertEquals( HOST, metric.getHost() );
         assertEquals( METRIC_VALUE, metric.getTotalRam() );
-
     }
 
 
@@ -422,7 +419,7 @@ public class MonitorImplTest
         monitor.getLocalContainerHostsMetrics( ENVIRONMENT_ID );
 
 
-        verify( containerHost).getId();
+        verify( containerHost ).getId();
     }
 
 
@@ -448,7 +445,7 @@ public class MonitorImplTest
                 .thenReturn( Sets.newHashSet( containerHost ) );
 
         HostNotFoundException exception = mock( HostNotFoundException.class );
-        doThrow( exception ).when( localPeer ).getResourceHostByContainerId( HOST_ID.toString());
+        doThrow( exception ).when( localPeer ).getResourceHostByContainerId( HOST_ID.toString() );
 
 
         monitor.getLocalContainerHostsMetrics( ENVIRONMENT_ID );
@@ -593,7 +590,7 @@ public class MonitorImplTest
 
 
         HostNotFoundException exception = mock( HostNotFoundException.class );
-        doThrow( exception ).when( localPeer ).getResourceHostByContainerId( HOST_ID.toString());
+        doThrow( exception ).when( localPeer ).getResourceHostByContainerId( HOST_ID.toString() );
 
         monitor.activateMonitoringAtLocalContainers( Sets.newHashSet( containerHost ), monitoringSettings );
 

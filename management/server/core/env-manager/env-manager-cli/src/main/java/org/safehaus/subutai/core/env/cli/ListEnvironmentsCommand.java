@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.env.cli;
 
 import java.util.Date;
 
-import org.safehaus.subutai.core.env.api.Environment;
+import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 
 import org.apache.karaf.shell.commands.Command;

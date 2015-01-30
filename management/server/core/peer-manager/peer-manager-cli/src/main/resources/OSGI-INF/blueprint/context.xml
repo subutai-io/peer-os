@@ -120,6 +120,7 @@
   <reference id="securityManager" availability="mandatory"
              interface="org.apache.shiro.mgt.SecurityManager" />
 
+             interface="org.safehaus.subutai.core.env.api.EnvironmentManager" />
   <!--<reference id="peerCommandDispatcher" availability="mandatory"
              interface="org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher" />-->
 
