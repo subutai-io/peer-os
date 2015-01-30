@@ -89,7 +89,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    private ExecutorService getSingleThreadExecutorService()
+    public ExecutorService getSingleThreadExecutorService()
     {
         if ( singleThreadExecutorService == null )
         {

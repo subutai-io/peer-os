@@ -16,6 +16,9 @@ import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.common.command.CommandCallback;
@@ -66,6 +69,7 @@ import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
 import org.safehaus.subutai.core.peer.api.task.Task;
 import org.safehaus.subutai.core.peer.api.task.clone.CloneTask;
+import org.safehaus.subutai.core.peer.impl.container.CreateContainerTask;
 import org.safehaus.subutai.core.peer.impl.dao.ContainerGroupDataService;
 import org.safehaus.subutai.core.peer.impl.dao.ContainerHostDataService;
 import org.safehaus.subutai.core.peer.impl.dao.ManagementHostDataService;
@@ -474,12 +478,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     }
 
 
-    private String getTempDirPath()
-    {
-        return System.getProperty( "java.io.tmpdir" );
-    }
-
-
     public Set<HostInfoModel> createContainers( final UUID environmentId, final UUID initiatorPeerId,
                                                 final UUID ownerId, final List<Template> templates,
                                                 final int numberOfContainers, final String strategyId,
@@ -492,6 +490,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( templates ), "Invalid template set" );
         Preconditions.checkArgument( numberOfContainers > 0, "Invalid number of containers" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( strategyId ), "Invalid strategy id" );
+
+        final int waitContainerTimeoutSec = 180;
 
         //check if strategy exists
         try
@@ -547,7 +547,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
         Set<String> existingContainerNames = getContainerNames();
 
-        //distribute new containers names across selected resource hosts
+        //distribute new containers' names across selected resource hosts
         Map<ResourceHost, Set<String>> containerDistribution = Maps.newHashMap();
         String templateName = templates.get( templates.size() - 1 ).getTemplateName();
 
@@ -565,8 +565,46 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
 
         Set<HostInfoModel> result = Sets.newHashSet();
+        List<Future<ContainerHost>> taskFutures = Lists.newArrayList();
 
-        //create containers
+        //create containers in parallel on each resource host
+        for ( Map.Entry<ResourceHost, Set<String>> resourceHostDistribution : containerDistribution.entrySet() )
+        {
+            ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) resourceHostDistribution.getValue();
+
+            Set<CreateContainerTask> createContainerTasks = Sets.newHashSet();
+            for ( String hostname : resourceHostDistribution.getValue() )
+            {
+                createContainerTasks.add( new CreateContainerTask( resourceHostEntity, templateName, hostname,
+                        waitContainerTimeoutSec ) );
+            }
+
+            ExecutorService executorService = resourceHostEntity.getSingleThreadExecutorService();
+
+            try
+            {
+                taskFutures.addAll( executorService.invokeAll( createContainerTasks ) );
+            }
+            catch ( InterruptedException e )
+            {
+                LOG.error( String.format( "Error creating containers on resource host %s",
+                        resourceHostEntity.getHostname() ), e );
+            }
+        }
+
+        //wait for succeeded containers
+        for ( Future<ContainerHost> future : taskFutures )
+        {
+            try
+            {
+                result.add( new HostInfoModel( future.get() ) );
+            }
+            catch ( ExecutionException | InterruptedException e )
+            {
+                LOG.error( "Error creating containers", e );
+            }
+        }
+
 
         return result;
     }
