@@ -177,7 +177,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     @Override
     public void shutdown()
     {
-        //        communicationManager.removeListener( this );
         hostRegistry.removeHostListener( this );
     }
 
@@ -584,7 +583,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         }
         if ( host == null )
         {
-            //TODO: implement remote ContainerHostImpl if needs
             host = new ContainerHostEntity( hostKey );
         }
         return ( ContainerHost ) host;
@@ -898,22 +896,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         {
             return false;
         }
-
-        //        try
-        //        {
-        //            Host h = bindHost( host.getId() );
-        //
-        //            if ( h instanceof ContainerHost )
-        //            {
-        //                return ContainerHostState.RUNNING.equals( ( ( ContainerHost ) h ).getState() );
-        //            }
-        //
-        //            return !isTimedOut( h.getLastHeartbeat(), HOST_INACTIVE_TIME );
-        //        }
-        //        catch ( PeerException e )
-        //        {
-        //            return false;
-        //        }
     }
 
 
