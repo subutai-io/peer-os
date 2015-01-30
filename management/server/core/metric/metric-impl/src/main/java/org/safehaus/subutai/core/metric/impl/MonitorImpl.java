@@ -3,7 +3,6 @@ package org.safehaus.subutai.core.metric.impl;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -11,26 +10,25 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.persistence.EntityManagerFactory;
-
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.dao.DaoManager;
+import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.MonitoringSettings;
 import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
-import org.safehaus.subutai.core.peer.api.Peer;
-import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.slf4j.Logger;
@@ -61,17 +59,19 @@ public class MonitorImpl implements Monitor
     private EnvironmentManager environmentManager;
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     protected MonitorDao monitorDao;
+    protected DaoManager daoManager;
 
 
-    public MonitorImpl( PeerManager peerManager, EntityManagerFactory emf, EnvironmentManager environmentManager )
+    public MonitorImpl( PeerManager peerManager, DaoManager daoManager, EnvironmentManager environmentManager )
             throws MonitorException
     {
         Preconditions.checkNotNull( peerManager, "Peer manager is null" );
-        Preconditions.checkNotNull( emf, "EntityManager factory is null." );
-        Preconditions.checkNotNull( emf, "Environment manager is null." );
+        Preconditions.checkNotNull( daoManager, "DaoManager is null." );
+
         try
         {
-            this.monitorDao = new MonitorDao( emf );
+            this.daoManager = daoManager;
+            this.monitorDao = new MonitorDao( daoManager.getEntityManagerFactory() );
             this.peerManager = peerManager;
             this.environmentManager = environmentManager;
             peerManager.addRequestListener( new RemoteAlertListener( this ) );
@@ -172,7 +172,7 @@ public class MonitorImpl implements Monitor
             {
                 //get container's resource host
                 ResourceHost resourceHost =
-                        peerManager.getLocalPeer().getResourceHostByName( localContainer.getParentHostname() );
+                        peerManager.getLocalPeer().getResourceHostByContainerId( localContainer.getId().toString() );
                 addLocalContainerHostMetric( environmentId, resourceHost, localContainer, metrics );
             }
         }
@@ -215,7 +215,7 @@ public class MonitorImpl implements Monitor
         }
         else
         {
-            LOG.warn( String.format( "Could not find resource host %s", localContainer.getParentHostname() ) );
+            LOG.warn( String.format( "Could not find resource host if %s", localContainer.getHostname() ) );
         }
     }
 
@@ -407,7 +407,7 @@ public class MonitorImpl implements Monitor
             try
             {
                 ResourceHost resourceHost =
-                        peerManager.getLocalPeer().getResourceHostByName( containerHost.getParentHostname() );
+                        peerManager.getLocalPeer().getResourceHostByContainerId( containerHost.getId().toString() );
                 CommandResult commandResult = resourceHost.execute(
                         commands.getActivateMonitoringCommand( containerHost.getHostname(), monitoringSettings ) );
                 if ( !commandResult.hasSucceeded() )
@@ -510,14 +510,18 @@ public class MonitorImpl implements Monitor
         try
         {
             //find container's environment
-            List<Environment> environments = environmentManager.getEnvironments();
+            Set<Environment> environments = environmentManager.getEnvironments();
             ContainerHost containerHost = null;
+            outer:
             for ( Environment environment : environments )
             {
-                containerHost = environment.getContainerHostById( metric.getHostId() );
-                if ( containerHost != null )
+                for ( ContainerHost container : environment.getContainerHosts() )
                 {
-                    break;
+                    if ( container.getId().equals( metric.getHostId() ) )
+                    {
+                        containerHost = container;
+                        break outer;
+                    }
                 }
             }
 

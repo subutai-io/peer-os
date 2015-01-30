@@ -4,8 +4,8 @@ package org.safehaus.subutai.core.security.impl;
 import java.util.Set;
 
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 
 public class Commands
@@ -59,7 +59,7 @@ public class Commands
 
         for ( ContainerHost host : containerHosts )
         {
-            String ip = host.getIpByMask( Common.IP_MASK );
+            String ip = host.getIpByInterfaceName( "eth0" );
             String hostname = host.getHostname();
             cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
             appendHosts.append( "/bin/echo '" ).

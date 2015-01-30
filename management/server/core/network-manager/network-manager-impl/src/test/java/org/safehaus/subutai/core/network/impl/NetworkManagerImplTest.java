@@ -11,15 +11,15 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.network.api.ContainerInfo;
 import org.safehaus.subutai.core.network.api.N2NConnection;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.network.api.Tunnel;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
-import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 
@@ -94,7 +94,7 @@ public class NetworkManagerImplTest
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
         when( localPeer.getManagementHost() ).thenReturn( managementHost );
         when( localPeer.getContainerHostByName( anyString() ) ).thenReturn( containerHost );
-        when( localPeer.getResourceHostByName( anyString() ) ).thenReturn( resourceHost );
+        when( localPeer.getResourceHostByContainerName( anyString() ) ).thenReturn( resourceHost );
         when( managementHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
         when( containerHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
@@ -210,7 +210,7 @@ public class NetworkManagerImplTest
         networkManager.setContainerIp( CONTAINER_NAME, LOCAL_IP, NET_MASK, VLAN_ID );
 
         verify( localPeer ).getContainerHostByName( CONTAINER_NAME );
-        verify( localPeer ).getResourceHostByName( anyString() );
+        verify( localPeer ).getResourceHostByContainerName( anyString() );
         verify( commands ).getSetContainerIpCommand( CONTAINER_NAME, LOCAL_IP, NET_MASK, VLAN_ID );
         verify( resourceHost ).execute( any( RequestBuilder.class ) );
     }
@@ -222,7 +222,7 @@ public class NetworkManagerImplTest
         networkManager.removeContainerIp( CONTAINER_NAME );
 
         verify( localPeer ).getContainerHostByName( CONTAINER_NAME );
-        verify( localPeer ).getResourceHostByName( anyString() );
+        verify( localPeer ).getResourceHostByContainerName( anyString() );
         verify( commands ).getRemoveContainerIpCommand( CONTAINER_NAME );
         verify( resourceHost ).execute( any( RequestBuilder.class ) );
     }
@@ -237,7 +237,7 @@ public class NetworkManagerImplTest
 
         assertNotNull( containerInfo );
         verify( localPeer ).getContainerHostByName( CONTAINER_NAME );
-        verify( localPeer ).getResourceHostByName( anyString() );
+        verify( localPeer ).getResourceHostByContainerName( anyString() );
         verify( commands ).getShowContainerIpCommand( CONTAINER_NAME );
 
 
@@ -330,7 +330,7 @@ public class NetworkManagerImplTest
     public void testGetResourceHost() throws Exception
     {
 
-        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).getResourceHostByName( anyString() );
+        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).getResourceHostByContainerName( anyString() );
 
         networkManager.getResourceHost( CONTAINER_NAME );
     }

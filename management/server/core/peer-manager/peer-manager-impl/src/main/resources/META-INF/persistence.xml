@@ -11,6 +11,7 @@
     <class>org.safehaus.subutai.core.peer.impl.entity.ManagementHostEntity</class>
     <class>org.safehaus.subutai.core.peer.impl.entity.ResourceHostEntity</class>
     <class>org.safehaus.subutai.core.peer.impl.entity.ContainerHostEntity</class>
+    <class>org.safehaus.subutai.core.peer.impl.entity.PeerData</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="openjpa.Log" value="DefaultLevel=WARN, Runtime=TRACE, Tool=INFO, SQL=TRACE"/>

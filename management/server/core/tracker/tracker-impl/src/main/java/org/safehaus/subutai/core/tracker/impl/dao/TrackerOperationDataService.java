@@ -15,7 +15,7 @@ import javax.persistence.TypedQuery;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.impl.TrackerOperationImpl;
 import org.safehaus.subutai.core.tracker.impl.TrackerOperationViewImpl;
-import org.safehaus.subutai.core.tracker.impl.model.TrackerOperationEntity;
+import org.safehaus.subutai.core.tracker.impl.entity.TrackerOperationEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

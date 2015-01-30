@@ -2,8 +2,11 @@ package org.safehaus.subutai.core.environment.impl.entity;
 
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -19,12 +22,15 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentStatusEnum;
-import org.safehaus.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
+
+import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Sets;
+import com.google.gson.reflect.TypeToken;
 
 
 @Entity
@@ -51,6 +57,18 @@ public class EnvironmentImpl implements Environment, Serializable
 
     @Column( name = "public_key", length = 3000 )
     private String publicKey;
+
+    @Column( name = "subnetCidr" )
+    private String subnetCidr;
+
+    @Column( name = "lastUsedIpIndex" )
+    private int lastUsedIpIndex;
+
+    @Column( name = "peerVlanInfo" )
+    private String peerVlanInfo;
+
+    @Column( name = "vni" )
+    private int vni;
 
 
     protected EnvironmentImpl()
@@ -141,6 +159,62 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
+    public String getSubnetCidr()
+    {
+        return subnetCidr;
+    }
+
+
+    public void setSubnetCidr( String subnetCidr )
+    {
+        // this ctor checks CIDR notation format validity
+        SubnetUtils cidr = new SubnetUtils( subnetCidr );
+        this.subnetCidr = cidr.getInfo().getCidrSignature();
+    }
+
+
+    public int getLastUsedIpIndex()
+    {
+        return lastUsedIpIndex;
+    }
+
+
+    public void setLastUsedIpIndex( int lastUsedIpIndex )
+    {
+        this.lastUsedIpIndex = lastUsedIpIndex;
+    }
+
+
+    @Override
+    public Map<UUID, Integer> getPeerVlanInfo()
+    {
+        Map<UUID, Integer> map = deserializePeerVlanInfo();
+        return Collections.unmodifiableMap( map );
+    }
+
+
+    public void setPeerVlanInfo( UUID peerId, int vlanId )
+    {
+        Map<UUID, Integer> map = deserializePeerVlanInfo();
+        map.put( peerId, vlanId );
+        this.peerVlanInfo = JsonUtil.to( map );
+    }
+
+
+    @Override
+    public int getVni()
+    {
+        return vni;
+    }
+
+
+    public void setVni( int vni )
+    {
+        this.vni = vni;
+    }
+
+
+    @Override
     public ContainerHost getContainerHostById( UUID uuid )
     {
         Iterator<ContainerHost> iterator = getContainerHosts().iterator();
@@ -204,6 +278,49 @@ public class EnvironmentImpl implements Environment, Serializable
     public void removeContainer( final ContainerHost containerHost )
     {
         getContainerHosts().remove( containerHost );
+    }
+
+
+    private Map<UUID, Integer> deserializePeerVlanInfo()
+    {
+        if ( peerVlanInfo == null || peerVlanInfo.isEmpty() )
+        {
+            return new HashMap<>();
+        }
+        TypeToken<Map<UUID, Integer>> typeToken = new TypeToken<Map<UUID, Integer>>()
+        {
+        };
+        return JsonUtil.fromJson( peerVlanInfo, typeToken.getType() );
+    }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof EnvironmentImpl ) )
+        {
+            return false;
+        }
+
+        final EnvironmentImpl that = ( EnvironmentImpl ) o;
+
+        if ( environmentId != null ? !environmentId.equals( that.environmentId ) : that.environmentId != null )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return environmentId != null ? environmentId.hashCode() : 0;
     }
 }
 

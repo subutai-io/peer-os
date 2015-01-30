@@ -22,40 +22,44 @@ import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Host;
+import org.safehaus.subutai.common.peer.HostEvent;
+import org.safehaus.subutai.common.peer.HostEventListener;
+import org.safehaus.subutai.common.peer.HostInfoModel;
+import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.quota.DiskPartition;
+import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
+import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.peer.api.CloneParam;
 import org.safehaus.subutai.core.peer.api.CommandUtil;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.core.peer.api.Host;
-import org.safehaus.subutai.core.peer.api.HostEvent;
-import org.safehaus.subutai.core.peer.api.HostEventListener;
-import org.safehaus.subutai.core.peer.api.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.HostKey;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.HostTask;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.Payload;
-import org.safehaus.subutai.core.peer.api.Peer;
-import org.safehaus.subutai.core.peer.api.PeerException;
-import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
@@ -326,7 +330,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         Set<ContainerHost> result = new HashSet<>();
         for ( HostCloneTask hostCloneTask : hostCloneTasks )
         {
-            result.add( hostCloneTask.getResult().getValue() );
+            if ( hostCloneTask.getResult().getValue() != null )
+            {
+                result.add( hostCloneTask.getResult().getValue() );
+            }
         }
         return result;
     }
@@ -878,19 +885,35 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     {
         try
         {
-            Host h = bindHost( host.getId() );
-
-            if ( h instanceof ContainerHost )
+            HostInfo hostInfo = hostRegistry.getHostInfoById( host.getId() );
+            if ( hostInfo instanceof ContainerHostInfo )
             {
-                return ContainerHostState.RUNNING.equals( ( ( ContainerHost ) h ).getState() );
+                return ContainerHostState.RUNNING.equals( ( ( ContainerHostInfo ) hostInfo ).getStatus() );
             }
 
+            Host h = bindHost( host.getId() );
             return !isTimedOut( h.getLastHeartbeat(), HOST_INACTIVE_TIME );
         }
-        catch ( PeerException e )
+        catch ( PeerException | HostDisconnectedException e )
         {
             return false;
         }
+
+        //        try
+        //        {
+        //            Host h = bindHost( host.getId() );
+        //
+        //            if ( h instanceof ContainerHost )
+        //            {
+        //                return ContainerHostState.RUNNING.equals( ( ( ContainerHost ) h ).getState() );
+        //            }
+        //
+        //            return !isTimedOut( h.getLastHeartbeat(), HOST_INACTIVE_TIME );
+        //        }
+        //        catch ( PeerException e )
+        //        {
+        //            return false;
+        //        }
     }
 
 
@@ -924,22 +947,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             quotaManager.setQuota( c.getHostname(), quota );
         }
         catch ( QuotaException e )
-        {
-            throw new PeerException( e );
-        }
-    }
-
-
-    @Override
-    public ProcessResourceUsage getProcessResourceUsage( final ContainerHost host, final int processPid )
-            throws PeerException
-    {
-        try
-        {
-            Host c = bindHost( host.getHostId() );
-            return monitor.getProcessResourceUsage( ( ContainerHost ) c, processPid );
-        }
-        catch ( MonitorException e )
         {
             throw new PeerException( e );
         }
@@ -1168,7 +1175,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
     {
-        LOG.info( String.format( "Received heartbeat: %s", resourceHostInfo ) );
+        //        LOG.info( String.format( "Received heartbeat: %s", resourceHostInfo ) );
         if ( resourceHostInfo.getHostname().equals( "management" ) )
         {
             if ( managementHost == null )
@@ -1234,6 +1241,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
 
     // ********** Quota functions *****************
+
+
+    @Override
+    public ProcessResourceUsage getProcessResourceUsage( final UUID containerId, final int processPid )
+            throws PeerException
+    {
+        try
+        {
+            Host c = bindHost( containerId );
+            return monitor.getProcessResourceUsage( ( ContainerHost ) c, processPid );
+        }
+        catch ( MonitorException e )
+        {
+            throw new PeerException( e );
+        }
+    }
 
 
     @Override
@@ -1312,6 +1335,34 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         try
         {
             quotaManager.setCpuSet( containerId, cpuSet );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
+    public DiskQuota getDiskQuota( final UUID containerId, final DiskPartition diskPartition ) throws PeerException
+    {
+        try
+        {
+            return quotaManager.getDiskQuota( containerId, diskPartition );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
+    public void setDiskQuota( final UUID containerId, final DiskQuota diskQuota ) throws PeerException
+    {
+        try
+        {
+            quotaManager.setDiskQuota( containerId, diskQuota );
         }
         catch ( QuotaException e )
         {

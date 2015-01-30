@@ -7,8 +7,11 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
 
+import org.safehaus.subutai.common.dao.DaoManager;
+import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
@@ -16,16 +19,12 @@ import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
-import org.safehaus.subutai.core.peer.api.Peer;
-import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerGroup;
-import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandRequestListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandResponseListener;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerRequestListener;
-import org.safehaus.subutai.core.peer.impl.dao.DaoManager;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequestListener;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
@@ -34,9 +33,9 @@ import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
 
 
 /**
@@ -53,7 +52,6 @@ public class PeerManagerImpl implements PeerManager
     private QuotaManager quotaManager;
     private Monitor monitor;
     private TemplateRegistry templateRegistry;
-    private DataSource dataSource;
     private CommandExecutor commandExecutor;
     private LocalPeer localPeer;
     private StrategyManager strategyManager;
@@ -66,10 +64,8 @@ public class PeerManagerImpl implements PeerManager
     private DaoManager daoManager;
 
 
-    public PeerManagerImpl( final DataSource dataSource, final Messenger messenger )
+    public PeerManagerImpl( final Messenger messenger )
     {
-        Preconditions.checkNotNull( dataSource, "Data source is null" );
-        this.dataSource = dataSource;
         this.messenger = messenger;
     }
 
@@ -102,7 +98,7 @@ public class PeerManagerImpl implements PeerManager
     {
         try
         {
-            this.peerDAO = new PeerDAO( dataSource );
+            this.peerDAO = new PeerDAO( daoManager );
         }
         catch ( SQLException e )
         {
@@ -184,6 +180,7 @@ public class PeerManagerImpl implements PeerManager
     {
         ManagementHost managementHost = getLocalPeer().getManagementHost();
         managementHost.addAptSource( peerInfo.getId().toString(), peerInfo.getIp() );
+
         return peerDAO.saveInfo( SOURCE_REMOTE_PEER, peerInfo.getId().toString(), peerInfo );
     }
 

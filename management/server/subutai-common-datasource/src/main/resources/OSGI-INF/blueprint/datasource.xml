@@ -17,6 +17,19 @@
       <entry key="osgi.jndi.service.name" value="openjpa/envManagerDS" />
     </service-properties>
   </service>
+  <!-- *********************Environment Manager 2************************ -->
+
+  <bean id="envManagerJDBC2" class="org.h2.jdbcx.JdbcDataSource">
+    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/environmentDb2" />
+    <property name="user" value="sa" />
+    <property name="password" value="" />
+  </bean>
+
+  <service interface="javax.sql.DataSource" ref="envManagerJDBC2">
+    <service-properties>
+      <entry key="osgi.jndi.service.name" value="openjpa/envManagerDS2" />
+    </service-properties>
+  </service>
 
   <!-- ********************* DataSource Common Service ************************ -->
 

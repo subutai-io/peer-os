@@ -59,17 +59,17 @@ function quota {
         fs_get_quota $container "rootfs"
       ;;
       "json")
-        local memory_value=$(lxc_get_memory $container)
+        local memory_value=$(lxc_get_memory_in_megabytes $container)
         local memory_value=$( [ -z $memory_value ] &&  echo "none" || echo $memory_value )
 
-        local cpu_value=$(lxc_get_cpus $container)
+        local cpu_value=$(lxc_get_cpu_quota $container)
         local cpu_value=$( [ -z $cpu_value ] && echo "none" || printf "\"$cpu_value\"" )
 
         local hdd_home_value=$(fs_get_quota $container "home")
         local hdd_var_value=$(fs_get_quota $container "var")
         local hdd_opt_value=$(fs_get_quota $container "opt")
         local hdd_rootfs_value=$(fs_get_quota $container "rootfs")
-        printf "{memory.quota=$memory_value,cpu.cpus=$cpu_value,hdd.quota.home=$hdd_home_value, hdd.quota.var=$hdd_var_value, hdd.quota.opt=$hdd_opt_value, hdd.quota.rootfs=$hdd_rootfs_value}"
+        printf "{ram=$memory_value,cpu=$cpu_value,diskHome=$hdd_home_value, diskVar=$hdd_var_value, diskOpt=$hdd_opt_value, diskRootfs=$hdd_rootfs_value}"
       ;;
       *)
         msg_error "$resource_parameter is not a supported parameter! Aborting.."
@@ -78,6 +78,11 @@ function quota {
   else
     case $resource_parameter in
       "ram" )
+        # If the parameter for ram metric does not have K,M,G letters
+        # then set the default value to M which causes to be tread as megabytes
+        if [ "`is_number $parameter_value`" == "true" ]; then
+          local parameter_value=$parameter_value"M"
+        fi
         lxc_set_memory $container $parameter_value
         ;;
       "cpuset" )

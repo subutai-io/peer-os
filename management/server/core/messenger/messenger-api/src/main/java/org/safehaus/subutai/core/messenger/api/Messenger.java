@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.messenger.api;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.common.peer.Peer;
 
 
 /**

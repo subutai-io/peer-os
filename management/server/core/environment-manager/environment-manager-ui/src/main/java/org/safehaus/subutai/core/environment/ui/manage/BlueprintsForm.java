@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.environment.ui.manage;
 import java.util.List;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.environment.ui.wizard.Blueprint2PeerGroupWizard;
 import org.safehaus.subutai.core.environment.ui.wizard.Node2PeerWizard;
@@ -34,8 +35,8 @@ public class BlueprintsForm
     private static final String NAME = "Name";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private VerticalLayout contentRoot;
-    private Table environmentsTable;
     private EnvironmentManagerPortalModule module;
+    private Table environmentsTable;
     private Button environmentsButton;
 
 
@@ -166,15 +167,15 @@ public class BlueprintsForm
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
-                        boolean result = module.getEnvironmentManager().deleteBlueprint( blueprint.getId() );
-                        if ( result )
+                        try
                         {
+                            module.getEnvironmentManager().deleteBlueprint( blueprint.getId() );
                             Notification.show( "Blueprint deleted" );
                             environmentsButton.click();
                         }
-                        else
+                        catch ( EnvironmentManagerException e )
                         {
-                            Notification.show( "Problem deleting blueprint." );
+                            Notification.show( String.format( "Problem deleting blueprint: %s", e.getMessage() ) );
                         }
                     }
                 } );

@@ -23,7 +23,7 @@ public class Commands
         return new RequestBuilder( String.format(
                 "subutai monitor -c all -p \" metricCollectionIntervalInMin:%s, maxSampleCount:%s, "
                         + "metricCountToAverageToAlert:%s, intervalBetweenAlertsInMin:%s, ramAlertThreshold:%s, "
-                        + "cpuAlertThreshold:%s, diskThreshold:%s \" %s",
+                        + "cpuAlertThreshold:%s, diskAlertThreshold:%s \" %s",
                 monitoringSettings.getMetricCollectionIntervalInMin(), monitoringSettings.getMaxSampleCount(),
                 monitoringSettings.getMetricCountToAverageToAlert(), monitoringSettings.getIntervalBetweenAlertsInMin(),
                 monitoringSettings.getRamAlertThreshold(), monitoringSettings.getCpuAlertThreshold(),

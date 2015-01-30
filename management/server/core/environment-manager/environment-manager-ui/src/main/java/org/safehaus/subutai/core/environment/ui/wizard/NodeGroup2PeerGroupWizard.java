@@ -8,13 +8,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.api.topology.NodeGroup2PeerGroupData;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.peer.api.PeerGroup;
-import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

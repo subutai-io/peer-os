@@ -3,7 +3,12 @@ package org.safehaus.subutai.core.peer.api;
 
 import java.util.List;
 import java.util.UUID;
+
 import javax.persistence.EntityManagerFactory;
+
+import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.peer.PeerInfo;
 
 
 public interface PeerManager

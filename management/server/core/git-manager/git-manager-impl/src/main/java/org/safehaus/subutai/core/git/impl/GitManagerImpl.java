@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.git.api.GitBranch;
@@ -20,7 +21,6 @@ import org.safehaus.subutai.core.git.api.GitFileStatus;
 import org.safehaus.subutai.core.git.api.GitManager;
 import org.safehaus.subutai.core.peer.api.CommandUtil;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
-import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import com.google.common.base.Preconditions;
@@ -148,7 +148,31 @@ public class GitManagerImpl implements GitManager
         Preconditions.checkArgument( !Strings.isNullOrEmpty( filePath ), "File path is null or empty" );
 
         CommandResult result = execute(
-                new RequestBuilder( String.format( "git diff %s %s %s", branchName1, branchName2, filePath ) )
+                new RequestBuilder( String.format( "git diff %s %s -- %s", branchName1, branchName2, filePath ) )
+                        .withCwd( repositoryRoot ), false );
+
+        return result.getStdOut();
+    }
+
+
+    /**
+     * Returns diff in file between specified branches
+     *
+     * @param repositoryRoot - path to repo
+     * @param branchName - branch name
+     * @param filePath - relative (to repo root) file path
+     *
+     * @return - differences in file {@code String}
+     */
+    @Override
+    public String showFile( final String repositoryRoot, final String branchName, final String filePath )
+            throws GitException
+    {
+        validateRepoUrl( repositoryRoot );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name 1 is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( filePath ), "File path is null or empty" );
+
+        CommandResult result = execute( new RequestBuilder( String.format( "git show %s:%s", branchName, filePath ) )
                         .withCwd( repositoryRoot ), false );
 
         return result.getStdOut();

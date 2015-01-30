@@ -1,13 +1,13 @@
 package org.safehaus.subutai.core.environment.impl.builder;
 
 
+import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.topology.NodeGroup2PeerData;
 import org.safehaus.subutai.core.environment.api.topology.TopologyData;
 import org.safehaus.subutai.core.environment.impl.EnvironmentManagerImpl;
-import org.safehaus.subutai.core.peer.api.Peer;
 
 
 public class NodeGroup2PeerBuilder extends EnvironmentBuildProcessBuilder

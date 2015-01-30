@@ -4,8 +4,9 @@ package org.safehaus.subutai.core.metric.cli;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.common.environment.Environment;
+import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
 
@@ -47,20 +48,19 @@ public class ContainerHostMetricsCommand extends OsgiCommandSupport
 
         UUID environmentId = UUID.fromString( environmentIdString );
 
-        Environment environment = environmentManager.getEnvironmentByUUID( environmentId );
-        if ( environment != null )
+        try
         {
+            Environment environment = environmentManager.findEnvironment( environmentId );
             Set<ContainerHostMetric> metrics = monitor.getContainerHostsMetrics( environment );
             for ( ContainerHostMetric metric : metrics )
             {
                 System.out.println( metric );
             }
         }
-        else
+        catch ( EnvironmentNotFoundException e )
         {
             System.out.println( "Environment not found" );
         }
-
 
         return null;
     }

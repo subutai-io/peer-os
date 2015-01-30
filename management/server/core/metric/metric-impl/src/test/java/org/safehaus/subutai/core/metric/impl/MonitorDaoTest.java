@@ -37,10 +37,7 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class MonitorDaoTest
 {
-    @Mock
-    DbUtil dbUtil;
-    @Mock
-    DataSource dataSource;
+
     private final static String SUBSCRIBER_ID = "subscriber";
     private final static UUID ENVIRONMENT_ID = UUID.randomUUID();
 
@@ -58,11 +55,6 @@ public class MonitorDaoTest
             super( emf );
         }
 
-
-        public void setDbUtil( DbUtil dbUtil )
-        {
-            this.dbUtil = dbUtil;
-        }
     }
 
 
@@ -83,10 +75,6 @@ public class MonitorDaoTest
         {
             e.printStackTrace();
         }
-
-
-        when( dbUtil.select( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
-        when( dbUtil.update( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
     }
 
 
@@ -96,7 +84,6 @@ public class MonitorDaoTest
         emf = Persistence.createEntityManagerFactory( "default" );
 
         monitorDao = new MonitorDaoExt( emf );
-        monitorDao.setDbUtil( dbUtil );
     }
 
 
@@ -140,11 +127,6 @@ public class MonitorDaoTest
     @Test
     public void testGetEnvironmentSubscribersIds() throws Exception
     {
-        ResultSet resultSet = mock( ResultSet.class );
-        when( dbUtil.select( anyString(), anyVararg() ) ).thenReturn( resultSet );
-        when( resultSet.next() ).thenReturn( true ).thenReturn( false );
-        when( resultSet.getString( anyString() ) ).thenReturn( SUBSCRIBER_ID );
-
         Set<String> subscribersIds = monitorDao.getEnvironmentSubscribersIds( ENVIRONMENT_ID );
 
         assertTrue( subscribersIds.contains( SUBSCRIBER_ID ) );

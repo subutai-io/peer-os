@@ -4,9 +4,8 @@ package org.safehaus.subutai.core.metric.api;
 import java.util.Set;
 
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
-import org.safehaus.subutai.core.metric.api.Metric;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.environment.Environment;
 
 
 /**

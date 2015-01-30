@@ -4,7 +4,7 @@ package org.safehaus.subutai.core.peer.ui.forms;
 import java.util.List;
 import java.util.UUID;
 
-import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.core.peer.api.PeerGroup;
 import org.safehaus.subutai.core.peer.ui.PeerManagerPortalModule;
 import org.slf4j.Logger;

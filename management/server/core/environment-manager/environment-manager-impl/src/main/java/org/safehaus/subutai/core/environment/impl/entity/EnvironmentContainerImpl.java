@@ -28,24 +28,27 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.SubutaiException;
+import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.common.host.HostArchitecture;
+import org.safehaus.subutai.common.host.HostInfo;
+import org.safehaus.subutai.common.host.Interface;
+import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Host;
+import org.safehaus.subutai.common.peer.HostEvent;
+import org.safehaus.subutai.common.peer.HostEventListener;
+import org.safehaus.subutai.common.peer.HostInfoModel;
+import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.protocol.api.DataService;
+import org.safehaus.subutai.common.quota.DiskPartition;
+import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
-import org.safehaus.subutai.core.hostregistry.api.HostArchitecture;
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
-import org.safehaus.subutai.core.hostregistry.api.Interface;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.core.peer.api.Host;
-import org.safehaus.subutai.core.peer.api.HostEvent;
-import org.safehaus.subutai.core.peer.api.HostEventListener;
-import org.safehaus.subutai.core.peer.api.HostInfoModel;
-import org.safehaus.subutai.core.peer.api.Peer;
-import org.safehaus.subutai.core.peer.api.PeerException;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -219,6 +222,20 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public void dispose() throws PeerException
     {
         getPeer().destroyContainer( this );
+    }
+
+
+    @Override
+    public void start() throws PeerException
+    {
+        getPeer().startContainer( this );
+    }
+
+
+    @Override
+    public void stop() throws PeerException
+    {
+        getPeer().stopContainer( this );
     }
 
 
@@ -501,5 +518,98 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public HostArchitecture getHostArchitecture()
     {
         return this.hostArchitecture;
+    }
+
+
+    @Override
+    public ProcessResourceUsage getProcessResourceUsage( final int processPid ) throws PeerException
+    {
+        return getPeer().getProcessResourceUsage( getId(), processPid );
+    }
+
+
+    @Override
+    public int getRamQuota() throws PeerException
+    {
+        return getPeer().getRamQuota( getId() );
+    }
+
+
+    @Override
+    public void setRamQuota( final int ramInMb ) throws PeerException
+    {
+        getPeer().setRamQuota( getId(), ramInMb );
+    }
+
+
+    @Override
+    public int getCpuQuota() throws PeerException
+    {
+        return getPeer().getCpuQuota( getId() );
+    }
+
+
+    @Override
+    public void setCpuQuota( final int cpuPercent ) throws PeerException
+    {
+        getPeer().setCpuQuota( getId(), cpuPercent );
+    }
+
+
+    @Override
+    public Set<Integer> getCpuSet() throws PeerException
+    {
+        return getPeer().getCpuSet( getId() );
+    }
+
+
+    @Override
+    public void setCpuSet( final Set<Integer> cpuSet ) throws PeerException
+    {
+        getPeer().setCpuSet( getId(), cpuSet );
+    }
+
+
+    @Override
+    public DiskQuota getDiskQuota( final DiskPartition diskPartition ) throws PeerException
+    {
+        return getPeer().getDiskQuota( getId(), diskPartition );
+    }
+
+
+    @Override
+    public void setDiskQuota( final DiskQuota diskQuota ) throws PeerException
+    {
+        getPeer().setDiskQuota( getId(), diskQuota );
+    }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof EnvironmentContainerImpl ) )
+        {
+            return false;
+        }
+
+        final EnvironmentContainerImpl that = ( EnvironmentContainerImpl ) o;
+
+        if ( hostId != null ? !hostId.equals( that.hostId ) : that.hostId != null )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return hostId != null ? hostId.hashCode() : 0;
     }
 }

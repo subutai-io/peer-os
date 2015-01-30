@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
@@ -14,7 +16,6 @@ import org.safehaus.subutai.core.strategy.api.ServerMetric;
  */
 public interface ResourceHost extends Host
 {
-    //    public void createContainer( ContainerCreateOrder contanerCreateOrder );
 
     void prepareTemplates( List<Template> templates ) throws ResourceHostException;
 
@@ -26,17 +27,12 @@ public interface ResourceHost extends Host
 
     void updateRepository( Template template ) throws ResourceHostException;
 
-    public Set<ContainerHost> getContainerHostsByNameList( Set<String> cloneNames );
 
     public ServerMetric getMetric() throws ResourceHostException;
 
     public Set<ContainerHost> getContainerHosts();
 
-    public void addContainerHost( ContainerHost containerHost );
-
     public ContainerHost getContainerHostByName( String hostname );
-
-    public Set<ContainerHost> getContainerHostsByEnvironmentId( UUID environmentId );
 
     public ContainerHost getContainerHostById( String id );
 
@@ -48,8 +44,16 @@ public interface ResourceHost extends Host
 
     public void removeContainerHost( ContainerHost result ) throws ResourceHostException;
 
-    //    void onHeartbeat( ResourceHostInfo resourceHostInfo );
     public void queue( HostTask hostTask );
 
-    void cloneContainer( String templateName, String hostname ) throws ResourceHostException;
+    public void cloneContainer( String templateName, String hostname ) throws ResourceHostException;
+
+    @Deprecated
+    public void addContainerHost( ContainerHost containerHost );
+
+    @Deprecated
+    public Set<ContainerHost> getContainerHostsByNameList( Set<String> cloneNames );
+
+    @Deprecated
+    public Set<ContainerHost> getContainerHostsByEnvironmentId( UUID environmentId );
 }

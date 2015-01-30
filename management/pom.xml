@@ -62,7 +62,6 @@
     <h2database.version>1.4.184</h2database.version>
     <openjpa.version>2.3.0</openjpa.version>
 
-
   </properties>
 
   <dependencyManagement>
@@ -133,6 +132,33 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>environment-manager-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- environment-manager 2-->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>env-manager-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>env-manager-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>env-manager-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>env-manager-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>env-manager-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -322,19 +348,6 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>messenger-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- security-manager -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>security-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>security-manager-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -675,6 +688,11 @@
         <version>3.1</version>
       </dependency>
       <dependency>
+        <groupId>commons-net</groupId>
+        <artifactId>commons-net</artifactId>
+        <version>3.3</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId>
         <version>4.3.2</version>
@@ -713,6 +731,11 @@
         <groupId>org.apache.geronimo.specs</groupId>
         <artifactId>geronimo-jta_1.1_spec</artifactId>
         <version>1.1.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.geronimo.specs</groupId>
+        <artifactId>geronimo-jpa_2.0_spec</artifactId>
+        <version>1.1</version>
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.specs</groupId>
@@ -770,9 +793,15 @@
         <artifactId>h2</artifactId>
         <version>${h2database.version}</version>
       </dependency>
+
       <dependency>
         <groupId>org.apache.openjpa</groupId>
         <artifactId>openjpa-all</artifactId>
+        <version>${openjpa.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.openjpa</groupId>
+        <artifactId>openjpa</artifactId>
         <version>${openjpa.version}</version>
       </dependency>
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

@@ -10,12 +10,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.Monitor;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -63,7 +63,7 @@ public class MonitorPortalModuleTest
     @Test
     public void testCreateComponent() throws Exception
     {
-        when( environmentManager.getEnvironments() ).thenReturn( Lists.<Environment>newArrayList() );
+        when( environmentManager.getEnvironments() ).thenReturn( Sets.<Environment>newHashSet() );
 
 
         assertTrue( module.createComponent() instanceof MonitorForm );

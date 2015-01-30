@@ -1,27 +1,47 @@
 package org.safehaus.subutai.core.peer.ui.container.manage;
 
 
-import com.vaadin.data.Item;
-import com.vaadin.data.Property;
-import com.vaadin.event.Action;
-import com.vaadin.server.ThemeResource;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.*;
-import org.safehaus.subutai.common.quota.*;
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
-import org.safehaus.subutai.core.peer.api.*;
-import org.safehaus.subutai.core.peer.ui.container.common.Buttons;
-import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.quota.CpuQuotaInfo;
+import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
+import org.safehaus.subutai.common.quota.PeerQuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
+import org.safehaus.subutai.core.peer.api.ContainerState;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
+import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.ResourceHost;
+import org.safehaus.subutai.core.peer.ui.container.common.Buttons;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vaadin.data.Item;
+import com.vaadin.data.Property;
+import com.vaadin.event.Action;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.AbsoluteLayout;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.TreeTable;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 
 @SuppressWarnings( "serial" )
@@ -431,14 +451,14 @@ public class Manager extends VerticalLayout
                 {
                     state = ContainerHostState.STOPPED;
                 }
-                if ( ContainerState.RUNNING.equals( state ) )
+                if ( ContainerHostState.RUNNING.equals( state ) )
                 {
                     containerStatus.setValue( "RUNNING" );
                     LOG.info( "This is quota manager: " + quotaManager.toString() );
 
                     try
                     {
-                        containerMemory = containerHost.getQuota( QuotaType.QUOTA_ALL_JSON );
+                        containerMemory = containerHost.getQuota( QuotaType.QUOTA_TYPE_ALL_JSON );
                         containerCpuTextField.setValue( containerMemory.getCpuQuotaInfo().getQuotaValue() );
 
                         modifyQuota.setValueForMemoryTextField2( containerMemory.getMemoryQuota().getQuotaValue() );
@@ -502,7 +522,7 @@ public class Manager extends VerticalLayout
                         show( pe.toString() );
                     }
                 }
-                else if ( ContainerState.STOPPED.equals( state ) )
+                else if ( ContainerHostState.STOPPED.equals( state ) )
                 {
                     containerStatus.setValue( "STOPPED" );
                 }

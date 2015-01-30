@@ -15,19 +15,22 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.common.host.HostInfo;
+import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.protocol.api.DataService;
+import org.safehaus.subutai.common.quota.DiskPartition;
+import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.HostKey;
-import org.safehaus.subutai.core.peer.api.Peer;
-import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 
 import com.google.common.base.Preconditions;
@@ -248,6 +251,22 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
 
     @Override
+    public void start() throws PeerException
+    {
+        Peer peer = getPeer();
+        peer.startContainer( this );
+    }
+
+
+    @Override
+    public void stop() throws PeerException
+    {
+        Peer peer = getPeer();
+        peer.stopContainer( this );
+    }
+
+
+    @Override
     public void updateHostInfo( final HostInfo hostInfo )
     {
         super.updateHostInfo( hostInfo );
@@ -261,5 +280,69 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public String getParentHostname()
     {
         return parent.getHostname();
+    }
+
+
+    @Override
+    public ProcessResourceUsage getProcessResourceUsage( final int processPid ) throws PeerException
+    {
+        Peer peer = getPeer();
+        return peer.getProcessResourceUsage( getId(), processPid );
+    }
+
+
+    @Override
+    public int getRamQuota() throws PeerException
+    {
+        return getPeer().getRamQuota( getId() );
+    }
+
+
+    @Override
+    public void setRamQuota( final int ramInMb ) throws PeerException
+    {
+        getPeer().setRamQuota( getId(), ramInMb );
+    }
+
+
+    @Override
+    public int getCpuQuota() throws PeerException
+    {
+        return getPeer().getCpuQuota( getId() );
+    }
+
+
+    @Override
+    public void setCpuQuota( final int cpuPercent ) throws PeerException
+    {
+        getPeer().setCpuQuota( getId(), cpuPercent );
+    }
+
+
+    @Override
+    public Set<Integer> getCpuSet() throws PeerException
+    {
+        return getPeer().getCpuSet( getId() );
+    }
+
+
+    @Override
+    public void setCpuSet( final Set<Integer> cpuSet ) throws PeerException
+    {
+        getPeer().setCpuSet( getId(), cpuSet );
+    }
+
+
+    @Override
+    public DiskQuota getDiskQuota( final DiskPartition diskPartition ) throws PeerException
+    {
+        return getPeer().getDiskQuota( getId(), diskPartition );
+    }
+
+
+    @Override
+    public void setDiskQuota( final DiskQuota diskQuota ) throws PeerException
+    {
+        getPeer().setDiskQuota( getId(), diskQuota );
     }
 }

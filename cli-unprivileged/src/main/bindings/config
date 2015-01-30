@@ -1,0 +1,246 @@
+#!/bin/bash
+
+
+function config_usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Adds or deletes a configuration path to/from the path set
+  echo
+  echo "        "subutai config [-ad] path container
+  echo
+  echo -----------------------------------------------------------------------
+}
+
+
+function config {
+  OPTIND=0
+  if [ "$1" == "config" ]; then
+    shift
+  fi
+
+  local add=
+  local del=
+  local lxc=
+
+  while getopts ":a:d:" opt; do
+    case $opt in
+      a)
+        add="$OPTARG"
+        if [ -n "$del" ]; then
+          msg_error "Cannot use the -a and -d options together." >&2
+          exit 1
+        fi
+        shift 2
+        ;;
+      d)
+        del="$OPTARG"
+        if [ -n "$add" ]; then
+          msg_error "Cannot use the -a and -d options together." >&2
+          exit 1
+        fi
+        shift 2
+        ;;
+      \?)
+        msg_error "Unrecognized option -$OPTARG"
+        exit 1
+        ;;
+    esac
+  done
+
+  if [ -z "$add" -a -z "$del" ]; then
+    msg_error "The -a or the -d switch to add or delete a path must be used."
+    show_usage "`config_usage`"
+  fi
+
+  while [ -n "`echo $1 | grep -`" ]; do
+    shift
+  done
+
+  local lxc="$1"
+
+  if [ "$TEST_MODE" == "true" ]; then
+    echo ---- TEST_MODE DUMP ----
+    echo -e "operand count\t= $#"
+    echo -e "operands\t= $@"
+    echo -e "add\t\t= $add"
+    echo -e "del\t\t= $del"
+    echo -e "lxc\t\t= $lxc"
+    echo
+  fi
+
+
+  # ---------------------------------------------------------------------------
+  # (1) perform some sanity checks
+  # ---------------------------------------------------------------------------
+  lxc_assert $lxc
+
+  # check to make sure the container is NOT a template
+  if [ "`fs_is_template $lxc`" == "true" ]; then
+    msg_error "Container \"$lxc\" is a template. Aborting ..."
+    exit 1
+  else
+    msg_info "    - check passed: \"$lxc\" is NOT a template"
+  fi
+
+  # check to make sure container is NOT registered as a template
+  if [ "`is_registered $lxc`" == "true" ]; then
+    msg_error "A template with name \"$lxc\" is registered. Aborting ..."
+    exit 1
+  else
+    msg_info "    - check passed: \"$lxc\" is NOT registered"
+  fi
+
+  if [ -n "$add" ]; then
+    config_add "$lxc" "$add"
+    check_status "Addition of config path \"$add\"" "$?"
+  else
+    config_del "$lxc" "$del"
+    check_status "Deletion of config path \"$del\"" "$?"
+  fi 
+
+}
+
+
+function config_del {
+  local lxc="$1"
+  local path="$2"
+
+
+  # check that the path actually exists and is a directory
+  if [ ! -d "$path" ]; then
+    msg_error "The path \"$path\" does not exist as a normal directory."
+    exit 1
+  else 
+    msg_info "    - check passed: \"$path\" is a normal directory and exists."
+  fi
+
+  lxc_chown $lxc
+  # check that the path is present in the lxc config
+  local found="false"
+  local lxc_root="$HOME/.local/share/lxc/$lxc"
+  local lxc_conf="$lxc_root/config"
+  for entry in `cat $lxc_conf | grep subutai.config.path | awk '{print $3}'`; do
+    # test if the path is equal to the entry
+    if [ "$path" == "$entry" ]; then
+      found="true"
+      msg_info "    - check passed: \"$path\" component used for configs."
+      cat $lxc_conf | grep -v "$path" | tee -a $lxc_conf.new
+      rm $lxc_conf
+      mv $lxc_conf.new $lxc_conf
+    fi
+  done
+
+  if [ "$found" == "false" ]; then
+    msg_error "The path \"$path\" is not used as a config path."
+    exit 1
+  fi
+
+  # the current directory we are in
+  local current="$lxc_root/rootfs"
+  # if the parent directory .gitignore was modified to remove the path
+  local parent_mod="false"
+  # the first component
+  local first_comp=
+  # the component count
+  local count=0;
+
+  for comp in `echo $path | sed -e 's/\// /g'`; do
+    parent="$current"
+    ignore="$parent/.gitignore"
+    current="$current/$comp"
+    count=$(($count +1))
+
+    # if the parent ignore file exist and our comp is NOT listed in it add it 
+    if [ -f "$ignore" ]; then
+      if [ -z "`cat $ignore | grep $comp`" ]; then
+        echo "$comp" | tee -a "$ignore"
+        continue
+      fi
+    fi
+  done
+  lxc_mapshifting $lxc
+#  git -C $lxc_root/rootfs add $first_comp $lxc_root/rootfs/.gitignore 
+}
+
+
+function config_add {
+  local lxc="$1"
+  local path="$2"
+  local lxc_root="$HOME/.local/share/lxc/$lxc"
+  local lxc_conf="$lxc_root/config"
+
+
+  # check that the path actually exists and is a directory
+  if [ ! -d "$path" ]; then
+    msg_error "The path \"$path\" does not exist as a normal directory."
+    exit 1
+  else 
+    msg_info "    - check passed: \"$path\" is a normal directory and exists."
+  fi
+
+  for entry in `cat $lxc_conf | grep subutai.config.path | awk '{print $3}'`; do
+    # test if the path is equal to the entry
+    if [ "$path" == "$entry" ]; then
+      msg_error "The path \"$entry\" already present as a configuration path."
+      exit 1
+    # test if path is contained in the path entry
+    elif [ -n "`echo $entry | grep $path`" ]; then
+      msg_error "The path \"$path\" contained in \"$entry\"."
+      exit 1
+    fi
+  done
+
+  lxc_chown $lxc
+  echo "subutai.config.path = $path" | tee -a "$lxc_root/config"
+
+  # the current directory we are in
+  local current="$lxc_root/rootfs"
+  # if the parent directory .gitignore was modified to expose the current
+  local parent_mod="false"
+  # the first component
+  local first_comp=
+  # the component count
+  local count=0;
+
+  for comp in `echo $path | sed -e 's/\// /g'`; do
+    parent="$current"
+    ignore="$parent/.gitignore"
+    current="$current/$comp"
+    count=$(($count +1))
+
+    # if the parent ignore file exist and our comp is listed in it remove it
+    if [ -f "$ignore" ]; then
+      if [ -n "`cat $ignore | grep $comp`" ]; then
+        cat $ignore | grep -v $comp | tee -a "$ignore.new"
+        rm $ignore
+        mv $ignore.new $ignore
+        parent_mod="true"
+        if [ $count -eq 1 ]; then
+          first_comp="$comp"
+        fi
+        continue
+#      elif [ "true" == "$parent_mod" ]; then
+#        parent_mod="false"
+      fi
+    # if the parent ignore file does not exist for this subdirectory yet we
+    # previously modified the parent ignore file we need to create a new ignore
+    # file that ignores everything except this current path component
+    else
+      for item in `ls $parent`; do
+        if [ ! "$item" == "$comp" ]; then
+          echo "$item" | sudo tee -a $ignore        
+        fi
+        parent_mod="false"
+      done 
+    fi
+  done
+
+  git -C $lxc_root/rootfs add $first_comp $lxc_root/rootfs/.gitignore
+  lxc_mapshifting $lxc 
+}
+
+
+function config_description {
+  echo adds or deletes a config path on a container
+}
+
+

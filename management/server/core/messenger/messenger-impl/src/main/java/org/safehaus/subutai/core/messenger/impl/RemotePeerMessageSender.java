@@ -6,9 +6,9 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.safehaus.subutai.common.exception.HTTPException;
+import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
-import org.safehaus.subutai.core.peer.api.Peer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

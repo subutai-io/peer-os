@@ -29,7 +29,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>environment-manager-api</artifactId>
+      <artifactId>env-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -55,21 +55,14 @@
       <artifactId>slf4j-simple</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.googlecode.catch-exception</groupId>
-      <artifactId>catch-exception</artifactId>
-      <version>1.2.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
       <version>2.3.2</version>
     </dependency>
     <dependency>
       <groupId>org.apache.openjpa</groupId>
-      <artifactId>openjpa-all</artifactId>
-      <version>2.3.0</version>
-      <scope>test</scope>
+      <artifactId>openjpa</artifactId>
+      <version>${openjpa.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
@@ -94,6 +87,7 @@
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
+            <Import-Package>javax.persistence;version="[1.0.0,2.1.0)",*</Import-Package>
           </instructions>
         </configuration>
       </plugin>

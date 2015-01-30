@@ -1,0 +1,5 @@
+*.log
+*.substvars
+files
+subutai-cli-unprivileged-debian-build
+debian/subutai-cli-unprivileged

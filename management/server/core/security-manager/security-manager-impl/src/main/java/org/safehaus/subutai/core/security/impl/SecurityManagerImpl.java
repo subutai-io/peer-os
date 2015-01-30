@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.security.impl;
 
 import java.util.Set;
 
-import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.core.security.api.SecurityManager;
 import org.safehaus.subutai.core.security.api.SecurityManagerException;
 

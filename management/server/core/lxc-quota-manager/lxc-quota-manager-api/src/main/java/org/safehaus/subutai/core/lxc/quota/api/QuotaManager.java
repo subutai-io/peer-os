@@ -4,7 +4,10 @@ package org.safehaus.subutai.core.lxc.quota.api;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.quota.DiskPartition;
+import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 
@@ -15,9 +18,8 @@ import org.safehaus.subutai.common.quota.QuotaType;
 public interface QuotaManager
 {
     /**
-     * Set Quota for container specified with parameters passed parameter as value to change, it is enum and specific
-     * value specified in enum key and newValue can be in any format for setting new value. host is a host with
-     * collection of container we intend to modify
+     * Set Quota for container specified with parameters passed containerName - the target container to set quota on,
+     * QuotaInfo - about quota information containing quota key and value in preformatted string values
      */
     public void setQuota( String containerName, QuotaInfo quota ) throws QuotaException;
 
@@ -78,4 +80,9 @@ public interface QuotaManager
      * @param cpuSet - allowed cpu set
      */
     public void setCpuSet( UUID containerId, Set<Integer> cpuSet ) throws QuotaException;
+
+
+    public DiskQuota getDiskQuota( UUID containerId, DiskPartition diskPartition ) throws QuotaException;
+
+    public void setDiskQuota( UUID containerId, DiskQuota diskQuota ) throws QuotaException;
 }

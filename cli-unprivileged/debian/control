@@ -1,0 +1,14 @@
+Source: subutai-cli-unprivileged
+Section: devel
+Priority: optional
+Maintainer: Subutai
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.4
+Homepage: http://www.safehaus.org
+
+Package: subutai-cli-unprivileged
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, git, awk, sed, grep, coreutils, build-essential, packaging-dev, lxc, lxc-templates, curl, bash-completion, rrdtool
+Description: Subutai LXC container running server host scripts that enable 
+ the creation of Subutai controlled LXC container templates and instance 
+ containers.
