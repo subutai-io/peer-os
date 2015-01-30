@@ -249,8 +249,8 @@ public class MainUI extends UI implements ViewChangeListener
     {
         helpManager.closeAll();
         Subject currentUser = SecurityUtils.getSubject();
-        LOG.info( String.format( "Current user: %s", currentUser.isAuthenticated() ) );
-        LOG.info( String.format( "View: %s", event.getViewName() ) );
+        LOG.debug( String.format( "Current user: %s", currentUser.isAuthenticated() ) );
+        LOG.debug( String.format( "View: %s", event.getViewName() ) );
 
         if ( currentUser.isAuthenticated() && event.getViewName().equals( "" ) )
         {
