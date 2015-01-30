@@ -29,6 +29,8 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 
 import com.google.common.reflect.TypeToken;
 
@@ -97,7 +99,8 @@ public class RemotePeerRestClient
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             return JsonUtil.fromJson( jsonObject, new TypeToken<Set<ContainerHost>>()
-            {}.getType() );
+            {
+            }.getType() );
         }
 
         if ( response.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() )
@@ -114,7 +117,7 @@ public class RemotePeerRestClient
     public void stopContainer( final ContainerHost containerHost ) throws PeerException
     {
         String path = "peer/container/stop";
-
+        Subject subject = SecurityUtils.getSubject();
         WebClient client = createWebClient();
 
         Form form = new Form();
@@ -131,6 +134,7 @@ public class RemotePeerRestClient
 
     public void startContainer( final ContainerHost containerHost ) throws PeerException
     {
+        Subject subject = SecurityUtils.getSubject();
         String path = "peer/container/start";
 
         WebClient client = createWebClient();
@@ -257,7 +261,8 @@ public class RemotePeerRestClient
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             return JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<Set<HostInfoModel>>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         else
         {
@@ -299,7 +304,8 @@ public class RemotePeerRestClient
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             return JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<PeerQuotaInfo>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         else
         {
@@ -321,7 +327,8 @@ public class RemotePeerRestClient
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             return JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<ProcessResourceUsage>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         else
         {
@@ -464,7 +471,8 @@ public class RemotePeerRestClient
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             return JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<Set<Integer>>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         else
         {
@@ -513,7 +521,8 @@ public class RemotePeerRestClient
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             return JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<DiskQuota>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         else
         {
