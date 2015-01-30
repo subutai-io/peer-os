@@ -26,12 +26,6 @@ public class ContainerHostDataService implements DataService<String, ContainerHo
     }
 
 
-    public void setEntityManagerFactory( final EntityManagerFactory emf )
-    {
-        this.emf = emf;
-    }
-
-
     @Override
     public ContainerHostEntity find( final String id )
     {

@@ -4,7 +4,6 @@ package org.safehaus.subutai.core.environment.impl.entity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -27,14 +26,12 @@ import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.exception.SubutaiException;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.host.HostArchitecture;
 import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.host.Interface;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.HostEvent;
 import org.safehaus.subutai.common.peer.HostEventListener;
 import org.safehaus.subutai.common.peer.HostInfoModel;
@@ -47,7 +44,6 @@ import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
-import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 
 import com.google.common.base.Preconditions;
@@ -389,65 +385,6 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public long getLastHeartbeat()
     {
         throw new UnsupportedOperationException( "Unsupported operation." );
-    }
-
-
-    @Override
-    public String getIpByMask( final String mask )
-    {
-        for ( Iterator<Interface> iterator = interfaces.iterator(); iterator.hasNext(); )
-        {
-            Interface intf = iterator.next();
-            if ( intf.getIp().matches( mask ) )
-            {
-                return intf.getIp();
-            }
-        }
-        return null;
-    }
-
-
-    @Override
-    public void addIpHostToEtcHosts( final String domainName, final Set<Host> others, final String mask )
-            throws SubutaiException
-    {
-        StringBuilder cleanHosts = new StringBuilder( "localhost|127.0.0.1|" );
-        StringBuilder appendHosts = new StringBuilder();
-        for ( Host otherHost : others )
-        {
-            if ( getId().equals( otherHost.getId() ) )
-            {
-                continue;
-            }
-
-            String ip = otherHost.getIpByMask( Common.IP_MASK );
-            String hostname = otherHost.getHostname();
-            cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
-            appendHosts.append( "/bin/echo '" ).
-                    append( ip ).append( " " ).
-                               append( hostname ).append( "." ).append( domainName ).
-                               append( " " ).append( hostname ).
-                               append( "' >> '/etc/hosts'; " );
-        }
-        if ( cleanHosts.length() > 0 )
-        {
-            //drop pipe | symbol
-            cleanHosts.setLength( cleanHosts.length() - 1 );
-            cleanHosts.insert( 0, "egrep -v '" );
-            cleanHosts.append( "' /etc/hosts > etc-hosts-cleaned; mv etc-hosts-cleaned /etc/hosts;" );
-            appendHosts.insert( 0, cleanHosts );
-        }
-
-        appendHosts.append( "/bin/echo '127.0.0.1 localhost " ).append( getHostname() ).append( "' >> '/etc/hosts';" );
-
-        try
-        {
-            execute( new RequestBuilder( appendHosts.toString() ).withTimeout( 30 ) );
-        }
-        catch ( CommandException e )
-        {
-            throw new SubutaiException( "Could not add to /etc/hosts: " + e.toString() );
-        }
     }
 
 
