@@ -53,7 +53,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 {
     private static final String CONTAINER_DOES_NOT_EXISTS = "Container \"%s\" does NOT exist. Aborting ...";
     private static final String CONTAINER_DESTROYED = "Destruction of \"%s\" completed successfully";
-    private static final String TEMPLATE_EXISTS = "Template \"%s\" seems already installed, please destroy first";
 
     @javax.persistence.Transient
     transient protected static final Logger LOG = LoggerFactory.getLogger( ResourceHostEntity.class );
@@ -81,7 +80,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     HostRegistry hostRegistry;
 
 
-    private ResourceHostEntity()
+    public ResourceHostEntity()
     {
     }
 
@@ -163,7 +162,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         RequestBuilder requestBuilder =
                 new RequestBuilder( String.format( "/usr/bin/lxc-info -n %s", container.getHostname() ) )
                         .withTimeout( 30 );
-        CommandResult result = null;
+        CommandResult result;
         try
         {
             result = execute( requestBuilder );
@@ -211,9 +210,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    public Set<ContainerHost> getContainerHosts()
+    public synchronized Set<ContainerHost> getContainerHosts()
     {
-        return containersHosts;
+        return Sets.newConcurrentHashSet( containersHosts );
     }
 
 
@@ -378,12 +377,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    public synchronized ContainerHost getContainerHostByName( final String hostname )
+    public ContainerHost getContainerHostByName( final String hostname )
     {
 
         ContainerHost result = null;
 
-        Iterator iterator = containersHosts.iterator();
+        Iterator iterator = getContainerHosts().iterator();
 
         while ( result == null && iterator.hasNext() )
         {
@@ -398,7 +397,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    public synchronized Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId )
+    public Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId )
     {
         Set<ContainerHost> result = new HashSet<>();
         for ( ContainerHost containerHost : getContainerHosts() )
@@ -407,7 +406,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             {
                 continue;
             }
-            if ( containerHost.getEnvironmentId().equals( environmentId ) )
+            if ( containerHost.getEnvironmentId().equals( environmentId.toString() ) )
             {
                 result.add( containerHost );
             }
@@ -418,17 +417,20 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     public void removeContainerHost( final ContainerHost containerHost )
     {
-        if ( containersHosts.contains( containerHost ) )
+        if ( getContainerHosts().contains( containerHost ) )
         {
-            containersHosts.remove( containerHost );
+            synchronized ( containersHosts )
+            {
+                containersHosts.remove( containerHost );
+            }
         }
     }
 
 
-    public synchronized ContainerHost getContainerHostById( final String id )
+    public ContainerHost getContainerHostById( final String id )
     {
         ContainerHost result = null;
-        Iterator iterator = containersHosts.iterator();
+        Iterator iterator = getContainerHosts().iterator();
 
         while ( result == null && iterator.hasNext() )
         {
@@ -535,11 +537,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         try
         {
             CommandResult commandResult = run( Command.IMPORT, template.getTemplateName() );
-            if ( commandResult.hasSucceeded() )
-            {
-                return;
-            }
-            else
+            if ( !commandResult.hasSucceeded() )
             {
                 LOG.warn( "Template import failed. ", commandResult );
             }
@@ -644,6 +642,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         catch ( CommandException ce )
         {
+            LOG.warn( "Error exporting template", ce );
         }
         return getExportedPackageFilePath( templateName );
     }
@@ -769,7 +768,10 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
 
         ( ( ContainerHostEntity ) host ).setParent( this );
-        containersHosts.add( host );
+        synchronized ( containersHosts )
+        {
+            containersHosts.add( host );
+        }
     }
 
 
