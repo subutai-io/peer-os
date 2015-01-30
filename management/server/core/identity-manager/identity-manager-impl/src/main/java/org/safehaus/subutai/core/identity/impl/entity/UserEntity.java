@@ -41,22 +41,26 @@ public class UserEntity implements User
     Set<RoleEntity> roles = new HashSet();
 
     @Column( name = "user_name" )
-    public String username;
+    private String username;
 
     @Column( name = "full_name" )
-    public String fullname;
+    private String fullname;
 
     @Column( name = "password" )
-    public String password;
+    private String password;
 
     @Column( name = "salt" )
-    public String salt;
+    private String salt;
 
     @Column( name = "permissions" )
-    public String permissions;
+    private String permissions;
 
     @Column( name = "e_mail" )
-    public String email;
+    private String email;
+
+
+    @Column( name = "key" )
+    private String key = "Empty key: not implemented yet.";
 
 
     @Override
@@ -159,5 +163,19 @@ public class UserEntity implements User
     public String getEmail()
     {
         return email;
+    }
+
+
+    @Override
+    public String getKey()
+    {
+        return this.key;
+    }
+
+
+    @Override
+    public void setKey( final String key )
+    {
+        this.key = key;
     }
 }

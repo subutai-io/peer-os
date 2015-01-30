@@ -213,6 +213,14 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+    @Override
+    public String getUserKey( final String username )
+    {
+        User user = userDataService.findByUsername( username );
+        return user.getKey();
+    }
+
+
     private String saltedHash( String password, byte[] salt )
     {
         Sha256Hash sha256Hash = new Sha256Hash( password, salt );

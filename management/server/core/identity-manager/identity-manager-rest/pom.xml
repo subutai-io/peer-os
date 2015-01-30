@@ -9,7 +9,7 @@
     <version>2.0.0</version>
   </parent>
 
-  <artifactId>peer-manager-rest</artifactId>
+  <artifactId>identity-manager-rest</artifactId>
   <name>Subutai Identity Manager REST</name>
   <description>Subutai Identity Manager REST</description>
   <packaging>bundle</packaging>

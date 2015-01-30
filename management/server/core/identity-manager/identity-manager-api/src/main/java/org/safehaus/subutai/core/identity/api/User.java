@@ -31,4 +31,8 @@ public interface User
     public void setFullname( String fullname );
 
     public void setEmail( String email );
+
+    public String getKey();
+
+    public void setKey(String key);
 }

@@ -22,5 +22,7 @@ public interface IdentityManager
     public List<User> getAllUsers();
 
     public boolean addUser( String username, String fullname, String password, String email );
+
+    public String getUserKey( String username );
 }
 

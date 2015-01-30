@@ -100,7 +100,6 @@ public class ShiroLoginModule extends AbstractKarafLoginModule
         String password = new String( tmpPassword );
         principals = new HashSet<Principal>();
 
-        LOGGER.debug( "Trying to authn with: " + user + ":" + password );
         try
         {
             UsernamePasswordToken token = new UsernamePasswordToken( user, password );
@@ -112,6 +111,7 @@ public class ShiroLoginModule extends AbstractKarafLoginModule
             principals.add( new UserPrincipal( user ) );
             principals.add( new ShiroPrincipal( shiroSubject ) );
             principals.add( new RolePrincipal( "admin" ) );
+            //TODO: retrive roles from realm
             //            principals.add( new RolePrincipal( "manager" ) );
             //            principals.add( new RolePrincipal( "viewer" ) );
             //            principals.add( new RolePrincipal( "group" ) );

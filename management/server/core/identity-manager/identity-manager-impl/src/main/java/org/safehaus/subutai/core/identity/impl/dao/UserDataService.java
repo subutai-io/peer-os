@@ -8,6 +8,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
 
 import org.safehaus.subutai.common.protocol.api.DataService;
+import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.identity.impl.entity.UserEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -164,9 +165,9 @@ public class UserDataService implements DataService<Long, UserEntity>
     }
 
 
-    public UserEntity findByUsername( final String username )
+    public User findByUsername( final String username )
     {
-        UserEntity result = null;
+        User result = null;
         EntityManager em = emf.createEntityManager();
         try
         {

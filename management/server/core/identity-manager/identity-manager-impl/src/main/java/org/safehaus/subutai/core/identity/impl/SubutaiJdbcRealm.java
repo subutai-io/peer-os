@@ -53,7 +53,17 @@ public class SubutaiJdbcRealm extends JdbcRealm
     {
         try
         {
-            InitialContext ic = new InitialContext();
+            InitialContext ic;
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            Thread.currentThread().setContextClassLoader( this.getClass().getClassLoader() );
+            try
+            {
+                ic = new InitialContext();
+            }
+            finally
+            {
+                Thread.currentThread().setContextClassLoader( cl );
+            }
             return ( DataSource ) ic.lookup( jndiDataSourceName );
         }
         catch ( NamingException e )
