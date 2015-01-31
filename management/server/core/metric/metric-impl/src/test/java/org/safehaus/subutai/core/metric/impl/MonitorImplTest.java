@@ -31,6 +31,7 @@ import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.MonitoringSettings;
 import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
+import org.safehaus.subutai.core.peer.api.ContainerGroup;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -237,7 +238,9 @@ public class MonitorImplTest
     public void testAlertThresholdExcessLocalPeer() throws Exception
     {
         //set owner id as local peer
-        when( containerHost.getInitiatorPeerId() ).thenReturn( LOCAL_PEER_ID.toString() );
+        ContainerGroup containerGroup = mock( ContainerGroup.class );
+        when( containerGroup.getInitiatorPeerId() ).thenReturn( LOCAL_PEER_ID );
+        when( localPeer.getContainerGroup( HOST_ID ) ).thenReturn( containerGroup );
         when( localPeer.getContainerHostByName( HOST ) ).thenReturn( containerHost );
         Peer ownerPeer = mock( Peer.class );
         when( peerManager.getPeer( LOCAL_PEER_ID ) ).thenReturn( ownerPeer );
@@ -254,7 +257,10 @@ public class MonitorImplTest
     public void testAlertThresholdExcessRemotePeer() throws Exception
     {
         //set owner id as local peer
-        when( containerHost.getInitiatorPeerId() ).thenReturn( REMOTE_PEER_ID.toString() );
+        ContainerGroup containerGroup = mock( ContainerGroup.class );
+        when( containerGroup.getInitiatorPeerId() ).thenReturn( REMOTE_PEER_ID );
+        when( localPeer.getContainerGroup( HOST_ID ) ).thenReturn( containerGroup );
+        //        when( containerHost.getInitiatorPeerId() ).thenReturn( REMOTE_PEER_ID.toString() );
         when( localPeer.getContainerHostByName( HOST ) ).thenReturn( containerHost );
         Peer ownerPeer = mock( Peer.class );
         when( peerManager.getPeer( REMOTE_PEER_ID ) ).thenReturn( ownerPeer );
