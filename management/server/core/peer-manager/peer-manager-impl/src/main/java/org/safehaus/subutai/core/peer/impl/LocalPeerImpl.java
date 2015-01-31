@@ -613,6 +613,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             }
         }
 
+        //create container group for new containers
         ContainerGroupEntity containerGroup =
                 new ContainerGroupEntity( environmentId, initiatorPeerId, ownerId, newContainers );
 
