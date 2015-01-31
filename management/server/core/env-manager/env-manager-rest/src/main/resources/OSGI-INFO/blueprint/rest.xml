@@ -5,7 +5,7 @@
 
   http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
 
-  <cxf:bus id="cxfBusEnvManager">
+  <cxf:bus id="cxfBusEnvManager2">
     <cxf:features>
       <cxf:logging />
     </cxf:features>
