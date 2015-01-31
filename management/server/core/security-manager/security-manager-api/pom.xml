@@ -24,6 +24,40 @@
       <groupId>org.safehaus.subutai</groupId>
       <artifactId>peer-manager-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.karaf.jaas</groupId>
+      <artifactId>org.apache.karaf.jaas.config</artifactId>
+      <version>${karaf.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.karaf.jaas</groupId>
+      <artifactId>org.apache.karaf.jaas.boot</artifactId>
+      <version>${karaf.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.karaf.jaas</groupId>
+      <artifactId>org.apache.karaf.jaas.modules</artifactId>
+      <version>${karaf.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <scope>provided</scope>
+      <version>4.3.5</version>
+    </dependency>
+
   </dependencies>
 
   <build>

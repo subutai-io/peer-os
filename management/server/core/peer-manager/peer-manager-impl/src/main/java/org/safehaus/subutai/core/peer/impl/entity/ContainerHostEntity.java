@@ -29,7 +29,7 @@ import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
+import org.safehaus.subutai.core.peer.api.ContainerGroup;
 import org.safehaus.subutai.core.peer.api.HostKey;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 
@@ -48,6 +48,9 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @ManyToOne( targetEntity = ResourceHostEntity.class )
     @JoinColumn( name = "parent_id" )
     private ResourceHost parent;
+    @ManyToOne( targetEntity = ContainerGroupEntity.class )
+    @JoinColumn( name = "group_id" )
+    private ContainerGroup group;
 
     @Column( name = "env_id", nullable = false )
     private String environmentId = "UNKNOWN";
@@ -63,7 +66,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Column( name = "node_group_name", nullable = false )
     private String nodeGroupName = "UNKNOWN";
 
-    private QuotaManager quotaManager;
+    //    private QuotaManager quotaManager;
 
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
     private Set<String> tags = new HashSet<>();

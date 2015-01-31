@@ -36,8 +36,9 @@ public class CreateContainerRequestListener extends RequestListener
         {
 
             Set<HostInfoModel> containerHosts = localPeer
-                    .scheduleCloneContainers( request.getCreatorPeerId(), request.getTemplates(), request.getQuantity(),
-                            request.getStrategyId(), request.getCriteria() );
+                    .createContainers( request.getEnvironmentId(), request.getInitiatorPeerId(), request.getOwnerId(),
+                            request.getTemplates(), request.getNumberOfContainers(), request.getStrategyId(),
+                            request.getCriteria() );
 
             return new CreateContainerResponse( containerHosts );
         }

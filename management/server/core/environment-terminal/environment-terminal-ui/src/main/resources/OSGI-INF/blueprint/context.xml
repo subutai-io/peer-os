@@ -4,7 +4,7 @@
     xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <reference id="environmentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
+             interface="org.safehaus.subutai.core.env.api.EnvironmentManager" />
 
   <bean id="module" scope="singleton"
         class="org.safehaus.subutai.core.environment.terminal.ui.EnvironmentTerminalPortalModule"

@@ -1,10 +1,32 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+<blueprint default-activation="eager"
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
+           xmlns:jaas="http://karaf.apache.org/xmlns/jaas/v1.1.0"
+    >
 
-  <bean id="networkManager" scope="singleton" class="org.safehaus.subutai.core.security.impl.SecurityManagerImpl">
+  <!--*****************************************************************-->
+  <bean id="daoManagerSecurity" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager" scope="prototype">
+    <jpa:unit unitname="securityManagerPUnit" property="entityManagerFactory" />
+  </bean>
+  <!--*****************************************************************-->
 
+  <bean id="networkManager" scope="singleton" class="org.safehaus.subutai.core.security.impl.SecurityManagerImpl"
+        init-method="init">
+    <!--  <property name="daoManager" ref="daoManagerSecurity" />-->
+    <property name="bundleContext" ref="blueprintBundleContext"></property>
   </bean>
 
-  <service ref="networkManager" interface="org.safehaus.subutai.core.security.api.SecurityManager" />
+  <service ref="networkManager" interface="SecurityManager" />
+
+  <jaas:config name="karaf" rank="2">
+    <jaas:module className="org.safehaus.subutai.core.security.impl.ShiroLoginModule"
+                 flags="sufficient" name="Subutai">
+    </jaas:module>
+  </jaas:config>
+  <!--
+    <service interface="org.apache.karaf.jaas.modules.BackingEngineFactory">
+      <bean class="org.apache.karaf.jaas.modules.syncope.SyncopeBackingEngineFactory" />
+    </service>
+  -->
 
 </blueprint>

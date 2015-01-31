@@ -1,0 +1,38 @@
+package org.safehaus.subutai.core.identity.api;
+
+
+import java.util.List;
+
+
+/**
+ * Created by timur on 1/21/15.
+ */
+public interface User
+{
+    public Long getId();
+
+    public void setUsername( String username );
+
+    public String getPassword();
+
+    public void setPassword( String password );
+
+
+    public List<String> getPermissions();
+
+    public void setSalt( String salt );
+
+    public String getFullname();
+
+    public String getUsername();
+
+    public String getEmail();
+
+    public void setFullname( String fullname );
+
+    public void setEmail( String email );
+
+    public String getKey();
+
+    public void setKey(String key);
+}

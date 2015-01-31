@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.naming.NamingException;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
@@ -25,7 +24,6 @@ import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.exception.SubutaiException;
 import org.safehaus.subutai.common.host.HostArchitecture;
 import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.host.Interface;
@@ -33,10 +31,6 @@ import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.HostEvent;
 import org.safehaus.subutai.common.peer.HostEventListener;
 import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -148,22 +142,6 @@ public abstract class AbstractSubutaiHost implements Host
     public Peer getPeer()
     {
         return peer;
-        //        Peer result;
-        //        try
-        //        {
-        //            PeerManager peerManager = ServiceLocator.getServiceNoCache( PeerManager.class );
-        //            result = peerManager.getPeer( UUID.fromString( peerId ) );
-        //            if ( result == null )
-        //            {
-        //                throw new PeerException( "Peer not registered." );
-        //            }
-        //        }
-        //        catch ( NamingException e )
-        //        {
-        //            throw new PeerException( "Could not locate PeerManager" );
-        //        }
-        //
-        //        return result;
     }
 
 
@@ -171,20 +149,6 @@ public abstract class AbstractSubutaiHost implements Host
     public void setPeer( Peer peer )
     {
         this.peer = peer;
-    }
-
-
-    public HostRegistry getHostRegistry() throws PeerException
-    {
-        HostRegistry result;
-        try
-        {
-            return ServiceLocator.getServiceNoCache( HostRegistry.class );
-        }
-        catch ( NamingException e )
-        {
-            throw new PeerException( "Could not locate PeerManager" );
-        }
     }
 
 
@@ -329,65 +293,6 @@ public abstract class AbstractSubutaiHost implements Host
         }
 
         return null;
-    }
-
-
-    @Override
-    public String getIpByMask( String mask )
-    {
-        String[] s = this.netInterfaces.split( ";" );
-        for ( String ip : s )
-        {
-            if ( ip.matches( mask ) )
-            {
-                return ip;
-            }
-        }
-        return null;
-    }
-
-
-    @Override
-    public void addIpHostToEtcHosts( String domainName, Set<Host> others, String mask ) throws SubutaiException
-    {
-        StringBuilder cleanHosts = new StringBuilder( "localhost|127.0.0.1|" );
-        StringBuilder appendHosts = new StringBuilder();
-        for ( Host otherHost : others )
-        {
-            if ( getId().equals( otherHost.getId() ) )
-            {
-                continue;
-            }
-
-            String ip = otherHost.getIpByMask( Common.IP_MASK );
-            String hostname = otherHost.getHostname();
-            cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
-            appendHosts.append( "/bin/echo '" ).
-                    append( ip ).append( " " ).
-                               append( hostname ).append( "." ).append( domainName ).
-                               append( " " ).append( hostname ).
-                               append( "' >> '/etc/hosts'; " );
-        }
-        if ( cleanHosts.length() > 0 )
-        {
-            //drop pipe | symbol
-            cleanHosts.setLength( cleanHosts.length() - 1 );
-            cleanHosts.insert( 0, "egrep -v '" );
-            cleanHosts.append( "' /etc/hosts > etc-hosts-cleaned; mv etc-hosts-cleaned /etc/hosts;" );
-            appendHosts.insert( 0, cleanHosts );
-        }
-
-        appendHosts.append( "/bin/echo '127.0.0.1 localhost " ).append( getHostname() ).append( "' >> '/etc/hosts';" );
-
-        try
-        {
-            execute( new RequestBuilder( String.format( "sh -c echo `%s`", appendHosts.toString() ) )
-                    .withTimeout( 30 ) );
-        }
-        catch ( CommandException e )
-        {
-            throw new SubutaiException( "Could not add to /etc/hosts: " + e.toString() );
-        }
     }
 
 

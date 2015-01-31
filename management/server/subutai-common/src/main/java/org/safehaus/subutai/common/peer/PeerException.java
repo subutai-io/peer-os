@@ -1,13 +1,10 @@
 package org.safehaus.subutai.common.peer;
 
 
-import org.safehaus.subutai.common.exception.SubutaiException;
-
-
 /**
  * Exception thrown by peer methods
  */
-public class PeerException extends SubutaiException
+public class PeerException extends Exception
 {
     private String description = "";
 
