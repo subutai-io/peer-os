@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.env.rest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -37,6 +38,10 @@ public interface RestService
     @Path( "grow" )
     public Response growEnvironment( @QueryParam( "environmentId" ) String environmentId,
                                      @QueryParam( "topology" ) String topologyJsonString );
+
+    @PUT
+    @Path( "key" )
+    public Response setSshKey( @QueryParam( "environmentId" ) String environmentId, @QueryParam( "key" ) String key );
 
     @GET
     @Path( "container/state" )

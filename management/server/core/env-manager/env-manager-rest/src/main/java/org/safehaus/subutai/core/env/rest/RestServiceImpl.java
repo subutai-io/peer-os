@@ -5,9 +5,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.environment.ContainerHostNotFoundException;
+import org.safehaus.subutai.common.environment.Environment;
+import org.safehaus.subutai.common.environment.EnvironmentModificationException;
+import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.NodeGroup;
 import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.host.ContainerHostState;
@@ -16,13 +19,9 @@ import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.common.environment.ContainerHostNotFoundException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
-import org.safehaus.subutai.common.environment.EnvironmentModificationException;
-import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.slf4j.Logger;
@@ -338,7 +337,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getContainerState( @QueryParam( "containerId" ) final String containerId )
+    public Response getContainerState( final String containerId )
     {
         if ( !UUIDUtil.isStringAUuid( containerId ) )
         {
@@ -365,6 +364,39 @@ public class RestServiceImpl implements RestService
         }
 
         return Response.status( Response.Status.NOT_FOUND ).build();
+    }
+
+
+    @Override
+    public Response setSshKey( final String environmentId, final String key )
+    {
+        if ( !UUIDUtil.isStringAUuid( environmentId ) )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
+        }
+        else if ( Strings.isNullOrEmpty( key ) )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid ssh key" ) ).build();
+        }
+
+        UUID envId = UUID.fromString( environmentId );
+
+        try
+        {
+            environmentManager.setSshKey( envId, key, false );
+
+            return Response.ok().build();
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            return Response.status( Response.Status.NOT_FOUND ).build();
+        }
+        catch ( EnvironmentModificationException e )
+        {
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
     }
 
 
