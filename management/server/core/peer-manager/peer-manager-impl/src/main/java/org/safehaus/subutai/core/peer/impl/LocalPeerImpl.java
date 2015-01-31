@@ -624,7 +624,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
 
     @Override
-    public ContainerGroup getContainerGroup( final UUID containerId ) throws ContainerGroupNotFoundException
+    public ContainerGroup findContainerGroupByContainerId( final UUID containerId )
+            throws ContainerGroupNotFoundException
     {
         Preconditions.checkNotNull( containerId, "Invalid container id" );
 
@@ -638,6 +639,26 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                 {
                     return containerGroup;
                 }
+            }
+        }
+
+        throw new ContainerGroupNotFoundException();
+    }
+
+
+    @Override
+    public ContainerGroup findContainerGroupByEnvironmentId( final UUID environmentId )
+            throws ContainerGroupNotFoundException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid container id" );
+
+        List<ContainerGroupEntity> containerGroups = ( List<ContainerGroupEntity> ) containerGroupDataService.getAll();
+
+        for ( ContainerGroupEntity containerGroup : containerGroups )
+        {
+            if ( environmentId.equals( containerGroup.getEnvironmentId() ) )
+            {
+                return containerGroup;
             }
         }
 
@@ -906,16 +927,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     }
 
 
-    @Override
-    public Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId )
-    {
-        Set<ContainerHost> result = new HashSet<>();
-        for ( ResourceHost resourceHost : getResourceHosts() )
-        {
-            result.addAll( resourceHost.getContainerHostsByEnvironmentId( environmentId ) );
-        }
-        return result;
-    }
+    //    @Override
+    //    public Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId )
+    //    {
+    //        Set<ContainerHost> result = new HashSet<>();
+    //        for ( ResourceHost resourceHost : getResourceHosts() )
+    //        {
+    //            result.addAll( resourceHost.getContainerHostsByEnvironmentId( environmentId ) );
+    //        }
+    //        return result;
+    //    }
 
 
     @Override

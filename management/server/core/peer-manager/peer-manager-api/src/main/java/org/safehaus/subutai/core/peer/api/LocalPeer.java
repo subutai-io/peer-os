@@ -88,7 +88,7 @@ public interface LocalPeer extends Peer
     public String getFreeHostName( String prefix );
 
     /**
-     * Returns container group to which specified container belongs
+     * Returns container group by container id
      *
      * @param containerId - id of container
      *
@@ -96,5 +96,17 @@ public interface LocalPeer extends Peer
      *
      * @throws ContainerGroupNotFoundException - thrown if container is created not as a part of environment
      */
-    public ContainerGroup getContainerGroup( UUID containerId ) throws ContainerGroupNotFoundException;
+    public ContainerGroup findContainerGroupByContainerId( UUID containerId ) throws ContainerGroupNotFoundException;
+
+    /**
+     * Returns container group by environment id
+     *
+     * @param environmentId - id of environment
+     *
+     * @return - {@code ContainerGroup}
+     *
+     * @throws ContainerGroupNotFoundException - thrown if group is not found
+     */
+    public ContainerGroup findContainerGroupByEnvironmentId( UUID environmentId )
+            throws ContainerGroupNotFoundException;
 }

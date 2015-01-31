@@ -240,7 +240,7 @@ public class MonitorImplTest
         //set owner id as local peer
         ContainerGroup containerGroup = mock( ContainerGroup.class );
         when( containerGroup.getInitiatorPeerId() ).thenReturn( LOCAL_PEER_ID );
-        when( localPeer.getContainerGroup( HOST_ID ) ).thenReturn( containerGroup );
+        when( localPeer.findContainerGroupByContainerId( HOST_ID ) ).thenReturn( containerGroup );
         when( localPeer.getContainerHostByName( HOST ) ).thenReturn( containerHost );
         Peer ownerPeer = mock( Peer.class );
         when( peerManager.getPeer( LOCAL_PEER_ID ) ).thenReturn( ownerPeer );
@@ -259,7 +259,7 @@ public class MonitorImplTest
         //set owner id as local peer
         ContainerGroup containerGroup = mock( ContainerGroup.class );
         when( containerGroup.getInitiatorPeerId() ).thenReturn( REMOTE_PEER_ID );
-        when( localPeer.getContainerGroup( HOST_ID ) ).thenReturn( containerGroup );
+        when( localPeer.findContainerGroupByContainerId( HOST_ID ) ).thenReturn( containerGroup );
         //        when( containerHost.getInitiatorPeerId() ).thenReturn( REMOTE_PEER_ID.toString() );
         when( localPeer.getContainerHostByName( HOST ) ).thenReturn( containerHost );
         Peer ownerPeer = mock( Peer.class );
@@ -360,8 +360,10 @@ public class MonitorImplTest
         when( commandResult.hasSucceeded() ).thenReturn( true );
         when( commandResult.getStdOut() ).thenReturn( METRIC_JSON );
         when( containerHost.getPeer() ).thenReturn( localPeer );
-        when( localPeer.getContainerHostsByEnvironmentId( ENVIRONMENT_ID ) )
-                .thenReturn( Sets.newHashSet( containerHost ) );
+        ContainerGroup containerGroup = mock(ContainerGroup.class);
+        when( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) )
+                .thenReturn( containerGroup );
+        when( containerGroup.getContainerHosts() ).thenReturn( Sets.newHashSet( containerHost ) );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
         when( localPeer.getResourceHostByContainerId( HOST_ID.toString() ) ).thenReturn( resourceHost );
 
@@ -419,8 +421,10 @@ public class MonitorImplTest
     @Test
     public void testGetLocalContainerHostMetrics() throws Exception
     {
-        when( localPeer.getContainerHostsByEnvironmentId( ENVIRONMENT_ID ) )
-                .thenReturn( Sets.newHashSet( containerHost ) );
+        ContainerGroup containerGroup = mock(ContainerGroup.class);
+        when( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) )
+                .thenReturn( containerGroup );
+        when( containerGroup.getContainerHosts() ).thenReturn( Sets.newHashSet( containerHost ) );
 
         monitor.getLocalContainerHostsMetrics( ENVIRONMENT_ID );
 
@@ -432,8 +436,12 @@ public class MonitorImplTest
     @Test
     public void testGetLocalContainerHostMetricsWithException() throws Exception
     {
-        PeerException exception = mock( PeerException.class );
-        doThrow( exception ).when( localPeer ).getContainerHostsByEnvironmentId( ENVIRONMENT_ID );
+        ContainerGroup containerGroup = mock(ContainerGroup.class);
+        when( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) )
+                .thenReturn( containerGroup );
+        when( containerGroup.getContainerHosts() ).thenReturn( Sets.newHashSet( containerHost ) );
+        HostNotFoundException exception = mock( HostNotFoundException.class );
+        doThrow( exception ).when( localPeer ).getResourceHostByContainerId( anyString() );
 
 
         monitor.getLocalContainerHostsMetrics( ENVIRONMENT_ID );
@@ -447,8 +455,10 @@ public class MonitorImplTest
     @Test
     public void testGetLocalContainerHostMetricsWithException2() throws Exception
     {
-        when( localPeer.getContainerHostsByEnvironmentId( ENVIRONMENT_ID ) )
-                .thenReturn( Sets.newHashSet( containerHost ) );
+        ContainerGroup containerGroup = mock(ContainerGroup.class);
+        when( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) )
+                .thenReturn( containerGroup );
+        when( containerGroup.getContainerHosts() ).thenReturn( Sets.newHashSet( containerHost ) );
 
         HostNotFoundException exception = mock( HostNotFoundException.class );
         doThrow( exception ).when( localPeer ).getResourceHostByContainerId( HOST_ID.toString() );

@@ -167,19 +167,23 @@ public class MonitorImpl implements Monitor
         Set<ContainerHostMetricImpl> metrics = Sets.newHashSet();
         try
         {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+
+            ContainerGroup containerGroup = localPeer.findContainerGroupByEnvironmentId( environmentId );
+
             //obtain environment containers
-            Set<ContainerHost> localContainers =
-                    peerManager.getLocalPeer().getContainerHostsByEnvironmentId( environmentId );
+            Set<ContainerHost> localContainers = containerGroup.getContainerHosts();
 
             for ( ContainerHost localContainer : localContainers )
             {
                 //get container's resource host
-                ResourceHost resourceHost =
-                        peerManager.getLocalPeer().getResourceHostByContainerId( localContainer.getId().toString() );
+                ResourceHost resourceHost = localPeer.getResourceHostByContainerId( localContainer.getId().toString() );
+
+                //get metric
                 addLocalContainerHostMetric( environmentId, resourceHost, localContainer, metrics );
             }
         }
-        catch ( PeerException e )
+        catch ( ContainerGroupNotFoundException | PeerException e )
         {
             LOG.error( "Error obtaining local container metrics", e );
         }
@@ -480,7 +484,7 @@ public class MonitorImpl implements Monitor
             containerHostMetric.setHostId( containerHost.getId() );
 
             //find container's initiator peer
-            ContainerGroup containerGroup = localPeer.getContainerGroup( containerHost.getId() );
+            ContainerGroup containerGroup = localPeer.findContainerGroupByContainerId( containerHost.getId() );
 
 
             Peer creatorPeer = peerManager.getPeer( containerGroup.getInitiatorPeerId() );

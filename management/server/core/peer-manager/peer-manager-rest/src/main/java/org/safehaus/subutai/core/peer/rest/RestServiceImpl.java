@@ -202,24 +202,6 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response environmentContainers( final String envId )
-    {
-        try
-        {
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            UUID environmentId = UUID.fromString( envId );
-
-            Set<ContainerHost> result = localPeer.getContainerHostsByEnvironmentId( environmentId );
-            return Response.ok( JsonUtil.toJson( result ) ).build();
-        }
-        catch ( PeerException e )
-        {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
-
-
-    @Override
     public Response destroyContainer( final String hostId )
     {
         try

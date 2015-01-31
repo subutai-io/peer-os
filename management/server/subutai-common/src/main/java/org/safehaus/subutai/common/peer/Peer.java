@@ -34,7 +34,8 @@ public interface Peer
 
     public PeerInfo getPeerInfo();
 
-    public Set<ContainerHost> getContainerHostsByEnvironmentId( UUID environmentId ) throws PeerException;
+//    @Deprecated
+    //    public Set<ContainerHost> getContainerHostsByEnvironmentId( UUID environmentId ) throws PeerException;
 
 
     Set<HostInfoModel> scheduleCloneContainers( UUID creatorPeerId, List<Template> templates, int quantity,

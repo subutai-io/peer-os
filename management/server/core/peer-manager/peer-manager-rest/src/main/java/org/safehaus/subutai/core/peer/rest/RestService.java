@@ -66,10 +66,10 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getTemplate( @FormParam( "templateName" ) String templateName );
 
-    @POST
-    @Path( "environment/containers" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response environmentContainers( @FormParam( "environmentId" ) String envId );
+//    @POST
+//    @Path( "environment/containers" )
+//    @Produces( { MediaType.APPLICATION_JSON } )
+//    public Response environmentContainers( @FormParam( "environmentId" ) String envId );
 
     @GET
     @Path( "ping" )
