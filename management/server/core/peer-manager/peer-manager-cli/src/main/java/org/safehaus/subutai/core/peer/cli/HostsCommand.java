@@ -128,19 +128,19 @@ public class HostsCommand extends OsgiCommandSupport
         {
             ContainerHost c = ( ContainerHost ) host;
             containerInfo += c.getState();
-            if ( c.getEnvironmentId() != null )
-            {
-                containerInfo += " " + c.getEnvironmentId();
-            }
-
-            if ( c.getCreatorPeerId() != null )
-            {
-                Peer peer = peerManager.getPeer( UUID.fromString( c.getPeerId() ) );
-                if ( peer != null )
-                {
-                    containerInfo += " " + peer.getPeerInfo().getIp();
-                }
-            }
+            //            if ( c.getEnvironmentId() != null )
+            //            {
+            //                containerInfo += " " + c.getEnvironmentId();
+            //            }
+            //
+            //            if ( c.getInitiatorPeerId() != null )
+            //            {
+            //                Peer peer = peerManager.getPeer( UUID.fromString( c.getPeerId() ) );
+            //                if ( peer != null )
+            //                {
+            //                    containerInfo += " " + peer.getPeerInfo().getIp();
+            //                }
+            //            }
         }
 
         System.out

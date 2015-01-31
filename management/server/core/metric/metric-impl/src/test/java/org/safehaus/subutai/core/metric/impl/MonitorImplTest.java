@@ -237,7 +237,7 @@ public class MonitorImplTest
     public void testAlertThresholdExcessLocalPeer() throws Exception
     {
         //set owner id as local peer
-        when( containerHost.getCreatorPeerId() ).thenReturn( LOCAL_PEER_ID.toString() );
+        when( containerHost.getInitiatorPeerId() ).thenReturn( LOCAL_PEER_ID.toString() );
         when( localPeer.getContainerHostByName( HOST ) ).thenReturn( containerHost );
         Peer ownerPeer = mock( Peer.class );
         when( peerManager.getPeer( LOCAL_PEER_ID ) ).thenReturn( ownerPeer );
@@ -254,7 +254,7 @@ public class MonitorImplTest
     public void testAlertThresholdExcessRemotePeer() throws Exception
     {
         //set owner id as local peer
-        when( containerHost.getCreatorPeerId() ).thenReturn( REMOTE_PEER_ID.toString() );
+        when( containerHost.getInitiatorPeerId() ).thenReturn( REMOTE_PEER_ID.toString() );
         when( localPeer.getContainerHostByName( HOST ) ).thenReturn( containerHost );
         Peer ownerPeer = mock( Peer.class );
         when( peerManager.getPeer( REMOTE_PEER_ID ) ).thenReturn( ownerPeer );

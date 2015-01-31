@@ -59,8 +59,8 @@ public interface ContainerHost extends Host
 
     public ContainerHostState getState() throws PeerException;
 
-
-    String getCreatorPeerId();
+    @Deprecated
+    public String getInitiatorPeerId();
 
     void dispose() throws PeerException;
 

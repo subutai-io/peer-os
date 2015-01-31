@@ -14,8 +14,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.peer.api.ContainerGroup;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
 
@@ -39,6 +41,24 @@ public class ContainerGroupEntity implements ContainerGroup
     @OneToMany( mappedBy = "group", fetch = FetchType.EAGER,
             targetEntity = ContainerHostEntity.class )
     Set<ContainerHost> containerHosts = Sets.newHashSet();
+
+
+    public ContainerGroupEntity( final UUID environmentId, final UUID initiatorPeerId, final UUID ownerId,
+                                 final Set<ContainerHost> containerHosts )
+    {
+        Preconditions.checkNotNull( environmentId );
+        Preconditions.checkNotNull( initiatorPeerId );
+        Preconditions.checkNotNull( ownerId );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
+
+        this.environmentId = environmentId.toString();
+        this.initiatorPeerId = initiatorPeerId.toString();
+        this.ownerId = ownerId.toString();
+        this.containerHosts = containerHosts;
+    }
+
+
+    protected ContainerGroupEntity() {}
 
 
     @Override

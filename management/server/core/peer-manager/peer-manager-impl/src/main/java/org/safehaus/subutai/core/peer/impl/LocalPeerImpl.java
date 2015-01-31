@@ -57,6 +57,8 @@ import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.peer.api.CloneParam;
 import org.safehaus.subutai.core.peer.api.CommandUtil;
+import org.safehaus.subutai.core.peer.api.ContainerGroup;
+import org.safehaus.subutai.core.peer.api.ContainerGroupNotFoundException;
 import org.safehaus.subutai.core.peer.api.HostKey;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.HostTask;
@@ -75,6 +77,7 @@ import org.safehaus.subutai.core.peer.impl.dao.ContainerHostDataService;
 import org.safehaus.subutai.core.peer.impl.dao.ManagementHostDataService;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.peer.impl.dao.ResourceHostDataService;
+import org.safehaus.subutai.core.peer.impl.entity.ContainerGroupEntity;
 import org.safehaus.subutai.core.peer.impl.entity.ContainerHostEntity;
 import org.safehaus.subutai.core.peer.impl.entity.ManagementHostEntity;
 import org.safehaus.subutai.core.peer.impl.entity.ResourceHostEntity;
@@ -565,7 +568,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         }
 
 
-        Set<HostInfoModel> result = Sets.newHashSet();
         List<Future<ContainerHost>> taskFutures = Lists.newArrayList();
 
         //create containers in parallel on each resource host
@@ -593,12 +595,17 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             }
         }
 
+        Set<HostInfoModel> result = Sets.newHashSet();
+        Set<ContainerHost> newContainers = Sets.newHashSet();
+
         //wait for succeeded containers
         for ( Future<ContainerHost> future : taskFutures )
         {
             try
             {
-                result.add( new HostInfoModel( future.get() ) );
+                ContainerHost containerHost = future.get();
+                newContainers.add( containerHost );
+                result.add( new HostInfoModel( containerHost ) );
             }
             catch ( ExecutionException | InterruptedException e )
             {
@@ -606,8 +613,34 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             }
         }
 
+        ContainerGroupEntity containerGroup =
+                new ContainerGroupEntity( environmentId, initiatorPeerId, ownerId, newContainers );
+
+        containerGroupDataService.persist( containerGroup );
 
         return result;
+    }
+
+
+    @Override
+    public ContainerGroup getContainerGroup( final UUID containerId ) throws ContainerGroupNotFoundException
+    {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+
+        List<ContainerGroupEntity> containerGroups = ( List<ContainerGroupEntity> ) containerGroupDataService.getAll();
+
+        for ( ContainerGroupEntity containerGroup : containerGroups )
+        {
+            for ( ContainerHost container : containerGroup.getContainerHosts() )
+            {
+                if ( containerId.equals( container.getId() ) )
+                {
+                    return containerGroup;
+                }
+            }
+        }
+
+        throw new ContainerGroupNotFoundException();
     }
 
 

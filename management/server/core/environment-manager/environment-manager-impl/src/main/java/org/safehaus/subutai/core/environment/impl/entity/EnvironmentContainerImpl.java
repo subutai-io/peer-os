@@ -208,7 +208,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
 
     @Override
-    public String getCreatorPeerId()
+    public String getInitiatorPeerId()
     {
         return creatorPeerId;
     }

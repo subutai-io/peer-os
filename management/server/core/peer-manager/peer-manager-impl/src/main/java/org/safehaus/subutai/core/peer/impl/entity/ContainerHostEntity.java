@@ -144,7 +144,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    public String getCreatorPeerId()
+    public String getInitiatorPeerId()
     {
         return creatorPeerId;
     }

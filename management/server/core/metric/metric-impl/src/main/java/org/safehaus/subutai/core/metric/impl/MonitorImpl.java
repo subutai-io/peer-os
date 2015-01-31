@@ -28,7 +28,10 @@ import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.MonitoringSettings;
 import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
+import org.safehaus.subutai.core.peer.api.ContainerGroup;
+import org.safehaus.subutai.core.peer.api.ContainerGroupNotFoundException;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.slf4j.Logger;
@@ -467,31 +470,34 @@ public class MonitorImpl implements Monitor
             //deserialize container metric
             ContainerHostMetricImpl containerHostMetric =
                     JsonUtil.fromJson( alertMetric, ContainerHostMetricImpl.class );
-            //find associated container host
-            ContainerHost containerHost =
-                    peerManager.getLocalPeer().getContainerHostByName( containerHostMetric.getHost() );
-            if ( containerHost != null )
+
+            LocalPeer localPeer = peerManager.getLocalPeer();
+
+            //find source container host
+            ContainerHost containerHost = localPeer.getContainerHostByName( containerHostMetric.getHost() );
+
+            //set host id for future reference
+            containerHostMetric.setHostId( containerHost.getId() );
+
+            //find container's initiator peer
+            ContainerGroup containerGroup = localPeer.getContainerGroup( containerHost.getId() );
+
+
+            Peer creatorPeer = peerManager.getPeer( containerGroup.getInitiatorPeerId() );
+
+            //if container is "created" by local peer, notifyOnAlert local peer
+            if ( creatorPeer.isLocal() )
             {
-                //set host id for future reference
-                containerHostMetric.setHostId( containerHost.getId() );
-
-                //find container's creator peer
-                Peer creatorPeer = peerManager.getPeer( UUID.fromString( containerHost.getCreatorPeerId() ) );
-
-                //if container is "created" by local peer, notifyOnAlert local peer
-                if ( creatorPeer.isLocal() )
-                {
-                    notifyOnAlert( containerHostMetric );
-                }
-                //send metric to remote creator peer
-                else
-                {
-                    creatorPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
-                            Constants.ALERT_TIMEOUT );
-                }
+                notifyOnAlert( containerHostMetric );
+            }
+            //send metric to remote creator peer
+            else
+            {
+                creatorPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
+                        Constants.ALERT_TIMEOUT );
             }
         }
-        catch ( PeerException | JsonSyntaxException e )
+        catch ( PeerException | ContainerGroupNotFoundException | JsonSyntaxException e )
         {
             LOG.error( "Error in onAlert", e );
             throw new MonitorException( e );

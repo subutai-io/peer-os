@@ -43,6 +43,7 @@ public interface LocalPeer extends Peer
     public ResourceHost getResourceHostByName( String hostname ) throws HostNotFoundException;
 
     public ResourceHost getResourceHostByContainerName( String containerName ) throws HostNotFoundException;
+
     public ResourceHost getResourceHostByContainerId( String hostId ) throws HostNotFoundException;
 
     public ContainerHost getContainerHostImpl( HostKey hostKey );
@@ -86,8 +87,14 @@ public interface LocalPeer extends Peer
 
     public String getFreeHostName( String prefix );
 
-
-    //    Agent waitForAgent( String containerName, int timeout );
-
-    //    public void onPeerEvent( PeerEvent event );
+    /**
+     * Returns container group to which specified container belongs
+     *
+     * @param containerId - id of container
+     *
+     * @return - {@code ContainerGroup}
+     *
+     * @throws ContainerGroupNotFoundException - thrown if container is created not as a part of environment
+     */
+    public ContainerGroup getContainerGroup( UUID containerId ) throws ContainerGroupNotFoundException;
 }
