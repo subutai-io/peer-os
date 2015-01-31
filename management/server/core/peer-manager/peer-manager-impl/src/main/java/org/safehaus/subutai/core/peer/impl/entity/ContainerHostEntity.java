@@ -78,7 +78,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    @Override
     public void setDataService( final DataService dataService )
     {
         this.dataService = dataService;
@@ -97,31 +96,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    public void setNodeGroupName( final String nodeGroupName )
-    {
-        throw new UnsupportedOperationException();
-    }
-
-
     public String getEnvironmentId()
-    {
-        throw new UnsupportedOperationException();
-    }
-
-
-    public void setEnvironmentId( final String environmentId )
-    {
-        throw new UnsupportedOperationException();
-    }
-
-
-    public String getInitiatorPeerId()
-    {
-        throw new UnsupportedOperationException();
-    }
-
-
-    public void setCreatorPeerId( final String creatorPeerId )
     {
         throw new UnsupportedOperationException();
     }
@@ -156,15 +131,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     {
         return this.tags;
     }
-
-
-    public void setTemplateName( final String templateName )
-    {
-        this.templateName = templateName;
-    }
-
-
-
 
 
     public ContainerHostState getState()
@@ -239,11 +205,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    @Override
-    public String getParentHostname()
-    {
-        return parent.getHostname();
-    }
+
 
 
     @Override

@@ -397,8 +397,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         for ( ContainerHost containerHost : containerHosts )
         {
-            containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
-            containerHost.setDataService( environmentContainerDataService );
+            ((EnvironmentContainerImpl)containerHost).setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
+            ((EnvironmentContainerImpl)containerHost).setDataService( environmentContainerDataService );
         }
     }
 

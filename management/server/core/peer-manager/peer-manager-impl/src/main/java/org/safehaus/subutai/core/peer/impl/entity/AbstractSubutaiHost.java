@@ -107,21 +107,18 @@ public abstract class AbstractSubutaiHost implements Host
     }
 
 
-    @Override
     public void addListener( HostEventListener hostEventListener )
     {
         this.eventListeners.add( hostEventListener );
     }
 
 
-    @Override
     public void removeListener( HostEventListener hostEventListener )
     {
         this.eventListeners.remove( hostEventListener );
     }
 
 
-    @Override
     public void fireEvent( HostEvent hostEvent )
     {
         for ( HostEventListener hostEventListener : eventListeners )
@@ -145,7 +142,6 @@ public abstract class AbstractSubutaiHost implements Host
     }
 
 
-    @Override
     public void setPeer( Peer peer )
     {
         this.peer = peer;
@@ -209,7 +205,6 @@ public abstract class AbstractSubutaiHost implements Host
     }
 
 
-    @Override
     public void updateHostInfo( final HostInfo hostInfo )
     {
         lastHeartbeat = System.currentTimeMillis();

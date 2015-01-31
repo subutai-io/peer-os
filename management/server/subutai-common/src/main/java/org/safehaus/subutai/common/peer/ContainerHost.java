@@ -6,7 +6,6 @@ import java.util.Set;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
@@ -20,39 +19,12 @@ import org.safehaus.subutai.common.quota.QuotaType;
 public interface ContainerHost extends Host
 {
 
-    //---deprecated
-    @Deprecated
-    public String getParentHostname();
-
-    @Deprecated
-    public void setNodeGroupName( String nodeGroupName );
-
-    @Deprecated
-    public void setEnvironmentId( String environmentId );
-
-    @Deprecated
-    public void setCreatorPeerId( String creatorPeerId );
-
-    @Deprecated
-    public void setTemplateName( String templateName );
-
-
-    @Deprecated
-    void setPeer( Peer peer );
-
-    @Deprecated
-    public PeerQuotaInfo getQuota( QuotaType quotaType ) throws PeerException;
-
-    @Deprecated
-    public void setQuota( QuotaInfo quota ) throws PeerException;
-
-    @Deprecated
-    public void setDataService( DataService dataService );
-
-    @Deprecated
-    public String getInitiatorPeerId();
 
     //----------------------
+    public PeerQuotaInfo getQuota( QuotaType quotaType ) throws PeerException;
+
+    public void setQuota( QuotaInfo quota ) throws PeerException;
+
 
     public String getEnvironmentId();
 

@@ -76,6 +76,7 @@ import org.safehaus.subutai.core.peer.impl.dao.ContainerHostDataService;
 import org.safehaus.subutai.core.peer.impl.dao.ManagementHostDataService;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.peer.impl.dao.ResourceHostDataService;
+import org.safehaus.subutai.core.peer.impl.entity.AbstractSubutaiHost;
 import org.safehaus.subutai.core.peer.impl.entity.ContainerGroupEntity;
 import org.safehaus.subutai.core.peer.impl.entity.ContainerHostEntity;
 import org.safehaus.subutai.core.peer.impl.entity.ManagementHostEntity;
@@ -156,8 +157,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         if ( allManagementHostEntity != null && allManagementHostEntity.size() > 0 )
         {
             managementHost = ( ManagementHost ) allManagementHostEntity.iterator().next();
-            managementHost.addListener( this );
-            managementHost.setPeer( this );
+            ( ( AbstractSubutaiHost ) managementHost ).addListener( this );
+            ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
             managementHost.init();
         }
 
@@ -185,8 +186,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     {
         for ( ResourceHost resourceHost : resourceHosts )
         {
-            resourceHost.addListener( this );
-            resourceHost.setPeer( this );
+            ( ( AbstractSubutaiHost ) resourceHost ).addListener( this );
+            ( ( AbstractSubutaiHost ) resourceHost ).setPeer( this );
             ( ( ResourceHostEntity ) resourceHost ).setRegistry( templateRegistry );
             ( ( ResourceHostEntity ) resourceHost ).setHostRegistry( hostRegistry );
         }
@@ -764,8 +765,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     {
         for ( ContainerHost containerHost : containerHosts )
         {
-            containerHost.setPeer( this );
-            containerHost.setDataService( containerHostDataService );
+            ( ( AbstractSubutaiHost ) containerHost ).setPeer( this );
+            ( ( ContainerHostEntity ) containerHost ).setDataService( containerHostDataService );
         }
     }
 
@@ -1339,10 +1340,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                     LOG.error( e.toString() );
                 }
                 managementHostDataService.persist( ( ManagementHostEntity ) managementHost );
-                managementHost.addListener( this );
-                managementHost.setPeer( this );
+                ( ( AbstractSubutaiHost ) managementHost ).addListener( this );
+                ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
             }
-            managementHost.updateHostInfo( resourceHostInfo );
+            ( ( AbstractSubutaiHost ) managementHost ).updateHostInfo( resourceHostInfo );
         }
         else
         {
@@ -1367,11 +1368,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                         {
                             containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
                             ( ( ContainerHostEntity ) containerHost ).setDataService( containerHostDataService );
-                            containerHost.setPeer( this );
+                            ( ( AbstractSubutaiHost ) containerHost ).setPeer( this );
                             host.addContainerHost( ( ContainerHostEntity ) containerHost );
                             containerHostDataService.persist( ( ContainerHostEntity ) containerHost );
                         }
-                        containerHost.updateHostInfo( containerHostInfo );
+                        ( ( AbstractSubutaiHost ) containerHost ).updateHostInfo( containerHostInfo );
                     }
                 }
             }
@@ -1383,7 +1384,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                 addResourceHost( host );
                 setResourceHostTransientFields( Sets.newHashSet( host ) );
             }
-            host.updateHostInfo( resourceHostInfo );
+            ( ( AbstractSubutaiHost ) host ).updateHostInfo( resourceHostInfo );
         }
     }
 
