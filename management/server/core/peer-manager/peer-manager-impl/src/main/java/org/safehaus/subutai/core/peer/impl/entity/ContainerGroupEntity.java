@@ -38,7 +38,7 @@ public class ContainerGroupEntity implements ContainerGroup
     @Column( name = "owner_id", nullable = false )
     private String ownerId;
 
-
+    //TODO fix this by storing only ids of containers
     @OneToMany( mappedBy = "group", fetch = FetchType.EAGER, cascade = CascadeType.ALL,
             targetEntity = ContainerHostEntity.class )
     Set<ContainerHost> containerHosts = Sets.newHashSet();
