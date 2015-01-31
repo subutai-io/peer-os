@@ -59,7 +59,6 @@ import org.safehaus.subutai.core.peer.api.CloneParam;
 import org.safehaus.subutai.core.peer.api.CommandUtil;
 import org.safehaus.subutai.core.peer.api.ContainerGroup;
 import org.safehaus.subutai.core.peer.api.ContainerGroupNotFoundException;
-import org.safehaus.subutai.core.peer.api.HostKey;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.HostTask;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -604,10 +603,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             try
             {
                 ContainerHost containerHost = future.get();
-                newContainers.add( containerHost );
+                newContainers.add( new ContainerHostEntity( getId().toString(),
+                        hostRegistry.getContainerHostInfoById( containerHost.getId() ) ) );
                 result.add( new HostInfoModel( containerHost ) );
             }
-            catch ( ExecutionException | InterruptedException e )
+            catch ( ExecutionException | InterruptedException | HostDisconnectedException e )
             {
                 LOG.error( "Error creating containers", e );
             }
@@ -767,30 +767,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             containerHost.setPeer( this );
             containerHost.setDataService( containerHostDataService );
         }
-    }
-
-
-    @Override
-    public ContainerHost getContainerHostImpl( final HostKey hostKey )
-    {
-        Host host = null;
-
-        if ( getId().toString().equals( hostKey.getCreatorId() ) )
-        {
-            try
-            {
-                host = bindHost( hostKey.getHostId() );
-            }
-            catch ( HostNotFoundException ignore )
-            {
-
-            }
-        }
-        if ( host == null )
-        {
-            host = new ContainerHostEntity( hostKey );
-        }
-        return ( ContainerHost ) host;
     }
 
 

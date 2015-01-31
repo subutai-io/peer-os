@@ -46,7 +46,6 @@ public interface LocalPeer extends Peer
 
     public ResourceHost getResourceHostByContainerId( String hostId ) throws HostNotFoundException;
 
-    public ContainerHost getContainerHostImpl( HostKey hostKey );
 
     /**
      * Returns implementation of ContainerHost interface.

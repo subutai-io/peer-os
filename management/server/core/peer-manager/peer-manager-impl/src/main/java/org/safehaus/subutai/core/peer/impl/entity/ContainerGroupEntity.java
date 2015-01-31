@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -39,7 +38,7 @@ public class ContainerGroupEntity implements ContainerGroup
     private String ownerId;
 
 
-    @OneToMany( mappedBy = "group", fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST }, orphanRemoval = false,
+    @OneToMany( mappedBy = "group", fetch = FetchType.EAGER,
             targetEntity = ContainerHostEntity.class )
     Set<ContainerHost> containerHosts = Sets.newHashSet();
 

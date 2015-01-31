@@ -20,6 +20,7 @@ import org.safehaus.subutai.common.quota.QuotaType;
 public interface ContainerHost extends Host
 {
 
+    //---deprecated
     @Deprecated
     public String getParentHostname();
 
@@ -35,8 +36,6 @@ public interface ContainerHost extends Host
     @Deprecated
     public void setTemplateName( String templateName );
 
-    @Deprecated
-    void setTemplateArch( String templateArch );
 
     @Deprecated
     void setPeer( Peer peer );
@@ -50,30 +49,30 @@ public interface ContainerHost extends Host
     @Deprecated
     public void setDataService( DataService dataService );
 
+    @Deprecated
+    public String getInitiatorPeerId();
+
+    //----------------------
 
     public String getEnvironmentId();
 
     public String getNodeGroupName();
 
-    String getTemplateArch();
-
     public ContainerHostState getState() throws PeerException;
 
-    @Deprecated
-    public String getInitiatorPeerId();
 
-    void dispose() throws PeerException;
+    public void dispose() throws PeerException;
 
-    void start() throws PeerException;
+    public void start() throws PeerException;
 
-    void stop() throws PeerException;
+    public void stop() throws PeerException;
 
-    Peer getPeer();
+    public Peer getPeer();
 
 
-    Template getTemplate() throws PeerException;
+    public Template getTemplate() throws PeerException;
 
-    String getTemplateName();
+    public String getTemplateName();
 
     public void addTag( String tag );
 

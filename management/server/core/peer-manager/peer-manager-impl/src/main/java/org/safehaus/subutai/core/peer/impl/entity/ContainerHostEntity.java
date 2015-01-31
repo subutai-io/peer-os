@@ -30,7 +30,6 @@ import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.peer.api.ContainerGroup;
-import org.safehaus.subutai.core.peer.api.HostKey;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 
 import com.google.common.base.Preconditions;
@@ -89,70 +88,42 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public ContainerHostEntity( String peerId, HostInfo hostInfo )
     {
         super( peerId, hostInfo );
-        this.creatorPeerId = "UNKNOWN";
-        this.environmentId = "UNKNOWN";
-        this.nodeGroupName = "UNKNOWN";
-        this.templateArch = "amd64";
-        this.templateName = "UNKNOWN";
-        //        this.parentHostname = parentHostname;
-    }
-
-
-    public ContainerHostEntity( final String peerId, final String creatorPeerId, final String environmentId,
-                                final String nodeGroupName, final HostInfo hostInfo )
-    {
-        super( peerId, hostInfo );
-        this.creatorPeerId = creatorPeerId;
-        this.environmentId = environmentId;
-        this.nodeGroupName = nodeGroupName;
-        this.templateArch = "amd64";
-        this.templateName = "UNKNOWN";
-    }
-
-
-    public ContainerHostEntity( final HostKey hostKey )
-    {
-        this.hostId = hostKey.getHostId();
-        this.peerId = hostKey.getPeerId();
-        this.creatorPeerId = hostKey.getCreatorId();
-        this.environmentId = hostKey.getEnvironmentId();
-        this.nodeGroupName = hostKey.getNodeGroupName();
     }
 
 
     public String getNodeGroupName()
     {
-        return nodeGroupName;
+        throw new UnsupportedOperationException();
     }
 
 
     public void setNodeGroupName( final String nodeGroupName )
     {
-        this.nodeGroupName = nodeGroupName;
+        throw new UnsupportedOperationException();
     }
 
 
     public String getEnvironmentId()
     {
-        return environmentId;
+        throw new UnsupportedOperationException();
     }
 
 
     public void setEnvironmentId( final String environmentId )
     {
-        this.environmentId = environmentId;
+        throw new UnsupportedOperationException();
     }
 
 
     public String getInitiatorPeerId()
     {
-        return creatorPeerId;
+        throw new UnsupportedOperationException();
     }
 
 
     public void setCreatorPeerId( final String creatorPeerId )
     {
-        this.creatorPeerId = creatorPeerId;
+        throw new UnsupportedOperationException();
     }
 
 
@@ -193,18 +164,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    @Override
-    public String getTemplateArch()
-    {
-        return templateArch;
-    }
 
-
-    @Override
-    public void setTemplateArch( final String templateArch )
-    {
-        this.templateArch = templateArch;
-    }
 
 
     public ContainerHostState getState()
