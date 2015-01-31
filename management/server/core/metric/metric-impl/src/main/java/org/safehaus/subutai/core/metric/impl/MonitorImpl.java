@@ -172,15 +172,16 @@ public class MonitorImpl implements Monitor
             ContainerGroup containerGroup = localPeer.findContainerGroupByEnvironmentId( environmentId );
 
             //obtain environment containers
-            Set<ContainerHost> localContainers = containerGroup.getContainerHosts();
+            Set<UUID> containerIds = containerGroup.getContainerIds();
 
-            for ( ContainerHost localContainer : localContainers )
+            for ( UUID containerId : containerIds )
             {
                 //get container's resource host
-                ResourceHost resourceHost = localPeer.getResourceHostByContainerId( localContainer.getId().toString() );
+                ResourceHost resourceHost = localPeer.getResourceHostByContainerId( containerId.toString() );
 
                 //get metric
-                addLocalContainerHostMetric( environmentId, resourceHost, localContainer, metrics );
+                addLocalContainerHostMetric( environmentId, resourceHost,
+                        resourceHost.getContainerHostById( containerId.toString() ), metrics );
             }
         }
         catch ( ContainerGroupNotFoundException | PeerException e )

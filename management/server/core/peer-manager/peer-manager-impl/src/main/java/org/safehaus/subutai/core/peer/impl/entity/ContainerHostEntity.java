@@ -6,7 +6,6 @@ import java.util.Set;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
-import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -29,7 +28,6 @@ import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.peer.api.ContainerGroup;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 
 import com.google.common.base.Preconditions;
@@ -47,33 +45,19 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @ManyToOne( targetEntity = ResourceHostEntity.class )
     @JoinColumn( name = "parent_id" )
     private ResourceHost parent;
-    @ManyToOne( targetEntity = ContainerGroupEntity.class )
-    @JoinColumn( name = "group_id" )
-    private ContainerGroup group;
 
-    @Column( name = "env_id", nullable = false )
-    private String environmentId = "UNKNOWN";
-    @Column( name = "creator_id", nullable = false )
-    private String creatorPeerId = "UNKNOWN";
-    @Column( name = "template_name", nullable = false )
-    private String templateName = "UNKNOWN";
-    @Column( name = "template_arch", nullable = false )
-    private String templateArch = "UNKNOWN";
-
-    @Transient
-    private volatile ContainerHostState state = ContainerHostState.STOPPED;
-    @Column( name = "node_group_name", nullable = false )
-    private String nodeGroupName = "UNKNOWN";
-
-    //    private QuotaManager quotaManager;
 
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
     private Set<String> tags = new HashSet<>();
+
+    @Transient
+    private volatile ContainerHostState state = ContainerHostState.STOPPED;
+
     @Transient
     private DataService dataService;
 
 
-    private ContainerHostEntity()
+    protected ContainerHostEntity()
     {
     }
 
@@ -104,7 +88,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     public String getTemplateName()
     {
-        return templateName;
+        throw new UnsupportedOperationException();
     }
 
 
@@ -147,7 +131,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     public void setParent( final ResourceHost parent )
     {
-        this.parent = ( ResourceHostEntity ) parent;
+        this.parent = parent;
     }
 
 
@@ -203,9 +187,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         ContainerHostInfo conatinerHostInfo = ( ContainerHostInfo ) hostInfo;
         this.state = conatinerHostInfo.getStatus();
     }
-
-
-
 
 
     @Override

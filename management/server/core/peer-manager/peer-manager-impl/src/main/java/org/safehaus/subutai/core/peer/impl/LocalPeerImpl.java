@@ -616,7 +616,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
         //create container group for new containers
         ContainerGroupEntity containerGroup =
-                new ContainerGroupEntity( environmentId, initiatorPeerId, ownerId, newContainers );
+                new ContainerGroupEntity( environmentId, initiatorPeerId, ownerId, templateName, newContainers );
 
         containerGroupDataService.persist( containerGroup );
 
@@ -634,9 +634,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
         for ( ContainerGroupEntity containerGroup : containerGroups )
         {
-            for ( ContainerHost container : containerGroup.getContainerHosts() )
+            for ( UUID containerHostId : containerGroup.getContainerIds() )
             {
-                if ( containerId.equals( container.getId() ) )
+                if ( containerId.equals( containerHostId ) )
                 {
                     return containerGroup;
                 }
