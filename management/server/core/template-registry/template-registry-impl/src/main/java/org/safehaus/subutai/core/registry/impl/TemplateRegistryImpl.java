@@ -338,7 +338,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
 
 
     /**
-     * Returns template by name and lxc arch
+     * Returns template by name and lxc arch this method required for template registration process
      *
      * @param templateName - name of template
      * @param lxcArch - lxc architecture
@@ -348,7 +348,18 @@ public class TemplateRegistryImpl implements TemplateRegistry
     @Override
     public Template getTemplate( final String templateName, String lxcArch )
     {
-        return getTemplate( templateName, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), lxcArch );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), TEMPLATE_IS_NULL_MSG );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), LXC_ARCH_IS_NULL_MSG );
+        //retrieve template from storage
+        try
+        {
+            return templateService.getTemplate( templateName, lxcArch );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error in getTemplate", e );
+            return null;
+        }
     }
 
 
