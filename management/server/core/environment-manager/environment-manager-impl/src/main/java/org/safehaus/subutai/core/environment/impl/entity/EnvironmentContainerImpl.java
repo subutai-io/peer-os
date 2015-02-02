@@ -28,12 +28,10 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.host.HostArchitecture;
-import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.host.Interface;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.HostEvent;
-import org.safehaus.subutai.common.peer.HostEventListener;
 import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
@@ -118,17 +116,9 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     }
 
 
-    @Override
     public void setDataService( final DataService dataService )
     {
         this.dataService = dataService;
-    }
-
-
-    @Override
-    public String getParentHostname()
-    {
-        throw new UnsupportedOperationException( "Unsupported method." );
     }
 
 
@@ -140,51 +130,9 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
 
     @Override
-    public void setNodeGroupName( final String nodeGroupName )
-    {
-        this.nodeGroupName = nodeGroupName;
-    }
-
-
-    @Override
-    public void setEnvironmentId( final String environmentId )
-    {
-        throw new UnsupportedOperationException( "Method unsupported." );
-    }
-
-
-    @Override
-    public void setCreatorPeerId( final String creatorPeerId )
-    {
-        this.creatorPeerId = creatorPeerId;
-    }
-
-
-    @Override
-    public void setTemplateName( final String templateName )
-    {
-        this.templateName = templateName;
-    }
-
-
-    @Override
     public String getNodeGroupName()
     {
         return this.nodeGroupName;
-    }
-
-
-    @Override
-    public String getTemplateArch()
-    {
-        return this.templateArch;
-    }
-
-
-    @Override
-    public void setTemplateArch( final String templateArch )
-    {
-        this.templateArch = templateArch;
     }
 
 
@@ -204,13 +152,6 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public void setQuota( QuotaInfo quota ) throws PeerException
     {
         throw new UnsupportedOperationException( "Unsupported operation." );
-    }
-
-
-    @Override
-    public String getCreatorPeerId()
-    {
-        return creatorPeerId;
     }
 
 
@@ -242,7 +183,6 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     }
 
 
-    @Override
     public void setPeer( final Peer peer )
     {
         this.peer = peer;
@@ -317,20 +257,6 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
 
     @Override
-    public void addListener( final HostEventListener hostEventListener )
-    {
-        throw new UnsupportedOperationException( "Unsupported operation." );
-    }
-
-
-    @Override
-    public void removeListener( final HostEventListener hostEventListener )
-    {
-        throw new UnsupportedOperationException( "Unsupported operation." );
-    }
-
-
-    @Override
     public void fireEvent( final HostEvent hostEvent )
     {
         throw new UnsupportedOperationException( "Unsupported operation." );
@@ -364,13 +290,6 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public void executeAsync( final RequestBuilder requestBuilder ) throws CommandException
     {
         getPeer().executeAsync( requestBuilder, this );
-    }
-
-
-    @Override
-    public void updateHostInfo( final HostInfo hostInfo )
-    {
-        throw new UnsupportedOperationException( "Unsupported operation." );
     }
 
 

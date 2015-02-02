@@ -5,7 +5,7 @@
 
   http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
 
-  <cxf:bus id="cxfBusEnvManager">
+  <cxf:bus id="cxfBusEnvManager2">
     <cxf:features>
       <cxf:logging />
     </cxf:features>
@@ -24,7 +24,7 @@
     <argument ref="templateRegistry" />
   </bean>
 
-  <jaxrs:server address="/environment2" id="environmentRestService">
+  <jaxrs:server address="/environments" id="environmentRestService">
     <jaxrs:serviceBeans>
       <ref component-id="environmentRestServiceImpl" />
     </jaxrs:serviceBeans>

@@ -57,10 +57,10 @@ public class ContainerCreatorThread extends Observable implements Runnable
             {
                 EnvironmentContainerImpl container =
                         new EnvironmentContainerImpl( message.getTargetPeerId(), message.getNodeGroupName(), hostInfo );
-                container.setCreatorPeerId( peerManager.getLocalPeer().getId().toString() );
-                container.setPeer( peerManager.getPeer( message.getTargetPeerId() ) );
-                container.setDataService( dataService );
-                container.setTemplateName( template.getTemplateName() );
+//                container.setCreatorPeerId( peerManager.getLocalPeer().getId().toString() );
+//                container.setPeer( peerManager.getPeer( message.getTargetPeerId() ) );
+//                container.setDataService( dataService );
+//                container.setTemplateName( template.getTemplateName() );
                 containers.add( container );
             }
             notifyObservers( containers );

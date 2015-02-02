@@ -7,15 +7,18 @@ import java.util.UUID;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.peer.api.ContainerGroup;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 
@@ -34,11 +37,34 @@ public class ContainerGroupEntity implements ContainerGroup
     private String initiatorPeerId;
     @Column( name = "owner_id", nullable = false )
     private String ownerId;
+    @Column( name = "template_name", nullable = false )
+    private String templateName;
+
+    @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
+    private Set<String> containerIds = Sets.newHashSet();
 
 
-    @OneToMany( mappedBy = "group", fetch = FetchType.EAGER,
-            targetEntity = ContainerHostEntity.class )
-    Set<ContainerHost> containerHosts = Sets.newHashSet();
+    public ContainerGroupEntity( final UUID environmentId, final UUID initiatorPeerId, final UUID ownerId,
+                                 final String templateName, final Set<ContainerHost> containerHosts )
+    {
+        Preconditions.checkNotNull( environmentId );
+        Preconditions.checkNotNull( initiatorPeerId );
+        Preconditions.checkNotNull( ownerId );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
+
+        this.environmentId = environmentId.toString();
+        this.initiatorPeerId = initiatorPeerId.toString();
+        this.ownerId = ownerId.toString();
+        this.templateName = templateName;
+        for ( ContainerHost containerHost : containerHosts )
+        {
+            containerIds.add( containerHost.getHostId() );
+        }
+    }
+
+
+    protected ContainerGroupEntity() {}
 
 
     @Override
@@ -81,14 +107,34 @@ public class ContainerGroupEntity implements ContainerGroup
 
 
     @Override
-    public Set<ContainerHost> getContainerHosts()
+    public String getTemplateName()
     {
-        return containerHosts;
+        return templateName;
     }
 
 
-    public void setContainerHosts( final Set<ContainerHost> containerHosts )
+    public void setTemplateName( final String templateName )
     {
-        this.containerHosts = containerHosts;
+        this.templateName = templateName;
+    }
+
+
+    @Override
+    public Set<UUID> getContainerIds()
+    {
+        Set<UUID> ids = Sets.newHashSet();
+
+        for ( String id : containerIds )
+        {
+            ids.add( UUID.fromString( id ) );
+        }
+
+        return ids;
+    }
+
+
+    public void setContainerIds( final Set<String> containerIds )
+    {
+        this.containerIds = containerIds;
     }
 }
