@@ -2,6 +2,7 @@ package org.safehaus.subutai.common.environment;
 
 
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.settings.Common;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -21,6 +22,7 @@ public class NodeGroup
     private PlacementStrategy containerPlacementStrategy;
 
 
+    @Deprecated
     public NodeGroup( final String name, final String templateName, final String domainName,
                       final int numberOfContainers, final int sshGroupId, final int hostsGroupId,
                       final PlacementStrategy containerPlacementStrategy )
@@ -39,6 +41,14 @@ public class NodeGroup
         this.sshGroupId = sshGroupId;
         this.hostsGroupId = hostsGroupId;
         this.containerPlacementStrategy = containerPlacementStrategy;
+    }
+
+
+    public NodeGroup( final String name, final String templateName, final int numberOfContainers, final int sshGroupId,
+                      final int hostsGroupId, final PlacementStrategy containerPlacementStrategy )
+    {
+        this( name, templateName, Common.DEFAULT_DOMAIN_NAME, numberOfContainers, sshGroupId, hostsGroupId,
+                containerPlacementStrategy );
     }
 
 
