@@ -124,14 +124,6 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    //    @Override
-    //    public Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId ) throws PeerException
-    //    {
-    //        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(), "8181" );
-    //        return remotePeerRestClient.getContainerHostsByEnvironmentId( environmentId );
-    //    }
-
-
     @Override
     public Set<HostInfoModel> scheduleCloneContainers( final UUID creatorPeerId, final List<Template> templates,
                                                        final int quantity, final String strategyId,
