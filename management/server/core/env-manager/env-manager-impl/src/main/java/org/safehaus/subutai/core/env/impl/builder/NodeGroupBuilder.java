@@ -100,14 +100,6 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
             try
             {
 
-
-                //
-                //                Set<HostInfoModel> newHosts = peer.scheduleCloneContainers( localPeerId,
-                //                        fetchRequiredTemplates( peer.getId(), nodeGroup.getTemplateName() ),
-                //                        nodeGroup.getNumberOfContainers(), nodeGroup.getContainerPlacementStrategy
-                // ().getStrategyId(),
-                //                        nodeGroup.getContainerPlacementStrategy().getCriteriaAsList() );
-
                 Set<HostInfoModel> newHosts =
                         peer.createContainers( environment.getId(), localPeer.getId(), localPeer.getOwnerId(),
                                 fetchRequiredTemplates( peer.getId(), nodeGroup.getTemplateName() ),
