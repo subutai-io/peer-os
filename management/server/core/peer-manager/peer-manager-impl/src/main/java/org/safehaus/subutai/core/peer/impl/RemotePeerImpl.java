@@ -124,12 +124,12 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-//    @Override
-//    public Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId ) throws PeerException
-//    {
-//        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(), "8181" );
-//        return remotePeerRestClient.getContainerHostsByEnvironmentId( environmentId );
-//    }
+    //    @Override
+    //    public Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId ) throws PeerException
+    //    {
+    //        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(), "8181" );
+    //        return remotePeerRestClient.getContainerHostsByEnvironmentId( environmentId );
+    //    }
 
 
     @Override
@@ -343,7 +343,8 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public ContainerHostState getContainerHostState( final String containerId ) throws PeerException
     {
-        throw new UnsupportedOperationException( "Not implemented yet." );
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+        return remotePeerRestClient.getContainerState( containerId );
     }
 
 
