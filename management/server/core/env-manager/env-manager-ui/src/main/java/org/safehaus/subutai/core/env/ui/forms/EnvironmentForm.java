@@ -162,6 +162,11 @@ public class EnvironmentForm
                             new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) ) :
                             new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) );
 
+            String iconId = isEnvironmentUnderModification ? "indicator" :
+                            environment.getStatus().equals( EnvironmentStatus.HEALTHY ) ?
+                            "ok" :
+                            "error";
+            icon.setId( iconId );
 
             environmentsTable.addItem( new Object[] {
                     environment.getName(), getCreationDate( environment.getCreationTimestamp() ), icon, containersBtn,
