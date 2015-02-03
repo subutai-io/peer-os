@@ -43,6 +43,10 @@ public interface RestService
     @Path( "key" )
     public Response setSshKey( @QueryParam( "environmentId" ) String environmentId, @QueryParam( "key" ) String key );
 
+    @DELETE
+    @Path( "key" )
+    public Response removeSshKey( @QueryParam( "environmentId" ) String environmentId );
+
     @GET
     @Path( "container/state" )
     @Produces( { MediaType.APPLICATION_JSON } )
