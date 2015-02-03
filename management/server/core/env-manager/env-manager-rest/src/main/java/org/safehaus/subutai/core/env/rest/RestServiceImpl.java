@@ -90,7 +90,6 @@ public class RestServiceImpl implements RestService
 
             return Response.ok( JsonUtil.toJson(
                     new EnvironmentJson( environment.getId(), environment.getName(), environment.getStatus(),
-                            environment.getSshKey(),
                             convertContainersToContainerJson( environment.getContainerHosts() ) ) ) ).build();
         }
         catch ( EnvironmentCreationException e )
@@ -191,7 +190,6 @@ public class RestServiceImpl implements RestService
         {
             environmentJsons
                     .add( new EnvironmentJson( environment.getId(), environment.getName(), environment.getStatus(),
-                            environment.getSshKey(),
                             convertContainersToContainerJson( environment.getContainerHosts() ) ) );
         }
 
@@ -216,7 +214,6 @@ public class RestServiceImpl implements RestService
 
             return Response.ok( JsonUtil.toJson(
                     new EnvironmentJson( environment.getId(), environment.getName(), environment.getStatus(),
-                            environment.getSshKey(),
                             convertContainersToContainerJson( environment.getContainerHosts() ) ) ) ).build();
         }
         catch ( EnvironmentNotFoundException e )
