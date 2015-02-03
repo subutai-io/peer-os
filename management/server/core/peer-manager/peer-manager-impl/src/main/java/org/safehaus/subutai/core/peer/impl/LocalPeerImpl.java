@@ -614,37 +614,41 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             }
         }
 
-        ContainerGroupEntity containerGroup;
-
-        try
+        if ( !CollectionUtil.isCollectionEmpty( newContainers ) )
         {
-            //update existing container group to include new containers
-            containerGroup = ( ContainerGroupEntity ) findContainerGroupByEnvironmentId( environmentId );
-            Set<String> containerIds = Sets.newHashSet();
-            if ( !CollectionUtil.isCollectionEmpty( containerGroup.getContainerIds() ) )
+            ContainerGroupEntity containerGroup;
+
+            try
             {
+                //update existing container group to include new containers
+                containerGroup = ( ContainerGroupEntity ) findContainerGroupByEnvironmentId( environmentId );
+
+                Set<String> containerIds = Sets.newHashSet();
+
                 for ( UUID containerId : containerGroup.getContainerIds() )
                 {
                     containerIds.add( containerId.toString() );
                 }
+
+                for ( ContainerHost containerHost : newContainers )
+                {
+                    containerIds.add( containerHost.getHostId() );
+                }
+
+                containerGroup.setContainerIds( containerIds );
+
+                containerGroupDataService.update( containerGroup );
             }
-            for ( ContainerHost containerHost : newContainers )
+            catch ( ContainerGroupNotFoundException e )
             {
-                containerIds.add( containerHost.getHostId() );
+                //create container group for new containers
+                containerGroup = new ContainerGroupEntity( environmentId, initiatorPeerId, ownerId, templateName,
+                        newContainers );
+
+
+                containerGroupDataService.persist( containerGroup );
             }
-            containerGroup.setContainerIds( containerIds );
-
-            containerGroupDataService.update( containerGroup );
         }
-        catch ( ContainerGroupNotFoundException e )
-        {
-            //create container group for new containers
-            containerGroup =
-                    new ContainerGroupEntity( environmentId, initiatorPeerId, ownerId, templateName, newContainers );
-
-            containerGroupDataService.persist( containerGroup );
-        }
-
 
         return result;
     }
