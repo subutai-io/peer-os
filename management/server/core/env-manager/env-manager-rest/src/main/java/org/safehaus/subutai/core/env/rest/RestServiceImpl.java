@@ -400,6 +400,34 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
+    public Response removeSshKey( final String environmentId )
+    {
+        if ( !UUIDUtil.isStringAUuid( environmentId ) )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
+        }
+
+        UUID envId = UUID.fromString( environmentId );
+
+        try
+        {
+            environmentManager.setSshKey( envId, null, false );
+
+            return Response.ok().build();
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            return Response.status( Response.Status.NOT_FOUND ).build();
+        }
+        catch ( EnvironmentModificationException e )
+        {
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
+    }
+
+
     private Set<ContainerJson> convertContainersToContainerJson( Set<ContainerHost> containerHosts )
     {
         Set<ContainerJson> jsonSet = Sets.newHashSet();
