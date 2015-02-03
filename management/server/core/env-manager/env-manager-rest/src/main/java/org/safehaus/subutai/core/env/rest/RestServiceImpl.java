@@ -180,7 +180,27 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getEnvironment( final String environmentId )
+    public Response listEnvironments()
+    {
+
+        Set<Environment> environments = environmentManager.getEnvironments();
+
+        Set<EnvironmentJson> environmentJsons = Sets.newHashSet();
+
+        for ( Environment environment : environments )
+        {
+            environmentJsons
+                    .add( new EnvironmentJson( environment.getId(), environment.getName(), environment.getStatus(),
+                            environment.getSshKey(),
+                            convertContainersToContainerJson( environment.getContainerHosts() ) ) );
+        }
+
+        return Response.ok( JsonUtil.toJson( environmentJsons ) ).build();
+    }
+
+
+    @Override
+    public Response viewEnvironment( final String environmentId )
     {
         if ( !UUIDUtil.isStringAUuid( environmentId ) )
         {
