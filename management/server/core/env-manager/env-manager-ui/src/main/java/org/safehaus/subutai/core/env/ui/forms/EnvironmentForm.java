@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.env.ui.forms;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -24,6 +25,7 @@ import com.vaadin.ui.VerticalLayout;
 
 public class EnvironmentForm
 {
+    private static final String ID = "Id";
     private static final String SSH_KEY = "Ssh key";
     private static final String DATE = "Date";
     private final EnvironmentManager environmentManager;
@@ -163,14 +165,12 @@ public class EnvironmentForm
                             new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) );
 
             String iconId = isEnvironmentUnderModification ? "indicator" :
-                            environment.getStatus().equals( EnvironmentStatus.HEALTHY ) ?
-                            "ok" :
-                            "error";
+                            environment.getStatus().equals( EnvironmentStatus.HEALTHY ) ? "ok" : "error";
             icon.setId( iconId );
 
             environmentsTable.addItem( new Object[] {
-                    environment.getName(), getCreationDate( environment.getCreationTimestamp() ), icon, containersBtn,
-                    sshKeyBtn, destroyBtn
+                    environment.getId(), environment.getName(), getCreationDate( environment.getCreationTimestamp() ),
+                    icon, containersBtn, sshKeyBtn, destroyBtn
             }, null );
         }
         environmentsTable.refreshRowCache();
@@ -203,6 +203,7 @@ public class EnvironmentForm
     private Table createEnvironmentsTable( String caption )
     {
         Table table = new Table( caption );
+        table.addContainerProperty( ID, UUID.class, null );
         table.addContainerProperty( NAME, String.class, null );
         table.addContainerProperty( DATE, String.class, null );
         table.addContainerProperty( STATUS, Embedded.class, null );

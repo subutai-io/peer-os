@@ -35,7 +35,7 @@ public class ContainersWindow extends Window
         this.environment = environment;
 
         setCaption( "Containers" );
-        setWidth( "800px" );
+        setWidth( "900px" );
         setHeight( "600px" );
         setModal( true );
         setClosable( true );
