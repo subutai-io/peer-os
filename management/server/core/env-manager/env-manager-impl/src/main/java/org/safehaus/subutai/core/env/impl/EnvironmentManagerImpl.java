@@ -239,6 +239,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
 
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+        {
+            throw new EnvironmentDestructionException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
+
         final Semaphore semaphore = new Semaphore( 0 );
 
         final ResultHolder<EnvironmentDestructionException> resultHolder = new ResultHolder<>();
@@ -344,6 +350,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
 
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+        {
+            throw new EnvironmentModificationException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
+
         final Set<ContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
         final Set<ContainerHost> newContainers = Sets.newHashSet();
 
@@ -446,6 +458,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final EnvironmentImpl environment =
                 ( EnvironmentImpl ) findEnvironment( UUID.fromString( containerHost.getEnvironmentId() ) );
+
+
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+        {
+            throw new EnvironmentModificationException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
 
         try
         {

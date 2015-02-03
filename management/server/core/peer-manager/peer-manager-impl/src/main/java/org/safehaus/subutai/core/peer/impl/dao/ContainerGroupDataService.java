@@ -8,7 +8,6 @@ import javax.persistence.EntityManagerFactory;
 
 import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.core.peer.impl.entity.ContainerGroupEntity;
-import org.safehaus.subutai.core.peer.impl.entity.ResourceHostEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +67,8 @@ public class ContainerGroupDataService implements DataService<String, ContainerG
         try
         {
             em.getTransaction().begin();
-            result = em.createQuery( "select h from ResourceHostEntity h", ContainerGroupEntity.class ).getResultList();
+            result = em.createQuery( "select h from ContainerGroupEntity h", ContainerGroupEntity.class )
+                       .getResultList();
             em.getTransaction().commit();
         }
         catch ( Exception e )
@@ -120,7 +120,7 @@ public class ContainerGroupDataService implements DataService<String, ContainerG
         try
         {
             em.getTransaction().begin();
-            ResourceHostEntity item = em.find( ResourceHostEntity.class, id );
+            ContainerGroupEntity item = em.find( ContainerGroupEntity.class, id );
             em.remove( item );
             em.getTransaction().commit();
         }

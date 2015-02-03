@@ -614,11 +614,36 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             }
         }
 
-        //create container group for new containers
-        ContainerGroupEntity containerGroup =
-                new ContainerGroupEntity( environmentId, initiatorPeerId, ownerId, templateName, newContainers );
+        if ( !CollectionUtil.isCollectionEmpty( newContainers ) )
+        {
+            ContainerGroupEntity containerGroup;
 
-        containerGroupDataService.persist( containerGroup );
+            try
+            {
+                //update existing container group to include new containers
+                containerGroup = ( ContainerGroupEntity ) findContainerGroupByEnvironmentId( environmentId );
+
+                Set<UUID> containerIds = Sets.newHashSet( containerGroup.getContainerIds() );
+
+                for ( ContainerHost containerHost : newContainers )
+                {
+                    containerIds.add( containerHost.getId() );
+                }
+
+                containerGroup.setContainerIds2( containerIds );
+
+                containerGroupDataService.update( containerGroup );
+            }
+            catch ( ContainerGroupNotFoundException e )
+            {
+                //create container group for new containers
+                containerGroup = new ContainerGroupEntity( environmentId, initiatorPeerId, ownerId, templateName,
+                        newContainers );
+
+
+                containerGroupDataService.persist( containerGroup );
+            }
+        }
 
         return result;
     }
@@ -1032,18 +1057,38 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         {
             ContainerHost result = bindHost( containerHost );
             ContainerHostEntity entity = ( ContainerHostEntity ) result;
-            ResourceHost resourceHost =
-                    entity.getParent(); //getResourceHostByName( containerHost.getAgent().getParentHostName() );
+            ResourceHost resourceHost = entity.getParent();
             resourceHost.destroyContainerHost( containerHost );
             containerHostDataService.remove( containerHost.getHostId() );
             entity.getParent().removeContainerHost( entity );
-            //            peerDAO.saveInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString(), resourceHost );
+
+            //update container group
+            ContainerGroupEntity containerGroup =
+                    ( ContainerGroupEntity ) findContainerGroupByContainerId( containerHost.getId() );
+
+            Set<UUID> containerIds = containerGroup.getContainerIds();
+            containerIds.remove( containerHost.getId() );
+
+            if ( containerIds.isEmpty() )
+            {
+                containerGroupDataService.remove( containerGroup.getEnvironmentId().toString() );
+            }
+            else
+            {
+                containerGroup.setContainerIds2( containerIds );
+
+                containerGroupDataService.update( containerGroup );
+            }
         }
         catch ( ResourceHostException e )
         {
             String errMsg = String.format( "Could not destroy container [%s]", containerHost.getHostname() );
             LOG.error( errMsg, e );
             throw new PeerException( errMsg, e.toString() );
+        }
+        catch ( ContainerGroupNotFoundException e )
+        {
+            LOG.error( "Could not find container group", e );
         }
     }
 
