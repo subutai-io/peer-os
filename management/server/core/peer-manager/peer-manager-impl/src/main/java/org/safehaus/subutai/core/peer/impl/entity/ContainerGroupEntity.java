@@ -137,4 +137,20 @@ public class ContainerGroupEntity implements ContainerGroup
     {
         this.containerIds = containerIds;
     }
+
+
+    public void setContainerIds2( final Set<UUID> containerIds )
+
+    {
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerIds ) );
+
+        Set<String> ids = Sets.newHashSet();
+
+        for ( UUID id : containerIds )
+        {
+            ids.add( id.toString() );
+        }
+
+        this.containerIds = ids;
+    }
 }
