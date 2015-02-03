@@ -15,17 +15,17 @@ import javax.ws.rs.core.Response;
 public interface RestService
 {
 
+    @GET
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response listEnvironments();
+
     @POST
     public Response createEnvironment( @QueryParam( "topology" ) String topologyJsonString );
 
-    @GET
-    @Path( "container/environmentId" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    public Response getContainerEnvironmentId( @QueryParam( "containerId" ) String containerId );
 
     @GET
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getEnvironment( @QueryParam( "environmentId" ) String environmentId );
+    public Response viewEnvironment( @QueryParam( "environmentId" ) String environmentId );
 
     @DELETE
     public Response destroyEnvironment( @QueryParam( "environmentId" ) String environmentId );
@@ -46,6 +46,12 @@ public interface RestService
     @DELETE
     @Path( "key" )
     public Response removeSshKey( @QueryParam( "environmentId" ) String environmentId );
+
+
+    @GET
+    @Path( "container/environmentId" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    public Response getContainerEnvironmentId( @QueryParam( "containerId" ) String containerId );
 
     @GET
     @Path( "container/state" )
