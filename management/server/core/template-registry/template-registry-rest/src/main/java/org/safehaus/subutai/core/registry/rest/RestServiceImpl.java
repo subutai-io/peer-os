@@ -25,7 +25,6 @@ import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.registry.api.TemplateTree;
 import org.safehaus.subutai.core.repository.api.RepositoryException;
 import org.safehaus.subutai.core.repository.api.RepositoryManager;
 import org.slf4j.Logger;
@@ -605,20 +604,6 @@ public class RestServiceImpl implements RestService
         else
         {
             return Response.status( Response.Status.NOT_FOUND ).build();
-        }
-    }
-
-
-    private void addChildren( TemplateTree tree, Template currentTemplate )
-    {
-        List<Template> children = tree.getChildrenTemplates( currentTemplate );
-        if ( !( children == null || children.isEmpty() ) )
-        {
-            currentTemplate.addChildren( children );
-            for ( Template child : children )
-            {
-                addChildren( tree, child );
-            }
         }
     }
 }
