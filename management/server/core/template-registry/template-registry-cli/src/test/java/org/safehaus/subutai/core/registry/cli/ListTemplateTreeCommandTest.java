@@ -1,15 +1,13 @@
 package org.safehaus.subutai.core.registry.cli;
 
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.registry.api.TemplateTree;
-
-import com.google.common.collect.Lists;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -30,14 +28,8 @@ public class ListTemplateTreeCommandTest extends TestParent
     {
         templateRegistry = mock( TemplateRegistry.class );
         templateTreeCommand = new ListTemplateTreeCommand( templateRegistry );
-        List<Template> rootTemplates = Lists.newArrayList( MockUtils.PARENT_TEMPLATE );
-        List<Template> childTemplates =
-                Lists.newArrayList( MockUtils.CHILD_TEMPLATE_TWO, MockUtils.CHILD_TEMPLATE_ONE );
-
-        TemplateTree templateTree = mock( TemplateTree.class );
+        List<Template> templateTree = Arrays.asList( MockUtils.PARENT_TEMPLATE );
         when( templateRegistry.getTemplateTree() ).thenReturn( templateTree );
-        when( templateTree.getRootTemplates() ).thenReturn( rootTemplates );
-        when( templateTree.getChildrenTemplates( MockUtils.PARENT_TEMPLATE ) ).thenReturn( childTemplates );
     }
 
 

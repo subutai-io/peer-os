@@ -25,7 +25,6 @@ import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.registry.api.TemplateTree;
 import org.safehaus.subutai.core.repository.api.RepositoryException;
 import org.safehaus.subutai.core.repository.api.RepositoryManager;
 import org.slf4j.Logger;
@@ -202,15 +201,11 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getTemplateTree()
     {
-        TemplateTree tree = templateRegistry.getTemplateTree();
-        List<Template> uberTemplates = tree.getRootTemplates();
-        if ( uberTemplates != null )
+        List<Template> templates = templateRegistry.getTemplateTree();
+
+        if ( templates.size() > 0 )
         {
-            for ( Template template : uberTemplates )
-            {
-                addChildren( tree, template );
-            }
-            return Response.ok().entity( GSON.toJson( uberTemplates ) ).build();
+            return Response.ok().entity( GSON.toJson( templates ) ).build();
         }
 
         return Response.status( Response.Status.NOT_FOUND ).build();
@@ -609,20 +604,6 @@ public class RestServiceImpl implements RestService
         else
         {
             return Response.status( Response.Status.NOT_FOUND ).build();
-        }
-    }
-
-
-    private void addChildren( TemplateTree tree, Template currentTemplate )
-    {
-        List<Template> children = tree.getChildrenTemplates( currentTemplate );
-        if ( !( children == null || children.isEmpty() ) )
-        {
-            currentTemplate.addChildren( children );
-            for ( Template child : children )
-            {
-                addChildren( tree, child );
-            }
         }
     }
 }

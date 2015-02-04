@@ -15,7 +15,6 @@ import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.protocol.api.TemplateService;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.registry.api.RegistryException;
-import org.safehaus.subutai.core.registry.api.TemplateTree;
 
 import com.google.common.collect.Lists;
 
@@ -262,15 +261,13 @@ public class TemplateRegistryImplTest
     @Test
     public void testGetTemplateTree() throws Exception
     {
-        List<Template> allTemplates = Lists.newArrayList( TestUtils.getParentTemplate(), TestUtils.getChildTemplate() );
+        List<Template> allTemplates = Lists.newArrayList( TestUtils.getParentTemplate() );
         when( templateService.getAllTemplates() ).thenReturn( allTemplates );
 
-        TemplateTree templateTree = templateRegistry.getTemplateTree();
+        List<Template> templateTree = templateRegistry.getTemplateTree();
 
-        assertTrue( templateTree.getChildrenTemplates( TestUtils.getParentTemplate() )
-                                .contains( TestUtils.getChildTemplate() ) );
-        assertTrue( templateTree.getRootTemplates().contains( TestUtils.getParentTemplate() ) );
-        assertEquals( TestUtils.getParentTemplate(), templateTree.getParentTemplate( TestUtils.getChildTemplate() ) );
+        assertTrue( templateTree.contains( TestUtils.getParentTemplate() ) );
+        assertEquals( TestUtils.getParentTemplate(), templateTree.get( 0 ) );
     }
 
 
@@ -279,9 +276,9 @@ public class TemplateRegistryImplTest
     {
         when( templateService.getAllTemplates() ).thenReturn( Collections.<Template>emptyList() );
 
-        TemplateTree templateTree = templateRegistry.getTemplateTree();
+        List<Template> templateTree = templateRegistry.getTemplateTree();
 
-        assertNull( templateTree.getRootTemplates() );
+        assertEquals( Collections.emptyList(), templateTree );
     }
 
 
