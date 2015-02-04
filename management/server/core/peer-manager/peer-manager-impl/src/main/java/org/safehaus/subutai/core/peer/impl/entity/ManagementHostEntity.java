@@ -37,16 +37,6 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     {
     }
 
-
-    //    public ManagementHostEntity( final String id, final String peerId, final String hostname )
-    //    {
-    //        this.id = id;
-    //        this.peerId = peerId;
-    //        this.hostname = hostname;
-    //    }
-    //
-
-
     public ManagementHostEntity( final String peerId, final ResourceHostInfo resourceHostInfo )
     {
         super( peerId, resourceHostInfo );

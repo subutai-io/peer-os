@@ -18,20 +18,15 @@ import org.safehaus.subutai.common.quota.QuotaType;
  */
 public interface ContainerHost extends Host
 {
-
-
-    //----------------------
     public PeerQuotaInfo getQuota( QuotaType quotaType ) throws PeerException;
 
     public void setQuota( QuotaInfo quota ) throws PeerException;
-
 
     public String getEnvironmentId();
 
     public String getNodeGroupName();
 
     public ContainerHostState getState() throws PeerException;
-
 
     public void dispose() throws PeerException;
 
@@ -40,7 +35,6 @@ public interface ContainerHost extends Host
     public void stop() throws PeerException;
 
     public Peer getPeer();
-
 
     public Template getTemplate() throws PeerException;
 

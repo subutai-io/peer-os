@@ -73,11 +73,7 @@ public interface LocalPeer extends Peer
      */
     public List<String> getTemplates();
 
-    void init();
-
-    void shutdown();
-
-    public void clean();
+    public void cleanDb();
 
     public ContainerHost createContainer( String hostName, String templateName, String cloneName, UUID envId )
             throws PeerException;
