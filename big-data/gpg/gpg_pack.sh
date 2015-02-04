@@ -4,7 +4,7 @@ set -e
 
 productName=gpg
 mode=bdproduct
-downloads=gpg/opt/subutai-gpg
+downloads=subutai-gpg/opt/subutai-gpg
   
 libgpg_error_url="ftp://ftp.gnupg.org/gcrypt/libgpg-error/libgpg-error-1.17.tar.bz2"
 libgcrypt_url="ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.2.tar.bz2"
@@ -13,15 +13,22 @@ libassuan_url="ftp://ftp.gnupg.org/gcrypt/libassuan/libassuan-2.2.0.tar.bz2"
 npth_url="ftp://ftp.gnupg.org/gcrypt/npth/npth-1.1.tar.bz2"
 gnupg_url="ftp://ftp.gnupg.org/gcrypt/gnupg/gnupg-2.1.1.tar.bz2"
 
-downloadAndMakeChanges() {
-	initializeVariables $1
+# NOTE: To be able to create debian package of subutai-gpg package,
+#       on machine which this script is going to be executed, liggpg-error,
+#       libgcrypt, libksba, libassuan and npth libraries should be 
+#       installed beforehand with "make install" command. 
+#       
+#       All of above dependecies listed above are put into subutai-gpg 
+#       debian package after running "./configure && make" commands inside
+#       their project directories. (look into dowload_n_compile function).
 
-  assert_root_user
+downloadAndMakeChanges() {
+  initializeVariables $1
+
+  # assert_root_user
   # apt-get update
   # assert_packages_available $packages_should_be_installed
   # install_latest_packages $packages_should_be_installed
-
-  mkdir -p $downloads
 
   download_n_compile $libgpg_error_url
   download_n_compile $libgcrypt_url
@@ -42,10 +49,10 @@ download_n_compile(){
   pushd $downloads
   tar -xvpf $tarFile > /dev/null 2>&1
   pushd $fileName*
-  ./configure
-  make
-  # make install
+  ./configure # > /dev/null 2>&1
+  make # > /dev/null 2>&1 
   popd
+  rm $tarFile
   popd
 }
 
