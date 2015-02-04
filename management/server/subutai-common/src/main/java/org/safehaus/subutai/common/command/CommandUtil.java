@@ -201,14 +201,6 @@ public class CommandUtil
     }
 
 
-    public static boolean stdOutContains( CommandResult commandResult, String text )
-    {
-        Preconditions.checkNotNull( commandResult, "CommandResult is null" );
-        Preconditions.checkNotNull( text, "Text is null" );
-        return commandResult.getStdOut().contains( text );
-    }
-
-
     private class HostCommandResult
     {
         private Host host;
