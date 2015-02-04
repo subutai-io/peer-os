@@ -4,7 +4,7 @@ set -e
 
 productName=gpg
 mode=bdproduct
-downloads=subutai-gpg/opt/subutai-gpg
+downloads=/var/lib/jenkins/jobs/master.bigdata.gpg/Gpg/subutai-gpg/opt/subutai-gpg
   
 libgpg_error_url="ftp://ftp.gnupg.org/gcrypt/libgpg-error/libgpg-error-1.17.tar.bz2"
 libgcrypt_url="ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.2.tar.bz2"
@@ -49,8 +49,8 @@ download_n_compile(){
   pushd $downloads
   tar -xvpf $tarFile > /dev/null 2>&1
   pushd $fileName*
-  ./configure # > /dev/null 2>&1
-  make # > /dev/null 2>&1 
+  # ./configure # > /dev/null 2>&1
+  # make # > /dev/null 2>&1 
   popd
   rm $tarFile
   popd
@@ -110,3 +110,4 @@ downloadAndMakeChanges $productName
 generateDebianPackage $productName
 # 5) Create the Wrapper Repo Debian Package
 generateRepoPackage $productName
+
