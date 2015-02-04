@@ -129,10 +129,10 @@ public class RestServiceImpl implements RestService
                     {
                         throw new EnvironmentCreationException( "Invalid node group name" );
                     }
-                    else if ( Strings.isNullOrEmpty( nodeGroup.getDomainName() ) )
-                    {
-                        throw new EnvironmentCreationException( "Invalid domain name" );
-                    }
+//                    else if ( Strings.isNullOrEmpty( nodeGroup.getDomainName() ) )
+//                    {
+//                        throw new EnvironmentCreationException( "Invalid domain name" );
+//                    }
                     else if ( nodeGroup.getNumberOfContainers() <= 0 )
                     {
                         throw new EnvironmentCreationException( "Invalid number of containers" );
