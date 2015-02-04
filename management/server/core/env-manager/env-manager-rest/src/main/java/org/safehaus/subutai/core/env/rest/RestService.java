@@ -20,6 +20,11 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response listEnvironments();
 
+    @GET
+    @Path( "domain" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    public Response getDefaultDomainName();
+
     @POST
     public Response createEnvironment( @QueryParam( "topology" ) String topologyJsonString );
 

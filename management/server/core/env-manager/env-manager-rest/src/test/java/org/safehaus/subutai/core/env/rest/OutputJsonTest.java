@@ -28,12 +28,12 @@ public class OutputJsonTest
         Map<UUID, Set<NodeGroup>> placement = Maps.newHashMap();
 
         NodeGroup nodeGroup =
-                new NodeGroup( "Node Group 1", "hadoop", "intra.lan", 4, 1, 1, new PlacementStrategy( "ROUND_ROBIN" ) );
-        NodeGroup nodeGroup2 = new NodeGroup( "Node Group 2", "cassandra", "intra.lan", 4, 1, 1,
+                new NodeGroup( "Node Group 1", "hadoop", 4, 1, 1, new PlacementStrategy( "ROUND_ROBIN" ) );
+        NodeGroup nodeGroup2 = new NodeGroup( "Node Group 2", "cassandra", 4, 1, 1,
                 new PlacementStrategy( "BEST_SERVER", new Criteria<>( "MORE_HDD", true ) ) );
         Set<NodeGroup> nodeGroups1 = Sets.newHashSet( nodeGroup, nodeGroup2 );
         NodeGroup nodeGroup3 =
-                new NodeGroup( "Node Group 3", "master", "intra.lan", 4, 1, 1, new PlacementStrategy( "ROUND_ROBIN" ) );
+                new NodeGroup( "Node Group 3", "master", 4, 1, 1, new PlacementStrategy( "ROUND_ROBIN" ) );
         Set<NodeGroup> nodeGroups2 = Sets.newHashSet( nodeGroup3 );
 
         placement.put( UUID.randomUUID(), nodeGroups1 );
