@@ -8,8 +8,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,7 +65,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @javax.persistence.Transient
     transient private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
     @javax.persistence.Transient
-    transient private ExecutorService singleThreadExecutorService;
+    transient private ExecutorService singleThreadExecutorService = Executors.newSingleThreadExecutor();
 
     @javax.persistence.Transient
     transient private ExecutorService cachedThredPoolService;
@@ -100,6 +102,30 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
 
         return singleThreadExecutorService;
+    }
+
+
+    public <T> Future<T> queueSequentialTask( Callable<T> callable )
+    {
+        return getSingleThreadExecutorService().submit( callable );
+    }
+
+
+    public Future queueSequentialTask( Runnable runnable )
+    {
+        return getSingleThreadExecutorService().submit( runnable );
+    }
+
+
+    public <T> Future<T> queueParallelTask( Callable<T> callable )
+    {
+        return getCachedThreadExecutorService().submit( callable );
+    }
+
+
+    public Future queueParallelTask( Runnable runnable )
+    {
+        return getCachedThreadExecutorService().submit( runnable );
     }
 
 
