@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.peer.api;
+package org.safehaus.subutai.common.command;
 
 
 import java.util.Map;
@@ -13,11 +13,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.safehaus.subutai.common.command.CommandCallback;
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.command.Response;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.util.CollectionUtil;
 
@@ -26,9 +21,8 @@ import com.google.common.collect.Maps;
 
 
 /**
- * Provide utility functions for command execution Use analog class in Subutai Common package instead
+ * Provide utility functions for command execution
  */
-@Deprecated
 public class CommandUtil
 {
     /**
@@ -40,7 +34,7 @@ public class CommandUtil
      *
      * @return -  command result
      *
-     * @throws CommandException - exception thrown if something went wrong
+     * @throws org.safehaus.subutai.common.command.CommandException - exception thrown if something went wrong
      */
     public CommandResult execute( RequestBuilder requestBuilder, Host host ) throws CommandException
     {
@@ -68,7 +62,7 @@ public class CommandUtil
      * @param host - host
      * @param callback - stoppable callback
      *
-     * @throws CommandException - exception thrown if something went wrong
+     * @throws org.safehaus.subutai.common.command.CommandException - exception thrown if something went wrong
      */
     public void executeAsync( RequestBuilder requestBuilder, Host host, final StoppableCallback callback )
             throws CommandException
@@ -100,7 +94,7 @@ public class CommandUtil
      * @param hosts - hosts
      * @param callback - callback
      *
-     * @throws CommandException - exception thrown if something went wrong
+     * @throws org.safehaus.subutai.common.command.CommandException - exception thrown if something went wrong
      */
 
     public void executeAsync( RequestBuilder requestBuilder, Set<Host> hosts, final CommandCallback callback )
@@ -143,7 +137,7 @@ public class CommandUtil
      *
      * @return -  map containing command results
      *
-     * @throws CommandException - exception thrown if something went wrong
+     * @throws org.safehaus.subutai.common.command.CommandException - exception thrown if something went wrong
      */
     public Map<Host, CommandResult> executeSequential( RequestBuilder requestBuilder, Set<Host> hosts )
             throws CommandException
@@ -170,7 +164,7 @@ public class CommandUtil
      *
      * @return -  map containing command results
      *
-     * @throws CommandException - exception thrown if something went wrong
+     * @throws org.safehaus.subutai.common.command.CommandException - exception thrown if something went wrong
      */
     public Map<Host, CommandResult> executeParallel( RequestBuilder requestBuilder, Set<Host> hosts )
             throws CommandException
