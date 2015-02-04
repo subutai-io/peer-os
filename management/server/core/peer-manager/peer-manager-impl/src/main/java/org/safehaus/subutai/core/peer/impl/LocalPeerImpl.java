@@ -17,7 +17,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -149,7 +148,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     }
 
 
-    @Override
     public void init()
     {
         managementHostDataService = new ManagementHostDataService( peerManager.getEntityManagerFactory() );
@@ -194,7 +192,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     }
 
 
-    @Override
     public void shutdown()
     {
         hostRegistry.removeHostListener( this );
@@ -532,8 +529,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             //and prepare needed templates
             if ( resourceHost.isConnected() )
             {
-                serverMetricMap.add( resourceHost.getMetric() );
-                resourceHost.prepareTemplates( templates );
+                try
+                {
+                    serverMetricMap.add( resourceHost.getMetric() );
+                    resourceHost.prepareTemplates( templates );
+                }
+                catch ( ResourceHostException e )
+                {
+                    throw new PeerException( e );
+                }
             }
         }
 
@@ -575,23 +579,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         {
             ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) resourceHostDistribution.getKey();
 
-            Set<CreateContainerTask> createContainerTasks = Sets.newHashSet();
             for ( String hostname : resourceHostDistribution.getValue() )
             {
-                createContainerTasks.add( new CreateContainerTask( resourceHostEntity, templateName, hostname,
-                        waitContainerTimeoutSec ) );
-            }
-
-            ExecutorService executorService = resourceHostEntity.getSingleThreadExecutorService();
-
-            try
-            {
-                taskFutures.addAll( executorService.invokeAll( createContainerTasks ) );
-            }
-            catch ( InterruptedException e )
-            {
-                LOG.error( String.format( "Error creating containers on resource host %s",
-                        resourceHostEntity.getHostname() ), e );
+                taskFutures.add( resourceHostEntity.queueSequentialTask(
+                        new CreateContainerTask( resourceHostEntity, templateName, hostname,
+                                waitContainerTimeoutSec ) ) );
             }
         }
 
@@ -1281,8 +1273,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     }
 
 
-    @Override
-    public void clean()
+    public void cleanDb()
     {
         if ( managementHost != null && managementHost.getId() != null )
         {
@@ -1414,7 +1405,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                             containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
                             ( ( ContainerHostEntity ) containerHost ).setDataService( containerHostDataService );
                             ( ( AbstractSubutaiHost ) containerHost ).setPeer( this );
-                            host.addContainerHost( ( ContainerHostEntity ) containerHost );
+                            ( ( ResourceHostEntity ) host ).addContainerHost( ( ContainerHostEntity ) containerHost );
                             containerHostDataService.persist( ( ContainerHostEntity ) containerHost );
                         }
                         ( ( AbstractSubutaiHost ) containerHost ).updateHostInfo( containerHostInfo );

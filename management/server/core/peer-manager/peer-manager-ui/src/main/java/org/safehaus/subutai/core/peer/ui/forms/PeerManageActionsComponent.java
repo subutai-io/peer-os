@@ -7,9 +7,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 
 
-/**
- * Created by talas on 10/14/14.
- */
 public class PeerManageActionsComponent extends HorizontalLayout
 {
     private Button positiveButton;

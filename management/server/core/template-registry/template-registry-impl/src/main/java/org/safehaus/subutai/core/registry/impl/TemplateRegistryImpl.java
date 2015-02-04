@@ -835,6 +835,19 @@ public class TemplateRegistryImpl implements TemplateRegistry
 
     public void init()
     {
+        try
+        {
+            LOG.warn( "Printing saved templates..." );
+            List<Template> templates = templateService.getAllTemplates();
+            for ( Template template1 : templates )
+            {
+                LOG.warn( template1.getTemplateName() );
+            }
+        }
+        catch ( DaoException e )
+        {
+            LOG.error( "Error while saving template: ", e );
+        }
     }
 
 

@@ -25,7 +25,7 @@ public class CleanCommand extends OsgiCommandSupport
     protected Object doExecute() throws Exception
     {
         LocalPeer localPeer = peerManager.getLocalPeer();
-        localPeer.clean();
+        localPeer.cleanDb();
         return null;
     }
 }

@@ -18,8 +18,4 @@ public interface ManagementHost extends Host
     public void removeAptSource( final String host, final String ip ) throws PeerException;
 
     public String readFile( String path ) throws IOException;
-    //    void resetHeartbeat();
-    //
-    //
-    //    void updateHostInfo();
 }

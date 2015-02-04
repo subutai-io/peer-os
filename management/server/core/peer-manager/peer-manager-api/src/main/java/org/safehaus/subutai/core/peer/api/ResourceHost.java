@@ -3,7 +3,6 @@ package org.safehaus.subutai.core.peer.api;
 
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
@@ -21,12 +20,11 @@ public interface ResourceHost extends Host
 
     void prepareTemplate( Template p ) throws ResourceHostException;
 
-    boolean isTemplateExist( Template template ) throws ResourceHostException;
+    boolean templateExists( Template template ) throws ResourceHostException;
 
     void importTemplate( Template template ) throws ResourceHostException;
 
     void updateRepository( Template template ) throws ResourceHostException;
-
 
     public ServerMetric getMetric() throws ResourceHostException;
 
@@ -42,6 +40,7 @@ public interface ResourceHost extends Host
 
     public void destroyContainerHost( ContainerHost containerHost ) throws ResourceHostException;
 
+    @Deprecated
     public void removeContainerHost( ContainerHost result ) throws ResourceHostException;
 
     public void queue( HostTask hostTask );
@@ -50,13 +49,4 @@ public interface ResourceHost extends Host
 
     public ContainerHost createContainer( String templateName, String hostname, int timeout )
             throws ResourceHostException;
-
-    @Deprecated
-    public void addContainerHost( ContainerHost containerHost );
-
-    @Deprecated
-    public Set<ContainerHost> getContainerHostsByNameList( Set<String> cloneNames );
-
-    @Deprecated
-    public Set<ContainerHost> getContainerHostsByEnvironmentId( UUID environmentId );
 }
