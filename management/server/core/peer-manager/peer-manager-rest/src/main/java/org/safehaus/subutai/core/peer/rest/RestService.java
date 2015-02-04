@@ -31,7 +31,12 @@ public interface RestService
     @Produces( { MediaType.TEXT_PLAIN } )
     public String getId();
 
+    @GET
+    @Path( "registered_peers" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getRegisteredPeers();
 
+    @Deprecated
     @POST
     @Path( "container/schedule" )
     @Produces( { MediaType.APPLICATION_JSON } )
@@ -66,10 +71,10 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getTemplate( @FormParam( "templateName" ) String templateName );
 
-    @POST
-    @Path( "environment/containers" )
+    @GET
+    @Path( "container/state" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response environmentContainers( @FormParam( "environmentId" ) String envId );
+    public Response getContainerState( @QueryParam( "containerId" ) String containerId );
 
     @GET
     @Path( "ping" )
@@ -85,6 +90,7 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response unregisterPeer( @QueryParam( "peerId" ) String peerId );
 
+    @Deprecated
     @PUT
     @Path( "update" )
     @Produces( { MediaType.APPLICATION_JSON } )

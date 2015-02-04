@@ -13,27 +13,32 @@ import org.safehaus.subutai.common.protocol.Template;
  */
 public class CreateContainerRequest
 {
-    private final UUID creatorPeerId;
+    private final UUID environmentId;
+    private final UUID initiatorPeerId;
+    private final UUID ownerId;
     private final List<Template> templates;
-    private final int quantity;
+    private final int numberOfContainers;
     private final String strategyId;
     private final List<Criteria> criteria;
 
 
-    public CreateContainerRequest( final UUID creatorPeerId, final List<Template> templates, final int quantity,
+    public CreateContainerRequest( final UUID environmentId, final UUID initiatorPeerId, final UUID ownerId,
+                                   final List<Template> templates, final int numberOfContainers,
                                    final String strategyId, final List<Criteria> criteria )
     {
-        this.creatorPeerId = creatorPeerId;
+        this.environmentId = environmentId;
+        this.initiatorPeerId = initiatorPeerId;
+        this.ownerId = ownerId;
         this.templates = templates;
-        this.quantity = quantity;
+        this.numberOfContainers = numberOfContainers;
         this.strategyId = strategyId;
         this.criteria = criteria;
     }
 
 
-    public UUID getCreatorPeerId()
+    public UUID getEnvironmentId()
     {
-        return creatorPeerId;
+        return environmentId;
     }
 
 
@@ -43,9 +48,9 @@ public class CreateContainerRequest
     }
 
 
-    public int getQuantity()
+    public int getNumberOfContainers()
     {
-        return quantity;
+        return numberOfContainers;
     }
 
 
@@ -58,5 +63,17 @@ public class CreateContainerRequest
     public List<Criteria> getCriteria()
     {
         return criteria;
+    }
+
+
+    public UUID getInitiatorPeerId()
+    {
+        return initiatorPeerId;
+    }
+
+
+    public UUID getOwnerId()
+    {
+        return ownerId;
     }
 }

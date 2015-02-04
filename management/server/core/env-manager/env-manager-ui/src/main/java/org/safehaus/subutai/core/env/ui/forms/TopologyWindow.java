@@ -73,6 +73,7 @@ public class TopologyWindow extends Window
         content.addComponent( placementTable );
 
         buildBtn = new Button( grow ? "Grow" : "Build" );
+        buildBtn.setId( "buildButton" );
         buildBtn.setEnabled( false );
         buildBtn.addClickListener( new Button.ClickListener()
         {
@@ -232,6 +233,7 @@ public class TopologyWindow extends Window
             slider.setValue( ( double ) nodeGroup.getNumberOfContainers() );
 
             ComboBox peersCombo = createPeersComboBox();
+            peersCombo.setId( "peersCombo" );
 
             Button placeBtn = createPlaceButton( nodeGroup, slider, peersCombo );
 
@@ -245,6 +247,7 @@ public class TopologyWindow extends Window
     private Button createPlaceButton( final NodeGroup nodeGroup, final Slider slider, final ComboBox peersCombo )
     {
         Button placeButton = new Button( "Place" );
+        placeButton.setId( "placeButton" );
 
         placeButton.addClickListener( new Button.ClickListener()
         {
@@ -279,6 +282,7 @@ public class TopologyWindow extends Window
     {
         final String rowId = String.format( "%s-%s", nodeGroup.getName(), peer.getId() );
         Button removeBtn = new Button( "Remove" );
+        removeBtn.setId( "removeButton" );
 
 
         final int amount = slider.getValue().intValue();

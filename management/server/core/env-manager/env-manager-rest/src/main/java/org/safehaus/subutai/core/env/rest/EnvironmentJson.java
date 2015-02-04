@@ -15,17 +15,15 @@ public class EnvironmentJson
     private UUID id;
     private String name;
     private EnvironmentStatus status;
-    private String publicKey;
     private Set<ContainerJson> containers;
 
 
-    public EnvironmentJson( final UUID id, final String name, final EnvironmentStatus status, final String publicKey,
+    public EnvironmentJson( final UUID id, final String name, final EnvironmentStatus status,
                             final Set<ContainerJson> containers )
     {
         this.id = id;
         this.name = name;
         this.status = status;
-        this.publicKey = publicKey;
         this.containers = containers;
     }
 
@@ -63,18 +61,6 @@ public class EnvironmentJson
     public void setStatus( final EnvironmentStatus status )
     {
         this.status = status;
-    }
-
-
-    public String getPublicKey()
-    {
-        return publicKey;
-    }
-
-
-    public void setPublicKey( final String publicKey )
-    {
-        this.publicKey = publicKey;
     }
 
 

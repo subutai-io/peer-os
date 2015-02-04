@@ -9,6 +9,7 @@ import java.util.UUID;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
@@ -99,8 +100,7 @@ public class RemotePeerRestClient
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             return JsonUtil.fromJson( jsonObject, new TypeToken<Set<ContainerHost>>()
-            {
-            }.getType() );
+            {}.getType() );
         }
 
         if ( response.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() )
@@ -193,6 +193,27 @@ public class RemotePeerRestClient
     }
 
 
+    public ContainerHostState getContainerState( final String containerId ) throws PeerException
+    {
+        String path = "peer/container/state";
+
+
+        WebClient client = createWebClient();
+
+        Response response =
+                client.path( path ).accept( MediaType.APPLICATION_JSON ).query( "containerId", containerId ).get();
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return JsonUtil.fromJson( response.readEntity( String.class ), ContainerHostState.class );
+        }
+        else
+        {
+            throw new PeerException( "Could not retrieve container state", response.getEntity().toString() );
+        }
+    }
+
+
     public Template getTemplate( final String templateName ) throws PeerException
     {
         String path = "peer/template/get";
@@ -261,8 +282,7 @@ public class RemotePeerRestClient
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             return JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<Set<HostInfoModel>>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         else
         {
@@ -304,8 +324,7 @@ public class RemotePeerRestClient
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             return JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<PeerQuotaInfo>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         else
         {
@@ -327,8 +346,7 @@ public class RemotePeerRestClient
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             return JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<ProcessResourceUsage>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         else
         {
@@ -471,8 +489,7 @@ public class RemotePeerRestClient
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             return JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<Set<Integer>>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         else
         {
@@ -521,8 +538,7 @@ public class RemotePeerRestClient
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             return JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<DiskQuota>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         else
         {

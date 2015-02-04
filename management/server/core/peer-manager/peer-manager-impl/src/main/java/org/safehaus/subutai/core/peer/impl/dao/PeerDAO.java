@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.util.GsonInterfaceAdapter;
@@ -52,11 +53,7 @@ public class PeerDAO
         EntityManager entityManager = daoManager.getEntityManagerFromFactory();
 
         try
-        {   /*
-            String json = gson.toJson( info );
-            dbUtil.update( "merge into peer (source, id, info) values (?, ? ,?)", source, UUID.fromString( key ),
-                    json );
-            */
+        {
             String json = gson.toJson( info );
             PeerData peerData = new PeerData();
             peerData.setId( key );
@@ -100,21 +97,9 @@ public class PeerDAO
         List<T> list = new ArrayList<>();
         try
         {
-            /*
-            ResultSet rs = dbUtil.select( "select info from peer where source = ?", source );
-            while ( rs != null && rs.next() )
-            {
-                Clob infoClob = rs.getClob( "info" );
-                if ( infoClob != null && infoClob.length() > 0 )
-                {
-                    String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
-                    list.add( gson.fromJson( info, clazz ) );
-                }
-            }*/
-
-            Query query;
-            query = entityManager.createQuery(
-                    "SELECT pd FROM PeerData " + "                             AS pd WHERE pd.source = :source" );
+            TypedQuery<PeerData> query;
+            query = entityManager
+                    .createQuery( "SELECT pd FROM PeerData AS pd WHERE pd.source = :source", PeerData.class );
             query.setParameter( "source", source );
             List<PeerData> results = query.getResultList();
 
@@ -154,22 +139,10 @@ public class PeerDAO
 
         try
         {
-            /*
-            ResultSet rs = dbUtil.select( "select info from peer where source = ? and id = ?", source,
-                    UUID.fromString( key ) );
-            if ( rs != null && rs.next() )
-            {
-                Clob infoClob = rs.getClob( "info" );
-                if ( infoClob != null && infoClob.length() > 0 )
-                {
-                    String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
-                    return gson.fromJson( info, clazz );
-                }
-            }*/
 
-            Query query;
-            query = entityManager
-                    .createQuery( "SELECT pd FROM PeerData AS pd WHERE pd.source = :source and pd.id=:id" );
+            TypedQuery query;
+            query = entityManager.createQuery( "SELECT pd FROM PeerData AS pd WHERE pd.source = :source and pd.id=:id",
+                    PeerData.class );
             query.setParameter( "source", source );
             query.setParameter( "id", key );
             PeerData pd = ( PeerData ) query.getSingleResult();
@@ -206,7 +179,6 @@ public class PeerDAO
 
         try
         {
-            //dbUtil.update( "delete from peer where source = ? and id = ?", source, UUID.fromString( key ) );
 
             daoManager.startTransaction( entityManager );
 
@@ -217,6 +189,7 @@ public class PeerDAO
             query.setParameter( "id", key );
             query.executeUpdate();
             daoManager.commitTransaction( entityManager );
+            return true;
         }
         catch ( Exception e )
         {
@@ -227,43 +200,6 @@ public class PeerDAO
         finally
         {
             daoManager.closeEntityManager( entityManager );
-            return true;
         }
-    }
-
-
-    public boolean updateInfo( String source, String key, Object info )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
-        Preconditions.checkNotNull( info, "Info is null" );
-
-        EntityManager entityManager = daoManager.getEntityManagerFromFactory();
-
-        try
-        {
-            String json = gson.toJson( info );
-            PeerData peerData = new PeerData();
-            peerData.setId( key );
-            peerData.setSource( source );
-            peerData.setInfo( json );
-
-            daoManager.startTransaction( entityManager );
-            entityManager.merge( peerData );
-            daoManager.commitTransaction( entityManager );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage() );
-
-            daoManager.rollBackTransaction( entityManager );
-
-            return false;
-        }
-        finally
-        {
-            daoManager.closeEntityManager( entityManager );
-        }
-        return true;
     }
 }

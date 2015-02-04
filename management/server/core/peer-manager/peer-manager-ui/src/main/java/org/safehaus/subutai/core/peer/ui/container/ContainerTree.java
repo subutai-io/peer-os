@@ -144,9 +144,6 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
     public HierarchicalContainer getNodeContainer()
     {
 
-        //        tree.removeAllItems();
-        //        tree.setContainerDataSource( container );
-
         try
         {
             ManagementHost managementHost = localPeer.getManagementHost();
@@ -221,49 +218,6 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
                     }
                 }
             }
-
-
-            // not registered containers
-            //                for ( ResourceHostInfo resourceHostInfo : hostRegistry.getResourceHostsInfo() )
-            //                {
-            //                    if ( resourceHostInfo.getContainerHosts() != null )
-            //                    {
-            //                        Item parentItem = container.getItem( resourceHostInfo.getId() );
-            //                        if ( parentItem != null )
-            //                        {
-            //                            for ( ContainerHostInfo containerHostInfo : resourceHostInfo
-            // .getContainerHosts() )
-            //                            {
-            //                                container.setChildrenAllowed( resourceHostInfo.getId(), true );
-            //                                Item containerHostItem = container.getItem( containerHostInfo.getId
-            // () );
-            //                                if ( containerHostItem == null )
-            //                                {
-            //                                    ContainerHost containerHost = localPeer
-            //                                            .getContainerHost( containerHostInfo, localPeer.getId()
-            // .toString() );
-            //
-            //                                    containerHostItem = container.addItem( containerHost.getId() );
-            //                                    if ( containerHostItem != null )
-            //                                    {
-            //                                        container.setChildrenAllowed( containerHost.getId(), false );
-            //                                        tree.setItemCaption( containerHost.getId(),
-            //                                                "NOT REGISTERED!!!" + containerHost.getHostname() );
-            //                                        containerHostItem.getItemProperty( "value" ).setValue(
-            // containerHost );
-            //                                        container.setParent( containerHost.getId(),
-            // resourceHostInfo.getId() );
-            //                                    }
-            //                                }
-            //                            }
-            //                        }
-            //                        else
-            //                        {
-            //                            LOG.warn( String.format( "Resource host %s not registered.",
-            //                                    resourceHostInfo.getHostname() ) );
-            //                        }
-            //                    }
-            //                }
         }
 
 

@@ -19,7 +19,6 @@ public interface PeerManager
     boolean update( PeerInfo peerInfo );
 
 
-    @Deprecated
     public List<PeerInfo> peers();
 
     public PeerInfo getLocalPeerInfo();

@@ -48,6 +48,9 @@ public interface ResourceHost extends Host
 
     public void cloneContainer( String templateName, String hostname ) throws ResourceHostException;
 
+    public ContainerHost createContainer( String templateName, String hostname, int timeout )
+            throws ResourceHostException;
+
     @Deprecated
     public void addContainerHost( ContainerHost containerHost );
 
