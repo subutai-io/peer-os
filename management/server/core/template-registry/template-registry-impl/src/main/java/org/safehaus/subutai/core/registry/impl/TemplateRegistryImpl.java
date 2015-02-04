@@ -299,7 +299,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
             if ( !children.isEmpty() )
             {
                 throw new RegistryException(
-                        String.format( "Can no delete template %s from registry because it has children",
+                        String.format( "Can not delete template %s from registry because it has children",
                                 templateName ) );
             }
 
@@ -374,8 +374,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
     @Override
     public Template getTemplate( final String templateName, TemplateVersion templateVersion )
     {
-        return getTemplate( templateName, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ),
-                Common.DEFAULT_LXC_ARCH );
+        return getTemplate( templateName, templateVersion, Common.DEFAULT_LXC_ARCH );
     }
 
 
@@ -861,19 +860,6 @@ public class TemplateRegistryImpl implements TemplateRegistry
 
     public void init()
     {
-        try
-        {
-            LOG.warn( "Printing saved templates..." );
-            List<Template> templates = templateService.getAllTemplates();
-            for ( Template template1 : templates )
-            {
-                LOG.warn( template1.getTemplateName() );
-            }
-        }
-        catch ( DaoException e )
-        {
-            LOG.error( "Error while saving template: ", e );
-        }
     }
 
 
