@@ -773,6 +773,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @Override
+    public String getDefaultDomainName()
+    {
+        return defaultDomain;
+    }
+
+
     public void registerListener( EnvironmentEventListener listener )
     {
         if ( listener != null )
