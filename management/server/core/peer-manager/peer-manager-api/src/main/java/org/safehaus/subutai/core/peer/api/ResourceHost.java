@@ -40,6 +40,7 @@ public interface ResourceHost extends Host
 
     public void destroyContainerHost( ContainerHost containerHost ) throws ResourceHostException;
 
+    @Deprecated
     public void removeContainerHost( ContainerHost result ) throws ResourceHostException;
 
     public void queue( HostTask hostTask );
