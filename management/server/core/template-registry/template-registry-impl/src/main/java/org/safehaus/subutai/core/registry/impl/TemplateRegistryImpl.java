@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -32,7 +34,6 @@ import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitManager;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.registry.api.TemplateTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -567,32 +568,6 @@ public class TemplateRegistryImpl implements TemplateRegistry
 
 
     /**
-     * Returns template tree
-     *
-     * @return {@code TemplateTree}
-     */
-    @Override
-    public TemplateTree getTemplateTree()
-    {
-        //retrieve all templates and fill template tree
-        TemplateTree templateTree = new TemplateTree();
-        try
-        {
-            List<Template> allTemplates = templateService.getAllTemplates();
-            for ( Template template : allTemplates )
-            {
-                templateTree.addTemplate( template );
-            }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error in getTemplateTree", e );
-        }
-        return templateTree;
-    }
-
-
-    /**
      * Returns parent templates
      *
      * @param childTemplateName - name of template whose parents to return
@@ -924,5 +899,28 @@ public class TemplateRegistryImpl implements TemplateRegistry
             LOG.error( "Error getting git file branch version.", e );
             return null;
         }
+    }
+
+
+    public List<Template> getTemplateTree()
+    {
+        List<Template> templates = getAllTemplates();
+        Set<Template> templateSet = new HashSet<>( templates );
+
+        List<Template> templateTree = new ArrayList<>();
+        for ( final Template template : templates )
+        {
+            boolean isChild = false;
+            for ( Iterator<Template> it = templateSet.iterator(); it.hasNext() && !isChild; )
+            {
+                Template template1 = it.next();
+                isChild = template1.getChildren().contains( template );
+            }
+            if ( !isChild )
+            {
+                templateTree.add( template );
+            }
+        }
+        return templateTree;
     }
 }

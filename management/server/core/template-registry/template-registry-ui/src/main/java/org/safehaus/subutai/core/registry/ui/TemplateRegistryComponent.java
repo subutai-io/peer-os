@@ -351,79 +351,41 @@ public class TemplateRegistryComponent extends CustomComponent
                 templateItem.getItemProperty( VALUE_PROPERTY ).setValue( template );
             }
             templateTree.setItemCaption( itemId, template.getTemplateName() );
-            List<Template> children = template.getChildren();
-            for ( final Template child : children )
-            {
-                String childItemId = String.format( "%s-%s-%s", child.getTemplateName(), child.getLxcArch(),
-                        child.getTemplateVersion().toString() );
-                Item childTemplateItem = container.addItem( childItemId );
-                if ( childTemplateItem == null )
-                {
-                    childTemplateItem = container.getItem( childItemId );
-                }
-                if ( childTemplateItem != null && childTemplateItem.getItemProperty( VALUE_PROPERTY ) != null )
-                {
-                    childTemplateItem.getItemProperty( VALUE_PROPERTY ).setValue( child );
-                }
-                templateTree.setItemCaption( childItemId, child.getTemplateName() );
-                container.setParent( childItemId, itemId );
-            }
-            if ( template.getChildren() == null || template.getChildren().isEmpty() )
-            {
-                container.setChildrenAllowed( itemId, false );
-            }
-            else
-            {
-                container.setChildrenAllowed( itemId, true );
-                templateTree.expandItem( itemId );
-            }
+            addTemplateTreeChildren( template );
         }
+    }
 
-        //        Map<Template, List<Template>> templateListMap = new HashMap<>();
-        //        for ( final Template template : templatesTree )
-        //        {
-        //            templateListMap.put( template, template.getChildren() );
-        //        }
-        //        for ( final Map.Entry<Template, List<Template>> entry : templateListMap.entrySet() )
-        //        {
-        //            Template currentTemplate = entry.getKey();
-        //            String itemId = String.format( "%s-%s-%s", currentTemplate.getTemplateName(), currentTemplate
-        // .getLxcArch(),
-        //                    currentTemplate.getTemplateVersion().toString() );
-        //            Item templateItem = container.addItem( itemId );
-        //            if ( templateItem != null && templateItem.getItemProperty( VALUE_PROPERTY ) != null )
-        //            {
-        //                templateItem.getItemProperty( VALUE_PROPERTY ).setValue( currentTemplate );
-        //            }
-        //            templateTree.setItemCaption( itemId, currentTemplate.getTemplateName() );
-        //
-        //            List<Template> children = entry.getValue();
-        //            for ( final Template child : children )
-        //            {
-        //                String childItemId = String.format( "%s-%s-%s", child.getTemplateName(), child.getLxcArch(),
-        //                        child.getTemplateVersion().toString() );
-        //                Item childTemplateItem = container.addItem( childItemId );
-        //                if ( childTemplateItem == null )
-        //                {
-        //                    childTemplateItem = container.getItem( childItemId );
-        //                }
-        //                if ( childTemplateItem != null && childTemplateItem.getItemProperty( VALUE_PROPERTY ) !=
-        // null )
-        //                {
-        //                    childTemplateItem.getItemProperty( VALUE_PROPERTY ).setValue( child );
-        //                }
-        //                templateTree.setItemCaption( childItemId, child.getTemplateName() );
-        //                container.setParent( childItemId, itemId );
-        //            }
-        //            if ( currentTemplate.getChildren() == null || currentTemplate.getChildren().isEmpty() )
-        //            {
-        //                container.setChildrenAllowed( itemId, false );
-        //            }
-        //            else
-        //            {
-        //                container.setChildrenAllowed( itemId, true );
-        //                templateTree.expandItem( itemId );
-        //            }
-        //        }
+
+    private void addTemplateTreeChildren( Template template )
+    {
+        String itemId = String.format( "%s-%s-%s", template.getTemplateName(), template.getLxcArch(),
+                template.getTemplateVersion().toString() );
+        List<Template> children = template.getChildren();
+        for ( final Template child : children )
+        {
+            String childItemId = String.format( "%s-%s-%s", child.getTemplateName(), child.getLxcArch(),
+                    child.getTemplateVersion().toString() );
+            Item childTemplateItem = container.addItem( childItemId );
+            if ( childTemplateItem == null )
+            {
+                childTemplateItem = container.getItem( childItemId );
+            }
+            if ( childTemplateItem != null && childTemplateItem.getItemProperty( VALUE_PROPERTY ) != null )
+            {
+                childTemplateItem.getItemProperty( VALUE_PROPERTY ).setValue( child );
+            }
+            templateTree.setItemCaption( childItemId, child.getTemplateName() );
+            container.setParent( childItemId, itemId );
+            addTemplateTreeChildren( child );
+        }
+        if ( template.getChildren() == null || template.getChildren().isEmpty() )
+        {
+            container.setChildrenAllowed( itemId, false );
+        }
+        else
+        {
+            container.setChildrenAllowed( itemId, true );
+            templateTree.expandItem( itemId );
+        }
     }
 }

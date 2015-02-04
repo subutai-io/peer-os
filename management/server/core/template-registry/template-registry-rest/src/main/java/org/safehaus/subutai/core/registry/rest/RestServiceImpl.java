@@ -202,15 +202,11 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getTemplateTree()
     {
-        TemplateTree tree = templateRegistry.getTemplateTree();
-        List<Template> uberTemplates = tree.getRootTemplates();
-        if ( uberTemplates != null )
+        List<Template> templates = templateRegistry.getTemplateTree();
+
+        if ( templates.size() > 0 )
         {
-            for ( Template template : uberTemplates )
-            {
-                addChildren( tree, template );
-            }
-            return Response.ok().entity( GSON.toJson( uberTemplates ) ).build();
+            return Response.ok().entity( GSON.toJson( templates ) ).build();
         }
 
         return Response.status( Response.Status.NOT_FOUND ).build();
