@@ -82,6 +82,11 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response unregisterPeer( @QueryParam( "peerId" ) String peerId );
 
+    @PUT
+    @Path( "update" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response updatePeer( @QueryParam( "peer" ) String peer );
+
 
     @POST
     @Path( "container/quota" )

@@ -133,6 +133,16 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response updatePeer( String peer )
+    {
+        PeerInfo p = GSON.fromJson( peer, PeerInfo.class );
+        p.setIp( getRequestIp() );
+        peerManager.update( p );
+        return Response.ok( GSON.toJson( p ) ).build();
+    }
+
+
+    @Override
     public Response setQuota( final String hostId, final String quotaInfo )
     {
         try
