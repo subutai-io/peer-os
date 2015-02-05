@@ -463,4 +463,29 @@ public class RemotePeerImpl implements RemotePeer
             throw new PeerException( "Command timed out" );
         }
     }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof RemotePeerImpl ) )
+        {
+            return false;
+        }
+
+        final RemotePeerImpl that = ( RemotePeerImpl ) o;
+
+        return getId().equals( that.getId() );
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return getId().hashCode();
+    }
 }
