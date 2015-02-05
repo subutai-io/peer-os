@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
-import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.identity.impl.dao.RoleDataService;
 import org.safehaus.subutai.core.identity.impl.dao.UserDataService;
@@ -66,7 +65,7 @@ public class IdentityManagerImpl implements IdentityManager
         userDataService = new UserDataService( daoManager.getEntityManagerFactory() );
 
         checkDefaultUser( "karaf" );
-        //        checkDefaultUser( "admin" );
+        checkDefaultUser( "admin" );
         //        checkDefaultUser( "timur" );
 
         SecurityUtils.setSecurityManager( securityManager );
@@ -103,7 +102,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
 
 
-        String password = "karaf";
+        String password = "secret";
         String salt = getSimpleSalt( username );
         user = new UserEntity();
         user.setUsername( username );
@@ -113,17 +112,17 @@ public class IdentityManagerImpl implements IdentityManager
         user.setSalt( salt );
         user.addRole( adminRole );
         user.addRole( managerRole );
-        userDataService.persist(  user );
+        userDataService.persist( user );
         LOG.debug( String.format( "User: %s", user.getId() ) );
 
-//        User karafUser = userDataService.findByUsername( "karaf" );
-//        LOG.debug( String.format( "%s %s", karafUser.getUsername(), karafUser.getRoles() ) );
-//
-//        Role r = karafUser.getRoles().iterator().next();
-//        karafUser.removeRole( r );
-//        userDataService.update( karafUser );
-//        karafUser = userDataService.findByUsername( "karaf" );
-//        LOG.debug( String.format( "%s %s", karafUser.getUsername(), karafUser.getRoles() ) );
+        //        User karafUser = userDataService.findByUsername( "karaf" );
+        //        LOG.debug( String.format( "%s %s", karafUser.getUsername(), karafUser.getRoles() ) );
+        //
+        //        Role r = karafUser.getRoles().iterator().next();
+        //        karafUser.removeRole( r );
+        //        userDataService.update( karafUser );
+        //        karafUser = userDataService.findByUsername( "karaf" );
+        //        LOG.debug( String.format( "%s %s", karafUser.getUsername(), karafUser.getRoles() ) );
     }
 
 
