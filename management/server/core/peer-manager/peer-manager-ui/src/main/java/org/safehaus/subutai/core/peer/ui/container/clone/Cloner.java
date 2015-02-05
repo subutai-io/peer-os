@@ -20,6 +20,7 @@ import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
+import org.safehaus.subutai.core.peer.api.ResourceHostException;
 import org.safehaus.subutai.core.peer.ui.container.ContainerTree;
 import org.safehaus.subutai.core.peer.ui.container.executor.AgentExecutionEvent;
 import org.safehaus.subutai.core.peer.ui.container.executor.AgentExecutionEventType;
@@ -319,7 +320,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
                     {
                         serverMetrics.add( rh.getMetric() );
                     }
-                    catch ( PeerException e )
+                    catch ( ResourceHostException e )
                     {
                         show( e.toString() );
                     }

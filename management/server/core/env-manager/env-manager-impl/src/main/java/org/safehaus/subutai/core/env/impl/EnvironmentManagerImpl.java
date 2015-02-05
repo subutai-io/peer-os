@@ -5,8 +5,10 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 
 import org.safehaus.subutai.common.dao.DaoManager;
@@ -18,7 +20,10 @@ import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.ContainersDestructionResult;
+import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentEventListener;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
@@ -56,8 +61,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private final NetworkManager networkManager;
     private final TopologyBuilder topologyBuilder;
     private final ExecutorService executor = Executors.newCachedThreadPool();
+    private final String defaultDomain;
 
-    private Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
+    private final Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
 
     //************* DaoManager ******************
     private final DaoManager daoManager;
@@ -69,17 +75,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager,
-                                   final NetworkManager networkManager, final DaoManager daoManager )
+                                   final NetworkManager networkManager, final DaoManager daoManager,
+                                   final String defaultDomain )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( networkManager );
         Preconditions.checkNotNull( daoManager );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( defaultDomain ) );
 
         this.peerManager = peerManager;
         this.networkManager = networkManager;
         this.daoManager = daoManager;
-        this.topologyBuilder = new TopologyBuilder( templateRegistry, peerManager );
+        this.defaultDomain = defaultDomain;
+        this.topologyBuilder = new TopologyBuilder( templateRegistry, peerManager, defaultDomain );
     }
 
 
@@ -260,35 +269,66 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 {
                     environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-                    Set<ContainerHost> containers = Sets.newHashSet( environment.getContainerHosts() );
-                    for ( ContainerHost container : containers )
+                    Set<Peer> environmentPeers = Sets.newHashSet();
+
+                    for ( ContainerHost container : environment.getContainerHosts() )
+                    {
+                        environmentPeers.add( container.getPeer() );
+                    }
+
+                    ExecutorService executorService = Executors.newFixedThreadPool( environmentPeers.size() );
+
+                    Set<Future<ContainersDestructionResult>> futures = Sets.newHashSet();
+
+                    for ( Peer peer : environmentPeers )
+                    {
+                        futures.add(
+                                executorService.submit( new PeerEnvironmentDestructionTask( peer, environmentId ) ) );
+                    }
+
+                    Set<ContainersDestructionResult> results = Sets.newHashSet();
+
+                    for ( Future<ContainersDestructionResult> future : futures )
                     {
                         try
                         {
-                            ( ( EnvironmentContainerImpl ) container ).destroy();
-
-                            environment.removeContainer( container.getId() );
-
-                            notifyOnContainerDestroyed( environment, container.getId() );
+                            results.add( future.get() );
                         }
-                        catch ( PeerException e )
+                        catch ( ExecutionException | InterruptedException e )
                         {
-                            if ( forceMetadataRemoval )
-                            {
-                                exceptions.add( new EnvironmentDestructionException( e ) );
-                            }
-                            else
-                            {
-                                environment.setStatus( EnvironmentStatus.UNHEALTHY );
+                            exceptions.add( new EnvironmentDestructionException( e ) );
+                        }
+                    }
 
-                                throw new EnvironmentDestructionException( e );
+                    executorService.shutdown();
+
+                    for ( ContainersDestructionResult result : results )
+                    {
+                        if ( !Strings.isNullOrEmpty( result.getException() ) )
+                        {
+                            exceptions.add( new EnvironmentDestructionException( result.getException() ) );
+                        }
+                        if ( !CollectionUtil.isCollectionEmpty( result.getDestroyedContainersIds() ) )
+                        {
+                            for ( UUID containerId : result.getDestroyedContainersIds() )
+                            {
+                                environment.removeContainer( containerId );
+
+                                notifyOnContainerDestroyed( environment, containerId );
                             }
                         }
                     }
 
-                    removeEnvironment( environmentId );
+                    if ( forceMetadataRemoval || environment.getContainerHosts().isEmpty() )
+                    {
+                        removeEnvironment( environmentId );
+                    }
+                    else
+                    {
+                        environment.setStatus( EnvironmentStatus.UNHEALTHY );
+                    }
                 }
-                catch ( EnvironmentDestructionException | EnvironmentNotFoundException e )
+                catch ( EnvironmentNotFoundException e )
                 {
                     LOG.error( String.format( "Error destroying environment %s", environmentId ), e );
 
@@ -307,27 +347,26 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 semaphore.acquire();
 
-                if ( forceMetadataRemoval )
+                if ( !exceptions.isEmpty() )
                 {
-
-                    if ( !exceptions.isEmpty() )
-                    {
-                        throw new EnvironmentDestructionException(
-                                String.format( "There were errors while destroying environment: %s", exceptions ) );
-                    }
+                    throw new EnvironmentDestructionException(
+                            String.format( "There were errors while destroying environment: %s", exceptions ) );
                 }
-                else
+                else if ( resultHolder.getResult() != null )
                 {
-
-                    if ( resultHolder.getResult() != null )
-                    {
-                        throw resultHolder.getResult();
-                    }
+                    throw resultHolder.getResult();
                 }
             }
             catch ( InterruptedException e )
             {
                 throw new EnvironmentDestructionException( e );
+            }
+        }
+        else
+        {
+            if ( !exceptions.isEmpty() )
+            {
+                LOG.error( String.format( "There were errors while destroying environment: %s", exceptions ) );
             }
         }
     }
@@ -506,7 +545,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                             }
                         }
 
-
                         environment.removeContainer( containerHost.getId() );
 
                         notifyOnContainerDestroyed( environment, containerHost.getId() );
@@ -518,7 +556,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
                         throw new EnvironmentModificationException( e );
                     }
-
 
                     if ( environment.getContainerHosts().isEmpty() )
                     {
@@ -766,6 +803,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 throw new EnvironmentModificationException( e );
             }
         }
+    }
+
+
+    @Override
+    public String getDefaultDomainName()
+    {
+        return defaultDomain;
     }
 
 

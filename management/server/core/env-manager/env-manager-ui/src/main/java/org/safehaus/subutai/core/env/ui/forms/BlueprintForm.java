@@ -3,13 +3,12 @@ package org.safehaus.subutai.core.env.ui.forms;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.common.environment.Blueprint;
+import org.safehaus.subutai.common.environment.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
-import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.common.environment.Blueprint;
-import org.safehaus.subutai.common.environment.NodeGroup;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -213,8 +212,8 @@ public class BlueprintForm
 
     private Blueprint getSampleBlueprint()
     {
-        NodeGroup nodeGroup = new NodeGroup( "Sample node group", "master", Common.DEFAULT_DOMAIN_NAME, 2, 0, 0,
-                new PlacementStrategy( "ROUND_ROBIN" ) );
+        NodeGroup nodeGroup =
+                new NodeGroup( "Sample node group", "master", 2, 0, 0, new PlacementStrategy( "ROUND_ROBIN" ) );
         return new Blueprint( "Sample blueprint", Sets.newHashSet( nodeGroup ) );
     }
 
@@ -257,11 +256,12 @@ public class BlueprintForm
                             Notification.show( "Invalid node group name", Notification.Type.ERROR_MESSAGE );
                             return;
                         }
-                        else if ( Strings.isNullOrEmpty( nodeGroup.getDomainName() ) )
-                        {
-                            Notification.show( "Invalid domain name", Notification.Type.ERROR_MESSAGE );
-                            return;
-                        }
+                        //                        else if ( Strings.isNullOrEmpty( nodeGroup.getDomainName() ) )
+                        //                        {
+                        //                            Notification.show( "Invalid domain name", Notification.Type
+                        // .ERROR_MESSAGE );
+                        //                            return;
+                        //                        }
                         else if ( nodeGroup.getNumberOfContainers() <= 0 )
                         {
                             Notification.show( "Invalid number of containers", Notification.Type.ERROR_MESSAGE );

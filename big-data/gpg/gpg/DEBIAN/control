@@ -1,0 +1,8 @@
+Package: subutai-gpg
+Version: 1.1.0-1
+Architecture: amd64
+Maintainer: safehaus <safehaus.org>
+Depends: zlib1g-dev, make, libqt4-core, pinentry-curses
+Section: unknown
+Priority: extra
+Description: subutai gpg package
