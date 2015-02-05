@@ -4,7 +4,7 @@ package org.safehaus.subutai.core.identity.ui.tabs;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.PermissionGroup;
-import org.safehaus.subutai.core.identity.ui.tabs.forms.PermissionForm;
+import org.safehaus.subutai.core.identity.ui.tabs.subviews.PermissionForm;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
@@ -18,7 +18,7 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * Created by talas on 1/26/15.
  */
-public class PermissionsTab extends CustomComponent
+public class PermissionsTab extends CustomComponent implements TabCallback<Permission>
 {
     private IdentityManager identityManager;
 
@@ -54,7 +54,7 @@ public class PermissionsTab extends CustomComponent
 
         // Create a form for editing a selected or new item.
         // It is invisible until actually used.
-        final PermissionForm permissionForm = new PermissionForm();
+        final PermissionForm permissionForm = new PermissionForm( identityManager );
         permissionForm.setVisible( false );
 
         // When the user selects an item, show it in the form
@@ -72,7 +72,7 @@ public class PermissionsTab extends CustomComponent
                 permissionForm.setVisible( true );
                 Permission permission = ( Permission ) table.getValue();
                 permissionForm.setPermission( permission );
-                //                table.setData( null );
+                table.setData( null );
             }
         } );
         table.setSelectable( true );
@@ -102,6 +102,8 @@ public class PermissionsTab extends CustomComponent
                 //                // form.setVisibleItemProperties( new Object[] { "name" } );
                 //                form.setItemDataSource( beans.getItem( newPermission ) );
                 //                form.setVisible( true );
+                permissionForm.setPermission( null );
+                permissionForm.setVisible( true );
             }
         } );
 
@@ -200,5 +202,29 @@ public class PermissionsTab extends CustomComponent
         vlayout.addComponent( newBean );
 
         setCompositionRoot( vlayout );
+    }
+
+
+    @Override
+    public void savePermission( final Permission value )
+    {
+        //TODO populate data to table
+        identityManager.updatePermission( value );
+    }
+
+
+    @Override
+    public void removeOperation( final Permission value )
+    {
+        //TODO remove data from table
+        identityManager.deletePermission( value );
+    }
+
+
+    @Override
+    public void updatePermission( final Permission value )
+    {
+        //TODO refresh data from table
+        identityManager.updatePermission( value );
     }
 }

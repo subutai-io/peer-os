@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.identity.ui.tabs.forms;
+package org.safehaus.subutai.core.identity.ui.tabs.subviews;
 
 
 import java.util.EnumSet;
