@@ -277,14 +277,6 @@ public interface TemplateRegistry
 
 
     /**
-     * Returns templates in genealogical hierarchy
-     *
-     * @return - {@code TemplateTree}
-     */
-    public TemplateTree getTemplateTree();
-
-
-    /**
      * Returns list of all templates
      *
      * @return -list of {@code Template}
@@ -334,4 +326,7 @@ public interface TemplateRegistry
     public boolean checkTemplateDownloadToken( String token );
 
     public Pair<String, String> getChangedFileVersions( String branchA, String branchB, GitChangedFile file );
+
+
+    public List<Template> getTemplateTree();
 }

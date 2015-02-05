@@ -8,9 +8,6 @@ import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Template;
 
 
-/**
- * Created by talas on 10/28/14.
- */
 public interface TemplateService
 {
     public Template saveTemplate( Template templateClone ) throws DaoException;

@@ -7,7 +7,7 @@ package org.safehaus.subutai.common.protocol;
 
 
 /**
- * @author dilshat
+ * Used by classes needed to be disposed
  */
 public interface Disposable
 {

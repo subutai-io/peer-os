@@ -24,8 +24,6 @@ import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import com.google.common.cache.Cache;
 import com.google.common.collect.Sets;
 
-import junit.framework.Assert;
-
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertNotNull;

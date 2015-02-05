@@ -42,7 +42,7 @@ public class HostCloneTask extends HostTask<ResourceHost, CloneParam, HostCloneR
                         host.getHostname() ) );
                 result.fail( new ResourceHostException(
                         String.format( "Container %s on %s is not cloned in estimated timeout.", host.getHostname(),
-                                param.getHostname() ), "" ) );
+                                param.getHostname() ) ) );
                 getHost().fireEvent( new HostEvent( host, HostEvent.EventType.HOST_CLONE_FAIL, containerHost ) );
             }
         }
@@ -53,7 +53,7 @@ public class HostCloneTask extends HostTask<ResourceHost, CloneParam, HostCloneR
                     e );
             fail( new ResourceHostException(
                     String.format( "Error on cloning container %s on %s.", host.getHostname(), param.getHostname() ),
-                    e.toString() ) );
+                    e ) );
         }
     }
 

@@ -56,8 +56,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private final NetworkManager networkManager;
     private final TopologyBuilder topologyBuilder;
     private final ExecutorService executor = Executors.newCachedThreadPool();
+    private final String defaultDomain;
 
-    private Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
+    private final Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
 
     //************* DaoManager ******************
     private final DaoManager daoManager;
@@ -69,17 +70,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager,
-                                   final NetworkManager networkManager, final DaoManager daoManager )
+                                   final NetworkManager networkManager, final DaoManager daoManager,
+                                   final String defaultDomain )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( networkManager );
         Preconditions.checkNotNull( daoManager );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( defaultDomain ) );
 
         this.peerManager = peerManager;
         this.networkManager = networkManager;
         this.daoManager = daoManager;
-        this.topologyBuilder = new TopologyBuilder( templateRegistry, peerManager );
+        this.defaultDomain = defaultDomain;
+        this.topologyBuilder = new TopologyBuilder( templateRegistry, peerManager, defaultDomain );
     }
 
 
@@ -239,6 +243,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
 
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+        {
+            throw new EnvironmentDestructionException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
+
         final Semaphore semaphore = new Semaphore( 0 );
 
         final ResultHolder<EnvironmentDestructionException> resultHolder = new ResultHolder<>();
@@ -344,6 +354,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
 
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+        {
+            throw new EnvironmentModificationException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
+
         final Set<ContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
         final Set<ContainerHost> newContainers = Sets.newHashSet();
 
@@ -446,6 +462,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final EnvironmentImpl environment =
                 ( EnvironmentImpl ) findEnvironment( UUID.fromString( containerHost.getEnvironmentId() ) );
+
+
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+        {
+            throw new EnvironmentModificationException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
 
         try
         {
@@ -747,6 +770,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 throw new EnvironmentModificationException( e );
             }
         }
+    }
+
+
+    @Override
+    public String getDefaultDomainName()
+    {
+        return defaultDomain;
     }
 
 

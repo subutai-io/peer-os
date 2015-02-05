@@ -125,32 +125,27 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId ) throws PeerException
-    {
-        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(), "8181" );
-        return remotePeerRestClient.getContainerHostsByEnvironmentId( environmentId );
-    }
-
-
-    @Override
     public Set<HostInfoModel> scheduleCloneContainers( final UUID creatorPeerId, final List<Template> templates,
                                                        final int quantity, final String strategyId,
                                                        final List<Criteria> criteria ) throws PeerException
     {
 
-        CreateContainerResponse response =
-                sendRequest( new CreateContainerRequest( creatorPeerId, templates, quantity, strategyId, criteria ),
-                        RecipientType.CONTAINER_CREATE_REQUEST.name(), Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT,
-                        CreateContainerResponse.class, Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT );
-
-        if ( response != null )
-        {
-            return response.getHosts();
-        }
-        else
-        {
-            throw new PeerException( "Command timed out" );
-        }
+        //        CreateContainerResponse response =
+        //                sendRequest( new CreateContainerRequest( creatorPeerId, templates, quantity, strategyId,
+        // criteria ),
+        //                        RecipientType.CONTAINER_CREATE_REQUEST.name(), Timeouts
+        // .CREATE_CONTAINER_REQUEST_TIMEOUT,
+        //                        CreateContainerResponse.class, Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT );
+        //
+        //        if ( response != null )
+        //        {
+        //            return response.getHosts();
+        //        }
+        //        else
+        //        {
+        //            throw new PeerException( "Command timed out" );
+        //        }
+        return null;
     }
 
 
@@ -340,7 +335,8 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public ContainerHostState getContainerHostState( final String containerId ) throws PeerException
     {
-        throw new UnsupportedOperationException( "Not implemented yet." );
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+        return remotePeerRestClient.getContainerState( containerId );
     }
 
 
@@ -438,5 +434,28 @@ public class RemotePeerImpl implements RemotePeer
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
 
         remotePeerRestClient.setDiskQuota( containerId, diskQuota );
+    }
+
+
+    @Override
+    public Set<HostInfoModel> createContainers( final UUID environmentId, final UUID initiatorPeerId,
+                                                final UUID ownerId, final List<Template> templates,
+                                                final int numberOfContainers, final String strategyId,
+                                                final List<Criteria> criteria ) throws PeerException
+    {
+        CreateContainerResponse response = sendRequest(
+                new CreateContainerRequest( environmentId, initiatorPeerId, ownerId, templates, numberOfContainers,
+                        strategyId, criteria ), RecipientType.CONTAINER_CREATE_REQUEST.name(),
+                Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateContainerResponse.class,
+                Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT );
+
+        if ( response != null )
+        {
+            return response.getHosts();
+        }
+        else
+        {
+            throw new PeerException( "Command timed out" );
+        }
     }
 }

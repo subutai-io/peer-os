@@ -9,9 +9,7 @@ import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.peer.api.task.TaskParam;
 
 
-/**
- * Created by timur on 11/30/14.
- */
+
 public class CloneTaskParam extends TaskParam
 {
     private List<Template> templates;

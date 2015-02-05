@@ -33,10 +33,6 @@
       <artifactId>peer-manager-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.safehaus.subutai</groupId>
-      <artifactId>environment-manager-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>host-registry-api</artifactId>
     </dependency>

@@ -43,9 +43,9 @@ public interface LocalPeer extends Peer
     public ResourceHost getResourceHostByName( String hostname ) throws HostNotFoundException;
 
     public ResourceHost getResourceHostByContainerName( String containerName ) throws HostNotFoundException;
+
     public ResourceHost getResourceHostByContainerId( String hostId ) throws HostNotFoundException;
 
-    public ContainerHost getContainerHostImpl( HostKey hostKey );
 
     /**
      * Returns implementation of ContainerHost interface.
@@ -73,11 +73,7 @@ public interface LocalPeer extends Peer
      */
     public List<String> getTemplates();
 
-    void init();
-
-    void shutdown();
-
-    public void clean();
+    public void cleanDb();
 
     public ContainerHost createContainer( String hostName, String templateName, String cloneName, UUID envId )
             throws PeerException;
@@ -86,8 +82,26 @@ public interface LocalPeer extends Peer
 
     public String getFreeHostName( String prefix );
 
+    /**
+     * Returns container group by container id
+     *
+     * @param containerId - id of container
+     *
+     * @return - {@code ContainerGroup}
+     *
+     * @throws ContainerGroupNotFoundException - thrown if container is created not as a part of environment
+     */
+    public ContainerGroup findContainerGroupByContainerId( UUID containerId ) throws ContainerGroupNotFoundException;
 
-    //    Agent waitForAgent( String containerName, int timeout );
-
-    //    public void onPeerEvent( PeerEvent event );
+    /**
+     * Returns container group by environment id
+     *
+     * @param environmentId - id of environment
+     *
+     * @return - {@code ContainerGroup}
+     *
+     * @throws ContainerGroupNotFoundException - thrown if group is not found
+     */
+    public ContainerGroup findContainerGroupByEnvironmentId( UUID environmentId )
+            throws ContainerGroupNotFoundException;
 }

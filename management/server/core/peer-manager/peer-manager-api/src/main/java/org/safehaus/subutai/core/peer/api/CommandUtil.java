@@ -26,8 +26,9 @@ import com.google.common.collect.Maps;
 
 
 /**
- * Provide utility functions for command execution
+ * Provide utility functions for command execution Use analog class in Subutai Common package instead
  */
+@Deprecated
 public class CommandUtil
 {
     /**

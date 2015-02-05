@@ -1,16 +1,16 @@
 package org.safehaus.subutai.core.peer.api;
 
 
-public class ResourceHostException extends HostException
+public class ResourceHostException extends Exception
 {
-    public ResourceHostException( final String message, final String description )
+    public ResourceHostException( final String message )
     {
-        super( message, description );
+        super( message );
     }
 
 
-    public ResourceHostException( final String message )
+    public ResourceHostException( final String message, final Throwable cause )
     {
-        super( message, "" );
+        super( message, cause );
     }
 }

@@ -8,6 +8,8 @@ import org.safehaus.subutai.common.peer.ContainerHost;
 
 public interface SecurityManager
 {
+    public org.apache.shiro.mgt.SecurityManager getSecurityManager();
+
     public void configSshOnAgents( Set<ContainerHost> containers ) throws SecurityManagerException;
 
     public void addSshKeyToAuthorizedKeys( String sshKey, Set<ContainerHost> containerHosts )

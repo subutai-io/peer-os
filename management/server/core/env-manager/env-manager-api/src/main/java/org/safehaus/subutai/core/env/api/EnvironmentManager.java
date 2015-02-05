@@ -4,15 +4,15 @@ package org.safehaus.subutai.core.env.api;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.environment.Environment;
-import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.environment.Blueprint;
+import org.safehaus.subutai.common.environment.Environment;
+import org.safehaus.subutai.common.environment.EnvironmentModificationException;
+import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.Topology;
+import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
-import org.safehaus.subutai.common.environment.EnvironmentModificationException;
-import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 
 
 /**
@@ -129,4 +129,7 @@ public interface EnvironmentManager
     public void removeBlueprint( UUID blueprintId ) throws EnvironmentManagerException;
 
     public Set<Blueprint> getBlueprints() throws EnvironmentManagerException;
+
+
+    public String getDefaultDomainName();
 }

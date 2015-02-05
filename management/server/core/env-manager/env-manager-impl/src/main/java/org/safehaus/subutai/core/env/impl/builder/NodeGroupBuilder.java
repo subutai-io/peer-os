@@ -6,18 +6,20 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
+import org.safehaus.subutai.common.environment.NodeGroup;
 import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.common.environment.NodeGroup;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
+import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.NodeGroupBuildException;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -25,27 +27,34 @@ import com.google.common.collect.Sets;
 /**
  * Creates node groups on a peer
  */
-public class NodeGroupBuilder implements Callable<Set<EnvironmentContainerImpl>>
+public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
 {
 
+    private final EnvironmentImpl environment;
     private final TemplateRegistry templateRegistry;
     private final PeerManager peerManager;
     private final Peer peer;
     private final Set<NodeGroup> nodeGroups;
+    private final String defaultDomain;
 
 
-    public NodeGroupBuilder( final TemplateRegistry templateRegistry, final PeerManager peerManager, final Peer peer,
-                             final Set<NodeGroup> nodeGroups )
+    public NodeGroupBuilder( final EnvironmentImpl environment, final TemplateRegistry templateRegistry,
+                             final PeerManager peerManager, final Peer peer, final Set<NodeGroup> nodeGroups,
+                             final String defaultDomain )
     {
+        Preconditions.checkNotNull( environment );
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( peer );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( nodeGroups ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( defaultDomain ) );
 
+        this.environment = environment;
         this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
         this.peer = peer;
         this.nodeGroups = nodeGroups;
+        this.defaultDomain = defaultDomain;
     }
 
 
@@ -82,43 +91,51 @@ public class NodeGroupBuilder implements Callable<Set<EnvironmentContainerImpl>>
 
 
     @Override
-    public Set<EnvironmentContainerImpl> call() throws NodeGroupBuildException
+    public Set<NodeGroupBuildResult> call() throws NodeGroupBuildException
     {
 
-        Set<EnvironmentContainerImpl> containers = Sets.newHashSet();
-
-        UUID localPeerId = peerManager.getLocalPeer().getId();
+        Set<NodeGroupBuildResult> results = Sets.newHashSet();
+        LocalPeer localPeer = peerManager.getLocalPeer();
 
         for ( NodeGroup nodeGroup : nodeGroups )
         {
+            NodeGroupBuildException exception = null;
+            Set<EnvironmentContainerImpl> containers = Sets.newHashSet();
+
             try
             {
-                //TODO revise peer container cloning:
-                // 1) add batch set<nodeGroup> cloning
-                // 2) replace creatorPeerId with ownerId or remove at all
-                // 3) review template sharing and parameter passing
 
-
-                Set<HostInfoModel> newHosts = peer.scheduleCloneContainers( localPeerId,
-                        fetchRequiredTemplates( peer.getId(), nodeGroup.getTemplateName() ),
-                        nodeGroup.getNumberOfContainers(), nodeGroup.getContainerPlacementStrategy().getStrategyId(),
-                        nodeGroup.getContainerPlacementStrategy().getCriteriaAsList() );
+                Set<HostInfoModel> newHosts =
+                        peer.createContainers( environment.getId(), localPeer.getId(), localPeer.getOwnerId(),
+                                fetchRequiredTemplates( peer.getId(), nodeGroup.getTemplateName() ),
+                                nodeGroup.getNumberOfContainers(),
+                                nodeGroup.getContainerPlacementStrategy().getStrategyId(),
+                                nodeGroup.getContainerPlacementStrategy().getCriteriaAsList() );
 
 
                 for ( HostInfoModel newHost : newHosts )
                 {
-                    containers.add( new EnvironmentContainerImpl( localPeerId, peer, nodeGroup.getName(), newHost,
+                    containers.add( new EnvironmentContainerImpl( localPeer.getId(), peer, nodeGroup.getName(), newHost,
                             templateRegistry.getTemplate( nodeGroup.getTemplateName() ), nodeGroup.getSshGroupId(),
-                            nodeGroup.getHostsGroupId(), nodeGroup.getDomainName() ) );
+                            nodeGroup.getHostsGroupId(), defaultDomain) );
+                }
+
+
+                if ( containers.size() < nodeGroup.getNumberOfContainers() )
+                {
+                    exception = new NodeGroupBuildException( String.format( "Requested %d but created only %d containers",
+                            nodeGroup.getNumberOfContainers(), containers.size() ), null );
                 }
             }
-            catch ( PeerException e )
+            catch ( Exception e )
             {
-                throw new NodeGroupBuildException(
+                exception = new NodeGroupBuildException(
                         String.format( "Error creating node group %s on peer %s", nodeGroup, peer ), e );
             }
+
+            results.add( new NodeGroupBuildResult( containers, exception ) );
         }
 
-        return containers;
+        return results;
     }
 }

@@ -14,13 +14,13 @@ public class NodeGroup
 {
     private String name;
     private String templateName;
-    private String domainName;
     private int numberOfContainers;
     private int sshGroupId;
     private int hostsGroupId;
     private PlacementStrategy containerPlacementStrategy;
 
 
+    @Deprecated
     public NodeGroup( final String name, final String templateName, final String domainName,
                       final int numberOfContainers, final int sshGroupId, final int hostsGroupId,
                       final PlacementStrategy containerPlacementStrategy )
@@ -34,7 +34,24 @@ public class NodeGroup
 
         this.name = name;
         this.templateName = templateName;
-        this.domainName = domainName;
+        this.numberOfContainers = numberOfContainers;
+        this.sshGroupId = sshGroupId;
+        this.hostsGroupId = hostsGroupId;
+        this.containerPlacementStrategy = containerPlacementStrategy;
+    }
+
+
+    public NodeGroup( final String name, final String templateName, final int numberOfContainers, final int sshGroupId,
+                      final int hostsGroupId, final PlacementStrategy containerPlacementStrategy )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid node group name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
+        Preconditions.checkArgument( numberOfContainers > 0, "Number of containers must be greater than 0" );
+        Preconditions.checkNotNull( containerPlacementStrategy, "Invalid container placement strategy" );
+
+
+        this.name = name;
+        this.templateName = templateName;
         this.numberOfContainers = numberOfContainers;
         this.sshGroupId = sshGroupId;
         this.hostsGroupId = hostsGroupId;
@@ -63,12 +80,6 @@ public class NodeGroup
     public PlacementStrategy getContainerPlacementStrategy()
     {
         return containerPlacementStrategy;
-    }
-
-
-    public String getDomainName()
-    {
-        return domainName;
     }
 
 
