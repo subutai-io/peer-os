@@ -23,9 +23,6 @@ import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
 
 
-/**
- * Created by timur on 11/5/14.
- */
 @Ignore
 @RunWith( MockitoJUnitRunner.class )
 public class LocalPeerImplTest
@@ -61,7 +58,7 @@ public class LocalPeerImplTest
     @Before
     public void setup()
     {
-        peerManager = new PeerManagerImpl(  messenger );
+        peerManager = new PeerManagerImpl( messenger );
         //        peerManager.init();
     }
 
@@ -70,8 +67,8 @@ public class LocalPeerImplTest
     public void testBindHostShouldFailOnNotExistenceHost() throws PeerException
     {
         LocalPeerImpl localPeer =
-                new LocalPeerImpl( peerManager, templateRegistry, peerDAO, quotaManager, strategyManager, null,
-                        commandExecutor, hostRegistry, monitor );
+                new LocalPeerImpl( peerManager, templateRegistry, quotaManager, strategyManager, null, commandExecutor,
+                        hostRegistry, monitor );
 
         localPeer.bindHost( UUID.randomUUID().toString() );
     }

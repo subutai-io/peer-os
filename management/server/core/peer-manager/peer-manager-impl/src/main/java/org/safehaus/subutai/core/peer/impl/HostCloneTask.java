@@ -28,55 +28,63 @@ public class HostCloneTask extends HostTask<ResourceHost, CloneParam, HostCloneR
         try
         {
             host.prepareTemplates( getParameter().getTemplates() );
-            host.cloneContainer( getParameter().getTemplateName(), getParameter().getHostname() );
-            ContainerHost containerHost = waitContainerHost( param.getHostname(), 180 );
-            if ( containerHost != null )
-            {
-                LOG.info( String.format( "Container %s with id %s on %s cloned successfully.", param.getHostname(),
-                        containerHost.getId(), host.getHostname() ) );
-                result.ok( containerHost );
-            }
-            else
-            {
-                LOG.debug( String.format( "Cloning container %s on %s failed.", param.getHostname(),
-                        host.getHostname() ) );
-                result.fail( new ResourceHostException(
-                        String.format( "Container %s on %s is not cloned in estimated timeout.", host.getHostname(),
-                                param.getHostname() ) ) );
-                getHost().fireEvent( new HostEvent( host, HostEvent.EventType.HOST_CLONE_FAIL, containerHost ) );
-            }
+            //            host.cloneContainer( getParameter().getTemplateName(), getParameter().getHostname() );
+            ContainerHost containerHost =
+                    host.createContainer( getParameter().getTemplateName(), getParameter().getHostname(),
+                            180 );//waitContainerHost( param.getHostname(), 180 );
+            //            if ( containerHost != null )
+            //            {
+            LOG.info( String.format( "Container %s with id %s on %s cloned successfully.", param.getHostname(),
+                    containerHost.getId(), host.getHostname() ) );
+            result.ok( containerHost );
+            //            }
+            //            else
+            //            {
+            //                LOG.debug( String.format( "Cloning container %s on %s failed.", param.getHostname(),
+            //                        host.getHostname() ) );
+            //                result.fail( new ResourceHostException(
+            //                        String.format( "Container %s on %s is not cloned in estimated timeout.", host
+            // .getHostname(),
+            //                                param.getHostname() ) ) );
+            //                getHost().fireEvent( new HostEvent( host, HostEvent.EventType.HOST_CLONE_FAIL,
+            // containerHost ) );
+            //            }
         }
 
         catch ( Exception e )
         {
             LOG.debug( String.format( "Cloning container %s on %s failed.", param.getHostname(), host.getHostname() ),
                     e );
+            result.fail( new ResourceHostException(
+                    String.format( "Container %s on %s is not cloned in estimated timeout.", host.getHostname(),
+                            param.getHostname() ) ) );
             fail( new ResourceHostException(
                     String.format( "Error on cloning container %s on %s.", host.getHostname(), param.getHostname() ),
                     e ) );
+            getHost().fireEvent( new HostEvent( host, HostEvent.EventType.HOST_CLONE_FAIL, null ) );
         }
     }
 
 
-    private ContainerHost waitContainerHost( final String hostname, final int timeout )
-    {
-        long threshold = System.currentTimeMillis() + timeout * 1000;
-        LOG.debug( String.format( "Waiting for container %s on %s.", hostname, getHost().getHostname() ) );
-        ContainerHost containerHost;
-        do
-        {
-            try
-            {
-                Thread.sleep( 2000 );
-            }
-            catch ( InterruptedException ignore )
-            {
-            }
-            containerHost = host.getContainerHostByName( hostname );
-        }
-        while ( threshold > System.currentTimeMillis() && containerHost == null );
-        return containerHost;
-    }
+    //    private ContainerHost waitContainerHost( final String hostname, final int timeout )
+    //    {
+    //        long threshold = System.currentTimeMillis() + timeout * 1000;
+    //        LOG.debug( String.format( "Waiting for container %s on %s.", hostname, getHost().getHostname() ) );
+    //        ContainerHost containerHost;
+    //        do
+    //        {
+    //            try
+    //            {
+    //                Thread.sleep( 2000 );
+    //            }
+    //            catch ( InterruptedException ignore )
+    //            {
+    //            }
+    //            containerHost = host.getContainerHostByName( hostname );
+    //        }
+    //        while ( threshold > System.currentTimeMillis() && containerHost == null );
+    //        return containerHost;
+    //    }
 
 
     @Override
