@@ -24,5 +24,15 @@ public interface IdentityManager
     public boolean addUser( String username, String fullname, String password, String email );
 
     public String getUserKey( String username );
+
+    public List<Permission> getAllPermissions();
+
+    public Permission createPermission( String permissionName, PermissionGroup permissionGroup, String description );
+
+    public boolean updatePermission( Permission permission );
+
+    public Permission getPermission( String name, PermissionGroup permissionGroup );
+
+    public boolean deletePermission( Permission permission );
 }
 

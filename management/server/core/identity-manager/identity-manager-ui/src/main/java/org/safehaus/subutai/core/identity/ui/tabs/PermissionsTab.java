@@ -1,6 +1,9 @@
 package org.safehaus.subutai.core.identity.ui.tabs;
 
 
+import org.safehaus.subutai.core.identity.api.IdentityManager;
+import org.safehaus.subutai.core.identity.api.Permission;
+
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
@@ -23,8 +26,12 @@ import com.vaadin.ui.VerticalLayout;
  */
 public class PermissionsTab extends CustomComponent
 {
-    public PermissionsTab()
+    private IdentityManager identityManager;
+
+
+    public PermissionsTab( final IdentityManager identityManager )
     {
+        this.identityManager = identityManager;
         editorForm();
         // TODO still need some modifications
     }
@@ -35,13 +42,11 @@ public class PermissionsTab extends CustomComponent
         VerticalLayout vlayout = new VerticalLayout();
 
         // Create a container for such beans
-        final BeanItemContainer<Permission> beans = new BeanItemContainer<>( Permission.class );
-
         // Add some beans to it
         //TODO need to retrieve all permissions from db.
-        beans.addBean( new Permission( "CRUD permissions" ) );
-        beans.addBean( new Permission( "Read permissions" ) );
-        beans.addBean( new Permission( "Update permissions" ) );
+        final BeanItemContainer<Permission> beans =
+                new BeanItemContainer<>( Permission.class, identityManager.getAllPermissions() );
+
 
         // A layout for the table and form
         HorizontalLayout layout = new HorizontalLayout();
@@ -92,22 +97,22 @@ public class PermissionsTab extends CustomComponent
         {
             public void buttonClick( Button.ClickEvent event )
             {
-                Permission newPermission = new Permission( "Some permission" );
-                // Create a new item; this will create a new bean
-                Object itemId = beans.addItem( newPermission );
-
-                // The form was opened for editing a new item
-                table.setData( itemId );
-
-                table.select( itemId );
-                table.setEnabled( false );
-                newBean.setEnabled( false );
-
-                // Make the form a bit nicer
-                //this is an example for future how to improve UI
-                // form.setVisibleItemProperties( new Object[] { "name" } );
-                form.setItemDataSource( beans.getItem( newPermission ) );
-                form.setVisible( true );
+                //                Permission newPermission = new Permission( "Some permission" );
+                //                // Create a new item; this will create a new bean
+                //                Object itemId = beans.addItem( newPermission );
+                //
+                //                // The form was opened for editing a new item
+                //                table.setData( itemId );
+                //
+                //                table.select( itemId );
+                //                table.setEnabled( false );
+                //                newBean.setEnabled( false );
+                //
+                //                // Make the form a bit nicer
+                //                //this is an example for future how to improve UI
+                //                // form.setVisibleItemProperties( new Object[] { "name" } );
+                //                form.setItemDataSource( beans.getItem( newPermission ) );
+                //                form.setVisible( true );
             }
         } );
 

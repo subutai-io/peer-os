@@ -8,9 +8,14 @@ import java.util.List;
 import org.osgi.framework.BundleContext;
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
+import org.safehaus.subutai.core.identity.api.Permission;
+import org.safehaus.subutai.core.identity.api.PermissionGroup;
 import org.safehaus.subutai.core.identity.api.User;
+import org.safehaus.subutai.core.identity.impl.dao.PermissionDataService;
 import org.safehaus.subutai.core.identity.impl.dao.RoleDataService;
 import org.safehaus.subutai.core.identity.impl.dao.UserDataService;
+import org.safehaus.subutai.core.identity.impl.entity.PermissionEntity;
+import org.safehaus.subutai.core.identity.impl.entity.PermissionPK;
 import org.safehaus.subutai.core.identity.impl.entity.RoleEntity;
 import org.safehaus.subutai.core.identity.impl.entity.UserEntity;
 import org.slf4j.Logger;
@@ -22,6 +27,8 @@ import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.SimpleByteSource;
+
+import com.google.common.collect.Lists;
 
 
 /**
@@ -38,6 +45,7 @@ public class IdentityManagerImpl implements IdentityManager
     private BundleContext bundleContext;
     private SecurityManager securityManager;
     private UserDataService userDataService;
+    private PermissionDataService permissionDataService;
 
 
     //    public IdentityManagerImpl()
@@ -93,6 +101,7 @@ public class IdentityManagerImpl implements IdentityManager
         //        r.setRealm( subutaiJdbcRealm );
 
         userDataService = new UserDataService( daoManager.getEntityManagerFactory() );
+        permissionDataService = new PermissionDataService( daoManager.getEntityManagerFactory() );
 
         checkDefaultUser( "karaf" );
         checkDefaultUser( "admin" );
@@ -218,6 +227,54 @@ public class IdentityManagerImpl implements IdentityManager
     {
         User user = userDataService.findByUsername( username );
         return user.getKey();
+    }
+
+
+    @Override
+    public List<Permission> getAllPermissions()
+    {
+        List<Permission> permissions = Lists.newArrayList();
+        permissions.addAll( permissionDataService.getAll() );
+        return permissions;
+    }
+
+
+    @Override
+    public Permission createPermission( final String permissionName, final PermissionGroup permissionGroup,
+                                        final String description )
+    {
+        return new PermissionEntity( permissionName, permissionGroup, description );
+    }
+
+
+    @Override
+    public boolean updatePermission( final Permission permission )
+    {
+        if ( !( permission instanceof PermissionEntity ) )
+        {
+            return false;
+        }
+        permissionDataService.update( ( PermissionEntity ) permission );
+        return true;
+    }
+
+
+    @Override
+    public Permission getPermission( final String name, final PermissionGroup permissionGroup )
+    {
+        return permissionDataService.find( new PermissionPK( name, permissionGroup ) );
+    }
+
+
+    @Override
+    public boolean deletePermission( final Permission permission )
+    {
+        if ( !( permission instanceof PermissionEntity ) )
+        {
+            return false;
+        }
+        permissionDataService.remove( new PermissionPK( permission.getName(), permission.getPermissionGroup() ) );
+        return true;
     }
 
 

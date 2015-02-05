@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.identity.ui.tabs;
 
 
 import org.safehaus.subutai.common.protocol.Disposable;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
@@ -16,18 +17,19 @@ public class RoleManagementForm extends CustomComponent implements Disposable
 {
     //Permissions
     //Roles associated with permissions
+    private IdentityManager identityManager;
 
 
-
-    public RoleManagementForm()
+    public RoleManagementForm( IdentityManager identityManager )
     {
+        this.identityManager = identityManager;
         setHeight( 100, Unit.PERCENTAGE );
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing( true );
         verticalLayout.setSizeFull();
 
-        PermissionsTab permissionsTab = new PermissionsTab();
+        PermissionsTab permissionsTab = new PermissionsTab( this.identityManager );
         RolesTab rolesTab = new RolesTab();
 
         TabSheet sheet = new TabSheet();

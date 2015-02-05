@@ -3,6 +3,10 @@ package org.safehaus.subutai.core.identity.impl.entity;
 
 import java.io.Serializable;
 
+import org.safehaus.subutai.core.identity.api.PermissionGroup;
+
+import com.google.common.base.Preconditions;
+
 
 /**
  * Created by talas on 2/4/15.
@@ -10,7 +14,7 @@ import java.io.Serializable;
 
 public class PermissionPK implements Serializable
 {
-    private String permissionKey;
+    private String name;
     private PermissionGroup permissionGroup;
 
 
@@ -21,14 +25,16 @@ public class PermissionPK implements Serializable
 
     public PermissionPK( final String permissionKey, final PermissionGroup permissionGroup )
     {
-        this.permissionKey = permissionKey;
+        Preconditions.checkNotNull( permissionKey, "Permission Name cannot be null value." );
+        Preconditions.checkNotNull( permissionGroup, "Ya know it's not applicable to set permissionGroup to null" );
+        this.name = permissionKey;
         this.permissionGroup = permissionGroup;
     }
 
 
     public String getPermissionKey()
     {
-        return permissionKey;
+        return name;
     }
 
 
@@ -52,14 +58,14 @@ public class PermissionPK implements Serializable
 
         final PermissionPK that = ( PermissionPK ) o;
 
-        return permissionGroup == that.permissionGroup && permissionKey.equals( that.permissionKey );
+        return permissionGroup == that.permissionGroup && name.equals( that.name );
     }
 
 
     @Override
     public int hashCode()
     {
-        int result = permissionKey.hashCode();
+        int result = name.hashCode();
         result = 31 * result + permissionGroup.hashCode();
         return result;
     }

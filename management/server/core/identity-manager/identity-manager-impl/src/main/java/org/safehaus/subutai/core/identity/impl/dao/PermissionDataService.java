@@ -5,37 +5,46 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.safehaus.subutai.common.protocol.api.DataService;
-import org.safehaus.subutai.core.identity.impl.entity.Permission;
-import org.safehaus.subutai.core.identity.impl.entity.PermissionGroup;
+import org.safehaus.subutai.core.identity.api.PermissionGroup;
+import org.safehaus.subutai.core.identity.impl.entity.PermissionEntity;
 import org.safehaus.subutai.core.identity.impl.entity.PermissionPK;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 
 /**
  * Created by talas on 2/5/15.
  */
-public class PermissionsDataService implements DataService<PermissionPK, Permission>
+public class PermissionDataService implements DataService<PermissionPK, PermissionEntity>
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( PermissionsDataService.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( PermissionDataService.class );
     private EntityManagerFactory emf;
 
 
-    @Override
-    public List<Permission> getAll()
+    public PermissionDataService( final EntityManagerFactory emf )
     {
-        List<Permission> result = Lists.newArrayList();
+        Preconditions.checkNotNull( emf, "Please provide valid entity manager factory for Permissions data service" );
+        this.emf = emf;
+    }
+
+
+    @Override
+    public List<PermissionEntity> getAll()
+    {
+        List<PermissionEntity> result = Lists.newArrayList();
         EntityManager em = emf.createEntityManager();
 
         try
         {
             em.getTransaction().begin();
-            result = em.createQuery( "SELECT p FROM Permission p", Permission.class ).getResultList();
+            result = em.createQuery( "SELECT p FROM PermissionEntity p", PermissionEntity.class ).getResultList();
             em.getTransaction().commit();
         }
         catch ( Exception e )
@@ -55,17 +64,17 @@ public class PermissionsDataService implements DataService<PermissionPK, Permiss
     }
 
 
-    public List<Permission> getAllByPermissionGroup( PermissionGroup permissionGroup )
+    public List<PermissionEntity> getAllByPermissionGroup( PermissionGroup permissionGroup )
     {
-        List<Permission> result = Lists.newArrayList();
+        List<PermissionEntity> result = Lists.newArrayList();
         EntityManager em = emf.createEntityManager();
 
         try
         {
             em.getTransaction().begin();
-            TypedQuery<Permission> query =
-                    em.createQuery( "SELECT p FROM Permission p WHERE p.permissionGroup = :permissionGroup",
-                            Permission.class );
+            TypedQuery<PermissionEntity> query =
+                    em.createQuery( "SELECT p FROM PermissionEntity p WHERE p.permissionGroup = :permissionGroup",
+                            PermissionEntity.class );
             query.setParameter( "permissionGroup", permissionGroup );
             result = query.getResultList();
             em.getTransaction().commit();
@@ -88,21 +97,21 @@ public class PermissionsDataService implements DataService<PermissionPK, Permiss
 
 
     @Override
-    public Permission find( final PermissionPK id )
+    public PermissionEntity find( final PermissionPK id )
     {
-        Permission result = null;
+        PermissionEntity result = null;
         EntityManager em = emf.createEntityManager();
 
         try
         {
             em.getTransaction().begin();
-            TypedQuery<Permission> query = em.createQuery(
-                    "SELECT p FROM Permission p WHERE p.permissionKey = :permissionKey AND p.permissionGroup = "
-                            + ":permissionGroup", Permission.class );
-            query.setParameter( "permissionKey", id.getPermissionKey() );
+            TypedQuery<PermissionEntity> query = em.createQuery(
+                    "SELECT p FROM PermissionEntity p WHERE p.name = :name AND p.permissionGroup = "
+                            + ":permissionGroup", PermissionEntity.class );
+            query.setParameter( "name", id.getPermissionKey() );
             query.setParameter( "permissionGroup", id.getPermissionGroup() );
 
-            List<Permission> permissions = query.getResultList();
+            List<PermissionEntity> permissions = query.getResultList();
             if ( permissions.size() > 0 )
             {
                 result = permissions.iterator().next();
@@ -127,7 +136,7 @@ public class PermissionsDataService implements DataService<PermissionPK, Permiss
 
 
     @Override
-    public void persist( final Permission item )
+    public void persist( final PermissionEntity item )
     {
         EntityManager em = emf.createEntityManager();
         try
@@ -136,6 +145,7 @@ public class PermissionsDataService implements DataService<PermissionPK, Permiss
             em.persist( item );
             em.flush();
             em.getTransaction().commit();
+            em.detach( item );
         }
         catch ( Exception e )
         {
@@ -158,10 +168,14 @@ public class PermissionsDataService implements DataService<PermissionPK, Permiss
         EntityManager em = emf.createEntityManager();
         try
         {
-            Permission permission = find( id );
+            PermissionEntity permission = find( id );
             em.getTransaction().begin();
 
-            em.remove( permission );
+            Query query = em.createQuery( "DELETE FROM PermissionEntity p WHERE p.name = :name AND p.permissionGroup = "
+                            + ":permissionGroup" );
+            query.setParameter( "name", id.getPermissionKey() );
+            query.setParameter( "permissionGroup", id.getPermissionGroup() );
+            query.executeUpdate();
 
             em.getTransaction().commit();
         }
@@ -181,7 +195,7 @@ public class PermissionsDataService implements DataService<PermissionPK, Permiss
 
 
     @Override
-    public void update( final Permission item )
+    public void update( final PermissionEntity item )
     {
         EntityManager em = emf.createEntityManager();
         try

@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.identity.impl.entity;
+package org.safehaus.subutai.core.identity.api;
 
 
 /**

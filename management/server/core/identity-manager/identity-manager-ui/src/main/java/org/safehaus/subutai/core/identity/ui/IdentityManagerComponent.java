@@ -38,7 +38,7 @@ public class IdentityManagerComponent extends CustomComponent implements Disposa
         userManagementForm = new UserManagementForm( identityManager );
         userRegistrationForm = new UserRegistrationForm( identityManager );
         userRegistrationForm.init();
-        roleManagementForm = new RoleManagementForm();
+        roleManagementForm = new RoleManagementForm( identityManager );
 
         sheet.addTab( userManagementForm, "User management space." );
         sheet.getTab( 0 ).setId( "UserManagement" );

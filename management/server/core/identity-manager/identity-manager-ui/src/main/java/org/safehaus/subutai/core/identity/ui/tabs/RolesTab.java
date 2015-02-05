@@ -3,6 +3,8 @@ package org.safehaus.subutai.core.identity.ui.tabs;
 
 import java.io.Serializable;
 
+import org.safehaus.subutai.core.identity.api.Permission;
+
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -81,9 +83,9 @@ public class RolesTab extends CustomComponent
 
         // Add some beans to it
         //TODO need to retrieve all roles from db.
-        beans.addBean( new Role( "Admin", new Permission( "CRUD operations" ) ) );
-        beans.addBean( new Role( "User", new Permission( "Read permissions" ) ) );
-        beans.addBean( new Role( "Spartan", new Permission( "Root permissions" ) ) );
+        //        beans.addBean( new Role( "Admin", new Permission( "CRUD operations" ) ) );
+        //        beans.addBean( new Role( "User", new Permission( "Read permissions" ) ) );
+        //        beans.addBean( new Role( "Spartan", new Permission( "Root permissions" ) ) );
 
         // A layout for the table and form
         HorizontalLayout layout = new HorizontalLayout();
@@ -157,23 +159,23 @@ public class RolesTab extends CustomComponent
         {
             public void buttonClick( Button.ClickEvent event )
             {
-                Role newRole = new Role( "Some role", new Permission( "" ) );
-                // Create a new item; this will create a new bean
-                Object itemId = beans.addItem( newRole );
-
-                // The form was opened for editing a new item
-                table.setData( itemId );
-
-                table.select( itemId );
-                table.setEnabled( false );
-                newBean.setEnabled( false );
-
-                //TODO need to remove Form and use FieldGroup instead
-                // Make the form a bit nicer
-                //this is an example for future how to improve UI
-                //                form.setVisibleItemProperties( new Object[] { "name" } );
-                //                form.setItemDataSource( beans.getItem( newRole ) );
-                form.setVisible( true );
+                //                Role newRole = new Role( "Some role", new Permission( "" ) );
+                //                // Create a new item; this will create a new bean
+                //                Object itemId = beans.addItem( newRole );
+                //
+                //                // The form was opened for editing a new item
+                //                table.setData( itemId );
+                //
+                //                table.select( itemId );
+                //                table.setEnabled( false );
+                //                newBean.setEnabled( false );
+                //
+                //                //TODO need to remove Form and use FieldGroup instead
+                //                // Make the form a bit nicer
+                //                //this is an example for future how to improve UI
+                //                //                form.setVisibleItemProperties( new Object[] { "name" } );
+                //                //                form.setItemDataSource( beans.getItem( newRole ) );
+                //                form.setVisible( true );
             }
         } );
 
