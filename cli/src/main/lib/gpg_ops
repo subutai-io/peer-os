@@ -475,3 +475,34 @@ del_subkey_with_index(){
                                                   --no-tty --status-fd --verbose \
                                                   --edit-key $key_id > /dev/null 2>&1
 }
+
+
+# if not key is supplied while signing other keys,
+# the first key (the upmost key listed with "gpg2 -k" 
+# command) is used to sign other keys.
+get_default_signer_key(){
+  echo `gpg2 -k | grep "^pub" | head -1 | grep 'pub' | cut -d "/" -f2 | cut -d " " -f1`
+}
+
+
+# check if the key is signed by signer key id
+# parameters
+#  1) signer key id 
+#  2) key id which is going to be signed
+is_signed(){
+  if [ $# == 2 ]; then
+    signer=$1
+    assert_key_exists_private_key_ring $signer
+    key_to_be_signed=$2
+    assert_key_exists $key_to_be_signed
+    output=`gpg2 --list-sigs $key_to_be_signed | grep $signer`
+    if [[ -z $output ]];then
+      echo "false"
+    else
+      echo "true"
+    fi
+  else
+    msg_error "is_signed method should have two arguments"
+  fi
+}
+

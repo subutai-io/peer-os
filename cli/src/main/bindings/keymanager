@@ -11,6 +11,7 @@ function key_manager_usage {
   echo "  "subutai keymanager list key_id
   echo "  "subutai keymanager revoke_subkey subkey_id
   echo "  "subutai keymanager del_subkey subkey_id
+  echo "  "subutai keymanager sign_key \<signer key id\> key_id_to_be_signed
   echo -----------------------------------------------------------------------
 }
 
@@ -258,8 +259,6 @@ sign(){
 }
 
 
-# FIXME: before signing key check if key is already signed
-#        with signer key (write a funtion in gpg_ops assert_key_sig)
 # signs the key
 # parameters:
 #  1) signer key (optional)
@@ -272,17 +271,21 @@ sign_key(){
   fi
 
   if [ $# == 1 ]; then
+    signer=`get_default_signer_key`
     key_to_be_signed=$1
     assert_key_exists $key_to_be_signed
-    gpg2 --yes --batch --sign-key $key_to_be_signed >> /dev/null 2>&1 
-    msg_info "signing key $key_to_be_signed"
   elif [ $# == 2 ]; then
     signer=$1
     assert_key_exists_private_key_ring $signer
     key_to_be_signed=$2
     assert_key_exists $key_to_be_signed
+  fi
+
+  if [[ "true" == `is_signed $signer $key_to_be_signed` ]]; then
+    msg_info "key $key_to_be_signed is already signed by $signer"
+  else
     gpg2 -u $signer --yes --batch --sign-key $key_to_be_signed >> /dev/null 2>&1
-    msg_info "signing key $key_to_be_signed with key $signer"
+    msg_ok "signing key $key_to_be_signed with key $signer"
   fi
 }
 
