@@ -1,0 +1,477 @@
+#!/bin/bash
+
+# --------------------------------------------------------------------------
+# Bunch-O GnuGP key related operations
+# --------------------------------------------------------------------------
+
+# checks if the given key_id exists in private keyring
+# parameters:
+#   1) key id
+assert_key_exists_private_key_ring(){
+  key_id=$1
+  if [ -z $key_id ];then
+    msg_error "missing key id "
+    exit 1
+  fi
+  all_secs=$(echo `gpg2 --list-secret-key | grep 'sec' | cut -d "/" -f2 | cut -d " " -f1 | tail -n +1`)
+  all_ssbs=$(echo `gpg2 --list-secret-key | grep '^ssb' | cut -d "/" -f2 | cut -d " " -f1 | tail -n +1`)
+
+  # search in pub keys
+  IFS=' ' read -a array <<< "$all_secs"
+  for element in "${array[@]}"
+  do
+    if [ "$element" == $key_id ];then
+      return
+    fi
+  done
+
+  # search in sub keys
+  IFS=' ' read -a array <<< "$all_ssbs"
+  for element in "${array[@]}"
+  do
+  if [ "$element" == $key_id ];then
+    return
+  fi
+  done
+  msg_error "key id $key_id does not exist in private keyring. (check with \"gpg2 --list-secret-keys\")"
+  exit 1
+}
+
+
+# checks if the given key_id exists in keyring
+# parameters:
+#   1) key id
+assert_key_exists(){
+  key_id=$1
+  if [ -z $key_id ];then
+    msg_error "missing key id "
+    exit 1
+  fi
+  all_pubs=`list_pubkeys`
+  all_subs=`list_subkeys`
+
+  
+  # search in pub keys
+  IFS=' ' read -a array <<< "$all_pubs"
+  for element in "${array[@]}"
+  do
+    if [ "$element" == $key_id ];then
+      return
+    fi  
+  done
+
+  # search in sub keys
+  IFS=' ' read -a array <<< "$all_subs"
+  for element in "${array[@]}"
+  do
+  if [ "$element" == $key_id ];then
+    return
+  fi
+  done
+  msg_error "key id $key_id does not exist in public keyring (check with \"gpg2 --list-keys\")"
+  exit 1
+}
+
+
+# This function is used to print output table in an alinged fashion.
+# It caclucates the length of strings in column, and puts white spaces accordingly.
+# This function is used to print output table in an alinged fashion.
+# It caclucates the length of strings in column, and puts white spaces accordingly.
+find_len(){
+  target=$1
+  max_size=0
+  all_pubs=`list_pubkeys`
+  IFS=' ' read -a array <<< "$all_pubs"
+  for element in "${array[@]}"
+  do
+    output=`gpg2 --list-keys | sed -n '/'$element'/,/^$/p'`
+    case $target in
+      sub | pub )
+        sub_ids=`echo -e "$output" | grep $target' ' | cut -d "/" -f2 | cut -d " " -f1`
+        result=""
+        IFS=' ' read -a array <<< $sub_ids
+        for element in "${array[@]}"
+        do
+          result=$result$element:
+        done
+        result=$(echo $result | sed s'/.$//')
+        ;;
+      name )
+        result=`echo -e "$output" | grep uid  | grep -o -P '(?<=]).*(?=<)' | sed 's/([^)]*[^(]//g' | sed 's/ //1'`
+        ;;
+      mail )
+        result=`echo -e "$output" | grep uid  | awk '{print $NF}' |  sed 's/^.\(.*\).$/\1/'`
+        ;;
+      expiry)
+        result=`echo -e "$output" | grep '^pub' | awk '{print $3}'`
+        ;;
+      trust)
+        result=`echo -e "$output" | grep '^pub' | awk '{print $3}'`
+        ;;
+    esac
+    size=${#result}
+    if (( $size > $max_size ));then
+      max_size=$size;
+    fi
+  done
+  echo $max_size
+}
+
+
+# lists all public keys
+list_pubkeys(){
+  echo `gpg2 --list-key | grep '^pub' | cut -d "/" -f2 | cut -d " " -f1 | tail -n +1`
+}
+
+
+# lists all subkeys 
+list_subkeys(){
+  echo `gpg2 --list-key | grep '^sub' | cut -d "/" -f2 | cut -d " " -f1 | tail -n +1`
+}
+
+
+# Lists all key pairs in summarized format
+list_all(){
+  params=`getopt -o te -n "$0" -- "$@"`
+  if [ $? -ne 0 ];then
+      echo "invalid option"
+      exit 1
+  fi
+  eval set -- "$params"
+  switches=""
+  while true ; do
+    case "$1" in
+      -t)
+        switches=$switches" -t"
+        shift
+        ;;
+      -e)
+        switches=$switches" -e"
+        shift 
+        ;;
+      --) 
+        shift
+        break 
+        ;;
+      *) 
+        echo "Internal error!" 
+        exit 1 
+        ;;
+    esac
+  done
+  all_pubs=`list_pubkeys`
+  IFS=' ' read -a array <<< "$all_pubs"
+  print_keys $switches array[@]
+}
+
+
+# summarized the key in this format:
+# pubkey subkey(s) name email
+# AC1FA4D2   12C8BEC8:698F684D     salih      salih@gmail.com
+# 6528BEAC   74F78A01              ahmet      ahmet@gmail.com
+# 
+# Note: if there are multiple subkey, they separated by ":".
+#
+# parameters:
+#   1) key id
+summarize_key(){
+  params=`getopt -o te -n '$0' -- "$@"`
+  eval set -- "$params"
+  date=false
+  trust=false
+  # extract options and their arguments into variables.
+  while true ; do
+      case "$1" in
+        -t)
+          trust=true
+          shift
+          ;;
+        -e)
+          date=true;
+          shift 
+          ;;
+        --) 
+          shift;
+          break 
+          ;;
+        *) 
+          echo "Internal error!" 
+          exit 1 
+          ;;
+      esac
+  done
+
+  key_id=$1
+  assert_key_exists $key_id
+  if [ -z `is_subkey $key_id` ]; then
+    key_id=`get_pubkey_of_subkey $key_id`    
+  fi
+
+  output=`gpg2 --list-keys | sed -n '/'$key_id'/,/^$/p'`
+  pub_id=`echo -e "$output" | grep 'pub' | cut -d "/" -f2 | cut -d " " -f1`
+  sub_ids=$(echo `echo -e "$output" | grep '^sub' | cut -d "/" -f2 | cut -d " " -f1`)
+  if [[ -z $sub_ids ]]; then
+    sub_ids="----"
+  fi
+  email=`echo -e "$output" | grep uid  | awk '{print $NF}' |  sed 's/^.\(.*\).$/\1/'`
+  name=`echo -e "$output" | grep uid  | sed 's/([^)]*[^(]//g' | awk '{print $(NF-1)}'`
+
+  if [ $trust == true ]; then
+    trustLevel=`echo -e "$output" | grep uid  | sed 's/([^)]*[^(]//g' | cut -d "[" -f2 | cut -d "]" -f1`
+  fi
+  if [ $date == true ]; then
+    expiry=`echo -e "$output" | grep '^pub'  | sed 's/([^)]*[^(]//g' | awk '{print $(3)}'`
+  fi
+
+  concatinate=""
+  IFS=' ' read -a array <<< "$sub_ids"
+  for element in "${array[@]}"
+  do
+    concatinate=$concatinate$element:
+  done
+  concatinate=$(echo $concatinate | sed s'/.$//')
+  echo $pub_id $concatinate $name $email $expiry $trustLevel
+}
+
+
+# prints header part of list commands
+print_keys(){
+  params=`getopt -o te -n '$0' -- "$@"`
+  eval set -- "$params"
+  date=false
+  trust=false
+  # extract options and their arguments into variables.
+  while true ; do
+      case "$1" in
+        -t)
+          trust=true
+          shift
+          ;;
+        -e)
+          date=true;
+          shift 
+          ;;
+        --) 
+          shift;
+          break 
+          ;;
+        *) 
+          echo "Internal error!" 
+          exit 1 
+          ;;
+      esac
+  done
+
+  declare -a list=("${!1}")
+  for (( i=0; i<${#list[@]}; i++ ));
+  do
+    ## print header
+    if [ $i == 0 ]; then 
+      space_list=`find_white_space_amount`
+      IFS=' ' read -a spaces <<< $space_list
+      if [ "false" == "$subutai_quiet" ];then
+        if [[ $date == true && $trust == true ]]; then
+          printf "%-${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s %-${spaces[4]}s %-${spaces[5]}s" "pubkey" "subkey" "name" "email" "expiry" "trust"
+          printf "\n"
+          printf "%-${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s %-${spaces[4]}s %-${spaces[5]}s" "------" "------" "----" "-----" "------" "-----"
+          printf "\n"
+        elif [[ $date == false && $trust == true ]]; then
+          printf "%-${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s %-${spaces[4]}s" "pubkey" "subkey" "name" "email" "trust"
+          printf "\n"
+          printf "%-${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s %-${spaces[4]}s" "------" "------" "----" "-----" "-----"
+          printf "\n"
+        elif [[ $date == true && $trust == false ]]; then
+          printf "%-${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s %-${spaces[4]}s" "pubkey" "subkey" "name" "email" "expiry"
+          printf "\n"
+          printf "%-${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s %-${spaces[4]}s" "------" "------" "----" "-----" "------"
+          printf "\n"
+        elif [[ $date == false && $trust == false ]]; then
+          printf "%-${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s" "pubkey" "subkey" "name" "email" 
+          printf "\n"
+          printf "%-${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s" "------" "------" "----" "-----"
+          printf "\n"
+        fi
+      fi
+    fi
+
+    if [[ $date == true && $trust == true ]]; then
+      summary=`summarize_key -et ${list[$i]} `
+      printf "%${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s %-${spaces[4]}s %-${spaces[5]}s" $summary
+      printf "\n"
+    elif [[ $date == false && $trust == true ]]; then
+      summary=`summarize_key -t ${list[$i]} `
+      printf "%${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s %-${spaces[4]}s" $summary
+      printf "\n"      
+    elif [[ $date == true && $trust == false ]]; then
+      summary=`summarize_key -e ${list[$i]} `
+      printf "%${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s %-${spaces[4]}s" $summary
+      printf "\n"      
+    elif [[ $date == false && $trust == false ]]; then
+      summary=`summarize_key ${list[$i]} `
+      printf "%${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s" $summary
+      printf "\n"      
+    fi
+  done
+}
+
+
+# finds the amount of white space to be inserted 
+# between columns while printing output of list commands.
+find_white_space_amount(){
+  white_space_size_pub=`find_len 'pub'`
+  white_space_size_sub=`find_len 'sub'`
+  white_space_size_name=`find_len 'name'`
+  white_space_size_email=`find_len 'mail'`
+  white_space_size_expiry=`find_len 'expiry'`
+  white_space_size_trust=`find_len 'trust'`
+  echo $white_space_size_pub $white_space_size_sub $white_space_size_name $white_space_size_email $white_space_size_expiry $white_space_size_trust
+}
+
+
+# extract fingerprint of given key id
+get_fingerprint(){
+  key_id=$1
+  assert_key_exists $key_id
+  echo `gpg2 --list-secret-keys --with-colons --fingerprint $key_id | sed -n 's/^fpr:::::::::\([[:alnum:]]\+\):/\1/p'`
+}
+
+
+# extracts keygrip of given key id
+get_keygrip(){
+  key_id=$1
+  assert_key_exists $key_id
+  echo `gpg2 --with-keygrip -k | awk '/'$key_id'/{getline; print}' | awk '{print $3}'`  
+}
+
+
+# checks if gpg agent is running with correct switches
+assert_gpg_agent_is_running(){
+  is_running=`ps axu | grep [g]pg-agent | grep enable-ssh-support`
+  if [[ -z $is_running ]];then
+    msg_error "gpg-agent is not running! (start it with \"--enable-ssh-support\" switch)"
+    exit 1
+  fi
+}
+
+
+# checks if given key id belong to a pubkey or not
+is_pubkey(){
+  key_id="$1"
+  assert_key_exists $key_id
+  all_pubs=`list_pubkeys` 
+  # search in pub keys
+  IFS=' ' read -a array <<< "$all_pubs"
+  for element in "${array[@]}"
+  do
+    if [ "$element" == $key_id ];then
+      return
+    fi  
+  done
+  echo "false"
+}
+
+
+# checks if given key id belong to a subkey or not
+is_subkey(){
+  key_id="$1"
+  assert_key_exists $key_id
+  all_subs=`list_subkeys` 
+  # search in pub keys
+  IFS=' ' read -a array <<< "$all_subs"
+  for element in "${array[@]}"
+  do
+    if [ "$element" == $key_id ];then
+      return
+    fi  
+  done
+  echo "false"
+}
+
+
+# return corresponding pubkey id of given subkey
+# parameters:
+#   1) subkey_id (key_id)
+get_pubkey_of_subkey(){
+  subkey_id="$1"
+  assert_key_exists $subkey_id
+  all_pubs=`list_pubkeys` 
+  IFS=' ' read -a array <<< "$all_pubs"
+  for element in "${array[@]}"
+  do
+    output=`gpg2 --list-keys | sed -n '/'$element'/,/^$/p'`
+    sub_ids=$(echo `echo -e "$output" | grep '^sub' | cut -d "/" -f2 | cut -d " " -f1`)
+    IFS=' ' read -a array <<< "$sub_ids"
+    for index in "${array[@]}"
+    do
+      if [ "$index" == $subkey_id ]; then
+        echo $element
+        return
+      fi
+    done
+  done
+}
+
+
+# exports public part of given key id which is
+# compatible with authorized_key file.
+#
+# Note: We may need to just allow subkey ids as arguments
+#
+export_key_compatible_with_authorized_key_file(){
+  assert_gpg_agent_is_running
+  key_id=$1
+  assert_key_exists $key_id
+  keygrip=`get_keygrip $key_id`
+  sshcontrol=${HOME}/.gnupg/sshcontrol
+  if [[ -z  `cat $sshcontrol | grep $keygrip` ]]; then
+    echo $keygrip >> $sshcontrol
+  else
+    sed -i '/'$keygrip'/d' $sshcontrol
+    echo $keygrip >> $sshcontrol
+  fi
+  public_part=`ssh-add -L | sed '$!d'`
+  echo $public_part | sed 's/([^)]*[^(]//g'
+}
+
+
+# check if given email is valid
+assert_email_validity(){
+  email=$1
+  if [ -z $email ];then
+     msg_error "Empty email string !"
+     exit 1
+  fi 
+  echo "$email" | grep '^[a-zA-Z0-9]*@[a-zA-Z0-9]*\.[a-zA-Z0-9]*$' > /dev/null 2>&1
+  if [ ! $? -eq 0 ]; then
+    msg_error "Invalid email address !"
+    exit 1
+  fi
+}
+
+
+# find key id's index 
+find_key_id_index(){
+  key_id=$1
+  local pubkey_id
+  assert_key_exists $key_id
+  if [[ -z `is_subkey $key_id` ]]; then
+    pubkey_id=`get_pubkey_of_subkey $key_id`    
+  else
+    msg_error "$key_id does not belong to a subkey"
+    exit 1
+  fi
+  number=`gpg2 --list-keys | sed -n '/'$pubkey_id'/,/^$/p' | grep "^sub" | grep -ne "." | grep $key_id | awk -F ":" {'print $1'}`
+  if [ ! -z $number ]; then
+    echo $number
+  fi 
+}
+
+
+# deletes subkey with given index 
+del_subkey_with_index(){
+  number=$1
+  key_id=$2
+  echo -e "key $number\ndelkey\ny\nsave\n" | gpg2 --pinentry-mode loopback --command-fd 0 \
+                                                  --no-tty --status-fd --verbose \
+                                                  --edit-key $key_id > /dev/null 2>&1
+}
