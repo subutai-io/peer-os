@@ -64,4 +64,16 @@ public class KeyInfoImpl implements KeyInfo
     {
         return Collections.unmodifiableSet( subKeyIds );
     }
+
+
+    @Override
+    public String toString()
+    {
+        return "KeyInfoImpl{" +
+                "realName='" + realName + '\'' +
+                ", email='" + email + '\'' +
+                ", publicKeyId='" + publicKeyId + '\'' +
+                ", subKeyIds=" + subKeyIds +
+                '}';
+    }
 }

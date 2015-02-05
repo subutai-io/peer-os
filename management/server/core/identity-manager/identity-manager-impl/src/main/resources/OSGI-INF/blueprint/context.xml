@@ -10,12 +10,15 @@
   </bean>
   <!--*****************************************************************-->
 
+  <reference id="keyManager" interface="org.safehaus.subutai.core.key.api.KeyManager" />
+
   <bean id="identityManager" scope="singleton" class="org.safehaus.subutai.core.identity.impl.IdentityManagerImpl"
         init-method="init">
     <property name="daoManager" ref="daoManagerSecurity" />
+    <property name="keyManager" ref="keyManager" />
     <property name="securityManager" ref="securityManager" />
 
-    <property name="bundleContext" ref="blueprintBundleContext" />
+    <!--    <property name="bundleContext" ref="blueprintBundleContext" />-->
   </bean>
 
   <service ref="identityManager" interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
@@ -64,7 +67,8 @@
     <property name="jndiDataSourceName" value="osgi:service/openjpa/securityManagerDS" />
     <property name="permissionsLookupEnabled" value="false" />
     <property name="authenticationQuery" value="select password, salt from subutai_user where user_name = ?" />
-    <property name="userRolesQuery" value="select role_name from subutai_users_roles where user_name = ?" />
+    <property name="userRolesQuery"
+              value="select role_name from subutai_user_role r left join subutai_user u where u.user_name = ?" />
     <property name="permissionsQuery" value="select permission from subutai_roles_permissions where role_name = ?" />
     <property name="credentialsMatcher" ref="sha256Matcher" />
   </bean>
