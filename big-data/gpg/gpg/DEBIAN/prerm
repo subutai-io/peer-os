@@ -27,20 +27,20 @@ echo "Removing gnupg-2.1.1 ..."
 make uninstall > /dev/null 2>&1
 
 deleteFromBashrc(){
-    local file=$HOME/.bashrc
-    local search="SSH_AUTH_SOCK="
-    if grep "$search" $file; then
-	 	sed -i '/SSH_AUTH_SOCK=/d' $file
-		sed -i '/export SSH_AUTH_SOCK/d' $file
-    fi
+  local file=$HOME/.bashrc
+  local search="SSH_AUTH_SOCK="
+  if grep "$search" $file; then
+    sed -i '/SSH_AUTH_SOCK=/d' $file
+    sed -i '/export SSH_AUTH_SOCK/d' $file
+  fi
 }
 
 stopGPGAgent(){
-	pid=`ps axu | grep [g]pg-agent | awk '{print $2}' | head -1`
-	if [ ! -z $pid ]; then
-		echo "stopping gpg-agent : $pid"
-		kill -9 $pid
-	fi
+  pid=`ps axu | grep [g]pg-agent | awk '{print $2}' | head -1`
+  if [ ! -z $pid ]; then
+    echo "stopping gpg-agent : $pid"
+    kill -9 $pid
+  fi
 }
 
 deleteFromBashrc

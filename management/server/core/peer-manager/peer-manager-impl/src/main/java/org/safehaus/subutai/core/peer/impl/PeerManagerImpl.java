@@ -19,7 +19,6 @@ import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
-import org.safehaus.subutai.core.peer.api.PeerGroup;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandRequestListener;
@@ -37,7 +36,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 
-
 /**
  * PeerManager implementation
  */
@@ -53,7 +51,7 @@ public class PeerManagerImpl implements PeerManager
     private Monitor monitor;
     private TemplateRegistry templateRegistry;
     private CommandExecutor commandExecutor;
-    private LocalPeer localPeer;
+    private LocalPeerImpl localPeer;
     private StrategyManager strategyManager;
     private PeerInfo peerInfo;
     private Messenger messenger;
@@ -68,6 +66,7 @@ public class PeerManagerImpl implements PeerManager
     {
         this.messenger = messenger;
     }
+
 
     public void setHostRegistry( final HostRegistry hostRegistry )
     {
@@ -90,7 +89,7 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public EntityManagerFactory getEntityManagerFactory()
     {
-        return  daoManager.getEntityManagerFactory();
+        return daoManager.getEntityManagerFactory();
     }
 
 
@@ -228,34 +227,6 @@ public class PeerManagerImpl implements PeerManager
     public PeerInfo getPeerInfo( UUID uuid )
     {
         return peerDAO.getInfo( SOURCE_REMOTE_PEER, uuid.toString(), PeerInfo.class );
-    }
-
-
-    @Override
-    public List<PeerGroup> peersGroups()
-    {
-        return peerDAO.getInfo( PEER_GROUP, PeerGroup.class );
-    }
-
-
-    @Override
-    public void deletePeerGroup( final PeerGroup group )
-    {
-        peerDAO.deleteInfo( PEER_GROUP, group.getId().toString() );
-    }
-
-
-    @Override
-    public boolean savePeerGroup( final PeerGroup group )
-    {
-        return peerDAO.saveInfo( PEER_GROUP, group.getId().toString(), group );
-    }
-
-
-    @Override
-    public PeerGroup getPeerGroup( final UUID peerGroupId )
-    {
-        return peerDAO.getInfo( PEER_GROUP, peerGroupId.toString(), PeerGroup.class );
     }
 
 
