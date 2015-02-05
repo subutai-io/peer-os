@@ -17,6 +17,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -69,7 +71,7 @@ import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
 import org.safehaus.subutai.core.peer.api.task.Task;
 import org.safehaus.subutai.core.peer.api.task.clone.CloneTask;
-import org.safehaus.subutai.core.peer.impl.container.CreateContainerTask;
+import org.safehaus.subutai.core.peer.impl.container.CreateContainerWrapperTask;
 import org.safehaus.subutai.core.peer.impl.dao.ContainerGroupDataService;
 import org.safehaus.subutai.core.peer.impl.dao.ContainerHostDataService;
 import org.safehaus.subutai.core.peer.impl.dao.ManagementHostDataService;
@@ -573,6 +575,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
 
         List<Future<ContainerHost>> taskFutures = Lists.newArrayList();
+        ExecutorService executorService = Executors.newFixedThreadPool( numberOfContainers );
 
         //create containers in parallel on each resource host
         for ( Map.Entry<ResourceHost, Set<String>> resourceHostDistribution : containerDistribution.entrySet() )
@@ -581,8 +584,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
             for ( String hostname : resourceHostDistribution.getValue() )
             {
-                taskFutures.add( resourceHostEntity.queueSequentialTask(
-                        new CreateContainerTask( resourceHostEntity, templateName, hostname,
+                taskFutures.add( executorService.submit(
+                        new CreateContainerWrapperTask( resourceHostEntity, templateName, hostname,
                                 waitContainerTimeoutSec ) ) );
             }
         }
@@ -1052,7 +1055,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             ResourceHost resourceHost = entity.getParent();
             resourceHost.destroyContainerHost( containerHost );
             containerHostDataService.remove( containerHost.getHostId() );
-            entity.getParent().removeContainerHost( entity );
+            ( ( ResourceHostEntity ) entity.getParent() ).removeContainerHost( entity );
 
             //update container group
             ContainerGroupEntity containerGroup =
