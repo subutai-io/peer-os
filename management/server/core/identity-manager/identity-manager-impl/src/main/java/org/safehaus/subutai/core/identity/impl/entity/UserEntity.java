@@ -8,7 +8,6 @@ import java.util.Set;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -19,6 +18,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.api.User;
 
 
@@ -35,10 +35,10 @@ public class UserEntity implements User
     @Column( name = "user_id" )
     private Long id;
 
-    @ManyToMany( fetch = FetchType.EAGER, cascade = CascadeType.ALL )
-    @JoinTable( name = "subutai_users_roles", joinColumns = @JoinColumn( name = "user_name" ), inverseJoinColumns =
-    @JoinColumn( name = "role_name" ) )
-    Set<RoleEntity> roles = new HashSet();
+    @ManyToMany( targetEntity = RoleEntity.class, fetch = FetchType.EAGER )
+    @JoinTable( name = "subutai_user_role", joinColumns = @JoinColumn( name = "user_id", referencedColumnName =
+            "user_id" ), inverseJoinColumns = @JoinColumn( name = "role_name", referencedColumnName = "name" ) )
+    Set<Role> roles = new HashSet();
 
     @Column( name = "user_name" )
     private String username;
@@ -90,12 +90,6 @@ public class UserEntity implements User
     }
 
 
-    //    public void setRoles( final List<Role> roles )
-    //    {
-    //        this.roles = roles;
-    //    }
-
-
     @Override
     public void setPassword( final String password )
     {
@@ -134,9 +128,21 @@ public class UserEntity implements User
     }
 
 
-    public void addRole( final RoleEntity roleEntity )
+    @Override
+    public void addRole( final Role roleEntity )
     {
+        if ( roleEntity == null )
+        {
+            throw new IllegalArgumentException( "Role could not be null." );
+        }
         roles.add( roleEntity );
+    }
+
+
+    @Override
+    public void removeRole( final Role roleEntity )
+    {
+        roles.remove( roleEntity );
     }
 
 
@@ -177,5 +183,12 @@ public class UserEntity implements User
     public void setKey( final String key )
     {
         this.key = key;
+    }
+
+
+    @Override
+    public Set<Role> getRoles()
+    {
+        return roles;
     }
 }

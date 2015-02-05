@@ -6,7 +6,6 @@ import java.security.Principal;
 import java.util.HashSet;
 import java.util.Map;
 
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -27,7 +26,6 @@ import org.apache.karaf.jaas.boot.principal.UserPrincipal;
 import org.apache.karaf.jaas.config.JaasRealm;
 import org.apache.karaf.jaas.modules.AbstractKarafLoginModule;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.authz.AuthorizationException;
 
 
 /**
@@ -36,22 +34,8 @@ import org.apache.shiro.authz.AuthorizationException;
 public class ShiroLoginModule extends AbstractKarafLoginModule
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( ShiroLoginModule.class.getName() );
+    private static final String[] KARAF_ROLES = { "admin", "manager", "viewer" };
     org.apache.shiro.subject.Subject shiroSubject;
-
-
-    private IdentityManager getIdentityManager()
-    {
-        try
-        {
-            InitialContext ic = new InitialContext();
-            return ( IdentityManager ) ic.lookup( "osgi:service/identityManager" );
-        }
-        catch ( NamingException e )
-        {
-            LOGGER.error( "JNDI error while retrieving osgi:service/identityManager", e );
-            throw new AuthorizationException( e );
-        }
-    }
 
 
     public void initialize( Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
@@ -62,7 +46,7 @@ public class ShiroLoginModule extends AbstractKarafLoginModule
         LOGGER.info( "Initializing shiro login module." );
 
 
-        // just make happy to import JaasRealm
+        // just for importing JaasRealm
         Object o = subject;
         if ( o instanceof JaasRealm )
         {
@@ -110,25 +94,20 @@ public class ShiroLoginModule extends AbstractKarafLoginModule
 
             principals.add( new UserPrincipal( user ) );
             principals.add( new ShiroPrincipal( shiroSubject ) );
-            principals.add( new RolePrincipal( "admin" ) );
-            //TODO: retrive roles from realm
-            //            principals.add( new RolePrincipal( "manager" ) );
-            //            principals.add( new RolePrincipal( "viewer" ) );
-            //            principals.add( new RolePrincipal( "group" ) );
-            //            principals.add( new GroupPrincipal( "admingroup" ) );
 
-
-            //            for ( Principal role : subject.getPrincipals())
-            //            {
-            //                principals.add( new RolePrincipal( role.getName() ) );
-            //            }
+            for ( String roleName : KARAF_ROLES )
+            {
+                if ( shiroSubject.hasRole( roleName ) )
+                {
+                    principals.add( new RolePrincipal( roleName ) );
+                }
+            }
         }
         catch ( Exception e )
         {
             LOGGER.error( e.toString() );
             return false;
         }
-
 
         subject.getPrincipals().addAll( principals );
         LOGGER.debug( "Finish login." );

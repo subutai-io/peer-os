@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.identity.api;
 
 
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -28,11 +29,18 @@ public interface User
 
     public String getEmail();
 
+    public void removeRole( Role roleEntity );
+
     public void setFullname( String fullname );
 
     public void setEmail( String email );
 
     public String getKey();
 
-    public void setKey(String key);
+    public void setKey( String key );
+
+    public void addRole( Role role );
+
+
+    Set<Role> getRoles();
 }

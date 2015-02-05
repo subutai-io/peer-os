@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.osgi.framework.BundleContext;
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.User;
@@ -13,6 +12,7 @@ import org.safehaus.subutai.core.identity.impl.dao.RoleDataService;
 import org.safehaus.subutai.core.identity.impl.dao.UserDataService;
 import org.safehaus.subutai.core.identity.impl.entity.RoleEntity;
 import org.safehaus.subutai.core.identity.impl.entity.UserEntity;
+import org.safehaus.subutai.core.key.api.KeyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,19 +35,9 @@ public class IdentityManagerImpl implements IdentityManager
     static final String HEXES = "0123456789abcdef";
 
     private DaoManager daoManager;
-    private BundleContext bundleContext;
+    private KeyManager keyManager;
     private SecurityManager securityManager;
     private UserDataService userDataService;
-
-
-    //    public IdentityManagerImpl()
-    //    {
-    //        LOG.info( "Initializing security manager..." );
-    //        IniSecurityManagerFactory factory = new IniSecurityManagerFactory( "subutai-shiro.ini" );
-    //        org.apache.shiro.mgt.SecurityManager securityManager = factory.getInstance();
-    //        SecurityUtils.setSecurityManager( securityManager );
-    //        LOG.info( String.format( "Security manager initialized: %s", securityManager ) );
-    //    }
 
 
     public void setSecurityManager( final SecurityManager securityManager )
@@ -56,9 +46,9 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    public void setBundleContext( final BundleContext bundleContext )
+    public void setKeyManager( final KeyManager keyManager )
     {
-        this.bundleContext = bundleContext;
+        this.keyManager = keyManager;
     }
 
 
@@ -71,35 +61,13 @@ public class IdentityManagerImpl implements IdentityManager
     public void init()
     {
         LOG.info( "Initializing security manager..." );
-        //        SubutaiJdbcRealm subutaiJdbcRealm = new SubutaiJdbcRealm();
-        //        if ( subutaiJdbcRealm == null )
-        //        {
-        //            LOG.error( "Could not initialiaze SubutaiJdbcrealm." );
-        //        }
-        //        Bundle bundle = bundleContext.getBundle();
-        //        URL url = bundle.getEntry( "subutai-shiro.ini" );
-        //        org.apache.shiro.config.Ini ini = new Ini();
-        //        try
-        //        {
-        //            ini.load( url.openStream() );
-        //        }
-        //        catch ( IOException e )
-        //        {
-        //            e.printStackTrace();
-        //        }
-        //        IniSecurityManagerFactory factory = new IniSecurityManagerFactory( ini );
-        //        securityManager = factory.getInstance();
-        //        RealmSecurityManager r = ( RealmSecurityManager ) securityManager;
-        //        r.setRealm( subutaiJdbcRealm );
 
         userDataService = new UserDataService( daoManager.getEntityManagerFactory() );
 
         checkDefaultUser( "karaf" );
         checkDefaultUser( "admin" );
-        checkDefaultUser( "timur" );
+        //        checkDefaultUser( "timur" );
 
-        //        RoleDataService roleDataService = new RoleDataService( daoManager.getEntityManagerFactory() );
-        //        roleDataService.persist( roleEntity );
         SecurityUtils.setSecurityManager( securityManager );
 
         LOG.info( String.format( "Security manager initialized: %s", securityManager ) );
@@ -117,11 +85,20 @@ public class IdentityManagerImpl implements IdentityManager
         }
         LOG.info( String.format( "User not found. Adding new user: [%s] ", username ) );
         RoleDataService roleDataService = new RoleDataService( daoManager.getEntityManagerFactory() );
-        RoleEntity roleEntity = roleDataService.find( "admin" );
-        if ( roleEntity == null )
+        RoleEntity adminRole = roleDataService.find( "admin" );
+        if ( adminRole == null )
         {
-            roleEntity = new RoleEntity();
-            roleEntity.setName( "admin" );
+            adminRole = new RoleEntity();
+            adminRole.setName( "admin" );
+            roleDataService.persist( adminRole );
+        }
+
+        RoleEntity managerRole = roleDataService.find( "manager" );
+        if ( managerRole == null )
+        {
+            managerRole = new RoleEntity();
+            managerRole.setName( "manager" );
+            roleDataService.persist( managerRole );
         }
 
 
@@ -133,9 +110,19 @@ public class IdentityManagerImpl implements IdentityManager
         user.setEmail( username + "@subutai.at" );
         user.setPassword( saltedHash( password, new SimpleByteSource( salt ).getBytes() ) );
         user.setSalt( salt );
-        //        user.addRole( roleEntity );
-        userDataService.persist( ( UserEntity ) user );
-        LOG.info( String.format( "User: %s", user.getId() ) );
+        user.addRole( adminRole );
+        user.addRole( managerRole );
+        userDataService.persist( user );
+        LOG.debug( String.format( "User: %s", user.getId() ) );
+
+        //        User karafUser = userDataService.findByUsername( "karaf" );
+        //        LOG.debug( String.format( "%s %s", karafUser.getUsername(), karafUser.getRoles() ) );
+        //
+        //        Role r = karafUser.getRoles().iterator().next();
+        //        karafUser.removeRole( r );
+        //        userDataService.update( karafUser );
+        //        karafUser = userDataService.findByUsername( "karaf" );
+        //        LOG.debug( String.format( "%s %s", karafUser.getUsername(), karafUser.getRoles() ) );
     }
 
 
@@ -155,8 +142,6 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public Subject login( final AuthenticationToken token )
     {
-        LOG.debug( String.format( "Login. Thread ID: %d %s", Thread.currentThread().getId(),
-                Thread.currentThread().getName() ) );
         SecurityUtils.setSecurityManager( securityManager );
         Subject subject = SecurityUtils.getSubject();
         subject.login( token );
@@ -201,6 +186,11 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public boolean addUser( final String username, final String fullname, final String password, final String email )
     {
+        //        try
+        //        {
+        //            KeyInfo keyInfo = keyManager.generateKey( fullname, email );
+
+
         String salt = getSimpleSalt( username );
         UserEntity user = new UserEntity();
         user.setUsername( username );
@@ -208,8 +198,19 @@ public class IdentityManagerImpl implements IdentityManager
         user.setFullname( fullname );
         user.setSalt( salt );
         user.setPassword( saltedHash( password, salt.getBytes() ) );
+
+        //            user.setKey( keyInfo.getPublicKeyId() );
+        //            LOG.debug( String.format( "%s %s", keyInfo.toString(), keyManager.readKey( keyInfo
+        // .getPublicKeyId() ) ) );
+
         userDataService.persist( user );
         return user.getId() != null;
+        //        }
+        //        catch ( KeyManagerException e )
+        //        {
+        //            LOG.error( e.toString(), e );
+        //            return false;
+        //        }
     }
 
 
