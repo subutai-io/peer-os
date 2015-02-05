@@ -14,7 +14,7 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.EnvironmentDestructionResult;
+import org.safehaus.subutai.common.peer.ContainerDestructionResult;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.common.peer.PeerException;
@@ -434,7 +434,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public EnvironmentDestructionResult destroyEnvironmentContainers( final UUID environmentId ) throws PeerException
+    public ContainerDestructionResult destroyEnvironmentContainers( final UUID environmentId ) throws PeerException
     {
         //TODO implement request exchange here
         return null;

@@ -29,8 +29,8 @@ import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.EnvironmentDestructionException;
-import org.safehaus.subutai.common.peer.EnvironmentDestructionResult;
+import org.safehaus.subutai.common.peer.ContainerDestructionException;
+import org.safehaus.subutai.common.peer.ContainerDestructionResult;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.HostEvent;
 import org.safehaus.subutai.common.peer.HostEventListener;
@@ -71,7 +71,7 @@ import org.safehaus.subutai.core.peer.api.task.Task;
 import org.safehaus.subutai.core.peer.api.task.clone.CloneTask;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerWrapperTask;
 import org.safehaus.subutai.core.peer.impl.container.DestroyContainerWrapperTask;
-import org.safehaus.subutai.core.peer.impl.container.EnvironmentDestructionResultImpl;
+import org.safehaus.subutai.core.peer.impl.container.ContainerDestructionResultImpl;
 import org.safehaus.subutai.core.peer.impl.dao.ContainerGroupDataService;
 import org.safehaus.subutai.core.peer.impl.dao.ContainerHostDataService;
 import org.safehaus.subutai.core.peer.impl.dao.ManagementHostDataService;
@@ -1318,7 +1318,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
 
     @Override
-    public EnvironmentDestructionResult destroyEnvironmentContainers( final UUID environmentId ) throws PeerException
+    public ContainerDestructionResult destroyEnvironmentContainers( final UUID environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId );
 
@@ -1375,15 +1375,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
             executorService.shutdown();
 
-            EnvironmentDestructionException environmentDestructionException = null;
+            ContainerDestructionException containerDestructionException = null;
 
             if ( !errors.isEmpty() )
             {
-                environmentDestructionException = new EnvironmentDestructionException(
+                containerDestructionException = new ContainerDestructionException(
                         String.format( "There were errors while destroying containers: %s", errors ) );
             }
 
-            return new EnvironmentDestructionResultImpl( destroyedContainersIds, environmentDestructionException );
+            return new ContainerDestructionResultImpl( destroyedContainersIds, containerDestructionException );
         }
         catch ( ContainerGroupNotFoundException e )
         {

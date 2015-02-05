@@ -4,20 +4,20 @@ package org.safehaus.subutai.core.peer.impl.container;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.peer.EnvironmentDestructionException;
-import org.safehaus.subutai.common.peer.EnvironmentDestructionResult;
+import org.safehaus.subutai.common.peer.ContainerDestructionException;
+import org.safehaus.subutai.common.peer.ContainerDestructionResult;
 
 import com.google.common.base.Preconditions;
 
 
-public class EnvironmentDestructionResultImpl implements EnvironmentDestructionResult
+public class ContainerDestructionResultImpl implements ContainerDestructionResult
 {
     private final Set<UUID> destroyedContainersIds;
-    private final EnvironmentDestructionException exception;
+    private final ContainerDestructionException exception;
 
 
-    public EnvironmentDestructionResultImpl( final Set<UUID> destroyedContainersIds,
-                                             final EnvironmentDestructionException exception )
+    public ContainerDestructionResultImpl( final Set<UUID> destroyedContainersIds,
+                                           final ContainerDestructionException exception )
     {
         Preconditions.checkNotNull( destroyedContainersIds );
 
@@ -34,7 +34,7 @@ public class EnvironmentDestructionResultImpl implements EnvironmentDestructionR
 
 
     @Override
-    public EnvironmentDestructionException getException()
+    public ContainerDestructionException getException()
     {
         return exception;
     }
