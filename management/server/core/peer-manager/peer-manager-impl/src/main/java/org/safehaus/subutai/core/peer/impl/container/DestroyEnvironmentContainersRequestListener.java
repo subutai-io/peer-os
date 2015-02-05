@@ -18,7 +18,7 @@ public class DestroyEnvironmentContainersRequestListener extends RequestListener
     private LocalPeer localPeer;
 
 
-    protected DestroyEnvironmentContainersRequestListener( LocalPeer localPeer )
+    public DestroyEnvironmentContainersRequestListener( LocalPeer localPeer )
     {
         super( RecipientType.CONTAINER_DESTROY_REQUEST.name() );
 
