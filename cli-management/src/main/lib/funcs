@@ -3,3 +3,4 @@
 . /usr/share/subutai-cli/subutai/lib/bsfl
 . /usr/share/subutai-cli/subutai/lib/net-ops
 . /usr/share/subutai-cli/subutai/lib/deb_ops
+. /usr/share/subutai-cli-subutai/lib/gpg_ops
