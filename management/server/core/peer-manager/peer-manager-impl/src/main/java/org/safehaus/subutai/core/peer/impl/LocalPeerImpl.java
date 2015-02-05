@@ -1347,16 +1347,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
             for ( ContainerHost containerHost : containerHosts )
             {
-                try
-                {
-                    taskFutures.add( executorService.submit(
-                            new DestroyContainerWrapperTask( getResourceHostByContainerId( containerHost.getHostId() ),
-                                    containerHost ) ) );
-                }
-                catch ( HostNotFoundException e )
-                {
-                    errors.add( e );
-                }
+
+                taskFutures.add( executorService.submit( new DestroyContainerWrapperTask( this, containerHost ) ) );
             }
 
             for ( Future<UUID> taskFuture : taskFutures )
