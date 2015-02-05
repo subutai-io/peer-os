@@ -5,9 +5,9 @@ import java.util.Set;
 import java.util.UUID;
 
 
-public interface ContainerDestructionResult
+public interface ContainersDestructionResult
 {
     public Set<UUID> getDestroyedContainersIds();
 
-    public ContainerDestructionException getException();
+    public String getException();
 }

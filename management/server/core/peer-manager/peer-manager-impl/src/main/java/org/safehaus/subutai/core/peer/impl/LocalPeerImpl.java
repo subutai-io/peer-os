@@ -29,8 +29,7 @@ import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.ContainerDestructionException;
-import org.safehaus.subutai.common.peer.ContainerDestructionResult;
+import org.safehaus.subutai.common.peer.ContainersDestructionResult;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.HostEvent;
 import org.safehaus.subutai.common.peer.HostEventListener;
@@ -69,9 +68,9 @@ import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
 import org.safehaus.subutai.core.peer.api.task.Task;
 import org.safehaus.subutai.core.peer.api.task.clone.CloneTask;
+import org.safehaus.subutai.core.peer.impl.container.ContainersDestructionResultImpl;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerWrapperTask;
 import org.safehaus.subutai.core.peer.impl.container.DestroyContainerWrapperTask;
-import org.safehaus.subutai.core.peer.impl.container.ContainerDestructionResultImpl;
 import org.safehaus.subutai.core.peer.impl.dao.ContainerGroupDataService;
 import org.safehaus.subutai.core.peer.impl.dao.ContainerHostDataService;
 import org.safehaus.subutai.core.peer.impl.dao.ManagementHostDataService;
@@ -1318,9 +1317,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
 
     @Override
-    public ContainerDestructionResult destroyEnvironmentContainers( final UUID environmentId ) throws PeerException
+    public ContainersDestructionResult destroyEnvironmentContainers( final UUID environmentId ) throws PeerException
     {
-        Preconditions.checkNotNull( environmentId );
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         Set<Exception> errors = Sets.newHashSet();
         Set<UUID> destroyedContainersIds = Sets.newHashSet();
@@ -1375,15 +1374,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
             executorService.shutdown();
 
-            ContainerDestructionException containerDestructionException = null;
+            String exception = null;
 
             if ( !errors.isEmpty() )
             {
-                containerDestructionException = new ContainerDestructionException(
-                        String.format( "There were errors while destroying containers: %s", errors ) );
+                exception = String.format( "There were errors while destroying containers: %s", errors );
             }
 
-            return new ContainerDestructionResultImpl( destroyedContainersIds, containerDestructionException );
+            return new ContainersDestructionResultImpl( destroyedContainersIds, exception );
         }
         catch ( ContainerGroupNotFoundException e )
         {

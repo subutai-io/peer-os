@@ -137,5 +137,5 @@ public interface Peer
     public void setDiskQuota( UUID containerId, DiskQuota diskQuota ) throws PeerException;
 
 
-    public ContainerDestructionResult destroyEnvironmentContainers( UUID environmentId ) throws PeerException;
+    public ContainersDestructionResult destroyEnvironmentContainers( UUID environmentId ) throws PeerException;
 }

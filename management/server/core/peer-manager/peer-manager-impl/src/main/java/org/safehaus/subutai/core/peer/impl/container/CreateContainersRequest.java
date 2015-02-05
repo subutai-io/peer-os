@@ -11,7 +11,7 @@ import org.safehaus.subutai.common.protocol.Template;
 /**
  * Request for container creation at a remote peer
  */
-public class CreateContainerRequest
+public class CreateContainersRequest
 {
     private final UUID environmentId;
     private final UUID initiatorPeerId;
@@ -22,9 +22,9 @@ public class CreateContainerRequest
     private final List<Criteria> criteria;
 
 
-    public CreateContainerRequest( final UUID environmentId, final UUID initiatorPeerId, final UUID ownerId,
-                                   final List<Template> templates, final int numberOfContainers,
-                                   final String strategyId, final List<Criteria> criteria )
+    public CreateContainersRequest( final UUID environmentId, final UUID initiatorPeerId, final UUID ownerId,
+                                    final List<Template> templates, final int numberOfContainers,
+                                    final String strategyId, final List<Criteria> criteria )
     {
         this.environmentId = environmentId;
         this.initiatorPeerId = initiatorPeerId;

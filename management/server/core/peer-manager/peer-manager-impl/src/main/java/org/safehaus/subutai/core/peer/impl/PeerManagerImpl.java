@@ -23,7 +23,7 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandRequestListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandResponseListener;
-import org.safehaus.subutai.core.peer.impl.container.CreateContainerRequestListener;
+import org.safehaus.subutai.core.peer.impl.container.CreateContainersRequestListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequestListener;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
@@ -132,7 +132,7 @@ public class PeerManagerImpl implements PeerManager
         messageResponseListener = new MessageResponseListener();
         messenger.addMessageListener( messageResponseListener );
         //add create container requests listener
-        addRequestListener( new CreateContainerRequestListener( localPeer ) );
+        addRequestListener( new CreateContainersRequestListener( localPeer ) );
         //add echo listener
         addRequestListener( new EchoRequestListener() );
     }
