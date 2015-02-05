@@ -36,14 +36,6 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getRegisteredPeers();
 
-    @Deprecated
-    @POST
-    @Path( "container/schedule" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response scheduleCloneContainers( @FormParam( "creatorPeerId" ) String creatorPeerId,
-                                      @FormParam( "templates" ) String templates, @FormParam( "quantity" ) int quantity,
-                                      @FormParam( "strategyId" ) String strategyId,
-                                      @FormParam( "criteria" ) String criteria );
 
     @POST
     @Path( "container/destroy" )
@@ -89,12 +81,6 @@ public interface RestService
     @Path( "unregister" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response unregisterPeer( @QueryParam( "peerId" ) String peerId );
-
-    @Deprecated
-    @PUT
-    @Path( "update" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response updatePeer( @QueryParam( "peer" ) String peer );
 
 
     @POST

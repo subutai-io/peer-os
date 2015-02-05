@@ -14,6 +14,7 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.EnvironmentDestructionResult;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.common.peer.PeerException;
@@ -40,8 +41,6 @@ import org.safehaus.subutai.core.peer.impl.container.CreateContainerResponse;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequest;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponse;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -52,7 +51,6 @@ import com.google.common.base.Strings;
  */
 public class RemotePeerImpl implements RemotePeer
 {
-    private static final Logger LOG = LoggerFactory.getLogger( RemotePeerImpl.class.getName() );
 
     private LocalPeer localPeer;
     protected PeerInfo peerInfo;
@@ -121,31 +119,6 @@ public class RemotePeerImpl implements RemotePeer
     public PeerInfo getPeerInfo()
     {
         return peerInfo;
-    }
-
-
-    @Override
-    public Set<HostInfoModel> scheduleCloneContainers( final UUID creatorPeerId, final List<Template> templates,
-                                                       final int quantity, final String strategyId,
-                                                       final List<Criteria> criteria ) throws PeerException
-    {
-
-        //        CreateContainerResponse response =
-        //                sendRequest( new CreateContainerRequest( creatorPeerId, templates, quantity, strategyId,
-        // criteria ),
-        //                        RecipientType.CONTAINER_CREATE_REQUEST.name(), Timeouts
-        // .CREATE_CONTAINER_REQUEST_TIMEOUT,
-        //                        CreateContainerResponse.class, Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT );
-        //
-        //        if ( response != null )
-        //        {
-        //            return response.getHosts();
-        //        }
-        //        else
-        //        {
-        //            throw new PeerException( "Command timed out" );
-        //        }
-        return null;
     }
 
 
@@ -457,5 +430,13 @@ public class RemotePeerImpl implements RemotePeer
         {
             throw new PeerException( "Command timed out" );
         }
+    }
+
+
+    @Override
+    public EnvironmentDestructionResult destroyEnvironmentContainers( final UUID environmentId ) throws PeerException
+    {
+        //TODO implement request exchange here
+        return null;
     }
 }

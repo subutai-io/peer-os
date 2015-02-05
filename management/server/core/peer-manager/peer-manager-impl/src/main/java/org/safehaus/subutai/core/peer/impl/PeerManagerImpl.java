@@ -117,7 +117,7 @@ public class PeerManagerImpl implements PeerManager
         {
             peerInfo = result.get( 0 );
         }
-        localPeer = new LocalPeerImpl( this, templateRegistry, peerDAO, quotaManager, strategyManager, requestListeners,
+        localPeer = new LocalPeerImpl( this, templateRegistry, quotaManager, strategyManager, requestListeners,
                 commandExecutor, hostRegistry, monitor );
         localPeer.init();
 
