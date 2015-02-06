@@ -7,8 +7,8 @@ package org.safehaus.subutai.common.metric;
 public class ProcessResourceUsage
 {
     private String host;
-    private int usedCpu;
-    private int usedRam;
+    private double usedCpu;
+    private double usedRam;
 
 
     public String getHost()
@@ -17,13 +17,13 @@ public class ProcessResourceUsage
     }
 
 
-    public int getUsedCpu()
+    public double getUsedCpu()
     {
         return usedCpu;
     }
 
 
-    public int getUsedRam()
+    public double getUsedRam()
     {
         return usedRam;
     }
