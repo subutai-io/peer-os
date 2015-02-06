@@ -3,7 +3,6 @@ package org.safehaus.subutai.core.identity.ui.tabs.subviews;
 
 import java.util.EnumSet;
 
-import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.PermissionGroup;
 import org.safehaus.subutai.core.identity.ui.tabs.TabCallback;
@@ -11,11 +10,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
+import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
@@ -30,18 +31,26 @@ public class PermissionForm extends VerticalLayout
     private static final Logger LOGGER = LoggerFactory.getLogger( PermissionForm.class );
 
     private BeanItem<Permission> permission;
-    private IdentityManager identityManager;
-    private TextField name = new TextField( "Permission name" );
-    private TextField description = new TextField( "Permission Description" );
+    private TextField name = new TextField()
+    {
+        {
+            setInputPrompt( "Permission name" );
+            setEnabled( false );
+        }
+    };
+    private TextField description = new TextField()
+    {
+        {
+            setInputPrompt( "Description" );
+        }
+    };
     private ComboBox permissionGroup;
     private BeanFieldGroup<Permission> permissionFieldGroup = new BeanFieldGroup<>( Permission.class );
-    private FormLayout form;
 
 
-    public PermissionForm( IdentityManager identityManager, TabCallback<BeanItem<Permission>> callback )
+    public PermissionForm( TabCallback<BeanItem<Permission>> callback )
     {
         init();
-        this.identityManager = identityManager;
         this.callback = callback;
     }
 
@@ -66,10 +75,9 @@ public class PermissionForm extends VerticalLayout
         HorizontalLayout buttons = new HorizontalLayout( saveButton, cancelButton, resetButton );
         buttons.setSpacing( true );
 
-        form = new FormLayout();
+        final FormLayout form = new FormLayout();
         form.addComponents( name, permissionGroup, description );
 
-        //        addComponents( name, permissionGroup, description );
         addComponents( form, buttons );
 
         setSpacing( true );
@@ -82,15 +90,15 @@ public class PermissionForm extends VerticalLayout
         if ( permission != null )
         {
             permissionFieldGroup.setItemDataSource( permission );
+            //            Field<?> name = permissionFieldGroup.buildAndBind( "Name", "name" );
+
             permissionFieldGroup.bind( name, "name" );
             permissionFieldGroup.bind( description, "description" );
             permissionFieldGroup.bind( permissionGroup, "permissionGroup" );
-            //            this.permission.addItemProperty( "name", name );
-            //            this.permission.addItemProperty( "description", description );
-            //            this.permission.addItemProperty( "permissionGroup", permissionGroup );
-            //            name.setValue( permission.getBean().getName() );
-            //            description.setValue( permission.getBean().getDescription() );
-            //            permissionGroup.select( permission.getBean().getPermissionGroup() );
+            permissionFieldGroup.setReadOnly( true );
+            Field<?> description = permissionFieldGroup.getField( "description" );
+            description.setReadOnly( false );
+
         }
     }
 
@@ -102,16 +110,26 @@ public class PermissionForm extends VerticalLayout
         {
             if ( permission != null )
             {
-                description.commit();
-                permission.getBean().setDescription( description.getValue() );
-                permission.getBean().setName( name.getValue() );
-                permission.getBean().setPermissionGroup( ( PermissionGroup ) permissionGroup.getValue() );
+                try
+                {
+                    permissionFieldGroup.commit();
+                }
+                catch ( FieldGroup.CommitException e )
+                {
+                    LOGGER.error( "Error commit permission fieldGroup changes" );
+                }
+                //                description.commit();
+                //                permission.getBean().setDescription( description.getValue() );
+                //                permission.getBean().setName( name.getValue() );
+                //                permission.getBean().setPermissionGroup( ( PermissionGroup ) permissionGroup
+                // .getValue() );
             }
             else
             {
-                permission = new BeanItem<Permission>( identityManager
-                        .createPermission( name.getValue(), ( PermissionGroup ) permissionGroup.getValue(),
-                                description.getValue() ) );
+                //                permission = new BeanItem<>( identityManager
+                //                        .createPermission( name.getValue(), ( PermissionGroup ) permissionGroup
+                // .getValue(),
+                //                                description.getValue() ) );
             }
             if ( callback != null )
             {
@@ -126,7 +144,7 @@ public class PermissionForm extends VerticalLayout
         public void buttonClick( final Button.ClickEvent event )
         {
             PermissionForm.this.setVisible( false );
-            setPermission( permission );
+            permissionFieldGroup.discard();
         }
     };
 
@@ -135,7 +153,7 @@ public class PermissionForm extends VerticalLayout
         @Override
         public void buttonClick( final Button.ClickEvent event )
         {
-            setPermission( permission );
+            permissionFieldGroup.discard();
         }
     };
 }

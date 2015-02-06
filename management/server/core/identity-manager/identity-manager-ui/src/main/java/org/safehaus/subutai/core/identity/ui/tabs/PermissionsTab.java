@@ -45,21 +45,24 @@ public class PermissionsTab extends CustomComponent implements TabCallback<BeanI
         //TODO need to retrieve all permissions from db.
         final BeanItemContainer<Permission> beans = new BeanItemContainer<>( Permission.class );
 
-        beans.addBean( identityManager
-                .createPermission( "Some permission", PermissionGroup.ENVIRONMENT_PERMISSIONS, "some description" ) );
+        beans.addAll( identityManager.getAllPermissions() );
+        beans.addNestedContainerProperty( "permissionGroup.name" );
 
         // A layout for the table and form
         HorizontalLayout layout = new HorizontalLayout();
 
         // Bind a table to it
         permissionsTable = new Table( "Permissions", beans );
-        permissionsTable.setVisibleColumns( new Object[] { "name", "permissionGroup", "description" } );
+        permissionsTable.setVisibleColumns( new Object[] { "name", "permissionGroup.name", "description" } );
         permissionsTable.setPageLength( 7 );
+        permissionsTable.setColumnHeader( "name", "Name" );
+        permissionsTable.setColumnHeader( "permissionGroup.name", "PermissionGroup" );
+        permissionsTable.setColumnHeader( "description", "Description" );
         permissionsTable.setBuffered( false );
 
         // Create a form for editing a selected or new item.
         // It is invisible until actually used.
-        final PermissionForm permissionForm = new PermissionForm( identityManager, this );
+        final PermissionForm permissionForm = new PermissionForm( this );
         permissionForm.setVisible( false );
 
         // When the user selects an item, show it in the form
@@ -77,7 +80,7 @@ public class PermissionsTab extends CustomComponent implements TabCallback<BeanI
                 permissionForm.setVisible( true );
                 BeanItem<Permission> permission = beans.getItem( permissionsTable.getValue() );
                 permissionForm.setPermission( permission );
-                permissionsTable.setData( null );
+                //                permissionsTable.select( null );
             }
         } );
         permissionsTable.setSelectable( true );
