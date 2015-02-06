@@ -791,7 +791,7 @@ function start_update_rrd {
   #write out current crontab
   crontab -l > mycron
   #echo path variable to cron file if not set(this is for sbin directory due to zfs)
-  local path_entry="PATH=\/bin:\/usr\/bin:\/sbin"
+  local path_entry="PATH=\/usr\/local\/sbin:\/usr\/local\/bin:\/usr\/sbin:\/usr\/bin:\/sbin:\/bin"
   if ! grep -q "PATH=" mycron
   then
     sed -i "1s/^/$path_entry\n/" mycron
