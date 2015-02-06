@@ -94,6 +94,10 @@
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.safehaus.subutai</groupId>
+      <artifactId>key-manager-api</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

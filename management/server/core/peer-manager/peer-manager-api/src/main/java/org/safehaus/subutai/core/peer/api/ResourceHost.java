@@ -40,12 +40,7 @@ public interface ResourceHost extends Host
 
     public void destroyContainerHost( ContainerHost containerHost ) throws ResourceHostException;
 
-    @Deprecated
-    public void removeContainerHost( ContainerHost result ) throws ResourceHostException;
-
     public void queue( HostTask hostTask );
-
-    public void cloneContainer( String templateName, String hostname ) throws ResourceHostException;
 
     public ContainerHost createContainer( String templateName, String hostname, int timeout )
             throws ResourceHostException;

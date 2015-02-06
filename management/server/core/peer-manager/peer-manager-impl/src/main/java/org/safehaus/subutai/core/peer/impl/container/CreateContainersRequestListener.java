@@ -13,14 +13,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class CreateContainerRequestListener extends RequestListener
+public class CreateContainersRequestListener extends RequestListener
 {
-    private static final Logger LOG = LoggerFactory.getLogger( CreateContainerRequestListener.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( CreateContainersRequestListener.class.getName() );
 
     private LocalPeer localPeer;
 
 
-    public CreateContainerRequestListener( LocalPeer localPeer )
+    public CreateContainersRequestListener( LocalPeer localPeer )
     {
         super( RecipientType.CONTAINER_CREATE_REQUEST.name() );
 
@@ -31,7 +31,7 @@ public class CreateContainerRequestListener extends RequestListener
     @Override
     public Object onRequest( Payload payload ) throws PeerException
     {
-        CreateContainerRequest request = payload.getMessage( CreateContainerRequest.class );
+        CreateContainersRequest request = payload.getMessage( CreateContainersRequest.class );
         if ( request != null )
         {
 
@@ -40,7 +40,7 @@ public class CreateContainerRequestListener extends RequestListener
                             request.getTemplates(), request.getNumberOfContainers(), request.getStrategyId(),
                             request.getCriteria() );
 
-            return new CreateContainerResponse( containerHosts );
+            return new CreateContainersResponse( containerHosts );
         }
         else
         {

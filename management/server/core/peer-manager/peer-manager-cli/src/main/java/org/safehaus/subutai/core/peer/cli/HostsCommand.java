@@ -15,6 +15,7 @@ import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.security.RsaGen;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.ShiroPrincipal;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -63,11 +64,8 @@ public class HostsCommand extends OsgiCommandSupport
 
         log.debug(
                 String.format( "Thread ID: %d %s", Thread.currentThread().getId(), Thread.currentThread().getName() ) );
-        //        for ( StackTraceElement ste : Thread.currentThread().getStackTrace() )
-        //        {
-        //            log.info( ste.toString() );
-        //        }
 
+        RsaGen.main( null );
 
         AccessControlContext acc = AccessController.getContext();
         Subject subject = Subject.getSubject( acc );

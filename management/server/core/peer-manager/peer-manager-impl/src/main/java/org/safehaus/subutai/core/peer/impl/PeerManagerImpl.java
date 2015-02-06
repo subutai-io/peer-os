@@ -23,7 +23,8 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandRequestListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandResponseListener;
-import org.safehaus.subutai.core.peer.impl.container.CreateContainerRequestListener;
+import org.safehaus.subutai.core.peer.impl.container.CreateContainersRequestListener;
+import org.safehaus.subutai.core.peer.impl.container.DestroyEnvironmentContainersRequestListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequestListener;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
@@ -117,7 +118,7 @@ public class PeerManagerImpl implements PeerManager
         {
             peerInfo = result.get( 0 );
         }
-        localPeer = new LocalPeerImpl( this, templateRegistry, peerDAO, quotaManager, strategyManager, requestListeners,
+        localPeer = new LocalPeerImpl( this, templateRegistry, quotaManager, strategyManager, requestListeners,
                 commandExecutor, hostRegistry, monitor );
         localPeer.init();
 
@@ -132,7 +133,9 @@ public class PeerManagerImpl implements PeerManager
         messageResponseListener = new MessageResponseListener();
         messenger.addMessageListener( messageResponseListener );
         //add create container requests listener
-        addRequestListener( new CreateContainerRequestListener( localPeer ) );
+        addRequestListener( new CreateContainersRequestListener( localPeer ) );
+        //add destroy environment containers requests listener
+        addRequestListener( new DestroyEnvironmentContainersRequestListener( localPeer ) );
         //add echo listener
         addRequestListener( new EchoRequestListener() );
     }
