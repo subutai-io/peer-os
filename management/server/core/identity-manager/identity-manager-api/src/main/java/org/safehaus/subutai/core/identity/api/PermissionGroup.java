@@ -8,7 +8,8 @@ public enum PermissionGroup
 {
     ENVIRONMENT_PERMISSIONS( "Environment group" ),
     PEER_PERMISSIONS( "Peer group" ),
-    TEMPLATE_REGISTRY_PERMISSIONS( "Template registry group" );
+    TEMPLATE_REGISTRY_PERMISSIONS( "Template registry group" ),
+    DEFAULT_PERMISSIONS( "Default system permissions" );
 
     private String name;
 

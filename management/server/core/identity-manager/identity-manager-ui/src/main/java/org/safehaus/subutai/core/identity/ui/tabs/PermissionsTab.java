@@ -7,9 +7,11 @@ import org.safehaus.subutai.core.identity.api.PermissionGroup;
 import org.safehaus.subutai.core.identity.ui.tabs.subviews.PermissionForm;
 
 import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.Form;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
@@ -18,9 +20,10 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * Created by talas on 1/26/15.
  */
-public class PermissionsTab extends CustomComponent implements TabCallback<Permission>
+public class PermissionsTab extends CustomComponent implements TabCallback<BeanItem<Permission>>
 {
     private IdentityManager identityManager;
+    private Table permissionsTable;
 
 
     public PermissionsTab( final IdentityManager identityManager )
@@ -34,6 +37,8 @@ public class PermissionsTab extends CustomComponent implements TabCallback<Permi
     void editorForm()
     {
         VerticalLayout vlayout = new VerticalLayout();
+        Form form = new Form();
+        form.commit();
 
         // Create a container for such beans
         // Add some beans to it
@@ -47,18 +52,18 @@ public class PermissionsTab extends CustomComponent implements TabCallback<Permi
         HorizontalLayout layout = new HorizontalLayout();
 
         // Bind a table to it
-        final Table table = new Table( "Permissions", beans );
-        table.setVisibleColumns( new Object[] { "name", "permissionGroup", "description" } );
-        table.setPageLength( 7 );
-        table.setBuffered( false );
+        permissionsTable = new Table( "Permissions", beans );
+        permissionsTable.setVisibleColumns( new Object[] { "name", "permissionGroup", "description" } );
+        permissionsTable.setPageLength( 7 );
+        permissionsTable.setBuffered( false );
 
         // Create a form for editing a selected or new item.
         // It is invisible until actually used.
-        final PermissionForm permissionForm = new PermissionForm( identityManager );
+        final PermissionForm permissionForm = new PermissionForm( identityManager, this );
         permissionForm.setVisible( false );
 
         // When the user selects an item, show it in the form
-        table.addValueChangeListener( new Property.ValueChangeListener()
+        permissionsTable.addValueChangeListener( new Property.ValueChangeListener()
         {
             @Override
             public void valueChange( Property.ValueChangeEvent event )
@@ -70,13 +75,13 @@ public class PermissionsTab extends CustomComponent implements TabCallback<Permi
                     return;
                 }
                 permissionForm.setVisible( true );
-                Permission permission = ( Permission ) table.getValue();
+                BeanItem<Permission> permission = beans.getItem( permissionsTable.getValue() );
                 permissionForm.setPermission( permission );
-                table.setData( null );
+                permissionsTable.setData( null );
             }
         } );
-        table.setSelectable( true );
-        table.setImmediate( true );
+        permissionsTable.setSelectable( true );
+        permissionsTable.setImmediate( true );
 
         // Creates a new bean for editing in the form before adding
         // it to the table. Adding is handled after committing
@@ -86,23 +91,23 @@ public class PermissionsTab extends CustomComponent implements TabCallback<Permi
         {
             public void buttonClick( Button.ClickEvent event )
             {
-                //                Permission newPermission = new Permission( "Some permission" );
-                //                // Create a new item; this will create a new bean
-                //                Object itemId = beans.addItem( newPermission );
+
+                // Create a new item; this will create a new bean
+                BeanItem<Permission> newPermission = new BeanItem<Permission>( identityManager
+                        .createPermission( "New permission", PermissionGroup.DEFAULT_PERMISSIONS,
+                                "Default permissions" ) );
+
+                // The form was opened for editing a new item
+                permissionsTable.select( null );
+                permissionsTable.setEnabled( false );
+                newBean.setEnabled( false );
                 //
-                //                // The form was opened for editing a new item
-                //                table.setData( itemId );
-                //
-                //                table.select( itemId );
-                //                table.setEnabled( false );
-                //                newBean.setEnabled( false );
-                //
-                //                // Make the form a bit nicer
-                //                //this is an example for future how to improve UI
+                // Make the form a bit nicer
+                //this is an example for future how to improve UI
                 //                // form.setVisibleItemProperties( new Object[] { "name" } );
                 //                form.setItemDataSource( beans.getItem( newPermission ) );
                 //                form.setVisible( true );
-                permissionForm.setPermission( null );
+                permissionForm.setPermission( newPermission );
                 permissionForm.setVisible( true );
             }
         } );
@@ -190,7 +195,7 @@ public class PermissionsTab extends CustomComponent implements TabCallback<Permi
             }
         } );
 
-        layout.addComponent( table );
+        layout.addComponent( permissionsTable );
         layout.addComponent( permissionForm );
 
         //        form.getFooter().addComponent( submit );
@@ -206,25 +211,25 @@ public class PermissionsTab extends CustomComponent implements TabCallback<Permi
 
 
     @Override
-    public void savePermission( final Permission value )
+    public void savePermission( final BeanItem<Permission> value )
     {
         //TODO populate data to table
-        identityManager.updatePermission( value );
+        identityManager.updatePermission( value.getBean() );
     }
 
 
     @Override
-    public void removeOperation( final Permission value )
+    public void removeOperation( final BeanItem<Permission> value )
     {
         //TODO remove data from table
-        identityManager.deletePermission( value );
+        identityManager.deletePermission( value.getBean() );
     }
 
 
     @Override
-    public void updatePermission( final Permission value )
+    public void updatePermission( final BeanItem<Permission> value )
     {
         //TODO refresh data from table
-        identityManager.updatePermission( value );
+        identityManager.updatePermission( value.getBean() );
     }
 }

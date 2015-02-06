@@ -10,10 +10,13 @@ import org.safehaus.subutai.core.identity.ui.tabs.TabCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vaadin.data.fieldgroup.BeanFieldGroup;
+import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -23,20 +26,23 @@ import com.vaadin.ui.themes.Reindeer;
 public class PermissionForm extends VerticalLayout
 {
 
-    TabCallback callback;
+    TabCallback<BeanItem<Permission>> callback;
     private static final Logger LOGGER = LoggerFactory.getLogger( PermissionForm.class );
 
-    private Permission permission;
+    private BeanItem<Permission> permission;
     private IdentityManager identityManager;
     private TextField name = new TextField( "Permission name" );
     private TextField description = new TextField( "Permission Description" );
     private ComboBox permissionGroup;
+    private BeanFieldGroup<Permission> permissionFieldGroup = new BeanFieldGroup<>( Permission.class );
+    private FormLayout form;
 
 
-    public PermissionForm( IdentityManager identityManager )
+    public PermissionForm( IdentityManager identityManager, TabCallback<BeanItem<Permission>> callback )
     {
         init();
         this.identityManager = identityManager;
+        this.callback = callback;
     }
 
 
@@ -60,27 +66,31 @@ public class PermissionForm extends VerticalLayout
         HorizontalLayout buttons = new HorizontalLayout( saveButton, cancelButton, resetButton );
         buttons.setSpacing( true );
 
-        addComponents( name, permissionGroup, description );
-        addComponents( buttons );
+        form = new FormLayout();
+        form.addComponents( name, permissionGroup, description );
+
+        //        addComponents( name, permissionGroup, description );
+        addComponents( form, buttons );
 
         setSpacing( true );
     }
 
 
-    public void setPermission( final Permission permission )
+    public void setPermission( final BeanItem<Permission> permission )
     {
         this.permission = permission;
         if ( permission != null )
         {
-            name.setValue( permission.getName() );
-            description.setValue( permission.getDescription() );
-            permissionGroup.select( permission.getPermissionGroup() );
-        }
-        else
-        {
-            name.setValue( "" );
-            description.setValue( "" );
-            permissionGroup.setValue( null );
+            permissionFieldGroup.setItemDataSource( permission );
+            permissionFieldGroup.bind( name, "name" );
+            permissionFieldGroup.bind( description, "description" );
+            permissionFieldGroup.bind( permissionGroup, "permissionGroup" );
+            //            this.permission.addItemProperty( "name", name );
+            //            this.permission.addItemProperty( "description", description );
+            //            this.permission.addItemProperty( "permissionGroup", permissionGroup );
+            //            name.setValue( permission.getBean().getName() );
+            //            description.setValue( permission.getBean().getDescription() );
+            //            permissionGroup.select( permission.getBean().getPermissionGroup() );
         }
     }
 
@@ -92,17 +102,20 @@ public class PermissionForm extends VerticalLayout
         {
             if ( permission != null )
             {
-                permission.setDescription( description.getValue() );
-                permission.setName( name.getValue() );
-                permission.setPermissionGroup( ( PermissionGroup ) permissionGroup.getValue() );
-                identityManager.updatePermission( permission );
+                description.commit();
+                permission.getBean().setDescription( description.getValue() );
+                permission.getBean().setName( name.getValue() );
+                permission.getBean().setPermissionGroup( ( PermissionGroup ) permissionGroup.getValue() );
             }
             else
             {
-                permission = identityManager
+                permission = new BeanItem<Permission>( identityManager
                         .createPermission( name.getValue(), ( PermissionGroup ) permissionGroup.getValue(),
-                                description.getValue() );
-                identityManager.updatePermission( permission );
+                                description.getValue() ) );
+            }
+            if ( callback != null )
+            {
+                callback.savePermission( permission );
             }
         }
     };
