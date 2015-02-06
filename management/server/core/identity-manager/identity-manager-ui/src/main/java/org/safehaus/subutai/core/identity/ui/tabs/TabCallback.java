@@ -6,9 +6,9 @@ package org.safehaus.subutai.core.identity.ui.tabs;
  */
 public interface TabCallback<T>
 {
-    public void savePermission( T value );
+    public void saveOperation( T value, final boolean newValue );
 
-    public void removeOperation( T value );
+    public void removeOperation( T value, final boolean newValue );
 
-    public void updatePermission( T value );
+    public void cancelOperation();
 }

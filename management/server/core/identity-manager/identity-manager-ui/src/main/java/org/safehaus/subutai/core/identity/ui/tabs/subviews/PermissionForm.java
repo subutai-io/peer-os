@@ -30,7 +30,7 @@ public class PermissionForm extends VerticalLayout
     TabCallback<BeanItem<Permission>> callback;
     private static final Logger LOGGER = LoggerFactory.getLogger( PermissionForm.class );
 
-    private BeanItem<Permission> permission;
+    private boolean newValue;
     private TextField name = new TextField()
     {
         {
@@ -59,7 +59,7 @@ public class PermissionForm extends VerticalLayout
     {
         final Button saveButton = new Button( "Save permission", saveListener );
         final Button cancelButton = new Button( "Cancel", cancelListener );
-        final Button resetButton = new Button( "Reset changes", resetListener );
+        final Button removeButton = new Button( "Remove permission", resetListener );
         saveButton.setStyleName( Reindeer.BUTTON_DEFAULT );
 
         BeanItemContainer<PermissionGroup> container = new BeanItemContainer<>( PermissionGroup.class );
@@ -72,7 +72,7 @@ public class PermissionForm extends VerticalLayout
         permissionGroup.setTextInputAllowed( false );
         permissionGroup.setRequired( true );
 
-        HorizontalLayout buttons = new HorizontalLayout( saveButton, cancelButton, resetButton );
+        HorizontalLayout buttons = new HorizontalLayout( saveButton, cancelButton, removeButton );
         buttons.setSpacing( true );
 
         final FormLayout form = new FormLayout();
@@ -84,9 +84,9 @@ public class PermissionForm extends VerticalLayout
     }
 
 
-    public void setPermission( final BeanItem<Permission> permission )
+    public void setPermission( final BeanItem<Permission> permission, boolean newValue )
     {
-        this.permission = permission;
+        this.newValue = newValue;
         if ( permission != null )
         {
             permissionFieldGroup.setItemDataSource( permission );
@@ -95,45 +95,36 @@ public class PermissionForm extends VerticalLayout
             permissionFieldGroup.bind( name, "name" );
             permissionFieldGroup.bind( description, "description" );
             permissionFieldGroup.bind( permissionGroup, "permissionGroup" );
-            permissionFieldGroup.setReadOnly( true );
-            Field<?> description = permissionFieldGroup.getField( "description" );
-            description.setReadOnly( false );
 
+            if ( !newValue )
+            {
+                permissionFieldGroup.setReadOnly( true );
+                Field<?> description = permissionFieldGroup.getField( "description" );
+                description.setReadOnly( false );
+            }
         }
     }
 
 
+    // When OK button is clicked, commit the form to the bean
     private Button.ClickListener saveListener = new Button.ClickListener()
     {
         @Override
         public void buttonClick( final Button.ClickEvent event )
         {
-            if ( permission != null )
+            // New items have to be added to the container
+            // Commit the addition
+            try
             {
-                try
-                {
-                    permissionFieldGroup.commit();
-                }
-                catch ( FieldGroup.CommitException e )
-                {
-                    LOGGER.error( "Error commit permission fieldGroup changes" );
-                }
-                //                description.commit();
-                //                permission.getBean().setDescription( description.getValue() );
-                //                permission.getBean().setName( name.getValue() );
-                //                permission.getBean().setPermissionGroup( ( PermissionGroup ) permissionGroup
-                // .getValue() );
+                permissionFieldGroup.commit();
             }
-            else
+            catch ( FieldGroup.CommitException e )
             {
-                //                permission = new BeanItem<>( identityManager
-                //                        .createPermission( name.getValue(), ( PermissionGroup ) permissionGroup
-                // .getValue(),
-                //                                description.getValue() ) );
+                LOGGER.error( "Error commit permission fieldGroup changes" );
             }
             if ( callback != null )
             {
-                callback.savePermission( permission );
+                callback.saveOperation( permissionFieldGroup.getItemDataSource(), newValue );
             }
         }
     };
@@ -143,8 +134,11 @@ public class PermissionForm extends VerticalLayout
         @Override
         public void buttonClick( final Button.ClickEvent event )
         {
-            PermissionForm.this.setVisible( false );
             permissionFieldGroup.discard();
+            if ( callback != null )
+            {
+                callback.removeOperation( permissionFieldGroup.getItemDataSource(), newValue );
+            }
         }
     };
 
@@ -154,6 +148,11 @@ public class PermissionForm extends VerticalLayout
         public void buttonClick( final Button.ClickEvent event )
         {
             permissionFieldGroup.discard();
+            PermissionForm.this.setVisible( false );
+            if ( callback != null )
+            {
+                callback.cancelOperation();
+            }
         }
     };
 }
