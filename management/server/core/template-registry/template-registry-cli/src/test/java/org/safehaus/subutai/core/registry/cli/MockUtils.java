@@ -39,6 +39,7 @@ public class MockUtils
         when( CHILD_TEMPLATE_ONE.toString() ).thenReturn( CHILD_ONE_TEMPLATE_NAME );
         when( CHILD_TEMPLATE_TWO.toString() ).thenReturn( CHILD_TWO_TEMPLATE_NAME );
         when( PARENT_TEMPLATE.toString() ).thenReturn( PARENT_TEMPLATE_NAME );
+        when( PARENT_TEMPLATE.getChildren() ).thenReturn( getChildTemplates() );
     }
 
 

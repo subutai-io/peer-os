@@ -1,12 +1,10 @@
 package org.safehaus.subutai.core.metric.impl;
 
 
-import java.sql.SQLException;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.util.DbUtil;
@@ -32,7 +30,7 @@ public class MonitorDao
     }
 
 
-   public void addSubscription( UUID environmentId, String subscriberId ) throws DaoException
+    public void addSubscription( UUID environmentId, String subscriberId ) throws DaoException
     {
 
         Preconditions.checkNotNull( environmentId, INVALID_ENV_ID );
@@ -40,7 +38,6 @@ public class MonitorDao
 
 
         dataService.update( environmentId.toString(), subscriberId );
-
     }
 
 
@@ -52,7 +49,6 @@ public class MonitorDao
 
 
         dataService.remove( environmentId.toString(), subscriberId );
-
     }
 
 

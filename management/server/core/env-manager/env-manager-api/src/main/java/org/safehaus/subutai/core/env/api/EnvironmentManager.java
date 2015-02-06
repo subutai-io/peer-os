@@ -4,14 +4,15 @@ package org.safehaus.subutai.core.env.api;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.environment.Blueprint;
+import org.safehaus.subutai.common.environment.Environment;
+import org.safehaus.subutai.common.environment.EnvironmentModificationException;
+import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
+import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.core.env.api.build.Blueprint;
-import org.safehaus.subutai.core.env.api.build.Topology;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
-import org.safehaus.subutai.core.env.api.exception.EnvironmentModificationException;
-import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
 
 
 /**
@@ -89,12 +90,13 @@ public interface EnvironmentManager
      *
      * @param environmentId - environment id
      * @param sshKey - ssh key content
+     * @param async - indicates whether ssh key is applied synchronously or asynchronously to the calling party
      *
      * @throws EnvironmentNotFoundException - thrown if environment not found
-     * @throws EnvironmentManagerException - thrown if error occurs during key insertion
+     * @throws EnvironmentModificationException - thrown if error occurs during key insertion
      */
-    public void setSshKey( UUID environmentId, String sshKey )
-            throws EnvironmentNotFoundException, EnvironmentManagerException;
+    public void setSshKey( UUID environmentId, String sshKey, boolean async )
+            throws EnvironmentNotFoundException, EnvironmentModificationException;
 
 
     /**
@@ -127,4 +129,7 @@ public interface EnvironmentManager
     public void removeBlueprint( UUID blueprintId ) throws EnvironmentManagerException;
 
     public Set<Blueprint> getBlueprints() throws EnvironmentManagerException;
+
+
+    public String getDefaultDomainName();
 }

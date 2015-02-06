@@ -31,14 +31,11 @@ public interface RestService
     @Produces( { MediaType.TEXT_PLAIN } )
     public String getId();
 
-
-    @POST
-    @Path( "container/schedule" )
+    @GET
+    @Path( "registered_peers" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response scheduleCloneContainers( @FormParam( "creatorPeerId" ) String creatorPeerId,
-                                      @FormParam( "templates" ) String templates, @FormParam( "quantity" ) int quantity,
-                                      @FormParam( "strategyId" ) String strategyId,
-                                      @FormParam( "criteria" ) String criteria );
+    public Response getRegisteredPeers();
+
 
     @POST
     @Path( "container/destroy" )
@@ -66,10 +63,10 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getTemplate( @FormParam( "templateName" ) String templateName );
 
-    @POST
-    @Path( "environment/containers" )
+    @GET
+    @Path( "container/state" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response environmentContainers( @FormParam( "environmentId" ) String envId );
+    public Response getContainerState( @QueryParam( "containerId" ) String containerId );
 
     @GET
     @Path( "ping" )

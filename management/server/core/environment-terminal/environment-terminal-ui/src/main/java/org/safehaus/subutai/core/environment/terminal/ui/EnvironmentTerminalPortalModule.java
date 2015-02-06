@@ -4,7 +4,7 @@ package org.safehaus.subutai.core.environment.terminal.ui;
 import java.io.File;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;

@@ -5,24 +5,30 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 
 import org.safehaus.subutai.common.dao.DaoManager;
+import org.safehaus.subutai.common.environment.Blueprint;
+import org.safehaus.subutai.common.environment.ContainerHostNotFoundException;
+import org.safehaus.subutai.common.environment.Environment;
+import org.safehaus.subutai.common.environment.EnvironmentModificationException;
+import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
+import org.safehaus.subutai.common.environment.EnvironmentStatus;
+import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.ContainersDestructionResult;
+import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.core.env.api.Environment;
+import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.core.env.api.EnvironmentEventListener;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.core.env.api.EnvironmentStatus;
-import org.safehaus.subutai.core.env.api.build.Blueprint;
-import org.safehaus.subutai.core.env.api.build.Topology;
-import org.safehaus.subutai.core.env.api.exception.ContainerHostNotFoundException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
-import org.safehaus.subutai.core.env.api.exception.EnvironmentModificationException;
-import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
 import org.safehaus.subutai.core.env.impl.builder.TopologyBuilder;
 import org.safehaus.subutai.core.env.impl.dao.BlueprintDataService;
 import org.safehaus.subutai.core.env.impl.dao.EnvironmentContainerDataService;
@@ -55,6 +61,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private final NetworkManager networkManager;
     private final TopologyBuilder topologyBuilder;
     private final ExecutorService executor = Executors.newCachedThreadPool();
+    private final String defaultDomain;
+
+    private final Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
 
     //************* DaoManager ******************
     private final DaoManager daoManager;
@@ -66,17 +75,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager,
-                                   final NetworkManager networkManager, final DaoManager daoManager )
+                                   final NetworkManager networkManager, final DaoManager daoManager,
+                                   final String defaultDomain )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( networkManager );
         Preconditions.checkNotNull( daoManager );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( defaultDomain ) );
 
         this.peerManager = peerManager;
         this.networkManager = networkManager;
         this.daoManager = daoManager;
-        this.topologyBuilder = new TopologyBuilder( templateRegistry, peerManager );
+        this.defaultDomain = defaultDomain;
+        this.topologyBuilder = new TopologyBuilder( templateRegistry, peerManager, defaultDomain );
     }
 
 
@@ -164,6 +176,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                         configureHosts( environment.getContainerHosts() );
 
                         configureSsh( environment.getContainerHosts() );
+
+                        environment.setStatus( EnvironmentStatus.HEALTHY );
+
+                        setContainersTransientFields( environment.getContainerHosts() );
                     }
                     catch ( EnvironmentBuildException | NetworkManagerException e )
                     {
@@ -171,11 +187,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
                         throw new EnvironmentCreationException( e );
                     }
-
-                    environment.setStatus( EnvironmentStatus.HEALTHY );
-
-                    //set container's transient fields
-                    setContainersTransientFields( environment.getContainerHosts() );
+                    finally
+                    {
+                        try
+                        {
+                            notifyOnEnvironmentCreated( findEnvironment( environment.getId() ) );
+                        }
+                        catch ( EnvironmentNotFoundException e )
+                        {
+                            LOG.warn( "Error notifying on environment creation", e );
+                        }
+                    }
                 }
                 catch ( EnvironmentCreationException e )
                 {
@@ -226,6 +248,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
 
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+        {
+            throw new EnvironmentDestructionException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
+
         final Semaphore semaphore = new Semaphore( 0 );
 
         final ResultHolder<EnvironmentDestructionException> resultHolder = new ResultHolder<>();
@@ -241,36 +269,70 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 {
                     environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-                    Set<ContainerHost> containers = Sets.newHashSet( environment.getContainerHosts() );
-                    for ( ContainerHost container : containers )
+                    Set<Peer> environmentPeers = Sets.newHashSet();
+
+                    for ( ContainerHost container : environment.getContainerHosts() )
+                    {
+                        environmentPeers.add( container.getPeer() );
+                    }
+
+                    ExecutorService executorService = Executors.newFixedThreadPool( environmentPeers.size() );
+
+                    Set<Future<ContainersDestructionResult>> futures = Sets.newHashSet();
+
+                    for ( Peer peer : environmentPeers )
+                    {
+                        futures.add(
+                                executorService.submit( new PeerEnvironmentDestructionTask( peer, environmentId ) ) );
+                    }
+
+                    Set<ContainersDestructionResult> results = Sets.newHashSet();
+
+                    for ( Future<ContainersDestructionResult> future : futures )
                     {
                         try
                         {
-                            ( ( EnvironmentContainerImpl ) container ).destroy();
-
-                            environment.removeContainer( container.getId() );
+                            results.add( future.get() );
                         }
-                        catch ( PeerException e )
+                        catch ( ExecutionException | InterruptedException e )
                         {
-                            if ( forceMetadataRemoval )
-                            {
-                                exceptions.add( new EnvironmentDestructionException( e ) );
-                            }
-                            else
-                            {
-                                environment.setStatus( EnvironmentStatus.UNHEALTHY );
+                            exceptions.add( new EnvironmentDestructionException( e ) );
+                        }
+                    }
 
-                                throw new EnvironmentDestructionException( e );
+                    executorService.shutdown();
+
+                    for ( ContainersDestructionResult result : results )
+                    {
+                        if ( !Strings.isNullOrEmpty( result.getException() ) )
+                        {
+                            exceptions.add( new EnvironmentDestructionException( result.getException() ) );
+                        }
+                        if ( !CollectionUtil.isCollectionEmpty( result.getDestroyedContainersIds() ) )
+                        {
+                            for ( UUID containerId : result.getDestroyedContainersIds() )
+                            {
+                                environment.removeContainer( containerId );
+
+                                notifyOnContainerDestroyed( environment, containerId );
                             }
                         }
                     }
 
-                    environmentDataService.remove( environmentId.toString() );
+                    if ( forceMetadataRemoval || environment.getContainerHosts().isEmpty() )
+                    {
+                        removeEnvironment( environmentId );
+                    }
+                    else
+                    {
+                        environment.setStatus( EnvironmentStatus.UNHEALTHY );
+                    }
                 }
-                catch ( EnvironmentDestructionException e )
+                catch ( EnvironmentNotFoundException e )
                 {
                     LOG.error( String.format( "Error destroying environment %s", environmentId ), e );
-                    resultHolder.setResult( e );
+
+                    resultHolder.setResult( new EnvironmentDestructionException( e ) );
                 }
                 finally
                 {
@@ -285,27 +347,26 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 semaphore.acquire();
 
-                if ( forceMetadataRemoval )
+                if ( !exceptions.isEmpty() )
                 {
-
-                    if ( !exceptions.isEmpty() )
-                    {
-                        throw new EnvironmentDestructionException(
-                                String.format( "There were errors while destroying environment: %s", exceptions ) );
-                    }
+                    throw new EnvironmentDestructionException(
+                            String.format( "There were errors while destroying environment: %s", exceptions ) );
                 }
-                else
+                else if ( resultHolder.getResult() != null )
                 {
-
-                    if ( resultHolder.getResult() != null )
-                    {
-                        throw resultHolder.getResult();
-                    }
+                    throw resultHolder.getResult();
                 }
             }
             catch ( InterruptedException e )
             {
                 throw new EnvironmentDestructionException( e );
+            }
+        }
+        else
+        {
+            if ( !exceptions.isEmpty() )
+            {
+                LOG.error( String.format( "There were errors while destroying environment: %s", exceptions ) );
             }
         }
     }
@@ -328,6 +389,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
 
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+        {
+            throw new EnvironmentModificationException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
+
         final Set<ContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
         final Set<ContainerHost> newContainers = Sets.newHashSet();
 
@@ -348,31 +415,37 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     {
                         topologyBuilder.build( environment, topology );
 
+                        newContainers.addAll( environment.getContainerHosts() );
+
+                        newContainers.removeAll( oldContainers );
+
+                        setContainersTransientFields( newContainers );
+
                         configureHosts( environment.getContainerHosts() );
 
                         configureSsh( environment.getContainerHosts() );
 
-                        if ( !Strings.isNullOrEmpty( environment.getPublicKey() ) )
+                        if ( !Strings.isNullOrEmpty( environment.getSshKey() ) )
                         {
-                            setSshKey( environmentId, environment.getPublicKey() );
+                            setSshKey( environmentId, environment.getSshKey(), false );
                         }
 
-                        //set container's transient fields
-                        setContainersTransientFields( environment.getContainerHosts() );
-
-                        newContainers.addAll( environment.getContainerHosts() );
-
-                        newContainers.removeAll( oldContainers );
+                        environment.setStatus( EnvironmentStatus.HEALTHY );
                     }
                     catch ( EnvironmentBuildException | NetworkManagerException | EnvironmentNotFoundException |
-                            EnvironmentManagerException e )
+                            EnvironmentModificationException e )
                     {
                         environment.setStatus( EnvironmentStatus.UNHEALTHY );
 
                         throw new EnvironmentModificationException( e );
                     }
-
-                    environment.setStatus( EnvironmentStatus.HEALTHY );
+                    finally
+                    {
+                        if ( !newContainers.isEmpty() )
+                        {
+                            notifyOnEnvironmentGrown( environment, newContainers );
+                        }
+                    }
                 }
                 catch ( EnvironmentModificationException e )
                 {
@@ -425,6 +498,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         final EnvironmentImpl environment =
                 ( EnvironmentImpl ) findEnvironment( UUID.fromString( containerHost.getEnvironmentId() ) );
 
+
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+        {
+            throw new EnvironmentModificationException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
+
         try
         {
             environment.getContainerHostById( containerHost.getId() );
@@ -465,8 +545,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                             }
                         }
 
-
                         environment.removeContainer( containerHost.getId() );
+
+                        notifyOnContainerDestroyed( environment, containerHost.getId() );
                     }
                     catch ( PeerException e )
                     {
@@ -475,7 +556,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
                         throw new EnvironmentModificationException( e );
                     }
-
 
                     if ( environment.getContainerHosts().isEmpty() )
                     {
@@ -530,6 +610,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         findEnvironment( environmentId );
 
         environmentDataService.remove( environmentId.toString() );
+
+        notifyOnEnvironmentDestroyed( environmentId );
     }
 
 
@@ -648,38 +730,167 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void setSshKey( final UUID environmentId, final String sshKey )
-            throws EnvironmentNotFoundException, EnvironmentManagerException
+    public void setSshKey( final UUID environmentId, final String sshKey, boolean async )
+            throws EnvironmentNotFoundException, EnvironmentModificationException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
 
-        String oldSshKey = environment.getPublicKey();
+        final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
 
-        environment.setPublicKey( sshKey );
+        final Semaphore semaphore = new Semaphore( 0 );
 
-        try
+        executor.submit( new Runnable()
         {
-            if ( Strings.isNullOrEmpty( sshKey ) && !Strings.isNullOrEmpty( oldSshKey ) )
+            @Override
+            public void run()
             {
-                //remove old key from containers
-                networkManager.removeSshKeyFromAuthorizedKeys( environment.getContainerHosts(), oldSshKey );
+                environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
+
+                String oldSshKey = environment.getSshKey();
+
+                environment.saveSshKey( sshKey );
+
+                try
+                {
+                    if ( Strings.isNullOrEmpty( sshKey ) && !Strings.isNullOrEmpty( oldSshKey ) )
+                    {
+                        //remove old key from containers
+                        networkManager.removeSshKeyFromAuthorizedKeys( environment.getContainerHosts(), oldSshKey );
+                    }
+                    else if ( !Strings.isNullOrEmpty( sshKey ) && Strings.isNullOrEmpty( oldSshKey ) )
+                    {
+                        //insert new key to containers
+                        networkManager.addSshKeyToAuthorizedKeys( environment.getContainerHosts(), sshKey );
+                    }
+                    else if ( !Strings.isNullOrEmpty( sshKey ) && !Strings.isNullOrEmpty( oldSshKey ) )
+                    {
+                        //replace old ssh key with new one
+                        networkManager
+                                .replaceSshKeyInAuthorizedKeys( environment.getContainerHosts(), oldSshKey, sshKey );
+                    }
+
+                    environment.setStatus( EnvironmentStatus.HEALTHY );
+                }
+                catch ( NetworkManagerException e )
+                {
+                    LOG.error( String.format( "Error setting ssh key to environment %s", environment.getName() ), e );
+                    environment.setStatus( EnvironmentStatus.UNHEALTHY );
+                    resultHolder.setResult( new EnvironmentModificationException( e ) );
+                }
+                finally
+                {
+                    semaphore.release();
+                }
             }
-            else if ( !Strings.isNullOrEmpty( sshKey ) && Strings.isNullOrEmpty( oldSshKey ) )
+        } );
+
+
+        if ( !async )
+        {
+            try
             {
-                //insert new key to containers
-                networkManager.addSshKeyToAuthorizedKeys( environment.getContainerHosts(), sshKey );
+                semaphore.acquire();
+
+                if ( resultHolder.getResult() != null )
+                {
+                    throw resultHolder.getResult();
+                }
             }
-            else if ( !Strings.isNullOrEmpty( sshKey ) && !Strings.isNullOrEmpty( oldSshKey ) )
+            catch ( InterruptedException e )
             {
-                //replace old ssh key with new one
-                networkManager.replaceSshKeyInAuthorizedKeys( environment.getContainerHosts(), oldSshKey, sshKey );
+                throw new EnvironmentModificationException( e );
             }
         }
-        catch ( NetworkManagerException e )
+    }
+
+
+    @Override
+    public String getDefaultDomainName()
+    {
+        return defaultDomain;
+    }
+
+
+    public void registerListener( EnvironmentEventListener listener )
+    {
+        if ( listener != null )
         {
-            throw new EnvironmentManagerException( "Failed to set SSH key to environment containers", e );
+            listeners.add( listener );
+        }
+    }
+
+
+    public void unregisterListener( EnvironmentEventListener listener )
+    {
+        if ( listener != null )
+        {
+            listeners.remove( listener );
+        }
+    }
+
+
+    private void notifyOnEnvironmentCreated( final Environment environment )
+    {
+        for ( final EnvironmentEventListener listener : listeners )
+        {
+            executor.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    listener.onEnvironmentCreated( environment );
+                }
+            } );
+        }
+    }
+
+
+    private void notifyOnEnvironmentGrown( final Environment environment, final Set<ContainerHost> containers )
+    {
+        for ( final EnvironmentEventListener listener : listeners )
+        {
+            executor.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    listener.onEnvironmentGrown( environment, containers );
+                }
+            } );
+        }
+    }
+
+
+    private void notifyOnContainerDestroyed( final Environment environment, final UUID containerId )
+    {
+        for ( final EnvironmentEventListener listener : listeners )
+        {
+            executor.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    listener.onContainerDestroyed( environment, containerId );
+                }
+            } );
+        }
+    }
+
+
+    private void notifyOnEnvironmentDestroyed( final UUID environmentId )
+    {
+        for ( final EnvironmentEventListener listener : listeners )
+        {
+            executor.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    listener.onEnvironmentDestroyed( environmentId );
+                }
+            } );
         }
     }
 }

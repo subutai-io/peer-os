@@ -9,9 +9,7 @@ import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.peer.api.task.Task;
 
 
-/**
- * Created by timur on 11/30/14.
- */
+
 public class CloneTask implements Task<CloneTaskParam, CloneTaskResult, CloneTaskType>
 {
 

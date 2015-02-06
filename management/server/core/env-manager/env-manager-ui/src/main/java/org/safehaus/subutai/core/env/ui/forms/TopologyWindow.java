@@ -6,12 +6,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.environment.Blueprint;
+import org.safehaus.subutai.common.environment.Environment;
+import org.safehaus.subutai.common.environment.EnvironmentModificationException;
+import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
+import org.safehaus.subutai.common.environment.NodeGroup;
+import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.core.env.api.build.Blueprint;
-import org.safehaus.subutai.core.env.api.build.NodeGroup;
-import org.safehaus.subutai.core.env.api.build.Topology;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
@@ -36,10 +39,11 @@ public class TopologyWindow extends Window
     private final PeerManager peerManager;
     private Table placementTable;
     private Button buildBtn;
+    private ComboBox envCombo;
 
 
     public TopologyWindow( final Blueprint blueprint, final PeerManager peerManager,
-                           final EnvironmentManager environmentManager )
+                           final EnvironmentManager environmentManager, final boolean grow )
     {
 
         this.blueprint = blueprint;
@@ -68,7 +72,8 @@ public class TopologyWindow extends Window
 
         content.addComponent( placementTable );
 
-        buildBtn = new Button( "Build" );
+        buildBtn = new Button( grow ? "Grow" : "Build" );
+        buildBtn.setId( "buildButton" );
         buildBtn.setEnabled( false );
         buildBtn.addClickListener( new Button.ClickListener()
         {
@@ -80,6 +85,10 @@ public class TopologyWindow extends Window
                 if ( placements == null )
                 {
                     Notification.show( "Failed to obtain topology", Notification.Type.ERROR_MESSAGE );
+                }
+                else if ( grow && envCombo.getValue() == null )
+                {
+                    Notification.show( "Please, select environment to grow" );
                 }
                 else
                 {
@@ -96,14 +105,23 @@ public class TopologyWindow extends Window
 
                     try
                     {
-                        environmentManager
-                                .createEnvironment( String.format( "%s-%s", blueprint.getName(), UUID.randomUUID() ),
-                                        topology, true );
-                        Notification.show( "Environment creation started" );
+                        if ( grow )
+                        {
+                            Environment environment = ( Environment ) envCombo.getValue();
+                            environmentManager.growEnvironment( environment.getId(), topology, true );
+                            Notification.show( "Environment growth started" );
+                        }
+                        else
+                        {
+                            environmentManager.createEnvironment(
+                                    String.format( "%s-%s", blueprint.getName(), UUID.randomUUID() ), topology, true );
+                            Notification.show( "Environment creation started" );
+                        }
                     }
-                    catch ( EnvironmentCreationException e )
+                    catch ( EnvironmentModificationException | EnvironmentNotFoundException |
+                            EnvironmentCreationException e )
                     {
-                        Notification.show( String.format( "Failed to create environment: %s", e ),
+                        Notification.show( String.format( "Failed to %s environment: %s", grow ? "grow" : "create", e ),
                                 Notification.Type.ERROR_MESSAGE );
                     }
 
@@ -113,6 +131,21 @@ public class TopologyWindow extends Window
             }
         } );
 
+        if ( grow )
+        {
+            envCombo = new ComboBox( "Environments" );
+            envCombo.setId( "envCb" );
+            envCombo.setImmediate( true );
+            envCombo.setTextInputAllowed( false );
+            envCombo.setNullSelectionAllowed( false );
+            envCombo.setRequired( true );
+            for ( Environment environment : environmentManager.getEnvironments() )
+            {
+                envCombo.addItem( environment );
+                envCombo.setItemCaption( environment, environment.getName() );
+            }
+            content.addComponent( envCombo );
+        }
         content.addComponent( buildBtn );
         content.setComponentAlignment( buildBtn, Alignment.TOP_RIGHT );
 
@@ -136,8 +169,8 @@ public class TopologyWindow extends Window
             {
                 if ( ng.getName().equalsIgnoreCase( nodeGroupName ) )
                 {
-                    nodeGroup = new NodeGroup( nodeGroupName, ng.getTemplateName(), ng.getDomainName(), amount,
-                            ng.getSshGroupId(), ng.getHostsGroupId(), ng.getContainerPlacementStrategy() );
+                    nodeGroup = new NodeGroup( nodeGroupName, ng.getTemplateName(), amount, ng.getSshGroupId(),
+                            ng.getHostsGroupId(), ng.getContainerPlacementStrategy() );
                     break;
                 }
             }
@@ -200,6 +233,7 @@ public class TopologyWindow extends Window
             slider.setValue( ( double ) nodeGroup.getNumberOfContainers() );
 
             ComboBox peersCombo = createPeersComboBox();
+            peersCombo.setId( "peersCombo" );
 
             Button placeBtn = createPlaceButton( nodeGroup, slider, peersCombo );
 
@@ -213,6 +247,7 @@ public class TopologyWindow extends Window
     private Button createPlaceButton( final NodeGroup nodeGroup, final Slider slider, final ComboBox peersCombo )
     {
         Button placeButton = new Button( "Place" );
+        placeButton.setId( "placeButton" );
 
         placeButton.addClickListener( new Button.ClickListener()
         {
@@ -247,6 +282,7 @@ public class TopologyWindow extends Window
     {
         final String rowId = String.format( "%s-%s", nodeGroup.getName(), peer.getId() );
         Button removeBtn = new Button( "Remove" );
+        removeBtn.setId( "removeButton" );
 
 
         final int amount = slider.getValue().intValue();

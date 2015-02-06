@@ -18,8 +18,6 @@ public interface PeerManager
 
     boolean update( PeerInfo peerInfo );
 
-
-    @Deprecated
     public List<PeerInfo> peers();
 
     public PeerInfo getLocalPeerInfo();
@@ -27,13 +25,6 @@ public interface PeerManager
     public PeerInfo getPeerInfo( UUID uuid );
 
     boolean unregister( String uuid ) throws PeerException;
-
-
-    List<PeerGroup> peersGroups();
-
-    void deletePeerGroup( PeerGroup group );
-
-    boolean savePeerGroup( PeerGroup group );
 
     public Peer getPeer( UUID peerId );
 
@@ -44,11 +35,9 @@ public interface PeerManager
 
     public LocalPeer getLocalPeer();
 
-    PeerGroup getPeerGroup( UUID peerGroupId );
-
     public void addRequestListener( RequestListener listener );
 
     public void removeRequestListener( RequestListener listener );
 
-    EntityManagerFactory getEntityManagerFactory();
+    public EntityManagerFactory getEntityManagerFactory();
 }

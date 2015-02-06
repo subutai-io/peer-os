@@ -162,8 +162,7 @@ public class Commands
     {
         return new RequestBuilder( String.format( "mkdir -p /root/.ssh && " +
                 "chmod 700 /root/.ssh && " +
-                "( grep -i -v \"%s\" /root/.ssh/authorized_keys > auth-keys-cleaned "
-                + " && mv auth-keys-cleaned /root/.ssh/authorized_keys ) ; " +
+                "sed -i \"\\,%s,d\" /root/.ssh/authorized_keys ; " +
                 "echo '%s' >> /root/.ssh/authorized_keys && " +
                 "chmod 644 /root/.ssh/authorized_keys", oldKey, newKey ) );
     }
@@ -212,8 +211,7 @@ public class Commands
     public RequestBuilder getRemoveSshKeyCommand( final String key )
     {
         return new RequestBuilder( String.format( "chmod 700 /root/.ssh && " +
-                        "grep -i -v \"%s\" /root/.ssh/authorized_keys > auth-keys-cleaned "
-                        + " && mv auth-keys-cleaned /root/.ssh/authorized_keys && " +
-                        "chmod 644 /root/.ssh/authorized_keys", key ) );
+                "sed -i \"\\,%s,d\" /root/.ssh/authorized_keys && " +
+                "chmod 644 /root/.ssh/authorized_keys", key ) );
     }
 }

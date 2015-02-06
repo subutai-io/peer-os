@@ -4,13 +4,12 @@ package org.safehaus.subutai.core.env.cli;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.environment.NodeGroup;
+import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
-import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.core.env.api.build.NodeGroup;
-import org.safehaus.subutai.core.env.api.build.Topology;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import org.apache.karaf.shell.commands.Argument;
@@ -57,7 +56,7 @@ public class GrowLocalEnvironmentCommand extends OsgiCommandSupport
 
         Topology topology = new Topology();
         NodeGroup nodeGroup = new NodeGroup( String.format( "NodeGroup%s", System.currentTimeMillis() ), templateName,
-                Common.DEFAULT_DOMAIN_NAME, numberOfContainers, 1, 1, new PlacementStrategy( "ROUND_ROBIN" ) );
+                numberOfContainers, 1, 1, new PlacementStrategy( "ROUND_ROBIN" ) );
 
         topology.addNodeGroupPlacement( peerManager.getLocalPeer(), nodeGroup );
 

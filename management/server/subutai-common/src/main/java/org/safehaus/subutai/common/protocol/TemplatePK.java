@@ -14,9 +14,6 @@ import org.safehaus.subutai.common.datatypes.TemplateVersion;
 import com.google.gson.annotations.Expose;
 
 
-/**
- * Created by talas on 11/5/14.
- */
 @Embeddable
 @Table( name = "template_pk" )
 @Access( AccessType.FIELD )

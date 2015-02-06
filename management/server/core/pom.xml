@@ -17,7 +17,6 @@
 
   <modules>
     <module>file-tracker</module>
-    <module>environment-manager</module>
     <module>environment-terminal</module>
     <module>git-manager</module>
     <module>lxc-quota-manager</module>
@@ -38,7 +37,8 @@
     <module>backup-manager</module>
     <module>plugin-manager</module>
     <module>env-manager</module>
-    <module>shiro-manager-parent</module>
+    <module>identity-manager</module>
+    <!--    <module>shiro-manager-parent</module>-->
   </modules>
 
 </project>

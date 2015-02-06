@@ -1,20 +1,18 @@
 package org.safehaus.subutai.core.peer.rest;
 
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
-import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
-import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
@@ -53,6 +51,13 @@ public class RestServiceImpl implements RestService
     {
         LocalPeer localPeer = peerManager.getLocalPeer();
         return localPeer.getId().toString();
+    }
+
+
+    @Override
+    public Response getRegisteredPeers()
+    {
+        return Response.ok( JsonUtil.toJson( peerManager.peers() ) ).build();
     }
 
 
@@ -180,46 +185,6 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response scheduleCloneContainers( final String creatorPeerId, final String templates, final int quantity,
-                                             final String strategyId, final String criteria )
-    {
-
-        try
-        {
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            Set<HostInfoModel> result = localPeer.scheduleCloneContainers( UUID.fromString( creatorPeerId ),
-                    JsonUtil.<List<Template>>fromJson( templates, new TypeToken<List<Template>>()
-                    {}.getType() ), quantity, strategyId,
-                    JsonUtil.<List<Criteria>>fromJson( templates, new TypeToken<List<Criteria>>()
-                    {}.getType() ) );
-            return Response.ok( JsonUtil.toJson( result ) ).build();
-        }
-        catch ( PeerException e )
-        {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
-
-
-    @Override
-    public Response environmentContainers( final String envId )
-    {
-        try
-        {
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            UUID environmentId = UUID.fromString( envId );
-
-            Set<ContainerHost> result = localPeer.getContainerHostsByEnvironmentId( environmentId );
-            return Response.ok( JsonUtil.toJson( result ) ).build();
-        }
-        catch ( PeerException e )
-        {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
-
-
-    @Override
     public Response destroyContainer( final String hostId )
     {
         try
@@ -288,6 +253,22 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             Boolean result = localPeer.isConnected( localPeer.bindHost( hostId ) );
             return Response.ok( result.toString() ).build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response getContainerState( final String containerId )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            ContainerHostState containerHostState = localPeer.getContainerHostState( containerId );
+            return Response.ok( JsonUtil.toJson( containerHostState ) ).build();
         }
         catch ( PeerException e )
         {

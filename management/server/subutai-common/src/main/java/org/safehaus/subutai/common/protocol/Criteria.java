@@ -11,10 +11,9 @@ public class Criteria<T>
     private T value;
 
 
-    public Criteria( String id, /*String title, */T value )
+    public Criteria( String id, T value )
     {
         this.id = id;
-//        this.title = title;
         this.value = value;
     }
 
@@ -30,17 +29,6 @@ public class Criteria<T>
         this.id = id;
     }
 
-//
-//    public String getTitle()
-//    {
-//        return title;
-//    }
-//
-//
-//    public void setTitle( String title )
-//    {
-//        this.title = title;
-//    }
 
 
     public T getValue()

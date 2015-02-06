@@ -1,12 +1,11 @@
 package org.safehaus.subutai.core.env.cli;
 
 
+import org.safehaus.subutai.common.environment.Environment;
+import org.safehaus.subutai.common.environment.NodeGroup;
+import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
-import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.core.env.api.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.core.env.api.build.NodeGroup;
-import org.safehaus.subutai.core.env.api.build.Topology;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import org.apache.karaf.shell.commands.Argument;
@@ -48,9 +47,8 @@ public class BuildLocalEnvironmentCommand extends OsgiCommandSupport
     protected Object doExecute() throws Exception
     {
         Topology topology = new Topology();
-        NodeGroup nodeGroup =
-                new NodeGroup( "NodeGroup1", templateName, Common.DEFAULT_DOMAIN_NAME, numberOfContainers, 1, 1,
-                        new PlacementStrategy( "ROUND_ROBIN" ) );
+        NodeGroup nodeGroup = new NodeGroup( "NodeGroup1", templateName, numberOfContainers, 1, 1,
+                new PlacementStrategy( "ROUND_ROBIN" ) );
 
         topology.addNodeGroupPlacement( peerManager.getLocalPeer(), nodeGroup );
 

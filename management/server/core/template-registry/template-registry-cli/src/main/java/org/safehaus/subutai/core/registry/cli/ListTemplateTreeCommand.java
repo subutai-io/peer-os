@@ -1,11 +1,11 @@
 package org.safehaus.subutai.core.registry.cli;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.registry.api.TemplateTree;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
@@ -23,16 +23,16 @@ public class ListTemplateTreeCommand extends OsgiCommandSupport
     private final TemplateRegistry templateRegistry;
 
 
-    private void listFamily( int level, TemplateTree tree, Template currentTemplate )
+    private void listFamily( int level, Template currentTemplate )
     {
         System.out.println(
                 String.format( "%" + ( level > 0 ? level : "" ) + "s %s", "", currentTemplate.getTemplateName() ) );
-        List<Template> children = tree.getChildrenTemplates( currentTemplate );
+        List<Template> children = currentTemplate.getChildren();
         if ( !( children == null || children.isEmpty() ) )
         {
             for ( Template child : children )
             {
-                listFamily( level + 1, tree, child );
+                listFamily( level + 1, child );
             }
         }
     }
@@ -50,14 +50,10 @@ public class ListTemplateTreeCommand extends OsgiCommandSupport
     protected Object doExecute() throws Exception
     {
 
-        TemplateTree tree = templateRegistry.getTemplateTree();
-        List<Template> uberTemplates = tree.getRootTemplates();
-        if ( uberTemplates != null )
+        List<Template> templates = new ArrayList<>( templateRegistry.getTemplateTree() );
+        for ( final Template template : templates )
         {
-            for ( Template template : uberTemplates )
-            {
-                listFamily( 0, tree, template );
-            }
+            listFamily( 0, template );
         }
 
         return null;

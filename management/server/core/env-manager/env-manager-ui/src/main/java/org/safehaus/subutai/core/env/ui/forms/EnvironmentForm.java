@@ -1,15 +1,18 @@
 package org.safehaus.subutai.core.env.ui.forms;
 
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.safehaus.subutai.core.env.api.Environment;
+import org.safehaus.subutai.common.environment.Environment;
+import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
+import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.core.env.api.EnvironmentStatus;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
-import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
 
 import com.vaadin.server.ClientConnector;
 import com.vaadin.server.ThemeResource;
@@ -22,6 +25,9 @@ import com.vaadin.ui.VerticalLayout;
 
 public class EnvironmentForm
 {
+    private static final String ID = "Id";
+    private static final String SSH_KEY = "Ssh key";
+    private static final String DATE = "Date";
     private final EnvironmentManager environmentManager;
     private static final String CONTAINERS = "Containers";
     private static final String NAME = "Name";
@@ -34,7 +40,7 @@ public class EnvironmentForm
 
     private final VerticalLayout contentRoot;
     private Table environmentsTable;
-    private ScheduledExecutorService updater = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService updater;
 
 
     public EnvironmentForm( final EnvironmentManager environmentManager )
@@ -72,13 +78,20 @@ public class EnvironmentForm
                 updater.shutdown();
             }
         } );
-
-        startTableUpdateThread();
+        contentRoot.addAttachListener( new ClientConnector.AttachListener()
+        {
+            @Override
+            public void attach( final ClientConnector.AttachEvent event )
+            {
+                startTableUpdateThread();
+            }
+        } );
     }
 
 
     private void startTableUpdateThread()
     {
+        updater = Executors.newSingleThreadScheduledExecutor();
         updater.scheduleWithFixedDelay( new Runnable()
         {
             @Override
@@ -104,6 +117,9 @@ public class EnvironmentForm
         for ( final Environment environment : environmentManager.getEnvironments() )
         {
             final Button containersBtn = new Button( CONTAINERS );
+            final Button sshKeyBtn = new Button( SSH_KEY );
+            final Button destroyBtn = new Button( DESTROY );
+            containersBtn.setId( environment.getName() + "-containers" );
             containersBtn.addClickListener( new Button.ClickListener()
             {
                 @Override
@@ -113,7 +129,6 @@ public class EnvironmentForm
                 }
             } );
 
-            final Button destroyBtn = new Button( DESTROY );
             destroyBtn.setId( environment.getName() + "-destroy" );
             destroyBtn.addClickListener( new Button.ClickListener()
             {
@@ -122,7 +137,18 @@ public class EnvironmentForm
                 {
                     destroyBtn.setEnabled( false );
                     containersBtn.setEnabled( false );
+                    sshKeyBtn.setEnabled( false );
                     destroyEnvironment( environment );
+                }
+            } );
+
+            sshKeyBtn.setId( environment.getName() + "-sshkey" );
+            sshKeyBtn.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( final Button.ClickEvent event )
+                {
+                    contentRoot.getUI().addWindow( new SshKeyWindow( environment ) );
                 }
             } );
 
@@ -131,18 +157,31 @@ public class EnvironmentForm
 
             destroyBtn.setEnabled( !isEnvironmentUnderModification );
             containersBtn.setEnabled( !isEnvironmentUnderModification );
+            sshKeyBtn.setEnabled( !isEnvironmentUnderModification );
 
             Embedded icon = isEnvironmentUnderModification ? new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) ) :
                             environment.getStatus().equals( EnvironmentStatus.HEALTHY ) ?
                             new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) ) :
                             new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) );
 
+            String iconId = isEnvironmentUnderModification ? "indicator" :
+                            environment.getStatus().equals( EnvironmentStatus.HEALTHY ) ? "ok" : "error";
+            icon.setId( iconId );
 
             environmentsTable.addItem( new Object[] {
-                    environment.getName(), icon, containersBtn, destroyBtn
+                    environment.getId(), environment.getName(), getCreationDate( environment.getCreationTimestamp() ),
+                    icon, containersBtn, sshKeyBtn, destroyBtn
             }, null );
         }
         environmentsTable.refreshRowCache();
+    }
+
+
+    private String getCreationDate( long ts )
+    {
+        SimpleDateFormat sdf = new SimpleDateFormat( "MMM dd,yyyy HH:mm" );
+        Date date = new Date( ts );
+        return sdf.format( date );
     }
 
 
@@ -164,9 +203,12 @@ public class EnvironmentForm
     private Table createEnvironmentsTable( String caption )
     {
         Table table = new Table( caption );
+        table.addContainerProperty( ID, UUID.class, null );
         table.addContainerProperty( NAME, String.class, null );
+        table.addContainerProperty( DATE, String.class, null );
         table.addContainerProperty( STATUS, Embedded.class, null );
         table.addContainerProperty( CONTAINERS, Button.class, null );
+        table.addContainerProperty( SSH_KEY, Button.class, null );
         table.addContainerProperty( DESTROY, Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );

@@ -4,10 +4,7 @@ package org.safehaus.subutai.core.metric.impl.model;
 import java.io.Serializable;
 
 
-/**
- * Created by talas on 12/12/14.
- */
-public class SubscriberPK  implements Serializable
+public class SubscriberPK implements Serializable
 {
     private String environmentId;
     private String subscriberId;

@@ -3,7 +3,6 @@ package org.safehaus.subutai.core.metric.impl;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -14,6 +13,7 @@ import java.util.concurrent.Executors;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.dao.DaoManager;
+import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.peer.ContainerHost;
@@ -21,15 +21,17 @@ import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.MonitoringSettings;
 import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
+import org.safehaus.subutai.core.peer.api.ContainerGroup;
+import org.safehaus.subutai.core.peer.api.ContainerGroupNotFoundException;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.slf4j.Logger;
@@ -165,19 +167,24 @@ public class MonitorImpl implements Monitor
         Set<ContainerHostMetricImpl> metrics = Sets.newHashSet();
         try
         {
-            //obtain environment containers
-            Set<ContainerHost> localContainers =
-                    peerManager.getLocalPeer().getContainerHostsByEnvironmentId( environmentId );
+            LocalPeer localPeer = peerManager.getLocalPeer();
 
-            for ( ContainerHost localContainer : localContainers )
+            ContainerGroup containerGroup = localPeer.findContainerGroupByEnvironmentId( environmentId );
+
+            //obtain environment containers
+            Set<UUID> containerIds = containerGroup.getContainerIds();
+
+            for ( UUID containerId : containerIds )
             {
                 //get container's resource host
-                ResourceHost resourceHost =
-                        peerManager.getLocalPeer().getResourceHostByContainerId( localContainer.getId().toString() );
-                addLocalContainerHostMetric( environmentId, resourceHost, localContainer, metrics );
+                ResourceHost resourceHost = localPeer.getResourceHostByContainerId( containerId.toString() );
+
+                //get metric
+                addLocalContainerHostMetric( environmentId, resourceHost,
+                        resourceHost.getContainerHostById( containerId.toString() ), metrics );
             }
         }
-        catch ( PeerException e )
+        catch ( ContainerGroupNotFoundException | PeerException e )
         {
             LOG.error( "Error obtaining local container metrics", e );
         }
@@ -468,31 +475,34 @@ public class MonitorImpl implements Monitor
             //deserialize container metric
             ContainerHostMetricImpl containerHostMetric =
                     JsonUtil.fromJson( alertMetric, ContainerHostMetricImpl.class );
-            //find associated container host
-            ContainerHost containerHost =
-                    peerManager.getLocalPeer().getContainerHostByName( containerHostMetric.getHost() );
-            if ( containerHost != null )
+
+            LocalPeer localPeer = peerManager.getLocalPeer();
+
+            //find source container host
+            ContainerHost containerHost = localPeer.getContainerHostByName( containerHostMetric.getHost() );
+
+            //set host id for future reference
+            containerHostMetric.setHostId( containerHost.getId() );
+
+            //find container's initiator peer
+            ContainerGroup containerGroup = localPeer.findContainerGroupByContainerId( containerHost.getId() );
+
+
+            Peer creatorPeer = peerManager.getPeer( containerGroup.getInitiatorPeerId() );
+
+            //if container is "created" by local peer, notifyOnAlert local peer
+            if ( creatorPeer.isLocal() )
             {
-                //set host id for future reference
-                containerHostMetric.setHostId( containerHost.getId() );
-
-                //find container's creator peer
-                Peer creatorPeer = peerManager.getPeer( UUID.fromString( containerHost.getCreatorPeerId() ) );
-
-                //if container is "created" by local peer, notifyOnAlert local peer
-                if ( creatorPeer.isLocal() )
-                {
-                    notifyOnAlert( containerHostMetric );
-                }
-                //send metric to remote creator peer
-                else
-                {
-                    creatorPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
-                            Constants.ALERT_TIMEOUT );
-                }
+                notifyOnAlert( containerHostMetric );
+            }
+            //send metric to remote creator peer
+            else
+            {
+                creatorPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
+                        Constants.ALERT_TIMEOUT );
             }
         }
-        catch ( PeerException | JsonSyntaxException e )
+        catch ( PeerException | ContainerGroupNotFoundException | JsonSyntaxException e )
         {
             LOG.error( "Error in onAlert", e );
             throw new MonitorException( e );
@@ -511,14 +521,18 @@ public class MonitorImpl implements Monitor
         try
         {
             //find container's environment
-            List<Environment> environments = environmentManager.getEnvironments();
+            Set<Environment> environments = environmentManager.getEnvironments();
             ContainerHost containerHost = null;
+            outer:
             for ( Environment environment : environments )
             {
-                containerHost = environment.getContainerHostById( metric.getHostId() );
-                if ( containerHost != null )
+                for ( ContainerHost container : environment.getContainerHosts() )
                 {
-                    break;
+                    if ( container.getId().equals( metric.getHostId() ) )
+                    {
+                        containerHost = container;
+                        break outer;
+                    }
                 }
             }
 

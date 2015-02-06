@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.registry.rest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Properties;
 
 import org.safehaus.subutai.common.datatypes.TemplateVersion;
@@ -87,7 +88,9 @@ public class TestUtils
 
     public static Template getParentTemplate() throws IOException
     {
-        return getTemplateFromConfigFiles( CONFIG_FILE, PACKAGES_MANIFEST, MD_5_SUM );
+        Template template = getTemplateFromConfigFiles( CONFIG_FILE, PACKAGES_MANIFEST, MD_5_SUM );
+        template.addChildren( Arrays.asList( getChildTemplate() ) );
+        return template;
     }
 
 

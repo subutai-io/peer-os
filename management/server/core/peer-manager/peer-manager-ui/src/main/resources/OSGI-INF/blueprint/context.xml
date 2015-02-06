@@ -7,7 +7,7 @@
 
   <bean id="module" scope="singleton" class="org.safehaus.subutai.core.peer.ui.PeerManagerPortalModule"
         init-method="init" destroy-method="destroy">
-    <property name="peerManager" ref="peerManager" />
+    <argument ref="peerManager" />
   </bean>
 
   <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule">

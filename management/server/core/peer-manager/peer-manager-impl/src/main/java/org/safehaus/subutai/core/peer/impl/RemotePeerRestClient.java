@@ -9,6 +9,7 @@ import java.util.UUID;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
@@ -29,6 +30,8 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 
 import com.google.common.reflect.TypeToken;
 
@@ -114,7 +117,7 @@ public class RemotePeerRestClient
     public void stopContainer( final ContainerHost containerHost ) throws PeerException
     {
         String path = "peer/container/stop";
-
+        Subject subject = SecurityUtils.getSubject();
         WebClient client = createWebClient();
 
         Form form = new Form();
@@ -131,6 +134,7 @@ public class RemotePeerRestClient
 
     public void startContainer( final ContainerHost containerHost ) throws PeerException
     {
+        Subject subject = SecurityUtils.getSubject();
         String path = "peer/container/start";
 
         WebClient client = createWebClient();
@@ -185,6 +189,27 @@ public class RemotePeerRestClient
         {
             LOG.error( response.getEntity().toString() );
             return false;
+        }
+    }
+
+
+    public ContainerHostState getContainerState( final String containerId ) throws PeerException
+    {
+        String path = "peer/container/state";
+
+
+        WebClient client = createWebClient();
+
+        Response response =
+                client.path( path ).accept( MediaType.APPLICATION_JSON ).query( "containerId", containerId ).get();
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return JsonUtil.fromJson( response.readEntity( String.class ), ContainerHostState.class );
+        }
+        else
+        {
+            throw new PeerException( "Could not retrieve container state", response.getEntity().toString() );
         }
     }
 

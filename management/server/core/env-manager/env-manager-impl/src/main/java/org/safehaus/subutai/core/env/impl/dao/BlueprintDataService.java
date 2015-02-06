@@ -12,7 +12,7 @@ import javax.persistence.TypedQuery;
 
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.env.api.build.Blueprint;
+import org.safehaus.subutai.common.environment.Blueprint;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentBlueprintEntity;
 import org.slf4j.Logger;

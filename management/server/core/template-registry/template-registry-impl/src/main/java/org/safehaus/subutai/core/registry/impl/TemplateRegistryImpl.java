@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -32,7 +34,6 @@ import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitManager;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.registry.api.TemplateTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -299,7 +300,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
             if ( !children.isEmpty() )
             {
                 throw new RegistryException(
-                        String.format( "Can no delete template %s from registry because it has children",
+                        String.format( "Can not delete template %s from registry because it has children",
                                 templateName ) );
             }
 
@@ -338,7 +339,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
 
 
     /**
-     * Returns template by name and lxc arch
+     * Returns template by name and lxc arch this method required for template registration process
      *
      * @param templateName - name of template
      * @param lxcArch - lxc architecture
@@ -348,7 +349,18 @@ public class TemplateRegistryImpl implements TemplateRegistry
     @Override
     public Template getTemplate( final String templateName, String lxcArch )
     {
-        return getTemplate( templateName, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), lxcArch );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), TEMPLATE_IS_NULL_MSG );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), LXC_ARCH_IS_NULL_MSG );
+        //retrieve template from storage
+        try
+        {
+            return templateService.getTemplate( templateName, lxcArch );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error in getTemplate", e );
+            return null;
+        }
     }
 
 
@@ -363,8 +375,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
     @Override
     public Template getTemplate( final String templateName, TemplateVersion templateVersion )
     {
-        return getTemplate( templateName, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ),
-                Common.DEFAULT_LXC_ARCH );
+        return getTemplate( templateName, templateVersion, Common.DEFAULT_LXC_ARCH );
     }
 
 
@@ -553,32 +564,6 @@ public class TemplateRegistryImpl implements TemplateRegistry
         }
 
         return null;
-    }
-
-
-    /**
-     * Returns template tree
-     *
-     * @return {@code TemplateTree}
-     */
-    @Override
-    public TemplateTree getTemplateTree()
-    {
-        //retrieve all templates and fill template tree
-        TemplateTree templateTree = new TemplateTree();
-        try
-        {
-            List<Template> allTemplates = templateService.getAllTemplates();
-            for ( Template template : allTemplates )
-            {
-                templateTree.addTemplate( template );
-            }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error in getTemplateTree", e );
-        }
-        return templateTree;
     }
 
 
@@ -927,5 +912,28 @@ public class TemplateRegistryImpl implements TemplateRegistry
             LOG.error( "Error getting git file branch version.", e );
             return null;
         }
+    }
+
+
+    public List<Template> getTemplateTree()
+    {
+        List<Template> templates = getAllTemplates();
+        Set<Template> templateSet = new HashSet<>( templates );
+
+        List<Template> templateTree = new ArrayList<>();
+        for ( final Template template : templates )
+        {
+            boolean isChild = false;
+            for ( Iterator<Template> it = templateSet.iterator(); it.hasNext() && !isChild; )
+            {
+                Template template1 = it.next();
+                isChild = template1.getChildren().contains( template );
+            }
+            if ( !isChild )
+            {
+                templateTree.add( template );
+            }
+        }
+        return templateTree;
     }
 }

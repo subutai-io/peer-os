@@ -6,7 +6,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.common.protocol.Disposable;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
 
 import com.google.common.base.Strings;
 import com.vaadin.event.ShortcutAction;

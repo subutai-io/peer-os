@@ -10,16 +10,17 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.safehaus.subutai.common.environment.NodeGroup;
+import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.core.env.api.build.NodeGroup;
-import org.safehaus.subutai.core.env.api.build.Topology;
-import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 
@@ -31,15 +32,19 @@ public class TopologyBuilder
 
     private final TemplateRegistry templateRegistry;
     private final PeerManager peerManager;
+    private final String defaultDomain;
 
 
-    public TopologyBuilder( final TemplateRegistry templateRegistry, final PeerManager peerManager )
+    public TopologyBuilder( final TemplateRegistry templateRegistry, final PeerManager peerManager,
+                            final String defaultDomain )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
+        Preconditions.checkNotNull( !Strings.isNullOrEmpty( defaultDomain ) );
 
         this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
+        this.defaultDomain = defaultDomain;
     }
 
 
@@ -52,13 +57,14 @@ public class TopologyBuilder
 
         ExecutorService taskExecutor = Executors.newFixedThreadPool( placement.size() );
 
-        CompletionService<Set<EnvironmentContainerImpl>> taskCompletionService =
+        CompletionService<Set<NodeGroupBuildResult>> taskCompletionService =
                 new ExecutorCompletionService<>( taskExecutor );
 
         for ( Map.Entry<Peer, Set<NodeGroup>> peerPlacement : placement.entrySet() )
         {
-            taskCompletionService.submit( new NodeGroupBuilder( templateRegistry, peerManager, peerPlacement.getKey(),
-                    peerPlacement.getValue() ) );
+            taskCompletionService.submit(
+                    new NodeGroupBuilder( environment, templateRegistry, peerManager, peerPlacement.getKey(),
+                            peerPlacement.getValue(), defaultDomain ) );
         }
 
         Set<Exception> errors = Sets.newHashSet();
@@ -67,9 +73,20 @@ public class TopologyBuilder
         {
             try
             {
-                Future<Set<EnvironmentContainerImpl>> result = taskCompletionService.take();
-                Set<EnvironmentContainerImpl> containers = result.get();
-                environment.addContainers( containers );
+                Future<Set<NodeGroupBuildResult>> futures = taskCompletionService.take();
+                Set<NodeGroupBuildResult> results = futures.get();
+                for ( NodeGroupBuildResult result : results )
+                {
+                    if ( !CollectionUtil.isCollectionEmpty( result.getContainers() ) )
+                    {
+                        environment.addContainers( result.getContainers() );
+                    }
+
+                    if ( result.getException() != null )
+                    {
+                        errors.add( result.getException() );
+                    }
+                }
             }
             catch ( ExecutionException | InterruptedException e )
             {

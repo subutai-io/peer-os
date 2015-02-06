@@ -15,7 +15,6 @@ import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.protocol.api.TemplateService;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.registry.api.RegistryException;
-import org.safehaus.subutai.core.registry.api.TemplateTree;
 
 import com.google.common.collect.Lists;
 
@@ -88,7 +87,7 @@ public class TemplateRegistryImplTest
     @Test( expected = RegistryException.class )
     public void testRegisterTemplateDuplicate() throws Exception
     {
-        when( templateService.getTemplate( TestUtils.TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), TestUtils.LXC_ARCH ) )
+        when( templateService.getTemplate( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH ) )
                 .thenReturn( TestUtils.getParentTemplate() );
 
         templateRegistry.registerTemplate( TestUtils.CONFIG_FILE, TestUtils.PACKAGES_MANIFEST, TestUtils.MD_5_SUM );
@@ -193,7 +192,7 @@ public class TemplateRegistryImplTest
     @Test
     public void testGetTemplate() throws Exception
     {
-        when( templateService.getTemplate( TestUtils.TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), TestUtils.LXC_ARCH ) )
+        when( templateService.getTemplate( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH ) )
                 .thenReturn( TestUtils.getParentTemplate() );
 
         Template template = templateRegistry.getTemplate( TestUtils.TEMPLATE_NAME );
@@ -239,7 +238,7 @@ public class TemplateRegistryImplTest
     @Test
     public void testGetParentTemplate() throws Exception
     {
-        when( templateService.getTemplate( TestUtils.TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), TestUtils.LXC_ARCH ) )
+        when( templateService.getTemplate( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH ) )
                 .thenReturn( TestUtils.getParentTemplate() );
         when( templateService.getTemplate( TestUtils.CHILD_TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), TestUtils.LXC_ARCH ) )
                 .thenReturn( TestUtils.getChildTemplate() );
@@ -262,15 +261,13 @@ public class TemplateRegistryImplTest
     @Test
     public void testGetTemplateTree() throws Exception
     {
-        List<Template> allTemplates = Lists.newArrayList( TestUtils.getParentTemplate(), TestUtils.getChildTemplate() );
+        List<Template> allTemplates = Lists.newArrayList( TestUtils.getParentTemplate() );
         when( templateService.getAllTemplates() ).thenReturn( allTemplates );
 
-        TemplateTree templateTree = templateRegistry.getTemplateTree();
+        List<Template> templateTree = templateRegistry.getTemplateTree();
 
-        assertTrue( templateTree.getChildrenTemplates( TestUtils.getParentTemplate() )
-                                .contains( TestUtils.getChildTemplate() ) );
-        assertTrue( templateTree.getRootTemplates().contains( TestUtils.getParentTemplate() ) );
-        assertEquals( TestUtils.getParentTemplate(), templateTree.getParentTemplate( TestUtils.getChildTemplate() ) );
+        assertTrue( templateTree.contains( TestUtils.getParentTemplate() ) );
+        assertEquals( TestUtils.getParentTemplate(), templateTree.get( 0 ) );
     }
 
 
@@ -279,16 +276,16 @@ public class TemplateRegistryImplTest
     {
         when( templateService.getAllTemplates() ).thenReturn( Collections.<Template>emptyList() );
 
-        TemplateTree templateTree = templateRegistry.getTemplateTree();
+        List<Template> templateTree = templateRegistry.getTemplateTree();
 
-        assertNull( templateTree.getRootTemplates() );
+        assertEquals( Collections.emptyList(), templateTree );
     }
 
 
     @Test
     public void testGetParentTemplates() throws Exception
     {
-        when( templateService.getTemplate( TestUtils.TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), TestUtils.LXC_ARCH ) )
+        when( templateService.getTemplate( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH ) )
                 .thenReturn( TestUtils.getParentTemplate() );
         when( templateService.getTemplate( TestUtils.CHILD_TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), TestUtils.LXC_ARCH ) )
                 .thenReturn( TestUtils.getChildTemplate() );

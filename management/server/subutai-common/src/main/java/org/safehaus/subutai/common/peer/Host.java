@@ -9,9 +9,7 @@ import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.exception.SubutaiException;
 import org.safehaus.subutai.common.host.HostArchitecture;
-import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.host.Interface;
 
 
@@ -20,19 +18,6 @@ import org.safehaus.subutai.common.host.Interface;
  */
 public interface Host extends Serializable
 {
-
-
-    @Deprecated
-    public void setPeer( Peer peer );
-
-    @Deprecated
-    void updateHostInfo( HostInfo hostInfo );
-
-    @Deprecated
-    public void addListener( HostEventListener hostEventListener );
-
-    @Deprecated
-    public void removeListener( HostEventListener hostEventListener );
 
     @Deprecated
     public void fireEvent( HostEvent hostEvent );
@@ -63,10 +48,6 @@ public interface Host extends Serializable
     public boolean isConnected();
 
     public long getLastHeartbeat();
-
-    public String getIpByMask( String mask );
-
-    void addIpHostToEtcHosts( String domainName, Set<Host> others, String mask ) throws SubutaiException;
 
     void init();
 
