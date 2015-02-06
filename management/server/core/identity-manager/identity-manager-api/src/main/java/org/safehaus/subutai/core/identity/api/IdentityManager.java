@@ -25,14 +25,35 @@ public interface IdentityManager
 
     public String getUserKey( String username );
 
+    public User createMockUser( String username, String fullName, String password, String email );
+
+    public boolean updateUser( User user );
+
+    public User getUser( Long id );
+
+    public boolean deleteUser( User user );
+
+    //Permissions
     public List<Permission> getAllPermissions();
 
-    public Permission createPermission( String permissionName, PermissionGroup permissionGroup, String description );
+    public Permission createMockPermission( String permissionName, PermissionGroup permissionGroup,
+                                            String description );
 
     public boolean updatePermission( Permission permission );
 
     public Permission getPermission( String name, PermissionGroup permissionGroup );
 
     public boolean deletePermission( Permission permission );
+
+    //Roles
+    public List<Role> getAllRoles();
+
+    public Role createMockRole( String permissionName, PermissionGroup permissionGroup, String description );
+
+    public boolean updateRole( Role role );
+
+    public Permission getRole( String name, PermissionGroup permissionGroup );
+
+    public boolean deleteRole( Role role );
 }
 

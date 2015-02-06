@@ -30,7 +30,8 @@ public class RoleManagementForm extends CustomComponent implements Disposable
         verticalLayout.setSizeFull();
 
         PermissionsTab permissionsTab = new PermissionsTab( this.identityManager );
-        RolesTab rolesTab = new RolesTab();
+        UsersTab usersTab = new UsersTab( this.identityManager );
+        RolesTabOld rolesTabOld = new RolesTabOld();
 
         TabSheet sheet = new TabSheet();
         sheet.setStyleName( Runo.TABSHEET_SMALL );
@@ -39,8 +40,11 @@ public class RoleManagementForm extends CustomComponent implements Disposable
         sheet.addTab( permissionsTab, "System Permissions" );
         sheet.getTab( 0 ).setId( "SystemPermissions" );
 
-        sheet.addTab( rolesTab, "System Roles" );
+        sheet.addTab( rolesTabOld, "System Roles" );
         sheet.getTab( 1 ).setId( "SystemRoles" );
+
+        sheet.addTab( usersTab, "System Users" );
+        sheet.getTab( 2 ).setId( "SystemUsers" );
 
         verticalLayout.addComponent( sheet );
 

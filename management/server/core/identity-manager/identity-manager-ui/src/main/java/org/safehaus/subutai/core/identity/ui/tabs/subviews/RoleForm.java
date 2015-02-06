@@ -3,8 +3,8 @@ package org.safehaus.subutai.core.identity.ui.tabs.subviews;
 
 import java.util.EnumSet;
 
-import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.PermissionGroup;
+import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.ui.tabs.TabCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +24,11 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 
 
-public class PermissionForm extends VerticalLayout
+public class RoleForm extends VerticalLayout
 {
 
-    TabCallback<BeanItem<Permission>> callback;
-    private static final Logger LOGGER = LoggerFactory.getLogger( PermissionForm.class );
+    TabCallback<BeanItem<Role>> callback;
+    private static final Logger LOGGER = LoggerFactory.getLogger( RoleForm.class );
 
     private boolean newValue;
     private TextField name = new TextField()
@@ -45,10 +45,10 @@ public class PermissionForm extends VerticalLayout
         }
     };
     private ComboBox permissionGroup;
-    private BeanFieldGroup<Permission> permissionFieldGroup = new BeanFieldGroup<>( Permission.class );
+    private BeanFieldGroup<Role> permissionFieldGroup = new BeanFieldGroup<>( Role.class );
 
 
-    public PermissionForm( TabCallback<BeanItem<Permission>> callback )
+    public RoleForm( TabCallback<BeanItem<Role>> callback )
     {
         init();
         this.callback = callback;
@@ -84,7 +84,7 @@ public class PermissionForm extends VerticalLayout
     }
 
 
-    public void setPermission( final BeanItem<Permission> permission, boolean newValue )
+    public void setPermission( final BeanItem<Role> permission, boolean newValue )
     {
         this.newValue = newValue;
         if ( permission != null )
@@ -102,10 +102,6 @@ public class PermissionForm extends VerticalLayout
                 Field<?> description = permissionFieldGroup.getField( "description" );
                 description.setReadOnly( false );
             }
-            else
-            {
-                permissionFieldGroup.setReadOnly( false );
-            }
         }
     }
 
@@ -121,14 +117,15 @@ public class PermissionForm extends VerticalLayout
             try
             {
                 permissionFieldGroup.commit();
+
+                if ( callback != null )
+                {
+                    callback.saveOperation( permissionFieldGroup.getItemDataSource(), newValue );
+                }
             }
             catch ( FieldGroup.CommitException e )
             {
                 LOGGER.error( "Error commit permission fieldGroup changes" );
-            }
-            if ( callback != null )
-            {
-                callback.saveOperation( permissionFieldGroup.getItemDataSource(), newValue );
             }
         }
     };
@@ -152,7 +149,7 @@ public class PermissionForm extends VerticalLayout
         public void buttonClick( final Button.ClickEvent event )
         {
             permissionFieldGroup.discard();
-            PermissionForm.this.setVisible( false );
+            RoleForm.this.setVisible( false );
             if ( callback != null )
             {
                 callback.cancelOperation();

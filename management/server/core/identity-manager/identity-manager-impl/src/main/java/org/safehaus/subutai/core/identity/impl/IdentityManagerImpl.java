@@ -9,6 +9,7 @@ import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.PermissionGroup;
+import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.identity.impl.dao.PermissionDataService;
 import org.safehaus.subutai.core.identity.impl.dao.RoleDataService;
@@ -232,6 +233,53 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     @Override
+    public User createMockUser( final String username, final String fullName, final String password,
+                                final String email )
+    {
+        String salt = getSimpleSalt( username );
+        UserEntity user = new UserEntity();
+        user.setUsername( username );
+        user.setEmail( email );
+        user.setFullname( fullName );
+        user.setSalt( salt );
+        user.setPassword( saltedHash( password, salt.getBytes() ) );
+        return user;
+    }
+
+
+    @Override
+    public boolean updateUser( final User user )
+    {
+        //TODO check for right function operation...
+        if ( !( user instanceof UserEntity ) )
+        {
+            return false;
+        }
+        userDataService.update( user );
+        return true;
+    }
+
+
+    @Override
+    public User getUser( final Long id )
+    {
+        return userDataService.find( id );
+    }
+
+
+    @Override
+    public boolean deleteUser( final User user )
+    {
+        if ( !( user instanceof UserEntity ) )
+        {
+            return false;
+        }
+        userDataService.remove( user.getId() );
+        return true;
+    }
+
+
+    @Override
     public List<Permission> getAllPermissions()
     {
         List<Permission> permissions = Lists.newArrayList();
@@ -241,8 +289,8 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     @Override
-    public Permission createPermission( final String permissionName, final PermissionGroup permissionGroup,
-                                        final String description )
+    public Permission createMockPermission( final String permissionName, final PermissionGroup permissionGroup,
+                                            final String description )
     {
         return new PermissionEntity( permissionName, permissionGroup, description );
     }
@@ -276,6 +324,42 @@ public class IdentityManagerImpl implements IdentityManager
         }
         permissionDataService.remove( new PermissionPK( permission.getName(), permission.getPermissionGroup() ) );
         return true;
+    }
+
+
+    @Override
+    public List<Role> getAllRoles()
+    {
+        return null;
+    }
+
+
+    @Override
+    public Role createMockRole( final String permissionName, final PermissionGroup permissionGroup,
+                                final String description )
+    {
+        return null;
+    }
+
+
+    @Override
+    public boolean updateRole( final Role role )
+    {
+        return false;
+    }
+
+
+    @Override
+    public Permission getRole( final String name, final PermissionGroup permissionGroup )
+    {
+        return null;
+    }
+
+
+    @Override
+    public boolean deleteRole( final Role role )
+    {
+        return false;
     }
 
 
