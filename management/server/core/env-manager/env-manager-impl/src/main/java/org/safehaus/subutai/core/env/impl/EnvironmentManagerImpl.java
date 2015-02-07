@@ -34,6 +34,7 @@ import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
 import org.safehaus.subutai.core.env.impl.tasks.CreateEnvironmentTask;
 import org.safehaus.subutai.core.env.impl.tasks.DestroyEnvironmentTask;
+import org.safehaus.subutai.core.env.impl.tasks.GrowEnvironmentTask;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -242,13 +243,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public Set<ContainerHost> growEnvironment( final UUID environmentId, final Topology topology, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        return growEnv( environmentId, topology, async );
-    }
-
-
-    private Set<ContainerHost> growEnv( final UUID environmentId, final Topology topology, boolean async )
-            throws EnvironmentModificationException, EnvironmentNotFoundException
-    {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
@@ -261,77 +255,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     String.format( "Environment status is %s", environment.getStatus() ) );
         }
 
-        final Set<ContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
         final Set<ContainerHost> newContainers = Sets.newHashSet();
-
-        final Semaphore semaphore = new Semaphore( 0 );
 
         final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
 
-        executor.submit( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
+        GrowEnvironmentTask growEnvironmentTask =
+                new GrowEnvironmentTask( this, environment, topology, resultHolder, newContainers );
 
-                    try
-                    {
-                        topologyBuilder.build( environment, topology );
-
-                        newContainers.addAll( environment.getContainerHosts() );
-
-                        newContainers.removeAll( oldContainers );
-
-                        setContainersTransientFields( newContainers );
-
-                        configureHosts( environment.getContainerHosts() );
-
-                        configureSsh( environment.getContainerHosts() );
-
-                        if ( !Strings.isNullOrEmpty( environment.getSshKey() ) )
-                        {
-                            setSshKey( environmentId, environment.getSshKey(), false );
-                        }
-
-                        environment.setStatus( EnvironmentStatus.HEALTHY );
-                    }
-                    catch ( EnvironmentBuildException | NetworkManagerException | EnvironmentNotFoundException |
-                            EnvironmentModificationException e )
-                    {
-                        environment.setStatus( EnvironmentStatus.UNHEALTHY );
-
-                        throw new EnvironmentModificationException( e );
-                    }
-                    finally
-                    {
-                        if ( !newContainers.isEmpty() )
-                        {
-                            notifyOnEnvironmentGrown( environment, newContainers );
-                        }
-                    }
-                }
-                catch ( EnvironmentModificationException e )
-                {
-                    LOG.error( String.format( "Error growing environment %s, topology %s", environmentId, topology ),
-                            e );
-                    resultHolder.setResult( e );
-                }
-                finally
-                {
-                    semaphore.release();
-                }
-            }
-        } );
-
+        executor.submit( growEnvironmentTask );
 
         if ( !async )
         {
             try
             {
-                semaphore.acquire();
+                growEnvironmentTask.waitCompletion();
 
                 if ( resultHolder.getResult() != null )
                 {
