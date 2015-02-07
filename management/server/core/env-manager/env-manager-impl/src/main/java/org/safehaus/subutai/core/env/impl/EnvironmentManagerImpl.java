@@ -18,7 +18,6 @@ import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.env.api.EnvironmentEventListener;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
@@ -33,6 +32,7 @@ import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
 import org.safehaus.subutai.core.env.impl.tasks.CreateEnvironmentTask;
+import org.safehaus.subutai.core.env.impl.tasks.DestroyContainerTask;
 import org.safehaus.subutai.core.env.impl.tasks.DestroyEnvironmentTask;
 import org.safehaus.subutai.core.env.impl.tasks.GrowEnvironmentTask;
 import org.safehaus.subutai.core.network.api.NetworkManager;
@@ -317,82 +317,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             throw new EnvironmentModificationException( e );
         }
 
-        final Semaphore semaphore = new Semaphore( 0 );
-
         final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
 
-        executor.submit( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
+        DestroyContainerTask destroyContainerTask =
+                new DestroyContainerTask( this, environment, containerHost, forceMetadataRemoval, resultHolder );
 
-                    try
-                    {
-                        try
-                        {
-                            ( ( EnvironmentContainerImpl ) containerHost ).destroy();
-                        }
-                        catch ( PeerException e )
-                        {
-                            if ( forceMetadataRemoval )
-                            {
-                                resultHolder.setResult( new EnvironmentModificationException( e ) );
-                            }
-                            else
-                            {
-                                throw e;
-                            }
-                        }
-
-                        environment.removeContainer( containerHost.getId() );
-
-                        notifyOnContainerDestroyed( environment, containerHost.getId() );
-                    }
-                    catch ( PeerException e )
-                    {
-
-                        environment.setStatus( EnvironmentStatus.UNHEALTHY );
-
-                        throw new EnvironmentModificationException( e );
-                    }
-
-                    if ( environment.getContainerHosts().isEmpty() )
-                    {
-                        try
-                        {
-                            removeEnvironment( environment.getId() );
-                        }
-                        catch ( EnvironmentNotFoundException e )
-                        {
-                            LOG.error( "Error removing environment", e );
-                        }
-                    }
-                    else
-                    {
-                        environment.setStatus( EnvironmentStatus.HEALTHY );
-                    }
-                }
-                catch ( EnvironmentModificationException e )
-                {
-                    LOG.error( String.format( "Error destroying container %s", containerHost.getHostname() ), e );
-                    resultHolder.setResult( e );
-                }
-                finally
-                {
-                    semaphore.release();
-                }
-            }
-        } );
+        executor.submit( destroyContainerTask );
 
         if ( !async )
         {
             try
             {
-                semaphore.acquire();
+                destroyContainerTask.waitCompletion();
 
                 if ( resultHolder.getResult() != null )
                 {
