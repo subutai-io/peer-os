@@ -1,0 +1,139 @@
+package org.safehaus.subutai.core.env.impl.tasks;
+
+
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.Semaphore;
+
+import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
+import org.safehaus.subutai.common.environment.EnvironmentStatus;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.ContainersDestructionResult;
+import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
+import org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl;
+import org.safehaus.subutai.core.env.impl.PeerEnvironmentDestructionTask;
+import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
+import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
+
+
+public class DestroyEnvironmentTask implements Runnable
+{
+    private static final Logger LOG = LoggerFactory.getLogger( DestroyEnvironmentTask.class.getName() );
+
+    private final EnvironmentManagerImpl environmentManager;
+    private final EnvironmentImpl environment;
+    private final Set<EnvironmentDestructionException> exceptions;
+    private final ResultHolder<EnvironmentDestructionException> resultHolder;
+    private final boolean forceMetadataRemoval;
+    private final Semaphore semaphore;
+
+
+    public DestroyEnvironmentTask( final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
+                                   final Set<EnvironmentDestructionException> exceptions,
+                                   final ResultHolder<EnvironmentDestructionException> resultHolder,
+                                   final boolean forceMetadataRemoval )
+    {
+        this.environmentManager = environmentManager;
+        this.environment = environment;
+        this.exceptions = exceptions;
+        this.resultHolder = resultHolder;
+        this.forceMetadataRemoval = forceMetadataRemoval;
+        this.semaphore = new Semaphore( 0 );
+    }
+
+
+    @Override
+    public void run()
+    {
+        try
+        {
+            environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
+
+            Set<Peer> environmentPeers = Sets.newHashSet();
+
+            for ( ContainerHost container : environment.getContainerHosts() )
+            {
+                environmentPeers.add( container.getPeer() );
+            }
+
+            ExecutorService executorService = Executors.newFixedThreadPool( environmentPeers.size() );
+
+            Set<Future<ContainersDestructionResult>> futures = Sets.newHashSet();
+
+            for ( Peer peer : environmentPeers )
+            {
+                futures.add(
+                        executorService.submit( new PeerEnvironmentDestructionTask( peer, environment.getId() ) ) );
+            }
+
+            Set<ContainersDestructionResult> results = Sets.newHashSet();
+
+            for ( Future<ContainersDestructionResult> future : futures )
+            {
+                try
+                {
+                    results.add( future.get() );
+                }
+                catch ( ExecutionException | InterruptedException e )
+                {
+                    exceptions.add( new EnvironmentDestructionException( e ) );
+                }
+            }
+
+            executorService.shutdown();
+
+            for ( ContainersDestructionResult result : results )
+            {
+                if ( !Strings.isNullOrEmpty( result.getException() ) )
+                {
+                    exceptions.add( new EnvironmentDestructionException( result.getException() ) );
+                }
+                if ( !CollectionUtil.isCollectionEmpty( result.getDestroyedContainersIds() ) )
+                {
+                    for ( UUID containerId : result.getDestroyedContainersIds() )
+                    {
+                        environment.removeContainer( containerId );
+
+                        environmentManager.notifyOnContainerDestroyed( environment, containerId );
+                    }
+                }
+            }
+
+            if ( forceMetadataRemoval || environment.getContainerHosts().isEmpty() )
+            {
+                environmentManager.removeEnvironment( environment.getId() );
+            }
+            else
+            {
+                environment.setStatus( EnvironmentStatus.UNHEALTHY );
+            }
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            LOG.error( String.format( "Error destroying environment %s", environment.getId() ), e );
+
+            resultHolder.setResult( new EnvironmentDestructionException( e ) );
+        }
+        finally
+        {
+            semaphore.release();
+        }
+    }
+
+
+    public void waitCompletion() throws InterruptedException
+    {
+        semaphore.acquire();
+    }
+}
