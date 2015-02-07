@@ -173,67 +173,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final EnvironmentImpl environment = new EnvironmentImpl( name );
 
-//        final Semaphore semaphore = new Semaphore( 0 );
-
         final ResultHolder<EnvironmentCreationException> resultHolder = new ResultHolder<>();
 
-        //        executor.submit( new Runnable()
-        //        {
-        //            @Override
-        //            public void run()
-        //            {
-        //                try
-        //                {
-        //                    environmentDataService.persist( environment );
-        //
-        //                    setEnvironmentTransientFields( environment );
-        //
-        //                    try
-        //                    {
-        //                        topologyBuilder.build( environment, topology );
-        //
-        //                        configureHosts( environment.getContainerHosts() );
-        //
-        //                        configureSsh( environment.getContainerHosts() );
-        //
-        //                        environment.setStatus( EnvironmentStatus.HEALTHY );
-        //
-        //                        setContainersTransientFields( environment.getContainerHosts() );
-        //                    }
-        //                    catch ( EnvironmentBuildException | NetworkManagerException e )
-        //                    {
-        //                        environment.setStatus( EnvironmentStatus.UNHEALTHY );
-        //
-        //                        throw new EnvironmentCreationException( e );
-        //                    }
-        //                    finally
-        //                    {
-        //                        try
-        //                        {
-        //                            notifyOnEnvironmentCreated( findEnvironment( environment.getId() ) );
-        //                        }
-        //                        catch ( EnvironmentNotFoundException e )
-        //                        {
-        //                            LOG.warn( "Error notifying on environment creation", e );
-        //                        }
-        //                    }
-        //                }
-        //                catch ( EnvironmentCreationException e )
-        //                {
-        //                    LOG.error( String.format( "Error creating environment %s, topology %s", name, topology
-        // ), e );
-        //                    resultHolder.setResult( e );
-        //                }
-        //                finally
-        //                {
-        //                    semaphore.release();
-        //                }
-        //            }
-        //        } );
-
-        CreateEnvironmentTask createEnvironmentTask = new CreateEnvironmentTask( this, environment, resultHolder, topology );
+        CreateEnvironmentTask createEnvironmentTask =
+                new CreateEnvironmentTask( this, environment, resultHolder, topology );
         executor.submit( createEnvironmentTask );
-
 
         if ( !async )
         {
