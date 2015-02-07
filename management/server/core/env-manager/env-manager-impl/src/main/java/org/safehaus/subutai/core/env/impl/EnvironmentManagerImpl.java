@@ -177,6 +177,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         CreateEnvironmentTask createEnvironmentTask =
                 new CreateEnvironmentTask( this, environment, resultHolder, topology );
+
         executor.submit( createEnvironmentTask );
 
         if ( !async )
