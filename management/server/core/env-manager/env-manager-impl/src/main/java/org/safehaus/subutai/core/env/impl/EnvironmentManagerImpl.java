@@ -142,31 +142,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public Environment createEnvironment( final String name, final Topology topology, boolean async )
             throws EnvironmentCreationException
     {
-        return createEnv( name, topology, async );
-    }
-
-
-    public void saveEnvironment( EnvironmentImpl environment )
-    {
-        environmentDataService.persist( environment );
-    }
-
-
-    public void updateEnvironment( EnvironmentImpl environment )
-    {
-        environmentDataService.update( environment );
-    }
-
-
-    public void build( EnvironmentImpl environment, Topology topology ) throws EnvironmentBuildException
-    {
-        topologyBuilder.build( environment, topology );
-    }
-
-
-    private Environment createEnv( final String name, final Topology topology, boolean async )
-            throws EnvironmentCreationException
-    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
@@ -198,6 +173,24 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
 
         return environment;
+    }
+
+
+    public void saveEnvironment( EnvironmentImpl environment )
+    {
+        environmentDataService.persist( environment );
+    }
+
+
+    public void updateEnvironment( EnvironmentImpl environment )
+    {
+        environmentDataService.update( environment );
+    }
+
+
+    public void build( EnvironmentImpl environment, Topology topology ) throws EnvironmentBuildException
+    {
+        topologyBuilder.build( environment, topology );
     }
 
 
