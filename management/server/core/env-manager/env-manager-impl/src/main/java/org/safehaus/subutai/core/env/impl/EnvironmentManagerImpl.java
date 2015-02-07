@@ -289,13 +289,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void destroyContainer( final ContainerHost containerHost, boolean async, boolean forceMetadataRemoval )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        destroyCont( containerHost, async, forceMetadataRemoval );
-    }
-
-
-    private void destroyCont( final ContainerHost containerHost, boolean async, final boolean forceMetadataRemoval )
-            throws EnvironmentModificationException, EnvironmentNotFoundException
-    {
         Preconditions.checkNotNull( containerHost, "Invalid container host" );
 
         final EnvironmentImpl environment =
