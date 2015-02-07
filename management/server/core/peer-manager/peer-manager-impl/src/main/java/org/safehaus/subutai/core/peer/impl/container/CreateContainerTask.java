@@ -50,6 +50,7 @@ public class CreateContainerTask implements Callable<ContainerHost>
         ContainerHost containerHost = null;
         while ( System.currentTimeMillis() - start < timeoutSec * 1000 && containerHost == null )
         {
+            Thread.sleep( 100 );
             containerHost = resourceHost.getContainerHostByName( hostname );
         }
 
