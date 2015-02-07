@@ -37,6 +37,7 @@ import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
+import org.safehaus.subutai.core.env.impl.tasks.CreateEnvironmentTask;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -145,6 +146,24 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    public void saveEnvironment( EnvironmentImpl environment )
+    {
+        environmentDataService.persist( environment );
+    }
+
+
+    public void updateEnvironment( EnvironmentImpl environment )
+    {
+        environmentDataService.update( environment );
+    }
+
+
+    public void build( EnvironmentImpl environment, Topology topology ) throws EnvironmentBuildException
+    {
+        topologyBuilder.build( environment, topology );
+    }
+
+
     private Environment createEnv( final String name, final Topology topology, boolean async )
             throws EnvironmentCreationException
     {
@@ -154,69 +173,73 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final EnvironmentImpl environment = new EnvironmentImpl( name );
 
-        final Semaphore semaphore = new Semaphore( 0 );
+//        final Semaphore semaphore = new Semaphore( 0 );
 
         final ResultHolder<EnvironmentCreationException> resultHolder = new ResultHolder<>();
 
-        executor.submit( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    environmentDataService.persist( environment );
+        //        executor.submit( new Runnable()
+        //        {
+        //            @Override
+        //            public void run()
+        //            {
+        //                try
+        //                {
+        //                    environmentDataService.persist( environment );
+        //
+        //                    setEnvironmentTransientFields( environment );
+        //
+        //                    try
+        //                    {
+        //                        topologyBuilder.build( environment, topology );
+        //
+        //                        configureHosts( environment.getContainerHosts() );
+        //
+        //                        configureSsh( environment.getContainerHosts() );
+        //
+        //                        environment.setStatus( EnvironmentStatus.HEALTHY );
+        //
+        //                        setContainersTransientFields( environment.getContainerHosts() );
+        //                    }
+        //                    catch ( EnvironmentBuildException | NetworkManagerException e )
+        //                    {
+        //                        environment.setStatus( EnvironmentStatus.UNHEALTHY );
+        //
+        //                        throw new EnvironmentCreationException( e );
+        //                    }
+        //                    finally
+        //                    {
+        //                        try
+        //                        {
+        //                            notifyOnEnvironmentCreated( findEnvironment( environment.getId() ) );
+        //                        }
+        //                        catch ( EnvironmentNotFoundException e )
+        //                        {
+        //                            LOG.warn( "Error notifying on environment creation", e );
+        //                        }
+        //                    }
+        //                }
+        //                catch ( EnvironmentCreationException e )
+        //                {
+        //                    LOG.error( String.format( "Error creating environment %s, topology %s", name, topology
+        // ), e );
+        //                    resultHolder.setResult( e );
+        //                }
+        //                finally
+        //                {
+        //                    semaphore.release();
+        //                }
+        //            }
+        //        } );
 
-                    setEnvironmentTransientFields( environment );
-
-                    try
-                    {
-                        topologyBuilder.build( environment, topology );
-
-                        configureHosts( environment.getContainerHosts() );
-
-                        configureSsh( environment.getContainerHosts() );
-
-                        environment.setStatus( EnvironmentStatus.HEALTHY );
-
-                        setContainersTransientFields( environment.getContainerHosts() );
-                    }
-                    catch ( EnvironmentBuildException | NetworkManagerException e )
-                    {
-                        environment.setStatus( EnvironmentStatus.UNHEALTHY );
-
-                        throw new EnvironmentCreationException( e );
-                    }
-                    finally
-                    {
-                        try
-                        {
-                            notifyOnEnvironmentCreated( findEnvironment( environment.getId() ) );
-                        }
-                        catch ( EnvironmentNotFoundException e )
-                        {
-                            LOG.warn( "Error notifying on environment creation", e );
-                        }
-                    }
-                }
-                catch ( EnvironmentCreationException e )
-                {
-                    LOG.error( String.format( "Error creating environment %s, topology %s", name, topology ), e );
-                    resultHolder.setResult( e );
-                }
-                finally
-                {
-                    semaphore.release();
-                }
-            }
-        } );
+        CreateEnvironmentTask createEnvironmentTask = new CreateEnvironmentTask( this, environment, resultHolder, topology );
+        executor.submit( createEnvironmentTask );
 
 
         if ( !async )
         {
             try
             {
-                semaphore.acquire();
+                createEnvironmentTask.waitCompletion();
 
                 if ( resultHolder.getResult() != null )
                 {
@@ -615,14 +638,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    private void setEnvironmentTransientFields( Environment environment )
+    public void setEnvironmentTransientFields( Environment environment )
     {
         ( ( EnvironmentImpl ) environment ).setDataService( environmentDataService );
         ( ( EnvironmentImpl ) environment ).setEnvironmentManager( this );
     }
 
 
-    private void setContainersTransientFields( Set<ContainerHost> containers )
+    public void setContainersTransientFields( Set<ContainerHost> containers )
     {
         for ( ContainerHost containerHost : containers )
         {
@@ -633,7 +656,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    private void configureSsh( Set<ContainerHost> containerHosts ) throws NetworkManagerException
+    public void configureSsh( Set<ContainerHost> containerHosts ) throws NetworkManagerException
     {
         Map<Integer, Set<ContainerHost>> sshGroups = Maps.newHashMap();
 
@@ -667,7 +690,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    private void configureHosts( Set<ContainerHost> containerHosts ) throws NetworkManagerException
+    public void configureHosts( Set<ContainerHost> containerHosts ) throws NetworkManagerException
     {
         Map<Integer, Set<ContainerHost>> hostGroups = Maps.newHashMap();
 
@@ -831,7 +854,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    private void notifyOnEnvironmentCreated( final Environment environment )
+    public void notifyOnEnvironmentCreated( final Environment environment )
     {
         for ( final EnvironmentEventListener listener : listeners )
         {
