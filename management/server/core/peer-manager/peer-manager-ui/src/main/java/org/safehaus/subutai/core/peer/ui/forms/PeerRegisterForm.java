@@ -114,29 +114,13 @@ public class PeerRegisterForm extends CustomComponent
         peerRegistration.setValue( "Peer registration" );
         absoluteLayout.addComponent( peerRegistration, "top:0.0px;left:20.0px;" );
 
-        // tags label
-        final Label servicePort = new Label();
-        servicePort.setImmediate( false );
-        servicePort.setWidth( "-1px" );
-        servicePort.setHeight( "-1px" );
-        servicePort.setValue( "Service Port:" );
-        absoluteLayout.addComponent( servicePort, "top:36.0px;left:20.0px;" );
-
-        // servicePortTextField
-        servicePortTextField = new TextField();
-        servicePortTextField.setImmediate( false );
-        servicePortTextField.setWidth( "-1px" );
-        servicePortTextField.setHeight( "-1px" );
-        servicePortTextField.setMaxLength( 256 );
-        absoluteLayout.addComponent( servicePortTextField, "top:36.0px;left:150.0px;" );
-
         // IP
         final Label IP = new Label();
         IP.setImmediate( false );
         IP.setWidth( "-1px" );
         IP.setHeight( "-1px" );
         IP.setValue( "IP" );
-        absoluteLayout.addComponent( IP, "top:80.0px;left:20.0px;" );
+        absoluteLayout.addComponent( IP, "top:36.0px;left:20.0px;" );
 
         // ipTextField
         ipTextField = new TextField();
@@ -144,7 +128,24 @@ public class PeerRegisterForm extends CustomComponent
         ipTextField.setWidth( "-1px" );
         ipTextField.setHeight( "-1px" );
         ipTextField.setMaxLength( 15 );
-        absoluteLayout.addComponent( ipTextField, "top:80.0px;left:150.0px;" );
+        absoluteLayout.addComponent( ipTextField, "top:36.0px;left:150.0px;" );
+
+        // tags label
+        final Label servicePort = new Label();
+        servicePort.setImmediate( false );
+        servicePort.setWidth( "-1px" );
+        servicePort.setHeight( "-1px" );
+        servicePort.setValue( "Service Port:" );
+        absoluteLayout.addComponent( servicePort, "top:80.0px;left:20.0px;" );
+
+        // servicePortTextField
+        servicePortTextField = new TextField();
+        servicePortTextField.setImmediate( false );
+        servicePortTextField.setWidth( "-1px" );
+        servicePortTextField.setHeight( "-1px" );
+        servicePortTextField.setMaxLength( 256 );
+        absoluteLayout.addComponent( servicePortTextField, "top:80.0px;left:150.0px;" );
+
 
         // registerRequestButton
         registerRequestButton = createRegisterButton();
