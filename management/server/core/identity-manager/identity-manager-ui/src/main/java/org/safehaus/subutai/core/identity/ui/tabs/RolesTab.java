@@ -87,7 +87,7 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
                     return;
                 }
                 BeanItem<Role> permission = beans.getItem( rolesTable.getValue() );
-                form.setPermission( permission, false );
+                form.setRole( permission, false );
                 refreshControls( FormState.STATE_EXISTING_ENTITY_SELECTED );
                 //                rolesTable.select( null );
             }
@@ -98,7 +98,7 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
         // Creates a new bean for editing in the form before adding
         // it to the table. Adding is handled after committing
         // the form.
-        newBean = new Button( "New Permission" );
+        newBean = new Button( "New role" );
         newBean.addClickListener( new Button.ClickListener()
         {
             public void buttonClick( Button.ClickEvent event )
@@ -114,7 +114,7 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
 
                 // Make the form a bit nicer
                 //this is an example for future how to improve UI
-                form.setPermission( newPermission, true );
+                form.setRole( newPermission, true );
             }
         } );
 
@@ -146,7 +146,7 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
                 form.setVisible( true );
                 break;
             case STATE_SAVE_EXISTING_ENTITY:
-                newBean.setEnabled( true );
+                newBean.setEnabled( false );
                 break;
             case STATE_SAVE_NEW_ENTITY:
                 newBean.setEnabled( true );

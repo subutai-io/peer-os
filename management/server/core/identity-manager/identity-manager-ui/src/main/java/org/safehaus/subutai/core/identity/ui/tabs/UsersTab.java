@@ -68,7 +68,7 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
 
         // Create a form for editing a selected or new item.
         // It is invisible until actually used.
-        form = new UserForm( this );
+        form = new UserForm( this, identityManager.getAllRoles() );
         form.setVisible( false );
 
         // When the user selects an item, show it in the form
@@ -83,8 +83,8 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
                     form.setVisible( false );
                     return;
                 }
-                BeanItem<User> permission = beans.getItem( usersTable.getValue() );
-                form.setUser( permission, false );
+                BeanItem<User> userBean = beans.getItem( usersTable.getValue() );
+                form.setUser( userBean, false );
                 refreshControls( FormState.STATE_EXISTING_ENTITY_SELECTED );
                 //                usersTable.select( null );
             }
@@ -142,7 +142,7 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
                 form.setVisible( true );
                 break;
             case STATE_SAVE_EXISTING_ENTITY:
-                newBean.setEnabled( true );
+                newBean.setEnabled( false );
                 break;
             case STATE_SAVE_NEW_ENTITY:
                 newBean.setEnabled( true );

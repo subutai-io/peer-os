@@ -89,7 +89,7 @@ public class RoleForm extends VerticalLayout
     }
 
 
-    public void setPermission( final BeanItem<Role> role, boolean newValue )
+    public void setRole( final BeanItem<Role> role, boolean newValue )
     {
         this.newValue = newValue;
         if ( role != null )
@@ -97,7 +97,8 @@ public class RoleForm extends VerticalLayout
             permissionFieldGroup.setItemDataSource( role );
 
             permissionFieldGroup.bind( name, "name" );
-            //                        permissionFieldGroup.bind( permissionsSelector, "permissions" );
+
+            // Pre-select role permissions
             Role roleBean = role.getBean();
             Set<String> permissionNames = new HashSet<>();
 
@@ -109,8 +110,6 @@ public class RoleForm extends VerticalLayout
             if ( !newValue )
             {
                 permissionFieldGroup.setReadOnly( true );
-                //                Field<?> permissionsField = permissionFieldGroup.getField( "permissions" );
-                //                permissionsField.setReadOnly( false );
             }
             else
             {
@@ -133,20 +132,14 @@ public class RoleForm extends VerticalLayout
                 permissionFieldGroup.commit();
                 if ( callback != null )
                 {
+                    // Set selected permissions for role
                     Collection<String> selectedPermissions = ( Collection<String> ) permissionsSelector.getValue();
                     Role role = permissionFieldGroup.getItemDataSource().getBean();
-
                     for ( final String permissionId : selectedPermissions )
                     {
                         BeanItem beanItem = ( BeanItem ) permissionsSelector.getItem( permissionId );
                         role.addPermission( ( Permission ) beanItem.getBean() );
                     }
-                    //
-                    //                    for ( final Permission selectedPermission : selectedPermissions )
-                    //                    {
-                    //                        role.addPermission( selectedPermission );
-                    //                    }
-                    //                    permissionFieldGroup.getItemDataSource().getBean().addPermission(  );
                     callback.saveOperation( permissionFieldGroup.getItemDataSource(), newValue );
                 }
             }

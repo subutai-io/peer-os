@@ -146,7 +146,7 @@ public class PermissionsTab extends CustomComponent implements TabCallback<BeanI
                 form.setVisible( true );
                 break;
             case STATE_SAVE_EXISTING_ENTITY:
-                newBean.setEnabled( true );
+                newBean.setEnabled( false );
                 break;
             case STATE_SAVE_NEW_ENTITY:
                 newBean.setEnabled( true );
