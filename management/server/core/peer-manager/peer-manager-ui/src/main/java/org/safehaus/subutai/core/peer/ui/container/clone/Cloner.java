@@ -72,7 +72,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
     private final TextField textFieldLxcName;
     private final Slider slider;
     private final ComboBox strategy;
-    private final ComboBox template;
+    private final ComboBox templateCombo;
     private final Label indicator;
     private final TreeTable lxcTable;
     private final HorizontalLayout criteriaLayout;
@@ -189,11 +189,16 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
         final GridLayout topContent = new GridLayout( 9, 2 );
         topContent.setSpacing( true );
 
-        template = new ComboBox( null, registry.getAllTemplates() );
-        template.setWidth( 200, Unit.PIXELS );
-        template.setImmediate( true );
-        template.setTextInputAllowed( false );
-        template.setNullSelectionAllowed( false );
+        templateCombo = new ComboBox();
+        templateCombo.setWidth( 200, Unit.PIXELS );
+        templateCombo.setImmediate( true );
+        templateCombo.setTextInputAllowed( false );
+        templateCombo.setNullSelectionAllowed( false );
+        for ( Template template : registry.getAllTemplates() )
+        {
+            templateCombo.addItem( template );
+            templateCombo.setItemCaption( template, template.getTemplateName() );
+        }
 
         strategy = new ComboBox( null, container );
         strategy.setItemCaptionPropertyId( "title" );
@@ -234,8 +239,6 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
 
                 criteriaTable.setEditable( true );
 
-                //                criteriaTable.setContainerDataSource(criteriaBeans);
-
                 criteriaLayout.addComponent( criteriaTable );
                 criteriaLayout.setVisible( st.hasCriteria() );
             }
@@ -246,7 +249,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
         topContent.addComponent( new Label( "Product name" ) );
         topContent.addComponent( textFieldLxcName );
         topContent.addComponent( new Label( "Template" ) );
-        topContent.addComponent( template );
+        topContent.addComponent( templateCombo );
         topContent.addComponent( new Label( "Containers count" ) );
         topContent.addComponent( slider );
         topContent.addComponent( cloneBtn );
@@ -336,7 +339,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
                     }
                 }
             }
-            Map<ServerMetric, Integer> bestServers ;
+            Map<ServerMetric, Integer> bestServers;
             try
             {
                 List<Criteria> cl = new ArrayList<>();
@@ -390,7 +393,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
             agentExecutor.addListener( this );
             ExecutorService executor = Executors.newFixedThreadPool( 1 );
             agentExecutor.execute( executor,
-                    new CloneCommandFactory( localPeer, host.getKey(), ( Template ) template.getValue() ) );
+                    new CloneCommandFactory( localPeer, host.getKey(), ( Template ) templateCombo.getValue() ) );
             executor.shutdown();
         }
     }
