@@ -14,6 +14,7 @@ import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -33,6 +34,8 @@ public class TerminalForm extends CustomComponent implements Disposable
     protected final TextField programTxtFld;
     protected final TextField timeoutTxtFld;
     protected final TextField workDirTxtFld;
+    protected final CheckBox daemonChk;
+
     protected final Label indicator;
     private final TextArea commandOutputTxtArea;
     protected AtomicInteger taskCount = new AtomicInteger();
@@ -83,6 +86,8 @@ public class TerminalForm extends CustomComponent implements Disposable
         controls.addComponent( clearBtn );
         final Button sendBtn = new Button( "Send" );
         controls.addComponent( sendBtn );
+        daemonChk = new CheckBox( "Daemon" );
+        controls.addComponent( daemonChk );
         indicator = new Label();
         indicator.setId( "terminal_indicator" );
         indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
