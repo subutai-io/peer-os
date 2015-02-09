@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.identity.api;
 
 
-import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -11,5 +11,9 @@ public interface Role
 {
     public String getName();
 
-    public List<String> getPermissions();
+    public Set<Permission> getPermissions();
+
+    public void addPermission(Permission permission);
+
+    public void removePermission(Permission permission);
 }

@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.CommandUtil;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.util.JsonUtil;
@@ -23,7 +24,6 @@ import org.safehaus.subutai.core.broker.api.Topic;
 import org.safehaus.subutai.core.filetracker.api.ConfigPointListener;
 import org.safehaus.subutai.core.filetracker.api.FileTrackerException;
 import org.safehaus.subutai.core.filetracker.api.InotifyEventType;
-import org.safehaus.subutai.core.peer.api.CommandUtil;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 

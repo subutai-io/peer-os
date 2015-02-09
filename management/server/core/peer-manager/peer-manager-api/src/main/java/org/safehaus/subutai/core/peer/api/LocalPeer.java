@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.peer.api;
 
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -9,6 +8,7 @@ import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.protocol.Template;
 
 
 /**
@@ -68,17 +68,12 @@ public interface LocalPeer extends Peer
 
     public Set<ResourceHost> getResourceHosts();
 
-    /**
-     * Returns the templates list
-     */
-    public List<String> getTemplates();
 
     public void cleanDb();
 
-    public ContainerHost createContainer( String hostName, String templateName, String cloneName, UUID envId )
-            throws PeerException;
+    public ContainerHost createContainer( final ResourceHost resourceHost, final Template template,
+                                          final String containerName ) throws PeerException;
 
-    public List<HostTask> getTasks();
 
     public String getFreeHostName( String prefix );
 

@@ -22,6 +22,7 @@ import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.GridLayout;
@@ -42,6 +43,7 @@ public class TerminalForm extends CustomComponent implements Disposable
     private final TextField timeoutTxtFld;
     private final TextField workDirTxtFld;
     private final TextField runAsTxtFld;
+    private final CheckBox daemonChk;
     private final ComboBox requestTypeCombo;
     private final Label indicator;
     private final AtomicInteger taskCount = new AtomicInteger();
@@ -110,6 +112,10 @@ public class TerminalForm extends CustomComponent implements Disposable
         controls.addComponent( clearBtn );
         final Button sendBtn = new Button( "Send" );
         controls.addComponent( sendBtn );
+
+        daemonChk = new CheckBox( "Daemon" );
+        controls.addComponent( daemonChk );
+
         indicator = new Label();
         indicator.setId( "terminal_indicator" );
         indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
@@ -165,6 +171,12 @@ public class TerminalForm extends CustomComponent implements Disposable
                 commandOutputTxtArea.setValue( "" );
             }
         } );
+    }
+
+
+    public CheckBox getDaemonChk()
+    {
+        return daemonChk;
     }
 
 
