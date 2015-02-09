@@ -1018,7 +1018,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
     {
-        //        LOG.info( String.format( "Received heartbeat: %s", resourceHostInfo ) );
         if ( resourceHostInfo.getHostname().equals( "management" ) )
         {
             if ( managementHost == null )
@@ -1043,30 +1042,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             try
             {
                 host = getResourceHostByName( resourceHostInfo.getHostname() );
-                if ( !resourceHostInfo.getContainers().isEmpty() )
-                {
-                    for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
-                    {
-                        if ( containerHostInfo.getInterfaces().size() == 0 )
-                        {
-                            continue;
-                        }
-                        Host containerHost;
-                        try
-                        {
-                            containerHost = bindHost( containerHostInfo.getId() );
-                        }
-                        catch ( HostNotFoundException hnfe )
-                        {
-                            containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
-                            ( ( ContainerHostEntity ) containerHost ).setDataService( containerHostDataService );
-                            ( ( AbstractSubutaiHost ) containerHost ).setPeer( this );
-                            ( ( ResourceHostEntity ) host ).addContainerHost( ( ContainerHostEntity ) containerHost );
-                            containerHostDataService.persist( ( ContainerHostEntity ) containerHost );
-                        }
-                        ( ( AbstractSubutaiHost ) containerHost ).updateHostInfo( containerHostInfo );
-                    }
-                }
+
+                saveResourceHostContainers( host, resourceHostInfo.getContainers() );
             }
             catch ( HostNotFoundException e )
             {
@@ -1075,11 +1052,38 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 resourceHostDataService.persist( ( ResourceHostEntity ) host );
                 addResourceHost( host );
                 setResourceHostTransientFields( Sets.newHashSet( host ) );
+
+                saveResourceHostContainers( host, resourceHostInfo.getContainers() );
             }
             ( ( AbstractSubutaiHost ) host ).updateHostInfo( resourceHostInfo );
         }
     }
 
+
+    private void saveResourceHostContainers( ResourceHost resourceHost, Set<ContainerHostInfo> containerHostInfos )
+    {
+        for ( ContainerHostInfo containerHostInfo : containerHostInfos )
+        {
+            if ( containerHostInfo.getInterfaces().size() == 0 )
+            {
+                continue;
+            }
+            Host containerHost;
+            try
+            {
+                containerHost = bindHost( containerHostInfo.getId() );
+            }
+            catch ( HostNotFoundException hnfe )
+            {
+                containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
+                ( ( AbstractSubutaiHost ) containerHost ).setPeer( this );
+                ( ( ContainerHostEntity ) containerHost ).setDataService( containerHostDataService );
+                ( ( ResourceHostEntity ) resourceHost ).addContainerHost( ( ContainerHostEntity ) containerHost );
+                containerHostDataService.persist( ( ContainerHostEntity ) containerHost );
+            }
+            ( ( AbstractSubutaiHost ) containerHost ).updateHostInfo( containerHostInfo );
+        }
+    }
 
     // ********** Quota functions *****************
 
