@@ -63,8 +63,9 @@ public class PeerRegisterForm extends CustomComponent
         buildMainLayout();
         setCompositionRoot( mainLayout );
 
-        // TODO add user code here
         this.module = module;
+
+        showPeersButton.click();
     }
 
 
@@ -153,7 +154,7 @@ public class PeerRegisterForm extends CustomComponent
         peersTable = new Table();
         peersTable.setCaption( "Peers" );
         peersTable.setImmediate( false );
-        peersTable.setWidth( "800px" );
+        peersTable.setWidth( "850px" );
         peersTable.setHeight( "283px" );
         absoluteLayout.addComponent( peersTable, "top:294.0px;left:20.0px;" );
 
@@ -210,7 +211,7 @@ public class PeerRegisterForm extends CustomComponent
                             {
                                 case REQUESTED:
                                     peer.setStatus( PeerStatus.APPROVED );
-                                    PeerInfo selfPeer = null;
+                                    PeerInfo selfPeer;
                                     try
                                     {
                                         selfPeer = getPeerJsonRepresentation( "127.0.0.1", "8181" );
@@ -405,6 +406,8 @@ public class PeerRegisterForm extends CustomComponent
                             selfPeer.setStatus( PeerStatus.REQUESTED );
 
                             registerPeerToAnother( selfPeer, ip, servicePort );
+
+                            showPeersButton.click();
                         }
                         catch ( PeerException e )
                         {
@@ -416,11 +419,5 @@ public class PeerRegisterForm extends CustomComponent
         } );
 
         return registerRequestButton;
-    }
-
-
-    private void show( String msg )
-    {
-        Notification.show( msg );
     }
 }
