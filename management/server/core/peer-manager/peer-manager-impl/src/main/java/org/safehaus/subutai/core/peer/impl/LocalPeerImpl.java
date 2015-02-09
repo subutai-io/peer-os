@@ -1,17 +1,13 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -54,11 +50,9 @@ import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
-import org.safehaus.subutai.core.peer.api.CloneParam;
 import org.safehaus.subutai.core.peer.api.ContainerGroup;
 import org.safehaus.subutai.core.peer.api.ContainerGroupNotFoundException;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
-import org.safehaus.subutai.core.peer.api.HostTask;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.Payload;
@@ -66,8 +60,6 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
-import org.safehaus.subutai.core.peer.api.task.Task;
-import org.safehaus.subutai.core.peer.api.task.clone.CloneTask;
 import org.safehaus.subutai.core.peer.impl.container.ContainersDestructionResultImpl;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerWrapperTask;
 import org.safehaus.subutai.core.peer.impl.container.DestroyContainerWrapperTask;
@@ -80,7 +72,6 @@ import org.safehaus.subutai.core.peer.impl.entity.ContainerGroupEntity;
 import org.safehaus.subutai.core.peer.impl.entity.ContainerHostEntity;
 import org.safehaus.subutai.core.peer.impl.entity.ManagementHostEntity;
 import org.safehaus.subutai.core.peer.impl.entity.ResourceHostEntity;
-import org.safehaus.subutai.core.peer.impl.task.CloneTaskImpl;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
@@ -121,7 +112,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     private ContainerGroupDataService containerGroupDataService;
     private HostRegistry hostRegistry;
     private Set<RequestListener> requestListeners;
-    private List<HostTask> tasks = Lists.newCopyOnWriteArrayList();
 
 
     public LocalPeerImpl( PeerManager peerManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
@@ -236,97 +226,29 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
 
     @Override
-    public List<HostTask> getTasks()
+    public ContainerHost createContainer( final ResourceHost resourceHost, final Template template,
+                                          final String containerName ) throws PeerException
     {
-        return tasks;
-    }
+        Preconditions.checkNotNull( resourceHost, "Invalid resource host" );
+        Preconditions.checkNotNull( template, "Invalid template" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerName ), "Invalid container name" );
 
+        getResourceHostByName( resourceHost.getHostname() );
 
-    @Override
-    public ContainerHost createContainer( final String hostName, final String templateName, final String cloneName,
-                                          final UUID environmentId ) throws PeerException
-    {
-        Preconditions.checkNotNull( hostName, "Host name is null." );
-        Preconditions.checkNotNull( environmentId, "Environment ID is null." );
-        Preconditions.checkNotNull( templateName, "Template list is null." );
-
-        CloneParam cloneParam = new CloneParam( cloneName, Lists.newArrayList( getTemplate( templateName ) ) );
-        ResourceHost resourceHost = getResourceHostByName( hostName );
-
-
-        UUID taskGroupId = UUID.randomUUID();
-        HostCloneTask hostCloneTask = new HostCloneTask( taskGroupId, resourceHost, cloneParam );
-        tasks.add( hostCloneTask );
-        hostCloneTask.start();
+        if ( templateRegistry.getTemplate( template.getTemplateName() ) == null )
+        {
+            throw new PeerException( String.format( "Template %s not registered", template.getTemplateName() ) );
+        }
 
         try
         {
-            return waitCloneTasks( Lists.newArrayList( hostCloneTask ) ).iterator().next();
+            return resourceHost.createContainer( template.getTemplateName(), containerName, 180 );
         }
-        catch ( Exception e )
+        catch ( ResourceHostException e )
         {
-            LOG.error( "Clone fail", e );
-            throw new PeerException( "Clone fail.", e.toString() );
+            LOG.error( "Failed to create container", e );
+            throw new PeerException( e );
         }
-    }
-
-
-    private Set<ContainerHost> waitCloneTasks( final List<HostCloneTask> hostCloneTasks ) throws Exception
-    {
-        int quantity = hostCloneTasks.size();
-        long threshold = System.currentTimeMillis() + 180 * quantity * 1000;
-        DateFormat formatter = new SimpleDateFormat( "HH:mm:ss" );
-        formatter.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
-
-        int i = 0;
-        while ( i < quantity && threshold - System.currentTimeMillis() > 0 )
-        {
-            i = 0;
-            for ( HostCloneTask hostCloneTask : hostCloneTasks )
-            {
-                LOG.info( String.format( "Clone task %s  %s:%s", hostCloneTask.getPhase(),
-                        hostCloneTask.getHost().getHostname(), hostCloneTask.getParameter().getHostname() ) );
-                if ( hostCloneTask.getPhase() == HostTask.Phase.DONE )
-                {
-                    if ( hostCloneTask.getResult().isOk() )
-                    {
-                        i++;
-                    }
-                    else
-                    {
-                        LOG.error( "Container clone error.", hostCloneTask.getException() );
-                        throw hostCloneTask.getException();
-                    }
-                }
-            }
-
-            try
-            {
-                Thread.sleep( 5000 );
-            }
-            catch ( InterruptedException ignore )
-            {
-            }
-            LOG.info( String.format( "Waiting clone tasks. Timeout: %s ",
-                    formatter.format( new Date( threshold - System.currentTimeMillis() ) ) ) );
-        }
-        Set<ContainerHost> result = new HashSet<>();
-        for ( HostCloneTask hostCloneTask : hostCloneTasks )
-        {
-            if ( hostCloneTask.getResult().getValue() != null )
-            {
-                result.add( hostCloneTask.getResult().getValue() );
-            }
-        }
-        return result;
-    }
-
-
-    public boolean schedule( Task task )
-    {
-        CloneTaskImpl cloneTask = new CloneTaskImpl( ( CloneTask ) task );
-        cloneTask.run();
-        return true;
     }
 
 
@@ -917,20 +839,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     public Set<ResourceHost> getResourceHosts()
     {
         return resourceHosts;
-    }
-
-
-    @Override
-    public List<String> getTemplates()
-    {
-        List<Template> templates = templateRegistry.getAllTemplates();
-
-        List<String> result = new ArrayList<>();
-        for ( Template template : templates )
-        {
-            result.add( template.getTemplateName() );
-        }
-        return result;
     }
 
 

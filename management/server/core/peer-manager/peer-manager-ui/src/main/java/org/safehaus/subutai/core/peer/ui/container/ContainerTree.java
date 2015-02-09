@@ -4,7 +4,6 @@ package org.safehaus.subutai.core.peer.ui.container;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -15,7 +14,6 @@ import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.protocol.Disposable;
-import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
@@ -42,15 +40,13 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
     private HierarchicalContainer container;
     private Set<Host> selectedHosts = new HashSet<>();
     private final ScheduledExecutorService scheduler;
-    private HostRegistry hostRegistry;
     private Item managementHostItem;
 
 
-    public ContainerTree( LocalPeer localPeer, HostRegistry hostRegistry )
+    public ContainerTree( LocalPeer localPeer )
     {
 
         this.localPeer = localPeer;
-        this.hostRegistry = hostRegistry;
         setSizeFull();
         setMargin( true );
 
@@ -204,10 +200,8 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
                 Collection children = container.getChildren( rh.getId() );
                 if ( children != null )
                 {
-                    Iterator iterator = children.iterator();
-                    while ( iterator.hasNext() )
+                    for ( final Object id : children )
                     {
-                        Object id = iterator.next();
                         Item item = container.getItem( id );
                         ContainerHost containerHost = ( ContainerHost ) item.getItemProperty( "value" ).getValue();
                         if ( !rh.getContainerHosts().contains( containerHost ) )

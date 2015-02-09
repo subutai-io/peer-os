@@ -6,9 +6,6 @@
 package org.safehaus.subutai.core.peer.ui.container.common;
 
 
-/**
- *
- */
 public enum Buttons
 {
 
