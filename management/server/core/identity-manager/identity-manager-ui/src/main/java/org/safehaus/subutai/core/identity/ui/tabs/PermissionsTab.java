@@ -1,32 +1,48 @@
 package org.safehaus.subutai.core.identity.ui.tabs;
 
 
-import com.vaadin.data.Item;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
+import org.safehaus.subutai.core.identity.api.Permission;
+import org.safehaus.subutai.core.identity.api.PermissionGroup;
+import org.safehaus.subutai.core.identity.ui.tabs.subviews.PermissionForm;
+
 import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.event.FieldEvents;
-import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.DefaultFieldFactory;
-import com.vaadin.ui.Field;
-import com.vaadin.ui.Form;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 
 /**
  * Created by talas on 1/26/15.
  */
-public class PermissionsTab extends CustomComponent
+public class PermissionsTab extends CustomComponent implements TabCallback<BeanItem<Permission>>
 {
-    public PermissionsTab()
+    private enum FormState
     {
+        STATE_EXISTING_ENTITY_SELECTED,
+        STATE_SAVE_EXISTING_ENTITY,
+        STATE_SAVE_NEW_ENTITY,
+        STATE_REMOVE_ENTITY,
+        STATE_NEW_ENTITY,
+        STATE_CANCEL
+    }
+
+
+    private IdentityManager identityManager;
+    private Table permissionsTable;
+    private BeanItemContainer<Permission> beans;
+    private Button newBean;
+    private PermissionForm form;
+
+
+    public PermissionsTab( final IdentityManager identityManager )
+    {
+        this.identityManager = identityManager;
         editorForm();
-        // TODO still need some modifications
     }
 
 
@@ -35,33 +51,31 @@ public class PermissionsTab extends CustomComponent
         VerticalLayout vlayout = new VerticalLayout();
 
         // Create a container for such beans
-        final BeanItemContainer<Permission> beans = new BeanItemContainer<>( Permission.class );
-
         // Add some beans to it
-        //TODO need to retrieve all permissions from db.
-        beans.addBean( new Permission( "CRUD permissions" ) );
-        beans.addBean( new Permission( "Read permissions" ) );
-        beans.addBean( new Permission( "Update permissions" ) );
+        beans = new BeanItemContainer<>( Permission.class );
+
+        beans.addAll( identityManager.getAllPermissions() );
+        beans.addNestedContainerProperty( "permissionGroup.name" );
 
         // A layout for the table and form
         HorizontalLayout layout = new HorizontalLayout();
 
         // Bind a table to it
-        final Table table = new Table( "Permissions", beans );
-        table.setVisibleColumns( new Object[] { "name" } );
-        table.setPageLength( 7 );
-        table.setBuffered( false );
+        permissionsTable = new Table( "Permissions", beans );
+        permissionsTable.setVisibleColumns( new Object[] { "name", "permissionGroup.name", "description" } );
+        permissionsTable.setPageLength( 7 );
+        permissionsTable.setColumnHeader( "name", "Name" );
+        permissionsTable.setColumnHeader( "permissionGroup.name", "PermissionGroup" );
+        permissionsTable.setColumnHeader( "description", "Description" );
+        permissionsTable.setBuffered( false );
 
         // Create a form for editing a selected or new item.
         // It is invisible until actually used.
-        final Form form = new Form();
-        form.setCaption( "Edit Permission" );
+        form = new PermissionForm( this );
         form.setVisible( false );
-        form.setBuffered( true );
-
 
         // When the user selects an item, show it in the form
-        table.addValueChangeListener( new Property.ValueChangeListener()
+        permissionsTable.addValueChangeListener( new Property.ValueChangeListener()
         {
             @Override
             public void valueChange( Property.ValueChangeEvent event )
@@ -72,132 +86,40 @@ public class PermissionsTab extends CustomComponent
                     form.setVisible( false );
                     return;
                 }
-
-                // Bind the form to the selected item
-                form.setItemDataSource( table.getItem( table.getValue() ) );
-                form.setVisible( true );
-
-                // The form was opened for editing an existing item
-                table.setData( null );
+                BeanItem<Permission> permission = beans.getItem( permissionsTable.getValue() );
+                form.setPermission( permission, false );
+                refreshControls( FormState.STATE_EXISTING_ENTITY_SELECTED );
+                //                permissionsTable.select( null );
             }
         } );
-        table.setSelectable( true );
-        table.setImmediate( true );
+        permissionsTable.setSelectable( true );
+        permissionsTable.setImmediate( true );
 
         // Creates a new bean for editing in the form before adding
         // it to the table. Adding is handled after committing
         // the form.
-        final Button newBean = new Button( "New Permission" );
+        newBean = new Button( "New Permission" );
         newBean.addClickListener( new Button.ClickListener()
         {
             public void buttonClick( Button.ClickEvent event )
             {
-                Permission newPermission = new Permission( "Some permission" );
+
                 // Create a new item; this will create a new bean
-                Object itemId = beans.addItem( newPermission );
+                BeanItem<Permission> newPermission = new BeanItem<>(
+                        identityManager.createMockPermission( "", PermissionGroup.DEFAULT_PERMISSIONS, "" ) );
 
                 // The form was opened for editing a new item
-                table.setData( itemId );
+                refreshControls( FormState.STATE_NEW_ENTITY );
 
-                table.select( itemId );
-                table.setEnabled( false );
-                newBean.setEnabled( false );
 
                 // Make the form a bit nicer
                 //this is an example for future how to improve UI
-                // form.setVisibleItemProperties( new Object[] { "name" } );
-                form.setItemDataSource( beans.getItem( newPermission ) );
-                form.setVisible( true );
+                form.setPermission( newPermission, true );
             }
         } );
 
-        // When OK button is clicked, commit the form to the bean
-        final Button submit = new Button( "Save" );
-        submit.addClickListener( new Button.ClickListener()
-        {
-            public void buttonClick( Button.ClickEvent event )
-            {
-                form.commit();
-                form.setVisible( false ); // and close it
-
-                // New items have to be added to the container
-                // Commit the addition
-                table.commit();
-
-                table.setEnabled( true );
-                newBean.setEnabled( true );
-            }
-        } );
-
-        // Make modification to enable/disable the Save button
-        form.setFormFieldFactory( new DefaultFieldFactory()
-        {
-            @Override
-            public Field createField( Item item, Object propertyId, Component uiContext )
-            {
-                final AbstractField field = ( AbstractField ) super.createField( item, propertyId, uiContext );
-                field.addValueChangeListener( new Property.ValueChangeListener()
-                {
-                    @Override
-                    public void valueChange( Property.ValueChangeEvent event )
-                    {
-                        submit.setEnabled( form.isModified() );
-                    }
-                } );
-                if ( field instanceof TextField )
-                {
-                    final TextField tf = ( TextField ) field;
-                    tf.addTextChangeListener( new FieldEvents.TextChangeListener()
-                    {
-                        @Override
-                        public void textChange( FieldEvents.TextChangeEvent event )
-                        {
-                            if ( form.isModified() || !event.getText().equals( tf.getValue() ) )
-                            {
-                                submit.setEnabled( true );
-
-                                // Not needed after first event unless
-                                // want to detect also changes back to
-                                // unmodified value.
-                                tf.removeTextChangeListener( this );
-
-                                // Has to be reset because the
-                                // removeListener() setting causes
-                                // updating the field value from the
-                                // server-side.
-                                tf.setValue( event.getText() );
-                            }
-                        }
-                    } );
-                }
-                field.setImmediate( true );
-
-                return field;
-            }
-        } );
-
-        Button cancel = new Button( "Cancel" );
-        cancel.addClickListener( new Button.ClickListener()
-        {
-            public void buttonClick( Button.ClickEvent event )
-            {
-                form.discard();  // Not really necessary
-                form.setVisible( false ); // and close it
-                table.discard(); // Discards possible addItem()
-                table.setEnabled( true );
-                if ( table.getData() != null )
-                {
-                    beans.removeItem( table.getData() );
-                }
-                newBean.setEnabled( true );
-            }
-        } );
-
-        layout.addComponent( table );
+        layout.addComponent( permissionsTable );
         layout.addComponent( form );
-
-        form.getFooter().addComponent( submit );
-        form.getFooter().addComponent( cancel );
 
         layout.setSpacing( true );
 
@@ -205,5 +127,82 @@ public class PermissionsTab extends CustomComponent
         vlayout.addComponent( newBean );
 
         setCompositionRoot( vlayout );
+    }
+
+
+    //make centralized modification and controls updates
+    //state:
+    //  0: existing entity selected in table
+    //  1: on save event existing one
+    //  2: on save event new entity
+    //  3: on remove event
+    //  4: on new entity button click
+    private void refreshControls( FormState state )
+    {
+        switch ( state )
+        {
+            case STATE_EXISTING_ENTITY_SELECTED:
+                newBean.setEnabled( false );
+                form.setVisible( true );
+                break;
+            case STATE_SAVE_EXISTING_ENTITY:
+                newBean.setEnabled( false );
+                break;
+            case STATE_SAVE_NEW_ENTITY:
+                newBean.setEnabled( true );
+                permissionsTable.setEnabled( true );
+                form.setVisible( false );
+                break;
+            case STATE_REMOVE_ENTITY:
+                newBean.setEnabled( true );
+                form.setVisible( false );
+                break;
+            case STATE_NEW_ENTITY:
+                form.setVisible( true );
+                newBean.setEnabled( false );
+                permissionsTable.setEnabled( false );
+                //                permissionsTable.select( null );
+                break;
+            case STATE_CANCEL:
+                form.setVisible( false );
+                newBean.setEnabled( true );
+                permissionsTable.setEnabled( true );
+                break;
+        }
+    }
+
+
+    @Override
+    public void saveOperation( final BeanItem<Permission> value, final boolean newValue )
+    {
+        identityManager.updatePermission( value.getBean() );
+        if ( newValue )
+        {
+            beans.addBean( value.getBean() );
+            refreshControls( FormState.STATE_SAVE_NEW_ENTITY );
+        }
+        else
+        {
+            refreshControls( FormState.STATE_SAVE_EXISTING_ENTITY );
+        }
+    }
+
+
+    @Override
+    public void removeOperation( final BeanItem<Permission> value, final boolean newValue )
+    {
+        if ( !newValue )
+        {
+            identityManager.deletePermission( value.getBean() );
+            beans.removeItem( value.getBean() );
+        }
+        refreshControls( FormState.STATE_REMOVE_ENTITY );
+    }
+
+
+    @Override
+    public void cancelOperation()
+    {
+        refreshControls( FormState.STATE_CANCEL );
     }
 }

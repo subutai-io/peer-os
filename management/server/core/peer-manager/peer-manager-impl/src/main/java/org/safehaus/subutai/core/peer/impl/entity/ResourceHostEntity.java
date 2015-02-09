@@ -7,11 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,7 +26,6 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.CommandUtil;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.command.Response;
 import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.protocol.Template;
@@ -35,9 +33,10 @@ import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.peer.api.ContainerState;
-import org.safehaus.subutai.core.peer.api.HostTask;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
+import org.safehaus.subutai.core.peer.impl.container.CreateContainerTask;
+import org.safehaus.subutai.core.peer.impl.container.DestroyContainerTask;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.slf4j.Logger;
@@ -144,23 +143,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    @Override
-    public synchronized void queue( final HostTask hostTask )
-    {
-        LOG.debug( String.format( "New sequential task %s queued.", hostTask.getId() ) );
-        ExecutorService executorService = getSingleThreadExecutorService();
-        //        LOG.debug( executorService.toString() );
-        executorService.submit( hostTask );
-    }
-
-
-    public synchronized void run( final HostTask hostTask )
-    {
-        LOG.info( String.format( "New immediate task %s added.", hostTask.getId() ) );
-        getCachedThreadExecutorService().submit( hostTask );
-    }
-
-
     public boolean startContainerHost( final ContainerHost container ) throws ResourceHostException
     {
         Preconditions.checkNotNull( container, "Container host is null" );
@@ -232,7 +214,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             {
                 String[] metrics = result.getStdOut().split( "\n" );
                 serverMetric = gatherMetrics( metrics );
-                //                serverMetric.setAverageMetrics( gatherAvgMetrics() );
+                System.out.println( serverMetric );
             }
             return serverMetric;
         }
@@ -392,41 +374,21 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         Preconditions.checkNotNull( containerHost, "Container host is null" );
 
+        if ( getContainerHostByName( containerHost.getHostname() ) == null )
+        {
+            throw new ResourceHostException(
+                    String.format( "Container with name %s does not exist", containerHost.getHostname() ) );
+        }
+
+        Future future = queueSequentialTask( new DestroyContainerTask( this, containerHost.getHostname() ) );
+
         try
         {
-            final Semaphore semaphore = new Semaphore( 0 );
-            final StringBuilder out = new StringBuilder();
-
-            commandUtil.executeAsync( Command.DESTROY.build( containerHost.getHostname() ), this,
-                    new CommandUtil.StoppableCallback()
-                    {
-                        @Override
-                        public void onResponse( final Response response, final CommandResult commandResult )
-                        {
-                            out.append( commandResult.getStdOut() );
-                            if ( commandResult.getStdOut().contains(
-                                    String.format( CONTAINER_DESTROYED, containerHost.getHostname() ) ) || commandResult
-                                    .getStdOut().contains(
-                                            String.format( CONTAINER_DOES_NOT_EXIST, containerHost.getHostname() ) ) )
-                            {
-                                semaphore.release();
-                                stop();
-                            }
-                        }
-                    } );
-
-
-            if ( !semaphore.tryAcquire( DESTROY_TIMEOUT, TimeUnit.SECONDS ) )
-            {
-                LOG.error( String.format( "Unexpected command result: %s", out ) );
-                throw new ResourceHostException(
-                        String.format( "Unexpected command result while destroying container: %s", out ) );
-            }
+            future.get();
         }
-        catch ( InterruptedException | CommandException ce )
+        catch ( ExecutionException | InterruptedException e )
         {
-            LOG.error( "Command exception.", ce );
-            throw new ResourceHostException( "General command exception while destroying container.", ce );
+            throw new ResourceHostException( "Error destroying container", e );
         }
     }
 
@@ -489,11 +451,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void cloneContainer( final String templateName, final String cloneName ) throws ResourceHostException
+    public ContainerHost createContainer( final String templateName, final String hostname, final int timeout )
+            throws ResourceHostException
     {
-
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( cloneName ), "Invalid container name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+        Preconditions.checkArgument( timeout > 0, "Invalid timeout" );
 
         if ( registry.getTemplate( templateName ) == null )
         {
@@ -505,54 +468,17 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             throw new ResourceHostException( String.format( "Container with name %s already exists", hostname ) );
         }
 
-
-        LOG.debug( String.format( "Cloning container %s on %s from template %s", cloneName, hostname, templateName ) );
+        Future<ContainerHost> containerHostFuture =
+                queueSequentialTask( new CreateContainerTask( this, templateName, hostname, timeout ) );
 
         try
         {
-            commandUtil.execute( Command.CLONE.build( templateName, cloneName ), this );
+            return containerHostFuture.get();
         }
-        catch ( CommandException ce )
+        catch ( ExecutionException | InterruptedException e )
         {
-            LOG.error( "Command exception.", ce );
-            throw new ResourceHostException( "General command exception on cloning container.", ce );
+            throw new ResourceHostException( "Error creating container", e );
         }
-    }
-
-
-    @Override
-    public ContainerHost createContainer( final String templateName, final String hostname, final int timeout )
-            throws ResourceHostException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
-        Preconditions.checkArgument( timeout > 0, "Invalid timeout" );
-
-        //        if ( registry.getTemplate( templateName ) == null )
-        //        {
-        //            throw new ResourceHostException( String.format( "Template %s is not registered", templateName ) );
-        //        }
-        //
-        //        if ( getContainerHostByName( hostname ) != null )
-        //        {
-        //            throw new ResourceHostException( String.format( "Container with name %s already exists",
-        // hostname ) );
-        //        }
-
-        cloneContainer( templateName, hostname );
-
-        long start = System.currentTimeMillis();
-
-        ContainerHost containerHost = null;
-        while ( System.currentTimeMillis() - start < timeout * 1000 && containerHost == null )
-        {
-            containerHost = getContainerHostByName( hostname );
-        }
-        if ( containerHost == null )
-        {
-            throw new ResourceHostException( String.format( "Container %s did not connect within timeout", hostname ) );
-        }
-        return containerHost;
     }
 
 

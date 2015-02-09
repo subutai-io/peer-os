@@ -2,9 +2,7 @@ package org.safehaus.subutai.core.env.impl.entity;
 
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -35,7 +33,6 @@ import org.safehaus.subutai.common.host.HostArchitecture;
 import org.safehaus.subutai.common.host.Interface;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.HostEvent;
 import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
@@ -333,19 +330,6 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     }
 
 
-    private List<String> getIps() throws PeerException
-    {
-        List<String> result = new ArrayList<>();
-
-        for ( Interface anInterface : interfaces )
-        {
-            String ip = anInterface.getIp();
-            result.add( ip );
-        }
-        return result;
-    }
-
-
     @Override
     public Set<Interface> getNetInterfaces()
     {
@@ -464,13 +448,6 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
     @Override
     public long getLastHeartbeat()
-    {
-        throw new UnsupportedOperationException( "Unsupported operation." );
-    }
-
-
-    @Override
-    public void fireEvent( final HostEvent hostEvent )
     {
         throw new UnsupportedOperationException( "Unsupported operation." );
     }

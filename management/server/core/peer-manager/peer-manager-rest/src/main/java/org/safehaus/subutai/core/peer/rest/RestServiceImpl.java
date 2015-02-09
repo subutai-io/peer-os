@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.peer.rest;
 
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -12,10 +11,8 @@ import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
-import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
-import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
@@ -64,6 +61,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Deprecated
     @Override
     public PeerInfo registerPeer( String config )
     {
@@ -100,6 +98,7 @@ public class RestServiceImpl implements RestService
     {
         PeerInfo p = GSON.fromJson( peer, PeerInfo.class );
         p.setIp( getRequestIp() );
+        p.setName( String.format( "Peer on %s", p.getIp() )  );
         try
         {
             peerManager.register( p );
@@ -140,6 +139,7 @@ public class RestServiceImpl implements RestService
     {
         PeerInfo p = GSON.fromJson( peer, PeerInfo.class );
         p.setIp( getRequestIp() );
+        p.setName( String.format( "Peer on %s", p.getIp() ) );
         peerManager.update( p );
         return Response.ok( GSON.toJson( p ) ).build();
     }
@@ -184,28 +184,6 @@ public class RestServiceImpl implements RestService
         Message message = PhaseInterceptorChain.getCurrentMessage();
         HttpServletRequest request = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
         return request.getRemoteAddr();
-    }
-
-
-    @Override
-    public Response scheduleCloneContainers( final String creatorPeerId, final String templates, final int quantity,
-                                             final String strategyId, final String criteria )
-    {
-
-        try
-        {
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            Set<HostInfoModel> result = localPeer.scheduleCloneContainers( UUID.fromString( creatorPeerId ),
-                    JsonUtil.<List<Template>>fromJson( templates, new TypeToken<List<Template>>()
-                    {}.getType() ), quantity, strategyId,
-                    JsonUtil.<List<Criteria>>fromJson( templates, new TypeToken<List<Criteria>>()
-                    {}.getType() ) );
-            return Response.ok( JsonUtil.toJson( result ) ).build();
-        }
-        catch ( PeerException e )
-        {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
     }
 
 

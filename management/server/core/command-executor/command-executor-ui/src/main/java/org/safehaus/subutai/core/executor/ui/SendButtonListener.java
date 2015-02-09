@@ -143,6 +143,11 @@ public class SendButtonListener implements Button.ClickListener, CommandCallback
             int timeout = Integer.valueOf( form.getTimeoutTxtFld().getValue() );
             requestBuilder.withTimeout( timeout );
 
+            if ( form.getDaemonChk().getValue() )
+            {
+                requestBuilder.daemon();
+            }
+
             execute( requestBuilder, hosts );
         }
     }

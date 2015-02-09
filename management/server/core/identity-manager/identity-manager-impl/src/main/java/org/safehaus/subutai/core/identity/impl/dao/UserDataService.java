@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 
-public class UserDataService implements DataService<Long, UserEntity>
+public class UserDataService implements DataService<Long, User>
 {
     private static final Logger LOG = LoggerFactory.getLogger( UserDataService.class );
     EntityManagerFactory emf;
@@ -62,14 +62,14 @@ public class UserDataService implements DataService<Long, UserEntity>
 
 
     @Override
-    public Collection<UserEntity> getAll()
+    public Collection<User> getAll()
     {
-        Collection<UserEntity> result = Lists.newArrayList();
+        Collection<User> result = Lists.newArrayList();
         EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
-            result = em.createQuery( "select h from UserEntity h", UserEntity.class ).getResultList();
+            result = em.createQuery( "select h from UserEntity h" ).getResultList();
             em.getTransaction().commit();
         }
         catch ( Exception e )
@@ -89,7 +89,7 @@ public class UserDataService implements DataService<Long, UserEntity>
 
 
     @Override
-    public void persist( final UserEntity item )
+    public void persist( final User item )
     {
         EntityManager em = emf.createEntityManager();
         try
@@ -141,7 +141,7 @@ public class UserDataService implements DataService<Long, UserEntity>
 
 
     @Override
-    public void update( final UserEntity item )
+    public void update( final User item )
     {
         EntityManager em = emf.createEntityManager();
         try
