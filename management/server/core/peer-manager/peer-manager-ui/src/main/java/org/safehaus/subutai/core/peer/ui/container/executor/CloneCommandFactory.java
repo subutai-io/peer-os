@@ -1,36 +1,29 @@
 package org.safehaus.subutai.core.peer.ui.container.executor;
 
 
-import java.util.UUID;
-
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
+import org.safehaus.subutai.core.peer.api.ResourceHost;
 
 
-/**
- * Created by timur on 9/8/14.
- */
 public class CloneCommandFactory implements AgentCommandFactory
 {
-    //    private ContainerManager containerManager;
     private LocalPeer localPeer;
-    private String hostName;
-    private String templateName;
-    private UUID envId;
+    private ResourceHost resourceHost;
+    private Template template;
 
 
-    public CloneCommandFactory( LocalPeer localPeer, UUID envId, String hostname, String templateName )
+    public CloneCommandFactory( LocalPeer localPeer, ResourceHost resourceHost, Template template )
     {
-        //        this.containerManager = containerManager;
         this.localPeer = localPeer;
-        this.hostName = hostname;
-        this.templateName = templateName;
-        this.envId = envId;
+        this.resourceHost = resourceHost;
+        this.template = template;
     }
 
 
     @Override
-    public AgentCommand newCommand( String cloneName )
+    public AgentCommand newCommand( String containerName )
     {
-        return new CloneCommand( localPeer, hostName, templateName, cloneName, envId );
+        return new CloneCommand( localPeer, resourceHost, template, containerName );
     }
 }

@@ -20,6 +20,7 @@ public interface RestService
 {
 
 
+    @Deprecated
     @POST
     @Path( "peer" )
     @Produces( { MediaType.APPLICATION_JSON } )

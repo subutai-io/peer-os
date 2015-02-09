@@ -4,10 +4,13 @@
 
   <reference id="peerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+  <reference id="templateRegistry" availability="mandatory"
+             interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
 
   <bean id="module" scope="singleton" class="org.safehaus.subutai.core.peer.ui.PeerManagerPortalModule"
         init-method="init" destroy-method="destroy">
     <argument ref="peerManager" />
+    <argument ref="templateRegistry" />
   </bean>
 
   <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule">

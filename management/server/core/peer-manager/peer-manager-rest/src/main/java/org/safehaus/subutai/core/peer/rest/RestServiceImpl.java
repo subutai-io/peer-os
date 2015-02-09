@@ -61,6 +61,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Deprecated
     @Override
     public PeerInfo registerPeer( String config )
     {
@@ -97,6 +98,7 @@ public class RestServiceImpl implements RestService
     {
         PeerInfo p = GSON.fromJson( peer, PeerInfo.class );
         p.setIp( getRequestIp() );
+        p.setName( String.format( "Peer on %s", p.getIp() )  );
         try
         {
             peerManager.register( p );
@@ -137,6 +139,7 @@ public class RestServiceImpl implements RestService
     {
         PeerInfo p = GSON.fromJson( peer, PeerInfo.class );
         p.setIp( getRequestIp() );
+        p.setName( String.format( "Peer on %s", p.getIp() ) );
         peerManager.update( p );
         return Response.ok( GSON.toJson( p ) ).build();
     }

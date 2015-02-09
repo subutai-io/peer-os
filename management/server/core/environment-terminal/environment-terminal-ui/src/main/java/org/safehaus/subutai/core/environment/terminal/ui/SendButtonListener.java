@@ -76,6 +76,11 @@ public class SendButtonListener implements Button.ClickListener
             int timeout = Integer.valueOf( form.timeoutTxtFld.getValue() );
             requestBuilder.withTimeout( timeout );
 
+            if ( form.daemonChk.getValue() )
+            {
+                requestBuilder.daemon();
+            }
+
             form.indicator.setVisible( true );
 
             for ( ContainerHost host : containers )

@@ -28,12 +28,9 @@ import org.safehaus.subutai.common.host.HostArchitecture;
 import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.host.Interface;
 import org.safehaus.subutai.common.peer.Host;
-import org.safehaus.subutai.common.peer.HostEvent;
-import org.safehaus.subutai.common.peer.HostEventListener;
 import org.safehaus.subutai.common.peer.Peer;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -68,8 +65,7 @@ public abstract class AbstractSubutaiHost implements Host
 
     @Transient
     protected volatile long lastHeartbeat = 0;
-    @Transient
-    protected Set<HostEventListener> eventListeners = Sets.newConcurrentHashSet();
+
 
     @Transient
     private Peer peer;
@@ -95,7 +91,7 @@ public abstract class AbstractSubutaiHost implements Host
 
         for ( Interface s : hostInfo.getInterfaces() )
         {
-            sb.append( s.getIp().replace( "addr:", "" ) + ";" );
+            sb.append( s.getIp().replace( "addr:", "" ) ).append( ";" );
             addInterface( new HostInterface( s ) );
         }
         this.netInterfaces = sb.toString();
@@ -104,34 +100,6 @@ public abstract class AbstractSubutaiHost implements Host
 
     protected AbstractSubutaiHost()
     {
-    }
-
-
-    public void addListener( HostEventListener hostEventListener )
-    {
-        this.eventListeners.add( hostEventListener );
-    }
-
-
-    public void removeListener( HostEventListener hostEventListener )
-    {
-        this.eventListeners.remove( hostEventListener );
-    }
-
-
-    public void fireEvent( HostEvent hostEvent )
-    {
-        for ( HostEventListener hostEventListener : eventListeners )
-        {
-            try
-            {
-                hostEventListener.onHostEvent( hostEvent );
-            }
-            catch ( Exception e )
-            {
-                eventListeners.remove( hostEventListener );
-            }
-        }
     }
 
 
@@ -192,12 +160,6 @@ public abstract class AbstractSubutaiHost implements Host
     }
 
 
-    public void setPeerId( final String peerId )
-    {
-        this.peerId = peerId;
-    }
-
-
     @Override
     public String getHostname()
     {
@@ -238,12 +200,7 @@ public abstract class AbstractSubutaiHost implements Host
 
         final AbstractSubutaiHost that = ( AbstractSubutaiHost ) o;
 
-        if ( !hostId.equals( that.hostId ) )
-        {
-            return false;
-        }
-
-        return true;
+        return hostId.equals( that.hostId );
     }
 
 
@@ -291,34 +248,11 @@ public abstract class AbstractSubutaiHost implements Host
     }
 
 
-    private List<String> getIps()
-    {
-        String[] str = this.netInterfaces.split( ";" );
-        List<String> result = new ArrayList<>();
-
-        for ( String s : str )
-        {
-            result.add( s );
-        }
-        return result;
-    }
 
 
     public String getHostId()
     {
         return hostId;
-    }
-
-
-    public void setHostId( final String hostId )
-    {
-        this.hostId = hostId;
-    }
-
-
-    public void setHostname( final String hostname )
-    {
-        this.hostname = hostname;
     }
 
 

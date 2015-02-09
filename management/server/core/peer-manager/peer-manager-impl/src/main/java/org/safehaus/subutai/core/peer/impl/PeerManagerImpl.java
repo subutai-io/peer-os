@@ -188,6 +188,16 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
+    public boolean unregister( final String uuid ) throws PeerException
+    {
+        ManagementHost managementHost = getLocalPeer().getManagementHost();
+        PeerInfo p = getPeerInfo( UUID.fromString( uuid ) );
+        managementHost.removeAptSource( p.getId().toString(), p.getIp() );
+        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, uuid );
+    }
+
+
+    @Override
     public boolean update( final PeerInfo peerInfo )
     {
         return peerDAO.saveInfo( SOURCE_REMOTE_PEER, peerInfo.getId().toString(), peerInfo );
@@ -213,16 +223,6 @@ public class PeerManagerImpl implements PeerManager
         }
 
         return result;
-    }
-
-
-    @Override
-    public boolean unregister( final String uuid ) throws PeerException
-    {
-        ManagementHost managementHost = getLocalPeer().getManagementHost();
-        PeerInfo p = getPeerInfo( UUID.fromString( uuid ) );
-        managementHost.removeAptSource( p.getId().toString(), p.getIp() );
-        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, uuid );
     }
 
 
