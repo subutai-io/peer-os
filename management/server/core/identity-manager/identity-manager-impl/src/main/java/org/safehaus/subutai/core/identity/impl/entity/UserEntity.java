@@ -38,7 +38,7 @@ public class UserEntity implements User
     @ManyToMany( targetEntity = RoleEntity.class, fetch = FetchType.EAGER )
     @JoinTable( name = "subutai_user_role", joinColumns = @JoinColumn( name = "user_id", referencedColumnName =
             "user_id" ), inverseJoinColumns = @JoinColumn( name = "role_name", referencedColumnName = "name" ) )
-    Set<Role> roles = new HashSet();
+    Set<Role> roles = new HashSet<>();
 
     @Column( name = "user_name" )
     private String username;
@@ -51,9 +51,6 @@ public class UserEntity implements User
 
     @Column( name = "salt" )
     private String salt;
-
-    @Column( name = "permissions" )
-    private String permissions;
 
     @Column( name = "e_mail" )
     private String email;
@@ -80,7 +77,7 @@ public class UserEntity implements User
     @Override
     public List<String> getPermissions()
     {
-        return Arrays.asList( permissions.split( ";" ) );
+        return Arrays.asList( "qwer;rewq".split( ";" ) );
     }
 
 
@@ -124,7 +121,6 @@ public class UserEntity implements User
 
     public void setPermissions( final String permissions )
     {
-        this.permissions = permissions;
     }
 
 
