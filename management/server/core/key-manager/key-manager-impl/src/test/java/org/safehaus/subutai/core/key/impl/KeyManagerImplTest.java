@@ -15,10 +15,6 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.core.key.api.KeyInfo;
 import org.safehaus.subutai.core.key.api.KeyManagerException;
-import org.safehaus.subutai.core.peer.api.HostNotFoundException;
-import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.ManagementHost;
-import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -42,18 +38,15 @@ public class KeyManagerImplTest
     private static final String KEY_ID = "123";
     private static final String PATH = "path";
 
-    @Mock
-    PeerManager peerManager;
+
     @Mock
     CommandUtil commandUtil;
-    @Mock
-    LocalPeer localPeer;
-    @Mock
-    ManagementHost managementHost;
     @Mock
     CommandResult commandResult;
     @Mock
     RequestBuilder requestBuilder;
+    @Mock
+    Host host;
 
     KeyManagerImpl keyManager;
 
@@ -61,23 +54,10 @@ public class KeyManagerImplTest
     @Before
     public void setUp() throws Exception
     {
-        keyManager = new KeyManagerImpl( peerManager );
+        keyManager = new KeyManagerImpl();
         keyManager.commandUtil = commandUtil;
-        when( peerManager.getLocalPeer() ).thenReturn( localPeer );
-        when( localPeer.getManagementHost() ).thenReturn( managementHost );
         when( commandUtil.execute( any( RequestBuilder.class ), any( Host.class ) ) ).thenReturn( commandResult );
         when( commandResult.getStdOut() ).thenReturn( OUTPUT );
-    }
-
-
-    @Test( expected = KeyManagerException.class )
-    public void testGetManagementHost() throws Exception
-    {
-        assertEquals( managementHost, keyManager.getManagementHost() );
-
-        doThrow( new HostNotFoundException( null ) ).when( localPeer ).getManagementHost();
-
-        keyManager.getManagementHost();
     }
 
 
@@ -85,18 +65,18 @@ public class KeyManagerImplTest
     public void testExecute() throws Exception
     {
 
-        assertEquals( OUTPUT, keyManager.execute( requestBuilder ) );
+        assertEquals( OUTPUT, keyManager.execute( requestBuilder, host ) );
 
         doThrow( new CommandException( "" ) ).when( commandUtil )
                                              .execute( any( RequestBuilder.class ), any( Host.class ) );
-        keyManager.execute( requestBuilder );
+        keyManager.execute( requestBuilder, host );
     }
 
 
     @Test( expected = KeyManagerException.class )
     public void testGenerateKey() throws Exception
     {
-        KeyInfo keyInfo = keyManager.generateKey( REAL_NAME, EMAIL );
+        KeyInfo keyInfo = keyManager.generateKey( host, REAL_NAME, EMAIL );
 
         assertNotNull( keyInfo );
         assertEquals( REAL_NAME, keyInfo.getRealName() );
@@ -105,14 +85,14 @@ public class KeyManagerImplTest
 
         when( commandResult.getStdOut() ).thenReturn( "" );
 
-        keyManager.generateKey( REAL_NAME, EMAIL );
+        keyManager.generateKey( host, REAL_NAME, EMAIL );
     }
 
 
     @Test
     public void testReadKey() throws Exception
     {
-        String output = keyManager.readKey( KEY_ID );
+        String output = keyManager.readKey( host, KEY_ID );
 
         verify( commandUtil ).execute( isA( RequestBuilder.class ), isA( Host.class ) );
         assertEquals( OUTPUT, output );
@@ -122,7 +102,7 @@ public class KeyManagerImplTest
     @Test
     public void testReadSshKey() throws Exception
     {
-        String output = keyManager.readSshKey( KEY_ID );
+        String output = keyManager.readSshKey( host, KEY_ID );
 
         verify( commandUtil ).execute( isA( RequestBuilder.class ), isA( Host.class ) );
         assertEquals( OUTPUT, output );
@@ -132,7 +112,7 @@ public class KeyManagerImplTest
     @Test
     public void testDeleteKey() throws Exception
     {
-        keyManager.deleteKey( KEY_ID );
+        keyManager.deleteKey( host, KEY_ID );
 
         verify( commandUtil ).execute( isA( RequestBuilder.class ), isA( Host.class ) );
     }
@@ -141,7 +121,7 @@ public class KeyManagerImplTest
     @Test
     public void testRevokeKey() throws Exception
     {
-        keyManager.revokeKey( KEY_ID );
+        keyManager.revokeKey( host, KEY_ID );
 
         verify( commandUtil ).execute( isA( RequestBuilder.class ), isA( Host.class ) );
     }
@@ -150,7 +130,7 @@ public class KeyManagerImplTest
     @Test
     public void testSignFileWithKey() throws Exception
     {
-        keyManager.signFileWithKey( KEY_ID, PATH );
+        keyManager.signFileWithKey( host, KEY_ID, PATH );
 
         verify( commandUtil ).execute( isA( RequestBuilder.class ), isA( Host.class ) );
     }
@@ -159,7 +139,7 @@ public class KeyManagerImplTest
     @Test
     public void testSignKeyWithKey() throws Exception
     {
-        keyManager.signKeyWithKey( KEY_ID, KEY_ID );
+        keyManager.signKeyWithKey( host, KEY_ID, KEY_ID );
 
         verify( commandUtil ).execute( isA( RequestBuilder.class ), isA( Host.class ) );
     }
@@ -168,7 +148,7 @@ public class KeyManagerImplTest
     @Test
     public void testSendKeyToHub() throws Exception
     {
-        keyManager.sendKeyToHub( KEY_ID );
+        keyManager.sendRevocationKeyToPublicKeyServer( host, KEY_ID );
 
         verify( commandUtil ).execute( isA( RequestBuilder.class ), isA( Host.class ) );
     }
@@ -177,7 +157,7 @@ public class KeyManagerImplTest
     @Test( expected = KeyManagerException.class )
     public void testGetKey() throws Exception
     {
-        KeyInfo keyInfo = keyManager.getKey( KEY_ID );
+        KeyInfo keyInfo = keyManager.getKey( host, KEY_ID );
 
         assertNotNull( keyInfo );
         assertEquals( REAL_NAME, keyInfo.getRealName() );
@@ -186,14 +166,14 @@ public class KeyManagerImplTest
 
         when( commandResult.getStdOut() ).thenReturn( "" );
 
-        keyManager.getKey( KEY_ID );
+        keyManager.getKey( host, KEY_ID );
     }
 
 
     @Test
     public void testGetKeys() throws Exception
     {
-        Set<KeyInfo> keys = keyManager.getKeys();
+        Set<KeyInfo> keys = keyManager.getKeys( host );
 
         assertFalse( keys.isEmpty() );
         KeyInfo keyInfo = keys.iterator().next();
