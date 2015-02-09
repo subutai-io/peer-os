@@ -22,6 +22,12 @@ public class Commands
     }
 
 
+    public RequestBuilder getGenerateSubKeyCommand( String keyId )
+    {
+        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "generate_subkey", keyId ) );
+    }
+
+
     public RequestBuilder getReadKeyCommand( String keyId )
     {
         return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "export", keyId ) );
@@ -65,27 +71,27 @@ public class Commands
     }
 
 
-    public RequestBuilder getDeleteKeyCommand( String keyId )
+    public RequestBuilder getGenerateRevocationKeyCommand( String keyId )
     {
-        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "delete", keyId ) );
+        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "generate_revkey", keyId ) );
     }
 
 
     public RequestBuilder getRevokeKeyCommand( String keyId )
     {
-        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "revoke", keyId ) );
-    }
-
-
-    public RequestBuilder getGenerateSubKeyCommand( String keyId )
-    {
-        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "generate_subkey", keyId ) );
+        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "revkey", keyId ) );
     }
 
 
     public RequestBuilder getRevokeSubKeyCommand( String keyId )
     {
-        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "revoke_subkey", keyId ) );
+        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "rev_subkey", keyId ) );
+    }
+
+
+    public RequestBuilder getDeleteKeyCommand( String keyId )
+    {
+        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "delete", keyId ) );
     }
 
 
