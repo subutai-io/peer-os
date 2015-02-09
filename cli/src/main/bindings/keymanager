@@ -9,7 +9,7 @@ function key_manager_usage {
   echo "  "subutai keymanager export \<--ssh\> key_id 
   echo "  "subutai keymanager list
   echo "  "subutai keymanager list key_id
-  echo "  "subutai keymanager revoke_subkey subkey_id
+  echo "  "subutai keymanager revkey key_id
   echo "  "subutai keymanager del_subkey subkey_id
   echo "  "subutai keymanager sign_key \<signer key id\> key_id_to_be_signed
   echo "  "subutai keymanager generate_revkey key_id
