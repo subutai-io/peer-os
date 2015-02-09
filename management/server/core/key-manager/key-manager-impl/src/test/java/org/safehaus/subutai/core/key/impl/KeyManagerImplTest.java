@@ -33,7 +33,7 @@ public class KeyManagerImplTest
     private static final String REAL_NAME = "real name";
     private static final String EMAIL = "real@mail.com";
     private static final String OUTPUT = String.format(
-            "pub sub real email\n" + "4668B463 4668B464:4668B465 %s %s\n" + "4668B466 4668B467 :4668B468 %1$s %2$s",
+            "pub sub real email\n---------\n" + "4668B463 4668B464:4668B465 %s %s\n" + "4668B466 4668B467 :4668B468 %1$s %2$s",
             REAL_NAME, EMAIL );
     private static final String KEY_ID = "123";
     private static final String PATH = "path";
