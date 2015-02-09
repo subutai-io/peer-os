@@ -27,8 +27,6 @@ import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.ContainersDestructionResult;
 import org.safehaus.subutai.common.peer.Host;
-import org.safehaus.subutai.common.peer.HostEvent;
-import org.safehaus.subutai.common.peer.HostEventListener;
 import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
@@ -91,7 +89,7 @@ import com.google.common.collect.Sets;
 /**
  * Local peer implementation
  */
-public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
+public class LocalPeerImpl implements LocalPeer, HostListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
@@ -137,7 +135,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         if ( allManagementHostEntity != null && allManagementHostEntity.size() > 0 )
         {
             managementHost = ( ManagementHost ) allManagementHostEntity.iterator().next();
-            ( ( AbstractSubutaiHost ) managementHost ).addListener( this );
             ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
             managementHost.init();
         }
@@ -166,7 +163,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     {
         for ( ResourceHost resourceHost : resourceHosts )
         {
-            ( ( AbstractSubutaiHost ) resourceHost ).addListener( this );
             ( ( AbstractSubutaiHost ) resourceHost ).setPeer( this );
             ( ( ResourceHostEntity ) resourceHost ).setRegistry( templateRegistry );
             ( ( ResourceHostEntity ) resourceHost ).setHostRegistry( hostRegistry );
@@ -467,13 +463,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             ( ( AbstractSubutaiHost ) containerHost ).setPeer( this );
             ( ( ContainerHostEntity ) containerHost ).setDataService( containerHostDataService );
         }
-    }
-
-
-    @Override
-    public void onHostEvent( final HostEvent hostEvent )
-    {
-        LOG.info( String.format( "HostEvent received: %s %s", hostEvent.getType(), hostEvent.getObject() ) );
     }
 
 
@@ -1044,7 +1033,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                     LOG.error( e.toString() );
                 }
                 managementHostDataService.persist( ( ManagementHostEntity ) managementHost );
-                ( ( AbstractSubutaiHost ) managementHost ).addListener( this );
                 ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
             }
             ( ( AbstractSubutaiHost ) managementHost ).updateHostInfo( resourceHostInfo );

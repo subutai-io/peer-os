@@ -214,7 +214,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             {
                 String[] metrics = result.getStdOut().split( "\n" );
                 serverMetric = gatherMetrics( metrics );
-                //                serverMetric.setAverageMetrics( gatherAvgMetrics() );
+                System.out.println( serverMetric );
             }
             return serverMetric;
         }
