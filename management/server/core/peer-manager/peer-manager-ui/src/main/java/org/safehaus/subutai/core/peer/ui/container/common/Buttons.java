@@ -10,7 +10,7 @@ public enum Buttons
 {
 
     INFO( "Info" ), START( "Start" ), STOP( "Stop" ), DESTROY( "Destroy" ), START_ALL( "Start All" ),
-    STOP_ALL( "Stop All" ), DESTROY_ALL( "Destroy All" );
+    STOP_ALL( "Stop All" ), DESTROY_ALL( "Destroy All" ), CLEAN_DB( "Clean DB" );
 
     private final String buttonLabel;
 

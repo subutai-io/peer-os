@@ -78,6 +78,16 @@ public class Manager extends VerticalLayout
                 getContainerInfo();
             }
         } );
+        final Button cleanDbBtn = new Button( Buttons.CLEAN_DB.getButtonLabel() );
+        cleanDbBtn.addStyleName( "default" );
+        cleanDbBtn.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                peerManager.getLocalPeer().cleanDb();
+            }
+        } );
 
         indicator = new Label();
         indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
@@ -90,6 +100,7 @@ public class Manager extends VerticalLayout
         grid.setSpacing( true );
 
         grid.addComponent( infoBtn );
+        grid.addComponent( cleanDbBtn );
         grid.addComponent( indicator );
         grid.setComponentAlignment( indicator, Alignment.MIDDLE_CENTER );
         addComponent( grid );

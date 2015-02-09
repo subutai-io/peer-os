@@ -225,7 +225,7 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
     }
 
 
-    private void refreshHosts()
+    public void refreshHosts()
     {
         getNodeContainer();
         for ( Object itemObj : container.getItemIds() )
