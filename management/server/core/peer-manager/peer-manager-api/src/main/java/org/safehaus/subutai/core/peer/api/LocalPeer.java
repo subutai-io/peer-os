@@ -75,6 +75,7 @@ public interface LocalPeer extends Peer
 
     public void cleanDb();
 
+    @Deprecated
     public ContainerHost createContainer( String hostName, String templateName, String cloneName, UUID envId )
             throws PeerException;
 

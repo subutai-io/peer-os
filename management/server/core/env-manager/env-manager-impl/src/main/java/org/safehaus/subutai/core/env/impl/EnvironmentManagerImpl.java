@@ -5,11 +5,8 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.Semaphore;
 
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.environment.Blueprint;
@@ -20,10 +17,6 @@ import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.ContainersDestructionResult;
-import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentEventListener;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
@@ -37,6 +30,11 @@ import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
+import org.safehaus.subutai.core.env.impl.tasks.CreateEnvironmentTask;
+import org.safehaus.subutai.core.env.impl.tasks.DestroyContainerTask;
+import org.safehaus.subutai.core.env.impl.tasks.DestroyEnvironmentTask;
+import org.safehaus.subutai.core.env.impl.tasks.GrowEnvironmentTask;
+import org.safehaus.subutai.core.env.impl.tasks.SetSshKeyTask;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -141,82 +139,24 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public Environment createEnvironment( final String name, final Topology topology, boolean async )
             throws EnvironmentCreationException
     {
-        return createEnv( name, topology, async );
-    }
-
-
-    private Environment createEnv( final String name, final Topology topology, boolean async )
-            throws EnvironmentCreationException
-    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
         final EnvironmentImpl environment = new EnvironmentImpl( name );
 
-        final Semaphore semaphore = new Semaphore( 0 );
-
         final ResultHolder<EnvironmentCreationException> resultHolder = new ResultHolder<>();
 
-        executor.submit( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    environmentDataService.persist( environment );
+        CreateEnvironmentTask createEnvironmentTask =
+                new CreateEnvironmentTask( this, environment, resultHolder, topology );
 
-                    setEnvironmentTransientFields( environment );
-
-                    try
-                    {
-                        topologyBuilder.build( environment, topology );
-
-                        configureHosts( environment.getContainerHosts() );
-
-                        configureSsh( environment.getContainerHosts() );
-
-                        environment.setStatus( EnvironmentStatus.HEALTHY );
-
-                        setContainersTransientFields( environment.getContainerHosts() );
-                    }
-                    catch ( EnvironmentBuildException | NetworkManagerException e )
-                    {
-                        environment.setStatus( EnvironmentStatus.UNHEALTHY );
-
-                        throw new EnvironmentCreationException( e );
-                    }
-                    finally
-                    {
-                        try
-                        {
-                            notifyOnEnvironmentCreated( findEnvironment( environment.getId() ) );
-                        }
-                        catch ( EnvironmentNotFoundException e )
-                        {
-                            LOG.warn( "Error notifying on environment creation", e );
-                        }
-                    }
-                }
-                catch ( EnvironmentCreationException e )
-                {
-                    LOG.error( String.format( "Error creating environment %s, topology %s", name, topology ), e );
-                    resultHolder.setResult( e );
-                }
-                finally
-                {
-                    semaphore.release();
-                }
-            }
-        } );
-
+        executor.submit( createEnvironmentTask );
 
         if ( !async )
         {
             try
             {
-                semaphore.acquire();
+                createEnvironmentTask.waitCompletion();
 
                 if ( resultHolder.getResult() != null )
                 {
@@ -233,15 +173,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    @Override
-    public void destroyEnvironment( final UUID environmentId, boolean async, boolean forceMetadataRemoval )
-            throws EnvironmentDestructionException, EnvironmentNotFoundException
+    public void saveEnvironment( EnvironmentImpl environment )
     {
-        destroyEnv( environmentId, async, forceMetadataRemoval );
+        environmentDataService.persist( environment );
     }
 
 
-    private void destroyEnv( final UUID environmentId, boolean async, final boolean forceMetadataRemoval )
+    public void build( EnvironmentImpl environment, Topology topology ) throws EnvironmentBuildException
+    {
+        topologyBuilder.build( environment, topology );
+    }
+
+
+    @Override
+    public void destroyEnvironment( final UUID environmentId, boolean async, boolean forceMetadataRemoval )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
@@ -254,98 +199,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     String.format( "Environment status is %s", environment.getStatus() ) );
         }
 
-        final Semaphore semaphore = new Semaphore( 0 );
-
         final ResultHolder<EnvironmentDestructionException> resultHolder = new ResultHolder<>();
 
         final Set<EnvironmentDestructionException> exceptions = Sets.newHashSet();
 
-        executor.submit( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
+        DestroyEnvironmentTask destroyEnvironmentTask =
+                new DestroyEnvironmentTask( this, environment, exceptions, resultHolder, forceMetadataRemoval );
 
-                    Set<Peer> environmentPeers = Sets.newHashSet();
-
-                    for ( ContainerHost container : environment.getContainerHosts() )
-                    {
-                        environmentPeers.add( container.getPeer() );
-                    }
-
-                    ExecutorService executorService = Executors.newFixedThreadPool( environmentPeers.size() );
-
-                    Set<Future<ContainersDestructionResult>> futures = Sets.newHashSet();
-
-                    for ( Peer peer : environmentPeers )
-                    {
-                        futures.add(
-                                executorService.submit( new PeerEnvironmentDestructionTask( peer, environmentId ) ) );
-                    }
-
-                    Set<ContainersDestructionResult> results = Sets.newHashSet();
-
-                    for ( Future<ContainersDestructionResult> future : futures )
-                    {
-                        try
-                        {
-                            results.add( future.get() );
-                        }
-                        catch ( ExecutionException | InterruptedException e )
-                        {
-                            exceptions.add( new EnvironmentDestructionException( e ) );
-                        }
-                    }
-
-                    executorService.shutdown();
-
-                    for ( ContainersDestructionResult result : results )
-                    {
-                        if ( !Strings.isNullOrEmpty( result.getException() ) )
-                        {
-                            exceptions.add( new EnvironmentDestructionException( result.getException() ) );
-                        }
-                        if ( !CollectionUtil.isCollectionEmpty( result.getDestroyedContainersIds() ) )
-                        {
-                            for ( UUID containerId : result.getDestroyedContainersIds() )
-                            {
-                                environment.removeContainer( containerId );
-
-                                notifyOnContainerDestroyed( environment, containerId );
-                            }
-                        }
-                    }
-
-                    if ( forceMetadataRemoval || environment.getContainerHosts().isEmpty() )
-                    {
-                        removeEnvironment( environmentId );
-                    }
-                    else
-                    {
-                        environment.setStatus( EnvironmentStatus.UNHEALTHY );
-                    }
-                }
-                catch ( EnvironmentNotFoundException e )
-                {
-                    LOG.error( String.format( "Error destroying environment %s", environmentId ), e );
-
-                    resultHolder.setResult( new EnvironmentDestructionException( e ) );
-                }
-                finally
-                {
-                    semaphore.release();
-                }
-            }
-        } );
+        executor.submit( destroyEnvironmentTask );
 
         if ( !async )
         {
             try
             {
-                semaphore.acquire();
+                destroyEnvironmentTask.waitCompletion();
 
                 if ( !exceptions.isEmpty() )
                 {
@@ -376,13 +243,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public Set<ContainerHost> growEnvironment( final UUID environmentId, final Topology topology, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        return growEnv( environmentId, topology, async );
-    }
-
-
-    private Set<ContainerHost> growEnv( final UUID environmentId, final Topology topology, boolean async )
-            throws EnvironmentModificationException, EnvironmentNotFoundException
-    {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
@@ -395,77 +255,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     String.format( "Environment status is %s", environment.getStatus() ) );
         }
 
-        final Set<ContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
         final Set<ContainerHost> newContainers = Sets.newHashSet();
-
-        final Semaphore semaphore = new Semaphore( 0 );
 
         final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
 
-        executor.submit( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
+        GrowEnvironmentTask growEnvironmentTask =
+                new GrowEnvironmentTask( this, environment, topology, resultHolder, newContainers );
 
-                    try
-                    {
-                        topologyBuilder.build( environment, topology );
-
-                        newContainers.addAll( environment.getContainerHosts() );
-
-                        newContainers.removeAll( oldContainers );
-
-                        setContainersTransientFields( newContainers );
-
-                        configureHosts( environment.getContainerHosts() );
-
-                        configureSsh( environment.getContainerHosts() );
-
-                        if ( !Strings.isNullOrEmpty( environment.getSshKey() ) )
-                        {
-                            setSshKey( environmentId, environment.getSshKey(), false );
-                        }
-
-                        environment.setStatus( EnvironmentStatus.HEALTHY );
-                    }
-                    catch ( EnvironmentBuildException | NetworkManagerException | EnvironmentNotFoundException |
-                            EnvironmentModificationException e )
-                    {
-                        environment.setStatus( EnvironmentStatus.UNHEALTHY );
-
-                        throw new EnvironmentModificationException( e );
-                    }
-                    finally
-                    {
-                        if ( !newContainers.isEmpty() )
-                        {
-                            notifyOnEnvironmentGrown( environment, newContainers );
-                        }
-                    }
-                }
-                catch ( EnvironmentModificationException e )
-                {
-                    LOG.error( String.format( "Error growing environment %s, topology %s", environmentId, topology ),
-                            e );
-                    resultHolder.setResult( e );
-                }
-                finally
-                {
-                    semaphore.release();
-                }
-            }
-        } );
-
+        executor.submit( growEnvironmentTask );
 
         if ( !async )
         {
             try
             {
-                semaphore.acquire();
+                growEnvironmentTask.waitCompletion();
 
                 if ( resultHolder.getResult() != null )
                 {
@@ -484,13 +287,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     @Override
     public void destroyContainer( final ContainerHost containerHost, boolean async, boolean forceMetadataRemoval )
-            throws EnvironmentModificationException, EnvironmentNotFoundException
-    {
-        destroyCont( containerHost, async, forceMetadataRemoval );
-    }
-
-
-    private void destroyCont( final ContainerHost containerHost, boolean async, final boolean forceMetadataRemoval )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkNotNull( containerHost, "Invalid container host" );
@@ -514,82 +310,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             throw new EnvironmentModificationException( e );
         }
 
-        final Semaphore semaphore = new Semaphore( 0 );
-
         final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
 
-        executor.submit( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
+        DestroyContainerTask destroyContainerTask =
+                new DestroyContainerTask( this, environment, containerHost, forceMetadataRemoval, resultHolder );
 
-                    try
-                    {
-                        try
-                        {
-                            ( ( EnvironmentContainerImpl ) containerHost ).destroy();
-                        }
-                        catch ( PeerException e )
-                        {
-                            if ( forceMetadataRemoval )
-                            {
-                                resultHolder.setResult( new EnvironmentModificationException( e ) );
-                            }
-                            else
-                            {
-                                throw e;
-                            }
-                        }
-
-                        environment.removeContainer( containerHost.getId() );
-
-                        notifyOnContainerDestroyed( environment, containerHost.getId() );
-                    }
-                    catch ( PeerException e )
-                    {
-
-                        environment.setStatus( EnvironmentStatus.UNHEALTHY );
-
-                        throw new EnvironmentModificationException( e );
-                    }
-
-                    if ( environment.getContainerHosts().isEmpty() )
-                    {
-                        try
-                        {
-                            removeEnvironment( environment.getId() );
-                        }
-                        catch ( EnvironmentNotFoundException e )
-                        {
-                            LOG.error( "Error removing environment", e );
-                        }
-                    }
-                    else
-                    {
-                        environment.setStatus( EnvironmentStatus.HEALTHY );
-                    }
-                }
-                catch ( EnvironmentModificationException e )
-                {
-                    LOG.error( String.format( "Error destroying container %s", containerHost.getHostname() ), e );
-                    resultHolder.setResult( e );
-                }
-                finally
-                {
-                    semaphore.release();
-                }
-            }
-        } );
+        executor.submit( destroyContainerTask );
 
         if ( !async )
         {
             try
             {
-                semaphore.acquire();
+                destroyContainerTask.waitCompletion();
 
                 if ( resultHolder.getResult() != null )
                 {
@@ -615,14 +347,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    private void setEnvironmentTransientFields( Environment environment )
+    public void setEnvironmentTransientFields( Environment environment )
     {
         ( ( EnvironmentImpl ) environment ).setDataService( environmentDataService );
         ( ( EnvironmentImpl ) environment ).setEnvironmentManager( this );
     }
 
 
-    private void setContainersTransientFields( Set<ContainerHost> containers )
+    public void setContainersTransientFields( Set<ContainerHost> containers )
     {
         for ( ContainerHost containerHost : containers )
         {
@@ -633,7 +365,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    private void configureSsh( Set<ContainerHost> containerHosts ) throws NetworkManagerException
+    public void configureSsh( Set<ContainerHost> containerHosts ) throws NetworkManagerException
     {
         Map<Integer, Set<ContainerHost>> sshGroups = Maps.newHashMap();
 
@@ -667,7 +399,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    private void configureHosts( Set<ContainerHost> containerHosts ) throws NetworkManagerException
+    public void configureHosts( Set<ContainerHost> containerHosts ) throws NetworkManagerException
     {
         Map<Integer, Set<ContainerHost>> hostGroups = Maps.newHashMap();
 
@@ -739,59 +471,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
 
-        final Semaphore semaphore = new Semaphore( 0 );
+        SetSshKeyTask setSshKeyTask = new SetSshKeyTask( environment, networkManager, resultHolder, sshKey );
 
-        executor.submit( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
-
-                String oldSshKey = environment.getSshKey();
-
-                environment.saveSshKey( sshKey );
-
-                try
-                {
-                    if ( Strings.isNullOrEmpty( sshKey ) && !Strings.isNullOrEmpty( oldSshKey ) )
-                    {
-                        //remove old key from containers
-                        networkManager.removeSshKeyFromAuthorizedKeys( environment.getContainerHosts(), oldSshKey );
-                    }
-                    else if ( !Strings.isNullOrEmpty( sshKey ) && Strings.isNullOrEmpty( oldSshKey ) )
-                    {
-                        //insert new key to containers
-                        networkManager.addSshKeyToAuthorizedKeys( environment.getContainerHosts(), sshKey );
-                    }
-                    else if ( !Strings.isNullOrEmpty( sshKey ) && !Strings.isNullOrEmpty( oldSshKey ) )
-                    {
-                        //replace old ssh key with new one
-                        networkManager
-                                .replaceSshKeyInAuthorizedKeys( environment.getContainerHosts(), oldSshKey, sshKey );
-                    }
-
-                    environment.setStatus( EnvironmentStatus.HEALTHY );
-                }
-                catch ( NetworkManagerException e )
-                {
-                    LOG.error( String.format( "Error setting ssh key to environment %s", environment.getName() ), e );
-                    environment.setStatus( EnvironmentStatus.UNHEALTHY );
-                    resultHolder.setResult( new EnvironmentModificationException( e ) );
-                }
-                finally
-                {
-                    semaphore.release();
-                }
-            }
-        } );
-
+        executor.submit( setSshKeyTask );
 
         if ( !async )
         {
             try
             {
-                semaphore.acquire();
+                setSshKeyTask.waitCompletion();
 
                 if ( resultHolder.getResult() != null )
                 {
@@ -831,7 +519,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    private void notifyOnEnvironmentCreated( final Environment environment )
+    public void notifyOnEnvironmentCreated( final Environment environment )
     {
         for ( final EnvironmentEventListener listener : listeners )
         {
@@ -847,7 +535,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    private void notifyOnEnvironmentGrown( final Environment environment, final Set<ContainerHost> containers )
+    public void notifyOnEnvironmentGrown( final Environment environment, final Set<ContainerHost> containers )
     {
         for ( final EnvironmentEventListener listener : listeners )
         {
@@ -863,7 +551,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    private void notifyOnContainerDestroyed( final Environment environment, final UUID containerId )
+    public void notifyOnContainerDestroyed( final Environment environment, final UUID containerId )
     {
         for ( final EnvironmentEventListener listener : listeners )
         {
@@ -879,7 +567,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    private void notifyOnEnvironmentDestroyed( final UUID environmentId )
+    public void notifyOnEnvironmentDestroyed( final UUID environmentId )
     {
         for ( final EnvironmentEventListener listener : listeners )
         {

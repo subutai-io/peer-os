@@ -1,0 +1,86 @@
+package org.safehaus.subutai.core.env.impl.tasks;
+
+
+import java.util.concurrent.Semaphore;
+
+import org.safehaus.subutai.common.environment.EnvironmentModificationException;
+import org.safehaus.subutai.common.environment.EnvironmentStatus;
+import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
+import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
+import org.safehaus.subutai.core.network.api.NetworkManager;
+import org.safehaus.subutai.core.network.api.NetworkManagerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
+
+
+public class SetSshKeyTask implements Runnable
+{
+    private static final Logger LOG = LoggerFactory.getLogger( SetSshKeyTask.class.getName() );
+
+    private final EnvironmentImpl environment;
+    private final NetworkManager networkManager;
+    private final ResultHolder<EnvironmentModificationException> resultHolder;
+    private final String sshKey;
+    private final Semaphore semaphore;
+
+
+    public SetSshKeyTask( final EnvironmentImpl environment, final NetworkManager networkManager,
+                          final ResultHolder<EnvironmentModificationException> resultHolder, final String sshKey )
+    {
+        this.environment = environment;
+        this.networkManager = networkManager;
+        this.resultHolder = resultHolder;
+        this.sshKey = sshKey;
+        this.semaphore = new Semaphore( 0 );
+    }
+
+
+    @Override
+    public void run()
+    {
+        environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
+
+        String oldSshKey = environment.getSshKey();
+
+        environment.saveSshKey( sshKey );
+
+        try
+        {
+            if ( Strings.isNullOrEmpty( sshKey ) && !Strings.isNullOrEmpty( oldSshKey ) )
+            {
+                //remove old key from containers
+                networkManager.removeSshKeyFromAuthorizedKeys( environment.getContainerHosts(), oldSshKey );
+            }
+            else if ( !Strings.isNullOrEmpty( sshKey ) && Strings.isNullOrEmpty( oldSshKey ) )
+            {
+                //insert new key to containers
+                networkManager.addSshKeyToAuthorizedKeys( environment.getContainerHosts(), sshKey );
+            }
+            else if ( !Strings.isNullOrEmpty( sshKey ) && !Strings.isNullOrEmpty( oldSshKey ) )
+            {
+                //replace old ssh key with new one
+                networkManager.replaceSshKeyInAuthorizedKeys( environment.getContainerHosts(), oldSshKey, sshKey );
+            }
+
+            environment.setStatus( EnvironmentStatus.HEALTHY );
+        }
+        catch ( NetworkManagerException e )
+        {
+            LOG.error( String.format( "Error setting ssh key to environment %s", environment.getName() ), e );
+            environment.setStatus( EnvironmentStatus.UNHEALTHY );
+            resultHolder.setResult( new EnvironmentModificationException( e ) );
+        }
+        finally
+        {
+            semaphore.release();
+        }
+    }
+
+
+    public void waitCompletion() throws InterruptedException
+    {
+        semaphore.acquire();
+    }
+}
