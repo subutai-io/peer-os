@@ -1,9 +1,6 @@
 package org.safehaus.subutai.core.peer.ui.container.manage;
 
 
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -17,7 +14,6 @@ import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
-import org.safehaus.subutai.core.peer.api.ContainerState;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
@@ -502,7 +498,7 @@ public class Manager extends VerticalLayout
                                     String memoryLimit = modifyQuota.getMemoryLimitValue();
                                     String cpuLimit = modifyQuota.getValueFromCpuCoresUsed();
 
-//                                    Memory memory = new Memory( memoryLimit );
+                                    //                                    Memory memory = new Memory( memoryLimit );
                                     QuotaInfo memoryQuota = new MemoryQuotaInfo( memoryLimit );
                                     QuotaInfo cpuQuota = new CpuQuotaInfo( cpuLimit );
 
@@ -540,107 +536,6 @@ public class Manager extends VerticalLayout
                 }
                 lxcTable.setCollapsed( parentId, false );
             }
-        }
-    }
-
-
-    private void populateTableOld( Map<String, EnumMap<ContainerState, List<String>>> agentFamilies )
-    {
-        lxcTable.removeAllItems();
-
-        for ( Map.Entry<String, EnumMap<ContainerState, List<String>>> agentFamily : agentFamilies.entrySet() )
-        {
-            boolean emptyTree = true;
-            final String parentHostname = agentFamily.getKey();
-            final Object parentId = lxcTable.addItem( new Object[] {
-                    parentHostname, new Label(), null, null, null
-            }, parentHostname );
-
-            for ( Map.Entry<ContainerState, List<String>> lxcs : agentFamily.getValue().entrySet() )
-            {
-                for ( final String lxcHostname : lxcs.getValue() )
-                {
-                    Label containerStatus = new Label();
-                    Button updateQuota = new Button( "Update" );
-                    updateQuota.addStyleName( "default" );
-                    String containerMemory;
-                    final QuotaMemoryComponent memoryQuotaComponent = new QuotaMemoryComponent();
-
-                    String containerCpu = "Cpu Shares";
-                    final TextField containerCpuTextField = new TextField();
-
-                    if ( lxcs.getKey() == ContainerState.RUNNING )
-                    {
-                        containerStatus.setValue( "RUNNING" );
-                        LOG.info( "This is quota manager: " + quotaManager.toString() );
-
-                        //                        try
-                        //                        {
-                        ////                            containerMemory = quotaManager.getQuota( lxcHostname,
-                        // QuotaEnum.MEMORY_LIMIT_IN_BYTES,
-                        ////                                    agentManager.getAgentByHostname( parentHostname ) );
-                        ////                            containerCpu = quotaManager.getQuota( lxcHostname, QuotaEnum
-                        // .CPUSET_CPUS,
-                        ////                                    agentManager.getAgentByHostname( parentHostname ) );
-                        ////                            containerCpuTextField.setValue( containerCpu );
-                        //
-                        ////                            memoryQuotaComponent.setValueForMemoryTextField(
-                        // containerMemory );
-                        ////                            updateQuota.addClickListener( new Button.ClickListener()
-                        ////                            {
-                        ////                                @Override
-                        ////                                public void buttonClick( final Button.ClickEvent
-                        // clickEvent )
-                        ////                                {
-                        ////                                    try
-                        ////                                    {
-                        ////                                        String memoryLimit = memoryQuotaComponent
-                        // .getMemoryLimitValue();
-                        ////                                        String cpuLimit = containerCpuTextField.getValue
-                        // ().replaceAll( "\n", "" );
-                        ////
-                        ////                                        quotaManager
-                        ////                                                .setQuota( lxcHostname, QuotaEnum
-                        // .MEMORY_LIMIT_IN_BYTES, memoryLimit,
-                        ////                                                        agentManager.getAgentByHostname(
-                        // parentHostname ) );
-                        ////                                        quotaManager.setQuota( lxcHostname, QuotaEnum
-                        // .CPUSET_CPUS, cpuLimit,
-                        ////                                                agentManager.getAgentByHostname(
-                        // parentHostname ) );
-                        ////                                    }
-                        ////                                    catch ( QuotaException e )
-                        ////                                    {
-                        ////                                        LOG.error( "Error executing command lxc-cgroup
-                        // -n:", e );
-                        ////                                    }
-                        ////                                }
-                        ////                            } );
-                        //                        }
-                        //                        catch ( QuotaException e )
-                        //                        {
-                        //                            LOG.error( "Error executing command lxc-cgroup -n: ", e );
-                        //                        }
-                    }
-                    else if ( lxcs.getKey() == ContainerState.STOPPED )
-                    {
-                        containerStatus.setValue( "STOPPED" );
-                    }
-                    Object childId = lxcTable.addItem( new Object[] {
-                            lxcHostname, containerStatus, memoryQuotaComponent, containerCpuTextField, updateQuota
-                    }, lxcHostname );
-
-                    lxcTable.setParent( childId, parentId );
-                    lxcTable.setChildrenAllowed( childId, false );
-                    lxcTable.setCollapsed( childId, false );
-                    emptyTree = false;
-                }
-            }
-            if ( emptyTree )
-            {
-                lxcTable.removeItem( parentId );
-            }
-            lxcTable.setCollapsed( parentId, false );
         }
     }
 }
