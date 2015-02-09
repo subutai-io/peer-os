@@ -38,7 +38,7 @@ public class UserEntity implements User
     @ManyToMany( targetEntity = RoleEntity.class, fetch = FetchType.EAGER )
     @JoinTable( name = "subutai_user_role", joinColumns = @JoinColumn( name = "user_id", referencedColumnName =
             "user_id" ), inverseJoinColumns = @JoinColumn( name = "role_name", referencedColumnName = "name" ) )
-    Set<Role> roles = new HashSet();
+    Set<Role> roles = new HashSet<>();
 
     @Column( name = "user_name" )
     private String username;

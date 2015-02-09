@@ -45,8 +45,10 @@ public class IdentityManagerImpl implements IdentityManager
     private DaoManager daoManager;
     private KeyManager keyManager;
     private SecurityManager securityManager;
+
     private UserDataService userDataService;
     private PermissionDataService permissionDataService;
+    private RoleDataService roleDataService;
 
 
     public void setSecurityManager( final SecurityManager securityManager )
@@ -73,6 +75,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         userDataService = new UserDataService( daoManager.getEntityManagerFactory() );
         permissionDataService = new PermissionDataService( daoManager.getEntityManagerFactory() );
+        roleDataService = new RoleDataService( daoManager.getEntityManagerFactory() );
 
         checkDefaultUser( "karaf" );
         checkDefaultUser( "admin" );
@@ -330,7 +333,9 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public List<Role> getAllRoles()
     {
-        return null;
+        List<Role> roles = Lists.newArrayList();
+        roles.addAll( roleDataService.getAll() );
+        return roles;
     }
 
 
@@ -338,14 +343,20 @@ public class IdentityManagerImpl implements IdentityManager
     public Role createMockRole( final String permissionName, final PermissionGroup permissionGroup,
                                 final String description )
     {
-        return null;
+        RoleEntity role = new RoleEntity( "" );
+        return role;
     }
 
 
     @Override
     public boolean updateRole( final Role role )
     {
-        return false;
+        if ( !( role instanceof RoleEntity ) )
+        {
+            return false;
+        }
+        roleDataService.update( ( RoleEntity ) role );
+        return true;
     }
 
 

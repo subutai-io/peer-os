@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.identity.ui.tabs;
 
 
+import java.util.HashSet;
+
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.PermissionGroup;
 import org.safehaus.subutai.core.identity.api.Role;
@@ -33,7 +35,7 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
 
 
     private IdentityManager identityManager;
-    private Table permissionsTable;
+    private Table rolesTable;
     private BeanItemContainer<Role> beans;
     private Button newBean;
     private RoleForm form;
@@ -55,27 +57,25 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
         beans = new BeanItemContainer<>( Role.class );
 
         beans.addAll( identityManager.getAllRoles() );
-        beans.addNestedContainerProperty( "permissionGroup.name" );
+        //        beans.addNestedContainerProperty( "permissionGroup.name" );
 
         // A layout for the table and form
         HorizontalLayout layout = new HorizontalLayout();
 
         // Bind a table to it
-        permissionsTable = new Table( "Permissions", beans );
-        permissionsTable.setVisibleColumns( new Object[] { "name", "permissionGroup.name", "description" } );
-        permissionsTable.setPageLength( 7 );
-        permissionsTable.setColumnHeader( "name", "Name" );
-        permissionsTable.setColumnHeader( "permissionGroup.name", "PermissionGroup" );
-        permissionsTable.setColumnHeader( "description", "Description" );
-        permissionsTable.setBuffered( false );
+        rolesTable = new Table( "Permissions", beans );
+        rolesTable.setVisibleColumns( new Object[] { "name" } );
+        rolesTable.setPageLength( 7 );
+        rolesTable.setColumnHeader( "name", "Name" );
+        rolesTable.setBuffered( false );
 
         // Create a form for editing a selected or new item.
         // It is invisible until actually used.
-        form = new RoleForm( this );
+        form = new RoleForm( this, new HashSet<>( identityManager.getAllPermissions() ) );
         form.setVisible( false );
 
         // When the user selects an item, show it in the form
-        permissionsTable.addValueChangeListener( new Property.ValueChangeListener()
+        rolesTable.addValueChangeListener( new Property.ValueChangeListener()
         {
             @Override
             public void valueChange( Property.ValueChangeEvent event )
@@ -86,14 +86,14 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
                     form.setVisible( false );
                     return;
                 }
-                BeanItem<Role> permission = beans.getItem( permissionsTable.getValue() );
+                BeanItem<Role> permission = beans.getItem( rolesTable.getValue() );
                 form.setPermission( permission, false );
                 refreshControls( FormState.STATE_EXISTING_ENTITY_SELECTED );
-                //                permissionsTable.select( null );
+                //                rolesTable.select( null );
             }
         } );
-        permissionsTable.setSelectable( true );
-        permissionsTable.setImmediate( true );
+        rolesTable.setSelectable( true );
+        rolesTable.setImmediate( true );
 
         // Creates a new bean for editing in the form before adding
         // it to the table. Adding is handled after committing
@@ -118,7 +118,7 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
             }
         } );
 
-        layout.addComponent( permissionsTable );
+        layout.addComponent( rolesTable );
         layout.addComponent( form );
 
         layout.setSpacing( true );
@@ -150,7 +150,7 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
                 break;
             case STATE_SAVE_NEW_ENTITY:
                 newBean.setEnabled( true );
-                permissionsTable.setEnabled( true );
+                rolesTable.setEnabled( true );
                 form.setVisible( false );
                 break;
             case STATE_REMOVE_ENTITY:
@@ -160,13 +160,13 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
             case STATE_NEW_ENTITY:
                 form.setVisible( true );
                 newBean.setEnabled( false );
-                permissionsTable.setEnabled( false );
-                //                permissionsTable.select( null );
+                rolesTable.setEnabled( false );
+                //                rolesTable.select( null );
                 break;
             case STATE_CANCEL:
                 form.setVisible( false );
                 newBean.setEnabled( true );
-                permissionsTable.setEnabled( true );
+                rolesTable.setEnabled( true );
                 break;
         }
     }

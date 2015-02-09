@@ -3,9 +3,9 @@ package org.safehaus.subutai.core.identity.ui;
 
 import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
-import org.safehaus.subutai.core.identity.ui.tabs.RoleManagementForm;
-import org.safehaus.subutai.core.identity.ui.tabs.UserManagementForm;
-import org.safehaus.subutai.core.identity.ui.tabs.UserRegistrationForm;
+import org.safehaus.subutai.core.identity.ui.tabs.PermissionsTab;
+import org.safehaus.subutai.core.identity.ui.tabs.RolesTab;
+import org.safehaus.subutai.core.identity.ui.tabs.UsersTab;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
@@ -18,12 +18,6 @@ import com.vaadin.ui.themes.Runo;
  */
 public class IdentityManagerComponent extends CustomComponent implements Disposable
 {
-
-    private UserManagementForm userManagementForm;
-    private UserRegistrationForm userRegistrationForm;
-    private RoleManagementForm roleManagementForm;
-
-
     public IdentityManagerComponent( final IdentityManagerPortalModule portalModule, IdentityManager identityManager )
     {
         setHeight( 100, Unit.PERCENTAGE );
@@ -35,19 +29,16 @@ public class IdentityManagerComponent extends CustomComponent implements Disposa
         TabSheet sheet = new TabSheet();
         sheet.setStyleName( Runo.TABSHEET_SMALL );
         sheet.setSizeFull();
-        userManagementForm = new UserManagementForm( identityManager );
-        userRegistrationForm = new UserRegistrationForm( identityManager );
-        userRegistrationForm.init();
-        roleManagementForm = new RoleManagementForm( identityManager );
 
-        sheet.addTab( userManagementForm, "User management space." );
-        sheet.getTab( 0 ).setId( "UserManagement" );
+        PermissionsTab permissionsTab = new PermissionsTab( identityManager );
+        UsersTab usersTab = new UsersTab( identityManager );
+        RolesTab rolesTab = new RolesTab( identityManager );
 
-        sheet.addTab( userRegistrationForm, "New user registration space." );
-        sheet.getTab( 1 ).setId( "UserRegistration" );
+        sheet.addTab( usersTab, "User management space." ).setId( "UsersTab" );
 
-        sheet.addTab( roleManagementForm, "Role editing/creation space." );
-        sheet.getTab( 2 ).setId( "UserRegistration" );
+        sheet.addTab( permissionsTab, "Permission edition space." ).setId( "PermissionsTab" );
+
+        sheet.addTab( rolesTab, "Roles management space" ).setId( "RolesManagement" );
 
         verticalLayout.addComponent( sheet );
 

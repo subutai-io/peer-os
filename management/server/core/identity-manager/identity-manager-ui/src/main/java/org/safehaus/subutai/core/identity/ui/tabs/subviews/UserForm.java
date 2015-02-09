@@ -24,8 +24,13 @@ import com.vaadin.ui.themes.Reindeer;
 public class UserForm extends VerticalLayout
 {
 
-    TabCallback<BeanItem<User>> callback;
+    private TabCallback<BeanItem<User>> callback;
+
     private static final Logger LOGGER = LoggerFactory.getLogger( UserForm.class );
+
+    private BeanFieldGroup<User> userFieldGroup = new BeanFieldGroup<>( User.class );
+
+
 
     private boolean newValue;
 
@@ -73,8 +78,6 @@ public class UserForm extends VerticalLayout
             } );
         }
     };
-
-    private BeanFieldGroup<User> userFieldGroup = new BeanFieldGroup<>( User.class );
 
 
     public UserForm( TabCallback<BeanItem<User>> callback )

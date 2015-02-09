@@ -13,12 +13,13 @@ import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.ui.AbstractSelect;
+import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
@@ -27,25 +28,47 @@ import com.vaadin.ui.themes.Reindeer;
 public class PermissionForm extends VerticalLayout
 {
 
-    TabCallback<BeanItem<Permission>> callback;
+    private TabCallback<BeanItem<Permission>> callback;
+
     private static final Logger LOGGER = LoggerFactory.getLogger( PermissionForm.class );
 
     private boolean newValue;
+
+    private BeanFieldGroup<Permission> permissionFieldGroup = new BeanFieldGroup<>( Permission.class );
+
     private TextField name = new TextField()
     {
         {
             setInputPrompt( "Permission name" );
             setEnabled( false );
+            setRequired( true );
+            addValidator(
+                    new StringLengthValidator( "Permission name must be at least 4 chars length", 4, 255, false ) );
         }
     };
+
     private TextField description = new TextField()
     {
         {
             setInputPrompt( "Description" );
         }
     };
-    private ComboBox permissionGroup;
-    private BeanFieldGroup<Permission> permissionFieldGroup = new BeanFieldGroup<>( Permission.class );
+
+    private ComboBox permissionGroup =
+            new ComboBox( "", new BeanItemContainer<>( PermissionGroup.class, EnumSet.allOf( PermissionGroup.class ) ) )
+            {
+                {
+                    setItemCaptionMode( ItemCaptionMode.PROPERTY );
+                    setItemCaptionPropertyId( "name" );
+                    setNullSelectionAllowed( false );
+                    setImmediate( true );
+                    setTextInputAllowed( false );
+                    setRequired( true );
+                }
+            };
+
+
+
 
 
     public PermissionForm( TabCallback<BeanItem<Permission>> callback )
@@ -61,16 +84,6 @@ public class PermissionForm extends VerticalLayout
         final Button cancelButton = new Button( "Cancel", cancelListener );
         final Button removeButton = new Button( "Remove permission", resetListener );
         saveButton.setStyleName( Reindeer.BUTTON_DEFAULT );
-
-        BeanItemContainer<PermissionGroup> container = new BeanItemContainer<>( PermissionGroup.class );
-        container.addAll( EnumSet.allOf( PermissionGroup.class ) );
-        permissionGroup = new ComboBox( "", container );
-        permissionGroup.setItemCaptionMode( AbstractSelect.ItemCaptionMode.PROPERTY );
-        permissionGroup.setItemCaptionPropertyId( "name" );
-        permissionGroup.setNullSelectionAllowed( false );
-        permissionGroup.setImmediate( true );
-        permissionGroup.setTextInputAllowed( false );
-        permissionGroup.setRequired( true );
 
         HorizontalLayout buttons = new HorizontalLayout( saveButton, cancelButton, removeButton );
         buttons.setSpacing( true );
@@ -90,7 +103,6 @@ public class PermissionForm extends VerticalLayout
         if ( permission != null )
         {
             permissionFieldGroup.setItemDataSource( permission );
-            //            Field<?> name = permissionFieldGroup.buildAndBind( "Name", "name" );
 
             permissionFieldGroup.bind( name, "name" );
             permissionFieldGroup.bind( description, "description" );
@@ -121,14 +133,15 @@ public class PermissionForm extends VerticalLayout
             try
             {
                 permissionFieldGroup.commit();
+                if ( callback != null )
+                {
+                    callback.saveOperation( permissionFieldGroup.getItemDataSource(), newValue );
+                }
             }
             catch ( FieldGroup.CommitException e )
             {
-                LOGGER.error( "Error commit permission fieldGroup changes" );
-            }
-            if ( callback != null )
-            {
-                callback.saveOperation( permissionFieldGroup.getItemDataSource(), newValue );
+                LOGGER.error( "Error commit permission fieldGroup changes", e );
+                Notification.show( e.getMessage(), Notification.Type.WARNING_MESSAGE );
             }
         }
     };

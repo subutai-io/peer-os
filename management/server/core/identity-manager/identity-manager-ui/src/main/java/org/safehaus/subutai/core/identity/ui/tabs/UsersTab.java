@@ -95,7 +95,7 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
         // Creates a new bean for editing in the form before adding
         // it to the table. Adding is handled after committing
         // the form.
-        newBean = new Button( "New Permission" );
+        newBean = new Button( "New User" );
         newBean.addClickListener( new Button.ClickListener()
         {
             public void buttonClick( Button.ClickEvent event )
