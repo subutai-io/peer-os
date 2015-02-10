@@ -66,6 +66,7 @@ generate(){
 EOF
     gpg2 --batch --gen-key $scriptName
     rm $scriptName
+    list `get_last_key_id_in_keyring`
 }
 
 
@@ -283,7 +284,7 @@ export(){
 # signs the file
 # parameters:
 #   1) key to be used while signing
-#   2) key path to be signed
+#   2) file path to be signed
 sign(){
   if [ $# == 1 ]; then
     file=$1

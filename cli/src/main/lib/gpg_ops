@@ -485,6 +485,12 @@ get_default_signer_key(){
 }
 
 
+# returns the last key id in keyring
+get_last_key_id_in_keyring(){
+  echo `gpg2 -k | grep "^pub" | tail -1 | grep 'pub' | cut -d "/" -f2 | cut -d " " -f1`
+}
+
+
 # check if the key is signed by signer key id
 # parameters
 #  1) signer key id 
@@ -504,29 +510,4 @@ is_signed(){
   else
     msg_error "is_signed method should have two arguments"
   fi
-}
-
-
-# Revokes the subkey which are generated unattentedly
-# Note: After revoking subkeys, they are not listed
-# with "gpg2 -k" command, which may change result of 
-# find_key_id_index fuction and let it misbehave. 
-# That's why after revoking subkey, I delete that subkey
-# in order to overcome this pitfall. 
-# parameters
-#   1) key_id
-revoke_subkey(){
-  key_id=$1
-  if [[ -z `is_subkey $key_id` ]]; then
-    number=`find_key_id_index $key_id`
-  else
-    msg_error "$key_id does not belong to a subkey"
-    exit 1
-  fi
-  msg_info "revoking subkey $key_id"
-  echo -e "key $number\nrevkey\ny\n0\n\ny\nsave\n" | gpg2 --pinentry-mode loopback --command-fd 0 \
-                                                          --no-tty  --status-fd --verbose \
-                                                          --edit-key $key_id > /dev/null 2>&1
-  del_subkey_with_index $number $key_id
-  msg_ok "subkey $key_id revoked!"
 }
