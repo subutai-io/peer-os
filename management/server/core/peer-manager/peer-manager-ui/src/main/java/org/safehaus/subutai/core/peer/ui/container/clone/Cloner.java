@@ -22,12 +22,6 @@ import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
 import org.safehaus.subutai.core.peer.ui.container.ContainerTree;
-import org.safehaus.subutai.core.peer.ui.container.executor.AgentExecutionEvent;
-import org.safehaus.subutai.core.peer.ui.container.executor.AgentExecutionEventType;
-import org.safehaus.subutai.core.peer.ui.container.executor.AgentExecutionListener;
-import org.safehaus.subutai.core.peer.ui.container.executor.AgentExecutor;
-import org.safehaus.subutai.core.peer.ui.container.executor.AgentExecutorImpl;
-import org.safehaus.subutai.core.peer.ui.container.executor.CloneCommandFactory;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
 import org.safehaus.subutai.core.strategy.api.CriteriaDef;
@@ -63,7 +57,7 @@ import com.vaadin.ui.VerticalLayout;
 
 
 @SuppressWarnings( "serial" )
-public class Cloner extends VerticalLayout implements AgentExecutionListener
+public class Cloner extends VerticalLayout
 {
     private static final Logger LOG = Logger.getLogger( Cloner.class.getName() );
 
@@ -287,6 +281,12 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
             return;
         }
 
+        if ( templateCombo.getValue() == null )
+        {
+            show( "Please select a template" );
+            return;
+        }
+
         Set<Host> resourceHosts = containerTree.getSelectedHosts();
 
         for ( Iterator<Host> iterator = resourceHosts.iterator(); iterator.hasNext(); )
@@ -371,7 +371,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
         }
         else
         { // process cloning in selected hosts
-            for ( Host physAgent : resourceHosts )
+            for ( Host resourceHost : resourceHosts )
             {
                 List<String> lxcHostNames = new ArrayList<>();
                 for ( int i = 1; i <= count; i++ )
@@ -379,7 +379,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
                     lxcHostNames.add( String.format( "%s%d%s", productName, lxcHostNames.size() + 1,
                             UUIDUtil.generateTimeBasedUUID().toString().replace( "-", "" ) ).substring( 0, 11 ) );
                 }
-                resourceHostFamilies.put( ( ResourceHost ) physAgent, lxcHostNames );
+                resourceHostFamilies.put( ( ResourceHost ) resourceHost, lxcHostNames );
             }
         }
 
@@ -387,15 +387,17 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
         populateLxcTable( resourceHostFamilies );
         countProcessed = new AtomicInteger( ( int ) ( count ) );
         errorProcessed = new AtomicInteger( 0 );
+        ExecutorService cloner = Executors.newFixedThreadPool( resourceHostFamilies.size() );
         for ( final Map.Entry<ResourceHost, List<String>> host : resourceHostFamilies.entrySet() )
         {
-            AgentExecutor agentExecutor = new AgentExecutorImpl( host.getKey().getHostname(), host.getValue() );
-            agentExecutor.addListener( this );
-            ExecutorService executor = Executors.newFixedThreadPool( 1 );
-            agentExecutor.execute( executor,
-                    new CloneCommandFactory( localPeer, host.getKey(), ( Template ) templateCombo.getValue() ) );
-            executor.shutdown();
+            for ( String containerName : host.getValue() )
+            {
+                cloner.submit(
+                        new CloneContainerTask( this, localPeer, host.getKey(), ( Template ) templateCombo.getValue(),
+                                containerName ) );
+            }
         }
+        cloner.shutdown();
     }
 
 
@@ -446,34 +448,27 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
     }
 
 
-    @Override
-    public void onExecutionEvent( AgentExecutionEvent event )
-    {
-        updateContainerStatus( event );
-    }
-
-
-    private void updateContainerStatus( final AgentExecutionEvent event )
+    protected void updateContainerStatus( final String hostname, final CloneResultType resultType )
     {
         getUI().access( new Runnable()
         {
             @Override
             public void run()
             {
-                Item row = lxcTable.getItem( event.getContainerName() );
+                Item row = lxcTable.getItem( hostname );
                 if ( row != null )
                 {
                     Property p = row.getItemProperty( "Status" );
-                    if ( AgentExecutionEventType.START.equals( event.getEventType() ) )
+                    if ( CloneResultType.START.equals( resultType ) )
                     {
                         p.setValue( new Embedded( "", new ThemeResource( loadIconSource ) ) );
                     }
-                    else if ( AgentExecutionEventType.SUCCESS.equals( event.getEventType() ) )
+                    else if ( CloneResultType.SUCCESS.equals( resultType ) )
                     {
                         p.setValue( new Embedded( "", new ThemeResource( okIconSource ) ) );
                         countProcessed.decrementAndGet();
                     }
-                    else if ( AgentExecutionEventType.FAIL.equals( event.getEventType() ) )
+                    else if ( CloneResultType.FAIL.equals( resultType ) )
                     {
                         p.setValue( new Embedded( "", new ThemeResource( errorIconSource ) ) );
                         countProcessed.decrementAndGet();
