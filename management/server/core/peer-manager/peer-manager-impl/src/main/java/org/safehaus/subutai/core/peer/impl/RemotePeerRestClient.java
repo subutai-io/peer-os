@@ -1,8 +1,6 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -13,9 +11,7 @@ import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
-import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
@@ -30,8 +26,6 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 
 import com.google.common.reflect.TypeToken;
 
@@ -84,40 +78,10 @@ public class RemotePeerRestClient
     }
 
 
-    public Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId ) throws PeerException
-    {
-
-        String path = "peer/environment/containers";
-
-        WebClient client = createWebClient();
-
-        Form form = new Form();
-        form.set( "environmentId", environmentId.toString() );
-        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
-                                  .accept( MediaType.APPLICATION_JSON ).post( form );
-
-        String jsonObject = response.readEntity( String.class );
-        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
-        {
-            return JsonUtil.fromJson( jsonObject, new TypeToken<Set<ContainerHost>>()
-            {}.getType() );
-        }
-
-        if ( response.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() )
-        {
-            throw new PeerException( response.getEntity().toString() );
-        }
-        else
-        {
-            return Collections.emptySet();
-        }
-    }
-
-
     public void stopContainer( final ContainerHost containerHost ) throws PeerException
     {
         String path = "peer/container/stop";
-        Subject subject = SecurityUtils.getSubject();
+
         WebClient client = createWebClient();
 
         Form form = new Form();
@@ -134,7 +98,6 @@ public class RemotePeerRestClient
 
     public void startContainer( final ContainerHost containerHost ) throws PeerException
     {
-        Subject subject = SecurityUtils.getSubject();
         String path = "peer/container/start";
 
         WebClient client = createWebClient();
@@ -172,7 +135,6 @@ public class RemotePeerRestClient
     public boolean isConnected( final Host host )
     {
         String path = "peer/container/isconnected";
-
 
         WebClient client = createWebClient();
 
@@ -261,36 +223,6 @@ public class RemotePeerRestClient
     }
 
 
-    public Set<HostInfoModel> scheduleCloneContainers( final UUID creatorPeerId, final List<Template> templates,
-                                                       final int quantity, final String strategyId,
-                                                       final List<Criteria> criteria ) throws PeerException
-    {
-        String path = "peer/container/schedule";
-
-        WebClient client = createWebClient();
-
-        Form form = new Form();
-        form.set( "creatorPeerId", creatorPeerId );
-        form.set( "templates", JsonUtil.toJson( templates ) );
-        form.set( "quantity", quantity );
-        form.set( "strategyId", strategyId );
-        form.set( "criteria", JsonUtil.toJson( criteria ) );
-
-        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
-                                  .accept( MediaType.APPLICATION_JSON ).post( form );
-
-        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
-        {
-            return JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<Set<HostInfoModel>>()
-            {}.getType() );
-        }
-        else
-        {
-            throw new PeerException( "Could not clone remote containers.", response.getEntity().toString() );
-        }
-    }
-
-
     public void setQuota( ContainerHost host, QuotaInfo quotaInfo ) throws PeerException
     {
         String path = "peer/container/quota";
@@ -333,6 +265,9 @@ public class RemotePeerRestClient
     }
 
 
+    //******** Quota functions ***********
+
+
     public ProcessResourceUsage getProcessResourceUsage( UUID containerId, int processPid ) throws PeerException
     {
         String path = "peer/container/resource/usage";
@@ -353,9 +288,6 @@ public class RemotePeerRestClient
             throw new PeerException( "Could not get process resource usage", response.getEntity().toString() );
         }
     }
-
-
-    //******** Quota functions ***********
 
 
     /**
