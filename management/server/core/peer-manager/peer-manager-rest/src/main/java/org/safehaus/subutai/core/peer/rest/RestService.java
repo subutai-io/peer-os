@@ -58,16 +58,16 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response isContainerConnected( @FormParam( "hostId" ) String hostId );
 
+    @GET
+    @Path( "container/state" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getContainerState( @QueryParam( "containerId" ) String containerId );
 
     @POST
     @Path( "template/get" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getTemplate( @FormParam( "templateName" ) String templateName );
 
-    @GET
-    @Path( "container/state" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getContainerState( @QueryParam( "containerId" ) String containerId );
 
     @GET
     @Path( "ping" )
