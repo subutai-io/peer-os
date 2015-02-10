@@ -19,8 +19,6 @@ import org.safehaus.subutai.common.host.Interface;
 public interface Host extends Serializable
 {
 
-    @Deprecated
-    public void fireEvent( HostEvent hostEvent );
 
     /**
      * Returns reference to parent peer

@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.identity.impl.dao;
 
 
-import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -60,9 +60,9 @@ public class RoleDataService implements DataService<String, RoleEntity>
 
 
     @Override
-    public Collection<RoleEntity> getAll()
+    public List<RoleEntity> getAll()
     {
-        Collection<RoleEntity> result = Lists.newArrayList();
+        List<RoleEntity> result = Lists.newArrayList();
         EntityManager em = emf.createEntityManager();
         try
         {

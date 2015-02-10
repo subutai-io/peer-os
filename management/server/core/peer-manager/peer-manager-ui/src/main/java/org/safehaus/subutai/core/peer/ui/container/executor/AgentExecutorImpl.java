@@ -13,9 +13,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 
-/**
- * Created by timur on 9/8/14.
- */
 public class AgentExecutorImpl implements AgentExecutor
 {
     private String hostName;
@@ -43,10 +40,10 @@ public class AgentExecutorImpl implements AgentExecutor
     @Override
     public void execute( final ExecutorService executor, final AgentCommandFactory commandFactory )
     {
-        final CompletionService<AgentExecutionEvent> completionService = new ExecutorCompletionService( executor );
+        final CompletionService<AgentExecutionEvent> completionService = new ExecutorCompletionService<>( executor );
         for ( final String containerName : containerNames )
         {
-            completionService.submit( new Callable()
+            completionService.submit( new Callable<AgentExecutionEvent>()
             {
                 public AgentExecutionEvent call()
                 {

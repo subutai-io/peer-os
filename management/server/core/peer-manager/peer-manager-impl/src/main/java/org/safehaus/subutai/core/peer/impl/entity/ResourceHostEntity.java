@@ -33,7 +33,6 @@ import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.peer.api.ContainerState;
-import org.safehaus.subutai.core.peer.api.HostTask;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerTask;
@@ -144,23 +143,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    @Override
-    public synchronized void queue( final HostTask hostTask )
-    {
-        LOG.debug( String.format( "New sequential task %s queued.", hostTask.getId() ) );
-        ExecutorService executorService = getSingleThreadExecutorService();
-        //        LOG.debug( executorService.toString() );
-        executorService.submit( hostTask );
-    }
-
-
-    public synchronized void run( final HostTask hostTask )
-    {
-        LOG.info( String.format( "New immediate task %s added.", hostTask.getId() ) );
-        getCachedThreadExecutorService().submit( hostTask );
-    }
-
-
     public boolean startContainerHost( final ContainerHost container ) throws ResourceHostException
     {
         Preconditions.checkNotNull( container, "Container host is null" );
@@ -232,7 +214,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             {
                 String[] metrics = result.getStdOut().split( "\n" );
                 serverMetric = gatherMetrics( metrics );
-                //                serverMetric.setAverageMetrics( gatherAvgMetrics() );
+                System.out.println( serverMetric );
             }
             return serverMetric;
         }
@@ -497,7 +479,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         {
             throw new ResourceHostException( "Error creating container", e );
         }
-
     }
 
 

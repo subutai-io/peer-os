@@ -13,6 +13,7 @@ import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 
 import com.vaadin.server.ClientConnector;
 import com.vaadin.server.ThemeResource;
@@ -28,6 +29,7 @@ public class EnvironmentForm
     private static final String ID = "Id";
     private static final String SSH_KEY = "Ssh key";
     private static final String DATE = "Date";
+    private static final String REMOVE = "Remove";
     private final EnvironmentManager environmentManager;
     private static final String CONTAINERS = "Containers";
     private static final String NAME = "Name";
@@ -119,6 +121,7 @@ public class EnvironmentForm
             final Button containersBtn = new Button( CONTAINERS );
             final Button sshKeyBtn = new Button( SSH_KEY );
             final Button destroyBtn = new Button( DESTROY );
+            final Button removeBtn = new Button( REMOVE );
             containersBtn.setId( environment.getName() + "-containers" );
             containersBtn.addClickListener( new Button.ClickListener()
             {
@@ -152,6 +155,35 @@ public class EnvironmentForm
                 }
             } );
 
+            removeBtn.setId( environment.getName() + "-remove" );
+            removeBtn.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( final Button.ClickEvent event )
+                {
+                    ConfirmationDialog alert =
+                            new ConfirmationDialog( "Do you really want to remove environment without destroying it?",
+                                    "Yes", "No" );
+                    alert.getOk().addClickListener( new Button.ClickListener()
+                    {
+                        @Override
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
+                            try
+                            {
+                                environmentManager.removeEnvironment( environment.getId() );
+                            }
+                            catch ( EnvironmentNotFoundException e )
+                            {
+                                Notification.show( String.format( "Error removing environment: %s", e.getMessage() ) );
+                            }
+                        }
+                    } );
+
+                    contentRoot.getUI().addWindow( alert.getAlert() );
+                }
+            } );
+
             boolean isEnvironmentUnderModification =
                     environment.getStatus().equals( EnvironmentStatus.UNDER_MODIFICATION );
 
@@ -170,7 +202,7 @@ public class EnvironmentForm
 
             environmentsTable.addItem( new Object[] {
                     environment.getId(), environment.getName(), getCreationDate( environment.getCreationTimestamp() ),
-                    icon, containersBtn, sshKeyBtn, destroyBtn
+                    icon, containersBtn, sshKeyBtn, destroyBtn, removeBtn
             }, null );
         }
         environmentsTable.refreshRowCache();
@@ -210,6 +242,7 @@ public class EnvironmentForm
         table.addContainerProperty( CONTAINERS, Button.class, null );
         table.addContainerProperty( SSH_KEY, Button.class, null );
         table.addContainerProperty( DESTROY, Button.class, null );
+        table.addContainerProperty( REMOVE, Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setEnabled( true );
