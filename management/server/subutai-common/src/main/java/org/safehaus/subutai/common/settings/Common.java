@@ -13,6 +13,8 @@ public class Common
             "^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])(\\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]{0,"
                     + "61}[a-zA-Z0-9]))*$";
 
+    public static final String ENVIRONMENT_ID_HEADER_NAME = "ENV_ID";
+
     //constants that can be converted into settings in the future
     public static final String MASTER_TEMPLATE_NAME = "master";
     public static final String MANAGEMENT_AGENT_HOSTNAME = "management";
