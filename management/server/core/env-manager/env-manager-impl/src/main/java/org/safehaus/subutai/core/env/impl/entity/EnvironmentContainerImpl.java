@@ -443,6 +443,26 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     }
 
 
+    @Override
+    public int getAvailableRamQuota() throws PeerException
+    {
+        return getPeer().getAvailableRamQuota( getId() );
+    }
+
+
+    @Override
+    public int getAvailableCpuQuota() throws PeerException
+    {
+        return getPeer().getAvailableCpuQuota( getId() );
+    }
+
+
+    @Override
+    public DiskQuota getAvailableDiskQuota( final DiskPartition diskPartition ) throws PeerException
+    {
+        return getPeer().getAvailableDiskQuota( getId(), diskPartition );
+    }
+
     //unsupported
 
 

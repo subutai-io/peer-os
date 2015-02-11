@@ -1221,6 +1221,49 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
+    public int getAvailableRamQuota( final UUID containerId ) throws PeerException
+    {
+        try
+        {
+            return quotaManager.getAvailableRamQuota( containerId );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
+    public int getAvailableCpuQuota( final UUID containerId ) throws PeerException
+    {
+        try
+        {
+            return quotaManager.getAvailableCpuQuota( containerId );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
+    public DiskQuota getAvailableDiskQuota( final UUID containerId, final DiskPartition diskPartition )
+            throws PeerException
+    {
+        try
+        {
+            return quotaManager.getAvailableDiskQuota( containerId, diskPartition );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
     public ContainersDestructionResult destroyEnvironmentContainers( final UUID environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );

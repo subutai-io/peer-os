@@ -430,6 +430,34 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public int getAvailableRamQuota( final UUID containerId ) throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+
+        return remotePeerRestClient.getAvailableRamQuota( containerId );
+    }
+
+
+    @Override
+    public int getAvailableCpuQuota( final UUID containerId ) throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+
+        return remotePeerRestClient.getAvailableCpuQuota( containerId );
+    }
+
+
+    @Override
+    public DiskQuota getAvailableDiskQuota( final UUID containerId, final DiskPartition diskPartition )
+            throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+
+        return remotePeerRestClient.getAvailableDiskQuota( containerId, diskPartition );
+    }
+
+
+    @Override
     public Set<HostInfoModel> createContainers( final UUID environmentId, final UUID initiatorPeerId,
                                                 final UUID ownerId, final List<Template> templates,
                                                 final int numberOfContainers, final String strategyId,

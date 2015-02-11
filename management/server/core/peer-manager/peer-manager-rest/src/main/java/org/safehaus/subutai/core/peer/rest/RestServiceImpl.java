@@ -275,6 +275,54 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response getAvailableRamQuota( final String containerId )
+    {
+        try
+        {
+            return Response.ok( peerManager.getLocalPeer().getAvailableRamQuota( UUID.fromString( containerId ) ) )
+                           .build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response getAvailableCpuQuota( final String containerId )
+    {
+        try
+        {
+            return Response.ok( peerManager.getLocalPeer().getAvailableCpuQuota( UUID.fromString( containerId ) ) )
+                           .build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response getAvailableDiskQuota( final String containerId, final String diskPartition )
+    {
+        try
+        {
+            return Response.ok( JsonUtil.toJson( peerManager.getLocalPeer()
+                                                            .getAvailableDiskQuota( UUID.fromString( containerId ),
+                                                                    JsonUtil.<DiskPartition>from( diskPartition,
+                                                                            new TypeToken<DiskPartition>()
+                                                                            {}.getType() ) ) ) ).build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
     public Response getProcessResourceUsage( final String hostId, final int processPid )
     {
         try

@@ -100,6 +100,23 @@ public interface RestService
                                       @QueryParam( "processId" ) int processPid );
 
     @GET
+    @Path( "container/quota/ram/available" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getAvailableRamQuota( @QueryParam( "containerId" ) String containerId );
+
+    @GET
+    @Path( "container/quota/cpu/available" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getAvailableCpuQuota( @QueryParam( "containerId" ) String containerId );
+
+    @GET
+    @Path( "container/quota/disk/available" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getAvailableDiskQuota( @QueryParam( "containerId" ) String containerId,
+                                    @QueryParam( "diskPartition" ) String diskPartition );
+
+
+    @GET
     @Path( "container/quota/ram" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getRamQuota( @QueryParam( "containerId" ) String containerId );

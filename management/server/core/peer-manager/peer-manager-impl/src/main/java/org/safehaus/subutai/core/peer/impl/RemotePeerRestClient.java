@@ -498,5 +498,74 @@ public class RemotePeerRestClient
         }
     }
 
+
+    public int getAvailableRamQuota( UUID containerId ) throws PeerException
+    {
+        String path = "peer/container/quota/ram/available";
+
+
+        WebClient client = createWebClient();
+
+        Response response =
+                client.path( path ).accept( MediaType.APPLICATION_JSON ).query( "containerId", containerId.toString() )
+                      .get();
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return response.readEntity( Integer.class );
+        }
+        else
+        {
+            throw new PeerException( "Could not get available RAM quota", response.getEntity().toString() );
+        }
+    }
+
+
+    public int getAvailableCpuQuota( UUID containerId ) throws PeerException
+    {
+        String path = "peer/container/quota/cpu/available";
+
+
+        WebClient client = createWebClient();
+
+        Response response =
+                client.path( path ).accept( MediaType.APPLICATION_JSON ).query( "containerId", containerId.toString() )
+                      .get();
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return response.readEntity( Integer.class );
+        }
+        else
+        {
+            throw new PeerException( "Could not get CPU quota", response.getEntity().toString() );
+        }
+    }
+
+
+    public DiskQuota getAvailableDiskQuota( final UUID containerId, final DiskPartition diskPartition )
+            throws PeerException
+    {
+        String path = "peer/container/quota/disk/available";
+
+
+        WebClient client = createWebClient();
+
+        Response response =
+                client.path( path ).accept( MediaType.APPLICATION_JSON ).query( "containerId", containerId.toString() )
+                      .query( "diskPartition", JsonUtil.toJson( diskPartition ) ).get();
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<DiskQuota>()
+            {}.getType() );
+        }
+        else
+        {
+            throw new PeerException( "Could not get available disk quota", response.getEntity().toString() );
+        }
+    }
+
+
     //*********** Environment Specific REST - END ***************
 }

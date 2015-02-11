@@ -116,4 +116,27 @@ public interface ContainerHost extends Host
      * @param diskQuota - quota to set
      */
     public void setDiskQuota( DiskQuota diskQuota ) throws PeerException;
+
+    /**
+     * Returns available RAM quota on container in megabytes
+     *
+     * @return - quota in mb
+     */
+    public int getAvailableRamQuota() throws PeerException;
+
+    /**
+     * Returns available CPU quota on container in percent
+     *
+     * @return - cpu quota on container in percent
+     */
+    public int getAvailableCpuQuota() throws PeerException;
+
+    /**
+     * Returns available disk quota
+     *
+     * @param diskPartition - disk partition which quota to return
+     *
+     * @return - disk partition quota
+     */
+    public DiskQuota getAvailableDiskQuota( DiskPartition diskPartition ) throws PeerException;
 }
