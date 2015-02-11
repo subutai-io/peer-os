@@ -184,7 +184,7 @@ public class QuotaManagerImpl implements QuotaManager
         CommandResult result = executeOnContainersResourceHost( containerId,
                 commands.getReadCpuQuotaCommand( containerHost.getHostname() ) );
 
-        return Integer.parseInt( result.getStdOut() );
+        return Integer.parseInt( result.getStdOut().trim() );
     }
 
 
@@ -335,7 +335,7 @@ public class QuotaManagerImpl implements QuotaManager
         CommandResult result = executeOnContainersResourceHost( containerId,
                 commands.getReadAvailableCpuQuotaCommand( containerHost.getHostname() ) );
 
-        return Integer.parseInt( result.getStdOut() );
+        return Integer.parseInt( result.getStdOut().trim() );
     }
 
 

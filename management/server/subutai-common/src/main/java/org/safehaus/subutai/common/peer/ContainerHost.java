@@ -18,8 +18,10 @@ import org.safehaus.subutai.common.quota.QuotaType;
  */
 public interface ContainerHost extends Host
 {
+    @Deprecated
     public PeerQuotaInfo getQuota( QuotaType quotaType ) throws PeerException;
 
+    @Deprecated
     public void setQuota( QuotaInfo quota ) throws PeerException;
 
     public String getEnvironmentId();
