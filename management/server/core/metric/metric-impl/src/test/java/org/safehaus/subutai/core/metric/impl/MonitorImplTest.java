@@ -70,6 +70,7 @@ public class MonitorImplTest
     private static final UUID LOCAL_PEER_ID = UUID.randomUUID();
     private static final UUID REMOTE_PEER_ID = UUID.randomUUID();
     private static final UUID HOST_ID = UUID.randomUUID();
+    private static final UUID ENVIRONMENT = UUID.randomUUID();
     private static final String HOST = "test";
     private static final double METRIC_VALUE = 123;
     private static final String METRIC_JSON = " {\"host\":\"test\", \"totalRam\":\"123\"," +
@@ -301,12 +302,42 @@ public class MonitorImplTest
     }
 
 
+    @Test
+    public void testStartMonitoringContainer() throws Exception
+    {
+
+        String longSubscriberId = StringUtils.repeat( "s", 101 );
+        String subscriberId = StringUtils.repeat( "s", 100 );
+        when( alertListener.getSubscriberId() ).thenReturn( longSubscriberId );
+        when( containerHost.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID.toString() );
+        when( containerHost.getPeer() ).thenReturn( localPeer );
+        when( localPeer.getResourceHostByContainerId( HOST_ID.toString() ) ).thenReturn( resourceHost );
+        CommandResult commandResult = mock( CommandResult.class );
+        when( commandResult.hasSucceeded() ).thenReturn( true );
+        when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
+
+
+        monitor.startMonitoring( alertListener, containerHost, monitoringSettings );
+
+        verify( monitorDao ).addSubscription( ENVIRONMENT_ID, subscriberId );
+    }
+
+
     @Test( expected = MonitorException.class )
     public void testStartMonitoringException() throws Exception
     {
         doThrow( new DaoException( "" ) ).when( monitorDao ).addSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
 
         monitor.startMonitoring( alertListener, environment, monitoringSettings );
+    }
+
+
+    @Test( expected = MonitorException.class )
+    public void testStartMonitoringContainerException() throws Exception
+    {
+        doThrow( new DaoException( "" ) ).when( monitorDao ).addSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
+
+        monitor.startMonitoring( alertListener, containerHost, monitoringSettings );
     }
 
 
