@@ -21,6 +21,7 @@ public class PeerInfo
     private int port = 8181;
 
     private int lastUsedVlanId = 100;
+    private String keyId;
 
 
     public UUID getId()
@@ -116,6 +117,18 @@ public class PeerInfo
     public void setLastUsedVlanId( int lastUsedVlanId )
     {
         this.lastUsedVlanId = lastUsedVlanId;
+    }
+
+
+    public String getKeyId()
+    {
+        return keyId;
+    }
+
+
+    public void setKeyId( final String keyId )
+    {
+        this.keyId = keyId;
     }
 
 
