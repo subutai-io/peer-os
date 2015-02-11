@@ -149,7 +149,7 @@ public class MonitorImpl implements Monitor
             ContainerHostMetricResponse response =
                     peer.sendRequest( request, RecipientType.METRIC_REQUEST_RECIPIENT.name(),
                             Constants.METRIC_REQUEST_TIMEOUT, ContainerHostMetricResponse.class,
-                            Constants.METRIC_REQUEST_TIMEOUT );
+                            Constants.METRIC_REQUEST_TIMEOUT, environmentId );
 
             //if response contains metrics, add them to result
             if ( response != null && !CollectionUtil.isCollectionEmpty( response.getMetrics() ) )
@@ -304,7 +304,7 @@ public class MonitorImpl implements Monitor
         }
 
         //activate monitoring
-        activateMonitoring( environment.getContainerHosts(), monitoringSettings );
+        activateMonitoring( environment.getContainerHosts(), monitoringSettings, environment.getId() );
     }
 
 
@@ -342,7 +342,8 @@ public class MonitorImpl implements Monitor
         }
 
         //activate monitoring
-        activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings );
+        activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings,
+                UUID.fromString( containerHost.getEnvironmentId() ) );
     }
 
 
@@ -381,13 +382,18 @@ public class MonitorImpl implements Monitor
     {
         Preconditions.checkNotNull( containerHost, CONTAINER_IS_NULL_MSG );
         Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
+        if ( !UUIDUtil.isStringAUuid( containerHost.getEnvironmentId() ) )
+        {
+            throw new MonitorException( "Container has invalid environment id" );
+        }
 
-        activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings );
+        activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings,
+                UUID.fromString( containerHost.getEnvironmentId() ) );
     }
 
 
-    protected void activateMonitoring( Set<ContainerHost> containerHosts, MonitoringSettings monitoringSettings )
-            throws MonitorException
+    protected void activateMonitoring( Set<ContainerHost> containerHosts, MonitoringSettings monitoringSettings,
+                                       UUID environmentId ) throws MonitorException
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
         Map<Peer, Set<ContainerHost>> peersContainers = Maps.newHashMap();
@@ -427,14 +433,14 @@ public class MonitorImpl implements Monitor
             }
             else
             {
-                activateMonitoringAtRemoteContainers( peer, containers, monitoringSettings );
+                activateMonitoringAtRemoteContainers( peer, containers, monitoringSettings, environmentId );
             }
         }
     }
 
 
     protected void activateMonitoringAtRemoteContainers( Peer peer, Set<ContainerHost> containerHosts,
-                                                         MonitoringSettings monitoringSettings )
+                                                         MonitoringSettings monitoringSettings, UUID environmentId )
     {
         Preconditions.checkNotNull( peer );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
@@ -442,7 +448,8 @@ public class MonitorImpl implements Monitor
         try
         {
             peer.sendRequest( new MonitoringActivationRequest( containerHosts, monitoringSettings ),
-                    RecipientType.MONITORING_ACTIVATION_RECIPIENT.name(), Constants.MONITORING_ACTIVATION_TIMEOUT );
+                    RecipientType.MONITORING_ACTIVATION_RECIPIENT.name(), Constants.MONITORING_ACTIVATION_TIMEOUT,
+                    environmentId );
         }
         catch ( PeerException e )
         {
@@ -546,7 +553,7 @@ public class MonitorImpl implements Monitor
             else
             {
                 creatorPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
-                        Constants.ALERT_TIMEOUT );
+                        Constants.ALERT_TIMEOUT, containerGroup.getEnvironmentId() );
             }
         }
         catch ( PeerException | ContainerGroupNotFoundException | JsonSyntaxException e )

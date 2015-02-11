@@ -959,7 +959,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
     @Override
     public <T, V> V sendRequest( final T request, final String recipient, final int requestTimeout,
-                                 final Class<V> responseType, final int responseTimeout ) throws PeerException
+                                 final Class<V> responseType, final int responseTimeout, UUID environmentId )
+            throws PeerException
     {
         Preconditions.checkNotNull( responseType, "Invalid response type" );
 
@@ -968,7 +969,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
-    public <T> void sendRequest( final T request, final String recipient, final int requestTimeout )
+    public <T> void sendRequest( final T request, final String recipient, final int requestTimeout, UUID environmentId )
             throws PeerException
     {
         sendRequestInternal( request, recipient, null );
