@@ -78,6 +78,34 @@ public class RemotePeerRestClient
     }
 
 
+    public UUID getId() throws PeerException
+    {
+        String path = "peer/id";
+        try
+        {
+            WebClient client = createWebClient();
+
+            Response response = client.path( path ).accept( MediaType.TEXT_PLAIN ).get();
+
+            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+            {
+                return UUID.fromString( response.readEntity( String.class ) );
+            }
+            else
+            {
+                throw new PeerException( "Could not retrieve remote peer ID." );
+            }
+        }
+        catch ( Exception ce )
+        {
+            throw new PeerException( "Could not retrieve remote peer ID.", ce.toString() );
+        }
+    }
+
+
+    //*********** Environment Specific REST - BEGIN ***************
+
+
     public void stopContainer( final ContainerHost containerHost ) throws PeerException
     {
         String path = "peer/container/stop";
@@ -198,31 +226,6 @@ public class RemotePeerRestClient
     }
 
 
-    public UUID getId() throws PeerException
-    {
-        String path = "peer/id";
-        try
-        {
-            WebClient client = createWebClient();
-
-            Response response = client.path( path ).accept( MediaType.TEXT_PLAIN ).get();
-
-            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
-            {
-                return UUID.fromString( response.readEntity( String.class ) );
-            }
-            else
-            {
-                throw new PeerException( "Could not retrieve remote peer ID." );
-            }
-        }
-        catch ( Exception ce )
-        {
-            throw new PeerException( "Could not retrieve remote peer ID.", ce.toString() );
-        }
-    }
-
-
     public void setQuota( ContainerHost host, QuotaInfo quotaInfo ) throws PeerException
     {
         String path = "peer/container/quota";
@@ -263,9 +266,6 @@ public class RemotePeerRestClient
             throw new PeerException( "Could not get quota", response.getEntity().toString() );
         }
     }
-
-
-    //******** Quota functions ***********
 
 
     public ProcessResourceUsage getProcessResourceUsage( UUID containerId, int processPid ) throws PeerException
@@ -497,4 +497,6 @@ public class RemotePeerRestClient
             throw new PeerException( "Could not set disk quota", response.getEntity().toString() );
         }
     }
+
+    //*********** Environment Specific REST - END ***************
 }
