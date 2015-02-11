@@ -239,7 +239,7 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
             }
             else
             {
-                item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual-stopped.png" ) );
+                item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual_offline.png" ) );
             }
         }
     }

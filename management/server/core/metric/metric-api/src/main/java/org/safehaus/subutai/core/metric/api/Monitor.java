@@ -3,9 +3,9 @@ package org.safehaus.subutai.core.metric.api;
 
 import java.util.Set;
 
+import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.environment.Environment;
 
 
 /**
@@ -50,6 +50,17 @@ public interface Monitor
                                  MonitoringSettings monitoringSettings ) throws MonitorException;
 
     /**
+     * Enables {@code AlertListener} to be triggered if thresholds on the provided container are exceeded. Monitoring
+     * infrastructure is initialized with given monitoring settings.
+     *
+     * @param alertListener alertListener  to trigger
+     * @param containerHost container host to activate monitoring on and listen to alerts from
+     * @param monitoringSettings monitoring settings
+     */
+    public void startMonitoring( AlertListener alertListener, ContainerHost containerHost,
+                                 MonitoringSettings monitoringSettings ) throws MonitorException;
+
+    /**
      * Disables {@code AlertListener} to be triggered for the given environment
      *
      * @param alertListener alertListener  to trigger
@@ -59,7 +70,8 @@ public interface Monitor
 
 
     /**
-     * Activates monitoring on a given container
+     * Activates monitoring on a given container. However interested party must be subscribed to the container's
+     * environment alerts to receive them
      *
      * @param containerHost container host to activate monitoring on
      * @param monitoringSettings monitoring settings
@@ -69,7 +81,8 @@ public interface Monitor
             throws MonitorException;
 
 
-    public ProcessResourceUsage getProcessResourceUsage( ContainerHost containerHost, int processPid ) throws MonitorException;
+    public ProcessResourceUsage getProcessResourceUsage( ContainerHost containerHost, int processPid )
+            throws MonitorException;
 
     /**
      * This method is called by REST endpoint from local peer indicating that some container hosted locally is under

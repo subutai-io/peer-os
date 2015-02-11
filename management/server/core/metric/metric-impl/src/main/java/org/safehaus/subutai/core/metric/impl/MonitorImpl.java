@@ -21,6 +21,7 @@ import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
@@ -38,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonSyntaxException;
@@ -51,6 +53,7 @@ public class MonitorImpl implements Monitor
     private static final String ENVIRONMENT_IS_NULL_MSG = "Environment is null";
     private static final String CONTAINER_IS_NULL_MSG = "Container is null";
     private static final String ALERT_LISTENER_IS_NULL = "Alert listener is null";
+    private static final String INVALID_SUBSCRIBER_ID_MSG = "Invalid subscriber id";
     private static final String SETTINGS_IS_NULL_MSG = "Settings is null";
     private static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class.getName() );
 
@@ -68,8 +71,9 @@ public class MonitorImpl implements Monitor
     public MonitorImpl( PeerManager peerManager, DaoManager daoManager, EnvironmentManager environmentManager )
             throws MonitorException
     {
-        Preconditions.checkNotNull( peerManager, "Peer manager is null" );
-        Preconditions.checkNotNull( daoManager, "DaoManager is null." );
+        Preconditions.checkNotNull( peerManager );
+        Preconditions.checkNotNull( daoManager );
+        Preconditions.checkNotNull( environmentManager );
 
         try
         {
@@ -145,7 +149,7 @@ public class MonitorImpl implements Monitor
             ContainerHostMetricResponse response =
                     peer.sendRequest( request, RecipientType.METRIC_REQUEST_RECIPIENT.name(),
                             Constants.METRIC_REQUEST_TIMEOUT, ContainerHostMetricResponse.class,
-                            Constants.METRIC_REQUEST_TIMEOUT );
+                            Constants.METRIC_REQUEST_TIMEOUT, environmentId );
 
             //if response contains metrics, add them to result
             if ( response != null && !CollectionUtil.isCollectionEmpty( response.getMetrics() ) )
@@ -208,6 +212,7 @@ public class MonitorImpl implements Monitor
                     ContainerHostMetricImpl metric =
                             JsonUtil.fromJson( result.getStdOut(), ContainerHostMetricImpl.class );
                     metric.setEnvironmentId( environmentId );
+                    metric.setHostId( localContainer.getId() );
                     metrics.add( metric );
                 }
                 else
@@ -277,6 +282,8 @@ public class MonitorImpl implements Monitor
     {
         Preconditions.checkNotNull( alertListener, ALERT_LISTENER_IS_NULL );
         Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
+        Preconditions
+                .checkArgument( !Strings.isNullOrEmpty( alertListener.getSubscriberId() ), INVALID_SUBSCRIBER_ID_MSG );
         Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
 
 
@@ -298,7 +305,47 @@ public class MonitorImpl implements Monitor
         }
 
         //activate monitoring
-        activateMonitoring( environment.getContainerHosts(), monitoringSettings );
+        activateMonitoring( environment.getContainerHosts(), monitoringSettings, environment.getId() );
+    }
+
+
+    @Override
+    public void startMonitoring( final AlertListener alertListener, final ContainerHost containerHost,
+                                 final MonitoringSettings monitoringSettings ) throws MonitorException
+    {
+        Preconditions.checkNotNull( alertListener, ALERT_LISTENER_IS_NULL );
+        Preconditions
+                .checkArgument( !Strings.isNullOrEmpty( alertListener.getSubscriberId() ), INVALID_SUBSCRIBER_ID_MSG );
+        Preconditions.checkNotNull( containerHost, CONTAINER_IS_NULL_MSG );
+        Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
+
+        if ( !UUIDUtil.isStringAUuid( containerHost.getEnvironmentId() ) )
+        {
+            throw new MonitorException( "Container has invalid environment id" );
+        }
+
+        //make sure subscriber id is truncated to 100 characters
+        String subscriberId = alertListener.getSubscriberId();
+        if ( subscriberId.length() > Constants.MAX_SUBSCRIBER_ID_LEN )
+        {
+            subscriberId = subscriberId.substring( 0, Constants.MAX_SUBSCRIBER_ID_LEN );
+        }
+
+        UUID environmentId = UUID.fromString( containerHost.getEnvironmentId() );
+
+        //save subscription to database
+        try
+        {
+            monitorDao.addSubscription( environmentId, subscriberId );
+        }
+        catch ( DaoException e )
+        {
+            LOG.error( "Error in startMonitoring", e );
+            throw new MonitorException( e );
+        }
+
+        //activate monitoring
+        activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings, environmentId );
     }
 
 
@@ -307,7 +354,10 @@ public class MonitorImpl implements Monitor
             throws MonitorException
     {
         Preconditions.checkNotNull( alertListener, ALERT_LISTENER_IS_NULL );
+        Preconditions
+                .checkArgument( !Strings.isNullOrEmpty( alertListener.getSubscriberId() ), INVALID_SUBSCRIBER_ID_MSG );
         Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
+
         //make sure subscriber id is truncated to 100 characters
         String subscriberId = alertListener.getSubscriberId();
         if ( subscriberId.length() > Constants.MAX_SUBSCRIBER_ID_LEN )
@@ -334,13 +384,18 @@ public class MonitorImpl implements Monitor
     {
         Preconditions.checkNotNull( containerHost, CONTAINER_IS_NULL_MSG );
         Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
+        if ( !UUIDUtil.isStringAUuid( containerHost.getEnvironmentId() ) )
+        {
+            throw new MonitorException( "Container has invalid environment id" );
+        }
 
-        activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings );
+        activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings,
+                UUID.fromString( containerHost.getEnvironmentId() ) );
     }
 
 
-    protected void activateMonitoring( Set<ContainerHost> containerHosts, MonitoringSettings monitoringSettings )
-            throws MonitorException
+    protected void activateMonitoring( Set<ContainerHost> containerHosts, MonitoringSettings monitoringSettings,
+                                       UUID environmentId ) throws MonitorException
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
         Map<Peer, Set<ContainerHost>> peersContainers = Maps.newHashMap();
@@ -380,14 +435,14 @@ public class MonitorImpl implements Monitor
             }
             else
             {
-                activateMonitoringAtRemoteContainers( peer, containers, monitoringSettings );
+                activateMonitoringAtRemoteContainers( peer, containers, monitoringSettings, environmentId );
             }
         }
     }
 
 
     protected void activateMonitoringAtRemoteContainers( Peer peer, Set<ContainerHost> containerHosts,
-                                                         MonitoringSettings monitoringSettings )
+                                                         MonitoringSettings monitoringSettings, UUID environmentId )
     {
         Preconditions.checkNotNull( peer );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
@@ -395,7 +450,8 @@ public class MonitorImpl implements Monitor
         try
         {
             peer.sendRequest( new MonitoringActivationRequest( containerHosts, monitoringSettings ),
-                    RecipientType.MONITORING_ACTIVATION_RECIPIENT.name(), Constants.MONITORING_ACTIVATION_TIMEOUT );
+                    RecipientType.MONITORING_ACTIVATION_RECIPIENT.name(), Constants.MONITORING_ACTIVATION_TIMEOUT,
+                    environmentId );
         }
         catch ( PeerException e )
         {
@@ -499,7 +555,7 @@ public class MonitorImpl implements Monitor
             else
             {
                 creatorPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
-                        Constants.ALERT_TIMEOUT );
+                        Constants.ALERT_TIMEOUT, containerGroup.getEnvironmentId() );
             }
         }
         catch ( PeerException | ContainerGroupNotFoundException | JsonSyntaxException e )
@@ -511,7 +567,7 @@ public class MonitorImpl implements Monitor
 
 
     /**
-     * This methods is called by REST endpoint when a remote peer sends an notifyOnAlert from one of its hosted
+     * This methods is called by REST endpoint when a remote peer sends a notifyOnAlert from one of its hosted
      * containers belonging to this peer or when local "own" container is under stress
      *
      * @param metric - {@code ContainerHostMetric} metric of the host where thresholds are being exceeded
@@ -567,11 +623,9 @@ public class MonitorImpl implements Monitor
     {
         for ( final AlertListener listener : alertListeners )
         {
-            if ( subscriberId.equalsIgnoreCase( listener.getSubscriberId() ) )
+            if ( listener.getSubscriberId().startsWith( subscriberId ) )
             {
                 notificationExecutor.execute( new AlertNotifier( metric, listener ) );
-
-                return;
             }
         }
     }

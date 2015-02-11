@@ -28,7 +28,12 @@ import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
+import org.safehaus.subutai.core.peer.api.ContainerGroup;
+import org.safehaus.subutai.core.peer.api.ContainerGroupNotFoundException;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -42,6 +47,8 @@ import com.google.common.base.Strings;
 @Access( AccessType.FIELD )
 public class ContainerHostEntity extends AbstractSubutaiHost implements ContainerHost
 {
+    private static final Logger LOG = LoggerFactory.getLogger( ContainerHostEntity.class );
+
     @ManyToOne( targetEntity = ResourceHostEntity.class )
     @JoinColumn( name = "parent_id" )
     private ResourceHost parent;
@@ -56,9 +63,18 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Transient
     private DataService dataService;
 
+    @Transient
+    private LocalPeer localPeer;
+
 
     protected ContainerHostEntity()
     {
+    }
+
+
+    public void setLocalPeer( final LocalPeer localPeer )
+    {
+        this.localPeer = localPeer;
     }
 
 
@@ -82,7 +98,18 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     public String getEnvironmentId()
     {
-        throw new UnsupportedOperationException();
+        try
+        {
+            ContainerGroup containerGroup = localPeer.findContainerGroupByContainerId( getId() );
+
+            return containerGroup.getEnvironmentId().toString();
+        }
+        catch ( ContainerGroupNotFoundException e )
+        {
+            LOG.error( "Container group not found", e );
+        }
+
+        return null;
     }
 
 

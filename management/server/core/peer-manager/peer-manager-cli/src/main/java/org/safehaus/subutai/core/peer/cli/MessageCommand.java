@@ -34,7 +34,8 @@ public class MessageCommand extends OsgiCommandSupport
     {
         Peer targetPeer = peerManager.getPeer( UUID.fromString( peerId ) );
 
-        System.out.println( targetPeer.sendRequest( message, "ECHO_LISTENER", TIMEOUT, String.class, TIMEOUT ) );
+        System.out.println(
+                targetPeer.sendRequest( message, "ECHO_LISTENER", TIMEOUT, String.class, TIMEOUT, UUID.randomUUID() ) );
 
         return null;
     }

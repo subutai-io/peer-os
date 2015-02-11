@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.peer.rest;
 
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -13,19 +12,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.common.peer.PeerInfo;
-
 
 public interface RestService
 {
 
-
-    @Deprecated
-    @POST
-    @Path( "peer" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    @Consumes( MediaType.TEXT_PLAIN )
-    public PeerInfo registerPeer( @QueryParam( "peer" ) String peer );
 
     @GET
     @Path( "id" )
@@ -37,6 +27,41 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getRegisteredPeers();
 
+    @GET
+    @Path( "ping" )
+    public Response ping();
+
+
+    //*************** Peer Registration Handshake REST - BEGIN ***************************
+
+    @POST
+    @Path( "register" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response processRegisterRequest( @QueryParam( "peer" ) String peer );
+
+    @DELETE
+    @Path( "unregister" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response unregisterPeer( @QueryParam( "peerId" ) String peerId );
+
+    @PUT
+    @Path( "update" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response updatePeer( @QueryParam( "peer" ) String peer );
+
+    //*************** Peer Registration Handshake REST - END ***************************
+
+
+    //*********** Environment Specific REST - BEGIN ***************
+
+    @POST
+    @Path( "container/quota" )
+    Response setQuota( @FormParam( "hostId" ) String hostId, @FormParam( "quotaInfo" ) String quotaInfo );
+
+    @GET
+    @Path( "container/quota" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getQuota( @QueryParam( "hostId" ) String hostId, @QueryParam( "quotaType" ) String quotaType );
 
     @POST
     @Path( "container/destroy" )
@@ -67,39 +92,6 @@ public interface RestService
     @Path( "template/get" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getTemplate( @FormParam( "templateName" ) String templateName );
-
-
-    @GET
-    @Path( "ping" )
-    public Response ping();
-
-    @POST
-    @Path( "register" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response processRegisterRequest( @QueryParam( "peer" ) String peer );
-
-    @DELETE
-    @Path( "unregister" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response unregisterPeer( @QueryParam( "peerId" ) String peerId );
-
-    @PUT
-    @Path( "update" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response updatePeer( @QueryParam( "peer" ) String peer );
-
-
-    @POST
-    @Path( "container/quota" )
-    Response setQuota( @FormParam( "hostId" ) String hostId, @FormParam( "quotaInfo" ) String quotaInfo );
-
-    @GET
-    @Path( "container/quota" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response getQuota( @QueryParam( "hostId" ) String hostId, @QueryParam( "quotaType" ) String quotaType );
-
-
-    //*********** Quota functions ***************
 
     @GET
     @Path( "container/resource/usage" )
@@ -143,4 +135,6 @@ public interface RestService
     @POST
     @Path( "container/quota/disk" )
     Response setDiskQuota( @FormParam( "containerId" ) String containerId, @FormParam( "diskQuota" ) String diskQuota );
+
+    //*********** Environment Specific REST - END ***************
 }

@@ -61,31 +61,6 @@ public class RestServiceImpl implements RestService
     }
 
 
-    @Deprecated
-    @Override
-    public PeerInfo registerPeer( String config )
-    {
-        if ( config != null )
-        {
-            PeerInfo peerInfo = GSON.fromJson( config, PeerInfo.class );
-            peerInfo.setIp( getRequestIp() );
-            try
-            {
-                peerManager.register( peerInfo );
-            }
-            catch ( PeerException e )
-            {
-                return null;
-            }
-            return peerInfo;
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-
     @Override
     public Response ping()
     {
@@ -98,7 +73,7 @@ public class RestServiceImpl implements RestService
     {
         PeerInfo p = GSON.fromJson( peer, PeerInfo.class );
         p.setIp( getRequestIp() );
-        p.setName( String.format( "Peer on %s", p.getIp() )  );
+        p.setName( String.format( "Peer on %s", p.getIp() ) );
         try
         {
             peerManager.register( p );
