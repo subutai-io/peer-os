@@ -69,6 +69,10 @@ public class MessageEntity implements Message, Serializable
         this.timeToLive = envelope.getTimeToLive();
         this.isSent = envelope.isSent();
         this.createDate = System.currentTimeMillis();
+        if ( envelope.getEnvironmentId() != null )
+        {
+            this.environmentId = envelope.getEnvironmentId().toString();
+        }
     }
 
 
