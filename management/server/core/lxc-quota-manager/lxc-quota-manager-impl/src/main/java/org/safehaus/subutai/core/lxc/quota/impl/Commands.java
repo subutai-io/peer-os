@@ -65,4 +65,23 @@ public class Commands
         return new RequestBuilder( QUOTA_BINDING )
                 .withCmdArgs( Lists.newArrayList( containerHostname, diskPartition, "-s", diskQuota ) );
     }
+
+
+    public RequestBuilder getReadAvailableDiskQuotaCommand( String containerHostname, String diskPartition )
+    {
+        return new RequestBuilder( QUOTA_BINDING )
+                .withCmdArgs( Lists.newArrayList( containerHostname, diskPartition, "-m" ) );
+    }
+
+
+    public RequestBuilder getReadAvailableRamQuotaCommand( String containerHostname )
+    {
+        return new RequestBuilder( QUOTA_BINDING ).withCmdArgs( Lists.newArrayList( containerHostname, "ram", "-m" ) );
+    }
+
+
+    public RequestBuilder getReadAvailableCpuQuotaCommand( String containerHostname )
+    {
+        return new RequestBuilder( QUOTA_BINDING ).withCmdArgs( Lists.newArrayList( containerHostname, "cpu", "-m" ) );
+    }
 }
