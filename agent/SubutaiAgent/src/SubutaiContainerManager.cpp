@@ -57,7 +57,7 @@ SubutaiContainerManager::~SubutaiContainerManager()
 }
 
 /**
- * \details 	Check if container with the name given is running
+ * \details 	check if a container is deleted or added and update container hostname-id matching list on start of agent
  */
 void SubutaiContainerManager::updateContainerIdListOnStart()
 {
