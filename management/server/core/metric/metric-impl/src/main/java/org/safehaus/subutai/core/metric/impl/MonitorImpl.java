@@ -331,10 +331,12 @@ public class MonitorImpl implements Monitor
             subscriberId = subscriberId.substring( 0, Constants.MAX_SUBSCRIBER_ID_LEN );
         }
 
+        UUID environmentId = UUID.fromString( containerHost.getEnvironmentId() );
+
         //save subscription to database
         try
         {
-            monitorDao.addSubscription( UUID.fromString( containerHost.getEnvironmentId() ), subscriberId );
+            monitorDao.addSubscription( environmentId, subscriberId );
         }
         catch ( DaoException e )
         {
@@ -343,8 +345,7 @@ public class MonitorImpl implements Monitor
         }
 
         //activate monitoring
-        activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings,
-                UUID.fromString( containerHost.getEnvironmentId() ) );
+        activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings, environmentId );
     }
 
 
