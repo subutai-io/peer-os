@@ -56,7 +56,8 @@ public class CommandRequestListener extends RequestListener
                             sourcePeer.sendRequest(
                                     new CommandResponse( commandRequest.getRequestId(), new ResponseImpl( response ),
                                             new CommandResultImpl( commandResult ) ),
-                                    RecipientType.COMMAND_RESPONSE.name(), Timeouts.COMMAND_REQUEST_MESSAGE_TIMEOUT );
+                                    RecipientType.COMMAND_RESPONSE.name(), Timeouts.COMMAND_REQUEST_MESSAGE_TIMEOUT,
+                                    commandRequest.getEnvironmentId() );
                         }
                         catch ( PeerException e )
                         {

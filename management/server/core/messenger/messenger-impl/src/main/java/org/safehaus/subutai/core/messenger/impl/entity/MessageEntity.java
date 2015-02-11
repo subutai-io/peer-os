@@ -14,6 +14,7 @@ import javax.persistence.Table;
 
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.StringUtil;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.impl.Envelope;
 
@@ -35,6 +36,8 @@ public class MessageEntity implements Message, Serializable
     private String id;
     @Column( name = "source_peer_id" )
     private String sourcePeerId;
+    @Column( name = "environment_id" )
+    private String environmentId;
     @Column( name = "sender" )
     private String sender;
     @Column( name = "payload" )
@@ -120,6 +123,27 @@ public class MessageEntity implements Message, Serializable
 
 
     @Override
+    public void setEnvironmentId( final UUID environmentId )
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        this.environmentId = environmentId.toString();
+    }
+
+
+    @Override
+    public UUID getEnvironmentId()
+    {
+        if ( UUIDUtil.isStringAUuid( environmentId ) )
+        {
+            return UUID.fromString( environmentId );
+        }
+
+        return null;
+    }
+
+
+    @Override
     public String toString()
     {
         return Objects.toStringHelper( this ).add( "id", id ).add( "sourcePeerId", sourcePeerId )
@@ -141,12 +165,7 @@ public class MessageEntity implements Message, Serializable
 
         final MessageEntity that = ( MessageEntity ) o;
 
-        if ( !id.equals( that.id ) )
-        {
-            return false;
-        }
-
-        return true;
+        return id.equals( that.id );
     }
 
 

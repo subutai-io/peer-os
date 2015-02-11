@@ -27,6 +27,7 @@ import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageException;
 import org.safehaus.subutai.core.messenger.api.Messenger;
@@ -248,14 +249,22 @@ public class RemotePeerImpl implements RemotePeer
             throw new CommandException( "Operation not allowed" );
         }
 
-        CommandRequest request = new CommandRequest( requestBuilder, host.getId() );
+        if ( !UUIDUtil.isStringAUuid( ( ( ContainerHost ) host ).getEnvironmentId() ) )
+        {
+            throw new CommandException( "Invalid container environment id" );
+        }
+
+        UUID environmentId = UUID.fromString( ( ( ContainerHost ) host ).getEnvironmentId() );
+
+        CommandRequest request = new CommandRequest( requestBuilder, host.getId(), environmentId );
         //cache callback
         commandResponseListener.addCallback( request.getRequestId(), callback, requestBuilder.getTimeout(), semaphore );
 
         //send command request to remote peer counterpart
         try
         {
-            sendRequest( request, RecipientType.COMMAND_REQUEST.name(), Timeouts.COMMAND_REQUEST_MESSAGE_TIMEOUT );
+            sendRequest( request, RecipientType.COMMAND_REQUEST.name(), Timeouts.COMMAND_REQUEST_MESSAGE_TIMEOUT,
+                    environmentId );
         }
         catch ( PeerException e )
         {
@@ -273,13 +282,15 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public <T, V> V sendRequest( final T request, String recipient, final int requestTimeout, Class<V> responseType,
-                                 int responseTimeout ) throws PeerException
+    public <T, V> V sendRequest( final T request, final String recipient, final int requestTimeout,
+                                 Class<V> responseType, int responseTimeout, final UUID environmentId )
+            throws PeerException
     {
+        Preconditions.checkArgument( responseTimeout > 0, "Invalid response timeout" );
         Preconditions.checkNotNull( responseType, "Invalid response type" );
 
         //send request
-        MessageRequest messageRequest = sendRequestInternal( request, recipient, requestTimeout );
+        MessageRequest messageRequest = sendRequestInternal( request, recipient, requestTimeout, environmentId );
 
         //wait for response here
         MessageResponse messageResponse =
@@ -302,30 +313,25 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public <T> void sendRequest( final T request, final String recipient, final int requestTimeout )
+    public <T> void sendRequest( final T request, final String recipient, final int requestTimeout, UUID environmentId )
             throws PeerException
     {
-        sendRequestInternal( request, recipient, requestTimeout );
+
+        sendRequestInternal( request, recipient, requestTimeout, environmentId );
     }
 
 
-    @Override
-    public ContainerHostState getContainerHostState( final String containerId ) throws PeerException
-    {
-        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
-        return remotePeerRestClient.getContainerState( containerId );
-    }
-
-
-    private <T> MessageRequest sendRequestInternal( final T request, final String recipient, final int requestTimeout )
-            throws PeerException
+    private <T> MessageRequest sendRequestInternal( final T request, final String recipient, final int requestTimeout,
+                                                    final UUID environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( request, "Invalid request" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
-        Preconditions.checkArgument( requestTimeout > 0, "Timeout must be greater than 0" );
+        Preconditions.checkArgument( requestTimeout > 0, "Invalid request timeout" );
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         MessageRequest messageRequest = new MessageRequest( new Payload( request, localPeer.getId() ), recipient );
         Message message = messenger.createMessage( messageRequest );
+        message.setEnvironmentId( environmentId );
 
         try
         {
@@ -338,6 +344,15 @@ public class RemotePeerImpl implements RemotePeer
 
         return messageRequest;
     }
+
+
+    @Override
+    public ContainerHostState getContainerHostState( final String containerId ) throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+        return remotePeerRestClient.getContainerState( containerId );
+    }
+
 
     // ********** Quota functions *****************
 
@@ -431,7 +446,7 @@ public class RemotePeerImpl implements RemotePeer
                 new CreateContainersRequest( environmentId, initiatorPeerId, ownerId, templates, numberOfContainers,
                         strategyId, criteria ), RecipientType.CONTAINER_CREATE_REQUEST.name(),
                 Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateContainersResponse.class,
-                Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT );
+                Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT, environmentId );
 
         if ( response != null )
         {
@@ -452,7 +467,8 @@ public class RemotePeerImpl implements RemotePeer
         DestroyEnvironmentContainersResponse response =
                 sendRequest( new DestroyEnvironmentContainersRequest( environmentId ),
                         RecipientType.CONTAINER_DESTROY_REQUEST.name(), Timeouts.DESTROY_CONTAINER_REQUEST_TIMEOUT,
-                        DestroyEnvironmentContainersResponse.class, Timeouts.DESTROY_CONTAINER_RESPONSE_TIMEOUT );
+                        DestroyEnvironmentContainersResponse.class, Timeouts.DESTROY_CONTAINER_RESPONSE_TIMEOUT,
+                        environmentId );
 
         if ( response != null )
         {

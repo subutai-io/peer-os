@@ -11,12 +11,14 @@ public class CommandRequest
     private RequestBuilder requestBuilder;
     private UUID hostId;
     private UUID requestId;
+    private UUID environmentId;
 
 
-    public CommandRequest( final RequestBuilder requestBuilder, final UUID hostId )
+    public CommandRequest( final RequestBuilder requestBuilder, final UUID hostId, final UUID environmentId )
     {
         this.requestBuilder = requestBuilder;
         this.hostId = hostId;
+        this.environmentId = environmentId;
         this.requestId = UUID.randomUUID();
     }
 
@@ -36,5 +38,11 @@ public class CommandRequest
     public UUID getHostId()
     {
         return hostId;
+    }
+
+
+    public UUID getEnvironmentId()
+    {
+        return environmentId;
     }
 }

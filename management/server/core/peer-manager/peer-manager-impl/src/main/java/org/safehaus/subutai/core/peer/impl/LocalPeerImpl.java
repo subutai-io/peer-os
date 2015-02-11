@@ -456,16 +456,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     }
 
 
-    private void setContainersTransientFields( final Set<ContainerHost> containerHosts )
-    {
-        for ( ContainerHost containerHost : containerHosts )
-        {
-            ( ( AbstractSubutaiHost ) containerHost ).setPeer( this );
-            ( ( ContainerHostEntity ) containerHost ).setDataService( containerHostDataService );
-        }
-    }
-
-
     @Override
     public String getFreeHostName( final String prefix )
     {
@@ -969,7 +959,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
     @Override
     public <T, V> V sendRequest( final T request, final String recipient, final int requestTimeout,
-                                 final Class<V> responseType, final int responseTimeout ) throws PeerException
+                                 final Class<V> responseType, final int responseTimeout, UUID environmentId )
+            throws PeerException
     {
         Preconditions.checkNotNull( responseType, "Invalid response type" );
 
@@ -978,7 +969,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
-    public <T> void sendRequest( final T request, final String recipient, final int requestTimeout )
+    public <T> void sendRequest( final T request, final String recipient, final int requestTimeout, UUID environmentId )
             throws PeerException
     {
         sendRequestInternal( request, recipient, null );
@@ -1076,14 +1067,27 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             catch ( HostNotFoundException hnfe )
             {
                 containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
-                ( ( AbstractSubutaiHost ) containerHost ).setPeer( this );
-                ( ( ContainerHostEntity ) containerHost ).setDataService( containerHostDataService );
+                setContainersTransientFields( Sets.newHashSet( ( ContainerHost ) containerHost ) );
+                //                ( ( AbstractSubutaiHost ) containerHost ).setPeer( this );
+                //                ( ( ContainerHostEntity ) containerHost ).setDataService( containerHostDataService );
                 ( ( ResourceHostEntity ) resourceHost ).addContainerHost( ( ContainerHostEntity ) containerHost );
                 containerHostDataService.persist( ( ContainerHostEntity ) containerHost );
             }
             ( ( AbstractSubutaiHost ) containerHost ).updateHostInfo( containerHostInfo );
         }
     }
+
+
+    private void setContainersTransientFields( final Set<ContainerHost> containerHosts )
+    {
+        for ( ContainerHost containerHost : containerHosts )
+        {
+            ( ( AbstractSubutaiHost ) containerHost ).setPeer( this );
+            ( ( ContainerHostEntity ) containerHost ).setDataService( containerHostDataService );
+            ( ( ContainerHostEntity ) containerHost ).setLocalPeer( this );
+        }
+    }
+
 
     // ********** Quota functions *****************
 
