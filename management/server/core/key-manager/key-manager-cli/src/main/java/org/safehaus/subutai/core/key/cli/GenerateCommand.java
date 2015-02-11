@@ -25,14 +25,9 @@ public class GenerateCommand extends OsgiCommandSupport
     private String email;
 
 
-    public void setKeyManager( final KeyManager keyManager )
+    public GenerateCommand( final KeyManager keyManager, final PeerManager peerManager )
     {
         this.keyManager = keyManager;
-    }
-
-
-    public void setPeerManager( final PeerManager peerManager )
-    {
         this.peerManager = peerManager;
     }
 
