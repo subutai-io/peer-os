@@ -290,7 +290,7 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
             }
             else
             {
-                item.getItemProperty( ICON_PROPERTY ).setValue( new ThemeResource( "img/lxc/virtual-offline.png" ) );
+                item.getItemProperty( ICON_PROPERTY ).setValue( new ThemeResource( "img/lxc/virtual_offline.png" ) );
             }
         }
     }
