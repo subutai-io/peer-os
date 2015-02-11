@@ -32,13 +32,13 @@ SubutaiContainerManager::SubutaiContainerManager(string lxc_path, SubutaiLogger*
     // Check for running containers in case we just started an app
     // after crash
     try {
-    	/*remove the containerIdList to get rid of the previous list and create a clean one*/
-    	if( remove( "/etc/subutai-agent/containerIdList.txt" ) != 0 )
-    		_logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", "Cannot clean container id list."));
-    	else
-    		_logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Container id list is removed.."));
-
     	_containers = findAllContainers();
+    	updateContainerIdListOnStart(); // remove the id-hostname matchings for removed containers from containerIdList
+    	for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++)
+    	{
+    		(*it).getContainerId();
+    	}
+
     } catch (SubutaiException e) {
         _logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", e.displayText()));         
     } catch (std::exception e) {
@@ -47,6 +47,8 @@ SubutaiContainerManager::SubutaiContainerManager(string lxc_path, SubutaiLogger*
 
     _logger->writeLog(6, _logger->setLogData("<SubutaiContainerManager>", "Initializing"));
 }
+
+
 /**
  * \details 	Default destructor of SubutaiContainerManager
  */
@@ -54,6 +56,38 @@ SubutaiContainerManager::~SubutaiContainerManager()
 {
 }
 
+/**
+ * \details 	Check if container with the name given is running
+ */
+void SubutaiContainerManager::updateContainerIdListOnStart()
+{
+	 	string hostname_file, id;
+
+	 	string path = "/etc/subutai-agent/";
+	    string uuidFile = path + "containerIdList.txt";
+
+	    ifstream file(uuidFile.c_str());
+	    ofstream temp("temp.txt"); // put id-hostname matchings which wont be deleted in temp
+
+
+	    while(file >> hostname_file >> id)
+	    {
+	    	for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
+	    	   	/*If new container is added, containerIdList is updated in getContainerId() method*/
+	    	    if ( !strcmp(hostname_file.c_str(), (*it).getContainerHostnameValue().c_str()))
+	    	    {
+	    	    	temp << hostname_file << " " << id << endl;
+	    	    	break;
+	    	    }
+	    	}
+	    }
+	    file.clear(); // clear eof and fail bits
+	    file.seekg(0, ios::beg);
+	    file.close();
+	    temp.close();
+	    remove(uuidFile.c_str());
+	    rename("temp.txt",uuidFile.c_str());
+}
 
 /**
  * \details 	Check if container with the name given is running
@@ -202,7 +236,7 @@ void SubutaiContainerManager::updateContainerLists()
         /* hold destroy container check array to control which container is deleted. */
         for (int i = 0; i < size_of_containers; i++) destroy_container_check[i] = false;
         for (int i = 0; i < num; i++) {
-            // Check is there is any new conatiner appears
+            // Check is there is any new container appears
             bool containerFound = false;
             index = 0;
             for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {

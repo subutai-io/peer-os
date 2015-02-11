@@ -54,6 +54,7 @@ class SubutaiContainerManager {
         vector<SubutaiContainer> getRunningContainers();
         vector<SubutaiContainer> getStoppedContainers();
         vector<SubutaiContainer> getFrozenContainers();
+        void updateContainerIdListOnStart();
         void deleteContainerInfo(string);
         bool isContainerRunning(string );
         bool isContainerStopped(string );
