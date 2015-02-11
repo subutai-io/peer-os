@@ -165,12 +165,7 @@ public class MessageEntity implements Message, Serializable
 
         final MessageEntity that = ( MessageEntity ) o;
 
-        if ( !id.equals( that.id ) )
-        {
-            return false;
-        }
-
-        return true;
+        return id.equals( that.id );
     }
 
 

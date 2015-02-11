@@ -36,25 +36,25 @@ public class MessengerImpl implements Messenger, MessageProcessor
     protected final Set<MessageListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<MessageListener, Boolean>() );
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
-    private   PeerManager peerManager;
+    private PeerManager peerManager;
     protected MessengerDao messengerDao;
     protected MessageSender messageSender;
-    private   DaoManager daoManager;
+    private DaoManager daoManager;
 
 
-    public MessengerImpl( )
-            throws MessengerException
+    public MessengerImpl() throws MessengerException
     {
     }
 
-    public void init( ) throws MessengerException
+
+    public void init() throws MessengerException
     {
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( daoManager );
 
         try
         {
-            this.messengerDao  = new MessengerDao( daoManager.getEntityManagerFactory());
+            this.messengerDao = new MessengerDao( daoManager.getEntityManagerFactory() );
             this.messageSender = new MessageSender( peerManager, messengerDao, this );
 
             messageSender.init();
@@ -64,11 +64,9 @@ public class MessengerImpl implements Messenger, MessageProcessor
             LOG.error( "Error on creating entity manager.", e );
             throw new MessengerException( e );
         }
-        finally
-        {
 
-        }
     }
+
 
     public void destroy()
     {
@@ -77,21 +75,9 @@ public class MessengerImpl implements Messenger, MessageProcessor
     }
 
 
-    public PeerManager getPeerManager()
-    {
-        return peerManager;
-    }
-
-
     public void setPeerManager( final PeerManager peerManager )
     {
         this.peerManager = peerManager;
-    }
-
-
-    public DaoManager getDaoManager()
-    {
-        return daoManager;
     }
 
 
