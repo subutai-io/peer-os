@@ -157,7 +157,7 @@ public class QuotaManagerImpl implements QuotaManager
         CommandResult result = executeOnContainersResourceHost( containerId,
                 commands.getReadRamQuotaCommand( containerHost.getHostname() ) );
 
-        return Integer.parseInt( result.getStdOut().replace( "M", "" ) );
+        return Integer.parseInt( result.getStdOut().replace( "M", "" ).trim() );
     }
 
 
