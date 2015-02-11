@@ -212,6 +212,7 @@ public class MonitorImpl implements Monitor
                     ContainerHostMetricImpl metric =
                             JsonUtil.fromJson( result.getStdOut(), ContainerHostMetricImpl.class );
                     metric.setEnvironmentId( environmentId );
+                    metric.setHostId( localContainer.getId() );
                     metrics.add( metric );
                 }
                 else
