@@ -121,13 +121,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setQuota( final String hostId, final String quotaInfo )
+    public Response setQuota( final String containerId, final String quotaInfo )
     {
         try
         {
             QuotaInfo q = GSON.fromJson( quotaInfo, QuotaInfo.class );
             LocalPeer localPeer = peerManager.getLocalPeer();
-            localPeer.setQuota( localPeer.getContainerHostById( UUID.fromString( hostId ) ), q );
+            localPeer.setQuota( localPeer.getContainerHostById( UUID.fromString( containerId ) ), q );
             return Response.ok().build();
         }
         catch ( JsonParseException | PeerException e )
@@ -138,14 +138,14 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getQuota( final String hostId, final String quotaType )
+    public Response getQuota( final String containerId, final String quotaType )
     {
         try
         {
             QuotaType q = GSON.fromJson( quotaType, QuotaType.class );
             LocalPeer localPeer = peerManager.getLocalPeer();
             PeerQuotaInfo quotaInfo =
-                    localPeer.getQuota( localPeer.getContainerHostById( UUID.fromString( hostId ) ), q );
+                    localPeer.getQuota( localPeer.getContainerHostById( UUID.fromString( containerId ) ), q );
             return Response.ok( GSON.toJson( quotaInfo ) ).build();
         }
         catch ( JsonParseException | PeerException e )
@@ -164,12 +164,12 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response destroyContainer( final String hostId )
+    public Response destroyContainer( final String containerId )
     {
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            Host host = localPeer.bindHost( hostId );
+            Host host = localPeer.bindHost( containerId );
             if ( host instanceof ContainerHost )
             {
                 localPeer.destroyContainer( ( ContainerHost ) host );
@@ -185,12 +185,12 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response startContainer( final String hostId )
+    public Response startContainer( final String containerId )
     {
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            Host host = localPeer.bindHost( hostId );
+            Host host = localPeer.bindHost( containerId );
             if ( host instanceof ContainerHost )
             {
                 localPeer.startContainer( ( ContainerHost ) host );
@@ -205,12 +205,12 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response stopContainer( final String hostId )
+    public Response stopContainer( final String containerId )
     {
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            Host host = localPeer.bindHost( hostId );
+            Host host = localPeer.bindHost( containerId );
             if ( host instanceof ContainerHost )
             {
                 localPeer.stopContainer( ( ContainerHost ) host );
@@ -225,12 +225,12 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response isContainerConnected( final String hostId )
+    public Response isContainerConnected( final String containerId )
     {
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            Boolean result = localPeer.isConnected( localPeer.bindHost( hostId ) );
+            Boolean result = localPeer.isConnected( localPeer.bindHost( containerId ) );
             return Response.ok( result.toString() ).build();
         }
         catch ( PeerException e )
@@ -324,13 +324,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getProcessResourceUsage( final String hostId, final int processPid )
+    public Response getProcessResourceUsage( final String containerId, final int processPid )
     {
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
             ProcessResourceUsage processResourceUsage =
-                    localPeer.getProcessResourceUsage( UUID.fromString( hostId ), processPid );
+                    localPeer.getProcessResourceUsage( UUID.fromString( containerId ), processPid );
             return Response.ok( GSON.toJson( processResourceUsage ) ).build();
         }
         catch ( PeerException e )
