@@ -14,7 +14,7 @@ function get_total_usable_ram_in_megabytes {
 
   local total_usable_ram_in_bytes=$(get_total_usable_ram $container)
   local result=$(echo $total_usable_ram_in_bytes/\(1024*1024\) | bc)
-  echo "$result"
+  echo $result"M"
   return
 }
 
