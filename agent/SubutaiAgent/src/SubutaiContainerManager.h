@@ -39,6 +39,15 @@
 #include "SubutaiContainer.h"
 #include "SubutaiException.h"
 
+#include <string>
+#include <stdio.h>
+#include <pthread.h>
+#include <iostream>
+#include <string.h>
+#include <unistd.h>
+#include <deque>
+
+
 using namespace std;
 
 typedef std::vector<SubutaiContainer>::iterator ContainerIterator;
@@ -54,6 +63,8 @@ class SubutaiContainerManager {
         vector<SubutaiContainer> getRunningContainers();
         vector<SubutaiContainer> getStoppedContainers();
         vector<SubutaiContainer> getFrozenContainers();
+        vector<string> getContainers();
+        bool checkIfContainer(string, vector<string>, bool );
         void updateContainerIdListOnStart();
         void deleteContainerInfo(string);
         bool isContainerRunning(string );
