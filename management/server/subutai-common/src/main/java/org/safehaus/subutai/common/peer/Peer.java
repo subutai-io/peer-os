@@ -69,9 +69,10 @@ public interface Peer
     public boolean isOnline() throws PeerException;
 
     public <T, V> V sendRequest( T request, String recipient, int requestTimeout, Class<V> responseType,
-                                 int responseTimeout ) throws PeerException;
+                                 int responseTimeout, UUID environmentId ) throws PeerException;
 
-    public <T> void sendRequest( T request, String recipient, int requestTimeout ) throws PeerException;
+    public <T> void sendRequest( T request, String recipient, int requestTimeout, UUID environmentId )
+            throws PeerException;
 
     public ContainerHostState getContainerHostState( String containerId ) throws PeerException;
 

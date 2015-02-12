@@ -9,10 +9,14 @@ import org.safehaus.subutai.common.exception.HTTPException;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 
 public class RestUtil
 {
+    private static final long DEFAULT_RECEIVE_TIMEOUT = 1000 * 60 * 5;
+    private static final long DEFAULT_CONNECTION_TIMEOUT = 1000 * 60;
 
 
     public static enum RequestType
@@ -21,31 +25,39 @@ public class RestUtil
     }
 
 
-    public String request( RequestType requestType, String url, Map<String, String> params ) throws HTTPException
+    public String request( RequestType requestType, String url, Map<String, String> params,
+                           Map<String, String> headers ) throws HTTPException
     {
         if ( requestType == RequestType.GET )
         {
-            return get( url, params );
+            return get( url, params, headers );
         }
         else
         {
-            return post( url, params );
+            return post( url, params, headers );
         }
     }
 
 
-    public static String get( String url, Map<String, String> params ) throws HTTPException
+    public static String get( String url, Map<String, String> params, Map<String, String> headers ) throws HTTPException
     {
         WebClient client = null;
         Response response = null;
         try
         {
-            client = WebClient.create( url );
+            client = createWebClient( url );
             if ( params != null )
             {
                 for ( Map.Entry<String, String> entry : params.entrySet() )
                 {
                     client.query( entry.getKey(), entry.getValue() );
+                }
+            }
+            if ( headers != null )
+            {
+                for ( Map.Entry<String, String> entry : headers.entrySet() )
+                {
+                    client.header( entry.getKey(), entry.getValue() );
                 }
             }
             response = client.get();
@@ -93,19 +105,27 @@ public class RestUtil
     }
 
 
-    public static String post( String url, Map<String, String> params ) throws HTTPException
+    public static String post( String url, Map<String, String> params, Map<String, String> headers )
+            throws HTTPException
     {
         WebClient client = null;
         Response response = null;
         try
         {
-            client = WebClient.create( url );
+            client = createWebClient( url );
             Form form = new Form();
             if ( params != null )
             {
                 for ( Map.Entry<String, String> entry : params.entrySet() )
                 {
                     form.set( entry.getKey(), entry.getValue() );
+                }
+            }
+            if ( headers != null )
+            {
+                for ( Map.Entry<String, String> entry : headers.entrySet() )
+                {
+                    client.header( entry.getKey(), entry.getValue() );
                 }
             }
             response = client.form( form );
@@ -150,5 +170,19 @@ public class RestUtil
         }
 
         return null;
+    }
+
+
+    protected static WebClient createWebClient( String url )
+    {
+        WebClient client = WebClient.create( url );
+        HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
+
+        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+        httpClientPolicy.setConnectionTimeout( DEFAULT_CONNECTION_TIMEOUT );
+        httpClientPolicy.setReceiveTimeout( DEFAULT_RECEIVE_TIMEOUT );
+
+        httpConduit.setClient( httpClientPolicy );
+        return client;
     }
 }
