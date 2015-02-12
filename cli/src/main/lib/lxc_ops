@@ -569,6 +569,10 @@ function lxc_set_cpu_quota {
   local container="$1"
   local parameter_value="$2"
 
+  if (( $(bc <<< "$parameter_value > 100") == 1 )); then
+    local parameter_value=100
+  fi
+
   local cpu_core_count=$(lxc_get_cpu_core_count $container)
   local cfs_period=$(lxc_get_cfs_period $container)
   local cfs_quota=$(echo $cfs_period*$cpu_core_count*$parameter_value/100 | bc)
