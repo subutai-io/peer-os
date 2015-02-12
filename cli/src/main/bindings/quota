@@ -5,12 +5,14 @@ function quota_usage {
   echo -----------------------------------------------------------------------
   echo Usage: Quota management of containers.
   echo
-  echo "        "subutai \[-qh\] quota container resource_type \[-s quota_value\|-m\]
+  echo "        "subutai \[-qh\] quota container \[resource_type \[-s quota_value\|-m\] \| output_type\]
   echo "           "resource_types:
   echo "                             "ram -- quota for memory \(in megabytes\)
   echo "                             "cpu -- quota for cpu \(in percentage\)
   echo "                             "cpuset -- quota for cpusets
   echo "                             "diskHome\|diskOpt\|diskVar\|diskRootfs\] -- quota for disk datasets \(no default units, can be \"none\" or in K\|M\|G\|T\|P\|E\|... \)
+  echo "           "output_types:
+  echo "                             "json -- prints all quota related information in json format
   echo "           "flags:
   echo "                "s -- set quota for the specified resource_type
   echo "                "m -- get the maximum quota can be set to the specified container and resource_type in their default units.
