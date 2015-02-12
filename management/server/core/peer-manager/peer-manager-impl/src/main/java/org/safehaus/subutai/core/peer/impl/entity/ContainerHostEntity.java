@@ -106,10 +106,8 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         }
         catch ( ContainerGroupNotFoundException e )
         {
-            LOG.error( "Container group not found", e );
+            throw new UnsupportedOperationException( "This operation is not allowed for non environment containers" );
         }
-
-        return null;
     }
 
 
@@ -220,83 +218,83 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public ProcessResourceUsage getProcessResourceUsage( final int processPid ) throws PeerException
     {
         Peer peer = getPeer();
-        return peer.getProcessResourceUsage( getId(), processPid );
+        return peer.getProcessResourceUsage( this, processPid );
     }
 
 
     @Override
     public int getRamQuota() throws PeerException
     {
-        return getPeer().getRamQuota( getId() );
+        return getPeer().getRamQuota( this );
     }
 
 
     @Override
     public void setRamQuota( final int ramInMb ) throws PeerException
     {
-        getPeer().setRamQuota( getId(), ramInMb );
+        getPeer().setRamQuota( this, ramInMb );
     }
 
 
     @Override
     public int getCpuQuota() throws PeerException
     {
-        return getPeer().getCpuQuota( getId() );
+        return getPeer().getCpuQuota( this );
     }
 
 
     @Override
     public void setCpuQuota( final int cpuPercent ) throws PeerException
     {
-        getPeer().setCpuQuota( getId(), cpuPercent );
+        getPeer().setCpuQuota( this, cpuPercent );
     }
 
 
     @Override
     public Set<Integer> getCpuSet() throws PeerException
     {
-        return getPeer().getCpuSet( getId() );
+        return getPeer().getCpuSet( this );
     }
 
 
     @Override
     public void setCpuSet( final Set<Integer> cpuSet ) throws PeerException
     {
-        getPeer().setCpuSet( getId(), cpuSet );
+        getPeer().setCpuSet( this, cpuSet );
     }
 
 
     @Override
     public DiskQuota getDiskQuota( final DiskPartition diskPartition ) throws PeerException
     {
-        return getPeer().getDiskQuota( getId(), diskPartition );
+        return getPeer().getDiskQuota( this, diskPartition );
     }
 
 
     @Override
     public void setDiskQuota( final DiskQuota diskQuota ) throws PeerException
     {
-        getPeer().setDiskQuota( getId(), diskQuota );
+        getPeer().setDiskQuota( this, diskQuota );
     }
 
 
     @Override
     public int getAvailableRamQuota() throws PeerException
     {
-        return getPeer().getAvailableRamQuota( getId() );
+        return getPeer().getAvailableRamQuota( this );
     }
 
 
     @Override
     public int getAvailableCpuQuota() throws PeerException
     {
-        return getPeer().getAvailableCpuQuota( getId() );
+        return getPeer().getAvailableCpuQuota( this );
     }
 
 
     @Override
     public DiskQuota getAvailableDiskQuota( final DiskPartition diskPartition ) throws PeerException
     {
-        return getPeer().getAvailableDiskQuota( getId(), diskPartition );
+        return getPeer().getAvailableDiskQuota( this, diskPartition );
     }
 }

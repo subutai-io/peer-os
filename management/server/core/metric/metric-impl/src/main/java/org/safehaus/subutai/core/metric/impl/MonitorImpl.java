@@ -21,7 +21,6 @@ import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
@@ -326,11 +325,6 @@ public class MonitorImpl implements Monitor
         Preconditions.checkNotNull( containerHost, CONTAINER_IS_NULL_MSG );
         Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
 
-        if ( !UUIDUtil.isStringAUuid( containerHost.getEnvironmentId() ) )
-        {
-            throw new MonitorException( "Container has invalid environment id" );
-        }
-
         //make sure subscriber id is truncated to 100 characters
         String subscriberId = alertListener.getSubscriberId();
         if ( subscriberId.length() > Constants.MAX_SUBSCRIBER_ID_LEN )
@@ -391,10 +385,6 @@ public class MonitorImpl implements Monitor
     {
         Preconditions.checkNotNull( containerHost, CONTAINER_IS_NULL_MSG );
         Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
-        if ( !UUIDUtil.isStringAUuid( containerHost.getEnvironmentId() ) )
-        {
-            throw new MonitorException( "Container has invalid environment id" );
-        }
 
         activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings,
                 UUID.fromString( containerHost.getEnvironmentId() ) );

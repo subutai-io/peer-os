@@ -28,10 +28,10 @@ import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
-import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageException;
 import org.safehaus.subutai.core.messenger.api.Messenger;
@@ -118,6 +118,22 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public UUID getRemoteId() throws PeerException
+    {
+        String path = "peer/id";
+
+        try
+        {
+            return UUID.fromString( get( path, null, null ) );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error obtaining peer id", e );
+        }
+    }
+
+
+    @Override
     public boolean isOnline() throws PeerException
     {
         if ( peerInfo.getId().equals( getRemoteId() ) )
@@ -128,6 +144,13 @@ public class RemotePeerImpl implements RemotePeer
         {
             throw new PeerException( "Invalid peer ID." );
         }
+    }
+
+
+    @Override
+    public boolean isLocal()
+    {
+        return false;
     }
 
 
@@ -153,6 +176,33 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public Template getTemplate( final String templateName ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
+
+        String path = "peer/template/get";
+
+        Map<String, String> params = Maps.newHashMap();
+
+        params.put( "templateName", templateName );
+
+        try
+        {
+            String response = get( path, params, null );
+
+            return JsonUtil.fromJson( response, Template.class );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error obtaining template", e );
+        }
+    }
+
+
+    //********** ENVIRONMENT SPECIFIC REST *************************************
+
+
+    @Override
     public void startContainer( final ContainerHost host ) throws PeerException
     {
         Preconditions.checkNotNull( host, "Container host is null" );
@@ -160,12 +210,14 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/start";
 
         Map<String, String> params = Maps.newHashMap();
-
         params.put( "containerId", host.getId().toString() );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
 
         try
         {
-            post( path, params, null );
+            post( path, params, headers );
         }
         catch ( HTTPException e )
         {
@@ -182,12 +234,14 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/stop";
 
         Map<String, String> params = Maps.newHashMap();
-
         params.put( "containerId", host.getId().toString() );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
 
         try
         {
-            post( path, params, null );
+            post( path, params, headers );
         }
         catch ( HTTPException e )
         {
@@ -204,12 +258,14 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/destroy";
 
         Map<String, String> params = Maps.newHashMap();
-
         params.put( "containerId", host.getId().toString() );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
 
         try
         {
-            post( path, params, null );
+            post( path, params, headers );
         }
         catch ( HTTPException e )
         {
@@ -222,16 +278,19 @@ public class RemotePeerImpl implements RemotePeer
     public boolean isConnected( final Host host )
     {
         Preconditions.checkNotNull( host, "Container host is null" );
+        Preconditions.checkArgument( host instanceof ContainerHost );
 
         String path = "peer/container/isconnected";
 
         Map<String, String> params = Maps.newHashMap();
-
         params.put( "containerId", host.getId().toString() );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, ( ( ContainerHost ) host ).getEnvironmentId() );
 
         try
         {
-            return JsonUtil.fromJson( post( path, params, null ), Boolean.class );
+            return JsonUtil.fromJson( post( path, params, headers ), Boolean.class );
         }
         catch ( Exception e )
         {
@@ -242,22 +301,24 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public ProcessResourceUsage getProcessResourceUsage( final UUID containerId, final int processPid )
+    public ProcessResourceUsage getProcessResourceUsage( final ContainerHost host, final int processPid )
             throws PeerException
     {
-        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkNotNull( host, "Invalid container host" );
         Preconditions.checkArgument( processPid > 0, "Process pid must be greater than 0" );
 
         String path = "peer/container/resource/usage";
 
         Map<String, String> params = Maps.newHashMap();
-
-        params.put( "containerId", containerId.toString() );
+        params.put( "containerId", host.getId().toString() );
         params.put( "processPid", String.valueOf( processPid ) );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
 
         try
         {
-            String response = get( path, params, null );
+            String response = get( path, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<ProcessResourceUsage>() {}.getType() );
         }
@@ -269,10 +330,379 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public boolean isLocal()
+    public ContainerHostState getContainerHostState( final ContainerHost host ) throws PeerException
     {
-        return false;
+        Preconditions.checkNotNull( host, "Invalid container host" );
+
+        String path = "peer/container/state";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", host.getId().toString() );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
+
+        try
+        {
+            String response = get( path, params, headers );
+
+            return JsonUtil.fromJson( response, ContainerHostState.class );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error obtaining container state", e );
+        }
     }
+
+
+    @Override
+    public int getRamQuota( final ContainerHost host ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+
+        String path = "peer/container/quota/ram";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", host.getId().toString() );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
+
+        try
+        {
+            String response = get( path, params, headers );
+
+            return JsonUtil.fromJson( response, Integer.class );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error obtaining container ram quota", e );
+        }
+    }
+
+
+    @Override
+    public void setRamQuota( final ContainerHost host, final int ramInMb ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkArgument( ramInMb > 0, "Ram quota value must be greater than 0" );
+
+        String path = "peer/container/quota/ram";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", host.getId().toString() );
+        params.put( "ram", String.valueOf( ramInMb ) );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
+
+        try
+        {
+            post( path, params, headers );
+        }
+        catch ( HTTPException e )
+        {
+            throw new PeerException( "Error setting container ram quota", e );
+        }
+    }
+
+
+    @Override
+    public int getCpuQuota( final ContainerHost host ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+
+        String path = "peer/container/quota/cpu";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", host.getId().toString() );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
+
+        try
+        {
+            String response = get( path, params, headers );
+
+            return JsonUtil.fromJson( response, Integer.class );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error obtaining container cpu quota", e );
+        }
+    }
+
+
+    @Override
+    public void setCpuQuota( final ContainerHost host, final int cpuPercent ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkArgument( cpuPercent > 0, "Cpu quota value must be greater than 0" );
+
+        String path = "peer/container/quota/cpu";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", host.getId().toString() );
+        params.put( "cpu", String.valueOf( cpuPercent ) );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
+
+        try
+        {
+            post( path, params, headers );
+        }
+        catch ( HTTPException e )
+        {
+            throw new PeerException( "Error setting container cpu quota", e );
+        }
+    }
+
+
+    @Override
+    public Set<Integer> getCpuSet( final ContainerHost host ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+
+        String path = "peer/container/quota/cpuset";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", host.getId().toString() );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
+
+        try
+        {
+            String response = get( path, params, headers );
+
+            return JsonUtil.fromJson( response, new TypeToken<Set<Integer>>() {}.getType() );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error obtaining container cpu set", e );
+        }
+    }
+
+
+    @Override
+    public void setCpuSet( final ContainerHost host, final Set<Integer> cpuSet ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( cpuSet ), "Empty cpu set" );
+
+        String path = "peer/container/quota/cpuset";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", host.getId().toString() );
+        params.put( "cpuset", JsonUtil.toJson( cpuSet ) );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
+
+        try
+        {
+            post( path, params, headers );
+        }
+        catch ( HTTPException e )
+        {
+            throw new PeerException( "Error setting container cpu set", e );
+        }
+    }
+
+
+    @Override
+    public DiskQuota getDiskQuota( final ContainerHost host, final DiskPartition diskPartition ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( diskPartition, "Invalid disk partition" );
+
+        String path = "peer/container/quota/disk";
+
+        Map<String, String> params = Maps.newHashMap();
+
+        params.put( "containerId", host.getId().toString() );
+        params.put( "diskPartition", JsonUtil.toJson( diskPartition ) );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
+
+        try
+        {
+            String response = get( path, params, headers );
+
+            return JsonUtil.fromJson( response, new TypeToken<DiskQuota>() {}.getType() );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error obtaining container disk quota", e );
+        }
+    }
+
+
+    @Override
+    public void setDiskQuota( final ContainerHost host, final DiskQuota diskQuota ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( diskQuota, "Invalid disk quota" );
+
+        String path = "peer/container/quota/disk";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", host.getId().toString() );
+        params.put( "diskQuota", JsonUtil.toJson( diskQuota ) );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
+
+        try
+        {
+            post( path, params, headers );
+        }
+        catch ( HTTPException e )
+        {
+            throw new PeerException( "Error setting container disk quota", e );
+        }
+    }
+
+
+    @Override
+    public int getAvailableRamQuota( final ContainerHost host ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+
+        String path = "peer/container/quota/ram/available";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", host.getId().toString() );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
+
+        try
+        {
+            String response = get( path, params, headers );
+
+            return JsonUtil.fromJson( response, Integer.class );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error obtaining container available ram quota", e );
+        }
+    }
+
+
+    @Override
+    public int getAvailableCpuQuota( final ContainerHost host ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+
+        String path = "peer/container/quota/cpu/available";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", host.getId().toString() );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
+
+        try
+        {
+            String response = get( path, params, headers );
+
+            return JsonUtil.fromJson( response, Integer.class );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error obtaining container available cpu quota", e );
+        }
+    }
+
+
+    @Override
+    public DiskQuota getAvailableDiskQuota( final ContainerHost host, final DiskPartition diskPartition )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( diskPartition, "Invalid disk partition" );
+
+        String path = "peer/container/quota/disk/available";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", host.getId().toString() );
+        params.put( "diskPartition", JsonUtil.toJson( diskPartition ) );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
+
+        try
+        {
+            String response = get( path, params, headers );
+
+            return JsonUtil.fromJson( response, new TypeToken<DiskQuota>() {}.getType() );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error obtaining container available disk quota", e );
+        }
+    }
+
+
+    @Override
+    public PeerQuotaInfo getQuota( final ContainerHost host, final QuotaType quotaType ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( quotaType, "Invalid quota type" );
+
+        String path = "peer/container/quota";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", host.getId().toString() );
+        params.put( "quotaType", JsonUtil.toJson( quotaType ) );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
+
+        try
+        {
+            String response = get( path, params, headers );
+
+            return JsonUtil.fromJson( response, new TypeToken<PeerQuotaInfo>() {}.getType() );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error obtaining container quota", e );
+        }
+    }
+
+
+    @Override
+    public void setQuota( final ContainerHost host, final QuotaInfo quotaInfo ) throws PeerException
+    {
+
+        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( quotaInfo, "Invalid quota info" );
+
+        String path = "peer/container/quota";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", host.getId().toString() );
+        params.put( "quotaInfo", JsonUtil.toJson( quotaInfo ) );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
+
+        try
+        {
+            post( path, params, headers );
+        }
+        catch ( HTTPException e )
+        {
+            throw new PeerException( "Error setting container quota", e );
+        }
+    }
+
+
+    //DONE
 
 
     @Override
@@ -333,11 +763,6 @@ public class RemotePeerImpl implements RemotePeer
         if ( !( host instanceof ContainerHost ) )
         {
             throw new CommandException( "Operation not allowed" );
-        }
-
-        if ( !UUIDUtil.isStringAUuid( ( ( ContainerHost ) host ).getEnvironmentId() ) )
-        {
-            throw new CommandException( "Invalid container environment id" );
         }
 
         UUID environmentId = UUID.fromString( ( ( ContainerHost ) host ).getEnvironmentId() );
@@ -425,326 +850,6 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public Template getTemplate( final String templateName ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
-
-        String path = "peer/template/get";
-
-        Map<String, String> params = Maps.newHashMap();
-
-        params.put( "templateName", templateName );
-
-        try
-        {
-            String response = get( path, params, null );
-
-            return JsonUtil.fromJson( response, Template.class );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error obtaining template", e );
-        }
-    }
-
-
-    @Override
-    public ContainerHostState getContainerHostState( final String containerId ) throws PeerException
-    {
-        Preconditions.checkArgument( UUIDUtil.isStringAUuid( containerId ), "Invalid container id" );
-
-        String path = "peer/container/state";
-
-        Map<String, String> params = Maps.newHashMap();
-
-        params.put( "containerId", containerId );
-
-        try
-        {
-            String response = get( path, params, null );
-
-            return JsonUtil.fromJson( response, ContainerHostState.class );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error obtaining container state", e );
-        }
-    }
-
-
-    // ********** Quota functions *****************
-
-
-    @Override
-    public int getRamQuota( final UUID containerId ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerId, "Invalid container id" );
-
-        String path = "peer/container/quota/ram";
-
-        Map<String, String> params = Maps.newHashMap();
-
-        params.put( "containerId", containerId.toString() );
-
-        try
-        {
-            String response = get( path, params, null );
-
-            return JsonUtil.fromJson( response, Integer.class );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error obtaining container ram quota", e );
-        }
-    }
-
-
-    @Override
-    public void setRamQuota( final UUID containerId, final int ramInMb ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerId, "Invalid container id" );
-        Preconditions.checkArgument( ramInMb > 0, "Ram quota value must be greater than 0" );
-
-        String path = "peer/container/quota/ram";
-
-        Map<String, String> params = Maps.newHashMap();
-
-        params.put( "containerId", containerId.toString() );
-        params.put( "ram", String.valueOf( ramInMb ) );
-
-        try
-        {
-            post( path, params, null );
-        }
-        catch ( HTTPException e )
-        {
-            throw new PeerException( "Error setting container ram quota", e );
-        }
-    }
-
-
-    @Override
-    public int getCpuQuota( final UUID containerId ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerId, "Invalid container id" );
-
-        String path = "peer/container/quota/cpu";
-
-        Map<String, String> params = Maps.newHashMap();
-
-        params.put( "containerId", containerId.toString() );
-
-        try
-        {
-            String response = get( path, params, null );
-
-            return JsonUtil.fromJson( response, Integer.class );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error obtaining container cpu quota", e );
-        }
-    }
-
-
-    @Override
-    public void setCpuQuota( final UUID containerId, final int cpuPercent ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerId, "Invalid container id" );
-        Preconditions.checkArgument( cpuPercent > 0, "Cpu quota value must be greater than 0" );
-
-        String path = "peer/container/quota/cpu";
-
-        Map<String, String> params = Maps.newHashMap();
-
-        params.put( "containerId", containerId.toString() );
-        params.put( "cpu", String.valueOf( cpuPercent ) );
-
-        try
-        {
-            post( path, params, null );
-        }
-        catch ( HTTPException e )
-        {
-            throw new PeerException( "Error setting container cpu quota", e );
-        }
-    }
-
-
-    @Override
-    public Set<Integer> getCpuSet( final UUID containerId ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerId, "Invalid container id" );
-
-        String path = "peer/container/quota/cpuset";
-
-        Map<String, String> params = Maps.newHashMap();
-
-        params.put( "containerId", containerId.toString() );
-
-        try
-        {
-            String response = get( path, params, null );
-
-            return JsonUtil.fromJson( response, new TypeToken<Set<Integer>>() {}.getType() );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error obtaining container cpu set", e );
-        }
-    }
-
-
-    @Override
-    public void setCpuSet( final UUID containerId, final Set<Integer> cpuSet ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerId, "Invalid container id" );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( cpuSet ), "Empty cpu set" );
-
-        String path = "peer/container/quota/cpuset";
-
-        Map<String, String> params = Maps.newHashMap();
-
-        params.put( "containerId", containerId.toString() );
-        params.put( "cpuset", JsonUtil.toJson( cpuSet ) );
-
-        try
-        {
-            post( path, params, null );
-        }
-        catch ( HTTPException e )
-        {
-            throw new PeerException( "Error setting container cpu set", e );
-        }
-    }
-
-
-    @Override
-    public DiskQuota getDiskQuota( final UUID containerId, final DiskPartition diskPartition ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerId, "Invalid container id" );
-        Preconditions.checkNotNull( diskPartition, "Invalid disk partition" );
-
-        String path = "peer/container/quota/disk";
-
-        Map<String, String> params = Maps.newHashMap();
-
-        params.put( "containerId", containerId.toString() );
-        params.put( "diskPartition", JsonUtil.toJson( diskPartition ) );
-
-        try
-        {
-            String response = get( path, params, null );
-
-            return JsonUtil.fromJson( response, new TypeToken<DiskQuota>() {}.getType() );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error obtaining container disk quota", e );
-        }
-    }
-
-
-    @Override
-    public void setDiskQuota( final UUID containerId, final DiskQuota diskQuota ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerId, "Invalid container id" );
-        Preconditions.checkNotNull( diskQuota, "Invalid disk quota" );
-
-        String path = "peer/container/quota/disk";
-
-        Map<String, String> params = Maps.newHashMap();
-
-        params.put( "containerId", containerId.toString() );
-        params.put( "diskQuota", JsonUtil.toJson( diskQuota ) );
-
-        try
-        {
-            post( path, params, null );
-        }
-        catch ( HTTPException e )
-        {
-            throw new PeerException( "Error setting container disk quota", e );
-        }
-    }
-
-
-    @Override
-    public int getAvailableRamQuota( final UUID containerId ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerId, "Invalid container id" );
-
-        String path = "peer/container/quota/ram/available";
-
-        Map<String, String> params = Maps.newHashMap();
-
-        params.put( "containerId", containerId.toString() );
-
-        try
-        {
-            String response = get( path, params, null );
-
-            return JsonUtil.fromJson( response, Integer.class );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error obtaining container available ram quota", e );
-        }
-    }
-
-
-    @Override
-    public int getAvailableCpuQuota( final UUID containerId ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerId, "Invalid container id" );
-
-        String path = "peer/container/quota/cpu/available";
-
-        Map<String, String> params = Maps.newHashMap();
-
-        params.put( "containerId", containerId.toString() );
-
-        try
-        {
-            String response = get( path, params, null );
-
-            return JsonUtil.fromJson( response, Integer.class );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error obtaining container available cpu quota", e );
-        }
-    }
-
-
-    @Override
-    public DiskQuota getAvailableDiskQuota( final UUID containerId, final DiskPartition diskPartition )
-            throws PeerException
-    {
-        Preconditions.checkNotNull( containerId, "Invalid container id" );
-        Preconditions.checkNotNull( diskPartition, "Invalid disk partition" );
-
-        String path = "peer/container/quota/disk/available";
-
-        Map<String, String> params = Maps.newHashMap();
-
-        params.put( "containerId", containerId.toString() );
-        params.put( "diskPartition", JsonUtil.toJson( diskPartition ) );
-
-        try
-        {
-            String response = get( path, params, null );
-
-            return JsonUtil.fromJson( response, new TypeToken<DiskQuota>() {}.getType() );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error obtaining container available disk quota", e );
-        }
-    }
-
-
-    @Override
     public Set<HostInfoModel> createContainers( final UUID environmentId, final UUID initiatorPeerId,
                                                 final UUID ownerId, final List<Template> templates,
                                                 final int numberOfContainers, final String strategyId,
@@ -796,71 +901,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    @Override
-    public PeerQuotaInfo getQuota( final ContainerHost host, final QuotaType quotaType ) throws PeerException
-    {
-        Preconditions.checkNotNull( host, "Invalid container host" );
-        Preconditions.checkNotNull( quotaType, "Invalid quota type" );
-
-        String path = "peer/container/quota";
-
-        Map<String, String> params = Maps.newHashMap();
-
-        params.put( "containerId", host.getId().toString() );
-        params.put( "quotaType", JsonUtil.toJson( quotaType ) );
-
-        try
-        {
-            String response = get( path, params, null );
-
-            return JsonUtil.fromJson( response, new TypeToken<PeerQuotaInfo>() {}.getType() );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error obtaining container quota", e );
-        }
-    }
-
-
-    @Override
-    public void setQuota( final ContainerHost host, final QuotaInfo quotaInfo ) throws PeerException
-    {
-
-        Preconditions.checkNotNull( host, "Invalid container host" );
-        Preconditions.checkNotNull( quotaInfo, "Invalid quota info" );
-
-        String path = "peer/container/quota";
-
-        Map<String, String> params = Maps.newHashMap();
-
-        params.put( "containerId", host.getId().toString() );
-        params.put( "quotaInfo", JsonUtil.toJson( quotaInfo ) );
-
-        try
-        {
-            post( path, params, null );
-        }
-        catch ( HTTPException e )
-        {
-            throw new PeerException( "Error setting container quota", e );
-        }
-    }
-
-
-    @Override
-    public UUID getRemoteId() throws PeerException
-    {
-        String path = "peer/id";
-
-        try
-        {
-            return UUID.fromString( get( path, null, null ) );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error obtaining peer id", e );
-        }
-    }
+    //************ END ENVIRONMENT SPECIFIC REST
 
 
     @Override
