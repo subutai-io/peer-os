@@ -181,7 +181,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     @Override
     public ContainerHostState getState() throws PeerException
     {
-        return getPeer().getContainerHostState( hostId );
+        return getPeer().getContainerHostState( getId() );
     }
 
 

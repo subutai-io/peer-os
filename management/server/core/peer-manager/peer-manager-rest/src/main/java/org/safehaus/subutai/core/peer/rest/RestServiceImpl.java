@@ -246,7 +246,7 @@ public class RestServiceImpl implements RestService
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            ContainerHostState containerHostState = localPeer.getContainerHostState( containerId );
+            ContainerHostState containerHostState = localPeer.getContainerHostState( UUID.fromString( containerId ) );
             return Response.ok( JsonUtil.toJson( containerHostState ) ).build();
         }
         catch ( PeerException e )

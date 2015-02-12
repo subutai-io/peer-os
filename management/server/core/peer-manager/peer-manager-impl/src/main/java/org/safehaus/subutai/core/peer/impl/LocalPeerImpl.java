@@ -207,7 +207,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
-    public ContainerHostState getContainerHostState( final String containerId ) throws PeerException
+    public ContainerHostState getContainerHostState( final UUID containerId ) throws PeerException
     {
         Host host = bindHost( containerId );
 

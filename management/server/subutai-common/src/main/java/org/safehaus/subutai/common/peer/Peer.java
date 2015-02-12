@@ -76,7 +76,7 @@ public interface Peer
     public <T> void sendRequest( T request, String recipient, int requestTimeout, UUID environmentId )
             throws PeerException;
 
-    public ContainerHostState getContainerHostState( String containerId ) throws PeerException;
+    public ContainerHostState getContainerHostState( UUID containerId ) throws PeerException;
 
     //******** Quota functions ***********
 

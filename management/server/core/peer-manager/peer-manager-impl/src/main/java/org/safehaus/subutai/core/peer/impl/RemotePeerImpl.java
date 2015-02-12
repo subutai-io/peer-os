@@ -449,15 +449,15 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public ContainerHostState getContainerHostState( final String containerId ) throws PeerException
+    public ContainerHostState getContainerHostState( final UUID containerId ) throws PeerException
     {
-        Preconditions.checkArgument( UUIDUtil.isStringAUuid( containerId ), "Invalid container id" );
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
 
         String path = "peer/container/state";
 
         Map<String, String> params = Maps.newHashMap();
 
-        params.put( "containerId", containerId );
+        params.put( "containerId", containerId.toString() );
 
         try
         {
