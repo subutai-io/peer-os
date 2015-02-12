@@ -157,32 +157,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
-        //        final EnvironmentImpl environment = new EnvironmentImpl( name );
-        //
-        //        final ResultHolder<EnvironmentCreationException> resultHolder = new ResultHolder<>();
-        //
-        //        CreateEnvironmentTask createEnvironmentTask =
-        //                new CreateEnvironmentTask( this, environment, resultHolder, topology );
-        //
-        //        executor.submit( createEnvironmentTask );
-        //
-        //        if ( !async )
-        //        {
-        //            try
-        //            {
-        //                createEnvironmentTask.waitCompletion();
-        //
-        //                if ( resultHolder.getResult() != null )
-        //                {
-        //                    throw resultHolder.getResult();
-        //                }
-        //            }
-        //            catch ( InterruptedException e )
-        //            {
-        //                throw new EnvironmentCreationException( e );
-        //            }
-        //        }
-
         final Environment environment = createEmptyEnvironment( name );
 
         try
