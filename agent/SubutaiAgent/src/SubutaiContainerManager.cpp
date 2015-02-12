@@ -218,15 +218,15 @@ vector<string> SubutaiContainerManager::getContainers()
  * 			This method returns true if element is not template.
  *
  */
-bool SubutaiContainerManager::checkIfContainer(string container_name, vector<string> containerList, bool isSubutaiAvailable)
+bool SubutaiContainerManager::checkIfTemplate(string container_name, vector<string> containerList, bool isSubutaiAvailable)
 {
 	// Template - container difference is only available for Subutai systems, otherwise always return true.
-	if(!isSubutaiAvailable) return true;
+	if(!isSubutaiAvailable) return false;
 	for(vector<string>::const_iterator it = containerList.begin(); it != containerList.end(); ++it)
 	{
-		if ( strcmp( (*it).c_str(), container_name.c_str()) == 0) return true;
+		if ( strcmp( (*it).c_str(), container_name.c_str()) == 0) return false;
 	}
-	return false;
+	return true;
 }
 
 
@@ -247,7 +247,7 @@ vector<SubutaiContainer> SubutaiContainerManager::findAllContainers()
     	if(isSubutaiAvailable) subutai_containers = getContainers();
         num = list_all_containers(_lxc_path.c_str(), &names, &cont);
         for (int i = 0; i < num; i++) {
-        	if( checkIfContainer(names[i], subutai_containers, isSubutaiAvailable) )
+        	if( !checkIfTemplate(names[i], subutai_containers, isSubutaiAvailable) )
         	{
 				SubutaiContainer* c = new SubutaiContainer(_logger, cont[i]);
 				c->setContainerHostname(names[i]);
@@ -307,13 +307,19 @@ void SubutaiContainerManager::updateContainerLists()
     int num, index = 0, size_of_containers = _containers.size();
     bool isSubutaiAvailable = system("which subutai")==0;
     try {
-    	if(isSubutaiAvailable) subutai_containers = getContainers();
+    	if(isSubutaiAvailable)
+    	{
+    		subutai_containers = getContainers();
+    	}
         num = list_all_containers(_lxc_path.c_str(), &names, &cont);
         bool destroy_container_check[size_of_containers];
         /* hold destroy container check array to control which container is deleted. */
-        for (int i = 0; i < size_of_containers; i++) destroy_container_check[i] = false;
+        for (int i = 0; i < size_of_containers; i++)
+        {
+        	destroy_container_check[i] = false;
+        }
         for (int i = 0; i < num; i++) {
-        	if( checkIfContainer(names[i], subutai_containers, isSubutaiAvailable) )
+        	if( !checkIfTemplate(names[i], subutai_containers, isSubutaiAvailable) )
         	{
 				// Check is there is any new container appears
 				bool containerFound = false;
