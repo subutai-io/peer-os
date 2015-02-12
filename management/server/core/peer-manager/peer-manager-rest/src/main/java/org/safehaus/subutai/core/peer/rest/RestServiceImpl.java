@@ -127,7 +127,7 @@ public class RestServiceImpl implements RestService
         {
             QuotaInfo q = GSON.fromJson( quotaInfo, QuotaInfo.class );
             LocalPeer localPeer = peerManager.getLocalPeer();
-            localPeer.setQuota( localPeer.getContainerHostById( hostId ), q );
+            localPeer.setQuota( localPeer.getContainerHostById( UUID.fromString( hostId ) ), q );
             return Response.ok().build();
         }
         catch ( JsonParseException | PeerException e )
@@ -144,7 +144,8 @@ public class RestServiceImpl implements RestService
         {
             QuotaType q = GSON.fromJson( quotaType, QuotaType.class );
             LocalPeer localPeer = peerManager.getLocalPeer();
-            PeerQuotaInfo quotaInfo = localPeer.getQuota( localPeer.getContainerHostById( hostId ), q );
+            PeerQuotaInfo quotaInfo =
+                    localPeer.getQuota( localPeer.getContainerHostById( UUID.fromString( hostId ) ), q );
             return Response.ok( GSON.toJson( quotaInfo ) ).build();
         }
         catch ( JsonParseException | PeerException e )
@@ -272,6 +273,54 @@ public class RestServiceImpl implements RestService
 
 
     //*********** Quota functions ***************
+
+
+    @Override
+    public Response getAvailableRamQuota( final String containerId )
+    {
+        try
+        {
+            return Response.ok( peerManager.getLocalPeer().getAvailableRamQuota( UUID.fromString( containerId ) ) )
+                           .build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response getAvailableCpuQuota( final String containerId )
+    {
+        try
+        {
+            return Response.ok( peerManager.getLocalPeer().getAvailableCpuQuota( UUID.fromString( containerId ) ) )
+                           .build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response getAvailableDiskQuota( final String containerId, final String diskPartition )
+    {
+        try
+        {
+            return Response.ok( JsonUtil.toJson( peerManager.getLocalPeer()
+                                                            .getAvailableDiskQuota( UUID.fromString( containerId ),
+                                                                    JsonUtil.<DiskPartition>from( diskPartition,
+                                                                            new TypeToken<DiskPartition>()
+                                                                            {}.getType() ) ) ) ).build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
 
 
     @Override

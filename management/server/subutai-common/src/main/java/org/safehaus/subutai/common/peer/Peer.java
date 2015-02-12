@@ -60,8 +60,10 @@ public interface Peer
 
     public boolean isLocal();
 
+    @Deprecated
     public PeerQuotaInfo getQuota( ContainerHost host, QuotaType quotaType ) throws PeerException;
 
+    @Deprecated
     public void setQuota( ContainerHost host, QuotaInfo quotaInfo ) throws PeerException;
 
     public Template getTemplate( String templateName ) throws PeerException;
@@ -79,6 +81,33 @@ public interface Peer
     //******** Quota functions ***********
 
     public ProcessResourceUsage getProcessResourceUsage( UUID containerId, int processPid ) throws PeerException;
+
+    /**
+     * Returns available RAM quota on container in megabytes
+     *
+     * @param containerId - id of container
+     *
+     * @return - quota in mb
+     */
+    public int getAvailableRamQuota( UUID containerId ) throws PeerException;
+
+    /**
+     * Returns available CPU quota on container in percent
+     *
+     * @param containerId - id of container
+     *
+     * @return - cpu quota on container in percent
+     */
+    public int getAvailableCpuQuota( UUID containerId ) throws PeerException;
+
+    /**
+     * Returns available disk quota
+     *
+     * @param diskPartition - disk partition which quota to return
+     *
+     * @return - disk partition quota
+     */
+    public DiskQuota getAvailableDiskQuota( UUID containerId, DiskPartition diskPartition ) throws PeerException;
 
     /**
      * Returns RAM quota on container in megabytes
@@ -132,11 +161,32 @@ public interface Peer
      */
     public void setCpuSet( UUID containerId, Set<Integer> cpuSet ) throws PeerException;
 
-
+    /**
+     * Returns disk quota
+     *
+     * @param containerId - id of container
+     * @param diskPartition - disk partition which quota to return
+     *
+     * @return - disk partition quota
+     */
     public DiskQuota getDiskQuota( UUID containerId, DiskPartition diskPartition ) throws PeerException;
 
+
+    /**
+     * Sets disk partition quota
+     *
+     * @param containerId - id of container
+     * @param diskQuota - quota to set
+     */
     public void setDiskQuota( UUID containerId, DiskQuota diskQuota ) throws PeerException;
 
 
+    /**
+     * Destroys hosted part of environment
+     *
+     * @param environmentId - id fo environment
+     *
+     * @return {@code ContainersDestructionResult}
+     */
     public ContainersDestructionResult destroyEnvironmentContainers( UUID environmentId ) throws PeerException;
 }
