@@ -39,15 +39,6 @@
 #include "SubutaiContainer.h"
 #include "SubutaiException.h"
 
-#include <string>
-#include <stdio.h>
-#include <pthread.h>
-#include <iostream>
-#include <string.h>
-#include <unistd.h>
-#include <deque>
-
-
 using namespace std;
 
 typedef std::vector<SubutaiContainer>::iterator ContainerIterator;
