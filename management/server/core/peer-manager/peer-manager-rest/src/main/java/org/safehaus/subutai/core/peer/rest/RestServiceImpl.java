@@ -127,7 +127,7 @@ public class RestServiceImpl implements RestService
         {
             QuotaInfo q = GSON.fromJson( quotaInfo, QuotaInfo.class );
             LocalPeer localPeer = peerManager.getLocalPeer();
-            localPeer.setQuota( localPeer.getContainerHostById( hostId ), q );
+            localPeer.setQuota( localPeer.getContainerHostById( UUID.fromString( hostId ) ), q );
             return Response.ok().build();
         }
         catch ( JsonParseException | PeerException e )
@@ -144,7 +144,8 @@ public class RestServiceImpl implements RestService
         {
             QuotaType q = GSON.fromJson( quotaType, QuotaType.class );
             LocalPeer localPeer = peerManager.getLocalPeer();
-            PeerQuotaInfo quotaInfo = localPeer.getQuota( localPeer.getContainerHostById( hostId ), q );
+            PeerQuotaInfo quotaInfo =
+                    localPeer.getQuota( localPeer.getContainerHostById( UUID.fromString( hostId ) ), q );
             return Response.ok( GSON.toJson( quotaInfo ) ).build();
         }
         catch ( JsonParseException | PeerException e )

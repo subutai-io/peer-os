@@ -128,32 +128,40 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void startContainer( final ContainerHost containerHost ) throws PeerException
+    public void startContainer( final ContainerHost host ) throws PeerException
     {
+        Preconditions.checkNotNull( host, "Container host is null" );
+
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
-        remotePeerRestClient.startContainer( containerHost );
+        remotePeerRestClient.startContainer( host );
     }
 
 
     @Override
-    public void stopContainer( final ContainerHost containerHost ) throws PeerException
+    public void stopContainer( final ContainerHost host ) throws PeerException
     {
+        Preconditions.checkNotNull( host, "Container host is null" );
+
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
-        remotePeerRestClient.stopContainer( containerHost );
+        remotePeerRestClient.stopContainer( host );
     }
 
 
     @Override
-    public void destroyContainer( final ContainerHost containerHost ) throws PeerException
+    public void destroyContainer( final ContainerHost host ) throws PeerException
     {
+        Preconditions.checkNotNull( host, "Container host is null" );
+
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
-        remotePeerRestClient.destroyContainer( containerHost );
+        remotePeerRestClient.destroyContainer( host );
     }
 
 
     @Override
     public boolean isConnected( final Host host )
     {
+        Preconditions.checkNotNull( host, "Container host is null" );
+
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
         return remotePeerRestClient.isConnected( host );
     }
@@ -179,6 +187,9 @@ public class RemotePeerImpl implements RemotePeer
     public ProcessResourceUsage getProcessResourceUsage( final UUID containerId, final int processPid )
             throws PeerException
     {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkArgument( processPid > 0, "Process pid must be greater than 0" );
+
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
         return remotePeerRestClient.getProcessResourceUsage( containerId, processPid );
     }
@@ -195,6 +206,8 @@ public class RemotePeerImpl implements RemotePeer
     public CommandResult execute( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
             throws CommandException
     {
+        Preconditions.checkNotNull( requestBuilder, "Invalid request" );
+        Preconditions.checkNotNull( host, "Invalid host" );
 
         BlockingCommandCallback blockingCommandCallback = new BlockingCommandCallback( callback );
 
@@ -236,8 +249,8 @@ public class RemotePeerImpl implements RemotePeer
     private void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback,
                                Semaphore semaphore ) throws CommandException
     {
-        Preconditions.checkNotNull( requestBuilder );
-        Preconditions.checkNotNull( host );
+        Preconditions.checkNotNull( requestBuilder, "Invalid request" );
+        Preconditions.checkNotNull( host, "Invalid host" );
 
         if ( !host.isConnected() )
         {
@@ -276,6 +289,8 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public Template getTemplate( final String templateName ) throws PeerException
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
+
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
         return remotePeerRestClient.getTemplate( templateName );
     }
@@ -349,6 +364,8 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public ContainerHostState getContainerHostState( final String containerId ) throws PeerException
     {
+        Preconditions.checkArgument( UUIDUtil.isStringAUuid( containerId ), "Invalid container id" );
+
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
         return remotePeerRestClient.getContainerState( containerId );
     }
@@ -360,6 +377,8 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public int getRamQuota( final UUID containerId ) throws PeerException
     {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
 
         return remotePeerRestClient.getRamQuota( containerId );
@@ -369,6 +388,9 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public void setRamQuota( final UUID containerId, final int ramInMb ) throws PeerException
     {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkArgument( ramInMb > 0, "Ram quota value must be greater than 0" );
+
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
 
         remotePeerRestClient.setRamQuota( containerId, ramInMb );
@@ -378,6 +400,8 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public int getCpuQuota( final UUID containerId ) throws PeerException
     {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
 
         return remotePeerRestClient.getCpuQuota( containerId );
@@ -387,6 +411,10 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public void setCpuQuota( final UUID containerId, final int cpuPercent ) throws PeerException
     {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkArgument( cpuPercent > 0, "Cpu quota value must be greater than 0" );
+
+
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
 
         remotePeerRestClient.setCpuQuota( containerId, cpuPercent );
@@ -396,6 +424,8 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public Set<Integer> getCpuSet( final UUID containerId ) throws PeerException
     {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
 
         return remotePeerRestClient.getCpuSet( containerId );
@@ -405,6 +435,9 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public void setCpuSet( final UUID containerId, final Set<Integer> cpuSet ) throws PeerException
     {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( cpuSet ), "Empty cpu set" );
+
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
 
         remotePeerRestClient.setCpuSet( containerId, cpuSet );
@@ -414,6 +447,9 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public DiskQuota getDiskQuota( final UUID containerId, final DiskPartition diskPartition ) throws PeerException
     {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkNotNull( diskPartition, "Invalid disk partition" );
+
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
 
         return remotePeerRestClient.getDiskQuota( containerId, diskPartition );
@@ -423,6 +459,9 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public void setDiskQuota( final UUID containerId, final DiskQuota diskQuota ) throws PeerException
     {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkNotNull( diskQuota, "Invalid disk quota" );
+
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
 
         remotePeerRestClient.setDiskQuota( containerId, diskQuota );
@@ -432,6 +471,8 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public int getAvailableRamQuota( final UUID containerId ) throws PeerException
     {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
 
         return remotePeerRestClient.getAvailableRamQuota( containerId );
@@ -441,6 +482,8 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public int getAvailableCpuQuota( final UUID containerId ) throws PeerException
     {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
 
         return remotePeerRestClient.getAvailableCpuQuota( containerId );
@@ -451,6 +494,9 @@ public class RemotePeerImpl implements RemotePeer
     public DiskQuota getAvailableDiskQuota( final UUID containerId, final DiskPartition diskPartition )
             throws PeerException
     {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkNotNull( diskPartition, "Invalid disk partition" );
+
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
 
         return remotePeerRestClient.getAvailableDiskQuota( containerId, diskPartition );

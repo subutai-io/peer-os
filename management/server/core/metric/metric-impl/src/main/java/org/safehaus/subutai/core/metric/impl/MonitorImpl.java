@@ -180,15 +180,22 @@ public class MonitorImpl implements Monitor
 
             for ( UUID containerId : containerIds )
             {
-                //get container's resource host
-                ResourceHost resourceHost = localPeer.getResourceHostByContainerId( containerId.toString() );
+                try
+                {  //get container's resource host
+                    ResourceHost resourceHost = localPeer.getResourceHostByContainerId( containerId );
 
-                //get metric
-                addLocalContainerHostMetric( environmentId, resourceHost,
-                        resourceHost.getContainerHostById( containerId.toString() ), metrics );
+                    //get metric
+
+                    addLocalContainerHostMetric( environmentId, resourceHost,
+                            resourceHost.getContainerHostById( containerId ), metrics );
+                }
+                catch ( HostNotFoundException e )
+                {
+                    LOG.warn( String.format( "Host not found by id %s", containerId ), e );
+                }
             }
         }
-        catch ( ContainerGroupNotFoundException | PeerException e )
+        catch ( ContainerGroupNotFoundException e )
         {
             LOG.error( "Error obtaining local container metrics", e );
         }
@@ -471,7 +478,7 @@ public class MonitorImpl implements Monitor
             try
             {
                 ResourceHost resourceHost =
-                        peerManager.getLocalPeer().getResourceHostByContainerId( containerHost.getId().toString() );
+                        peerManager.getLocalPeer().getResourceHostByContainerId( containerHost.getId() );
                 CommandResult commandResult = resourceHost.execute(
                         commands.getActivateMonitoringCommand( containerHost.getHostname(), monitoringSettings ) );
                 if ( !commandResult.hasSucceeded() )

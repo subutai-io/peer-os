@@ -399,7 +399,7 @@ public class QuotaManagerImpl implements QuotaManager
     {
         try
         {
-            return peerManager.getLocalPeer().getContainerHostById( containerId.toString() );
+            return peerManager.getLocalPeer().getContainerHostById( containerId );
         }
         catch ( HostNotFoundException e )
         {
@@ -412,7 +412,7 @@ public class QuotaManagerImpl implements QuotaManager
     {
         try
         {
-            return peerManager.getLocalPeer().getResourceHostByContainerId( containerId.toString() );
+            return peerManager.getLocalPeer().getResourceHostByContainerId( containerId);
         }
         catch ( HostNotFoundException e )
         {

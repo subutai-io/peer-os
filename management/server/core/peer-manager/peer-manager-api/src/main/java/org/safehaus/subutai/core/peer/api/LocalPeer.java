@@ -42,9 +42,11 @@ public interface LocalPeer extends Peer
 
     public ResourceHost getResourceHostByName( String hostname ) throws HostNotFoundException;
 
+    public ResourceHost getResourceHostById( UUID hostId ) throws HostNotFoundException;
+
     public ResourceHost getResourceHostByContainerName( String containerName ) throws HostNotFoundException;
 
-    public ResourceHost getResourceHostByContainerId( String hostId ) throws HostNotFoundException;
+    public ResourceHost getResourceHostByContainerId( UUID hostId ) throws HostNotFoundException;
 
 
     /**
@@ -60,14 +62,11 @@ public interface LocalPeer extends Peer
      *
      * @param hostId ID of the container
      */
-    public ContainerHost getContainerHostById( String hostId ) throws HostNotFoundException;
-
-    <T extends Host> T bindHost( T host ) throws HostNotFoundException;
+    public ContainerHost getContainerHostById( UUID hostId ) throws HostNotFoundException;
 
     public ManagementHost getManagementHost() throws HostNotFoundException;
 
     public Set<ResourceHost> getResourceHosts();
-
 
     public void cleanDb();
 
