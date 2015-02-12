@@ -119,6 +119,7 @@ function list_registered_templates {
     echo -e "--------\t-------"
   fi
 
+  IFS=$'\n'
   for template in $templates; do
     local t=`echo -e "$template" | cut -f 1`
     local p=`echo -e "$template" | cut -s -f 2`
