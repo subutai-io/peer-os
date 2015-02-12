@@ -102,6 +102,10 @@ function quota {
       "ram" )
         get_total_usable_ram_in_megabytes $container
         ;;
+      "cpu" )
+        # Maximum cpu quota in percentage is always 100%
+        echo "100"
+        ;;
       "diskHome" )
         fs_get_total_usable_quota_readable $container "home"
       ;;
