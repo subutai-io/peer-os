@@ -498,6 +498,7 @@ function lxc_install_agent {
   fi
 }
 
+
 function lxc_get_memory {
   local container=$1
   local resource_parameter="memory.limit_in_bytes"
@@ -521,6 +522,7 @@ function lxc_get_memory_in_megabytes {
   echo $ram_quota"M"
   return
 }
+
 
 function lxc_set_memory {
   local container=$1

@@ -23,6 +23,7 @@ fi
 . $subutai_lib_base/monitor_ops
 . $subutai_lib_base/pre_post_ops
 . $subutai_lib_base/script_ops
+. $subutai_lib_base/quota_ops
 # Function addmount:
 # -----------------------------------------------------------------------------
 # 

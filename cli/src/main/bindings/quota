@@ -5,12 +5,17 @@ function quota_usage {
   echo -----------------------------------------------------------------------
   echo Usage: Quota management of containers.
   echo
-  echo "        "subutai \[-qh\] quota container quota_parameter \[quota_value\] \[additional_parameters\]
-  echo "           "quota_parameters:
+  echo "        "subutai \[-qh\] quota container \[resource_type \[-s quota_value\|-m\] \| output_type\]
+  echo "           "resource_types:
   echo "                             "ram -- quota for memory \(in megabytes\)
   echo "                             "cpu -- quota for cpu \(in percentage\)
   echo "                             "cpuset -- quota for cpusets
-  echo "                             "diskHome\|diskOpt\|diskVar\|diskRootfs\] -- quota for disk datasets
+  echo "                             "diskHome\|diskOpt\|diskVar\|diskRootfs\] -- quota for disk datasets \(no default units, can be \"none\" or in K\|M\|G\|T\|P\|E\|... \)
+  echo "           "output_types:
+  echo "                             "json -- prints all quota related information in json format
+  echo "           "flags:
+  echo "                "s -- set quota for the specified resource_type
+  echo "                "m -- get the maximum quota can be set to the specified container and resource_type in their default units.
   echo -----------------------------------------------------------------------
 }
 
@@ -25,18 +30,96 @@ function quota {
     exit 1;
   fi
 
+
   local container=$1
-  local resource_parameter=$2
-  local parameter_value=$3
+  local resource_type=$2
   lxc_assert "$container" "`quota_usage`" > /dev/null
 
-  if [[ -z $resource_parameter ]]; then
-    msg_error "Resource parameter not provided. Aborting..."
+  if [[ -z $resource_type ]]; then
+    msg_error "Resource type is not provided. Aborting..."
+    quota_usage
     exit 1;
   fi
 
-  if [ -z $parameter_value ]; then
-    case $resource_parameter in
+  local set_quota="false"
+  local get_maximum_available_quota="false"
+  shift
+  shift
+  while getopts ":s:m" opt; do
+    case $opt in
+      s)
+        set_quota="true"
+        quota_value="$OPTARG"
+        ;;
+      m)
+        get_maximum_available_quota="true"
+        ;;
+      \?)
+        msg_error "Unrecognized option -$OPTARG"
+        exit 1
+        ;;
+      :)
+        msg_error "Option -$OPTARG requires an argument." >&2
+        exit 1
+        ;;
+    esac
+  done
+
+  if [ "x$set_quota" == "xtrue" ]; then
+    case $resource_type in
+      "ram" )
+        # If the parameter for ram metric does not have K,M,G letters
+        # then set the default value to M which causes to be tread as megabytes
+        if [ "`is_number $quota_value`" == "true" ]; then
+          local quota_value=$quota_value"M"
+        fi
+        lxc_set_memory $container $quota_value
+        ;;
+      "cpuset" )
+        lxc_set_cpus $container $quota_value
+      ;;
+      "cpu")
+        lxc_set_cpu_quota $container $quota_value
+      ;;
+      "diskHome" )
+        fs_set_quota $container "home" $quota_value
+      ;;
+      "diskVar")
+        fs_set_quota $container "var" $quota_value
+      ;;
+      "diskOpt")
+        fs_set_quota $container "opt" $quota_value
+      ;;
+      "diskRootfs")
+        fs_set_quota $container "rootfs" $quota_value
+      ;;
+      *)
+        msg_error "$resource_type is not a supported type! Aborting.."
+        exit 1
+    esac
+  elif [ "x$get_maximum_available_quota" == "xtrue" ]; then
+    case $resource_type in
+      "ram" )
+        get_total_usable_ram_in_megabytes $container
+        ;;
+      "diskHome" )
+        fs_get_total_usable_quota_readable $container "home"
+      ;;
+      "diskVar")
+        fs_get_total_usable_quota_readable $container "var"
+      ;;
+      "diskOpt")
+        fs_get_total_usable_quota_readable $container "opt"
+      ;;
+      "diskRootfs")
+        fs_get_total_usable_quota_readable $container "rootfs"
+      ;;
+      *)
+        msg_error "$resource_type is not a supported type for maximum available quota! Aborting.."
+        exit 1
+    esac
+  else
+    case $resource_type in
       "ram" )
         lxc_get_memory_in_megabytes $container
       ;;
@@ -72,39 +155,7 @@ function quota {
         printf "{ram=$memory_value,cpu=$cpu_value,diskHome=$hdd_home_value, diskVar=$hdd_var_value, diskOpt=$hdd_opt_value, diskRootfs=$hdd_rootfs_value}"
       ;;
       *)
-        msg_error "$resource_parameter is not a supported parameter! Aborting.."
-        exit 1
-    esac
-  else
-    case $resource_parameter in
-      "ram" )
-        # If the parameter for ram metric does not have K,M,G letters
-        # then set the default value to M which causes to be tread as megabytes
-        if [ "`is_number $parameter_value`" == "true" ]; then
-          local parameter_value=$parameter_value"M"
-        fi
-        lxc_set_memory $container $parameter_value
-        ;;
-      "cpuset" )
-        lxc_set_cpus $container $parameter_value
-      ;;
-      "cpu")
-        lxc_set_cpu_quota $container $parameter_value
-      ;;
-      "diskHome" )
-        fs_set_quota $container "home" $parameter_value
-      ;;
-      "diskVar")
-        fs_set_quota $container "var" $parameter_value
-      ;;
-      "diskOpt")
-        fs_set_quota $container "opt" $parameter_value
-      ;;
-      "diskRootfs")
-        fs_set_quota $container "rootfs" $parameter_value
-      ;;
-      *)
-        msg_error "$resource_parameter is not a supported parameter! Aborting.."
+        msg_error "$resource_type is not a supported type! Aborting.."
         exit 1
     esac
   fi

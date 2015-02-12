@@ -555,6 +555,37 @@ function fs_get_physical_used_disk {
 }
 
 
+# returns maximum amount of disk space on physical machine
+# that can be given to the specified container for
+# in bytes
+function fs_get_total_usable_quota {
+  local container=$1
+  local dataset=$2
+  local pool=$(get_pool_by_dataset $dataset)
+
+  local used_disk_space_of_container=$(fs_get_used_disk $container $dataset)
+  local pyhsical_available_disk_space=$(fs_get_physical_available_disk $pool)
+
+  local total_usable_disk_quota_in_bytes=$(echo $used_disk_space_of_container+$pyhsical_available_disk_space | bc)
+  echo $total_usable_disk_quota_in_bytes
+  return
+}
+
+
+# returns maximum amount of disk space on physical machine
+# that can be given to the specified container for
+# in megabytes
+function fs_get_total_usable_quota_readable {
+  local container=$1
+  local dataset=$2
+  local total_usable_disk_quota_in_bytes=$(fs_get_total_usable_quota $container $dataset)
+  local total_usable_disk_quota_in_readable_format=$(get_readable_output_from_byte $total_usable_disk_quota_in_bytes)
+
+  echo $total_usable_disk_quota_in_readable_format
+  return
+}
+
+
 function fs_quota_operations {
   local container=$1
   local quota_value=$2
