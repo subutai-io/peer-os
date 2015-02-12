@@ -52,9 +52,9 @@ public class GrowEnvironmentTask implements Runnable
     {
         try
         {
-            final Set<ContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
-
             environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
+
+            final Set<ContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
 
             try
             {

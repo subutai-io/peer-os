@@ -48,6 +48,8 @@ public class CreateEnvironmentTask implements Runnable
 
             environmentManager.setEnvironmentTransientFields( environment );
 
+            environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
+
             try
             {
                 environmentManager.build( environment, topology );
