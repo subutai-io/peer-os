@@ -22,8 +22,10 @@ import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.protocol.api.DataService;
+import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
+import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
@@ -174,6 +176,13 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
+    public QuotaInfo getQuotaInfo( final QuotaType quotaType ) throws PeerException
+    {
+        Peer peer = getPeer();
+        return peer.getQuotaInfo( this, quotaType );
+    }
+
+
     public Template getTemplate() throws PeerException
     {
         Peer peer = getPeer();
@@ -230,6 +239,13 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
 
     @Override
+    public MemoryQuotaInfo getRamQuotaInfo() throws PeerException
+    {
+        return getPeer().getRamQuotaInfo( this );
+    }
+
+
+    @Override
     public void setRamQuota( final int ramInMb ) throws PeerException
     {
         getPeer().setRamQuota( this, ramInMb );
@@ -240,6 +256,13 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public int getCpuQuota() throws PeerException
     {
         return getPeer().getCpuQuota( this );
+    }
+
+
+    @Override
+    public CpuQuotaInfo getCpuQuotaInfo() throws PeerException
+    {
+        return getPeer().getCpuQuotaInfo( this );
     }
 
 

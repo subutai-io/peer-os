@@ -1,50 +1,56 @@
 package org.safehaus.subutai.common.quota;
 
 
+import com.google.common.base.Preconditions;
+
+
 /**
  * Created by talas on 12/2/14.
  */
 public class MemoryQuotaInfo extends QuotaInfo
 {
-    private Memory memoryQuota;
+    private DiskQuotaUnit quotaUnit;
+    private double memoryQuotaValue;
 
 
-    public MemoryQuotaInfo( final String memoryQuota )
+    public MemoryQuotaInfo( final DiskQuotaUnit quotaUnit, final Double memoryQuotaValue )
     {
-        this.memoryQuota = new Memory( memoryQuota );
-        if ( this.memoryQuota.getValue() > Long.MAX_VALUE )
-        {
-            this.memoryQuota.unit = MemoryUnit.NONE;
-        }
+        Preconditions.checkNotNull( quotaUnit, "Quota Unit cannot be null" );
+        Preconditions.checkNotNull( memoryQuotaValue, "Memory Quota value cannot be null" );
+        this.quotaUnit = quotaUnit;
+        this.memoryQuotaValue = memoryQuotaValue;
     }
 
 
-    public MemoryQuotaInfo( final Memory memoryQuota )
+    public DiskQuotaUnit getQuotaUnit()
     {
-        this.memoryQuota = memoryQuota;
-        if ( this.memoryQuota.getValue() > Long.MAX_VALUE )
-        {
-            this.memoryQuota.unit = MemoryUnit.NONE;
-        }
+        return quotaUnit;
     }
 
 
-    public Memory getMemoryQuota()
+    public double getMemoryQuota()
     {
-        return memoryQuota;
+        return memoryQuotaValue;
     }
 
 
     @Override
     public String getQuotaKey()
     {
-        return "ram";
+        return QuotaType.QUOTA_TYPE_RAM.getKey();
     }
 
 
     @Override
     public String getQuotaValue()
     {
-        return memoryQuota.toString();
+        return String.format( "%.1f", memoryQuotaValue );
+    }
+
+
+    @Override
+    public QuotaType getQuotaType()
+    {
+        return QuotaType.QUOTA_TYPE_RAM;
     }
 }

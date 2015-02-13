@@ -23,8 +23,10 @@ import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
+import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
@@ -320,7 +322,9 @@ public class RemotePeerImpl implements RemotePeer
         {
             String response = get( path, params, headers );
 
-            return JsonUtil.fromJson( response, new TypeToken<ProcessResourceUsage>() {}.getType() );
+            return JsonUtil.fromJson( response, new TypeToken<ProcessResourceUsage>()
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -382,6 +386,32 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public MemoryQuotaInfo getRamQuotaInfo( final ContainerHost host ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+
+        String path = "peer/container/quota/ram/info";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", host.getId().toString() );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
+
+        try
+        {
+            String response = get( path, params, headers );
+
+            return JsonUtil.fromJson( response, MemoryQuotaInfo.class );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error obtaining container ram quota", e );
+        }
+    }
+
+
+    @Override
     public void setRamQuota( final ContainerHost host, final int ramInMb ) throws PeerException
     {
         Preconditions.checkNotNull( host, "Invalid container host" );
@@ -434,6 +464,32 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public CpuQuotaInfo getCpuQuotaInfo( final ContainerHost host ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+
+        String path = "peer/container/quota/cpu/info";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", host.getId().toString() );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
+
+        try
+        {
+            String response = get( path, params, headers );
+
+            return JsonUtil.fromJson( response, CpuQuotaInfo.class );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error obtaining container cpu quota", e );
+        }
+    }
+
+
+    @Override
     public void setCpuQuota( final ContainerHost host, final int cpuPercent ) throws PeerException
     {
         Preconditions.checkNotNull( host, "Invalid container host" );
@@ -476,7 +532,9 @@ public class RemotePeerImpl implements RemotePeer
         {
             String response = get( path, params, headers );
 
-            return JsonUtil.fromJson( response, new TypeToken<Set<Integer>>() {}.getType() );
+            return JsonUtil.fromJson( response, new TypeToken<Set<Integer>>()
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -531,7 +589,9 @@ public class RemotePeerImpl implements RemotePeer
         {
             String response = get( path, params, headers );
 
-            return JsonUtil.fromJson( response, new TypeToken<DiskQuota>() {}.getType() );
+            return JsonUtil.fromJson( response, new TypeToken<DiskQuota>()
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -638,7 +698,9 @@ public class RemotePeerImpl implements RemotePeer
         {
             String response = get( path, params, headers );
 
-            return JsonUtil.fromJson( response, new TypeToken<DiskQuota>() {}.getType() );
+            return JsonUtil.fromJson( response, new TypeToken<DiskQuota>()
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -666,7 +728,39 @@ public class RemotePeerImpl implements RemotePeer
         {
             String response = get( path, params, headers );
 
-            return JsonUtil.fromJson( response, new TypeToken<PeerQuotaInfo>() {}.getType() );
+            return JsonUtil.fromJson( response, new TypeToken<PeerQuotaInfo>()
+            {
+            }.getType() );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error obtaining container quota", e );
+        }
+    }
+
+
+    @Override
+    public QuotaInfo getQuotaInfo( final ContainerHost host, final QuotaType quotaType ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( quotaType, "Invalid quota type" );
+
+        String path = "peer/container/quota/info";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", host.getId().toString() );
+        params.put( "quotaType", JsonUtil.toJson( quotaType ) );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
+
+        try
+        {
+            String response = get( path, params, headers );
+
+            return JsonUtil.fromJson( response, new TypeToken<QuotaInfo>()
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {

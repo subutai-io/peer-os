@@ -14,8 +14,10 @@ import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
+import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
@@ -63,6 +65,18 @@ public interface Peer
 
     @Deprecated
     public PeerQuotaInfo getQuota( ContainerHost host, QuotaType quotaType ) throws PeerException;
+
+
+    /**
+     * Get quota for enum specified
+     *
+     * @param host - Target container host whose quota details been requested
+     * @param quotaType - QuotaType needed
+     *
+     * @return - Abstract QuotaInfo class extended by quota classes
+     */
+    public QuotaInfo getQuotaInfo( ContainerHost host, QuotaType quotaType ) throws PeerException;
+
 
     @Deprecated
     public void setQuota( ContainerHost host, QuotaInfo quotaInfo ) throws PeerException;
@@ -120,6 +134,17 @@ public interface Peer
      */
     public int getRamQuota( ContainerHost host ) throws PeerException;
 
+
+    /**
+     * Returns RAM quota on container with details
+     *
+     * @param host -  container
+     *
+     * @return - MemoryQuotaInfo with quota details
+     */
+    public MemoryQuotaInfo getRamQuotaInfo( ContainerHost host ) throws PeerException;
+
+
     /**
      * Sets RAM quota on container in megabytes
      *
@@ -137,6 +162,17 @@ public interface Peer
      * @return - cpu quota on container in percent
      */
     public int getCpuQuota( ContainerHost host ) throws PeerException;
+
+
+    /**
+     * Returns CPU quota on container in brief description
+     *
+     * @param host - container
+     *
+     * @return - cpu quota object on container
+     */
+    public CpuQuotaInfo getCpuQuotaInfo( ContainerHost host ) throws PeerException;
+
 
     /**
      * Sets CPU quota on container in percent

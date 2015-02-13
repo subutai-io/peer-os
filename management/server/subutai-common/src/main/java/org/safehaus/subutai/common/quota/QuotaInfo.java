@@ -10,6 +10,8 @@ public abstract class QuotaInfo
 
     public abstract String getQuotaValue();
 
+    public abstract QuotaType getQuotaType();
+
 
     @Override
     public String toString()
