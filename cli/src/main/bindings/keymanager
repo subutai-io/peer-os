@@ -6,7 +6,7 @@ function key_manager_usage {
   echo
   echo "  "subutai keymanager generate real_name email
   echo "  "subutai keymanager generate_subkey key_id
-  echo "  "subutai keymanager export \<--ssh\> key_id 
+  echo "  "subutai keymanager export \<--ssh, --ssl\> key_id 
   echo "  "subutai keymanager list
   echo "  "subutai keymanager list key_id
   echo "  "subutai keymanager revoke_subkey subkey_id
