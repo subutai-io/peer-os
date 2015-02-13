@@ -2,6 +2,7 @@ package org.safehaus.subutai.common.peer;
 
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -71,9 +72,9 @@ public interface Peer
     public boolean isOnline() throws PeerException;
 
     public <T, V> V sendRequest( T request, String recipient, int requestTimeout, Class<V> responseType,
-                                 int responseTimeout, UUID environmentId ) throws PeerException;
+                                 int responseTimeout, Map<String, String> headers ) throws PeerException;
 
-    public <T> void sendRequest( T request, String recipient, int requestTimeout, UUID environmentId )
+    public <T> void sendRequest( T request, String recipient, int requestTimeout, Map<String, String> headers )
             throws PeerException;
 
     public ContainerHostState getContainerHostState( ContainerHost host ) throws PeerException;

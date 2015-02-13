@@ -1,14 +1,13 @@
 package org.safehaus.subutai.core.messenger.impl;
 
 
-
 import java.sql.Timestamp;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -22,9 +21,10 @@ import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageException;
 import org.safehaus.subutai.core.messenger.api.MessageListener;
 import org.safehaus.subutai.core.messenger.api.MessageStatus;
-import org.safehaus.subutai.core.messenger.api.MessengerException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+
+import com.google.common.collect.Maps;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -32,7 +32,6 @@ import static junit.framework.Assert.assertNotNull;
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -48,6 +47,7 @@ public class MessengerImplTest
     private static final UUID MESSAGE_ID = UUID.randomUUID();
     private static final String RECIPIENT = "sender";
     private static final Object PAYLOAD = new Object();
+    private static final Map<String, String> HEADERS = Maps.newHashMap();
 
 
     private static final int TIME_TO_LIVE = 5;
@@ -91,6 +91,7 @@ public class MessengerImplTest
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
     }
 
+
     @Ignore
     @Test
     public void testInit() throws Exception
@@ -123,13 +124,13 @@ public class MessengerImplTest
     @Test( expected = MessageException.class )
     public void testSendMessage() throws Exception
     {
-        messenger.sendMessage( localPeer, message, RECIPIENT, TIME_TO_LIVE );
+        messenger.sendMessage( localPeer, message, RECIPIENT, TIME_TO_LIVE, HEADERS );
 
         verify( messengerDao ).saveEnvelope( isA( Envelope.class ) );
 
         doThrow( new RuntimeException() ).when( messengerDao ).saveEnvelope( any( Envelope.class ) );
 
-        messenger.sendMessage( localPeer, message, RECIPIENT, TIME_TO_LIVE );
+        messenger.sendMessage( localPeer, message, RECIPIENT, TIME_TO_LIVE, HEADERS );
     }
 
 
@@ -176,7 +177,7 @@ public class MessengerImplTest
         //test exception
         doThrow( new RuntimeException() ).when( messengerDao ).getEnvelope( any( UUID.class ) );
 
-        status = messenger.getMessageStatus( MESSAGE_ID );
+        messenger.getMessageStatus( MESSAGE_ID );
     }
 
 
@@ -199,7 +200,7 @@ public class MessengerImplTest
     public void testProcessMessage() throws Exception
     {
         MessageImpl message = new MessageImpl( LOCAL_PEER_ID, PAYLOAD );
-        Envelope envelope = new Envelope( message, LOCAL_PEER_ID, RECIPIENT, TIME_TO_LIVE );
+        Envelope envelope = new Envelope( message, LOCAL_PEER_ID, RECIPIENT, TIME_TO_LIVE, HEADERS );
         MessageListener listener = mock( MessageListener.class );
         messenger.addMessageListener( listener );
         when( listener.getRecipient() ).thenReturn( RECIPIENT );
