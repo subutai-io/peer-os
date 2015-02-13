@@ -4,7 +4,7 @@ package org.safehaus.subutai.common.quota;
 /**
  * Created by talas on 12/2/14.
  */
-public class HddQuotaInfo extends QuotaInfo
+public class HddQuotaInfo
 {
     private DiskPartition partition;
     private Memory memory;
@@ -29,14 +29,12 @@ public class HddQuotaInfo extends QuotaInfo
     }
 
 
-    @Override
     public String getQuotaKey()
     {
         return partition.getPartitionName();
     }
 
 
-    @Override
     public String getQuotaValue()
     {
         return memory.toString();

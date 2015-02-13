@@ -31,8 +31,10 @@ import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
+import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.common.quota.QuotaInfo;
@@ -780,6 +782,21 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
+    public QuotaInfo getQuotaInfo( ContainerHost host, final QuotaType quota ) throws PeerException
+    {
+        try
+        {
+            Host c = bindHost( host.getHostId() );
+            return quotaManager.getQuotaInfo( c.getId(), quota );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
     public void setQuota( ContainerHost host, final QuotaInfo quota ) throws PeerException
     {
         try
@@ -1130,6 +1147,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
+    public MemoryQuotaInfo getRamQuotaInfo( final ContainerHost host ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+
+        try
+        {
+            return quotaManager.getRamQuotaInfo( host.getId() );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
     public void setRamQuota( final ContainerHost host, final int ramInMb ) throws PeerException
     {
         Preconditions.checkNotNull( host, "Invalid container host" );
@@ -1154,6 +1187,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         try
         {
             return quotaManager.getCpuQuota( host.getId() );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
+    public CpuQuotaInfo getCpuQuotaInfo( final ContainerHost host ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+
+        try
+        {
+            return quotaManager.getCpuQuotaInfo( host.getId() );
         }
         catch ( QuotaException e )
         {
