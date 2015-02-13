@@ -238,6 +238,7 @@ public class QuotaManagerImpl implements QuotaManager
         }
         else
         {
+            //TODO Need to modify regex to be able to parse decimal point values
             String regex = "(\\d+)(K|M|G|T|P|E)?";
             Pattern quotaPattern = Pattern.compile( regex );
             Matcher quotaMatcher = quotaPattern.matcher( result.getStdOut().trim() );
@@ -321,6 +322,7 @@ public class QuotaManagerImpl implements QuotaManager
         }
         else
         {
+            //TODO Need to modify regex to be able to parse decimal point values
             String regex = "(\\d+)(K|M|G|T|P|E)?";
             Pattern quotaPattern = Pattern.compile( regex );
             Matcher quotaMatcher = quotaPattern.matcher( result.getStdOut().trim() );
