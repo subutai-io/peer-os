@@ -33,12 +33,11 @@ import com.google.common.collect.Lists;
 
 
 /**
- * Implementation of Network Manager
+ * Implementation of Identity Manager
  */
 public class IdentityManagerImpl implements IdentityManager
 {
-    private static final Logger LOG =
-            LoggerFactory.getLogger( org.safehaus.subutai.core.identity.impl.IdentityManagerImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( IdentityManagerImpl.class );
 
     static final String HEXES = "0123456789abcdef";
 
@@ -115,7 +114,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
 
 
-        String password = "secret";
+        String password = "karaf";
         String salt = getSimpleSalt( username );
         user = new UserEntity();
         user.setUsername( username );

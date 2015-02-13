@@ -68,7 +68,7 @@
     <property name="permissionsLookupEnabled" value="false" />
     <property name="authenticationQuery" value="select password, salt from subutai_user where user_name = ?" />
     <property name="userRolesQuery"
-              value="select role_name from subutai_user_role r left join subutai_user u where u.user_name = ?" />
+              value="select r.role_name from subutai_user_role r inner join subutai_user u on u.user_id = r.user_id where u.user_name = ?" />
     <property name="permissionsQuery" value="select permission from subutai_roles_permissions where role_name = ?" />
     <property name="credentialsMatcher" ref="sha256Matcher" />
   </bean>
