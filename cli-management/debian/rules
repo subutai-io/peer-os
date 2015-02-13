@@ -39,8 +39,10 @@ install: build
 	cp -a src/main/lib/* ${d}${LIBDIR}
 	cp -a src/main/bindings/* ${d}${BINDINGS}
 	cp -a ../cli/src/main/lib/bsfl ${d}${LIBDIR}
+	cp -a ../cli/src/main/lib/gpg_ops ${d}${LIBDIR}
 	cp -a ../cli/src/main/scripts/subutai ${d}${SCRIPTS}
 	cp -a ../cli/src/main/config/config ${d}${CONFIG}
+	cp -a ../cli/src/main/bindings/keymanager ${d}${BINDINGS}
 	cp debian/subutai-cli-management.bash_completion ${d}${BASHCOMPDIR}
 	dh_link
 
