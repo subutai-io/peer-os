@@ -4,7 +4,7 @@ package org.safehaus.subutai.common.quota;
 /**
  * Disk quota
  */
-public class DiskQuota
+public class DiskQuota extends QuotaInfo
 {
     private DiskPartition diskPartition;
     private DiskQuotaUnit diskQuotaUnit;
@@ -34,5 +34,27 @@ public class DiskQuota
     public long getDiskQuotaValue()
     {
         return diskQuotaValue;
+    }
+
+
+    public String getQuotaKey()
+    {
+        return diskPartition.getPartitionName();
+    }
+
+
+    public String getQuotaValue()
+    {
+        if ( diskQuotaUnit == DiskQuotaUnit.UNLIMITED )
+        {
+            return DiskQuotaUnit.UNLIMITED.getAcronym();
+        }
+        return String.format( "%d%s", diskQuotaValue, diskQuotaUnit.getAcronym() );
+    }
+
+
+    public QuotaType getQuotaType()
+    {
+        return QuotaType.getQuotaType( diskPartition.getPartitionName() );
     }
 }

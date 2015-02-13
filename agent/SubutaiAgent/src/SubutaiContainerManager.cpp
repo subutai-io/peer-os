@@ -209,6 +209,7 @@ vector<string> SubutaiContainerManager::getContainers()
 	    	get_word_from_line(line, static_cast<int>(n) );
 	     	containerList.push_back(line);
 	    }
+	    pclose(fp);
 	}
 	return containerList;
 }

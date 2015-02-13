@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.peer.impl.command;
 
 
+import java.util.Map;
+
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
@@ -8,6 +10,7 @@ import org.safehaus.subutai.common.command.Response;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.Payload;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -16,6 +19,8 @@ import org.safehaus.subutai.core.peer.impl.RecipientType;
 import org.safehaus.subutai.core.peer.impl.Timeouts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Maps;
 
 
 public class CommandRequestListener extends RequestListener
@@ -53,11 +58,14 @@ public class CommandRequestListener extends RequestListener
                     {
                         try
                         {
+                            Map<String, String> headers = Maps.newHashMap();
+                            headers.put( Common.ENVIRONMENT_ID_HEADER_NAME,
+                                    commandRequest.getEnvironmentId().toString() );
                             sourcePeer.sendRequest(
                                     new CommandResponse( commandRequest.getRequestId(), new ResponseImpl( response ),
                                             new CommandResultImpl( commandResult ) ),
                                     RecipientType.COMMAND_RESPONSE.name(), Timeouts.COMMAND_REQUEST_MESSAGE_TIMEOUT,
-                                    commandRequest.getEnvironmentId() );
+                                    headers );
                         }
                         catch ( PeerException e )
                         {

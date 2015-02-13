@@ -23,8 +23,10 @@ import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
+import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
@@ -320,7 +322,9 @@ public class RemotePeerImpl implements RemotePeer
         {
             String response = get( path, params, headers );
 
-            return JsonUtil.fromJson( response, new TypeToken<ProcessResourceUsage>() {}.getType() );
+            return JsonUtil.fromJson( response, new TypeToken<ProcessResourceUsage>()
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -382,6 +386,32 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public MemoryQuotaInfo getRamQuotaInfo( final ContainerHost host ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+
+        String path = "peer/container/quota/ram/info";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", host.getId().toString() );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
+
+        try
+        {
+            String response = get( path, params, headers );
+
+            return JsonUtil.fromJson( response, MemoryQuotaInfo.class );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error obtaining container ram quota", e );
+        }
+    }
+
+
+    @Override
     public void setRamQuota( final ContainerHost host, final int ramInMb ) throws PeerException
     {
         Preconditions.checkNotNull( host, "Invalid container host" );
@@ -434,6 +464,32 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public CpuQuotaInfo getCpuQuotaInfo( final ContainerHost host ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+
+        String path = "peer/container/quota/cpu/info";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", host.getId().toString() );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
+
+        try
+        {
+            String response = get( path, params, headers );
+
+            return JsonUtil.fromJson( response, CpuQuotaInfo.class );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error obtaining container cpu quota", e );
+        }
+    }
+
+
+    @Override
     public void setCpuQuota( final ContainerHost host, final int cpuPercent ) throws PeerException
     {
         Preconditions.checkNotNull( host, "Invalid container host" );
@@ -476,7 +532,9 @@ public class RemotePeerImpl implements RemotePeer
         {
             String response = get( path, params, headers );
 
-            return JsonUtil.fromJson( response, new TypeToken<Set<Integer>>() {}.getType() );
+            return JsonUtil.fromJson( response, new TypeToken<Set<Integer>>()
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -531,7 +589,9 @@ public class RemotePeerImpl implements RemotePeer
         {
             String response = get( path, params, headers );
 
-            return JsonUtil.fromJson( response, new TypeToken<DiskQuota>() {}.getType() );
+            return JsonUtil.fromJson( response, new TypeToken<DiskQuota>()
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -638,7 +698,9 @@ public class RemotePeerImpl implements RemotePeer
         {
             String response = get( path, params, headers );
 
-            return JsonUtil.fromJson( response, new TypeToken<DiskQuota>() {}.getType() );
+            return JsonUtil.fromJson( response, new TypeToken<DiskQuota>()
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -666,7 +728,39 @@ public class RemotePeerImpl implements RemotePeer
         {
             String response = get( path, params, headers );
 
-            return JsonUtil.fromJson( response, new TypeToken<PeerQuotaInfo>() {}.getType() );
+            return JsonUtil.fromJson( response, new TypeToken<PeerQuotaInfo>()
+            {
+            }.getType() );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error obtaining container quota", e );
+        }
+    }
+
+
+    @Override
+    public QuotaInfo getQuotaInfo( final ContainerHost host, final QuotaType quotaType ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( quotaType, "Invalid quota type" );
+
+        String path = "peer/container/quota/info";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", host.getId().toString() );
+        params.put( "quotaType", JsonUtil.toJson( quotaType ) );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
+
+        try
+        {
+            String response = get( path, params, headers );
+
+            return JsonUtil.fromJson( response, new TypeToken<QuotaInfo>()
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -774,8 +868,11 @@ public class RemotePeerImpl implements RemotePeer
         //send command request to remote peer counterpart
         try
         {
+            Map<String, String> headers = Maps.newHashMap();
+            headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, environmentId.toString() );
+
             sendRequest( request, RecipientType.COMMAND_REQUEST.name(), Timeouts.COMMAND_REQUEST_MESSAGE_TIMEOUT,
-                    environmentId );
+                    headers );
         }
         catch ( PeerException e )
         {
@@ -786,14 +883,14 @@ public class RemotePeerImpl implements RemotePeer
 
     @Override
     public <T, V> V sendRequest( final T request, final String recipient, final int requestTimeout,
-                                 Class<V> responseType, int responseTimeout, final UUID environmentId )
+                                 Class<V> responseType, int responseTimeout, final Map<String, String> headers )
             throws PeerException
     {
         Preconditions.checkArgument( responseTimeout > 0, "Invalid response timeout" );
         Preconditions.checkNotNull( responseType, "Invalid response type" );
 
         //send request
-        MessageRequest messageRequest = sendRequestInternal( request, recipient, requestTimeout, environmentId );
+        MessageRequest messageRequest = sendRequestInternal( request, recipient, requestTimeout, headers );
 
         //wait for response here
         MessageResponse messageResponse =
@@ -816,29 +913,28 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public <T> void sendRequest( final T request, final String recipient, final int requestTimeout, UUID environmentId )
-            throws PeerException
+    public <T> void sendRequest( final T request, final String recipient, final int requestTimeout,
+                                 final Map<String, String> headers ) throws PeerException
     {
 
-        sendRequestInternal( request, recipient, requestTimeout, environmentId );
+        sendRequestInternal( request, recipient, requestTimeout, headers );
     }
 
 
     private <T> MessageRequest sendRequestInternal( final T request, final String recipient, final int requestTimeout,
-                                                    final UUID environmentId ) throws PeerException
+                                                    final Map<String, String> headers ) throws PeerException
     {
         Preconditions.checkNotNull( request, "Invalid request" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
         Preconditions.checkArgument( requestTimeout > 0, "Invalid request timeout" );
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        MessageRequest messageRequest = new MessageRequest( new Payload( request, localPeer.getId() ), recipient );
+        MessageRequest messageRequest =
+                new MessageRequest( new Payload( request, localPeer.getId() ), recipient, headers );
         Message message = messenger.createMessage( messageRequest );
-        message.setEnvironmentId( environmentId );
 
         try
         {
-            messenger.sendMessage( this, message, RecipientType.PEER_REQUEST_LISTENER.name(), requestTimeout );
+            messenger.sendMessage( this, message, RecipientType.PEER_REQUEST_LISTENER.name(), requestTimeout, headers );
         }
         catch ( MessageException e )
         {
@@ -862,11 +958,14 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( numberOfContainers > 0, "Invalid number of containers" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( strategyId ), "Invalid strategy id" );
 
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, environmentId.toString() );
+
         CreateContainersResponse response = sendRequest(
                 new CreateContainersRequest( environmentId, initiatorPeerId, ownerId, templates, numberOfContainers,
                         strategyId, criteria ), RecipientType.CONTAINER_CREATE_REQUEST.name(),
                 Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateContainersResponse.class,
-                Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT, environmentId );
+                Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT, headers );
 
         if ( response != null )
         {
@@ -884,11 +983,14 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, environmentId.toString() );
+
         DestroyEnvironmentContainersResponse response =
                 sendRequest( new DestroyEnvironmentContainersRequest( environmentId ),
                         RecipientType.CONTAINER_DESTROY_REQUEST.name(), Timeouts.DESTROY_CONTAINER_REQUEST_TIMEOUT,
                         DestroyEnvironmentContainersResponse.class, Timeouts.DESTROY_CONTAINER_RESPONSE_TIMEOUT,
-                        environmentId );
+                        headers );
 
         if ( response != null )
         {

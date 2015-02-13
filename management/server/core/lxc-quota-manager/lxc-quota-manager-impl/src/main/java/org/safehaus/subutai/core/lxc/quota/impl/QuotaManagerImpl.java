@@ -7,7 +7,6 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.json.JSONObject;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.CommandUtil;
@@ -17,7 +16,6 @@ import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.DiskQuotaUnit;
-import org.safehaus.subutai.common.quota.HddQuotaInfo;
 import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaException;
@@ -78,72 +76,7 @@ public class QuotaManagerImpl implements QuotaManager
     @Override
     public PeerQuotaInfo getQuota( String containerName, QuotaType quotaType ) throws QuotaException
     {
-        Preconditions.checkNotNull( quotaType, "QuotaType cannot be null." );
-        Preconditions.checkNotNull( containerName, "ContainerName cannot be null." );
-
-        String cmd = String.format( "subutai quota %s %s", containerName, quotaType.getKey() );
-
-        try
-        {
-            ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostByContainerName( containerName );
-            CommandResult commandResult = commandUtil.execute( new RequestBuilder( cmd ), resourceHost );
-
-            if ( quotaType == QuotaType.QUOTA_TYPE_ALL_JSON )
-            {
-                JSONObject jsonObject = new JSONObject( commandResult.getStdOut() );
-
-                CpuQuotaInfo cpuQuota = new CpuQuotaInfo( jsonObject.getString( QuotaType.QUOTA_TYPE_CPU.getKey() ) );
-                HddQuotaInfo hddHomeQuota = new HddQuotaInfo( DiskPartition.HOME,
-                        jsonObject.getString( QuotaType.QUOTA_TYPE_DISK_HOME.getKey() ) );
-                HddQuotaInfo hddVarQuota = new HddQuotaInfo( DiskPartition.VAR,
-                        jsonObject.getString( QuotaType.QUOTA_TYPE_DISK_VAR.getKey() ) );
-                HddQuotaInfo hddOptQuota = new HddQuotaInfo( DiskPartition.OPT,
-                        jsonObject.getString( QuotaType.QUOTA_TYPE_DISK_OPT.getKey() ) );
-                HddQuotaInfo hddRootfsQuota = new HddQuotaInfo( DiskPartition.ROOT_FS,
-                        jsonObject.getString( QuotaType.QUOTA_TYPE_DISK_ROOTFS.getKey() ) );
-                MemoryQuotaInfo memoryQuotaInfo =
-                        new MemoryQuotaInfo( jsonObject.getString( QuotaType.QUOTA_TYPE_RAM.getKey() ) );
-
-                return new PeerQuotaInfo( cpuQuota, hddHomeQuota, hddVarQuota, hddOptQuota, hddRootfsQuota,
-                        memoryQuotaInfo );
-            }
-            else if ( quotaType == QuotaType.QUOTA_TYPE_RAM )
-            {
-                return new PeerQuotaInfo( new MemoryQuotaInfo( commandResult.getStdOut() ) );
-            }
-            else if ( quotaType == QuotaType.QUOTA_TYPE_CPU )
-            {
-                CpuQuotaInfo cpuQuotaInfo = new CpuQuotaInfo( commandResult.getStdOut() );
-                return new PeerQuotaInfo( cpuQuotaInfo );
-            }
-            else if ( quotaType == QuotaType.QUOTA_TYPE_DISK_HOME )
-            {
-                return new PeerQuotaInfo( new HddQuotaInfo( DiskPartition.HOME, commandResult.getStdOut() ) );
-            }
-            else if ( quotaType == QuotaType.QUOTA_TYPE_DISK_OPT )
-            {
-                return new PeerQuotaInfo( new HddQuotaInfo( DiskPartition.OPT, commandResult.getStdOut() ) );
-            }
-            else if ( quotaType == QuotaType.QUOTA_TYPE_DISK_ROOTFS )
-            {
-                return new PeerQuotaInfo( new HddQuotaInfo( DiskPartition.ROOT_FS, commandResult.getStdOut() ) );
-            }
-            else if ( quotaType == QuotaType.QUOTA_TYPE_DISK_VAR )
-            {
-                //defaul QuotaType.QUOTA_TYPE_DISK_VAR
-                return new PeerQuotaInfo( new HddQuotaInfo( DiskPartition.VAR, commandResult.getStdOut() ) );
-            }
-            else
-            {
-                LOGGER.error( "Error in getQuota. Unsupported quota type." );
-                throw new QuotaException( "Specify correct quota type: " + cmd );
-            }
-        }
-        catch ( CommandException | HostNotFoundException e )
-        {
-            LOGGER.error( "Error int getQuota.", e );
-            throw new QuotaException( "Error getting quota value for command: " + cmd, e );
-        }
+        throw new UnsupportedOperationException( "This method is depricated refer to docs for appropriate method." );
     }
 
 
@@ -158,6 +91,21 @@ public class QuotaManagerImpl implements QuotaManager
                 commands.getReadRamQuotaCommand( containerHost.getHostname() ) );
 
         return Integer.parseInt( result.getStdOut().replace( "M", "" ).trim() );
+    }
+
+
+    @Override
+    public MemoryQuotaInfo getRamQuotaInfo( final UUID containerId ) throws QuotaException
+    {
+        Preconditions.checkNotNull( containerId );
+
+        ContainerHost containerHost = getContainerHostById( containerId );
+
+        CommandResult result = executeOnContainersResourceHost( containerId,
+                commands.getReadRamQuotaCommand( containerHost.getHostname() ) );
+
+        return new MemoryQuotaInfo( DiskQuotaUnit.MB,
+                Double.parseDouble( result.getStdOut().replace( "M", "" ).trim() ) );
     }
 
 
@@ -189,6 +137,20 @@ public class QuotaManagerImpl implements QuotaManager
 
 
     @Override
+    public CpuQuotaInfo getCpuQuotaInfo( final UUID containerId ) throws QuotaException
+    {
+        Preconditions.checkNotNull( containerId );
+
+        ContainerHost containerHost = getContainerHostById( containerId );
+
+        CommandResult result = executeOnContainersResourceHost( containerId,
+                commands.getReadCpuQuotaCommand( containerHost.getHostname() ) );
+
+        return new CpuQuotaInfo( result.getStdOut().trim() );
+    }
+
+
+    @Override
     public void setCpuQuota( final UUID containerId, final int cpuPercent ) throws QuotaException
     {
         Preconditions.checkNotNull( containerId );
@@ -212,7 +174,7 @@ public class QuotaManagerImpl implements QuotaManager
                 commands.getReadCpuSetCommand( containerHost.getHostname() ) );
 
         Pattern p = Pattern.compile( "(\\s*\\d+\\s*-\\s*\\d+\\s*)" );
-        StringTokenizer st = new StringTokenizer( result.getStdOut(), "," );
+        StringTokenizer st = new StringTokenizer( result.getStdOut().trim(), "," );
         Set<Integer> cpuSet = Sets.newHashSet();
 
         while ( st.hasMoreTokens() )
@@ -270,15 +232,16 @@ public class QuotaManagerImpl implements QuotaManager
         CommandResult result = executeOnContainersResourceHost( containerId,
                 commands.getReadDiskQuotaCommand( containerHost.getHostname(), diskPartition.getPartitionName() ) );
 
-        if ( result.getStdOut().equalsIgnoreCase( DiskQuotaUnit.UNLIMITED.getAcronym() ) )
+        if ( result.getStdOut().contains( DiskQuotaUnit.UNLIMITED.getAcronym() ) )
         {
             return new DiskQuota( diskPartition, DiskQuotaUnit.UNLIMITED, -1 );
         }
         else
         {
-            String regex = "(\\d+)(K|M|G|T|P|E){0,1}";
+            //TODO Need to modify regex to be able to parse decimal point values
+            String regex = "(\\d+)(K|M|G|T|P|E)?";
             Pattern quotaPattern = Pattern.compile( regex );
-            Matcher quotaMatcher = quotaPattern.matcher( result.getStdOut() );
+            Matcher quotaMatcher = quotaPattern.matcher( result.getStdOut().trim() );
             if ( quotaMatcher.matches() )
             {
                 String quotaValue = quotaMatcher.group( 1 );
@@ -353,15 +316,16 @@ public class QuotaManagerImpl implements QuotaManager
                 commands.getReadAvailableDiskQuotaCommand( containerHost.getHostname(),
                         diskPartition.getPartitionName() ) );
 
-        if ( result.getStdOut().equalsIgnoreCase( DiskQuotaUnit.UNLIMITED.getAcronym() ) )
+        if ( result.getStdOut().contains( DiskQuotaUnit.UNLIMITED.getAcronym() ) )
         {
             return new DiskQuota( diskPartition, DiskQuotaUnit.UNLIMITED, -1 );
         }
         else
         {
-            String regex = "(\\d+)(K|M|G|T|P|E){0,1}";
+            //TODO Need to modify regex to be able to parse decimal point values
+            String regex = "(\\d+)(K|M|G|T|P|E)?";
             Pattern quotaPattern = Pattern.compile( regex );
-            Matcher quotaMatcher = quotaPattern.matcher( result.getStdOut() );
+            Matcher quotaMatcher = quotaPattern.matcher( result.getStdOut().trim() );
             if ( quotaMatcher.matches() )
             {
                 String quotaValue = quotaMatcher.group( 1 );
@@ -418,5 +382,34 @@ public class QuotaManagerImpl implements QuotaManager
         {
             throw new QuotaException( String.format( "Resource host is not found by container id %s", containerId ) );
         }
+    }
+
+
+    @Override
+    public QuotaInfo getQuotaInfo( UUID containerId, final QuotaType quotaType ) throws QuotaException
+    {
+        QuotaInfo quotaInfo = null;
+        switch ( quotaType )
+        {
+            case QUOTA_TYPE_CPU:
+                quotaInfo = getCpuQuotaInfo( containerId );
+                break;
+            case QUOTA_TYPE_DISK_ROOTFS:
+                quotaInfo = getDiskQuota( containerId, DiskPartition.ROOT_FS );
+                break;
+            case QUOTA_TYPE_DISK_VAR:
+                quotaInfo = getDiskQuota( containerId, DiskPartition.VAR );
+                break;
+            case QUOTA_TYPE_DISK_OPT:
+                quotaInfo = getDiskQuota( containerId, DiskPartition.OPT );
+                break;
+            case QUOTA_TYPE_DISK_HOME:
+                quotaInfo = getDiskQuota( containerId, DiskPartition.HOME );
+                break;
+            case QUOTA_TYPE_RAM:
+                quotaInfo = getRamQuotaInfo( containerId );
+                break;
+        }
+        return quotaInfo;
     }
 }

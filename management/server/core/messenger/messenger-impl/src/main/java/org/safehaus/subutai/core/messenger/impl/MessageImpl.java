@@ -19,7 +19,6 @@ public class MessageImpl implements Message
     public static final int MAX_SENDER_LEN = 50;
     private final UUID id;
     private final UUID sourcePeerId;
-    private UUID environmentId;
     private String sender;
     private String payloadString;
 
@@ -30,7 +29,6 @@ public class MessageImpl implements Message
         payloadString = message.getPayload();
         id = message.getId();
         sender = message.getSender();
-        environmentId = message.getEnvironmentId();
     }
 
 
@@ -91,26 +89,9 @@ public class MessageImpl implements Message
 
 
     @Override
-    public UUID getEnvironmentId()
-    {
-        return environmentId;
-    }
-
-
-    @Override
-    public void setEnvironmentId( final UUID environmentId )
-    {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-
-        this.environmentId = environmentId;
-    }
-
-
-    @Override
     public String toString()
     {
         return Objects.toStringHelper( this ).add( "id", id ).add( "sourcePeerId", sourcePeerId )
-                      .add( "sender", sender ).add( "payloadString", payloadString )
-                      .add( "environmentId", environmentId ).toString();
+                      .add( "sender", sender ).add( "payloadString", payloadString ).toString();
     }
 }

@@ -123,16 +123,15 @@ createDebian() {
 	md5sum `find ./$packageName -type f | awk '/.\//{ print substr($0, 3) }'` >> $packageName/DEBIAN/md5sums
 	dpkg-deb -z8 -Zgzip --build $packageName/
 
-	#when deb is created copy new deb to Bigdata folder.
-	cp $packageName.deb /var/lib/jenkins/Automation/Bigdata/agent/
+	#when deb is created copy new deb to Automation_ISO/Packages folder.
+	cp $packageName.deb /var/lib/jenkins/Automation/Automation_ISO/Packages/agent/
 }
 
 
 generateRepoPackage() {
   #Basic path definitions
   BASE="/var/lib/jenkins/jobs/master.agent/Agent/deb"
-  #SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
-  TARGET="/var/lib/jenkins/Automation/Bigdata/agent"
+  TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/agent"
   PACK="/var/lib/jenkins/Automation/Automation_ISO/mgmt-repo/template-repo-package/"
   ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
 

@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.messenger.impl;
 
 
 import java.sql.Timestamp;
+import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Before;
@@ -10,6 +11,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.core.messenger.impl.entity.MessageEntity;
+
+import com.google.common.collect.Maps;
 
 import junit.framework.TestCase;
 
@@ -26,6 +29,7 @@ public class EnvelopeTest
     private static final UUID TARGET_PEER_ID = UUID.randomUUID();
     private static final String RECIPIENT = "recipient";
     private static final int TIME_TO_LIVE = 5;
+    private static final Map<String, String> HEADERS = Maps.newHashMap();
     private static final Timestamp CREATE_DATE = new Timestamp( System.currentTimeMillis() );
 
     @Mock
@@ -39,10 +43,10 @@ public class EnvelopeTest
     @Before
     public void setUp() throws Exception
     {
-        envelope = new Envelope( message, TARGET_PEER_ID, RECIPIENT, TIME_TO_LIVE );
-//        when(messageEntity.getTargetPeerId()).thenReturn( TARGET_PEER_ID );
-//        when( messageEntity.getRecipient() ).thenReturn( RECIPIENT );
-//        when( messageEntity.getTimeToLive() ).thenReturn( TIME_TO_LIVE );
+        envelope = new Envelope( message, TARGET_PEER_ID, RECIPIENT, TIME_TO_LIVE, HEADERS );
+        //        when(messageEntity.getTargetPeerId()).thenReturn( TARGET_PEER_ID );
+        //        when( messageEntity.getRecipient() ).thenReturn( RECIPIENT );
+        //        when( messageEntity.getTimeToLive() ).thenReturn( TIME_TO_LIVE );
     }
 
 
@@ -59,7 +63,7 @@ public class EnvelopeTest
         }
         try
         {
-            new Envelope( null, TARGET_PEER_ID, RECIPIENT, TIME_TO_LIVE );
+            new Envelope( null, TARGET_PEER_ID, RECIPIENT, TIME_TO_LIVE, HEADERS );
             fail( "Exception was expected for null message" );
         }
         catch ( NullPointerException e )
@@ -67,7 +71,7 @@ public class EnvelopeTest
         }
         try
         {
-            new Envelope( message, null, RECIPIENT, TIME_TO_LIVE );
+            new Envelope( message, null, RECIPIENT, TIME_TO_LIVE, HEADERS );
             fail( "Exception was expected for null target peer id" );
         }
         catch ( NullPointerException e )
@@ -75,7 +79,7 @@ public class EnvelopeTest
         }
         try
         {
-            new Envelope( message, TARGET_PEER_ID, null, TIME_TO_LIVE );
+            new Envelope( message, TARGET_PEER_ID, null, TIME_TO_LIVE, HEADERS );
             fail( "Exception was expected for null recipient" );
         }
         catch ( IllegalArgumentException e )
@@ -83,7 +87,7 @@ public class EnvelopeTest
         }
         try
         {
-            new Envelope( message, TARGET_PEER_ID, RECIPIENT, -1 );
+            new Envelope( message, TARGET_PEER_ID, RECIPIENT, -1, HEADERS );
             fail( "Exception was expected for invalid ttl" );
         }
         catch ( IllegalArgumentException e )
@@ -132,7 +136,6 @@ public class EnvelopeTest
 
         envelope = new Envelope( messageEntity );
 
-        TestCase.assertEquals(envelope.getCreateDate(), new Timestamp( ts ));
-
+        TestCase.assertEquals( envelope.getCreateDate(), new Timestamp( ts ) );
     }
 }

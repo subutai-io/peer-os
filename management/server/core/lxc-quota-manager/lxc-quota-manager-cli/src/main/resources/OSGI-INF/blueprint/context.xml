@@ -3,6 +3,9 @@
   <reference id="quotaManager" availability="mandatory"
              interface="org.safehaus.subutai.core.lxc.quota.api.QuotaManager" />
 
+  <reference id="peerManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="quota/list-quota">
       <action class="org.safehaus.subutai.core.lxc.quota.cli.ListQuotaTypes">
@@ -14,6 +17,7 @@
     <command name="quota/get-quota">
       <action class="org.safehaus.subutai.core.lxc.quota.cli.GetQuota">
         <argument ref="quotaManager" />
+        <argument ref="peerManager" />
       </action>
     </command>
   </command-bundle>
@@ -22,6 +26,7 @@
     <command name="quota/set-quota">
       <action class="org.safehaus.subutai.core.lxc.quota.cli.SetQuota">
         <argument ref="quotaManager" />
+        <argument ref="peerManager" />
       </action>
     </command>
   </command-bundle>
