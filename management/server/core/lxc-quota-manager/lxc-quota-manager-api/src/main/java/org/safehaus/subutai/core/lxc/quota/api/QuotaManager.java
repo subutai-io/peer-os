@@ -80,8 +80,49 @@ public interface QuotaManager
      */
     public void setCpuSet( UUID containerId, Set<Integer> cpuSet ) throws QuotaException;
 
-
+    /**
+     * Returns disk partition quota on container
+     *
+     * @param containerId - id of container
+     * @param diskPartition - disk partition
+     *
+     * @return {@code DiskQuota}
+     */
     public DiskQuota getDiskQuota( UUID containerId, DiskPartition diskPartition ) throws QuotaException;
 
+
+    /**
+     * Sets disk partition quota on container
+     *
+     * @param containerId - id of container
+     * @param diskQuota - disk quota to set
+     */
     public void setDiskQuota( UUID containerId, DiskQuota diskQuota ) throws QuotaException;
+
+    /**
+     * Returns max available RAM quota in MB on container
+     *
+     * @param containerId - id of container
+     *
+     * @return - max available ram quota in MB
+     */
+    public int getAvailableRamQuota( UUID containerId ) throws QuotaException;
+
+    /**
+     * Returns max available CPU quota in percent on container
+     *
+     * @param containerId - id of container
+     *
+     * @return - max available cpu quota in percent
+     */
+    public int getAvailableCpuQuota( UUID containerId ) throws QuotaException;
+
+    /**
+     * Returns max available disk quota on container
+     *
+     * @param containerId - id of container
+     *
+     * @return - max available ram disk quota {@code DiskQuota}
+     */
+    public DiskQuota getAvailableDiskQuota( UUID containerId, DiskPartition diskPartition ) throws QuotaException;
 }

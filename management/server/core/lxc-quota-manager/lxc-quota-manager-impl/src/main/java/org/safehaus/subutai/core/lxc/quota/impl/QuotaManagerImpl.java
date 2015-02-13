@@ -184,7 +184,7 @@ public class QuotaManagerImpl implements QuotaManager
         CommandResult result = executeOnContainersResourceHost( containerId,
                 commands.getReadCpuQuotaCommand( containerHost.getHostname() ) );
 
-        return Integer.parseInt( result.getStdOut() );
+        return Integer.parseInt( result.getStdOut().trim() );
     }
 
 
@@ -276,7 +276,7 @@ public class QuotaManagerImpl implements QuotaManager
         }
         else
         {
-            String regex = "(\\d+)(K|M|G){0,1}";
+            String regex = "(\\d+)(K|M|G|T|P|E){0,1}";
             Pattern quotaPattern = Pattern.compile( regex );
             Matcher quotaMatcher = quotaPattern.matcher( result.getStdOut() );
             if ( quotaMatcher.matches() )
@@ -311,6 +311,74 @@ public class QuotaManagerImpl implements QuotaManager
     }
 
 
+    @Override
+    public int getAvailableRamQuota( final UUID containerId ) throws QuotaException
+    {
+        Preconditions.checkNotNull( containerId );
+
+        ContainerHost containerHost = getContainerHostById( containerId );
+
+        CommandResult result = executeOnContainersResourceHost( containerId,
+                commands.getReadAvailableRamQuotaCommand( containerHost.getHostname() ) );
+
+        return Integer.parseInt( result.getStdOut().replace( "M", "" ).trim() );
+    }
+
+
+    @Override
+    public int getAvailableCpuQuota( final UUID containerId ) throws QuotaException
+    {
+        Preconditions.checkNotNull( containerId );
+
+        ContainerHost containerHost = getContainerHostById( containerId );
+
+        CommandResult result = executeOnContainersResourceHost( containerId,
+                commands.getReadAvailableCpuQuotaCommand( containerHost.getHostname() ) );
+
+        return Integer.parseInt( result.getStdOut().trim() );
+    }
+
+
+    @Override
+    public DiskQuota getAvailableDiskQuota( final UUID containerId, final DiskPartition diskPartition )
+            throws QuotaException
+    {
+
+        Preconditions.checkNotNull( containerId );
+        Preconditions.checkNotNull( diskPartition );
+
+        ContainerHost containerHost = getContainerHostById( containerId );
+
+        CommandResult result = executeOnContainersResourceHost( containerId,
+                commands.getReadAvailableDiskQuotaCommand( containerHost.getHostname(),
+                        diskPartition.getPartitionName() ) );
+
+        if ( result.getStdOut().equalsIgnoreCase( DiskQuotaUnit.UNLIMITED.getAcronym() ) )
+        {
+            return new DiskQuota( diskPartition, DiskQuotaUnit.UNLIMITED, -1 );
+        }
+        else
+        {
+            String regex = "(\\d+)(K|M|G|T|P|E){0,1}";
+            Pattern quotaPattern = Pattern.compile( regex );
+            Matcher quotaMatcher = quotaPattern.matcher( result.getStdOut() );
+            if ( quotaMatcher.matches() )
+            {
+                String quotaValue = quotaMatcher.group( 1 );
+                long value = Long.parseLong( quotaValue );
+                String acronym = quotaMatcher.group( 2 );
+                DiskQuotaUnit diskQuotaUnit = DiskQuotaUnit.parseFromAcronym( acronym );
+                return new DiskQuota( diskPartition, diskQuotaUnit == null ? DiskQuotaUnit.BYTE : diskQuotaUnit,
+                        value );
+            }
+            else
+            {
+                throw new QuotaException( String.format( "Unparseable result: %s", result.getStdOut() ) );
+            }
+        }
+    }
+
+
     protected CommandResult executeOnContainersResourceHost( UUID containerId, RequestBuilder command )
             throws QuotaException
     {
@@ -331,7 +399,7 @@ public class QuotaManagerImpl implements QuotaManager
     {
         try
         {
-            return peerManager.getLocalPeer().getContainerHostById( containerId.toString() );
+            return peerManager.getLocalPeer().getContainerHostById( containerId );
         }
         catch ( HostNotFoundException e )
         {
@@ -344,7 +412,7 @@ public class QuotaManagerImpl implements QuotaManager
     {
         try
         {
-            return peerManager.getLocalPeer().getResourceHostByContainerId( containerId.toString() );
+            return peerManager.getLocalPeer().getResourceHostByContainerId( containerId);
         }
         catch ( HostNotFoundException e )
         {

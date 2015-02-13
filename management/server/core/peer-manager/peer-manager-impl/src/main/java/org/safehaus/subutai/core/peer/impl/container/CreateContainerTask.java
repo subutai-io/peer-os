@@ -7,6 +7,7 @@ import org.safehaus.subutai.common.command.CommandUtil;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.core.peer.api.ContainerCreationException;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 
 import com.google.common.base.Preconditions;
@@ -51,7 +52,14 @@ public class CreateContainerTask implements Callable<ContainerHost>
         while ( System.currentTimeMillis() - start < timeoutSec * 1000 && containerHost == null )
         {
             Thread.sleep( 100 );
-            containerHost = resourceHost.getContainerHostByName( hostname );
+            try
+            {
+                containerHost = resourceHost.getContainerHostByName( hostname );
+            }
+            catch ( HostNotFoundException e )
+            {
+                //ignore
+            }
         }
 
         if ( containerHost == null )

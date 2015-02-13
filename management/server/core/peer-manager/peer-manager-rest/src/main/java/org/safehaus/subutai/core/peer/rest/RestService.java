@@ -56,39 +56,39 @@ public interface RestService
 
     @POST
     @Path( "container/quota" )
-    Response setQuota( @FormParam( "hostId" ) String hostId, @FormParam( "quotaInfo" ) String quotaInfo );
+    Response setQuota( @FormParam( "containerId" ) String containerId, @FormParam( "quotaInfo" ) String quotaInfo );
 
     @GET
     @Path( "container/quota" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response getQuota( @QueryParam( "hostId" ) String hostId, @QueryParam( "quotaType" ) String quotaType );
+    Response getQuota( @QueryParam( "containerId" ) String containerId, @QueryParam( "quotaType" ) String quotaType );
 
     @POST
     @Path( "container/destroy" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response destroyContainer( @FormParam( "hostId" ) String host );
+    public Response destroyContainer( @FormParam( "containerId" ) String containerId );
 
     @POST
     @Path( "container/start" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response startContainer( @FormParam( "hostId" ) String host );
+    public Response startContainer( @FormParam( "containerId" ) String containerId );
 
     @POST
     @Path( "container/stop" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response stopContainer( @FormParam( "hostId" ) String host );
+    public Response stopContainer( @FormParam( "containerId" ) String containerId );
 
     @POST
     @Path( "container/isconnected" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response isContainerConnected( @FormParam( "hostId" ) String hostId );
+    public Response isContainerConnected( @FormParam( "containerId" ) String containerId );
 
     @GET
     @Path( "container/state" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getContainerState( @QueryParam( "containerId" ) String containerId );
 
-    @POST
+    @GET
     @Path( "template/get" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getTemplate( @FormParam( "templateName" ) String templateName );
@@ -96,8 +96,25 @@ public interface RestService
     @GET
     @Path( "container/resource/usage" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response getProcessResourceUsage( @QueryParam( "hostId" ) String hostId,
+    Response getProcessResourceUsage( @QueryParam( "containerId" ) String containerId,
                                       @QueryParam( "processId" ) int processPid );
+
+    @GET
+    @Path( "container/quota/ram/available" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getAvailableRamQuota( @QueryParam( "containerId" ) String containerId );
+
+    @GET
+    @Path( "container/quota/cpu/available" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getAvailableCpuQuota( @QueryParam( "containerId" ) String containerId );
+
+    @GET
+    @Path( "container/quota/disk/available" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getAvailableDiskQuota( @QueryParam( "containerId" ) String containerId,
+                                    @QueryParam( "diskPartition" ) String diskPartition );
+
 
     @GET
     @Path( "container/quota/ram" )

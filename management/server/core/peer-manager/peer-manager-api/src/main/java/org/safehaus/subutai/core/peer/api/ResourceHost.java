@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.peer.api;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
@@ -30,15 +31,17 @@ public interface ResourceHost extends Host
 
     public Set<ContainerHost> getContainerHosts();
 
-    public ContainerHost getContainerHostByName( String hostname );
+    public ContainerHost getContainerHostByName( String hostname ) throws HostNotFoundException;
 
-    public ContainerHost getContainerHostById( String id );
+    public ContainerHost getContainerHostById( UUID id ) throws HostNotFoundException;
 
-    public boolean startContainerHost( ContainerHost containerHost ) throws ResourceHostException;
+    public void startContainerHost( ContainerHost containerHost ) throws ResourceHostException;
 
-    public boolean stopContainerHost( ContainerHost containerHost ) throws ResourceHostException;
+    public void stopContainerHost( ContainerHost containerHost ) throws ResourceHostException;
 
     public void destroyContainerHost( ContainerHost containerHost ) throws ResourceHostException;
+
+    public ContainerState getContainerHostState( final ContainerHost container ) throws ResourceHostException;
 
     public ContainerHost createContainer( String templateName, String hostname, int timeout )
             throws ResourceHostException;

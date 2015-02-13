@@ -1,11 +1,9 @@
 package org.safehaus.subutai.core.peer.impl.entity;
 
 
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -30,9 +28,9 @@ import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.peer.api.ContainerState;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerTask;
@@ -55,8 +53,6 @@ import com.google.common.collect.Sets;
 @Access( AccessType.FIELD )
 public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceHost
 {
-    private static final String CONTAINER_DOES_NOT_EXIST = "Container \"%s\" does NOT exist";
-    private static final String CONTAINER_DESTROYED = "Destruction of \"%s\" completed successfully";
     private static final int DESTROY_TIMEOUT = 180;
 
     @javax.persistence.Transient
@@ -70,8 +66,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @javax.persistence.Transient
     transient private ExecutorService singleThreadExecutorService = Executors.newSingleThreadExecutor();
 
-    @javax.persistence.Transient
-    transient private ExecutorService cachedThredPoolService;
 
     @OneToMany( mappedBy = "parent", fetch = FetchType.EAGER,
             targetEntity = ContainerHostEntity.class )
@@ -96,95 +90,39 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    public ExecutorService getSingleThreadExecutorService()
-    {
-        if ( singleThreadExecutorService == null )
-        {
-            singleThreadExecutorService = Executors.newSingleThreadExecutor();
-            LOG.debug( String.format( "New single thread executor created for %s", hostname ) );
-        }
-
-        return singleThreadExecutorService;
-    }
-
-
     public <T> Future<T> queueSequentialTask( Callable<T> callable )
     {
-        return getSingleThreadExecutorService().submit( callable );
+        return singleThreadExecutorService.submit( callable );
     }
 
 
-    public Future queueSequentialTask( Runnable runnable )
+    @Override
+    public ContainerState getContainerHostState( final ContainerHost containerHost ) throws ResourceHostException
     {
-        return getSingleThreadExecutorService().submit( runnable );
-    }
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
 
-
-    public <T> Future<T> queueParallelTask( Callable<T> callable )
-    {
-        return getCachedThreadExecutorService().submit( callable );
-    }
-
-
-    public Future queueParallelTask( Runnable runnable )
-    {
-        return getCachedThreadExecutorService().submit( runnable );
-    }
-
-
-    private ExecutorService getCachedThreadExecutorService()
-    {
-        if ( cachedThredPoolService == null )
-        {
-            cachedThredPoolService = Executors.newCachedThreadPool();
-        }
-
-        return cachedThredPoolService;
-    }
-
-
-    public boolean startContainerHost( final ContainerHost container ) throws ResourceHostException
-    {
-        Preconditions.checkNotNull( container, "Container host is null" );
-
-        RequestBuilder requestBuilder =
-                new RequestBuilder( String.format( "/usr/bin/lxc-start -n %s -d", container.getHostname() ) )
-                        .withTimeout( 60 ).daemon();
         try
         {
-            execute( requestBuilder );
+            getContainerHostById( containerHost.getId() );
         }
-        catch ( CommandException e )
+        catch ( HostNotFoundException e )
         {
-            throw new ResourceHostException( "Error on starting container.", e );
-        }
-        try
-        {
-            Thread.sleep( WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS );
-        }
-        catch ( InterruptedException ignore )
-        {
+            throw new ResourceHostException(
+                    String.format( "Container with name %s does not exist", containerHost.getHostname() ) );
         }
 
-        return ContainerState.RUNNING.equals( getContainerHostState( container ) );
-    }
-
-
-    private ContainerState getContainerHostState( final ContainerHost container ) throws ResourceHostException
-    {
-        Preconditions.checkNotNull( container, "Container host is null" );
 
         RequestBuilder requestBuilder =
-                new RequestBuilder( String.format( "/usr/bin/lxc-info -n %s", container.getHostname() ) )
+                new RequestBuilder( String.format( "/usr/bin/lxc-info -n %s", containerHost.getHostname() ) )
                         .withTimeout( 30 );
         CommandResult result;
         try
         {
-            result = execute( requestBuilder );
+            result = commandUtil.execute( requestBuilder, this );
         }
         catch ( CommandException e )
         {
-            throw new ResourceHostException( "Error on fetching container state.", e );
+            throw new ResourceHostException( "Error fetching container state", e );
         }
 
         String stdOut = result.getStdOut();
@@ -340,12 +278,22 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    public boolean stopContainerHost( final ContainerHost container ) throws ResourceHostException
+    public void startContainerHost( final ContainerHost containerHost ) throws ResourceHostException
     {
-        Preconditions.checkNotNull( container, "Container host is null" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+
+        try
+        {
+            getContainerHostById( containerHost.getId() );
+        }
+        catch ( HostNotFoundException e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Container with name %s does not exist", containerHost.getHostname() ) );
+        }
 
         RequestBuilder requestBuilder =
-                new RequestBuilder( String.format( "/usr/bin/lxc-stop -n %s", container.getHostname() ) )
+                new RequestBuilder( String.format( "/usr/bin/lxc-start -n %s -d", containerHost.getHostname() ) )
                         .withTimeout( 60 ).daemon();
         try
         {
@@ -353,18 +301,42 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         catch ( CommandException e )
         {
-            throw new ResourceHostException( "Error on stopping container.", e );
+            throw new ResourceHostException( "Error on starting container", e );
         }
+
+        if ( !ContainerState.RUNNING.equals( getContainerHostState( containerHost ) ) )
+        {
+            throw new ResourceHostException(
+                    String.format( "Error starting container %s", containerHost.getHostname() ) );
+        }
+    }
+
+
+    public void stopContainerHost( final ContainerHost containerHost ) throws ResourceHostException
+    {
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
 
         try
         {
-            Thread.sleep( WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS );
+            getContainerHostById( containerHost.getId() );
         }
-        catch ( InterruptedException ignore )
+        catch ( HostNotFoundException e )
         {
+            throw new ResourceHostException(
+                    String.format( "Container with name %s does not exist", containerHost.getHostname() ) );
         }
 
-        return ContainerState.STOPPED.equals( getContainerHostState( container ) );
+        RequestBuilder requestBuilder =
+                new RequestBuilder( String.format( "/usr/bin/lxc-stop -n %s", containerHost.getHostname() ) )
+                        .withTimeout( 60 );
+        try
+        {
+            commandUtil.execute( requestBuilder, this );
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException( "Error stopping container", e );
+        }
     }
 
 
@@ -374,7 +346,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         Preconditions.checkNotNull( containerHost, "Container host is null" );
 
-        if ( getContainerHostByName( containerHost.getHostname() ) == null )
+        try
+        {
+            getContainerHostById( containerHost.getId() );
+        }
+        catch ( HostNotFoundException e )
         {
             throw new ResourceHostException(
                     String.format( "Container with name %s does not exist", containerHost.getHostname() ) );
@@ -394,25 +370,21 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public ContainerHost getContainerHostByName( final String hostname )
+    public ContainerHost getContainerHostByName( final String hostname ) throws HostNotFoundException
     {
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
 
-        ContainerHost result = null;
-
-        Iterator iterator = getContainerHosts().iterator();
-
-        while ( result == null && iterator.hasNext() )
+        for ( ContainerHost containerHost : getContainerHosts() )
         {
-            ContainerHost host = ( ContainerHost ) iterator.next();
 
-            if ( host.getHostname().equals( hostname ) )
+            if ( containerHost.getHostname().equalsIgnoreCase( hostname ) )
             {
-                result = host;
+                return containerHost;
             }
         }
-        return result;
+
+        throw new HostNotFoundException( String.format( "Container host not found by hostname %s", hostname ) );
     }
 
 
@@ -430,23 +402,19 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    public ContainerHost getContainerHostById( final String id )
+    public ContainerHost getContainerHostById( final UUID id ) throws HostNotFoundException
     {
-        Preconditions.checkArgument( UUIDUtil.isStringAUuid( id ), "Invalid container id" );
+        Preconditions.checkNotNull( id, "Invalid container id" );
 
-        ContainerHost result = null;
-        Iterator iterator = getContainerHosts().iterator();
-
-        while ( result == null && iterator.hasNext() )
+        for ( ContainerHost containerHost : getContainerHosts() )
         {
-            ContainerHost host = ( ContainerHost ) iterator.next();
-
-            if ( host.getHostId().equals( id ) )
+            if ( containerHost.getId().equals( id ) )
             {
-                result = host;
+                return containerHost;
             }
         }
-        return result;
+
+        throw new HostNotFoundException( String.format( "Container host not found by id %s", id ) );
     }
 
 
@@ -463,9 +431,14 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             throw new ResourceHostException( String.format( "Template %s is not registered", templateName ) );
         }
 
-        if ( getContainerHostByName( hostname ) != null )
+        try
         {
+            getContainerHostByName( hostname );
             throw new ResourceHostException( String.format( "Container with name %s already exists", hostname ) );
+        }
+        catch ( HostNotFoundException e )
+        {
+            //ignore
         }
 
         Future<ContainerHost> containerHostFuture =
@@ -610,98 +583,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    /**
-     * Promotes a given clone into a template with given name. This method gives possibility to promote a copy of the
-     * clone instead of the clone itself.
-     *
-     * @param cloneName name of the clone to be converted
-     * @param newName new name for template
-     * @param copyit if set <tt>true</tt>, a copy of clone is made first and a copied clone is promoted to template
-     *
-     * @return <tt>true</tt> if promote successfully completed
-     */
-    public boolean promote( String cloneName, String newName, boolean copyit ) throws ResourceHostException
-    {
-        List<String> args = new ArrayList<>();
-        if ( newName != null && newName.length() > 0 )
-        {
-            args.add( "-n " + newName );
-        }
-        if ( copyit )
-        {
-            args.add( "-c" );
-        }
-        args.add( cloneName );
-        String[] arr = args.toArray( new String[args.size()] );
-        try
-        {
-            CommandResult commandResult = run( Command.PROMOTE, arr );
-            if ( !commandResult.hasSucceeded() )
-            {
-                throw new ResourceHostException( String.format( "Could not promote container %s.", cloneName ) );
-            }
-        }
-        catch ( CommandException ce )
-        {
-            LOG.error( "Command exception.", ce );
-            throw new ResourceHostException( "General command exception on promoting container.", ce );
-        }
-        return true;
-    }
-
-
-    /**
-     * Exports the template in the given server into a deb package.
-     *
-     * @param templateName the template name to be exported
-     *
-     * @return path to generated deb package
-     */
-    public String exportTemplate( String templateName ) throws ResourceHostException
-    {
-        try
-        {
-            CommandResult commandResult = run( Command.EXPORT, templateName );
-            if ( !commandResult.hasSucceeded() )
-            {
-                throw new ResourceHostException(
-                        String.format( "Could not export template %s on %s.", templateName, hostname ) );
-            }
-        }
-        catch ( CommandException ce )
-        {
-            LOG.warn( "Error exporting template", ce );
-        }
-        return getExportedPackageFilePath( templateName );
-    }
-
-
-    /**
-     * Gets a full Debian package name for a given template. Name does not have <tt>.deb</tt> extension.
-     *
-     * @param templateName the template name
-     */
-    public String getDebianPackageName( String templateName ) throws ResourceHostException
-    {
-        try
-        {
-            CommandResult commandResult = execute( Command.GET_DEB_PACKAGE_NAME.build( templateName ) );
-            if ( commandResult.hasSucceeded() )
-            {
-                return commandResult.getStdOut();
-            }
-            else
-            {
-                return null;
-            }
-        }
-        catch ( CommandException e )
-        {
-            throw new ResourceHostException( "Could not get deb package name.", e );
-        }
-    }
-
-
     public void setRegistry( final TemplateRegistry registry )
     {
         this.registry = registry;
@@ -711,61 +592,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public void setHostRegistry( final HostRegistry hostRegistry )
     {
         this.hostRegistry = hostRegistry;
-    }
-
-
-    private String getExportedPackageFilePath( String templateName ) throws ResourceHostException
-    {
-        String result = null;
-        try
-        {
-            CommandResult dirCommandResult = execute( Command.SUBUTAI_TMPDIR.build() );
-            if ( dirCommandResult.hasSucceeded() )
-            {
-                String dir = dirCommandResult.getStdOut();
-                CommandResult packageNameCommandResult = execute( Command.GET_PACKAGE_NAME.build( templateName ) );
-                if ( packageNameCommandResult.hasSucceeded() )
-                {
-                    result = Paths.get( dir, packageNameCommandResult.getStdOut() ).toString();
-                }
-            }
-        }
-        catch ( CommandException e )
-        {
-            throw new ResourceHostException( "Could not get exported package file path.", e );
-        }
-
-        if ( result == null )
-        {
-            throw new ResourceHostException(
-                    String.format( "Could not get exported package file path of template %s", templateName ) );
-        }
-        return result;
-    }
-
-
-    /**
-     * Gets package name for a given template. Package name is a name used in Apt commands. It is NOT a full Debian
-     * package name of a template.
-     */
-    public String getPackageName( String templateName ) throws ResourceHostException
-    {
-        try
-        {
-            CommandResult commandResult = execute( Command.GET_PACKAGE_NAME.build( templateName ) );
-            if ( commandResult.hasSucceeded() )
-            {
-                return commandResult.getStdOut();
-            }
-            else
-            {
-                return null;
-            }
-        }
-        catch ( CommandException e )
-        {
-            throw new ResourceHostException( "Could not get package name.", e );
-        }
     }
 
 

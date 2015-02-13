@@ -30,7 +30,6 @@ import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
-import org.safehaus.subutai.core.env.impl.tasks.CreateEnvironmentTask;
 import org.safehaus.subutai.core.env.impl.tasks.DestroyContainerTask;
 import org.safehaus.subutai.core.env.impl.tasks.DestroyEnvironmentTask;
 import org.safehaus.subutai.core.env.impl.tasks.GrowEnvironmentTask;
@@ -136,6 +135,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
+    public Environment createEmptyEnvironment( final String name )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
+        final EnvironmentImpl environment = new EnvironmentImpl( name );
+
+        saveEnvironment( environment );
+        setEnvironmentTransientFields( environment );
+
+        notifyOnEnvironmentCreated( environment );
+
+        return environment;
+    }
+
+
+    @Override
     public Environment createEnvironment( final String name, final Topology topology, boolean async )
             throws EnvironmentCreationException
     {
@@ -143,30 +157,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
-        final EnvironmentImpl environment = new EnvironmentImpl( name );
+        final Environment environment = createEmptyEnvironment( name );
 
-        final ResultHolder<EnvironmentCreationException> resultHolder = new ResultHolder<>();
-
-        CreateEnvironmentTask createEnvironmentTask =
-                new CreateEnvironmentTask( this, environment, resultHolder, topology );
-
-        executor.submit( createEnvironmentTask );
-
-        if ( !async )
+        try
         {
-            try
-            {
-                createEnvironmentTask.waitCompletion();
-
-                if ( resultHolder.getResult() != null )
-                {
-                    throw resultHolder.getResult();
-                }
-            }
-            catch ( InterruptedException e )
-            {
-                throw new EnvironmentCreationException( e );
-            }
+            growEnvironment( environment.getId(), topology, async );
+        }
+        catch ( EnvironmentModificationException | EnvironmentNotFoundException e )
+        {
+            throw new EnvironmentCreationException( e );
         }
 
         return environment;

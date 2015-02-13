@@ -289,7 +289,7 @@ public class MonitorImplTest
         String subscriberId = StringUtils.repeat( "s", 100 );
         when( alertListener.getSubscriberId() ).thenReturn( longSubscriberId );
         when( containerHost.getPeer() ).thenReturn( localPeer );
-        when( localPeer.getResourceHostByContainerId( HOST_ID.toString() ) ).thenReturn( resourceHost );
+        when( localPeer.getResourceHostByContainerId( HOST_ID ) ).thenReturn( resourceHost );
         CommandResult commandResult = mock( CommandResult.class );
         when( commandResult.hasSucceeded() ).thenReturn( true );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
@@ -310,7 +310,7 @@ public class MonitorImplTest
         when( alertListener.getSubscriberId() ).thenReturn( longSubscriberId );
         when( containerHost.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID.toString() );
         when( containerHost.getPeer() ).thenReturn( localPeer );
-        when( localPeer.getResourceHostByContainerId( HOST_ID.toString() ) ).thenReturn( resourceHost );
+        when( localPeer.getResourceHostByContainerId( HOST_ID ) ).thenReturn( resourceHost );
         CommandResult commandResult = mock( CommandResult.class );
         when( commandResult.hasSucceeded() ).thenReturn( true );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
@@ -392,8 +392,8 @@ public class MonitorImplTest
         when( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) ).thenReturn( containerGroup );
         when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( HOST_ID ) );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
-        when( localPeer.getResourceHostByContainerId( HOST_ID.toString() ) ).thenReturn( resourceHost );
-        when( resourceHost.getContainerHostById( HOST_ID.toString() ) ).thenReturn( containerHost );
+        when( localPeer.getResourceHostByContainerId( HOST_ID ) ).thenReturn( resourceHost );
+        when( resourceHost.getContainerHostById( HOST_ID ) ).thenReturn( containerHost );
 
 
         Set<ContainerHostMetric> metrics = monitor.getContainerHostsMetrics( environment );
@@ -456,8 +456,8 @@ public class MonitorImplTest
         ContainerGroup containerGroup = mock( ContainerGroup.class );
         when( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) ).thenReturn( containerGroup );
         when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( HOST_ID ) );
-        when( localPeer.getResourceHostByContainerId( HOST_ID.toString() ) ).thenReturn( resourceHost );
-        when( resourceHost.getContainerHostById( HOST_ID.toString() ) ).thenReturn( containerHost );
+        when( localPeer.getResourceHostByContainerId( HOST_ID ) ).thenReturn( resourceHost );
+        when( resourceHost.getContainerHostById( HOST_ID ) ).thenReturn( containerHost );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
 
 
@@ -475,7 +475,7 @@ public class MonitorImplTest
         when( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) ).thenReturn( containerGroup );
         when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( HOST_ID ) );
         HostNotFoundException exception = mock( HostNotFoundException.class );
-        doThrow( exception ).when( localPeer ).getResourceHostByContainerId( anyString() );
+        doThrow( exception ).when( localPeer ).getResourceHostByContainerId( any(UUID.class) );
 
 
         monitor.getLocalContainerHostsMetrics( ENVIRONMENT_ID );
@@ -494,7 +494,7 @@ public class MonitorImplTest
         when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( HOST_ID ) );
 
         HostNotFoundException exception = mock( HostNotFoundException.class );
-        doThrow( exception ).when( localPeer ).getResourceHostByContainerId( HOST_ID.toString() );
+        doThrow( exception ).when( localPeer ).getResourceHostByContainerId( HOST_ID );
 
 
         monitor.getLocalContainerHostsMetrics( ENVIRONMENT_ID );
@@ -623,7 +623,7 @@ public class MonitorImplTest
     @Test
     public void testActivateMonitoringAtLocalContainers() throws Exception
     {
-        when( localPeer.getResourceHostByContainerId( HOST_ID.toString() ) ).thenReturn( resourceHost );
+        when( localPeer.getResourceHostByContainerId( HOST_ID ) ).thenReturn( resourceHost );
         CommandResult commandResult = mock( CommandResult.class );
         when( commandResult.hasSucceeded() ).thenReturn( true );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
@@ -641,7 +641,7 @@ public class MonitorImplTest
 
 
         HostNotFoundException exception = mock( HostNotFoundException.class );
-        doThrow( exception ).when( localPeer ).getResourceHostByContainerId( HOST_ID.toString() );
+        doThrow( exception ).when( localPeer ).getResourceHostByContainerId( HOST_ID );
 
         monitor.activateMonitoringAtLocalContainers( Sets.newHashSet( containerHost ), monitoringSettings );
 
@@ -654,7 +654,7 @@ public class MonitorImplTest
     public void testActivateMonitoring() throws Exception
     {
         when( containerHost.getPeer() ).thenReturn( localPeer );
-        when( localPeer.getResourceHostByContainerId( HOST_ID.toString() ) ).thenReturn( resourceHost );
+        when( localPeer.getResourceHostByContainerId( HOST_ID ) ).thenReturn( resourceHost );
         CommandResult commandResult = mock( CommandResult.class );
         when( commandResult.hasSucceeded() ).thenReturn( true );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
