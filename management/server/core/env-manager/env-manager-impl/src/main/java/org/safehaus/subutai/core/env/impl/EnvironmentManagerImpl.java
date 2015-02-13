@@ -135,17 +135,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public Environment createEmptyEnvironment( final String name )
+    public UUID createEmptyEnvironment( final String name )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
+
         final EnvironmentImpl environment = new EnvironmentImpl( name );
 
         saveEnvironment( environment );
+
         setEnvironmentTransientFields( environment );
 
         notifyOnEnvironmentCreated( environment );
 
-        return environment;
+        return environment.getId();
     }
 
 
@@ -157,18 +159,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
-        final Environment environment = createEmptyEnvironment( name );
+        final UUID environmentId = createEmptyEnvironment( name );
 
         try
         {
-            growEnvironment( environment.getId(), topology, async );
+            growEnvironment( environmentId, topology, async );
+
+            return findEnvironment( environmentId );
         }
         catch ( EnvironmentModificationException | EnvironmentNotFoundException e )
         {
             throw new EnvironmentCreationException( e );
         }
-
-        return environment;
     }
 
 
