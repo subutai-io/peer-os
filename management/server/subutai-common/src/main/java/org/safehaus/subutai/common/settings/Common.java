@@ -12,6 +12,7 @@ public class Common
     public static final String HOSTNAME_REGEX =
             "^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])(\\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]{0,"
                     + "61}[a-zA-Z0-9]))*$";
+    public static final int MAX_CONTAINER_NAME_LEN = 64;
 
     public static final String ENVIRONMENT_ID_HEADER_NAME = "ENV_ID";
 
