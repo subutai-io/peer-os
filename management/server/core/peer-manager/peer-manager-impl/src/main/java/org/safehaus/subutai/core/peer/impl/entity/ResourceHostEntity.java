@@ -62,8 +62,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @javax.persistence.Transient
     transient private static final Pattern LOAD_AVERAGE_PATTERN = Pattern.compile( "load average: (.*)" );
     @javax.persistence.Transient
-    transient private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
-    @javax.persistence.Transient
     transient private ExecutorService singleThreadExecutorService = Executors.newSingleThreadExecutor();
 
 
@@ -485,11 +483,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             return;
         }
         // trying add repository
-        /* TODO
-           download each template except master in ancestry lineage if not installed already
-           install it using dpkg -i
-           then proceed
-          */
         updateRepository( template );
         importTemplate( template );
         if ( !templateExists( template ) )
