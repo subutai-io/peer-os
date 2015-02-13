@@ -6,8 +6,10 @@ import java.util.Set;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
+import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
@@ -20,6 +22,15 @@ public interface ContainerHost extends Host
 {
     @Deprecated
     public PeerQuotaInfo getQuota( QuotaType quotaType ) throws PeerException;
+
+    /**
+     * Get quotaInfo for specified type
+     *
+     * @param quotaType - Simple Enum indicating quota type
+     *
+     * @return - Abstract class for quota, each quota extends this class
+     */
+    public QuotaInfo getQuotaInfo( QuotaType quotaType ) throws PeerException;
 
     @Deprecated
     public void setQuota( QuotaInfo quota ) throws PeerException;
@@ -65,6 +76,15 @@ public interface ContainerHost extends Host
      */
     public int getRamQuota() throws PeerException;
 
+
+    /**
+     * Get RAM quota object in details
+     * @return - MemoryQuotaInfo carries ram quota specific info
+     * @throws PeerException
+     */
+    public MemoryQuotaInfo getRamQuotaInfo() throws PeerException;
+
+
     /**
      * Sets RAM quota on container in megabytes
      *
@@ -79,6 +99,14 @@ public interface ContainerHost extends Host
      * @return - cpu quota on container in percent
      */
     public int getCpuQuota() throws PeerException;
+
+
+    /**
+     * Returns CPU quota object on container
+     *
+     * @return - cpu quota object on container
+     */
+    public CpuQuotaInfo getCpuQuotaInfo() throws PeerException;
 
     /**
      * Sets CPU quota on container in percent

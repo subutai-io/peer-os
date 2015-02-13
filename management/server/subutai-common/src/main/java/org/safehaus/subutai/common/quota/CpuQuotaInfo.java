@@ -30,18 +30,19 @@ public class CpuQuotaInfo extends QuotaInfo
     @Override
     public String getQuotaValue()
     {
-        String cpuAmount = String.valueOf( percentage );
-        if ( percentage == 0 )
-        {
-            cpuAmount = "none";
-        }
-        return cpuAmount;
+        return String.format( "%d", percentage );
     }
 
 
     @Override
     public String getQuotaKey()
     {
-        return "cpu";
+        return QuotaType.QUOTA_TYPE_CPU.getKey();
+    }
+
+
+    public QuotaType getQuotaType()
+    {
+        return QuotaType.QUOTA_TYPE_CPU;
     }
 }
