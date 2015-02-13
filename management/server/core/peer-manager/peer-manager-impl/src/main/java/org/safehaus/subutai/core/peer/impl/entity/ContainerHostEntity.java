@@ -28,7 +28,12 @@ import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
+import org.safehaus.subutai.core.peer.api.ContainerGroup;
+import org.safehaus.subutai.core.peer.api.ContainerGroupNotFoundException;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -42,6 +47,8 @@ import com.google.common.base.Strings;
 @Access( AccessType.FIELD )
 public class ContainerHostEntity extends AbstractSubutaiHost implements ContainerHost
 {
+    private static final Logger LOG = LoggerFactory.getLogger( ContainerHostEntity.class );
+
     @ManyToOne( targetEntity = ResourceHostEntity.class )
     @JoinColumn( name = "parent_id" )
     private ResourceHost parent;
@@ -56,9 +63,18 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Transient
     private DataService dataService;
 
+    @Transient
+    private LocalPeer localPeer;
+
 
     protected ContainerHostEntity()
     {
+    }
+
+
+    public void setLocalPeer( final LocalPeer localPeer )
+    {
+        this.localPeer = localPeer;
     }
 
 
@@ -82,7 +98,16 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     public String getEnvironmentId()
     {
-        throw new UnsupportedOperationException();
+        try
+        {
+            ContainerGroup containerGroup = localPeer.findContainerGroupByContainerId( getId() );
+
+            return containerGroup.getEnvironmentId().toString();
+        }
+        catch ( ContainerGroupNotFoundException e )
+        {
+            throw new UnsupportedOperationException( "This operation is not allowed for non environment containers" );
+        }
     }
 
 
@@ -193,62 +218,83 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public ProcessResourceUsage getProcessResourceUsage( final int processPid ) throws PeerException
     {
         Peer peer = getPeer();
-        return peer.getProcessResourceUsage( getId(), processPid );
+        return peer.getProcessResourceUsage( this, processPid );
     }
 
 
     @Override
     public int getRamQuota() throws PeerException
     {
-        return getPeer().getRamQuota( getId() );
+        return getPeer().getRamQuota( this );
     }
 
 
     @Override
     public void setRamQuota( final int ramInMb ) throws PeerException
     {
-        getPeer().setRamQuota( getId(), ramInMb );
+        getPeer().setRamQuota( this, ramInMb );
     }
 
 
     @Override
     public int getCpuQuota() throws PeerException
     {
-        return getPeer().getCpuQuota( getId() );
+        return getPeer().getCpuQuota( this );
     }
 
 
     @Override
     public void setCpuQuota( final int cpuPercent ) throws PeerException
     {
-        getPeer().setCpuQuota( getId(), cpuPercent );
+        getPeer().setCpuQuota( this, cpuPercent );
     }
 
 
     @Override
     public Set<Integer> getCpuSet() throws PeerException
     {
-        return getPeer().getCpuSet( getId() );
+        return getPeer().getCpuSet( this );
     }
 
 
     @Override
     public void setCpuSet( final Set<Integer> cpuSet ) throws PeerException
     {
-        getPeer().setCpuSet( getId(), cpuSet );
+        getPeer().setCpuSet( this, cpuSet );
     }
 
 
     @Override
     public DiskQuota getDiskQuota( final DiskPartition diskPartition ) throws PeerException
     {
-        return getPeer().getDiskQuota( getId(), diskPartition );
+        return getPeer().getDiskQuota( this, diskPartition );
     }
 
 
     @Override
     public void setDiskQuota( final DiskQuota diskQuota ) throws PeerException
     {
-        getPeer().setDiskQuota( getId(), diskQuota );
+        getPeer().setDiskQuota( this, diskQuota );
+    }
+
+
+    @Override
+    public int getAvailableRamQuota() throws PeerException
+    {
+        return getPeer().getAvailableRamQuota( this );
+    }
+
+
+    @Override
+    public int getAvailableCpuQuota() throws PeerException
+    {
+        return getPeer().getAvailableCpuQuota( this );
+    }
+
+
+    @Override
+    public DiskQuota getAvailableDiskQuota( final DiskPartition diskPartition ) throws PeerException
+    {
+        return getPeer().getAvailableDiskQuota( this, diskPartition );
     }
 }

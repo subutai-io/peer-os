@@ -10,6 +10,9 @@ public enum DiskQuotaUnit
     KB( "K", "Kilobytes" ),
     MB( "M", "Megabytes" ),
     GB( "G", "Gigabytes" ),
+    TB( "T", "Terabytes" ),
+    PB( "P", "Petabytes" ),
+    EB( "E", "Exabytes" ),
     UNLIMITED( "none", "Unlimited" );
     private String acronym;
     private String name;

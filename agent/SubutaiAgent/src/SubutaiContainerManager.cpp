@@ -32,13 +32,13 @@ SubutaiContainerManager::SubutaiContainerManager(string lxc_path, SubutaiLogger*
     // Check for running containers in case we just started an app
     // after crash
     try {
-    	/*remove the containerIdList to get rid of the previous list and create a clean one*/
-    	if( remove( "/etc/subutai-agent/containerIdList.txt" ) != 0 )
-    		_logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", "Cannot clean container id list."));
-    	else
-    		_logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Container id list is removed.."));
-
     	_containers = findAllContainers();
+    	updateContainerIdListOnStart(); // remove the id-hostname matchings for removed containers from containerIdList
+    	for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++)
+    	{
+    		(*it).getContainerId();
+    	}
+
     } catch (SubutaiException e) {
         _logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", e.displayText()));         
     } catch (std::exception e) {
@@ -47,6 +47,8 @@ SubutaiContainerManager::SubutaiContainerManager(string lxc_path, SubutaiLogger*
 
     _logger->writeLog(6, _logger->setLogData("<SubutaiContainerManager>", "Initializing"));
 }
+
+
 /**
  * \details 	Default destructor of SubutaiContainerManager
  */
@@ -54,6 +56,38 @@ SubutaiContainerManager::~SubutaiContainerManager()
 {
 }
 
+/**
+ * \details 	check if a container is deleted or added and update container hostname-id matching list on start of agent
+ */
+void SubutaiContainerManager::updateContainerIdListOnStart()
+{
+	 	string hostname_file, id;
+
+	 	string path = "/etc/subutai-agent/";
+	    string uuidFile = path + "containerIdList.txt";
+
+	    ifstream file(uuidFile.c_str());
+	    ofstream temp("temp.txt"); // put id-hostname matchings which wont be deleted in temp
+
+
+	    while(file >> hostname_file >> id)
+	    {
+	    	for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
+	    	   	/*If new container is added, containerIdList is updated in getContainerId() method*/
+	    	    if ( !strcmp(hostname_file.c_str(), (*it).getContainerHostnameValue().c_str()))
+	    	    {
+	    	    	temp << hostname_file << " " << id << endl;
+	    	    	break;
+	    	    }
+	    	}
+	    }
+	    file.clear(); // clear eof and fail bits
+	    file.seekg(0, ios::beg);
+	    file.close();
+	    temp.close();
+	    remove(uuidFile.c_str());
+	    rename("temp.txt",uuidFile.c_str());
+}
 
 /**
  * \details 	Check if container with the name given is running
@@ -129,6 +163,74 @@ void SubutaiContainerManager::deleteContainerInfo(string hostname)
 }
 
 /*
+ * \details get the word from a line when the end of the word is specified with \n - new line.
+ *
+ */
+void get_word_from_line(char * line, int size)
+{
+	for(int i=0; i<size; i++)
+	{
+		if(line[i] == '\n')
+		{
+			line[i] = '\0';
+			break;
+		}
+	}
+}
+
+/*
+ * \details This method gets the list of containers using subutai methodology.
+ */
+vector<string> SubutaiContainerManager::getContainers()
+{
+	FILE * fp = popen("subutai list -c", "r");
+	vector<string> containerList;
+	if (fp)
+	{
+		char *line=NULL; size_t n;
+		if ((getline(&line, &n, fp) > 0) )
+		{
+			get_word_from_line(line, static_cast<int>(n) );
+			if(strcmp(line, "CONTAINER") != 0 )
+			{
+				_logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Return value of 'subutai list -c' is changed.. The first line is not 'CONTAINER'. It may cause problems, please check."));
+			}
+		}
+		if ((getline(&line, &n, fp) > 0) )
+		{
+			get_word_from_line(line, static_cast<int>(n) );
+			if(strcmp(line, "---------") != 0 )
+			{
+				_logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Return value of 'subutai list -c' is changed.. The second line is not '---------'. It may cause problems, please check."));
+			}
+		}
+	    while ((getline(&line, &n, fp) > 0) && line)
+	    {
+	    	get_word_from_line(line, static_cast<int>(n) );
+	     	containerList.push_back(line);
+	    }
+	}
+	return containerList;
+}
+
+/*
+ * \details lxc api returns both containers and templates by list_all_containers.
+ * 			This method returns true if element is not template.
+ *
+ */
+bool SubutaiContainerManager::checkIfTemplate(string container_name, vector<string> containerList, bool isSubutaiAvailable)
+{
+	// Template - container difference is only available for Subutai systems, otherwise always return true.
+	if(!isSubutaiAvailable) return false;
+	for(vector<string>::const_iterator it = containerList.begin(); it != containerList.end(); ++it)
+	{
+		if ( strcmp( (*it).c_str(), container_name.c_str()) == 0) return false;
+	}
+	return true;
+}
+
+
+/*
  * \details find all containers - returns all defined containers -active stopped running
  *
  */
@@ -136,16 +238,22 @@ vector<SubutaiContainer> SubutaiContainerManager::findAllContainers()
 {
     _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Get all containers."));
     vector<SubutaiContainer> containers;
+    vector<string> subutai_containers;
     char** names;
     lxc_container** cont;
     int num;
+    bool isSubutaiAvailable = system("which subutai")==0;
     try {
+    	if(isSubutaiAvailable) subutai_containers = getContainers();
         num = list_all_containers(_lxc_path.c_str(), &names, &cont);
         for (int i = 0; i < num; i++) {
-            SubutaiContainer* c = new SubutaiContainer(_logger, cont[i]);
-            c->setContainerHostname(names[i]);
-            _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", c->getContainerHostnameValue() + " added.."));
-            containers.push_back(*c);
+        	if( !checkIfTemplate(names[i], subutai_containers, isSubutaiAvailable) )
+        	{
+				SubutaiContainer* c = new SubutaiContainer(_logger, cont[i]);
+				c->setContainerHostname(names[i]);
+				_logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", c->getContainerHostnameValue() + " added.."));
+				containers.push_back(*c);
+        	}
         }
     } catch (SubutaiException e) {
         _logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", e.displayText()));
@@ -195,30 +303,42 @@ void SubutaiContainerManager::updateContainerLists()
     _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Update container list and their fields.."));
     char** names;
     lxc_container** cont;
+    vector<string> subutai_containers;
     int num, index = 0, size_of_containers = _containers.size();
+    bool isSubutaiAvailable = system("which subutai")==0;
     try {
+    	if(isSubutaiAvailable)
+    	{
+    		subutai_containers = getContainers();
+    	}
         num = list_all_containers(_lxc_path.c_str(), &names, &cont);
         bool destroy_container_check[size_of_containers];
         /* hold destroy container check array to control which container is deleted. */
-        for (int i = 0; i < size_of_containers; i++) destroy_container_check[i] = false;
+        for (int i = 0; i < size_of_containers; i++)
+        {
+        	destroy_container_check[i] = false;
+        }
         for (int i = 0; i < num; i++) {
-            // Check is there is any new conatiner appears
-            bool containerFound = false;
-            index = 0;
-            for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
-                if ((*it).getContainerHostnameValue() == string(names[i])) {
-                    containerFound = true;
-                    destroy_container_check[index] = true;
-                    break;
-                }
-                index++;
-            }
-            if (!containerFound) {
-                SubutaiContainer* c = new SubutaiContainer(_logger, cont[i]);
-                c->setContainerHostname(names[i]);
-                _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", c->getContainerHostnameValue() + " added.."));
-                _containers.push_back(*c);
-            }
+        	if( !checkIfTemplate(names[i], subutai_containers, isSubutaiAvailable) )
+        	{
+				// Check is there is any new container appears
+				bool containerFound = false;
+				index = 0;
+				for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
+					if ((*it).getContainerHostnameValue() == string(names[i])) {
+						containerFound = true;
+						destroy_container_check[index] = true;
+						break;
+					}
+					index++;
+				}
+				if (!containerFound) {
+					SubutaiContainer* c = new SubutaiContainer(_logger, cont[i]);
+					c->setContainerHostname(names[i]);
+					_logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", c->getContainerHostnameValue() + " added.."));
+					_containers.push_back(*c);
+				}
+			}
         }
 
 

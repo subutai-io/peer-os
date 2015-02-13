@@ -69,7 +69,7 @@ public class RemotePeerMessageSenderTest
         boolean result = remotePeerMessageSender.call();
 
         assertTrue( result );
-        verify( restUtil ).request( isA( RestUtil.RequestType.class ), anyString(), anyMap() );
+        verify( restUtil ).request( isA( RestUtil.RequestType.class ), anyString(), anyMap(), anyMap() );
         verify( messengerDao ).markAsSent( envelope );
     }
 
@@ -77,7 +77,7 @@ public class RemotePeerMessageSenderTest
     @Test
     public void testCallException() throws Exception
     {
-        when( restUtil.request( any( RestUtil.RequestType.class ), anyString(), anyMap() ) )
+        when( restUtil.request( any( RestUtil.RequestType.class ), anyString(), anyMap(), anyMap() ) )
                 .thenThrow( new HTTPException( "" ) );
 
         remotePeerMessageSender.call();

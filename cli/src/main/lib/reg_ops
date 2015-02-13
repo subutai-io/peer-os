@@ -139,6 +139,8 @@ function list_reg_templates {
   local url=`build_rest_url $SUBUTAI_REST_LIST_TEMPLATES`
   IFS=$'\n'
   response=$(curl -s $url)
+  # this is necessary to initialize response with newline instead of \n
+  response=$(echo -e $response | sed 's/\"//g')
   for i in $response
   do
     if [ "$parents" == "parents" ]; then
@@ -147,6 +149,7 @@ function list_reg_templates {
       echo "$i" | awk '{print $1}'
     fi
   done
+  unset IFS
 }
   
 # URGENT: this is a stub function and needs to be properly implemented

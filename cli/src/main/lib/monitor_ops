@@ -48,7 +48,6 @@ function get_maximum_cpu_capacity_nanoseconds {
 
   local result=$(echo $cfs_quota*$seconds_to_nanoseconds/$cfs_period | bc)
   echo "$result"
-#  echo "asd"
   return
 }
 
@@ -92,6 +91,7 @@ function get_available_ram {
 
 
 # returns the amount of ram used by the container
+# in bytes
 function get_used_ram {
   local lxc=$1
   lxc_assert $lxc > /dev/null
@@ -288,6 +288,7 @@ function get_used_cpu {
 
 
 # returns the total ram capacity of the physical machine
+# in bytes
 function get_physical_total_ram {
   local total_ram_kb=$(grep MemTotal /proc/meminfo | awk '{print $2}')
   echo "$(($total_ram_kb * 1024))"
@@ -296,6 +297,7 @@ function get_physical_total_ram {
 
 
 # returns the available ram capacity of the physical machine
+# in bytes
 function get_physical_available_ram {
   local total_ram=$(get_physical_total_ram)
   local used_ram=$(get_physical_used_ram)
@@ -305,6 +307,7 @@ function get_physical_available_ram {
 
 
 # returns the used ram amount of the physical machine
+# in bytes
 function get_physical_used_ram {
   local used_ram=$(cat /sys/fs/cgroup/memory/memory.usage_in_bytes)
   local status=$?
@@ -494,6 +497,14 @@ function get_total_diskRootfs {
   echo $(get_total_disk_by_dataset "$lxc" "rootfs")
 }
 
+
+# returns the pool name of the specified dataset
+function get_pool_by_dataset {
+  local dataset=$1
+  assert_dataset $dataset
+
+  get_"$dataset"_dataset_pool
+}
 
 # returns the pool name where "var" dataset is mounted to
 function get_var_dataset_pool {
@@ -1812,4 +1823,35 @@ function is_number {
   return
 }
 
+
+# returns human readable output for the provided byte value
+# note: it appends B|K|M|G|T|P|E to the output
+function get_readable_output_from_byte {
+  local bytes=$1
+  assert_number $bytes
+  local precision_count=2
+  local kilobytes=$(echo "scale=$precision_count; $bytes/1024" | bc)
+  local megabytes=$(echo "scale=$precision_count; $kilobytes/1024" | bc)
+  local gigabytes=$(echo "scale=$precision_count; $megabytes/1024" | bc)
+  local terabytes=$(echo "scale=$precision_count; $gigabytes/1024" | bc)
+  local petabytes=$(echo "scale=$precision_count; $terabytes/1024" | bc)
+  local exabytes=$(echo "scale=$precision_count; $petabytes/1024" | bc)
+
+  if (( $(bc <<< "$bytes <= 1024") == 1 )); then
+    echo $bytes"B"
+  elif (( $(bc <<< "$kilobytes <= 1024") == 1 )); then
+    echo $kilobytes"K"
+  elif (( $(bc <<< "$megabytes <= 1024") == 1 )); then
+    echo $megabytes"M"
+  elif (( $(bc <<< "$gigabytes <= 1024") == 1 )); then
+    echo $gigabytes"G"
+  elif (( $(bc <<< "$terabytes <= 1024") == 1 )); then
+    echo $terabytes"T"
+  elif (( $(bc <<< "$petabytes <= 1024") == 1 )); then
+    echo $petabytes"P"
+  else (( $(bc <<< "$exabytes <= 1024") == 1 ))
+    echo $exabytes"E"
+  fi
+  return
+}
 

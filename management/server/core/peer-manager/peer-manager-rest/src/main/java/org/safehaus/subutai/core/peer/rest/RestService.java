@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.peer.rest;
 
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -13,19 +12,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.common.peer.PeerInfo;
-
 
 public interface RestService
 {
 
-
-    @Deprecated
-    @POST
-    @Path( "peer" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    @Consumes( MediaType.TEXT_PLAIN )
-    public PeerInfo registerPeer( @QueryParam( "peer" ) String peer );
 
     @GET
     @Path( "id" )
@@ -37,41 +27,12 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getRegisteredPeers();
 
-
-    @POST
-    @Path( "container/destroy" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response destroyContainer( @FormParam( "hostId" ) String host );
-
-    @POST
-    @Path( "container/start" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response startContainer( @FormParam( "hostId" ) String host );
-
-    @POST
-    @Path( "container/stop" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response stopContainer( @FormParam( "hostId" ) String host );
-
-    @POST
-    @Path( "container/isconnected" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response isContainerConnected( @FormParam( "hostId" ) String hostId );
-
-
-    @POST
-    @Path( "template/get" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getTemplate( @FormParam( "templateName" ) String templateName );
-
-    @GET
-    @Path( "container/state" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getContainerState( @QueryParam( "containerId" ) String containerId );
-
     @GET
     @Path( "ping" )
     public Response ping();
+
+
+    //*************** Peer Registration Handshake REST - BEGIN ***************************
 
     @POST
     @Path( "register" )
@@ -88,24 +49,72 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response updatePeer( @QueryParam( "peer" ) String peer );
 
+    //*************** Peer Registration Handshake REST - END ***************************
+
+
+    //*********** Environment Specific REST - BEGIN ***************
 
     @POST
     @Path( "container/quota" )
-    Response setQuota( @FormParam( "hostId" ) String hostId, @FormParam( "quotaInfo" ) String quotaInfo );
+    Response setQuota( @FormParam( "containerId" ) String containerId, @FormParam( "quotaInfo" ) String quotaInfo );
 
     @GET
     @Path( "container/quota" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response getQuota( @QueryParam( "hostId" ) String hostId, @QueryParam( "quotaType" ) String quotaType );
+    Response getQuota( @QueryParam( "containerId" ) String containerId, @QueryParam( "quotaType" ) String quotaType );
 
+    @POST
+    @Path( "container/destroy" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response destroyContainer( @FormParam( "containerId" ) String containerId );
 
-    //*********** Quota functions ***************
+    @POST
+    @Path( "container/start" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response startContainer( @FormParam( "containerId" ) String containerId );
+
+    @POST
+    @Path( "container/stop" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response stopContainer( @FormParam( "containerId" ) String containerId );
+
+    @POST
+    @Path( "container/isconnected" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response isContainerConnected( @FormParam( "containerId" ) String containerId );
+
+    @GET
+    @Path( "container/state" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getContainerState( @QueryParam( "containerId" ) String containerId );
+
+    @GET
+    @Path( "template/get" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getTemplate( @FormParam( "templateName" ) String templateName );
 
     @GET
     @Path( "container/resource/usage" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response getProcessResourceUsage( @QueryParam( "hostId" ) String hostId,
+    Response getProcessResourceUsage( @QueryParam( "containerId" ) String containerId,
                                       @QueryParam( "processId" ) int processPid );
+
+    @GET
+    @Path( "container/quota/ram/available" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getAvailableRamQuota( @QueryParam( "containerId" ) String containerId );
+
+    @GET
+    @Path( "container/quota/cpu/available" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getAvailableCpuQuota( @QueryParam( "containerId" ) String containerId );
+
+    @GET
+    @Path( "container/quota/disk/available" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getAvailableDiskQuota( @QueryParam( "containerId" ) String containerId,
+                                    @QueryParam( "diskPartition" ) String diskPartition );
+
 
     @GET
     @Path( "container/quota/ram" )
@@ -143,4 +152,6 @@ public interface RestService
     @POST
     @Path( "container/quota/disk" )
     Response setDiskQuota( @FormParam( "containerId" ) String containerId, @FormParam( "diskQuota" ) String diskQuota );
+
+    //*********** Environment Specific REST - END ***************
 }

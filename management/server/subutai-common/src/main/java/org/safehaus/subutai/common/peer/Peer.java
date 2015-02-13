@@ -60,8 +60,10 @@ public interface Peer
 
     public boolean isLocal();
 
+    @Deprecated
     public PeerQuotaInfo getQuota( ContainerHost host, QuotaType quotaType ) throws PeerException;
 
+    @Deprecated
     public void setQuota( ContainerHost host, QuotaInfo quotaInfo ) throws PeerException;
 
     public Template getTemplate( String templateName ) throws PeerException;
@@ -69,73 +71,123 @@ public interface Peer
     public boolean isOnline() throws PeerException;
 
     public <T, V> V sendRequest( T request, String recipient, int requestTimeout, Class<V> responseType,
-                                 int responseTimeout ) throws PeerException;
+                                 int responseTimeout, UUID environmentId ) throws PeerException;
 
-    public <T> void sendRequest( T request, String recipient, int requestTimeout ) throws PeerException;
+    public <T> void sendRequest( T request, String recipient, int requestTimeout, UUID environmentId )
+            throws PeerException;
 
-    public ContainerHostState getContainerHostState( String containerId ) throws PeerException;
+    public ContainerHostState getContainerHostState( ContainerHost host ) throws PeerException;
 
     //******** Quota functions ***********
 
-    public ProcessResourceUsage getProcessResourceUsage( UUID containerId, int processPid ) throws PeerException;
+    public ProcessResourceUsage getProcessResourceUsage( ContainerHost host, int processPid ) throws PeerException;
+
+    /**
+     * Returns available RAM quota on container in megabytes
+     *
+     * @param host - container
+     *
+     * @return - quota in mb
+     */
+    public int getAvailableRamQuota( ContainerHost host ) throws PeerException;
+
+    /**
+     * Returns available CPU quota on container in percent
+     *
+     * @param host - container
+     *
+     * @return - cpu quota on container in percent
+     */
+    public int getAvailableCpuQuota( ContainerHost host ) throws PeerException;
+
+    /**
+     * Returns available disk quota
+     *
+     * @param host - container
+     * @param diskPartition - disk partition which quota to return
+     *
+     * @return - disk partition quota
+     */
+    public DiskQuota getAvailableDiskQuota( ContainerHost host, DiskPartition diskPartition ) throws PeerException;
 
     /**
      * Returns RAM quota on container in megabytes
      *
-     * @param containerId - id of container
+     * @param host -  container
      *
      * @return - quota in mb
      */
-    public int getRamQuota( UUID containerId ) throws PeerException;
+    public int getRamQuota( ContainerHost host ) throws PeerException;
 
     /**
      * Sets RAM quota on container in megabytes
      *
-     * @param containerId - id of container
+     * @param host - container
      * @param ramInMb - quota in mb
      */
-    public void setRamQuota( UUID containerId, int ramInMb ) throws PeerException;
+    public void setRamQuota( ContainerHost host, int ramInMb ) throws PeerException;
 
 
     /**
      * Returns CPU quota on container in percent
      *
-     * @param containerId - id of container
+     * @param host - container
      *
      * @return - cpu quota on container in percent
      */
-    public int getCpuQuota( UUID containerId ) throws PeerException;
+    public int getCpuQuota( ContainerHost host ) throws PeerException;
 
     /**
      * Sets CPU quota on container in percent
      *
-     * @param containerId - id of container
+     * @param host - container
      * @param cpuPercent - cpu quota in percent
      */
-    public void setCpuQuota( UUID containerId, int cpuPercent ) throws PeerException;
+    public void setCpuQuota( ContainerHost host, int cpuPercent ) throws PeerException;
 
     /**
      * Returns allowed cpus/cores ids on container
      *
-     * @param containerId - id of container
+     * @param host - container
      *
      * @return - allowed cpu set
      */
-    public Set<Integer> getCpuSet( UUID containerId ) throws PeerException;
+    public Set<Integer> getCpuSet( ContainerHost host ) throws PeerException;
 
     /**
      * Sets allowed cpus/cores on container
      *
-     * @param containerId - id of container
+     * @param host - container
      * @param cpuSet - allowed cpu set
      */
-    public void setCpuSet( UUID containerId, Set<Integer> cpuSet ) throws PeerException;
+    public void setCpuSet( ContainerHost host, Set<Integer> cpuSet ) throws PeerException;
+
+    /**
+     * Returns disk quota
+     *
+     * @param host - container
+     * @param diskPartition - disk partition which quota to return
+     *
+     * @return - disk partition quota
+     */
+    public DiskQuota getDiskQuota( ContainerHost host, DiskPartition diskPartition ) throws PeerException;
 
 
-    public DiskQuota getDiskQuota( UUID containerId, DiskPartition diskPartition ) throws PeerException;
+    /**
+     * Sets disk partition quota
+     *
+     * @param host - container
+     * @param diskQuota - quota to set
+     */
+    public void setDiskQuota( ContainerHost host, DiskQuota diskQuota ) throws PeerException;
 
-    public void setDiskQuota( UUID containerId, DiskQuota diskQuota ) throws PeerException;
 
-
+    /**
+     * Destroys hosted part of environment
+     *
+     * @param environmentId - id fo environment
+     *
+     * @return {@code ContainersDestructionResult}
+     */
     public ContainersDestructionResult destroyEnvironmentContainers( UUID environmentId ) throws PeerException;
 }

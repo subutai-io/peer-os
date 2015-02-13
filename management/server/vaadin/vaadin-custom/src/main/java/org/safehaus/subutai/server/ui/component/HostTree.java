@@ -184,7 +184,7 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
                     if ( hostInfo instanceof ContainerHostInfo )
                     {
                         ContainerHost containerHost =
-                                peerManager.getLocalPeer().getContainerHostById( hostInfo.getId().toString() );
+                                peerManager.getLocalPeer().getContainerHostById( hostInfo.getId() );
                         if ( containerHost.getTags().contains( tag ) )
                         {
                             matchedContainerNames.add( containerHost.getHostname() );

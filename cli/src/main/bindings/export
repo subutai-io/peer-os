@@ -64,9 +64,9 @@ function export {
   
   assert_version_validity $version
    
-  ps aux | grep "subutai export $container" | grep -v $$ \
-         | grep -v "grep subutai" | grep -v "grep --color" > /dev/null 2>&1
-  if [ $? == 0 ]
+  ps aux | grep "[s]ubutai export $container$" | grep -v $$ > /dev/null 2>&1
+  local stat=$?
+  if [ "$stat" == "0" ]
   then
     msg_error "Container \"$container\" is being exported by other process!"
     exit 1

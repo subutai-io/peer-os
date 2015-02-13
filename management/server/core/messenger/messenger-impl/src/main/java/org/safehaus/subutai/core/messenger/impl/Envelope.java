@@ -18,6 +18,7 @@ public class Envelope
 {
     private final MessageImpl message;
     private final UUID targetPeerId;
+    private final UUID environmentId;
     private final String recipient;
     private final int timeToLive;
     private transient boolean isSent;
@@ -34,6 +35,7 @@ public class Envelope
         this.timeToLive = message.getTimeToLive();
         this.isSent = message.getIsSent();
         this.createDate = new Timestamp( message.getCreateDate() );
+        this.environmentId = message.getEnvironmentId();
     }
 
 
@@ -49,6 +51,7 @@ public class Envelope
         this.targetPeerId = targetPeerId;
         this.recipient = recipient;
         this.timeToLive = timeToLive;
+        this.environmentId = message.getEnvironmentId();
     }
 
 
@@ -97,5 +100,11 @@ public class Envelope
     public void setCreateDate( final Timestamp createDate )
     {
         this.createDate = ( Timestamp ) createDate.clone();
+    }
+
+
+    public UUID getEnvironmentId()
+    {
+        return environmentId;
     }
 }
