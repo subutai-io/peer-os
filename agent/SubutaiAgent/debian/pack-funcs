@@ -163,15 +163,41 @@ generateRepoPackage() {
      exit 1
   fi
 
+  #starting to genereate template repo package
+  generateTemplateRepo
+  echo "Repo wrapper package Successfully created."
+
+  popd
+
+}
+
+
+#generate Template repo package structure
+generateTemplateRepo() {
+  pushd $BASE
   templateName="temp"
 
   #check temp folder does exist or not
   if [ -d "$templateName" ]; then
     rm -rf "$BASE/$templateName"
   fi
-  cp -a $PACK $BASE/$templateName
 
-  sed -i "s/template/subutai-repo-$purePackageName/g" $BASE/$templateName/DEBIAN/control
+  #creating main folders  
+  mkdir -p $BASE/$templateName/DEBIAN
+  mkdir -p $BASE/$templateName/repo/ksks/amd64/trusty
+
+  #generating and filling control file 
+  touch $BASE/$templateName/DEBIAN/control
+  chmod 755 $BASE/$templateName/DEBIAN/control
+  echo "Package: subutai-repo-$purePackageName" >> $BASE/$templateName/DEBIAN/control
+  echo "Version: $version_new" >> $BASE/$templateName/DEBIAN/control
+  echo "Architecture: $archType" >> $BASE/$templateName/DEBIAN/control
+  echo "Maintainer: <subut.ai>" >> $BASE/$templateName/DEBIAN/control
+  echo "Priority: optional" >> $BASE/$templateName/DEBIAN/control
+  echo "Description: This is subutai repo $purePackageName wrapper package" >> $BASE/$templateName/DEBIAN/control
+  echo "Homepage: http://www.safehaus.org" >> $BASE/$templateName/DEBIAN/control
+  echo "Section: devel" >> $BASE/$templateName/DEBIAN/control
+ 
   cp $currentPackage $BASE/$templateName/repo/ksks/amd64/trusty/
   mv $BASE/$templateName/ $BASE/subutai-repo-$shortCurrentPackage
 
@@ -182,14 +208,8 @@ generateRepoPackage() {
   mv $BASE/subutai-repo-"$shortCurrentPackage".deb $ISOPATH
   rm -rf $BASE/subutai-repo-$shortCurrentPackage
   rm -rf $BASE/$templateName
-
-  echo "Repo wrapper package Successfully created."
-
   popd
-
 }
-
-
 
 
 
