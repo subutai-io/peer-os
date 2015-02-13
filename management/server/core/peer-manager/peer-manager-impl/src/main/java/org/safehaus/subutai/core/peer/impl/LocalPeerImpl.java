@@ -39,6 +39,7 @@ import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
@@ -337,7 +338,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             Set<String> hostCloneNames = new HashSet<>();
             for ( int i = 0; i < e.getValue(); i++ )
             {
-                String newContainerName = nextHostName( templateName, existingContainerNames );
+                String newContainerName = String.format( "%s%s", templateName, UUID.randomUUID() ).replace( "-",
+                        "" );//nextHostName(templateName, existingContainerNames );
+                if ( newContainerName.length() > Common.MAX_CONTAINER_NAME_LEN )
+                {
+                    newContainerName = newContainerName.substring( 0, Common.MAX_CONTAINER_NAME_LEN );
+                }
                 hostCloneNames.add( newContainerName );
             }
             ResourceHost resourceHost = getResourceHostByName( e.getKey().getHostname() );
@@ -978,7 +984,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
     @Override
     public <T, V> V sendRequest( final T request, final String recipient, final int requestTimeout,
-                                 final Class<V> responseType, final int responseTimeout, UUID environmentId )
+                                 final Class<V> responseType, final int responseTimeout, Map<String, String> headers )
             throws PeerException
     {
         Preconditions.checkNotNull( responseType, "Invalid response type" );
@@ -988,8 +994,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
-    public <T> void sendRequest( final T request, final String recipient, final int requestTimeout, UUID environmentId )
-            throws PeerException
+    public <T> void sendRequest( final T request, final String recipient, final int requestTimeout,
+                                 Map<String, String> headers ) throws PeerException
     {
         sendRequestInternal( request, recipient, null );
     }

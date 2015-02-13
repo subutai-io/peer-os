@@ -59,9 +59,9 @@ public interface EnvironmentManager
      *
      * @param name - environment name
      *
-     * @return - created environment
+     * @return - id of created environment
      */
-    public Environment createEmptyEnvironment( String name );
+    public UUID createEmptyEnvironment( String name );
 
     /**
      * Destroys environment by id.

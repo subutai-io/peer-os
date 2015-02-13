@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.messenger.impl;
 
 
+import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Before;
@@ -13,6 +14,7 @@ import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.util.RestUtil;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import static org.junit.Assert.assertTrue;
@@ -33,6 +35,8 @@ public class RemotePeerMessageSenderTest
     private static final UUID TARGET_PEER_ID = UUID.randomUUID();
     private static final String RECIPIENT = "sender";
     private static final int TIME_TO_LIVE = 5;
+    private static final Map<String, String> HEADERS = Maps.newHashMap();
+
 
 
     @Mock
@@ -54,7 +58,7 @@ public class RemotePeerMessageSenderTest
     {
         MessageImpl message = new MessageImpl( SOURCE_PEER_ID, PAYLOAD );
 
-        envelope = new Envelope( message, TARGET_PEER_ID, RECIPIENT, TIME_TO_LIVE );
+        envelope = new Envelope( message, TARGET_PEER_ID, RECIPIENT, TIME_TO_LIVE, HEADERS );
         remotePeerMessageSender =
                 new RemotePeerMessageSender( restUtil, messengerDao, peer, Sets.newHashSet( envelope ) );
 

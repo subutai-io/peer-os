@@ -19,6 +19,7 @@ import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
@@ -144,11 +145,14 @@ public class MonitorImpl implements Monitor
             //create request for metrics
             ContainerHostMetricRequest request = new ContainerHostMetricRequest( environmentId );
 
+            Map<String, String> headers = Maps.newHashMap();
+            headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, environmentId.toString() );
+
             //send request and obtain metrics
             ContainerHostMetricResponse response =
                     peer.sendRequest( request, RecipientType.METRIC_REQUEST_RECIPIENT.name(),
                             Constants.METRIC_REQUEST_TIMEOUT, ContainerHostMetricResponse.class,
-                            Constants.METRIC_REQUEST_TIMEOUT, environmentId );
+                            Constants.METRIC_REQUEST_TIMEOUT, headers );
 
             //if response contains metrics, add them to result
             if ( response != null && !CollectionUtil.isCollectionEmpty( response.getMetrics() ) )
@@ -446,9 +450,12 @@ public class MonitorImpl implements Monitor
 
         try
         {
+            Map<String, String> headers = Maps.newHashMap();
+            headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, environmentId.toString() );
+
             peer.sendRequest( new MonitoringActivationRequest( containerHosts, monitoringSettings ),
                     RecipientType.MONITORING_ACTIVATION_RECIPIENT.name(), Constants.MONITORING_ACTIVATION_TIMEOUT,
-                    environmentId );
+                    headers );
         }
         catch ( PeerException e )
         {
@@ -477,7 +484,7 @@ public class MonitorImpl implements Monitor
                             commandResult.getStatus(), commandResult.getStdErr() ) );
                 }
             }
-            catch ( CommandException | PeerException e )
+            catch ( Exception e )
             {
                 LOG.error( "Error in activateMonitoringAtLocalContainers", e );
             }
@@ -505,7 +512,7 @@ public class MonitorImpl implements Monitor
             }
             return JsonUtil.fromJson( commandResult.getStdOut(), ProcessResourceUsage.class );
         }
-        catch ( CommandException | HostNotFoundException | JsonSyntaxException e )
+        catch ( Exception e )
         {
             LOG.error( String.format( "Could not obtain process resource usage for container %s, pid %d",
                     containerHost.getHostname(), processPid ), e );
@@ -551,11 +558,13 @@ public class MonitorImpl implements Monitor
             //send metric to remote creator peer
             else
             {
+                Map<String, String> headers = Maps.newHashMap();
+                headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, containerGroup.getEnvironmentId().toString() );
                 creatorPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
-                        Constants.ALERT_TIMEOUT, containerGroup.getEnvironmentId() );
+                        Constants.ALERT_TIMEOUT, headers );
             }
         }
-        catch ( PeerException | ContainerGroupNotFoundException | JsonSyntaxException e )
+        catch (Exception e )
         {
             LOG.error( "Error in onAlert", e );
             throw new MonitorException( e );
