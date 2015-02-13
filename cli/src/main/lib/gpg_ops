@@ -484,11 +484,13 @@ get_default_signer_key(){
   echo `gpg2 -k | grep "^pub" | head -1 | grep 'pub' | cut -d "/" -f2 | cut -d " " -f1`
 }
 
-
-# returns the last key id in keyring
+# if not key is supplied while signing other keys,
+# the first key (the upmost key listed with "gpg2 -k" 
+# command) is used to sign other keys.
 get_last_key_id_in_keyring(){
   echo `gpg2 -k | grep "^pub" | tail -1 | grep 'pub' | cut -d "/" -f2 | cut -d " " -f1`
 }
+
 
 
 # check if the key is signed by signer key id
@@ -511,3 +513,35 @@ is_signed(){
     msg_error "is_signed method should have two arguments"
   fi
 }
+
+
+# Generate X.509 compatible self-signed certificate using gpgsm tool
+# parameters:
+#   1) key id 
+generate_cert(){
+  key_id=$1
+  assert_key_exists $key_id
+  keygrip=`get_keygrip $key_id`
+  scriptName=".key_$RANDOM"
+  cat >$scriptName<<EOF
+    Key-Type: RSA
+    Key-Length: 2048 
+    Key-Grip: $keygrip
+    Key-Usage: sign, encrypt
+    Serial: random
+    Name-DN: CN=$key_id, UID=$key_id
+    Name-Email: subut.ai@com
+EOF
+    output="out_$RANDOM"
+    gpgsm --export -o $output -a CN=$key_id UID=$key_id
+    if [ -s $output ]; then
+       cat $output
+    else
+       gpgsm --gen-key --batch -o $output -a $scriptName > /dev/null 2>&1
+       gpgsm --import $output > /dev/null 2>&1
+       gpgsm --export -a CN=$key_id
+    fi
+    rm $scriptName
+    rm $output
+}
+

@@ -2,27 +2,27 @@
 
 function key_manager_usage {
   echo -----------------------------------------------------------------------
-  echo Usage: GnuPG subutai wrapper
+  echo Usage: Key manager wrapper
   echo
   echo "  "subutai keymanager generate real_name email
   echo "  "subutai keymanager generate_subkey key_id
   echo "  "subutai keymanager export \<--ssh\> key_id 
   echo "  "subutai keymanager list
   echo "  "subutai keymanager list key_id
-  echo "  "subutai keymanager revkey key_id
+  echo "  "subutai keymanager revoke_subkey subkey_id
   echo "  "subutai keymanager del_subkey subkey_id
   echo "  "subutai keymanager sign_key \<signer key id\> key_id_to_be_signed
-  echo "  "subutai keymanager generate_revkey key_id
   echo -----------------------------------------------------------------------
 }
 
 
 function keymanager {
   subcommand=$1
-  if [ -z "$subcommand" ]; then
+  if [[ -z "$subcommand" ]]; then
     key_manager_usage
   fi
   shift
+  
   $subcommand "$@"
 }
 
@@ -50,7 +50,7 @@ generate(){
   #create key generation script
   scriptName=".key_$RANDOM"
   cat >$scriptName<<EOF
-    %echo Generating a Subutai Environment key
+    #%echo Generating a Subutai Environment key
     Key-Type: RSA
     Key-Length: 2048
     Subkey-Type: RSA
@@ -62,7 +62,7 @@ generate(){
     Expire-Date: 1y
     %no-protection
     %commit
-    %echo DONE
+    #%echo DONE
 EOF
     gpg2 --batch --gen-key $scriptName
     rm $scriptName
@@ -99,15 +99,6 @@ generate_subkey(){
   msg_ok "subkey is generated. Id of genereated subkey is $new_key_id"
 }
 
-
-# generate revocation key
-generate_revkey(){
-  key_id=$1
-  assert_key_exists $key_id
-  echo -e "y\n0\n\ny\n" | gpg2 --pinentry-mode loopback \
-                         --command-fd 0 --status-fd --verbose \
-                         --no-tty --gen-revoke $key_id
-}
 
 # if no parameter supplied, lists all keys in summarized format
 # else just lists the given key both in summarizeds and detailed format
@@ -154,74 +145,6 @@ list(){
 }
 
 
-# Revokes the subkey which are generated unattentedly
-# Note: After revoking subkeys, they are not listed
-# with "gpg2 -k" command, which may change result of 
-# find_key_id_index fuction and let it misbehave. 
-# That's why after revoking subkey, I delete that subkey
-# in order to overcome this pitfall. 
-# parameters
-#   1) key_id
-revkey(){
-  params=`getopt -o f -n '$0' -- "$@"`
-  eval set -- "$params"
-  force=false
-  while true ; do
-    case "$1" in
-      -f)
-        force=true
-        shift
-        ;;
-      --)
-        shift;
-        break
-        ;;
-      *)
-        echo "Internal error!" 
-        exit 1
-        ;;
-    esac
-  done
-
-  key_id=$1
-  assert_key_exists $key_id
-
-  # Confirm destroy operation
-  if [[ $force == "false" ]]; then
-    echo WARNING: this will revoke your supplied key
-    while true; do
-      read -p "Do you wish to remove key? [Y/N]" yn
-      case $yn in
-        [Yy]* ) break;;
-        [Nn]* ) 
-              exit 1;;
-        * ) echo "Please answer yes or no.";;
-      esac
-    done
-  fi
-
-  if [[ -z `is_subkey $key_id` ]]; then
-    number=`find_key_id_index $key_id`
-    msg_info "revoking subkey $key_id"
-    exit 1
-    echo -e "key $number\nrevkey\ny\nsave\n" | gpg2 --pinentry-mode loopback --command-fd 0 \
-                                                  --no-tty --status-fd --verbose \
-                                                  --edit-key $key_id > /dev/null 2>&1
-    # delete subkey 
-    del_subkey_with_index $number $key_id
-
-    msg_ok "subkey $key_id revoked!"
-  else
-    msg_info "revoking key $key_id"
-    exit 1
-    echo -e "revkey\ny\nsave\n" | gpg2 --pinentry-mode loopback --command-fd 0 \
-                                                  --no-tty --status-fd --verbose \
-                                                  --edit-key $key_id > /dev/null 2>&1
-    msg_ok "key $key_id revoked"
-  fi
-}
-
-
 # Deletes subkey which are generated unattentedly
 # parameters
 #   1) key_id
@@ -233,6 +156,31 @@ del_subkey(){
                                                   --no-tty --status-fd --verbose \
                                                   --edit-key $key_id > /dev/null 2>&1
   msg_ok "subkey $key_id deleted!"
+}
+
+
+# Revokes the subkey which are generated unattentedly
+# Note: After revoking subkeys, they are not listed
+# with "gpg2 -k" command, which may change result of 
+# find_key_id_index fuction and let it misbehave. 
+# That's why after revoking subkey, I delete that subkey
+# in order to overcome this pitfall. 
+# parameters
+#   1) key_id
+revoke_subkey(){
+  key_id=$1
+  if [[ -z `is_subkey $key_id` ]]; then
+    number=`find_key_id_index $key_id`
+  else
+    msg_error "$key_id does not belong to a subkey"
+    exit 1
+  fi
+  msg_info "revoking subkey $key_id"
+  echo -e "key $number\nrevkey\ny\n0\n\ny\nsave\n" | gpg2 --pinentry-mode loopback --command-fd 0 \
+                                                          --no-tty  --status-fd --verbose \
+                                                          --edit-key $key_id > /dev/null 2>&1
+  del_subkey_with_index $number $key_id
+  msg_ok "subkey $key_id revoked!"
 }
 
 
@@ -263,8 +211,12 @@ export(){
       key_id=$2
       export_key_compatible_with_authorized_key_file $key_id
       return
+    elif [  "$1" == "-ssl" ] || [ "$1" == "--ssl" ];then
+      key_id=$2
+      generate_cert $key_id
+      return
     fi
-    msg_error "invalid switch. use \"--ssh\""
+    msg_error "invalid switch. Available switches: \"--ssh, --ssl\""
     exit 1
   fi
   key_id=$1
@@ -273,18 +225,14 @@ export(){
     exit 1
   fi
   assert_key_exists $key_id
-  if [[ $ssh == true ]];then
-    gpgkey2ssh $key_id
-  else
-    gpg2 --armor --export $key_id 
-  fi
+  gpg2 --armor --export $key_id 
 }
 
 
 # signs the file
 # parameters:
 #   1) key to be used while signing
-#   2) file path to be signed
+#   2) key path to be signed
 sign(){
   if [ $# == 1 ]; then
     file=$1
