@@ -7,3 +7,4 @@ Depends: libc6 (>> 2.15), libc6 (<< 2.20), libgcc1 (>= 1:4.1.1), libssl1.0.0 (>=
 Section: unknown
 Priority: extra
 Description: Subutai Agent Debian Package
+Architecture: all
