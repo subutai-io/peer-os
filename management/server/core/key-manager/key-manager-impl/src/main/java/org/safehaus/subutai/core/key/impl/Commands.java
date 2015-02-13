@@ -12,7 +12,7 @@ import com.google.common.collect.Lists;
 public class Commands
 {
 
-    private static final String KEY_MANAGER_BINDING = ". /etc/profile subutai keymanager";
+    private static final String KEY_MANAGER_BINDING = ". /etc/profile && subutai keymanager";
 
 
     public RequestBuilder getGenerateKeyCommand( String realName, String email )
