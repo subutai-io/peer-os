@@ -7,17 +7,14 @@ package org.safehaus.subutai.core.strategy.api;
 
 
 /**
- * Class which contains metrics for physical server
+ * Class which contains current metrics of resource host
  */
 public class ServerMetric
 {
-
-    //average metrics obtained from elastic search
     private int freeHddMb;
     private int freeRamMb;
     private int cpuLoadPercent;
     private int numOfProcessors;
-    private int numOfLxcs;
     private String hostname;
 
 
@@ -49,21 +46,9 @@ public class ServerMetric
     }
 
 
-    public void setNumOfProcessors( int numOfProcessors )
-    {
-        this.numOfProcessors = numOfProcessors;
-    }
-
-
     public int getFreeHddMb()
     {
         return freeHddMb;
-    }
-
-
-    public void setFreeHddMb( int freeHddMb )
-    {
-        this.freeHddMb = freeHddMb;
     }
 
 
@@ -73,33 +58,9 @@ public class ServerMetric
     }
 
 
-    public void setFreeRamMb( int freeRamMb )
-    {
-        this.freeRamMb = freeRamMb;
-    }
-
-
     public int getCpuLoadPercent()
     {
         return cpuLoadPercent;
-    }
-
-
-    public void setCpuLoadPercent( int cpuLoadPercent )
-    {
-        this.cpuLoadPercent = cpuLoadPercent;
-    }
-
-
-    public int getNumOfLxcs()
-    {
-        return numOfLxcs;
-    }
-
-
-    public void setNumOfLxcs( int numOfLxcs )
-    {
-        this.numOfLxcs = numOfLxcs;
     }
 
 
@@ -107,6 +68,6 @@ public class ServerMetric
     public String toString()
     {
         return "ServerMetric{" + "freeHddMb=" + freeHddMb + ", freeRamMb=" + freeRamMb + ", cpuLoadPercent="
-                + cpuLoadPercent + ", numOfProcessors=" + numOfProcessors + ", numOfLxcs=" + numOfLxcs + '}';
+                + cpuLoadPercent + ", numOfProcessors=" + numOfProcessors + '}';
     }
 }

@@ -11,7 +11,7 @@ import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
-import org.safehaus.subutai.core.strategy.api.StrategyNotAvailable;
+import org.safehaus.subutai.core.strategy.api.StrategyNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +85,7 @@ public class StrategyManagerImpl implements StrategyManager
 
 
     @Override
-    public ContainerPlacementStrategy findStrategyById( String strategyId ) throws StrategyNotAvailable
+    public ContainerPlacementStrategy findStrategyById( String strategyId ) throws StrategyNotFoundException
     {
         ContainerPlacementStrategy placementStrategy = null;
         for ( int i = 0; i < placementStrategies.size() && placementStrategy == null; i++ )
@@ -97,7 +97,7 @@ public class StrategyManagerImpl implements StrategyManager
         }
         if ( placementStrategy == null )
         {
-            throw new StrategyNotAvailable(
+            throw new StrategyNotFoundException(
                     String.format( "Container placement strategy [%s] not available.", strategyId ) );
         }
         return placementStrategy;

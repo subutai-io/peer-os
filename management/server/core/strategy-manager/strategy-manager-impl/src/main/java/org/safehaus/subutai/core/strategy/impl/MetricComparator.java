@@ -11,7 +11,7 @@ abstract class MetricComparator
 
     static MetricComparator create( Criteria criteria ) throws StrategyException
     {
-        MetricComparator mc = null;
+        MetricComparator mc;
         if ( "MORE_HDD".equals( criteria.getId() ) )
         {
             mc = new MetricComparator()
@@ -23,7 +23,7 @@ abstract class MetricComparator
                 }
             };
         }
-        if ( "MORE_RAM".equals( criteria.getId() ) )
+        else if ( "MORE_RAM".equals( criteria.getId() ) )
         {
             mc = new MetricComparator()
             {
@@ -34,7 +34,7 @@ abstract class MetricComparator
                 }
             };
         }
-        if ( "MORE_CPU".equals( criteria.getId() ) )
+        else if ( "MORE_CPU".equals( criteria.getId() ) )
         {
             mc = new MetricComparator()
             {

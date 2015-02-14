@@ -5,16 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.safehaus.subutai.core.strategy.api.AbstractContainerPlacementStrategy;
 import org.safehaus.subutai.common.protocol.Criteria;
+import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.core.strategy.api.AbstractContainerPlacementStrategy;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 
 
 public class RoundRobinStrategy extends AbstractContainerPlacementStrategy
 {
-
-    public static final String DEFAULT_NODE_TYPE = "default";
 
 
     @Override
@@ -35,7 +34,7 @@ public class RoundRobinStrategy extends AbstractContainerPlacementStrategy
     public void calculatePlacement( int nodesCount, List<ServerMetric> serverMetrics, List<Criteria> criteria )
             throws StrategyException
     {
-        if ( serverMetrics == null || serverMetrics.isEmpty() )
+        if ( CollectionUtil.isCollectionEmpty( serverMetrics ) )
         {
             return;
         }

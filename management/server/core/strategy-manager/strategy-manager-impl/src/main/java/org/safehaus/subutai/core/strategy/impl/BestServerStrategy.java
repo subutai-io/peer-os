@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.strategy.impl;
 
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -13,10 +12,12 @@ import org.safehaus.subutai.core.strategy.api.CriteriaDef;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 
+import com.google.common.collect.Lists;
+
 
 public class BestServerStrategy extends RoundRobinStrategy
 {
-    private List<Criteria> criteria = new ArrayList<Criteria>();
+    private List<Criteria> criteria = Lists.newArrayList();
 
 
     @Override
@@ -52,7 +53,7 @@ public class BestServerStrategy extends RoundRobinStrategy
         }
 
         // sort servers by their grades in decreasing order
-        List<Map.Entry<ServerMetric, Integer>> ls = new ArrayList<>( grades.entrySet() );
+        List<Map.Entry<ServerMetric, Integer>> ls = Lists.newArrayList( grades.entrySet() );
         Collections.sort( ls, new Comparator<Map.Entry>()
         {
 
@@ -65,7 +66,7 @@ public class BestServerStrategy extends RoundRobinStrategy
             }
         } );
 
-        List<ServerMetric> servers = new ArrayList<ServerMetric>();
+        List<ServerMetric> servers = Lists.newArrayList();
         for ( Map.Entry<ServerMetric, Integer> e : ls )
         {
             servers.add( e.getKey() );
@@ -90,7 +91,7 @@ public class BestServerStrategy extends RoundRobinStrategy
     private ServerMetric getBestMatch( List<ServerMetric> serverMetrics, final MetricComparator mc )
     {
 
-        List<ServerMetric> ls = new ArrayList<>( serverMetrics );
+        List<ServerMetric> ls = Lists.newArrayList( serverMetrics );
         Collections.sort( ls, new Comparator<ServerMetric>()
         {
 
@@ -118,12 +119,12 @@ public class BestServerStrategy extends RoundRobinStrategy
     @Override
     public List<CriteriaDef> getCriteriaDef()
     {
-        List<CriteriaDef> list = new ArrayList<>();
-        CriteriaDef c = new CriteriaDef( "MORE_HDD", "More HDD", Boolean.valueOf( false ) );
+        List<CriteriaDef> list = Lists.newArrayList();
+        CriteriaDef c = new CriteriaDef<>( "MORE_HDD", "More HDD", false );
         list.add( c );
-        c = new CriteriaDef( "MORE_RAM", "More RAM", Boolean.valueOf( false ) );
+        c = new CriteriaDef<>( "MORE_RAM", "More RAM", false );
         list.add( c );
-        c = new CriteriaDef( "MORE_CPU", "More CPU", Boolean.valueOf( false ) );
+        c = new CriteriaDef<>( "MORE_CPU", "More CPU", false );
         list.add( c );
 
         return Collections.unmodifiableList( list );

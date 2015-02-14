@@ -18,5 +18,5 @@ public interface StrategyManager
                                                                 String strategyId, List<Criteria> criteria )
             throws StrategyException;
 
-    public ContainerPlacementStrategy findStrategyById( String strategyId ) throws StrategyNotAvailable;
+    public ContainerPlacementStrategy findStrategyById( String strategyId ) throws StrategyNotFoundException;
 }

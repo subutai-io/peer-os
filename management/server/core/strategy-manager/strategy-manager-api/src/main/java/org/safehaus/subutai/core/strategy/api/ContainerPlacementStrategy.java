@@ -8,7 +8,7 @@ import org.safehaus.subutai.common.protocol.Criteria;
 
 
 /**
- * Container placement strategy contains methods to distribute containers on physical hosts
+ * Container placement strategy contains methods to distribute containers across resource hosts
  */
 public interface ContainerPlacementStrategy
 {
@@ -24,11 +24,9 @@ public interface ContainerPlacementStrategy
     public Map<ServerMetric, Integer> calculateSlots( int nodesCount, List<ServerMetric> serverMetrics );
 
     /**
-     * This method calculates placement of lxcs on physical servers. Code should check passed server metrics to figure
-     * out strategy for lxc placement This is done by calling addPlacementInfo method.This method calculates on which
-     * physical server to places lxc, the number of lxcs to place and their type
-     *
-     * @param serverMetrics - map where key is a physical agent and value is a metric
+     * This method calculates placement of containers across physical servers. Code should check passed server metrics
+     * to figure out strategy for container placement This is done by calling addPlacementInfo method.This method
+     * calculates on which resource host to place containers, the number of containers to place and their type
      */
     public void calculatePlacement( int nodesCount, List<ServerMetric> serverMetrics, List<Criteria> criteria )
             throws StrategyException;

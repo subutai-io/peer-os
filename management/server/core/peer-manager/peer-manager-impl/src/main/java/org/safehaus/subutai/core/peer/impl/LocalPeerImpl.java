@@ -78,7 +78,7 @@ import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
-import org.safehaus.subutai.core.strategy.api.StrategyNotAvailable;
+import org.safehaus.subutai.core.strategy.api.StrategyNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -273,7 +273,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         {
             strategyManager.findStrategyById( strategyId );
         }
-        catch ( StrategyNotAvailable e )
+        catch ( StrategyNotFoundException e )
         {
             throw new PeerException( e );
         }
