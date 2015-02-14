@@ -156,7 +156,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         catch ( CommandException e )
         {
-            throw new ResourceHostException( "Unable retrieve host metric", e );
+            throw new ResourceHostException( "Failed to retrieve resource host metric", e );
         }
     }
 
