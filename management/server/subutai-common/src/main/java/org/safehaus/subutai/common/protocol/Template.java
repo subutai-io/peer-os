@@ -99,13 +99,13 @@ public class Template
     //children of template, this property is calculated upon need and is null by default (see REST API for calculation)
     @Expose
     @OneToMany( fetch = FetchType.EAGER, cascade = { CascadeType.ALL }, orphanRemoval = true )
-    private Set<Template> children;
+    private Set<Template> children = new HashSet<>();
 
     //subutai products present only in this template excluding all subutai products present in the whole ancestry
     // lineage above
     @Expose
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
-    private Set<String> products;
+    private Set<String> products = new HashSet<>();
 
 
     //indicates whether this template is in use on any of FAIs connected to Subutai
