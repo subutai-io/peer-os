@@ -338,8 +338,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             Set<String> hostCloneNames = new HashSet<>();
             for ( int i = 0; i < e.getValue(); i++ )
             {
-                String newContainerName = String.format( "%s%s", templateName, UUID.randomUUID() ).replace( "-",
-                        "" );
+                String newContainerName = String.format( "%s%s", templateName, UUID.randomUUID() ).replace( "-", "" );
                 if ( newContainerName.length() > Common.MAX_CONTAINER_NAME_LEN )
                 {
                     newContainerName = newContainerName.substring( 0, Common.MAX_CONTAINER_NAME_LEN );
@@ -1377,29 +1376,32 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 }
             }
 
-            List<Future<UUID>> taskFutures = Lists.newArrayList();
-            ExecutorService executorService = Executors.newFixedThreadPool( containerHosts.size() );
-
-            for ( ContainerHost containerHost : containerHosts )
+            if ( !containerHosts.isEmpty() )
             {
+                List<Future<UUID>> taskFutures = Lists.newArrayList();
+                ExecutorService executorService = Executors.newFixedThreadPool( containerHosts.size() );
 
-                taskFutures.add( executorService.submit( new DestroyContainerWrapperTask( this, containerHost ) ) );
-            }
-
-            for ( Future<UUID> taskFuture : taskFutures )
-            {
-                try
+                for ( ContainerHost containerHost : containerHosts )
                 {
-                    destroyedContainersIds.add( taskFuture.get() );
+
+                    taskFutures.add( executorService.submit( new DestroyContainerWrapperTask( this, containerHost ) ) );
                 }
-                catch ( ExecutionException | InterruptedException e )
+
+                for ( Future<UUID> taskFuture : taskFutures )
                 {
-                    errors.add( e );
+                    try
+                    {
+                        destroyedContainersIds.add( taskFuture.get() );
+                    }
+                    catch ( ExecutionException | InterruptedException e )
+                    {
+                        errors.add( e );
+                    }
                 }
+
+
+                executorService.shutdown();
             }
-
-
-            executorService.shutdown();
 
             String exception = null;
 
