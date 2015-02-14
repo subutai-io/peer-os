@@ -5,7 +5,9 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.core.peer.api.ResourceHost;
 
 
 /**
@@ -34,6 +36,9 @@ public interface Monitor
      * @return set of metrics, one per each resource host within the local peer
      */
     public Set<ResourceHostMetric> getResourceHostsMetrics() throws MonitorException;
+
+
+    public ResourceHostMetric getResourceHostMetric( ResourceHost resourceHost ) throws MonitorException;
 
 
     /**

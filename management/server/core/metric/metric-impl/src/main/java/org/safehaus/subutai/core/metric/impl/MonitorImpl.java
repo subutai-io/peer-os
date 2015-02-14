@@ -28,7 +28,7 @@ import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.MonitoringSettings;
-import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.core.peer.api.ContainerGroup;
 import org.safehaus.subutai.core.peer.api.ContainerGroupNotFoundException;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
@@ -257,6 +257,23 @@ public class MonitorImpl implements Monitor
 
 
         return metrics;
+    }
+
+
+    @Override
+    public ResourceHostMetric getResourceHostMetric( ResourceHost resourceHost ) throws MonitorException
+    {
+        Preconditions.checkNotNull( resourceHost, "Invalid resource host" );
+
+        Set<ResourceHostMetric> metrics = Sets.newHashSet();
+        addResourceHostMetric( resourceHost, metrics );
+
+        if ( metrics.isEmpty() )
+        {
+            throw new MonitorException( "Failed to obtain resource host metric" );
+        }
+
+        return metrics.iterator().next();
     }
 
 
@@ -564,7 +581,7 @@ public class MonitorImpl implements Monitor
                         Constants.ALERT_TIMEOUT, headers );
             }
         }
-        catch (Exception e )
+        catch ( Exception e )
         {
             LOG.error( "Error in onAlert", e );
             throw new MonitorException( e );
