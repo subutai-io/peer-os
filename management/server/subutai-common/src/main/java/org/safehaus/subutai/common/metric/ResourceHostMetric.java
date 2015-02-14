@@ -23,6 +23,6 @@ public abstract class ResourceHostMetric extends Metric
     @Override
     public String toString()
     {
-        return Objects.toStringHelper( this ).add( "peerId", peerId ).toString();
+        return Objects.toStringHelper( this ).add( "metric", super.toString() ).add( "peerId", peerId ).toString();
     }
 }
