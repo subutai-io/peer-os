@@ -1,8 +1,8 @@
 package org.safehaus.subutai.core.strategy.impl;
 
 
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.protocol.Criteria;
-import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 
 
@@ -17,9 +17,9 @@ abstract class MetricComparator
             mc = new MetricComparator()
             {
                 @Override
-                public int getValue( ServerMetric m )
+                public double getValue( ResourceHostMetric m )
                 {
-                    return m.getFreeHddMb();
+                    return m.getAvailableDiskVar();
                 }
             };
         }
@@ -28,9 +28,9 @@ abstract class MetricComparator
             mc = new MetricComparator()
             {
                 @Override
-                int getValue( ServerMetric m )
+                double getValue( ResourceHostMetric m )
                 {
-                    return m.getFreeRamMb();
+                    return m.getAvailableRam();
                 }
             };
         }
@@ -39,9 +39,9 @@ abstract class MetricComparator
             mc = new MetricComparator()
             {
                 @Override
-                int getValue( ServerMetric m )
+                double getValue( ResourceHostMetric m )
                 {
-                    return m.getCpuLoadPercent();
+                    return m.getUsedCpu();
                 }
 
 
@@ -61,7 +61,7 @@ abstract class MetricComparator
     }
 
 
-    abstract int getValue( ServerMetric m );
+    abstract double getValue( ResourceHostMetric m );
 
 
     boolean isLessBetter()

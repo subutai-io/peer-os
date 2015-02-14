@@ -6,9 +6,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.protocol.Criteria;
-import org.safehaus.subutai.core.strategy.api.ServerMetric;
+import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.safehaus.subutai.core.strategy.api.StrategyNotFoundException;
@@ -59,15 +59,15 @@ public class StrategyManagerImpl implements StrategyManager
 
 
     @Override
-    public Map<ServerMetric, Integer> getPlacementDistribution( List<ServerMetric> serverMetrics, int nodesCount,
-                                                         String strategyId, List<Criteria> criteria )
-            throws StrategyException
+    public Map<ResourceHostMetric, Integer> getPlacementDistribution( List<ResourceHostMetric> serverMetrics,
+                                                                      int nodesCount, String strategyId,
+                                                                      List<Criteria> criteria ) throws StrategyException
     {
         ContainerPlacementStrategy containerPlacementStrategy = findStrategyById( strategyId );
 
         containerPlacementStrategy.calculatePlacement( nodesCount, serverMetrics, criteria );
 
-        Map<ServerMetric, Integer> result = containerPlacementStrategy.getPlacementDistribution();
+        Map<ResourceHostMetric, Integer> result = containerPlacementStrategy.getPlacementDistribution();
         int totalSlots = 0;
 
         for ( int slotCount : result.values() )

@@ -7,9 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.core.strategy.api.CriteriaDef;
-import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 
 import com.google.common.collect.Lists;
@@ -35,17 +35,17 @@ public class BestServerStrategy extends RoundRobinStrategy
 
 
     @Override
-    protected List<ServerMetric> sortServers( List<ServerMetric> serverMetrics ) throws StrategyException
+    protected List<ResourceHostMetric> sortServers( List<ResourceHostMetric> serverMetrics ) throws StrategyException
     {
         // using each strategy criteria, grade servers one by one
-        Map<ServerMetric, Integer> grades = new HashMap<>();
-        for ( ServerMetric a : serverMetrics )
+        Map<ResourceHostMetric, Integer> grades = new HashMap<>();
+        for ( ResourceHostMetric a : serverMetrics )
         {
             grades.put( a, 0 );
         }
         for ( Criteria sf : criteria )
         {
-            ServerMetric a = getBestMatch( serverMetrics, MetricComparator.create( sf ) );
+            ResourceHostMetric a = getBestMatch( serverMetrics, MetricComparator.create( sf ) );
             if ( a != null )
             {
                 incrementGrade( grades, a );
@@ -53,7 +53,7 @@ public class BestServerStrategy extends RoundRobinStrategy
         }
 
         // sort servers by their grades in decreasing order
-        List<Map.Entry<ServerMetric, Integer>> ls = Lists.newArrayList( grades.entrySet() );
+        List<Map.Entry<ResourceHostMetric, Integer>> ls = Lists.newArrayList( grades.entrySet() );
         Collections.sort( ls, new Comparator<Map.Entry>()
         {
 
@@ -66,8 +66,8 @@ public class BestServerStrategy extends RoundRobinStrategy
             }
         } );
 
-        List<ServerMetric> servers = Lists.newArrayList();
-        for ( Map.Entry<ServerMetric, Integer> e : ls )
+        List<ResourceHostMetric> servers = Lists.newArrayList();
+        for ( Map.Entry<ResourceHostMetric, Integer> e : ls )
         {
             servers.add( e.getKey() );
         }
@@ -75,9 +75,9 @@ public class BestServerStrategy extends RoundRobinStrategy
     }
 
 
-    private void incrementGrade( Map<ServerMetric, Integer> grades, ServerMetric a )
+    private void incrementGrade( Map<ResourceHostMetric, Integer> grades, ResourceHostMetric a )
     {
-        for ( Map.Entry<ServerMetric, Integer> entry : grades.entrySet() )
+        for ( Map.Entry<ResourceHostMetric, Integer> entry : grades.entrySet() )
         {
             if ( entry.getKey().equals( a ) )
             {
@@ -88,19 +88,19 @@ public class BestServerStrategy extends RoundRobinStrategy
     }
 
 
-    private ServerMetric getBestMatch( List<ServerMetric> serverMetrics, final MetricComparator mc )
+    private ResourceHostMetric getBestMatch( List<ResourceHostMetric> serverMetrics, final MetricComparator mc )
     {
 
-        List<ServerMetric> ls = Lists.newArrayList( serverMetrics );
-        Collections.sort( ls, new Comparator<ServerMetric>()
+        List<ResourceHostMetric> ls = Lists.newArrayList( serverMetrics );
+        Collections.sort( ls, new Comparator<ResourceHostMetric>()
         {
 
             @Override
-            public int compare( ServerMetric o1, ServerMetric o2 )
+            public int compare( ResourceHostMetric o1, ResourceHostMetric o2 )
             {
-                int v1 = mc.getValue( o1 );
-                int v2 = mc.getValue( o2 );
-                return Integer.compare( v1, v2 );
+                double v1 = mc.getValue( o1 );
+                double v2 = mc.getValue( o2 );
+                return Double.compare( v1, v2 );
             }
         } );
 

@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -20,7 +22,7 @@ import com.google.common.collect.Maps;
 public abstract class AbstractContainerPlacementStrategy implements ContainerPlacementStrategy
 {
     public static final String DEFAULT_NODE_TYPE = "default";
-    private final Map<ServerMetric, Map<String, Integer>> placementInfoMap = new HashMap<>();
+    private final Map<ResourceHostMetric, Map<String, Integer>> placementInfoMap = new HashMap<>();
     private List<CriteriaDef> criteria = Lists.newArrayList();
 
 
@@ -30,7 +32,7 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
     }
 
 
-    public final void addPlacementInfo( ServerMetric resourceHostMetric, String nodeType, int numberOfContainers )
+    public final void addPlacementInfo( ResourceHostMetric resourceHostMetric, String nodeType, int numberOfContainers )
     {
 
         Preconditions.checkNotNull( resourceHostMetric, "Invalid resource host metric" );
@@ -54,7 +56,7 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
      * @return map where key is a resource host metric and value is a map where key is type of node and value is a
      * number of containers to place on this server
      */
-    public Map<ServerMetric, Map<String, Integer>> getPlacementInfoMap()
+    public Map<ResourceHostMetric, Map<String, Integer>> getPlacementInfoMap()
     {
         return Collections.unmodifiableMap( placementInfoMap );
     }
@@ -83,7 +85,7 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
      * accommodate
      */
     @Override
-    public Map<ServerMetric, Integer> calculateSlots( int nodesCount, List<ServerMetric> serverMetrics )
+    public Map<ResourceHostMetric, Integer> calculateSlots( int nodesCount, List<ResourceHostMetric> serverMetrics )
     {
         return null;
     }
@@ -95,10 +97,10 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
      * @return map where key is a resource host metric and value is a number of containers to be placed on that server
      */
     @Override
-    public Map<ServerMetric, Integer> getPlacementDistribution()
+    public Map<ResourceHostMetric, Integer> getPlacementDistribution()
     {
-        Map<ServerMetric, Integer> res = new HashMap<>();
-        for ( Map.Entry<ServerMetric, Map<String, Integer>> e : placementInfoMap.entrySet() )
+        Map<ResourceHostMetric, Integer> res = new HashMap<>();
+        for ( Map.Entry<ResourceHostMetric, Map<String, Integer>> e : placementInfoMap.entrySet() )
         {
             int total = 0;
             for ( Integer i : e.getValue().values() )
@@ -111,16 +113,16 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
     }
 
 
-    protected List<ServerMetric> sortServers( List<ServerMetric> serverMetrics ) throws StrategyException
+    protected List<ResourceHostMetric> sortServers( List<ResourceHostMetric> serverMetrics ) throws StrategyException
     {
-        List<ServerMetric> result = new ArrayList<>( serverMetrics );
+        List<ResourceHostMetric> result = new ArrayList<>( serverMetrics );
 
-        Collections.sort( result, new Comparator<ServerMetric>()
+        Collections.sort( result, new Comparator<ResourceHostMetric>()
         {
             @Override
-            public int compare( final ServerMetric o1, final ServerMetric o2 )
+            public int compare( final ResourceHostMetric o1, final ResourceHostMetric o2 )
             {
-                return o1.getHostname().compareTo( o2.getHostname() );
+                return o1.getHost().compareTo( o2.getHost() );
             }
         } );
         return result;

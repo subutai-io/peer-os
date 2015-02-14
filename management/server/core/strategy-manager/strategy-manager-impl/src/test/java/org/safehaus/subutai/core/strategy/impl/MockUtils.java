@@ -6,15 +6,9 @@
 package org.safehaus.subutai.core.strategy.impl;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
-import org.safehaus.subutai.core.strategy.api.ServerMetric;
-
-import com.google.common.collect.Sets;
 
 
 /**
@@ -52,22 +46,5 @@ public class MockUtils
     public static ContainerPlacementStrategy getBestServerPlacementStrategy()
     {
         return new BestServerStrategy();
-    }
-
-
-    public static List<ServerMetric> getServerMetrics()
-    {
-        List<ServerMetric> result = new ArrayList<>();
-
-
-        Set<String> hosts = Sets.newHashSet( PHYSICAL_HOSTNAME_1, PHYSICAL_HOSTNAME_2, PHYSICAL_HOSTNAME_3 );
-        int i = 0;
-        for ( String hostname : hosts )
-        {
-            ServerMetric metric =
-                    new ServerMetric( hostname, 20000 + ( i++ ), 40000 + ( i++ ), 30 + ( i++ ), 4 + ( i++ ) );
-            result.add( metric );
-        }
-        return result;
     }
 }
