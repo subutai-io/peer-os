@@ -1062,7 +1062,13 @@ function destroy_monitor {
 
   remove_monitor_configuration $hostname $metric_type
   remove_monitor_update_configuration "$hostname"
-  remove_monitor_directory "$hostname"
+
+  # remove configuration directory only if it is empty
+  local monitor_conf_dir=$(get_monitor_configuration_dir $hostname)
+  if [ -d $monitor_conf_dir  ] && [ ! "$(ls -A $monitor_conf_dir)" ]; then
+    remove_monitor_directory "$hostname"
+  fi
+
   remove_rrd_file $hostname $metric_type
 }
 
