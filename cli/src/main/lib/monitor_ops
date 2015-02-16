@@ -1014,7 +1014,7 @@ function get_cpu_usage_percentage_by_pid {
   local usage_in_percentage_without_quotas=$(echo -e "$usage_output" | tail -1 | tr -d ' ')
   local cpu_quota=$(get_maximum_cpu_capacity_nanoseconds $hostname)
   local physical_cpu_capacity=$(get_physical_cpu_capacity_nanoseconds)
-  local usage_in_percentage_with_quotas=$(echo "$usage_in_percentage_without_quotas*$cpu_quota*100/$physical_cpu_capacity" | bc)
+  local usage_in_percentage_with_quotas=$(echo "$usage_in_percentage_without_quotas*$cpu_quota/$physical_cpu_capacity" | bc)
   echo "$usage_in_percentage_with_quotas"
   return
 }
