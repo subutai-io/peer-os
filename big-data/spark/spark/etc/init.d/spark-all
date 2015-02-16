@@ -9,13 +9,13 @@ fi
 pidMaster=/var/run/spark/$Master
 pidWorker=/var/run/spark/$Worker
 sbin=/opt/$sparkVer/sbin
-PIDDIR=/var/run/spark
+pid_dir=/var/run/spark
 DESCMaster="Spark Master"
 DESCWorker="Spark Worker"
 CMD_PATT="spark"
 . /lib/lsb/init-functions
 
-export SPARK_PID_DIR=$PIDDIR
+export SPARK_PID_DIR=$pid_dir
 
 check_process(){
   if [ $# == 1 ]; then
@@ -24,14 +24,19 @@ check_process(){
     pid_file=$1
     role=$2
   fi
+
   if [ -f $pid_file ] && [ "x$pid_file" != "x" ]; then
     pid=`cat $pid_file`
-    if grep -Eq "$CMD_PATT" "/proc/$pid/cmdline"; then
-      log_success_msg "Spark $role is running (pid:$pid)"
-      return 0
-    else
-      log_failure_msg "could not access pidfile"
-      return 1
+    if [ -d "/proc/$pid" ]; then
+      if grep -Eq "$CMD_PATT" "/proc/$pid/cmdline"; then
+        log_success_msg "Spark $role is running (pid:$pid)"
+        return 0
+      else
+        log_failure_msg "$role is NOT running"
+        return 1
+      fi
+    else 
+       log_failure_msg "$role is NOT running"
     fi
   else
     log_success_msg "$role is NOT running"

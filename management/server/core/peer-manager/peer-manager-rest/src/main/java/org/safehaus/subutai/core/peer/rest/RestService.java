@@ -31,6 +31,10 @@ public interface RestService
     @Path( "ping" )
     public Response ping();
 
+    @GET
+    @Path( "template/get" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getTemplate( @FormParam( "templateName" ) String templateName );
 
     //*************** Peer Registration Handshake REST - BEGIN ***************************
 
@@ -96,10 +100,6 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getContainerState( @QueryParam( "containerId" ) String containerId );
 
-    @GET
-    @Path( "template/get" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getTemplate( @FormParam( "templateName" ) String templateName );
 
     @GET
     @Path( "container/resource/usage" )

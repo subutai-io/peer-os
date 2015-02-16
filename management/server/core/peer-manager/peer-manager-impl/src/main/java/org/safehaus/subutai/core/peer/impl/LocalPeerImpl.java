@@ -23,6 +23,7 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.ContainersDestructionResult;
 import org.safehaus.subutai.common.peer.Host;
@@ -39,6 +40,7 @@ import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
@@ -74,10 +76,9 @@ import org.safehaus.subutai.core.peer.impl.entity.ManagementHostEntity;
 import org.safehaus.subutai.core.peer.impl.entity.ResourceHostEntity;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
-import org.safehaus.subutai.core.strategy.api.StrategyNotAvailable;
+import org.safehaus.subutai.core.strategy.api.StrategyNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -169,6 +170,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         {
             ( ( AbstractSubutaiHost ) resourceHost ).setPeer( this );
             ( ( ResourceHostEntity ) resourceHost ).setRegistry( templateRegistry );
+            ( ( ResourceHostEntity ) resourceHost ).setMonitor( monitor );
             ( ( ResourceHostEntity ) resourceHost ).setHostRegistry( hostRegistry );
         }
     }
@@ -272,7 +274,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         {
             strategyManager.findStrategyById( strategyId );
         }
-        catch ( StrategyNotAvailable e )
+        catch ( StrategyNotFoundException e )
         {
             throw new PeerException( e );
         }
@@ -295,7 +297,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         }
 
 
-        List<ServerMetric> serverMetricMap = new ArrayList<>();
+        List<ResourceHostMetric> serverMetricMap = new ArrayList<>();
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
             //take connected resource hosts for container creation
@@ -304,7 +306,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             {
                 try
                 {
-                    serverMetricMap.add( resourceHost.getMetric() );
+                    serverMetricMap.add( resourceHost.getHostMetric() );
                     resourceHost.prepareTemplates( templates );
                 }
                 catch ( ResourceHostException e )
@@ -315,7 +317,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         }
 
         //calculate placement strategy
-        Map<ServerMetric, Integer> slots;
+        Map<ResourceHostMetric, Integer> slots;
         try
         {
             slots = strategyManager
@@ -326,21 +328,24 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             throw new PeerException( e );
         }
 
-        Set<String> existingContainerNames = getContainerNames();
 
         //distribute new containers' names across selected resource hosts
         Map<ResourceHost, Set<String>> containerDistribution = Maps.newHashMap();
         String templateName = templates.get( templates.size() - 1 ).getTemplateName();
 
-        for ( Map.Entry<ServerMetric, Integer> e : slots.entrySet() )
+        for ( Map.Entry<ResourceHostMetric, Integer> e : slots.entrySet() )
         {
             Set<String> hostCloneNames = new HashSet<>();
             for ( int i = 0; i < e.getValue(); i++ )
             {
-                String newContainerName = nextHostName( templateName, existingContainerNames );
+                String newContainerName = String.format( "%s%s", templateName, UUID.randomUUID() ).replace( "-", "" );
+                if ( newContainerName.length() > Common.MAX_CONTAINER_NAME_LEN )
+                {
+                    newContainerName = newContainerName.substring( 0, Common.MAX_CONTAINER_NAME_LEN );
+                }
                 hostCloneNames.add( newContainerName );
             }
-            ResourceHost resourceHost = getResourceHostByName( e.getKey().getHostname() );
+            ResourceHost resourceHost = getResourceHostByName( e.getKey().getHost() );
             containerDistribution.put( resourceHost, hostCloneNames );
         }
 
@@ -1371,29 +1376,32 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 }
             }
 
-            List<Future<UUID>> taskFutures = Lists.newArrayList();
-            ExecutorService executorService = Executors.newFixedThreadPool( containerHosts.size() );
-
-            for ( ContainerHost containerHost : containerHosts )
+            if ( !containerHosts.isEmpty() )
             {
+                List<Future<UUID>> taskFutures = Lists.newArrayList();
+                ExecutorService executorService = Executors.newFixedThreadPool( containerHosts.size() );
 
-                taskFutures.add( executorService.submit( new DestroyContainerWrapperTask( this, containerHost ) ) );
-            }
-
-            for ( Future<UUID> taskFuture : taskFutures )
-            {
-                try
+                for ( ContainerHost containerHost : containerHosts )
                 {
-                    destroyedContainersIds.add( taskFuture.get() );
+
+                    taskFutures.add( executorService.submit( new DestroyContainerWrapperTask( this, containerHost ) ) );
                 }
-                catch ( ExecutionException | InterruptedException e )
+
+                for ( Future<UUID> taskFuture : taskFutures )
                 {
-                    errors.add( e );
+                    try
+                    {
+                        destroyedContainersIds.add( taskFuture.get() );
+                    }
+                    catch ( ExecutionException | InterruptedException e )
+                    {
+                        errors.add( e );
+                    }
                 }
+
+
+                executorService.shutdown();
             }
-
-
-            executorService.shutdown();
 
             String exception = null;
 

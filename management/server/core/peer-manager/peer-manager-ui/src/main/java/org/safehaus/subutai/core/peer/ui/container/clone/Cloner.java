@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.protocol.Criteria;
@@ -25,7 +26,6 @@ import org.safehaus.subutai.core.peer.ui.container.ContainerTree;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
 import org.safehaus.subutai.core.strategy.api.CriteriaDef;
-import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
 
@@ -322,7 +322,7 @@ public class Cloner extends VerticalLayout
                 }
             }
 
-            List<ServerMetric> serverMetrics = new ArrayList<>();
+            List<ResourceHostMetric> serverMetrics = new ArrayList<>();
 
             for ( Host host : localPeer.getResourceHosts() )
             {
@@ -331,7 +331,7 @@ public class Cloner extends VerticalLayout
                     ResourceHost rh = ( ResourceHost ) host;
                     try
                     {
-                        serverMetrics.add( rh.getMetric() );
+                        serverMetrics.add( rh.getHostMetric() );
                     }
                     catch ( ResourceHostException e )
                     {
@@ -339,7 +339,7 @@ public class Cloner extends VerticalLayout
                     }
                 }
             }
-            Map<ServerMetric, Integer> bestServers;
+            Map<ResourceHostMetric, Integer> bestServers;
             try
             {
                 List<Criteria> cl = new ArrayList<>();
@@ -355,11 +355,11 @@ public class Cloner extends VerticalLayout
                 show( e.toString() );
                 return;
             }
-            Map<ServerMetric, Integer> sortedBestServers = CollectionUtil.sortMapByValueDesc( bestServers );
+            Map<ResourceHostMetric, Integer> sortedBestServers = CollectionUtil.sortMapByValueDesc( bestServers );
 
-            for ( final ServerMetric serverMetric : sortedBestServers.keySet() )
+            for ( final ResourceHostMetric serverMetric : sortedBestServers.keySet() )
             {
-                ResourceHost rh = localPeer.getResourceHostByName( serverMetric.getHostname() );
+                ResourceHost rh = localPeer.getResourceHostByName( serverMetric.getHost() );
                 List<String> lxcHostNames = new ArrayList<>();
                 for ( int i = 0; i < sortedBestServers.get( serverMetric ); i++ )
                 {

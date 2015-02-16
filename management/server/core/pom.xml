@@ -38,6 +38,7 @@
     <module>plugin-manager</module>
     <module>env-manager</module>
     <module>identity-manager</module>
+    <module>template-wizard</module>
     <!--    <module>shiro-manager-parent</module>-->
   </modules>
 

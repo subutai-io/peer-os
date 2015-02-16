@@ -11,7 +11,7 @@ import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
-import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

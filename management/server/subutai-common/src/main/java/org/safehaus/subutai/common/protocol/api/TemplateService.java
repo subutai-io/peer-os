@@ -29,5 +29,6 @@ public interface TemplateService
     public Template getTemplate( String templateName, String lxcArch, String md5sum, TemplateVersion version )
             throws DaoException;
 
-    Template getTemplate( String templateName, TemplateVersion templateVersion, String lxcArch ) throws DaoException;
+    public Template getTemplate( String templateName, TemplateVersion templateVersion, String lxcArch )
+            throws DaoException;
 }

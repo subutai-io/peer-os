@@ -1,8 +1,8 @@
 package org.safehaus.subutai.core.strategy.impl;
 
 
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.protocol.Criteria;
-import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 
 
@@ -11,37 +11,37 @@ abstract class MetricComparator
 
     static MetricComparator create( Criteria criteria ) throws StrategyException
     {
-        MetricComparator mc = null;
+        MetricComparator mc;
         if ( "MORE_HDD".equals( criteria.getId() ) )
         {
             mc = new MetricComparator()
             {
                 @Override
-                public int getValue( ServerMetric m )
+                public double getValue( ResourceHostMetric m )
                 {
-                    return m.getFreeHddMb();
+                    return m.getAvailableDiskVar();
                 }
             };
         }
-        if ( "MORE_RAM".equals( criteria.getId() ) )
+        else if ( "MORE_RAM".equals( criteria.getId() ) )
         {
             mc = new MetricComparator()
             {
                 @Override
-                int getValue( ServerMetric m )
+                double getValue( ResourceHostMetric m )
                 {
-                    return m.getFreeRamMb();
+                    return m.getAvailableRam();
                 }
             };
         }
-        if ( "MORE_CPU".equals( criteria.getId() ) )
+        else if ( "MORE_CPU".equals( criteria.getId() ) )
         {
             mc = new MetricComparator()
             {
                 @Override
-                int getValue( ServerMetric m )
+                double getValue( ResourceHostMetric m )
                 {
-                    return m.getCpuLoadPercent();
+                    return m.getUsedCpu();
                 }
 
 
@@ -61,7 +61,7 @@ abstract class MetricComparator
     }
 
 
-    abstract int getValue( ServerMetric m );
+    abstract double getValue( ResourceHostMetric m );
 
 
     boolean isLessBetter()
