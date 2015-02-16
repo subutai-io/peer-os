@@ -86,7 +86,7 @@ public class LoginView extends VerticalLayout implements View
         fields.addComponent( username );
 
         final PasswordField password = new PasswordField( "Password" );
-        password.setValue( "karaf" );
+        password.setValue( "secret" );
         fields.addComponent( password );
 
         final Button signin = new Button( "Sign In" );
@@ -131,7 +131,7 @@ public class LoginView extends VerticalLayout implements View
                 }
                 catch ( Exception e )
                 {
-                    error.setValue( "Wrong username or password. <span>Hint: admin:karaf</span>" );
+                    error.setValue( "Wrong username or password. <span>Hint: admin:secret</span>" );
                     username.focus();
                 }
                 username.setValue( "" );

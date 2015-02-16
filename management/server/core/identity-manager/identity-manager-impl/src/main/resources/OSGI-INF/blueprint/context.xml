@@ -11,12 +11,14 @@
   <!--*****************************************************************-->
 
   <reference id="keyManager" interface="org.safehaus.subutai.core.key.api.KeyManager" />
+  <reference id="peerManager" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
   <bean id="identityManager" scope="singleton" class="org.safehaus.subutai.core.identity.impl.IdentityManagerImpl"
         init-method="init">
     <property name="daoManager" ref="daoManagerSecurity" />
     <property name="keyManager" ref="keyManager" />
     <property name="securityManager" ref="securityManager" />
+    <property name="peerManager" ref="peerManager" />
 
     <!--    <property name="bundleContext" ref="blueprintBundleContext" />-->
   </bean>

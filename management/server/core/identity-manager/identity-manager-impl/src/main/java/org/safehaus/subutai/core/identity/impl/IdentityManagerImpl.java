@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.safehaus.subutai.common.dao.DaoManager;
+import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.PermissionGroup;
@@ -18,7 +19,11 @@ import org.safehaus.subutai.core.identity.impl.entity.PermissionEntity;
 import org.safehaus.subutai.core.identity.impl.entity.PermissionPK;
 import org.safehaus.subutai.core.identity.impl.entity.RoleEntity;
 import org.safehaus.subutai.core.identity.impl.entity.UserEntity;
+import org.safehaus.subutai.core.key.api.KeyInfo;
 import org.safehaus.subutai.core.key.api.KeyManager;
+import org.safehaus.subutai.core.key.api.KeyManagerException;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,11 +53,18 @@ public class IdentityManagerImpl implements IdentityManager
     private UserDataService userDataService;
     private PermissionDataService permissionDataService;
     private RoleDataService roleDataService;
+    private PeerManager peerManager;
 
 
     public void setSecurityManager( final SecurityManager securityManager )
     {
         this.securityManager = securityManager;
+    }
+
+
+    public void setPeerManager( final PeerManager peerManager )
+    {
+        this.peerManager = peerManager;
     }
 
 
@@ -78,7 +90,6 @@ public class IdentityManagerImpl implements IdentityManager
 
         checkDefaultUser( "karaf" );
         checkDefaultUser( "admin" );
-        //        checkDefaultUser( "timur" );
 
         SecurityUtils.setSecurityManager( securityManager );
 
@@ -114,7 +125,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
 
 
-        String password = "karaf";
+        String password = "secret";
         String salt = getSimpleSalt( username );
         user = new UserEntity();
         user.setUsername( username );
@@ -124,6 +135,7 @@ public class IdentityManagerImpl implements IdentityManager
         user.setSalt( salt );
         user.addRole( adminRole );
         user.addRole( managerRole );
+        generateKey( user );
         userDataService.persist( user );
         LOG.debug( String.format( "User: %s", user.getId() ) );
 
@@ -198,11 +210,6 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public boolean addUser( final String username, final String fullname, final String password, final String email )
     {
-        //        try
-        //        {
-        //            KeyInfo keyInfo = keyManager.generateKey( fullname, email );
-
-
         String salt = getSimpleSalt( username );
         UserEntity user = new UserEntity();
         user.setUsername( username );
@@ -211,18 +218,20 @@ public class IdentityManagerImpl implements IdentityManager
         user.setSalt( salt );
         user.setPassword( saltedHash( password, salt.getBytes() ) );
 
-        //            user.setKey( keyInfo.getPublicKeyId() );
-        //            LOG.debug( String.format( "%s %s", keyInfo.toString(), keyManager.readKey( keyInfo
-        // .getPublicKeyId() ) ) );
+        try
+        {
+            Host host = peerManager.getLocalPeer().getManagementHost();
+            KeyInfo keyInfo = keyManager.generateKey( host, fullname, email );
+            user.setKey( keyInfo.getPublicKeyId() );
+            LOG.debug( String.format( "%s", keyInfo.toString() ) );
+        }
+        catch ( HostNotFoundException | KeyManagerException e )
+        {
+            LOG.error( e.toString(), e );
+        }
 
         userDataService.persist( user );
         return user.getId() != null;
-        //        }
-        //        catch ( KeyManagerException e )
-        //        {
-        //            LOG.error( e.toString(), e );
-        //            return false;
-        //        }
     }
 
 
@@ -257,8 +266,50 @@ public class IdentityManagerImpl implements IdentityManager
         {
             return false;
         }
+
+        if ( isPasswordChanged( user ) )
+        {
+            user.setSalt( getSimpleSalt( user.getUsername() ) );
+            user.setPassword( saltedHash( user.getPassword(), ( ( UserEntity ) user ).getSalt().getBytes() ) );
+        }
+
+        if ( user.getId() == null )
+        {
+            generateKey( user );
+        }
+
         userDataService.update( user );
         return true;
+    }
+
+
+    private void generateKey( final User user )
+    {
+        try
+        {
+            Host host = peerManager.getLocalPeer().getManagementHost();
+            KeyInfo keyInfo = keyManager.generateKey( host, user.getFullname(), user.getEmail() );
+            user.setKey( keyInfo.getPublicKeyId() );
+            LOG.debug( String.format( "%s", keyInfo.toString() ) );
+        }
+        catch ( HostNotFoundException | KeyManagerException e )
+        {
+            LOG.error( e.toString(), e );
+        }
+    }
+
+
+    private boolean isPasswordChanged( final User user )
+    {
+        if ( user.getId() != null )
+        {
+            User entity = userDataService.find( user.getId() );
+            return !entity.getPassword().equals( user.getPassword() );
+        }
+        else
+        {
+            return true;
+        }
     }
 
 
