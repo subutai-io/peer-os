@@ -42,7 +42,7 @@ public interface RestService
 
     @POST
     public Response createEnvironment( @FormParam( "topology" ) String topologyJsonString,
-                                       @FormParam( "sshKey" ) String sshKey );
+                                       @FormParam( "key" ) String sshKey );
 
     @POST
     @Path( "grow" )
