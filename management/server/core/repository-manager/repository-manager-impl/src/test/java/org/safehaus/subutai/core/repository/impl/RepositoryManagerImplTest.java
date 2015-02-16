@@ -29,22 +29,22 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith( MockitoJUnitRunner.class )
 public class RepositoryManagerImplTest
 {
     private static final String ARGUMENT = "argument";
     private static final String SHORT_NAME = "hadoop-subutai-template";
     private static final String FULL_NAME = "hadoop-subutai-template_2.1.0_amd64.deb";
     private static final String LIST_OUTPUT = "subutai-repo-hbase - Subutai Repository Package";
-    private static final String PACKAGE_INFO = "Package: hadoop-subutai-template\n" + "Maintainer: subutai\n"
-            + "Architecture: amd64\n" + "Version: 2.1.0\n"
-            + "Depends: subutai-cli (>= 2.1.0), master-subutai-template (= 2.1.0)\n" + "Priority: optional\n"
-            + "Section: devel\n"
-            + "Filename: pool/main/h/hadoop-subutai-template/hadoop-subutai-template_2.1.0_amd64.deb\n"
-            + "Size: 348573636\n" + "SHA256: 79a1c342c4bf99b588e6df3ce4cdccf889de5d5249024c69af01845d7814ef1f\n"
-            + "SHA1: c005a1d82d6a46af97612c6d3c2e2e59524a2865\n" + "MD5sum: 3fee4a7c3530f3c0d54964c8ca8a4a96\n"
-            + "Description: This is a Subutai delta image debian package of hadoop template\n"
-            + "Description-md5: d7a727affd4f3f44c48851e84dc4dabe\n";
+    private static final String PACKAGE_INFO =
+            "Package: hadoop-subutai-template\n" + "Maintainer: subutai\n" + "Architecture: amd64\n"
+                    + "Version: 2.1.0\n" + "Depends: subutai-cli (>= 2.1.0), master-subutai-template (= 2.1.0)\n"
+                    + "Priority: optional\n" + "Section: devel\n"
+                    + "Filename: pool/main/h/hadoop-subutai-template/hadoop-subutai-template_2.1.0_amd64.deb\n"
+                    + "Size: 348573636\n" + "SHA256: 79a1c342c4bf99b588e6df3ce4cdccf889de5d5249024c69af01845d7814ef1f\n"
+                    + "SHA1: c005a1d82d6a46af97612c6d3c2e2e59524a2865\n" + "MD5sum: 3fee4a7c3530f3c0d54964c8ca8a4a96\n"
+                    + "Description: This is a Subutai delta image debian package of hadoop template\n"
+                    + "Description-md5: d7a727affd4f3f44c48851e84dc4dabe\n";
     private static final Set<String> FILES = Sets.newHashSet( ARGUMENT );
 
     @Mock
@@ -71,12 +71,13 @@ public class RepositoryManagerImplTest
     @Before
     public void setUp() throws Exception
     {
-        when( peerManager.getLocalPeer() ).thenReturn( localPeer );
-        when( localPeer.getManagementHost() ).thenReturn( managementHost );
-        when( managementHost.execute( any( RequestBuilder.class ) ) ).thenReturn( result );
+        when( peerManager.getLocalPeer() ).thenReturn( localPeer, localPeer );
+        when( localPeer.getManagementHost() ).thenReturn( managementHost, managementHost );
+        when( managementHost.execute( any( RequestBuilder.class ) ) ).thenReturn( result, result );
         repositoryManager = new RepositoryManagerImpl( peerManager );
         repositoryManager.commands = commands;
-        when( result.hasSucceeded() ).thenReturn( true );
+        when( result.hasSucceeded() ).thenReturn( true, true );
+        when( result.hasCompleted() ).thenReturn( true, false );
     }
 
 
@@ -92,7 +93,6 @@ public class RepositoryManagerImplTest
         catch ( NullPointerException e )
         {
         }
-
     }
 
 
@@ -143,23 +143,27 @@ public class RepositoryManagerImplTest
     }
 
 
-    @Test
+    @Test( expected = RepositoryException.class )
     public void testAddPackageByPath() throws Exception
     {
 
         repositoryManager.addPackageByPath( ARGUMENT );
 
         verify( commands ).getAddPackageCommand( ARGUMENT );
+
+        repositoryManager.addPackageByPath( ARGUMENT );
     }
 
 
-    @Test
+    @Test( expected = RepositoryException.class )
     public void testRemovePackageByName() throws Exception
     {
 
         repositoryManager.removePackageByName( ARGUMENT );
 
         verify( commands ).getRemovePackageCommand( ARGUMENT );
+
+        repositoryManager.removePackageByName( ARGUMENT );
     }
 
 
