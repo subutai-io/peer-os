@@ -81,7 +81,6 @@ public class RestServiceImpl implements RestService
 
             templateRegistry.registerTemplate( FileUtil.readFile( configFilePath, Charset.defaultCharset() ),
                     FileUtil.readFile( packagesFilePath, Charset.defaultCharset() ), md5sum );
-
             return Response.ok().build();
         }
         catch ( IOException | RegistryException | RuntimeException e )
@@ -322,14 +321,20 @@ public class RestServiceImpl implements RestService
     @Override
     public Response removeTemplate( final String templateName, final String templateVersion )
     {
-        Response response = unregisterTemplate( templateName, templateVersion );
+        Template targetTemplate = templateRegistry.getTemplate( templateName, new TemplateVersion( templateVersion ) );
+        Response response = unregisterTemplate( targetTemplate.getTemplateName(),
+                targetTemplate.getTemplateVersion().getTemplateVersion() );
 
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             try
             {
-                String packageName = String.format( "%s-subutai-template_%s_%s.deb", templateName, templateVersion,
-                        Common.DEFAULT_LXC_ARCH );
+                //TODO this temporarily is disabled as template version problem will still exist.
+                //                String packageName = String.format( "%s-subutai-template_%s_%s.deb", targetTemplate
+                // .getTemplateName(),
+                //                        targetTemplate.getTemplateVersion().getTemplateVersion(), Common
+                // .DEFAULT_LXC_ARCH );
+                String packageName = String.format( "%s-subutai-template", targetTemplate.getTemplateName() );
                 String fullPackageName = repositoryManager.getFullPackageName( packageName );
                 repositoryManager.removePackageByName( fullPackageName );
                 return Response.ok().build();

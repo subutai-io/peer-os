@@ -47,4 +47,10 @@ public class Commands
     {
         return new RequestBuilder( String.format( "subutai package_manager info %s", packageName ) );
     }
+
+
+    public RequestBuilder getUpdateRepoCommand()
+    {
+        return new RequestBuilder( "apt-get update" ).withTimeout( 120 );
+    }
 }
