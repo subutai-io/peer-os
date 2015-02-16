@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.test.SystemOutRedirectTest;
 import org.safehaus.subutai.core.metric.api.Monitor;
-import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 
 import com.google.common.collect.Sets;
 

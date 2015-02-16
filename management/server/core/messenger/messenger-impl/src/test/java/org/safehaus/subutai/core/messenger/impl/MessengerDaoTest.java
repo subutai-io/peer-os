@@ -2,10 +2,11 @@ package org.safehaus.subutai.core.messenger.impl;
 
 
 import java.sql.Timestamp;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +17,7 @@ import org.safehaus.subutai.core.messenger.impl.dao.MessageDataService;
 import org.safehaus.subutai.core.messenger.impl.entity.MessageEntity;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.anyInt;
@@ -23,7 +25,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import javax.persistence.EntityManagerFactory;
 
 
 @RunWith( MockitoJUnitRunner.class )
@@ -34,6 +35,8 @@ public class MessengerDaoTest
     private static final String RECIPIENT = "recipient";
     private static final int TIME_TO_LIVE = 5;
     private static final Timestamp CREATE_DATE = new Timestamp( System.currentTimeMillis() );
+    private static final Map<String, String> HEADERS = Maps.newHashMap();
+
 
     private static final UUID SOURCE_PEER_ID = UUID.randomUUID();
     private static final Object PAYLOAD = new Object();
@@ -58,7 +61,7 @@ public class MessengerDaoTest
         messengerDao = new MessengerDao( entityManagerFactory );
         messengerDao.messageDataService = messageDataService;
         message = new MessageImpl( SOURCE_PEER_ID, PAYLOAD );
-        envelope = new Envelope( message, TARGET_PEER_ID, RECIPIENT, TIME_TO_LIVE );
+        envelope = new Envelope( message, TARGET_PEER_ID, RECIPIENT, TIME_TO_LIVE, HEADERS );
         envelope.setCreateDate( CREATE_DATE );
     }
 
@@ -95,7 +98,7 @@ public class MessengerDaoTest
     @Test
     public void testBuildEnvelopes() throws Exception
     {
-        Set<Envelope> envelopeSet = messengerDao.buildEnvelopes( Lists.newArrayList(messageEntity) );
+        Set<Envelope> envelopeSet = messengerDao.buildEnvelopes( Lists.newArrayList( messageEntity ) );
 
         assertFalse( envelopeSet.isEmpty() );
     }

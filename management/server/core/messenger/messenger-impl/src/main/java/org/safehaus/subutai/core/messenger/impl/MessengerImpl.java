@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.messenger.impl;
 
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -64,7 +65,6 @@ public class MessengerImpl implements Messenger, MessageProcessor
             LOG.error( "Error on creating entity manager.", e );
             throw new MessengerException( e );
         }
-
     }
 
 
@@ -97,8 +97,8 @@ public class MessengerImpl implements Messenger, MessageProcessor
 
 
     @Override
-    public void sendMessage( final Peer peer, final Message message, final String recipient, final int timeToLive )
-            throws MessageException
+    public void sendMessage( final Peer peer, final Message message, final String recipient, final int timeToLive,
+                             final Map<String, String> headers ) throws MessageException
     {
         Preconditions.checkNotNull( peer, "Peer is null" );
         Preconditions.checkNotNull( message, "Message is null" );
@@ -107,7 +107,7 @@ public class MessengerImpl implements Messenger, MessageProcessor
 
         try
         {
-            Envelope envelope = new Envelope( message, peer.getId(), recipient, timeToLive );
+            Envelope envelope = new Envelope( message, peer.getId(), recipient, timeToLive, headers );
 
             messengerDao.saveEnvelope( envelope );
         }

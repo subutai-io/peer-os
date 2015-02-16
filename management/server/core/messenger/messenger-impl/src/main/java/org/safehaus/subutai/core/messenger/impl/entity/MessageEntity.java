@@ -2,19 +2,24 @@ package org.safehaus.subutai.core.messenger.impl.entity;
 
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
 
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.StringUtil;
-import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.impl.Envelope;
 
@@ -36,8 +41,6 @@ public class MessageEntity implements Message, Serializable
     private String id;
     @Column( name = "source_peer_id" )
     private String sourcePeerId;
-    @Column( name = "environment_id" )
-    private String environmentId;
     @Column( name = "sender" )
     private String sender;
     @Column( name = "payload" )
@@ -56,6 +59,12 @@ public class MessageEntity implements Message, Serializable
     @Column( name = "attempts" )
     private Integer attempts = 0;
 
+    @ElementCollection( fetch = FetchType.EAGER )
+    @CollectionTable( name = "message_headers" )
+    @MapKeyColumn( name = "header_name" )
+    @Column( name = "header_value" )
+    private Map<String, String> headers = new HashMap<>();
+
 
     public MessageEntity( Envelope envelope )
     {
@@ -69,15 +78,21 @@ public class MessageEntity implements Message, Serializable
         this.timeToLive = envelope.getTimeToLive();
         this.isSent = envelope.isSent();
         this.createDate = System.currentTimeMillis();
-        if ( envelope.getEnvironmentId() != null )
+        if ( envelope.getHeaders() != null )
         {
-            this.environmentId = envelope.getEnvironmentId().toString();
+            this.headers = envelope.getHeaders();
         }
     }
 
 
     public MessageEntity()
     {
+    }
+
+
+    public Map<String, String> getHeaders()
+    {
+        return headers;
     }
 
 
@@ -123,27 +138,6 @@ public class MessageEntity implements Message, Serializable
     public String getPayload()
     {
         return payloadString;
-    }
-
-
-    @Override
-    public void setEnvironmentId( final UUID environmentId )
-    {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-
-        this.environmentId = environmentId.toString();
-    }
-
-
-    @Override
-    public UUID getEnvironmentId()
-    {
-        if ( UUIDUtil.isStringAUuid( environmentId ) )
-        {
-            return UUID.fromString( environmentId );
-        }
-
-        return null;
     }
 
 

@@ -7,7 +7,6 @@ import java.util.concurrent.Callable;
 
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
 import org.slf4j.Logger;
@@ -52,16 +51,9 @@ public class RemotePeerMessageSender implements Callable<Boolean>
                 String targetPeerIP = targetPeer.getPeerInfo().getIp();
                 int targetPeerPort = targetPeer.getPeerInfo().getPort();
 
-                Map<String, String> headers = Maps.newHashMap();
-
-                if ( envelope.getEnvironmentId() != null )
-                {
-                    headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, envelope.getEnvironmentId().toString() );
-                }
-
                 restUtil.request( RestUtil.RequestType.POST,
                         String.format( "http://%s:%d/cxf/messenger/message", targetPeerIP, targetPeerPort ), params,
-                        headers );
+                        envelope.getHeaders() );
 
                 messengerDao.markAsSent( envelope );
             }

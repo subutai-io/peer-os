@@ -1,28 +1,27 @@
 package org.safehaus.subutai.common.protocol.impl;
 
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-
-import static junit.framework.TestCase.assertNull;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 public class TemplateServiceImplTest
@@ -34,115 +33,162 @@ public class TemplateServiceImplTest
 
     private TemplateServiceImpl templateServiceImpl;
 
-    /*
+    private EntityManagerFactory mockedEmf;
+    private EntityManager mockedEm;
+    private EntityTransaction transaction;
+
+
     @Before
     public void setUp() throws Exception
     {
         emf = Persistence.createEntityManagerFactory( "default" );
         templateServiceImpl = new TemplateServiceImpl();
         templateServiceImpl.setEntityManagerFactory( emf );
+
+        mockedEmf = mock( EntityManagerFactory.class );
+        mockedEm = mock( EntityManager.class );
+        transaction = mock( EntityTransaction.class );
+        when( mockedEmf.createEntityManager() ).thenReturn( mockedEm );
+        when( mockedEm.getTransaction() ).thenReturn( transaction, transaction, transaction );
+        when( mockedEm.createQuery( anyString() ) ).thenThrow( Exception.class );
+        when( mockedEm.merge( anyObject() ) ).thenThrow( Exception.class );
+        when( transaction.isActive() ).thenReturn( true );
     }
 
 
     @After
     public void tearDown() throws Exception
     {
-        //        em.close();
-        emf.close();
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        em.createQuery( "DELETE FROM Template t" ).executeUpdate();
+        em.getTransaction().commit();
     }
 
 
     @Test
+    public void testSetEntityManagerFactory() throws Exception
+    {
+        assertEquals( emf, templateServiceImpl.getEntityManagerFactory() );
+    }
+
+
+    @Test( expected = DaoException.class )
     public void testSaveTemplate() throws Exception
     {
-        Template template = TestUtils.getParentTemplate();
-        templateServiceImpl.saveTemplate( template );
-        Template savedTemplate = templateServiceImpl.getTemplate( template.getTemplateName(), template.getLxcArch() );
-        assertEquals( template, savedTemplate );
+        templateServiceImpl.saveTemplate( TestUtils.getParentTemplate() );
+        assertTrue( templateServiceImpl.getAllTemplates().contains( TestUtils.getParentTemplate() ) );
+
+        templateServiceImpl.setEntityManagerFactory( mockedEmf );
+        templateServiceImpl.saveTemplate( TestUtils.getParentTemplate() );
     }
 
 
-    @Test
-    public void testGetAllTemplates() throws Exception
-    {
-        Map<Pair<String, String>, Template> templates = new HashMap<>();
-
-        Template childTemplate = TestUtils.getChildTemplate();
-        Template parentTemplate = TestUtils.getParentTemplate();
-
-        templates.put( new ImmutablePair<>( childTemplate.getTemplateName(), childTemplate.getLxcArch() ),
-                childTemplate );
-        templates.put( new ImmutablePair<>( parentTemplate.getTemplateName(), parentTemplate.getLxcArch() ),
-                parentTemplate );
-
-        //        templates.add( TestUtils.getChildTemplate() );
-        //        templates.add( TestUtils.getParentTemplate() );
-
-        LOGGER.info( "Templates going to be persisted" );
-        for ( Map.Entry<Pair<String, String>, Template> pairTemplateEntry : templates.entrySet() )
-        {
-            templateServiceImpl.saveTemplate( pairTemplateEntry.getValue() );
-            LOGGER.warn( pairTemplateEntry.getValue().getTemplateName() );
-        }
-
-
-        LOGGER.info( "Templates persisted in database" );
-        Map<Pair<String, String>, Template> savedTemplatesMap = new HashMap<>();
-        List<Template> savedTemplates = templateServiceImpl.getAllTemplates();
-        for ( Template savedTemplate : savedTemplates )
-        {
-            savedTemplatesMap.put( new ImmutablePair<>( savedTemplate.getTemplateName(), savedTemplate.getLxcArch() ),
-                    savedTemplate );
-            LOGGER.warn( savedTemplate.getTemplateName() );
-        }
-
-        assertArrayEquals( templates.entrySet().toArray(), savedTemplatesMap.entrySet().toArray() );
-    }
-
-
-    @Test
+    @Test( expected = DaoException.class )
     public void testRemoveTemplate() throws Exception
     {
-        LOGGER.warn( "\n\n\n\nTesting Remove Template" );
-        Template template = TestUtils.getParentTemplate();
-        templateServiceImpl.saveTemplate( template );
+        templateServiceImpl.saveTemplate( TestUtils.getParentTemplate() );
+        assertTrue( templateServiceImpl.getAllTemplates().contains( TestUtils.getParentTemplate() ) );
+        templateServiceImpl.removeTemplate( TestUtils.getParentTemplate() );
+        assertFalse( templateServiceImpl.getAllTemplates().contains( TestUtils.getParentTemplate() ) );
 
-        Template savedTemplate = templateServiceImpl.getTemplate( template.getTemplateName(), template.getLxcArch() );
-        LOGGER.warn( template.toString() );
-        LOGGER.warn( savedTemplate.toString() );
-        LOGGER.warn( "\n\n\n\nGetting all templates from DB" );
-        for ( Template template1 : templateServiceImpl.getAllTemplates() )
-        {
-            LOGGER.warn( template1.getTemplateName() );
-        }
-        assertEquals( template, savedTemplate );
-        templateServiceImpl.removeTemplate( template );
-        savedTemplate = templateServiceImpl.getTemplate( template.getTemplateName(), template.getLxcArch() );
-        LOGGER.warn( "\n\n\n\nGetting template from database" );
-        assertNull( savedTemplate );
+        templateServiceImpl.setEntityManagerFactory( mockedEmf );
+        templateServiceImpl.removeTemplate( TestUtils.getParentTemplate() );
     }
 
 
-    @Test
+    @Test( expected = DaoException.class )
+    public void testGetTemplate() throws Exception
+    {
+        Template parentTemplate = TestUtils.getParentTemplate();
+        templateServiceImpl.saveTemplate( parentTemplate );
+        assertTrue( templateServiceImpl.getAllTemplates().contains( parentTemplate ) );
+        assertNotNull(
+                templateServiceImpl.getTemplate( parentTemplate.getTemplateName(), parentTemplate.getLxcArch() ) );
+
+        templateServiceImpl.setEntityManagerFactory( mockedEmf );
+        templateServiceImpl.getTemplate( parentTemplate.getTemplateName(), parentTemplate.getLxcArch() );
+    }
+
+
+    @Test( expected = DaoException.class )
+    public void testGetTemplate1() throws Exception
+    {
+        Template parentTemplate = TestUtils.getParentTemplate();
+        templateServiceImpl.saveTemplate( parentTemplate );
+        assertTrue( templateServiceImpl.getAllTemplates().contains( parentTemplate ) );
+        assertNotNull( templateServiceImpl
+                .getTemplate( parentTemplate.getTemplateName(), parentTemplate.getLxcArch(), parentTemplate.getMd5sum(),
+                        parentTemplate.getTemplateVersion() ) );
+
+        templateServiceImpl.setEntityManagerFactory( mockedEmf );
+        templateServiceImpl
+                .getTemplate( parentTemplate.getTemplateName(), parentTemplate.getLxcArch(), parentTemplate.getMd5sum(),
+                        parentTemplate.getTemplateVersion() );
+    }
+
+
+    @Test( expected = DaoException.class )
+    public void testGetTemplate2() throws Exception
+    {
+        Template parentTemplate = TestUtils.getParentTemplate();
+
+        templateServiceImpl.saveTemplate( parentTemplate );
+        assertTrue( templateServiceImpl.getAllTemplates().contains( parentTemplate ) );
+        assertNotNull( templateServiceImpl
+                .getTemplate( parentTemplate.getTemplateName(), parentTemplate.getTemplateVersion(),
+                        parentTemplate.getLxcArch() ) );
+
+        templateServiceImpl.setEntityManagerFactory( mockedEmf );
+        templateServiceImpl.getTemplate( parentTemplate.getTemplateName(), parentTemplate.getTemplateVersion(),
+                parentTemplate.getLxcArch() );
+    }
+
+
+    @Test( expected = DaoException.class )
+    public void testGetAllTemplates() throws Exception
+    {
+        templateServiceImpl.saveTemplate( TestUtils.getParentTemplate() );
+        templateServiceImpl.saveTemplate( TestUtils.getChildTemplate() );
+        assertTrue( templateServiceImpl.getAllTemplates().contains( TestUtils.getParentTemplate() ) );
+        assertTrue( templateServiceImpl.getAllTemplates().contains( TestUtils.getChildTemplate() ) );
+
+        templateServiceImpl.setEntityManagerFactory( mockedEmf );
+        templateServiceImpl.getAllTemplates();
+    }
+
+
+    @Test( expected = DaoException.class )
     public void testGetChildTemplates() throws Exception
     {
         Template parentTemplate = TestUtils.getParentTemplate();
         Template childTemplate = TestUtils.getChildTemplate();
-        parentTemplate.addChildren( Arrays.asList( childTemplate ) );
         templateServiceImpl.saveTemplate( parentTemplate );
-        List<Template> childTemplates =
-                templateServiceImpl.getChildTemplates( parentTemplate.getTemplateName(), parentTemplate.getLxcArch() );
-        assertTrue( childTemplates.contains( childTemplate ) );
+        templateServiceImpl.saveTemplate( childTemplate );
+
+        assertTrue(
+                templateServiceImpl.getChildTemplates( parentTemplate.getTemplateName(), parentTemplate.getLxcArch() )
+                                   .contains( childTemplate ) );
+
+        templateServiceImpl.setEntityManagerFactory( mockedEmf );
+        templateServiceImpl.getChildTemplates( parentTemplate.getTemplateName(), parentTemplate.getLxcArch() );
     }
 
 
-    @Test
-    public void testGetTemplateByName() throws Exception
+    @Test( expected = DaoException.class )
+    public void testGetChildTemplates1() throws Exception
     {
-        Template template = TestUtils.getParentTemplate();
-        templateServiceImpl.saveTemplate( template );
-        Template savedTemplate = templateServiceImpl.getTemplate( template.getTemplateName(), template.getLxcArch() );
-        assertEquals( template, savedTemplate );
+        Template parentTemplate = TestUtils.getParentTemplate();
+        Template childTemplate = TestUtils.getChildTemplate();
+        templateServiceImpl.saveTemplate( parentTemplate );
+        templateServiceImpl.saveTemplate( childTemplate );
+
+        assertTrue( templateServiceImpl
+                .getChildTemplates( parentTemplate.getTemplateName(), parentTemplate.getTemplateVersion(),
+                        parentTemplate.getLxcArch() ).contains( childTemplate ) );
+
+        templateServiceImpl.setEntityManagerFactory( mockedEmf );
+        templateServiceImpl.getChildTemplates( parentTemplate.getTemplateName(), parentTemplate.getTemplateVersion(),
+                parentTemplate.getLxcArch() );
     }
-    */
 }

@@ -4,8 +4,10 @@ package org.safehaus.subutai.core.lxc.quota.api;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
+import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.common.quota.QuotaInfo;
@@ -29,6 +31,17 @@ public interface QuotaManager
 
 
     /**
+     * Return abstract QuotaInfo object
+     *
+     * @param containerId - containerId
+     * @param quotaType - quotaType
+     *
+     * @return - brief description of quota requested
+     */
+    public QuotaInfo getQuotaInfo( UUID containerId, QuotaType quotaType ) throws QuotaException;
+
+
+    /**
      * Returns RAM quota on container in megabytes
      *
      * @param containerId - id of container
@@ -36,6 +49,17 @@ public interface QuotaManager
      * @return - quota in mb
      */
     public int getRamQuota( UUID containerId ) throws QuotaException;
+
+
+    /**
+     * Returns RAM quota object on container
+     *
+     * @param containerId - id of container
+     *
+     * @return - quota object
+     */
+    public MemoryQuotaInfo getRamQuotaInfo( UUID containerId ) throws QuotaException;
+
 
     /**
      * Sets RAM quota on container in megabytes
@@ -54,6 +78,17 @@ public interface QuotaManager
      * @return - cpu quota on container in percent
      */
     public int getCpuQuota( UUID containerId ) throws QuotaException;
+
+
+    /**
+     * Returns CPU quota object on container
+     *
+     * @param containerId - id of container
+     *
+     * @return - cpu quota object on container
+     */
+    public CpuQuotaInfo getCpuQuotaInfo( UUID containerId ) throws QuotaException;
+
 
     /**
      * Sets CPU quota on container in percent

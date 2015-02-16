@@ -34,9 +34,6 @@ public class MetricTest
         assertTrue( VALUE == metric.getAvailableRam() );
         assertTrue( VALUE == metric.getUsedRam() );
         assertTrue( VALUE == metric.getUsedCpu() );
-        assertTrue( VALUE == metric.getAvailableDisk() );
-        assertTrue( VALUE == metric.getUsedDisk() );
-        assertTrue( VALUE == metric.getTotalDisk() );
     }
 
 
@@ -46,7 +43,6 @@ public class MetricTest
         UUID environmentId = UUID.randomUUID();
         metric.setEnvironmentId( environmentId );
 
-        assertThat( metric.toString(), containsString( HOST ) );
         assertThat( metric.toString(), containsString( environmentId.toString() ) );
     }
 }

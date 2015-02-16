@@ -19,16 +19,16 @@ import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.MonitoringSettings;
-import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.core.peer.api.ContainerGroup;
 import org.safehaus.subutai.core.peer.api.ContainerGroupNotFoundException;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
@@ -145,11 +145,14 @@ public class MonitorImpl implements Monitor
             //create request for metrics
             ContainerHostMetricRequest request = new ContainerHostMetricRequest( environmentId );
 
+            Map<String, String> headers = Maps.newHashMap();
+            headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, environmentId.toString() );
+
             //send request and obtain metrics
             ContainerHostMetricResponse response =
                     peer.sendRequest( request, RecipientType.METRIC_REQUEST_RECIPIENT.name(),
                             Constants.METRIC_REQUEST_TIMEOUT, ContainerHostMetricResponse.class,
-                            Constants.METRIC_REQUEST_TIMEOUT, environmentId );
+                            Constants.METRIC_REQUEST_TIMEOUT, headers );
 
             //if response contains metrics, add them to result
             if ( response != null && !CollectionUtil.isCollectionEmpty( response.getMetrics() ) )
@@ -257,6 +260,23 @@ public class MonitorImpl implements Monitor
     }
 
 
+    @Override
+    public ResourceHostMetric getResourceHostMetric( ResourceHost resourceHost ) throws MonitorException
+    {
+        Preconditions.checkNotNull( resourceHost, "Invalid resource host" );
+
+        Set<ResourceHostMetric> metrics = Sets.newHashSet();
+        addResourceHostMetric( resourceHost, metrics );
+
+        if ( metrics.isEmpty() )
+        {
+            throw new MonitorException( "Failed to obtain resource host metric" );
+        }
+
+        return metrics.iterator().next();
+    }
+
+
     protected void addResourceHostMetric( ResourceHost resourceHost, Set<ResourceHostMetric> metrics )
     {
         try
@@ -326,11 +346,6 @@ public class MonitorImpl implements Monitor
         Preconditions.checkNotNull( containerHost, CONTAINER_IS_NULL_MSG );
         Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
 
-        if ( !UUIDUtil.isStringAUuid( containerHost.getEnvironmentId() ) )
-        {
-            throw new MonitorException( "Container has invalid environment id" );
-        }
-
         //make sure subscriber id is truncated to 100 characters
         String subscriberId = alertListener.getSubscriberId();
         if ( subscriberId.length() > Constants.MAX_SUBSCRIBER_ID_LEN )
@@ -391,10 +406,6 @@ public class MonitorImpl implements Monitor
     {
         Preconditions.checkNotNull( containerHost, CONTAINER_IS_NULL_MSG );
         Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
-        if ( !UUIDUtil.isStringAUuid( containerHost.getEnvironmentId() ) )
-        {
-            throw new MonitorException( "Container has invalid environment id" );
-        }
 
         activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings,
                 UUID.fromString( containerHost.getEnvironmentId() ) );
@@ -456,9 +467,12 @@ public class MonitorImpl implements Monitor
 
         try
         {
+            Map<String, String> headers = Maps.newHashMap();
+            headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, environmentId.toString() );
+
             peer.sendRequest( new MonitoringActivationRequest( containerHosts, monitoringSettings ),
                     RecipientType.MONITORING_ACTIVATION_RECIPIENT.name(), Constants.MONITORING_ACTIVATION_TIMEOUT,
-                    environmentId );
+                    headers );
         }
         catch ( PeerException e )
         {
@@ -487,7 +501,7 @@ public class MonitorImpl implements Monitor
                             commandResult.getStatus(), commandResult.getStdErr() ) );
                 }
             }
-            catch ( CommandException | PeerException e )
+            catch ( Exception e )
             {
                 LOG.error( "Error in activateMonitoringAtLocalContainers", e );
             }
@@ -515,7 +529,7 @@ public class MonitorImpl implements Monitor
             }
             return JsonUtil.fromJson( commandResult.getStdOut(), ProcessResourceUsage.class );
         }
-        catch ( CommandException | HostNotFoundException | JsonSyntaxException e )
+        catch ( Exception e )
         {
             LOG.error( String.format( "Could not obtain process resource usage for container %s, pid %d",
                     containerHost.getHostname(), processPid ), e );
@@ -561,11 +575,13 @@ public class MonitorImpl implements Monitor
             //send metric to remote creator peer
             else
             {
+                Map<String, String> headers = Maps.newHashMap();
+                headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, containerGroup.getEnvironmentId().toString() );
                 creatorPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
-                        Constants.ALERT_TIMEOUT, containerGroup.getEnvironmentId() );
+                        Constants.ALERT_TIMEOUT, headers );
             }
         }
-        catch ( PeerException | ContainerGroupNotFoundException | JsonSyntaxException e )
+        catch ( Exception e )
         {
             LOG.error( "Error in onAlert", e );
             throw new MonitorException( e );

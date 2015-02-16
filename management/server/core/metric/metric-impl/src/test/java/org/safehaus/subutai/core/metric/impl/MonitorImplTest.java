@@ -30,7 +30,7 @@ import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.MonitoringSettings;
-import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.core.peer.api.ContainerGroup;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -47,6 +47,7 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -257,6 +258,7 @@ public class MonitorImplTest
     {
         //set owner id as local peer
         ContainerGroup containerGroup = mock( ContainerGroup.class );
+        when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
         when( containerGroup.getInitiatorPeerId() ).thenReturn( REMOTE_PEER_ID );
         when( localPeer.findContainerGroupByContainerId( HOST_ID ) ).thenReturn( containerGroup );
         when( localPeer.getContainerHostByName( HOST ) ).thenReturn( containerHost );
@@ -267,7 +269,7 @@ public class MonitorImplTest
         monitor.alert( METRIC_JSON );
 
 
-        verify( ownerPeer ).sendRequest( isA( ContainerHostMetric.class ), anyString(), anyInt(), any( UUID.class ) );
+        verify( ownerPeer ).sendRequest( isA( ContainerHostMetric.class ), anyString(), anyInt(), anyMap() );
     }
 
 
@@ -413,7 +415,7 @@ public class MonitorImplTest
         ContainerHostMetricResponse response = mock( ContainerHostMetricResponse.class );
         when( remotePeer
                 .sendRequest( anyObject(), anyString(), anyInt(), eq( ContainerHostMetricResponse.class ), anyInt(),
-                        any( UUID.class ) ) ).thenReturn( response );
+                        anyMap()) ).thenReturn( response );
         ContainerHostMetricImpl metric = JsonUtil.fromJson( METRIC_JSON, ContainerHostMetricImpl.class );
         when( response.getMetrics() ).thenReturn( Sets.newHashSet( metric ) );
 
@@ -427,7 +429,7 @@ public class MonitorImplTest
         PeerException exception = mock( PeerException.class );
         doThrow( exception ).when( remotePeer )
                             .sendRequest( anyObject(), anyString(), anyInt(), eq( ContainerHostMetricResponse.class ),
-                                    anyInt(), any( UUID.class ) );
+                                    anyInt(), anyMap() );
 
 
         monitor.getContainerHostsMetrics( environment );
@@ -605,13 +607,13 @@ public class MonitorImplTest
                 ENVIRONMENT_ID );
 
         verify( remotePeer )
-                .sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt(), any( UUID.class ) );
+                .sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt(), anyMap() );
 
 
         PeerException exception = mock( PeerException.class );
         doThrow( exception ).when( remotePeer )
                             .sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt(),
-                                    any( UUID.class ) );
+                                    anyMap() );
 
         monitor.activateMonitoringAtRemoteContainers( remotePeer, Sets.newHashSet( containerHost ), monitoringSettings,
                 ENVIRONMENT_ID );
@@ -669,18 +671,18 @@ public class MonitorImplTest
         monitor.activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings, ENVIRONMENT_ID );
 
         verify( remotePeer )
-                .sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt(), any( UUID.class ) );
+                .sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt(), anyMap() );
 
 
         monitor.activateMonitoring( containerHost, monitoringSettings );
 
         verify( remotePeer, times( 2 ) )
-                .sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt(), any( UUID.class ) );
+                .sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt(), anyMap() );
 
         monitor.activateMonitoring( containerHost, monitoringSettings );
 
         verify( remotePeer, times( 3 ) )
-                .sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt(), any( UUID.class ) );
+                .sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt(), anyMap() );
 
 
         Exception exception = mock( RuntimeException.class );

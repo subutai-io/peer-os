@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.env.ui;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.ui.forms.BlueprintForm;
 import org.safehaus.subutai.core.env.ui.forms.EnvironmentForm;
+import org.safehaus.subutai.core.env.ui.tabs.EnvironmentContainersQuotaTab;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
@@ -15,11 +16,23 @@ import com.vaadin.ui.themes.Runo;
 
 public class EnvironmentManagerComponent extends CustomComponent
 {
+    private EnvironmentManager environmentManager;
+    private PeerManager peerManager;
+    private TemplateRegistry templateRegistry;
 
-    public EnvironmentManagerComponent( final EnvironmentManager environmentManager, final PeerManager peerManager, final
-                                        TemplateRegistry templateRegistry )
+
+    public EnvironmentManagerComponent( final EnvironmentManager environmentManager, final PeerManager peerManager,
+                                        final TemplateRegistry templateRegistry )
     {
+        this.environmentManager = environmentManager;
+        this.peerManager = peerManager;
+        this.templateRegistry = templateRegistry;
+        init();
+    }
 
+
+    private void init()
+    {
         setHeight( 100, Unit.PERCENTAGE );
 
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -33,12 +46,42 @@ public class EnvironmentManagerComponent extends CustomComponent
         BlueprintForm blueprintForm = new BlueprintForm( environmentManager, peerManager, templateRegistry );
         formSheet.addTab( blueprintForm.getContentRoot(), "Blueprints" );
         formSheet.getTab( 0 ).setId( "Blueprints" );
+
         final EnvironmentForm environmentForm = new EnvironmentForm( environmentManager );
         formSheet.addTab( environmentForm.getContentRoot(), "Environments" );
         formSheet.getTab( 1 ).setId( "Environments" );
 
+        EnvironmentContainersQuotaTab envContainersTab = new EnvironmentContainersQuotaTab( this );
+        formSheet.addTab( envContainersTab, "Environment Container Quota" ).setId( "EnvironmentContainersTab" );
+        formSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
+        {
+            @Override
+            public void selectedTabChange( final TabSheet.SelectedTabChangeEvent event )
+            {
+
+            }
+        } );
+
         verticalLayout.addComponent( formSheet );
 
         setCompositionRoot( verticalLayout );
+    }
+
+
+    public EnvironmentManager getEnvironmentManager()
+    {
+        return environmentManager;
+    }
+
+
+    public PeerManager getPeerManager()
+    {
+        return peerManager;
+    }
+
+
+    public TemplateRegistry getTemplateRegistry()
+    {
+        return templateRegistry;
     }
 }

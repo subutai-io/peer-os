@@ -39,6 +39,7 @@ public class EnvironmentForm
     private static final String OK_ICON_SOURCE = "img/ok.png";
     private static final String ERROR_ICON_SOURCE = "img/cancel.png";
     private static final String LOAD_ICON_SOURCE = "img/spinner.gif";
+    private static final String QUESTION_ICON_SOURCE = "img/question.png";
 
     private final VerticalLayout contentRoot;
     private Table environmentsTable;
@@ -194,7 +195,9 @@ public class EnvironmentForm
             Embedded icon = isEnvironmentUnderModification ? new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) ) :
                             environment.getStatus().equals( EnvironmentStatus.HEALTHY ) ?
                             new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) ) :
-                            new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) );
+                            environment.getStatus().equals( EnvironmentStatus.UNHEALTHY ) ?
+                            new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) ) :
+                            new Embedded( "", new ThemeResource( QUESTION_ICON_SOURCE ) );
 
             String iconId = isEnvironmentUnderModification ? "indicator" :
                             environment.getStatus().equals( EnvironmentStatus.HEALTHY ) ? "ok" : "error";
