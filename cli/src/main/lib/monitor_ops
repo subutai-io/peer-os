@@ -1046,8 +1046,8 @@ function get_ram_usage_in_bytes_by_pid {
   local pid=$2
 
   local usage_in_percentage=$(get_ram_usage_percentage_by_pid $hostname $pid)
-  local ram_quota=$(get_total_ram $hostname)
-  local usage_in_byte=$(echo $ram_quota*$usage_in_percentage/100 | bc)
+  local total_ram=$(get_physical_total_ram)
+  local usage_in_byte=$(echo $total_ram*$usage_in_percentage/100 | bc)
   echo $usage_in_byte
 }
 
