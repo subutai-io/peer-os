@@ -32,7 +32,7 @@ public class SetSshKeyTask implements Runnable
         this.environment = environment;
         this.networkManager = networkManager;
         this.resultHolder = resultHolder;
-        this.sshKey = sshKey;
+        this.sshKey = Strings.isNullOrEmpty( sshKey ) ? null : sshKey.trim();
         this.semaphore = new Semaphore( 0 );
     }
 
