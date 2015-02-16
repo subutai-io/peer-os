@@ -75,6 +75,7 @@ public class RepositoryManagerImpl implements RepositoryManager
         Preconditions.checkArgument( !Strings.isNullOrEmpty( pathToPackage ), "Invalid package path" );
 
         executeCommand( commands.getAddPackageCommand( pathToPackage ) );
+        executeUpdateRepoCommand();
     }
 
 
@@ -84,6 +85,7 @@ public class RepositoryManagerImpl implements RepositoryManager
         Preconditions.checkArgument( !Strings.isNullOrEmpty( packageName ), INVALID_PACKAGE_NAME );
 
         executeCommand( commands.getRemovePackageCommand( packageName ) );
+        executeUpdateRepoCommand();
     }
 
 
@@ -156,6 +158,26 @@ public class RepositoryManagerImpl implements RepositoryManager
             throw new RepositoryException(
                     String.format( "Could not obtain full name by short name %s from:%n%s", shortPackageName,
                             packageInfo ) );
+        }
+    }
+
+
+    private CommandResult executeUpdateRepoCommand() throws RepositoryException
+    {
+        try
+        {
+            ManagementHost managementHost = peerManager.getLocalPeer().getManagementHost();
+            CommandResult result = managementHost.execute( commands.getUpdateRepoCommand() );
+            if ( !result.hasCompleted() )
+            {
+                throw new RepositoryException( "Command timed out" );
+            }
+
+            return result;
+        }
+        catch ( PeerException | CommandException e )
+        {
+            throw new RepositoryException( e );
         }
     }
 }

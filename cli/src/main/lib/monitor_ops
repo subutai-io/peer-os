@@ -1060,9 +1060,8 @@ function destroy_monitor {
 
   assert_metric "$metric_type"
 
+  stop_update_rrd $hostname $metric_type
   remove_monitor_configuration $hostname $metric_type
-  remove_monitor_update_configuration "$hostname"
-  remove_monitor_directory "$hostname"
   remove_rrd_file $hostname $metric_type
 }
 
@@ -1074,6 +1073,8 @@ function destroy_all_monitor {
   do
     destroy_monitor $hostname $metric_type
   done
+  remove_monitor_update_configuration "$hostname"
+  remove_monitor_directory "$hostname"
 }
 
 
