@@ -44,8 +44,6 @@ public class IdentityManagerImpl implements IdentityManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( IdentityManagerImpl.class );
 
-    static final String HEXES = "0123456789abcdef";
-
     private DaoManager daoManager;
     private KeyManager keyManager;
     private SecurityManager securityManager;
@@ -285,16 +283,46 @@ public class IdentityManagerImpl implements IdentityManager
 
     private void generateKey( final User user )
     {
-        try
+
+        Host host = null;
+        long threshold = System.currentTimeMillis() + 1000 * 60;
+        do
         {
-            Host host = peerManager.getLocalPeer().getManagementHost();
-            KeyInfo keyInfo = keyManager.generateKey( host, user.getFullname(), user.getEmail() );
-            user.setKey( keyInfo.getPublicKeyId() );
-            LOG.debug( String.format( "%s", keyInfo.toString() ) );
+            try
+            {
+                host = peerManager.getLocalPeer().getManagementHost();
+            }
+            catch ( HostNotFoundException ignore )
+            {
+            }
+            try
+            {
+                LOG.debug( String.format( "Waiting for management host...[%s]", host == null ? "OFF" : "ON" ) );
+                Thread.sleep( 1000 );
+            }
+            catch ( InterruptedException ignore )
+            {
+            }
         }
-        catch ( HostNotFoundException | KeyManagerException e )
+        while ( host == null && threshold > System.currentTimeMillis() );
+
+        if ( host != null )
         {
-            LOG.error( e.toString(), e );
+            KeyInfo keyInfo = null;
+            try
+            {
+                keyInfo = keyManager.generateKey( host, user.getUsername(), user.getEmail() );
+                user.setKey( keyInfo.getPublicKeyId() );
+                LOG.debug( String.format( "%s", keyInfo.toString() ) );
+            }
+            catch ( KeyManagerException e )
+            {
+                LOG.error( e.toString(), e );
+            }
+        }
+        else
+        {
+            LOG.warn( "Management host not available on generating keys." );
         }
     }
 
