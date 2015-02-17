@@ -7,6 +7,7 @@ import java.util.Map;
 import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.util.UnitUtil;
 import org.safehaus.subutai.core.strategy.api.AbstractContainerPlacementStrategy;
 
 import com.google.common.collect.Maps;
@@ -22,6 +23,7 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
     private static final double MIN_HDD_IN_RESERVE_MB = 20 * 1024;
     private static final double MIN_RAM_LXC_MB = 512;
     private static final double MIN_RAM_IN_RESERVE_MB = 1024;
+    private UnitUtil unitUtil = new UnitUtil();
 
 
     @Override
@@ -121,10 +123,6 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
 
     private double getBytesInMb( double bytes )
     {
-        if ( bytes > 0 )
-        {
-            return bytes / ( 1024 * 1024 );
-        }
-        return 0;
+        return unitUtil.convert( bytes, UnitUtil.Unit.B, UnitUtil.Unit.MB );
     }
 }

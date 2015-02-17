@@ -1,6 +1,8 @@
 package org.safehaus.subutai.common.metric;
 
 
+import java.util.UUID;
+
 import com.google.common.base.Objects;
 
 
@@ -17,6 +19,7 @@ public abstract class Metric
 {
 
     protected String host;
+    protected UUID hostId;
     protected Double totalRam;
     protected Double availableRam;
     protected Double usedRam;
@@ -153,10 +156,16 @@ public abstract class Metric
     }
 
 
+    public UUID getHostId()
+    {
+        return hostId;
+    }
+
+
     @Override
     public String toString()
     {
-        return Objects.toStringHelper( this ).add( "host", host ).add( "totalRam", totalRam )
+        return Objects.toStringHelper( this ).add( "host", host ).add( "hostId", hostId ).add( "totalRam", totalRam )
                       .add( "availableRam", availableRam ).add( "usedRam", usedRam ).add( "usedCpu", usedCpu )
                       .add( "availableDiskRootfs", availableDiskRootfs ).add( "availableDiskVar", availableDiskVar )
                       .add( "availableDiskHome", availableDiskHome ).add( "availableDiskOpt", availableDiskOpt )

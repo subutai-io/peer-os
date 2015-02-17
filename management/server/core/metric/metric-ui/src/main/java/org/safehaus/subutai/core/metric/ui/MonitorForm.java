@@ -6,16 +6,15 @@ import java.util.Set;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.environment.Environment;
+import org.safehaus.subutai.common.metric.Metric;
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.common.util.UnitUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
-import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gwt.thirdparty.guava.common.base.Strings;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
@@ -24,7 +23,8 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.TextArea;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Table;
 
 
 public class MonitorForm extends CustomComponent
@@ -33,8 +33,9 @@ public class MonitorForm extends CustomComponent
 
     private Monitor monitor;
     private EnvironmentManager environmentManager;
-    protected TextArea outputTxtArea;
     private ComboBox environmentCombo;
+    protected Table metricTable;
+    private UnitUtil unitUtil = new UnitUtil();
 
 
     public MonitorForm( ServiceLocator serviceLocator ) throws NamingException
@@ -56,7 +57,7 @@ public class MonitorForm extends CustomComponent
 
         content.addComponent( controls, 0, 0 );
 
-        content.addComponent( getOutputArea(), 0, 1, 0, 9 );
+        content.addComponent( getMetricTable(), 0, 1, 0, 9 );
 
         controls.addComponent( getResourceHostsButton() );
 
@@ -85,7 +86,7 @@ public class MonitorForm extends CustomComponent
 
                 if ( environment == null )
                 {
-                    addOutput( "Please, select environment" );
+                    Notification.show( "Please, select environment" );
                 }
                 else
                 {
@@ -102,18 +103,37 @@ public class MonitorForm extends CustomComponent
     {
         try
         {
-            Set<ContainerHostMetric> metrics = monitor.getContainerHostsMetrics( environment );
-            for ( ContainerHostMetric metric : metrics )
-            {
-                addOutput( metric.toString() );
-            }
+            displayMetrics( monitor.getContainerHostsMetrics( environment ) );
         }
         catch ( MonitorException e )
         {
             LOG.error( "Error getting container metrics", e );
 
-            addOutput( e.getMessage() );
+            Notification.show( e.getMessage() );
         }
+    }
+
+
+    protected void displayMetrics( Set<? extends Metric> metrics )
+    {
+        metricTable.removeAllItems();
+        for ( Metric metric : metrics )
+        {
+            metricTable.addItem( new Object[] {
+                    metric.getHost(), metric.getUsedCpu(),
+                    unitUtil.convert( metric.getUsedRam(), UnitUtil.Unit.B, UnitUtil.Unit.MB ),
+                    unitUtil.convert( metric.getTotalRam(), UnitUtil.Unit.B, UnitUtil.Unit.MB ),
+                    unitUtil.convert( metric.getUsedDiskVar(), UnitUtil.Unit.B, UnitUtil.Unit.GB ),
+                    unitUtil.convert( metric.getUsedDiskOpt(), UnitUtil.Unit.B, UnitUtil.Unit.GB ),
+                    unitUtil.convert( metric.getUsedDiskHome(), UnitUtil.Unit.B, UnitUtil.Unit.GB ),
+                    unitUtil.convert( metric.getUsedDiskRootfs(), UnitUtil.Unit.B, UnitUtil.Unit.GB ),
+                    unitUtil.convert( metric.getTotalDiskVar(), UnitUtil.Unit.B, UnitUtil.Unit.GB ),
+                    unitUtil.convert( metric.getTotalDiskOpt(), UnitUtil.Unit.B, UnitUtil.Unit.GB ),
+                    unitUtil.convert( metric.getTotalDiskHome(), UnitUtil.Unit.B, UnitUtil.Unit.GB ),
+                    unitUtil.convert( metric.getTotalDiskRootfs(), UnitUtil.Unit.B, UnitUtil.Unit.GB )
+            }, null );
+        }
+        metricTable.refreshRowCache();
     }
 
 
@@ -121,17 +141,13 @@ public class MonitorForm extends CustomComponent
     {
         try
         {
-            Set<ResourceHostMetric> metrics = monitor.getResourceHostsMetrics();
-            for ( ResourceHostMetric metric : metrics )
-            {
-                addOutput( metric.toString() );
-            }
+            displayMetrics( monitor.getResourceHostsMetrics() );
         }
         catch ( MonitorException e )
         {
             LOG.error( "Error getting resource host metrics", e );
 
-            addOutput( e.getMessage() );
+            Notification.show( e.getMessage() );
         }
     }
 
@@ -155,15 +171,27 @@ public class MonitorForm extends CustomComponent
     }
 
 
-    protected Component getOutputArea()
+    protected Table getMetricTable()
     {
-        outputTxtArea = new TextArea( "Metrics" );
-        outputTxtArea.setId( "outputTxtArea" );
-        outputTxtArea.setImmediate( true );
-        outputTxtArea.setWordwrap( true );
-        outputTxtArea.setSizeFull();
-        outputTxtArea.setRows( 30 );
-        return outputTxtArea;
+        metricTable = new Table( "Metrics" );
+        metricTable.addContainerProperty( "Hostname", String.class, null );
+        metricTable.addContainerProperty( "Used CPU (nanoseconds)", Double.class, null );
+        metricTable.addContainerProperty( "Used RAM (Mb)", Double.class, null );
+        metricTable.addContainerProperty( "Total RAM (Mb)", Double.class, null );
+        metricTable.addContainerProperty( "Used disk VAR (GB)", Double.class, null );
+        metricTable.addContainerProperty( "Used disk OPT (GB)", Double.class, null );
+        metricTable.addContainerProperty( "Used disk HOME (GB)", Double.class, null );
+        metricTable.addContainerProperty( "Used disk ROOTFS (GB)", Double.class, null );
+        metricTable.addContainerProperty( "Total disk VAR (GB)", Double.class, null );
+        metricTable.addContainerProperty( "Total disk OPT (GB)", Double.class, null );
+        metricTable.addContainerProperty( "Total disk HOME (GB)", Double.class, null );
+        metricTable.addContainerProperty( "Total disk ROOTFS (GB)", Double.class, null );
+        metricTable.setPageLength( 10 );
+        metricTable.setSelectable( false );
+        metricTable.setEnabled( true );
+        metricTable.setImmediate( true );
+        metricTable.setSizeFull();
+        return metricTable;
     }
 
 
@@ -178,16 +206,5 @@ public class MonitorForm extends CustomComponent
         environmentCombo.setTextInputAllowed( false );
         environmentCombo.setNullSelectionAllowed( false );
         return environmentCombo;
-    }
-
-
-    protected void addOutput( String output )
-    {
-
-        if ( !Strings.isNullOrEmpty( output ) )
-        {
-            outputTxtArea.setValue( String.format( "%s%n%s", outputTxtArea.getValue(), output ) );
-            outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
-        }
     }
 }
