@@ -6,6 +6,9 @@ import org.safehaus.subutai.common.command.Request;
 import com.google.common.base.Preconditions;
 
 
+/**
+ * Serializes command request
+ */
 public class RequestWrapper
 {
     private final Request request;

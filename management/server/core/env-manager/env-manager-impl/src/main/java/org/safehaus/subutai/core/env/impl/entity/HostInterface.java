@@ -16,6 +16,17 @@ import javax.persistence.Table;
 import org.safehaus.subutai.common.host.Interface;
 
 
+/**
+ * {@link org.safehaus.subutai.core.env.impl.entity.HostInterface} stores host network interface
+ * information.
+ * <p> {@link #interfaceName} - host interface name</p>
+ * <p> {@link #ip} - ip address</p>
+ * <p> {@link #mac} - mac address</p>
+ * <p> {@link #host} - target host whose metadata being saved</p>
+ *
+ * @see org.safehaus.subutai.common.host.Interface
+ * @see org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl
+ */
 @Entity
 @Table( name = "interface" )
 @Access( AccessType.FIELD )

@@ -13,20 +13,32 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 import com.google.common.base.Preconditions;
 
 
+/**
+ * Destroys environment
+ */
 @Command( scope = "env", name = "destroy", description = "Command to destroy environment" )
 public class DestroyEnvironmentCommand extends OsgiCommandSupport
 {
     @Argument( name = "envId", description = "Environment id",
             index = 0, multiValued = false, required = true )
-    private String environmentId;
+    /**
+     * {@value environmentId} target environment id to destroy
+     * {@code required = true}
+     */ private String environmentId;
 
     @Argument( name = "async", description = "asynchronous destruction",
             index = 1, multiValued = false, required = false )
-    private boolean async = false;
+    /**
+     * {@value async} execute destroy environment asynchronously
+     * <p> {@code required = false}, {@code default = false}</p>
+     */ private boolean async = false;
 
     @Argument( name = "force", description = "force metadata removal",
             index = 2, multiValued = false, required = false )
-    private boolean forceMetadataRemoval = false;
+    /**
+     * {@value forceMetadataRemoval} force metadata removal despite exception handled
+     * <p> {@code required = false}, {@code default = false}</p>
+     */ private boolean forceMetadataRemoval = false;
 
 
     private final EnvironmentManager environmentManager;

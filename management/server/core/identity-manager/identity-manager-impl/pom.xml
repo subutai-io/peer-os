@@ -66,6 +66,10 @@
       <version>${org.apache.shiro.version}</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.safehaus.subutai</groupId>
+      <artifactId>peer-manager-api</artifactId>
+    </dependency>
 
     <!--Tests-->
     <dependency>

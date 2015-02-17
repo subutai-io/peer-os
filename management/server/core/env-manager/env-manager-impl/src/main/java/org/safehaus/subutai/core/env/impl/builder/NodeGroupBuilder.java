@@ -25,7 +25,7 @@ import com.google.common.collect.Sets;
 
 
 /**
- * Creates node groups on a peer
+ * * A task that returns created node groups on a peer and may throw an exception.
  */
 public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
 {
@@ -58,6 +58,13 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
     }
 
 
+    /**
+     * Before triggering container host creation process force to verify for all required templates existence
+     * @param sourcePeerId - initializer peer id
+     * @param templateName - template name to fetch
+     * @return - list of templates with parent dependencies
+     * @throws NodeGroupBuildException
+     */
     public List<Template> fetchRequiredTemplates( UUID sourcePeerId, final String templateName )
             throws NodeGroupBuildException
     {
@@ -90,6 +97,12 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
     }
 
 
+    /**
+     * Computes a result, or throws an exception if unable to do so.
+     *
+     * @return computed result
+     * @throws NodeGroupBuildException if unable to compute a result
+     */
     @Override
     public Set<NodeGroupBuildResult> call() throws NodeGroupBuildException
     {

@@ -11,8 +11,8 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.safehaus.subutai.common.dao.DaoManager;
-import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.environment.Blueprint;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentBlueprintEntity;
 import org.slf4j.Logger;
@@ -38,6 +38,11 @@ public class BlueprintDataService
     }
 
 
+    /**
+     * Save blueprint to database
+     *
+     * @param blueprint - object to save
+     */
     public void persist( final Blueprint blueprint ) throws EnvironmentManagerException
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
@@ -64,6 +69,11 @@ public class BlueprintDataService
     }
 
 
+    /**
+     * Returns list of blueprints saved in database
+     *
+     * @return - Set of {@link org.safehaus.subutai.common.environment.Blueprint}
+     */
     public Set<Blueprint> getAll()
     {
         Set<Blueprint> blueprints = Sets.newHashSet();
@@ -96,6 +106,11 @@ public class BlueprintDataService
     }
 
 
+    /**
+     * Delete {@link org.safehaus.subutai.common.environment.Blueprint} from database by id
+     * @param id - blueprint id to remove
+     * @throws EnvironmentManagerException
+     */
     public void remove( final UUID id ) throws EnvironmentManagerException
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();

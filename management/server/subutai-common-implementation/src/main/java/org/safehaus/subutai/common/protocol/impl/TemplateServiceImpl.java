@@ -50,10 +50,6 @@ public class TemplateServiceImpl implements TemplateService
         try
         {
             entityManager = entityManagerFactory.createEntityManager();
-            entityManager.getTransaction().begin();
-            savedTemplate = entityManager.merge( template );
-            entityManager.flush();
-            entityManager.getTransaction().commit();
 
             if ( template.getParentTemplateName() != null && !template.getParentTemplateName()
                                                                       .equals( template.getTemplateName() ) )
@@ -63,13 +59,24 @@ public class TemplateServiceImpl implements TemplateService
                 //                saveTemplate( parent );
                 if ( parent != null )
                 {
+                    entityManager.getTransaction().begin();
+                    savedTemplate = entityManager.merge( template );
+                    entityManager.flush();
+                    entityManager.getTransaction().commit();
                     parent.addChildren( Arrays.asList( template ) );
                     saveTemplate( parent );
                 }
                 else
                 {
-                    throw new Exception( "Parent template is null." );
+                    throw new Exception( "Parent template is null: " + template.getParentTemplateName() );
                 }
+            }
+            else
+            {
+                entityManager.getTransaction().begin();
+                savedTemplate = entityManager.merge( template );
+                entityManager.flush();
+                entityManager.getTransaction().commit();
             }
         }
         catch ( Exception ex )

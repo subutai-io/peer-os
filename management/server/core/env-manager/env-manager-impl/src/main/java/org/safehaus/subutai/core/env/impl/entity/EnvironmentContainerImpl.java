@@ -52,6 +52,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
+/**
+ * Database entity to store environment container host parameters in structured manner.
+ */
 @Entity
 @Table( name = "environment_container" )
 @Access( AccessType.FIELD )
