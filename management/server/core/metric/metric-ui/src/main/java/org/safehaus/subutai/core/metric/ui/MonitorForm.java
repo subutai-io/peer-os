@@ -58,7 +58,7 @@ public class MonitorForm extends CustomComponent
         content.setSpacing( true );
         content.setSizeFull();
         content.setMargin( true );
-        content.setRows( 10 );
+        content.setRows( 25 );
         content.setColumns( 1 );
 
         HorizontalLayout controls = new HorizontalLayout();
