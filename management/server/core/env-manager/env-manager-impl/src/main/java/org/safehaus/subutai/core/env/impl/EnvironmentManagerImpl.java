@@ -135,11 +135,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public UUID createEmptyEnvironment( final String name )
+    public UUID createEmptyEnvironment( final String name, final String sshKey )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
 
-        final EnvironmentImpl environment = new EnvironmentImpl( name );
+        final EnvironmentImpl environment = new EnvironmentImpl( name, sshKey );
 
         saveEnvironment( environment );
 
@@ -152,14 +152,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public Environment createEnvironment( final String name, final Topology topology, boolean async )
-            throws EnvironmentCreationException
+    public Environment createEnvironment( final String name, final Topology topology, final String sshKey,
+                                          boolean async ) throws EnvironmentCreationException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
-        final UUID environmentId = createEmptyEnvironment( name );
+        final UUID environmentId = createEmptyEnvironment( name, sshKey );
 
         try
         {

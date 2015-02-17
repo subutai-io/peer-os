@@ -44,13 +44,14 @@ public interface EnvironmentManager
      *
      * @param name - environment name
      * @param topology - {@code Topology}
+     * @param sshKey - optional ssh key content
      * @param async - indicates whether environment is created synchronously or asynchronously to the calling party
      *
      * @return - created environment
      *
      * @throws EnvironmentCreationException - thrown if error occurs during environment creation
      */
-    public Environment createEnvironment( String name, Topology topology, boolean async )
+    public Environment createEnvironment( String name, Topology topology, String sshKey, boolean async )
             throws EnvironmentCreationException;
 
 
@@ -58,10 +59,11 @@ public interface EnvironmentManager
      * Creates empty environment
      *
      * @param name - environment name
+     * @param sshKey - ssh key content
      *
      * @return - id of created environment
      */
-    public UUID createEmptyEnvironment( String name );
+    public UUID createEmptyEnvironment( String name, String sshKey );
 
     /**
      * Destroys environment by id.

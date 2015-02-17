@@ -870,9 +870,12 @@ function stop_update_rrd {
     unset $update_entry_in_configuration
   fi
 
+  # Remove update and alert cronjobs of specified hostname
+  # if there is no metric_type set to true 
+  # for update and alert jobs inside configuration file
   if ! grep -q "true" "$monitor_update_conf" > /dev/null 2>&1; then
     local update_entry=$(get_update_entry $hostname)
-    crontab -l | grep "$update_entry" > /dev/null
+    (crontab -l | grep "$update_entry") > /dev/null 2>&1
     local status=$?
     if [ $status == 0 ]; then
       msg_info "    - stop update job for $hostname"
@@ -880,7 +883,7 @@ function stop_update_rrd {
     fi
 
     local alert_entry=$(get_alert_entry $hostname)
-    crontab -l | grep "$alert_entry" > /dev/null
+    (crontab -l | grep "$alert_entry") > /dev/null 2>&1
     local status=$?
     if [ $status == 0 ]; then
       msg_info "    - stop alert job for $hostname"

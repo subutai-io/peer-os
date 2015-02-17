@@ -69,7 +69,8 @@ public class BuildLocalEnvironmentCommand extends OsgiCommandSupport
 
         topology.addNodeGroupPlacement( peerManager.getLocalPeer(), nodeGroup );
 
-        Environment environment = environmentManager.createEnvironment( "Dummy environment name", topology, async );
+        Environment environment =
+                environmentManager.createEnvironment( "Dummy environment name", topology, null, async );
 
         System.out.println( String.format( "Environment created with id %s", environment.getId() ) );
 
