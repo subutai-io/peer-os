@@ -16,25 +16,38 @@ public interface IdentityManager
 {
     /**
      * Returns shiro SecurityManager
-     * @see org.apache.shiro.mgt.SecurityManager
+     *
      * @return {@link org.apache.shiro.mgt.SecurityManager}
+     *
+     * @see org.apache.shiro.mgt.SecurityManager
      */
     public SecurityManager getSecurityManager();
 
+    /**
+     * Return user entity
+     *
+     * @param username - user name
+     *
+     * @return user entity
+     */
+    public User getUser( String username );
 
     /**
      * Logs in user with token passed
+     *
      * @param token - consolidation of an account's principals and supporting credentials submitted by user
+     *
      * @return - {@code Subject} represents state and security operations for a <em>single</em> application user.
      */
-    public User getUser( String username );
 
     public Subject login( AuthenticationToken token );
 
 
     /**
      * Get {@code Subject} for target session
+     *
      * @param sessionId - session id
+     *
      * @return - {@code Subject} represents state and security operations for a <em>single</em> application user.
      */
     public Subject getSubject( Serializable sessionId );
@@ -42,6 +55,7 @@ public interface IdentityManager
 
     /**
      * Logout user by sessions id
+     *
      * @param sessionId - logout user by session id
      */
     public void logout( Serializable sessionId );
@@ -49,6 +63,7 @@ public interface IdentityManager
 
     /**
      * Get all registered users
+     *
      * @return - {@code List} of {@code User}
      */
     public List<User> getAllUsers();
@@ -56,10 +71,12 @@ public interface IdentityManager
 
     /**
      * Save new user in system
+     *
      * @param username - username
      * @param fullname - surname/name
      * @param password - password
      * @param email - email
+     *
      * @return - user registration operation result
      */
     public boolean addUser( String username, String fullname, String password, String email );
@@ -67,7 +84,9 @@ public interface IdentityManager
 
     /**
      * Returns user key by username
+     *
      * @param username - username
+     *
      * @return - user key
      */
     public String getUserKey( String username );
@@ -75,10 +94,12 @@ public interface IdentityManager
 
     /**
      * Creates sample user entity. This generates salt from username and hashed password
+     *
      * @param username - username
      * @param fullName - fullName
      * @param password - password
      * @param email - email
+     *
      * @return - {@code User}
      */
     public User createMockUser( String username, String fullName, String password, String email );
@@ -86,7 +107,9 @@ public interface IdentityManager
 
     /**
      * Update user parameters
+     *
      * @param user - target user to update some parameters
+     *
      * @return - update result
      */
     public boolean updateUser( User user );
@@ -94,7 +117,9 @@ public interface IdentityManager
 
     /**
      * Get user by id
+     *
      * @param id - user id
+     *
      * @return - {@code User}
      */
     public User getUser( Long id );
@@ -102,7 +127,9 @@ public interface IdentityManager
 
     /**
      * Remove user from system
+     *
      * @param user - {@code User} entity
+     *
      * @return - remove operation result
      */
     public boolean deleteUser( User user );
@@ -112,6 +139,7 @@ public interface IdentityManager
 
     /**
      * Get all Permissions
+     *
      * @return - {@code Collection} of {@code Permission}
      */
     public List<Permission> getAllPermissions();
@@ -119,9 +147,11 @@ public interface IdentityManager
 
     /**
      * Create sample {@code Permission} entity
+     *
      * @param permissionName - permission name
      * @param permissionGroup - permission group
      * @param description - description
+     *
      * @return - {@code Permission} entity
      */
     public Permission createMockPermission( String permissionName, PermissionGroup permissionGroup,
@@ -130,7 +160,9 @@ public interface IdentityManager
 
     /**
      * Update existing permission
+     *
      * @param permission - {@code Permission} entity to update
+     *
      * @return - update operation result
      */
     public boolean updatePermission( Permission permission );
@@ -139,8 +171,10 @@ public interface IdentityManager
     /**
      * Returns {@code Permission} for {@link Permission#getName()} and {@link Permission#getPermissionGroup()}
      * parameters
+     *
      * @param name - permission name
      * @param permissionGroup - permission group
+     *
      * @return - {@code Permission} entity
      */
     public Permission getPermission( String name, PermissionGroup permissionGroup );
@@ -148,7 +182,9 @@ public interface IdentityManager
 
     /**
      * Erases {@code Permission} entity from database
+     *
      * @param permission - target {@code Permission} to erase
+     *
      * @return - result for delete operation
      */
     public boolean deletePermission( Permission permission );
@@ -158,6 +194,7 @@ public interface IdentityManager
 
     /**
      * Get list of {@code Role} existing in database
+     *
      * @return - {@code Collection} of {@code Role} entities
      */
     public List<Role> getAllRoles();
@@ -165,9 +202,11 @@ public interface IdentityManager
 
     /**
      * Create sample {@code Role} for persisting purposes
+     *
      * @param permissionName - permission name
      * @param permissionGroup - permission group {@link PermissionGroup}
      * @param description - description
+     *
      * @return - {@code Role} entity
      */
     public Role createMockRole( String permissionName, PermissionGroup permissionGroup, String description );
@@ -175,7 +214,9 @@ public interface IdentityManager
 
     /**
      * Update existing role or save a new one
+     *
      * @param role - {@code Role} entity
+     *
      * @return - result for {@code Role} update operation
      */
     public boolean updateRole( Role role );
@@ -183,15 +224,19 @@ public interface IdentityManager
 
     /**
      * Return {@code Role} by name
+     *
      * @param name - role name
+     *
      * @return - {@code Role} entity
      */
-    public Role getRole( String name);
+    public Role getRole( String name );
 
 
     /**
      * Erase existing {@code Role} from database
+     *
      * @param role - {@code Role}
+     *
      * @return - result for erase operation
      */
     public boolean deleteRole( Role role );
