@@ -7,6 +7,10 @@ import java.util.concurrent.Executors;
 
 import javax.naming.NamingException;
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.metric.Metric;
 import org.safehaus.subutai.common.util.ServiceLocator;
@@ -14,6 +18,7 @@ import org.safehaus.subutai.common.util.UnitUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
+import org.safehaus.subutai.core.metric.ui.chart.JFreeChartWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +82,39 @@ public class MonitorForm extends CustomComponent
         controls.addComponent( getContainerHostsButton() );
 
         controls.addComponent( getIndicator() );
+
+        Button chartBtn = new Button( "Chart" );
+
+        chartBtn.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
+            {
+                try
+                {
+                /* Step - 1: Define the data for the line chart  */
+                    DefaultCategoryDataset line_chart_dataset = new DefaultCategoryDataset();
+                    line_chart_dataset.addValue( 15, "schools", "1970" );
+                    line_chart_dataset.addValue( 30, "schools", "1980" );
+                    line_chart_dataset.addValue( 60, "schools", "1990" );
+                    line_chart_dataset.addValue( 120, "schools", "2000" );
+                    line_chart_dataset.addValue( 240, "schools", "2010" );
+
+                /* Step -2:Define the JFreeChart object to create line chart */
+                    JFreeChart lineChartObject = ChartFactory
+                            .createLineChart( "Schools Vs Years", "Year", "Schools Count", line_chart_dataset,
+                                    PlotOrientation.VERTICAL, true, true, false );
+                    JFreeChartWrapper jFreeChartWrapper = new JFreeChartWrapper( lineChartObject );
+                    content.addComponent( jFreeChartWrapper );
+                }
+                catch ( Exception e )
+                {
+                    Notification.show( e.getMessage() );
+                }
+            }
+        } );
+
+        controls.addComponent( chartBtn );
 
         setCompositionRoot( content );
 
