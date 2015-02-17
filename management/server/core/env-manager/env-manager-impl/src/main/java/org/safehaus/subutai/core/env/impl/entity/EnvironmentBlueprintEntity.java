@@ -10,10 +10,14 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 
 
+/**
+ * Environment Blueprint class is basic wrapper over {@link org.safehaus.subutai.common.environment.Blueprint} to simplify data storing functionality.
+ * Where Blueprint is stored in {@link #getInfo()} BLob field
+ * @see org.safehaus.subutai.common.environment.Blueprint
+ */
 @Entity
 @Table( name = "environment_blueprint" )
 @Access( AccessType.FIELD )
-
 public class EnvironmentBlueprintEntity
 {
     @Id

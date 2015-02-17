@@ -27,6 +27,15 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 
+/**
+ * Destroys Environment with all values carried with it.
+ * Destroys all container hosts across peers if any.
+ *
+ * @see org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl
+ * @see org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl
+ * @see org.safehaus.subutai.core.env.impl.exception.ResultHolder
+ * @see java.lang.Runnable
+ */
 public class DestroyEnvironmentTask implements Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger( DestroyEnvironmentTask.class.getName() );

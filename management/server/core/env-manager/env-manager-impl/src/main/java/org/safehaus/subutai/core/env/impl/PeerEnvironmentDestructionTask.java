@@ -10,6 +10,12 @@ import org.safehaus.subutai.common.peer.Peer;
 import com.google.common.base.Preconditions;
 
 
+/**
+ * PeerEnvironmentDestructionTask destroys Environment on Peer
+ *
+ * @see org.safehaus.subutai.common.peer.Peer
+ * @see org.safehaus.subutai.common.environment.Environment
+ */
 public class PeerEnvironmentDestructionTask implements Callable<ContainersDestructionResult>
 {
     private final Peer peer;

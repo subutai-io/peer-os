@@ -133,12 +133,33 @@ public interface EnvironmentManager
     public void removeEnvironment( UUID environmentId ) throws EnvironmentNotFoundException;
 
 
+    /**
+     * Save environment blueprint
+     * @param blueprint - blueprint to save
+     * @throws EnvironmentManagerException
+     */
     public void saveBlueprint( Blueprint blueprint ) throws EnvironmentManagerException;
 
+
+    /**
+     * Remove blueprint from database
+     * @param blueprintId - blueprint id to remove
+     * @throws EnvironmentManagerException
+     */
     public void removeBlueprint( UUID blueprintId ) throws EnvironmentManagerException;
 
+
+    /**
+     * Get All blueprints
+     * @return - set of blueprints
+     * @throws EnvironmentManagerException
+     */
     public Set<Blueprint> getBlueprints() throws EnvironmentManagerException;
 
 
+    /**
+     * Get default domain name defaultDomainName: intra.lan
+     * @return - default domain name
+     */
     public String getDefaultDomainName();
 }

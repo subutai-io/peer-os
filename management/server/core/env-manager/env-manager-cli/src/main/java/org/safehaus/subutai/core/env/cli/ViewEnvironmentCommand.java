@@ -3,9 +3,9 @@ package org.safehaus.subutai.core.env.cli;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 
 import org.apache.karaf.shell.commands.Argument;
@@ -15,12 +15,19 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 import com.google.common.base.Preconditions;
 
 
+/**
+ * View target environment brief info
+ */
 @Command( scope = "env", name = "view", description = "Command to view environment" )
 public class ViewEnvironmentCommand extends OsgiCommandSupport
 {
 
     @Argument( name = "envId", description = "Environment id",
             index = 0, multiValued = false, required = true )
+    /**
+     * {@value environmentId} environment id to view info about
+     * <p>{@code required = true}</p>
+     */
     private String environmentId;
 
     private final EnvironmentManager environmentManager;

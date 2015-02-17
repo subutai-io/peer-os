@@ -20,6 +20,14 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 import com.google.common.base.Preconditions;
 
 
+/**
+ * Karaf CLI command support for command executor bundle
+ * Executes command asynchronously with parameters passed:
+ * hostId: id of target host to execute command
+ * command: command to execute
+ * timeout: optional parameter to kill a process executing the command
+ * daemon: specify command execution as a daemon or not
+ */
 @Command( scope = "command", name = "exec-async", description = "Executes command asynchronously" )
 public class ExecAsyncCommand extends OsgiCommandSupport
 {

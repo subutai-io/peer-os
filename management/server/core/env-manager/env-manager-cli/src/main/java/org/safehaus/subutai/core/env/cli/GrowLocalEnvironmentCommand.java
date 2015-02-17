@@ -19,21 +19,43 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 import com.google.common.base.Preconditions;
 
 
+/**
+ * Adds environment container hosts to target environment
+ */
 @Command( scope = "env", name = "grow-local", description = "Command to grow local environment" )
 public class GrowLocalEnvironmentCommand extends OsgiCommandSupport
 {
+
     @Argument( name = "envId", description = "Environment id",
             index = 0, multiValued = false, required = true )
-    private String environmentId;
+    /**
+     * {@value environmentId} target environment id to grow
+     * <p>{@code required = true}</p>
+     */ private String environmentId;
+
+
     @Argument( name = "templateName", description = "Template name",
             index = 1, multiValued = false, required = true )
-    private String templateName;
+    /**
+     * {@value templateName} template to clone for new environment container host
+     * <p>{@code required = true}</p>
+     */ private String templateName;
+
+
     @Argument( name = "numberOfContainers", description = "Number of containers",
             index = 2, multiValued = false, required = true )
-    private int numberOfContainers;
+    /**
+     * {@value numberOfContainers} number of containers to add to environment
+     * <p>{@code required = true}</p>
+     */ private int numberOfContainers;
+
+
     @Argument( name = "async", description = "asynchronous build",
             index = 3, multiValued = false, required = false )
-    private boolean async = false;
+    /**
+     * {@value async} grow environment asynchronously
+     * <p>{@code required = false}, {@code default = false}</p>
+     */ private boolean async = false;
 
     private final EnvironmentManager environmentManager;
     private final PeerManager peerManager;

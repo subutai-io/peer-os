@@ -15,18 +15,35 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 import com.google.common.base.Preconditions;
 
 
+/**
+ * Karaf console command support Command to build environment on local mgm
+ */
 @Command( scope = "env", name = "build-local", description = "Command to build environment on local peer" )
 public class BuildLocalEnvironmentCommand extends OsgiCommandSupport
 {
 
+
     @Argument( name = "templateName", description = "Template name",
             index = 0, multiValued = false, required = true )
-    private String templateName;
+    /**
+     * {@value templateName} template to clone for environment hosts
+     * {@code required = true}
+     */ private String templateName;
+
+
     @Argument( name = "numberOfContainers", description = "Number of containers",
             index = 1, multiValued = false, required = true )
-    private int numberOfContainers;
+    /**
+     * {@value numberOfContainers }number of container hosts to create in environment
+     * {@code required = true}
+     */ private int numberOfContainers;
+
     @Argument( name = "async", description = "asynchronous build",
             index = 2, multiValued = false, required = false )
+    /**
+     * {@value async} Create environment asynchronously
+     * {@code async = false}
+     */
     private boolean async = false;
 
     private final EnvironmentManager environmentManager;

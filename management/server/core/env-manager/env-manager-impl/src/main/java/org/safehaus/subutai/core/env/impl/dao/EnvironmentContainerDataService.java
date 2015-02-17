@@ -2,7 +2,9 @@ package org.safehaus.subutai.core.env.impl.dao;
 
 
 import java.util.Collection;
+
 import javax.persistence.EntityManager;
+
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
@@ -12,6 +14,10 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 
+/**
+ * {@link org.safehaus.subutai.core.env.impl.dao.EnvironmentContainerDataService} manages information about
+ * environment container in database
+ */
 public class EnvironmentContainerDataService implements DataService<String, EnvironmentContainerImpl>
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentContainerDataService.class );
@@ -22,6 +28,12 @@ public class EnvironmentContainerDataService implements DataService<String, Envi
         this.daoManager = daoManager;
     }
 
+
+    /**
+     * Returns {@link org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl} object for requested id {@link java.lang.String}
+     * <p>@param id - entity id to retrieve an object from database</p>
+     * <p>@return - {@link org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl} object or {@code null} value</p>
+     */
     @Override
     public EnvironmentContainerImpl find( final String id )
     {
@@ -43,6 +55,10 @@ public class EnvironmentContainerDataService implements DataService<String, Envi
     }
 
 
+    /**
+     * Gets list of all {@link org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl} exist in database
+     * @return - {@link java.util.Collection} of {@link org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl}
+     */
     @Override
     public Collection<EnvironmentContainerImpl> getAll()
     {
@@ -65,6 +81,11 @@ public class EnvironmentContainerDataService implements DataService<String, Envi
     }
 
 
+    /**
+     * Save {@link org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl} object to database <b>Warning your entity object
+     * key must be unique in database otherwise rollback transaction will be applied </b>
+     * @param item - entity object to save
+     */
     @Override
     public void persist( final EnvironmentContainerImpl item )
     {
@@ -87,7 +108,10 @@ public class EnvironmentContainerDataService implements DataService<String, Envi
         }
     }
 
-
+    /**
+     * Delete {@link org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl} from database by {@link java.lang.String} key
+     * @param id - entity id to remove
+     */
     @Override
     public void remove( final String id )
     {
@@ -111,6 +135,10 @@ public class EnvironmentContainerDataService implements DataService<String, Envi
     }
 
 
+    /**
+     * Update {@link org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl} entity saved in database
+     * @param item - entity to update
+     */
     @Override
     public void update( final EnvironmentContainerImpl item )
     {

@@ -12,6 +12,9 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 import com.google.common.base.Preconditions;
 
 
+/**
+ * List all existing environments
+ */
 @Command( scope = "env", name = "list", description = "Command to view environment" )
 public class ListEnvironmentsCommand extends OsgiCommandSupport
 {
