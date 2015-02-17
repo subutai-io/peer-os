@@ -137,14 +137,6 @@ public class IdentityManagerImpl implements IdentityManager
         userDataService.persist( user );
         LOG.debug( String.format( "User: %s", user.getId() ) );
 
-        //        User karafUser = userDataService.findByUsername( "karaf" );
-        //        LOG.debug( String.format( "%s %s", karafUser.getUsername(), karafUser.getRoles() ) );
-        //
-        //        Role r = karafUser.getRoles().iterator().next();
-        //        karafUser.removeRole( r );
-        //        userDataService.update( karafUser );
-        //        karafUser = userDataService.findByUsername( "karaf" );
-        //        LOG.debug( String.format( "%s %s", karafUser.getUsername(), karafUser.getRoles() ) );
     }
 
 
@@ -162,6 +154,13 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     @Override
+    public User getUser( String username )
+    {
+        return userDataService.findByUsername( username );
+    }
+
+
+    @Override
     public Subject login( final AuthenticationToken token )
     {
         SecurityUtils.setSecurityManager( securityManager );
@@ -169,14 +168,6 @@ public class IdentityManagerImpl implements IdentityManager
         subject.login( token );
 
         return subject;
-
-        //        SecurityUtils.getSecurityManager().getSession( sessionId );
-        //
-        //        Subject s = new Subject.Builder( securityManager ).sessionId( sessionId ).buildSubject();
-        //        LOG.info( String.format( "Principal: %s. Is authenticated?: %s", token.getPrincipal().toString(),
-        //                subject.isAuthenticated() ) );
-        //        ThreadContext.bind( subject );
-        //        UserIdMdcHelper.set( subject );
     }
 
 

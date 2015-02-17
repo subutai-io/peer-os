@@ -13,6 +13,8 @@ public interface IdentityManager
 {
     public SecurityManager getSecurityManager();
 
+    public User getUser( String username );
+
     public Subject login( AuthenticationToken token );
 
     public Subject getSubject( Serializable sessionId );
