@@ -66,16 +66,12 @@ function clone {
         postScripts=$OPTARG
         ;;
       N)
+	gpgpub="true"
         realName="$OPTARG"
         ;;
       M)
-        if [ -n "$realName" ]; then
-          gpgpub="true"
-          email="$OPTARG"
-        else
-          msg_error "Mail Option Should be used with Real Name Option!"
-          exit 1
-        fi
+	gpgpub="true"
+        email="$OPTARG"
         ;;
       m)
         monitor_enabled="true"
@@ -90,6 +86,15 @@ function clone {
     esac
     shift_amount=$(($shift_amount + 1))
   done
+
+  if [ "$gpgpub" == "true" ]; then
+    if [[ -n "$realName" && -n "$email" ]]; then
+       msg_info "    - Keys will be generated in container!"
+    else
+       msg_error "    - Name and Email Address should not be empty!"
+       exit 1
+    fi
+  fi
 
   lock_container_write $parent $child
   if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
