@@ -1,23 +1,15 @@
 package org.safehaus.subutai.core.peer.cli;
 
 
-import java.security.AccessControlContext;
-import java.security.AccessController;
-import java.security.Principal;
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.security.auth.Subject;
 
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
-import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.common.security.RsaGen;
+import org.safehaus.subutai.common.util.SecurityUtil;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
-import org.safehaus.subutai.core.identity.api.ShiroPrincipal;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -27,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.subject.Subject;
 
 
 @Command( scope = "peer", name = "hosts" )
@@ -37,7 +29,6 @@ public class HostsCommand extends OsgiCommandSupport
     DateFormat fmt = new SimpleDateFormat( "dd.MM.yy HH:mm:ss.SS" );
     private PeerManager peerManager;
     private IdentityManager identityManager;
-    private org.apache.shiro.mgt.SecurityManager securityManager;
 
 
     public void setPeerManager( final PeerManager peerManager )
@@ -52,32 +43,24 @@ public class HostsCommand extends OsgiCommandSupport
     }
 
 
-    public void setSecurityManager( final SecurityManager securityManager )
-    {
-        this.securityManager = securityManager;
-    }
+    //    public void setSecurityManager( final SecurityManager securityManager )
+    //    {
+    //        this.securityManager = securityManager;
+    //    }
 
 
     @Override
     protected Object doExecute() throws Exception
     {
+        Serializable sessionId = SecurityUtil.getSessionId();
 
-        log.debug(
-                String.format( "Thread ID: %d %s", Thread.currentThread().getId(), Thread.currentThread().getName() ) );
+        log.debug( String.format( "Session ID: %s", sessionId ) );
 
-        RsaGen.main( null );
+        Subject subject = identityManager.getSubject( sessionId );
 
-        AccessControlContext acc = AccessController.getContext();
-        Subject subject = Subject.getSubject( acc );
-        Set<Principal> principals = subject.getPrincipals();
+        log.debug( String.format( "Subject: %s", subject ) );
 
-        Set<ShiroPrincipal> shiroPrincipal = subject.getPrincipals( ShiroPrincipal.class );
-
-        org.apache.shiro.subject.Subject sub = shiroPrincipal.iterator().next().getSubject();
-
-        System.out.println( String.format( "Is authn? %s %s %s", sub.isAuthenticated(), sub.getPrincipal(),
-                sub.getSession().getId() ) );
-
+        identityManager.getUser( subject.getPrincipal().toString() );
 
         LocalPeer localPeer = peerManager.getLocalPeer();
         //        localPeer.init();
@@ -102,19 +85,19 @@ public class HostsCommand extends OsgiCommandSupport
         return null;
     }
 
-
-    private String getSessionId( final Set<Principal> principals )
-    {
-        String result = "";
-        for ( Principal p : principals )
-        {
-            if ( p.getName().contains( "session" ) )
-            {
-                result = p.getName().split( ":" )[1];
-            }
-        }
-        return result;
-    }
+    //
+    //    private String getSessionId( final Set<Principal> principals )
+    //    {
+    //        String result = "";
+    //        for ( Principal p : principals )
+    //        {
+    //            if ( p.getName().contains( "session" ) )
+    //            {
+    //                result = p.getName().split( ":" )[1];
+    //            }
+    //        }
+    //        return result;
+    //    }
 
 
     private void print( Host host, String padding ) throws PeerException

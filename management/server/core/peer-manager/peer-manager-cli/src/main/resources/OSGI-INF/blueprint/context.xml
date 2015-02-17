@@ -64,7 +64,6 @@
       <action class="org.safehaus.subutai.core.peer.cli.HostsCommand">
         <property name="peerManager" ref="peerManager" />
         <property name="identityManager" ref="identityManager" />
-        <property name="securityManager" ref="securityManager" />
       </action>
     </command>
   </command-bundle>
