@@ -20,4 +20,13 @@ public class ResourceHostMetricImpl extends ResourceHostMetric
 
         this.peerId = peerId;
     }
+
+
+    protected void setHostId( final UUID hostId )
+    {
+
+        Preconditions.checkNotNull( host, "Invalid host id" );
+
+        this.hostId = hostId;
+    }
 }

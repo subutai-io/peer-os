@@ -2,21 +2,25 @@ package org.safehaus.subutai.core.metric.ui;
 
 
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.environment.Environment;
+import org.safehaus.subutai.common.metric.Metric;
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.common.util.UnitUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
-import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gwt.thirdparty.guava.common.base.Strings;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.server.Sizeable;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
@@ -24,7 +28,8 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.TextArea;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Table;
 
 
 public class MonitorForm extends CustomComponent
@@ -33,8 +38,13 @@ public class MonitorForm extends CustomComponent
 
     private Monitor monitor;
     private EnvironmentManager environmentManager;
-    protected TextArea outputTxtArea;
     private ComboBox environmentCombo;
+    protected Table metricTable;
+    private Label indicator;
+    private Button showRHMetricsBtn;
+    private Button showCHMetricsBtn;
+    private UnitUtil unitUtil = new UnitUtil();
+    protected ExecutorService executorService = Executors.newCachedThreadPool();
 
 
     public MonitorForm( ServiceLocator serviceLocator ) throws NamingException
@@ -48,7 +58,7 @@ public class MonitorForm extends CustomComponent
         content.setSpacing( true );
         content.setSizeFull();
         content.setMargin( true );
-        content.setRows( 10 );
+        content.setRows( 25 );
         content.setColumns( 1 );
 
         HorizontalLayout controls = new HorizontalLayout();
@@ -56,7 +66,7 @@ public class MonitorForm extends CustomComponent
 
         content.addComponent( controls, 0, 0 );
 
-        content.addComponent( getOutputArea(), 0, 1, 0, 9 );
+        content.addComponent( getMetricTable(), 0, 1, 0, 9 );
 
         controls.addComponent( getResourceHostsButton() );
 
@@ -66,17 +76,27 @@ public class MonitorForm extends CustomComponent
 
         controls.addComponent( getContainerHostsButton() );
 
+        controls.addComponent( getIndicator() );
+
         setCompositionRoot( content );
+
+        addDetachListener( new DetachListener()
+        {
+            @Override
+            public void detach( final DetachEvent event )
+            {
+                executorService.shutdown();
+            }
+        } );
     }
 
 
     protected Component getContainerHostsButton()
     {
-        Button button = new Button( "Get Container Hosts Metrics" );
-
-        button.setId( "btnContainerHostsMetrics" );
-        button.setStyleName( "default" );
-        button.addClickListener( new Button.ClickListener()
+        showCHMetricsBtn = new Button( "Get Container Hosts Metrics" );
+        showCHMetricsBtn.setId( "btnContainerHostsMetrics" );
+        showCHMetricsBtn.setStyleName( "default" );
+        showCHMetricsBtn.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
@@ -85,7 +105,7 @@ public class MonitorForm extends CustomComponent
 
                 if ( environment == null )
                 {
-                    addOutput( "Please, select environment" );
+                    Notification.show( "Please, select environment" );
                 }
                 else
                 {
@@ -94,55 +114,123 @@ public class MonitorForm extends CustomComponent
             }
         } );
 
-        return button;
+        return showCHMetricsBtn;
     }
 
 
-    protected void printContainerMetrics( Environment environment )
+    protected void printContainerMetrics( final Environment environment )
     {
-        try
+        showProgress();
+        executorService.submit( new Runnable()
         {
-            Set<ContainerHostMetric> metrics = monitor.getContainerHostsMetrics( environment );
-            for ( ContainerHostMetric metric : metrics )
+            @Override
+            public void run()
             {
-                addOutput( metric.toString() );
-            }
-        }
-        catch ( MonitorException e )
-        {
-            LOG.error( "Error getting container metrics", e );
+                try
+                {
+                    displayMetrics( monitor.getContainerHostsMetrics( environment ) );
+                }
+                catch ( MonitorException e )
+                {
+                    LOG.error( "Error getting container metrics", e );
 
-            addOutput( e.getMessage() );
-        }
+                    Notification.show( e.getMessage() );
+                }
+                finally
+                {
+                    hideProgress();
+                }
+            }
+        } );
     }
 
 
     protected void printResourceHostMetrics()
     {
-        try
+        showProgress();
+        executorService.submit( new Runnable()
         {
-            Set<ResourceHostMetric> metrics = monitor.getResourceHostsMetrics();
-            for ( ResourceHostMetric metric : metrics )
+            @Override
+            public void run()
             {
-                addOutput( metric.toString() );
-            }
-        }
-        catch ( MonitorException e )
-        {
-            LOG.error( "Error getting resource host metrics", e );
+                try
+                {
+                    displayMetrics( monitor.getResourceHostsMetrics() );
+                }
+                catch ( MonitorException e )
+                {
+                    LOG.error( "Error getting resource host metrics", e );
 
-            addOutput( e.getMessage() );
+                    Notification.show( e.getMessage() );
+                }
+                finally
+                {
+                    hideProgress();
+                }
+            }
+        } );
+    }
+
+
+    private void showProgress()
+    {
+        showRHMetricsBtn.setEnabled( false );
+        showCHMetricsBtn.setEnabled( false );
+        indicator.setVisible( true );
+    }
+
+
+    private void hideProgress()
+    {
+        showRHMetricsBtn.setEnabled( true );
+        showCHMetricsBtn.setEnabled( true );
+        indicator.setVisible( false );
+    }
+
+
+    protected void displayMetrics( Set<? extends Metric> metrics )
+    {
+        metricTable.removeAllItems();
+        for ( Metric metric : metrics )
+        {
+            metricTable.addItem( new Object[] {
+                    metric.getHost(), metric.getUsedCpu(),
+                    unitUtil.convert( metric.getUsedRam(), UnitUtil.Unit.B, UnitUtil.Unit.MB ),
+                    unitUtil.convert( metric.getTotalRam(), UnitUtil.Unit.B, UnitUtil.Unit.MB ),
+                    unitUtil.convert( metric.getUsedDiskVar(), UnitUtil.Unit.B, UnitUtil.Unit.GB ),
+                    unitUtil.convert( metric.getUsedDiskOpt(), UnitUtil.Unit.B, UnitUtil.Unit.GB ),
+                    unitUtil.convert( metric.getUsedDiskHome(), UnitUtil.Unit.B, UnitUtil.Unit.GB ),
+                    unitUtil.convert( metric.getUsedDiskRootfs(), UnitUtil.Unit.B, UnitUtil.Unit.GB ),
+                    unitUtil.convert( metric.getTotalDiskVar(), UnitUtil.Unit.B, UnitUtil.Unit.GB ),
+                    unitUtil.convert( metric.getTotalDiskOpt(), UnitUtil.Unit.B, UnitUtil.Unit.GB ),
+                    unitUtil.convert( metric.getTotalDiskHome(), UnitUtil.Unit.B, UnitUtil.Unit.GB ),
+                    unitUtil.convert( metric.getTotalDiskRootfs(), UnitUtil.Unit.B, UnitUtil.Unit.GB )
+            }, null );
         }
+        metricTable.refreshRowCache();
+    }
+
+
+    protected Label getIndicator()
+    {
+        indicator = new Label();
+        indicator.setId( "indicator" );
+        indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
+        indicator.setContentMode( ContentMode.HTML );
+        indicator.setHeight( 11, Sizeable.Unit.PIXELS );
+        indicator.setWidth( 50, Sizeable.Unit.PIXELS );
+        indicator.setVisible( false );
+
+        return indicator;
     }
 
 
     protected Component getResourceHostsButton()
     {
-        Button button = new Button( "Get Resource Hosts Metrics" );
-
-        button.setId( "btnResourceHostsMetrics" );
-        button.setStyleName( "default" );
-        button.addClickListener( new Button.ClickListener()
+        showRHMetricsBtn = new Button( "Get Resource Hosts Metrics" );
+        showRHMetricsBtn.setId( "btnResourceHostsMetrics" );
+        showRHMetricsBtn.setStyleName( "default" );
+        showRHMetricsBtn.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
@@ -151,19 +239,31 @@ public class MonitorForm extends CustomComponent
             }
         } );
 
-        return button;
+        return showRHMetricsBtn;
     }
 
 
-    protected Component getOutputArea()
+    protected Table getMetricTable()
     {
-        outputTxtArea = new TextArea( "Metrics" );
-        outputTxtArea.setId( "outputTxtArea" );
-        outputTxtArea.setImmediate( true );
-        outputTxtArea.setWordwrap( true );
-        outputTxtArea.setSizeFull();
-        outputTxtArea.setRows( 30 );
-        return outputTxtArea;
+        metricTable = new Table( "Metrics" );
+        metricTable.addContainerProperty( "Hostname", String.class, null );
+        metricTable.addContainerProperty( "Used CPU (nanoseconds)", Double.class, null );
+        metricTable.addContainerProperty( "Used RAM (Mb)", Double.class, null );
+        metricTable.addContainerProperty( "Total RAM (Mb)", Double.class, null );
+        metricTable.addContainerProperty( "Used disk VAR (GB)", Double.class, null );
+        metricTable.addContainerProperty( "Used disk OPT (GB)", Double.class, null );
+        metricTable.addContainerProperty( "Used disk HOME (GB)", Double.class, null );
+        metricTable.addContainerProperty( "Used disk ROOTFS (GB)", Double.class, null );
+        metricTable.addContainerProperty( "Total disk VAR (GB)", Double.class, null );
+        metricTable.addContainerProperty( "Total disk OPT (GB)", Double.class, null );
+        metricTable.addContainerProperty( "Total disk HOME (GB)", Double.class, null );
+        metricTable.addContainerProperty( "Total disk ROOTFS (GB)", Double.class, null );
+        metricTable.setPageLength( 10 );
+        metricTable.setSelectable( false );
+        metricTable.setEnabled( true );
+        metricTable.setImmediate( true );
+        metricTable.setSizeFull();
+        return metricTable;
     }
 
 
@@ -178,16 +278,5 @@ public class MonitorForm extends CustomComponent
         environmentCombo.setTextInputAllowed( false );
         environmentCombo.setNullSelectionAllowed( false );
         return environmentCombo;
-    }
-
-
-    protected void addOutput( String output )
-    {
-
-        if ( !Strings.isNullOrEmpty( output ) )
-        {
-            outputTxtArea.setValue( String.format( "%s%n%s", outputTxtArea.getValue(), output ) );
-            outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
-        }
     }
 }

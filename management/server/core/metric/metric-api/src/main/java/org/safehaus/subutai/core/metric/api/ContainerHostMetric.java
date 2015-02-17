@@ -16,13 +16,6 @@ import com.google.common.base.Objects;
 public abstract class ContainerHostMetric extends Metric
 {
     protected UUID environmentId;
-    protected UUID hostId;
-
-
-    public UUID getHostId()
-    {
-        return hostId;
-    }
 
 
     public UUID getEnvironmentId()
