@@ -14,6 +14,12 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 
+/**
+ * {@link EnvironmentDataService} implements
+ * {@link DataService} interface.
+ * {@link org.safehaus.subutai.core.env.impl.dao.EnvironmentDataService}
+ * manages {@link org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl} entities in database
+ */
 public class EnvironmentDataService implements DataService<String, EnvironmentImpl>
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentDataService.class );
@@ -26,6 +32,11 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
     }
 
 
+    /**
+     * Returns {@link org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl} object for requested id {@link String}
+     * <p>@param id - entity id to retrieve an object from database</p>
+     * <p>@return - {@link org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl} object or {@code null} value</p>
+     */
     @Override
     public EnvironmentImpl find( final String id )
     {
@@ -47,6 +58,10 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
     }
 
 
+    /**
+     * Gets list of all {@link org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl} exist in database
+     * @return - {@link java.util.Collection} of {@link org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl}
+     */
     @Override
     public Collection<EnvironmentImpl> getAll()
     {
@@ -68,6 +83,11 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
     }
 
 
+    /**
+     * Save {@link org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl} object to database <b>Warning your entity object
+     * key must be unique in database otherwise rollback transaction will be applied </b>
+     * @param item - entity object to save
+     */
     @Override
     public void persist( final EnvironmentImpl item )
     {
@@ -91,6 +111,10 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
     }
 
 
+    /**
+     * Delete {@link org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl} from database by {@link java.lang.String} key
+     * @param id - entity id to remove
+     */
     @Override
     public void remove( final String id )
     {
@@ -115,6 +139,10 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
     }
 
 
+    /**
+     * Update {@link org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl} entity saved in database
+     * @param item - entity to update
+     */
     @Override
     public void update( final EnvironmentImpl item )
     {

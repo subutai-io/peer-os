@@ -361,7 +361,7 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     @Override
-    public Permission getRole( final String name, final PermissionGroup permissionGroup )
+    public Role getRole( final String name )
     {
         return null;
     }
