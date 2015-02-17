@@ -94,9 +94,12 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public EnvironmentImpl( String name )
+    public EnvironmentImpl( String name, String sshKey )
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
+
         this.name = name;
+        this.publicKey = Strings.isNullOrEmpty( sshKey ) ? null : sshKey.trim();
         this.environmentId = UUID.randomUUID().toString();
         this.creationTimestamp = System.currentTimeMillis();
         this.status = EnvironmentStatus.EMPTY;
@@ -126,9 +129,9 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public void saveSshKey( final String publicKey )
+    public void saveSshKey( final String sshKey )
     {
-        this.publicKey = publicKey;
+        this.publicKey = Strings.isNullOrEmpty( sshKey ) ? null : sshKey.trim();
         dataService.update( this );
     }
 
