@@ -40,4 +40,6 @@ public interface PeerManager
     public void removeRequestListener( RequestListener listener );
 
     public EntityManagerFactory getEntityManagerFactory();
+
+    public EnvironmentContext prepareEnvironment( UUID environmentId, String email );
 }
