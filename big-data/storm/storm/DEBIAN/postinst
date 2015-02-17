@@ -1,7 +1,9 @@
 #!/bin/bash
 set -e
 . /etc/profile
-export JAVA_HOME=$JAVA_HOME
+if [ "x$JAVA_HOME" == "x" ]; then
+  export JAVA_HOME=$(readlink -f /usr/bin/javac | sed "s:/bin/javac::")
+fi
 
 stormHome="/opt/storm-0.8.2"
 stormConf="/etc/storm"
