@@ -14,6 +14,8 @@ import com.google.common.collect.Sets;
 
 /**
  * Blueprint for environment creation
+ * stores nodeGroups.
+ * @see org.safehaus.subutai.common.environment.NodeGroup
  */
 public class Blueprint
 {

@@ -7,6 +7,10 @@ import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.exception.NodeGroupBuildException;
 
 
+/**
+ * Result for {@link org.safehaus.subutai.core.env.impl.builder.NodeGroupBuilder} task
+ * holds containers created and exception occurred during a process
+ */
 public class NodeGroupBuildResult
 {
     private Set<EnvironmentContainerImpl> containers;

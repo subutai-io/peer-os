@@ -16,6 +16,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+/**
+ * Environment Container host destroy task. This destroys, removes
+ * {@link org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl}
+ * from {@link org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl} metadata.
+ * And consequently destroys container host on existing Peer#ResourceHost
+ *
+ * @see org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl
+ * @see org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl
+ * @see org.safehaus.subutai.common.peer.ContainerHost
+ * @see org.safehaus.subutai.core.env.impl.exception.ResultHolder
+ * @see java.lang.Runnable
+ */
 public class DestroyContainerTask implements Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger( DestroyContainerTask.class.getName() );

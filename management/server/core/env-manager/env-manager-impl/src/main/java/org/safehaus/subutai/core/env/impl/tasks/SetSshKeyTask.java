@@ -15,6 +15,14 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 
 
+/**
+ * Generate and configure environment ssh keys.
+ *
+ * @see org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl
+ * @see org.safehaus.subutai.core.env.impl.exception.ResultHolder
+ * @see org.safehaus.subutai.core.network.api.NetworkManager
+ * @see java.lang.Runnable
+ */
 public class SetSshKeyTask implements Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger( SetSshKeyTask.class.getName() );
@@ -32,7 +40,7 @@ public class SetSshKeyTask implements Runnable
         this.environment = environment;
         this.networkManager = networkManager;
         this.resultHolder = resultHolder;
-        this.sshKey = sshKey;
+        this.sshKey = Strings.isNullOrEmpty( sshKey ) ? null : sshKey.trim();
         this.semaphore = new Semaphore( 0 );
     }
 

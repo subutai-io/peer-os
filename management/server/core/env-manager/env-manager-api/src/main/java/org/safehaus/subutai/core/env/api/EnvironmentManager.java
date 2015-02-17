@@ -44,13 +44,14 @@ public interface EnvironmentManager
      *
      * @param name - environment name
      * @param topology - {@code Topology}
+     * @param sshKey - optional ssh key content
      * @param async - indicates whether environment is created synchronously or asynchronously to the calling party
      *
      * @return - created environment
      *
      * @throws EnvironmentCreationException - thrown if error occurs during environment creation
      */
-    public Environment createEnvironment( String name, Topology topology, boolean async )
+    public Environment createEnvironment( String name, Topology topology, String sshKey, boolean async )
             throws EnvironmentCreationException;
 
 
@@ -58,10 +59,11 @@ public interface EnvironmentManager
      * Creates empty environment
      *
      * @param name - environment name
+     * @param sshKey - ssh key content
      *
      * @return - id of created environment
      */
-    public UUID createEmptyEnvironment( String name );
+    public UUID createEmptyEnvironment( String name, String sshKey );
 
     /**
      * Destroys environment by id.
@@ -133,12 +135,33 @@ public interface EnvironmentManager
     public void removeEnvironment( UUID environmentId ) throws EnvironmentNotFoundException;
 
 
+    /**
+     * Save environment blueprint
+     * @param blueprint - blueprint to save
+     * @throws EnvironmentManagerException
+     */
     public void saveBlueprint( Blueprint blueprint ) throws EnvironmentManagerException;
 
+
+    /**
+     * Remove blueprint from database
+     * @param blueprintId - blueprint id to remove
+     * @throws EnvironmentManagerException
+     */
     public void removeBlueprint( UUID blueprintId ) throws EnvironmentManagerException;
 
+
+    /**
+     * Get All blueprints
+     * @return - set of blueprints
+     * @throws EnvironmentManagerException
+     */
     public Set<Blueprint> getBlueprints() throws EnvironmentManagerException;
 
 
+    /**
+     * Get default domain name defaultDomainName: intra.lan
+     * @return - default domain name
+     */
     public String getDefaultDomainName();
 }

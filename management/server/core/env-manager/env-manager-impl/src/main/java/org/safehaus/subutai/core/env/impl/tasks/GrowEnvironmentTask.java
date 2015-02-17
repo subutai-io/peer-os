@@ -21,6 +21,14 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 
+/**
+ * Add specified number of environment hosts to existing environment.
+ *
+ * @see org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl
+ * @see org.safehaus.subutai.core.env.impl.exception.ResultHolder
+ * @see org.safehaus.subutai.common.environment.Topology
+ * @see org.safehaus.subutai.common.peer.ContainerHost
+ */
 public class GrowEnvironmentTask implements Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger( GrowEnvironmentTask.class.getName() );

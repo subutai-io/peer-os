@@ -13,6 +13,9 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 import com.google.common.base.Preconditions;
 
 
+/**
+ * Remove environment metadata from database and notify trigger environment destroyed event
+ */
 @Command( scope = "env", name = "remove", description = "Command to remove environment from database" )
 public class RemoveEnvironmentCommand extends OsgiCommandSupport
 {

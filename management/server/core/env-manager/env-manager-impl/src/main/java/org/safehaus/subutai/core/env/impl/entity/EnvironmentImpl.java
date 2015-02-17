@@ -27,10 +27,10 @@ import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.env.impl.dao.EnvironmentDataService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +44,12 @@ import com.google.common.collect.Sets;
 import com.google.gson.reflect.TypeToken;
 
 
+/**
+ * Database entity to store environment specific fields.
+ *
+ * @see org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl
+ * @see org.safehaus.subutai.common.peer.ContainerHost
+ */
 @Entity
 @Table( name = "environment" )
 @Access( AccessType.FIELD )
@@ -84,7 +90,7 @@ public class EnvironmentImpl implements Environment, Serializable
     private String publicKey;
 
     @Transient
-    private DataService dataService;
+    private EnvironmentDataService dataService;
     @Transient
     private EnvironmentManager environmentManager;
 
@@ -94,9 +100,12 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public EnvironmentImpl( String name )
+    public EnvironmentImpl( String name, String sshKey )
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
+
         this.name = name;
+        this.publicKey = Strings.isNullOrEmpty( sshKey ) ? null : sshKey.trim();
         this.environmentId = UUID.randomUUID().toString();
         this.creationTimestamp = System.currentTimeMillis();
         this.status = EnvironmentStatus.EMPTY;
@@ -126,9 +135,9 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public void saveSshKey( final String publicKey )
+    public void saveSshKey( final String sshKey )
     {
-        this.publicKey = publicKey;
+        this.publicKey = Strings.isNullOrEmpty( sshKey ) ? null : sshKey.trim();
         dataService.update( this );
     }
 
@@ -283,7 +292,7 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public void setDataService( final DataService dataService )
+    public void setDataService( final EnvironmentDataService dataService )
     {
         this.dataService = dataService;
     }
