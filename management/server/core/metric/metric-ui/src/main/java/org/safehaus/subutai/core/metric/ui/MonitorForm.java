@@ -2,6 +2,8 @@ package org.safehaus.subutai.core.metric.ui;
 
 
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.naming.NamingException;
 
@@ -16,6 +18,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.server.Sizeable;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
@@ -35,7 +40,11 @@ public class MonitorForm extends CustomComponent
     private EnvironmentManager environmentManager;
     private ComboBox environmentCombo;
     protected Table metricTable;
+    private Label indicator;
+    private Button showRHMetricsBtn;
+    private Button showCHMetricsBtn;
     private UnitUtil unitUtil = new UnitUtil();
+    protected ExecutorService executorService = Executors.newCachedThreadPool();
 
 
     public MonitorForm( ServiceLocator serviceLocator ) throws NamingException
@@ -67,17 +76,27 @@ public class MonitorForm extends CustomComponent
 
         controls.addComponent( getContainerHostsButton() );
 
+        controls.addComponent( getIndicator() );
+
         setCompositionRoot( content );
+
+        addDetachListener( new DetachListener()
+        {
+            @Override
+            public void detach( final DetachEvent event )
+            {
+                executorService.shutdown();
+            }
+        } );
     }
 
 
     protected Component getContainerHostsButton()
     {
-        Button button = new Button( "Get Container Hosts Metrics" );
-
-        button.setId( "btnContainerHostsMetrics" );
-        button.setStyleName( "default" );
-        button.addClickListener( new Button.ClickListener()
+        showCHMetricsBtn = new Button( "Get Container Hosts Metrics" );
+        showCHMetricsBtn.setId( "btnContainerHostsMetrics" );
+        showCHMetricsBtn.setStyleName( "default" );
+        showCHMetricsBtn.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
@@ -95,22 +114,77 @@ public class MonitorForm extends CustomComponent
             }
         } );
 
-        return button;
+        return showCHMetricsBtn;
     }
 
 
-    protected void printContainerMetrics( Environment environment )
+    protected void printContainerMetrics( final Environment environment )
     {
-        try
+        showProgress();
+        executorService.submit( new Runnable()
         {
-            displayMetrics( monitor.getContainerHostsMetrics( environment ) );
-        }
-        catch ( MonitorException e )
-        {
-            LOG.error( "Error getting container metrics", e );
+            @Override
+            public void run()
+            {
+                try
+                {
+                    displayMetrics( monitor.getContainerHostsMetrics( environment ) );
+                }
+                catch ( MonitorException e )
+                {
+                    LOG.error( "Error getting container metrics", e );
 
-            Notification.show( e.getMessage() );
-        }
+                    Notification.show( e.getMessage() );
+                }
+                finally
+                {
+                    hideProgress();
+                }
+            }
+        } );
+    }
+
+
+    protected void printResourceHostMetrics()
+    {
+        showProgress();
+        executorService.submit( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    displayMetrics( monitor.getResourceHostsMetrics() );
+                }
+                catch ( MonitorException e )
+                {
+                    LOG.error( "Error getting resource host metrics", e );
+
+                    Notification.show( e.getMessage() );
+                }
+                finally
+                {
+                    hideProgress();
+                }
+            }
+        } );
+    }
+
+
+    private void showProgress()
+    {
+        showRHMetricsBtn.setEnabled( false );
+        showCHMetricsBtn.setEnabled( false );
+        indicator.setVisible( true );
+    }
+
+
+    private void hideProgress()
+    {
+        showRHMetricsBtn.setEnabled( true );
+        showCHMetricsBtn.setEnabled( true );
+        indicator.setVisible( false );
     }
 
 
@@ -137,28 +211,26 @@ public class MonitorForm extends CustomComponent
     }
 
 
-    protected void printResourceHostMetrics()
+    protected Label getIndicator()
     {
-        try
-        {
-            displayMetrics( monitor.getResourceHostsMetrics() );
-        }
-        catch ( MonitorException e )
-        {
-            LOG.error( "Error getting resource host metrics", e );
+        indicator = new Label();
+        indicator.setId( "indicator" );
+        indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
+        indicator.setContentMode( ContentMode.HTML );
+        indicator.setHeight( 11, Sizeable.Unit.PIXELS );
+        indicator.setWidth( 50, Sizeable.Unit.PIXELS );
+        indicator.setVisible( false );
 
-            Notification.show( e.getMessage() );
-        }
+        return indicator;
     }
 
 
     protected Component getResourceHostsButton()
     {
-        Button button = new Button( "Get Resource Hosts Metrics" );
-
-        button.setId( "btnResourceHostsMetrics" );
-        button.setStyleName( "default" );
-        button.addClickListener( new Button.ClickListener()
+        showRHMetricsBtn = new Button( "Get Resource Hosts Metrics" );
+        showRHMetricsBtn.setId( "btnResourceHostsMetrics" );
+        showRHMetricsBtn.setStyleName( "default" );
+        showRHMetricsBtn.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
@@ -167,7 +239,7 @@ public class MonitorForm extends CustomComponent
             }
         } );
 
-        return button;
+        return showRHMetricsBtn;
     }
 
 
