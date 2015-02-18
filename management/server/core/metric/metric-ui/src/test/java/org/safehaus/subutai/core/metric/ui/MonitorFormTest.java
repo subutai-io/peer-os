@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.metric.ui;
 
 
-import java.io.PrintStream;
 import java.util.concurrent.ExecutorService;
 
 import org.junit.Before;
@@ -14,9 +13,9 @@ import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
-import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.impl.ContainerHostMetricImpl;
 import org.safehaus.subutai.core.metric.impl.ResourceHostMetricImpl;
 
@@ -27,8 +26,6 @@ import com.vaadin.ui.Table;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,6 +47,9 @@ public class MonitorFormTest
     Table metricsTable;
     @Mock
     ExecutorService executorService;
+
+    @Mock
+    HostRegistry hostRegistry;
 
     private static final String METRIC = " {\"host\":\"py991745969\", \"totalRam\":\"16501141504\", "
             + "\"availableRam\":\"15651282944\", \"usedRam\":\"849711104\",\n"
@@ -75,7 +75,7 @@ public class MonitorFormTest
         when( serviceLocator.getService( EnvironmentManager.class ) ).thenReturn( environmentManager );
         when( environmentManager.getEnvironments() ).thenReturn( Sets.<Environment>newHashSet() );
 
-        monitorForm = new MonitorForm( serviceLocator );
+        monitorForm = new MonitorForm( serviceLocator, hostRegistry );
         monitorForm.metricTable = metricsTable;
         monitorForm.executorService = executorService;
         containerHostMetric = JsonUtil.fromJson( METRIC, ContainerHostMetricImpl.class );
