@@ -262,10 +262,55 @@ sign(){
 
 
 # signs the key
+# There are four type of verification level that can be 
+# specified while signing keys: 
+#   (0) I will not answer. (default)
+#   (1) I have not checked at all.
+#   (2) I have done casual checking.
+#   (3) I have done very careful checking.
+# 
+# And sing_key function has an optional <-l> swithc to 
+# specify these levels.
+#   e.g.: subutai keymanager sign_key -l 2 <signer_key> <key_id_to_be_signed>
 # parameters:
 #  1) signer key (optional)
 #  2) key to be signed (mandatory)
 sign_key(){
+  params=`getopt -o l:  --long level: -n '$0' -- "$@"`
+  eval set -- "$params"
+  sing_level=0
+  # extract options and their arguments into variables.
+  while true ; do
+    case "$1" in
+      -l | --level)
+        case "$2" in
+          0 | 1 | 2 | 3 )
+	    sign_level="$2"
+	    ;;
+ 	  *)
+            msg_error "invalid switch!"
+            echo " Available switches that can be used with \"-l\""
+            echo "  (0) I will not answer. (default)"
+	    echo "  (1) I have not checked at all."
+	    echo "  (2) I have done casual checking."
+	    echo "  (3) I have done very careful checking."
+	    exit 1
+            ;;
+        esac 
+        shift 3
+        break
+        ;;
+      --)
+        shift;
+        break
+        ;;
+      *)
+        echo "Invalid switch!" 
+        exit 1
+        ;;
+    esac
+  done
+
   if [[ $# < 1 ]]; then
     msg_error "missing arguments"
     key_manager_usage
@@ -282,12 +327,14 @@ sign_key(){
     key_to_be_signed=$2
     assert_key_exists $key_to_be_signed
   fi
-
+ 
   if [[ "true" == `is_signed $signer $key_to_be_signed` ]]; then
     msg_info "key $key_to_be_signed is already signed by $signer"
   else
-    gpg2 -u $signer --yes --batch --sign-key $key_to_be_signed >> /dev/null 2>&1
     msg_ok "signing key $key_to_be_signed with key $signer"
+    echo -e "$sign_level\ny\n" | gpg2 -u $signer --yes --sign-key \
+                            --no-tty --command-fd 0  \
+                            --ask-cert-level $key_to_be_signed >> /dev/null 2>&1
   fi
 }
 
