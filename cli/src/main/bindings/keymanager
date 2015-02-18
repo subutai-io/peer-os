@@ -11,7 +11,7 @@ function key_manager_usage {
   echo "  "subutai keymanager list key_id
   echo "  "subutai keymanager revoke_subkey subkey_id
   echo "  "subutai keymanager del_subkey subkey_id
-  echo "  "subutai keymanager sign_key \<signer key id\> key_id_to_be_signed
+  echo "  "subutai keymanager sign_key \<-l\> signer_key_id key_id_to_be_signed
   echo -----------------------------------------------------------------------
 }
 
@@ -269,12 +269,12 @@ sign(){
 #   (2) I have done casual checking.
 #   (3) I have done very careful checking.
 # 
-# And sing_key function has an optional <-l> swithc to 
+# And sing_key function has an optional <-l> switch to 
 # specify these levels.
 #   e.g.: subutai keymanager sign_key -l 2 <signer_key> <key_id_to_be_signed>
 # parameters:
-#  1) signer key (optional)
-#  2) key to be signed (mandatory)
+#  1) signer key
+#  2) key to be signed
 sign_key(){
   params=`getopt -o l:  --long level: -n '$0' -- "$@"`
   eval set -- "$params"
@@ -311,22 +311,16 @@ sign_key(){
     esac
   done
 
-  if [[ $# < 1 ]]; then
+  if [[ $# < 2 ]]; then
     msg_error "missing arguments"
     key_manager_usage
     exit 1
   fi
 
-  if [ $# == 1 ]; then
-    signer=`get_default_signer_key`
-    key_to_be_signed=$1
-    assert_key_exists $key_to_be_signed
-  elif [ $# == 2 ]; then
-    signer=$1
-    assert_key_exists_private_key_ring $signer
-    key_to_be_signed=$2
-    assert_key_exists $key_to_be_signed
-  fi
+  signer=$1
+  assert_key_exists_private_key_ring $signer
+  key_to_be_signed=$2
+  assert_key_exists $key_to_be_signed
  
   if [[ "true" == `is_signed $signer $key_to_be_signed` ]]; then
     msg_info "key $key_to_be_signed is already signed by $signer"
