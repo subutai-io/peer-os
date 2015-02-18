@@ -74,8 +74,6 @@ public interface LocalPeer extends Peer
                                           final String containerName ) throws PeerException;
 
 
-    public String getFreeHostName( String prefix );
-
     /**
      * Returns container group by container id
      *

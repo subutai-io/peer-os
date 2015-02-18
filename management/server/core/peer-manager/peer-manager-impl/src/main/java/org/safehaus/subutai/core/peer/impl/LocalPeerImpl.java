@@ -8,13 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
@@ -42,6 +39,7 @@ import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
@@ -97,7 +95,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
     private static final long HOST_INACTIVE_TIME = 5 * 1000 * 60; // 5 min
-    private static final int MAX_LXC_NAME = 15;
     private PeerManager peerManager;
     private TemplateRegistry templateRegistry;
     private ManagementHost managementHost;
@@ -106,7 +103,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     private StrategyManager strategyManager;
     private QuotaManager quotaManager;
     private Monitor monitor;
-    private ConcurrentMap<String, AtomicInteger> sequences;
     private ManagementHostDataService managementHostDataService;
     private ResourceHostDataService resourceHostDataService;
     private ContainerHostDataService containerHostDataService;
@@ -160,7 +156,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
         hostRegistry.addHostListener( this );
-        sequences = new ConcurrentHashMap<>();
     }
 
 
@@ -253,6 +248,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         }
     }
 
+
     //TODO wrap all parameters into request object
     public Set<HostInfoModel> createContainers( final UUID environmentId, final UUID initiatorPeerId,
                                                 final UUID ownerId, final List<Template> templates,
@@ -338,11 +334,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             Set<String> hostCloneNames = new HashSet<>();
             for ( int i = 0; i < e.getValue(); i++ )
             {
-                String newContainerName = String.format( "%s%s", templateName, UUID.randomUUID() ).replace( "-", "" );
-                if ( newContainerName.length() > Common.MAX_CONTAINER_NAME_LEN )
-                {
-                    newContainerName = newContainerName.substring( 0, Common.MAX_CONTAINER_NAME_LEN );
-                }
+                String newContainerName = StringUtil
+                        .trimToSize( String.format( "%s%s", templateName, UUID.randomUUID() ).replace( "-", "" ),
+                                Common.MAX_CONTAINER_NAME_LEN );
                 hostCloneNames.add( newContainerName );
             }
             ResourceHost resourceHost = getResourceHostByName( e.getKey().getHost() );
@@ -483,48 +477,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             }
         }
 
-        return result;
-    }
-
-
-    @Override
-    public String getFreeHostName( final String prefix )
-    {
-        return nextHostName( prefix, getContainerNames() );
-    }
-
-
-    private String nextHostName( String templateName, Set<String> existingNames )
-    {
-        AtomicInteger i = sequences.putIfAbsent( templateName, new AtomicInteger() );
-        if ( i == null )
-        {
-            i = sequences.get( templateName );
-        }
-        while ( true )
-        {
-            String suffix = String.valueOf( i.incrementAndGet() );
-            int prefixLen = MAX_LXC_NAME - suffix.length();
-            String name = ( templateName.length() > prefixLen ? templateName.substring( 0, prefixLen ) : templateName )
-                    + suffix;
-            if ( !existingNames.contains( name ) )
-            {
-                return name;
-            }
-        }
-    }
-
-
-    private Set<String> getContainerNames()
-    {
-        Set<String> result = new HashSet<>();
-        for ( ResourceHost resourceHost : getResourceHosts() )
-        {
-            for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
-            {
-                result.add( containerHost.getHostname() );
-            }
-        }
         return result;
     }
 

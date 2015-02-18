@@ -24,6 +24,7 @@ import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
@@ -355,11 +356,8 @@ public class MonitorImpl implements Monitor
 
 
         //make sure subscriber id is truncated to 100 characters
-        String subscriberId = alertListener.getSubscriberId();
-        if ( subscriberId.length() > Constants.MAX_SUBSCRIBER_ID_LEN )
-        {
-            subscriberId = subscriberId.substring( 0, Constants.MAX_SUBSCRIBER_ID_LEN );
-        }
+        String subscriberId = StringUtil.trimToSize( alertListener.getSubscriberId(), Constants.MAX_SUBSCRIBER_ID_LEN );
+
         //save subscription to database
         try
         {
@@ -387,11 +385,7 @@ public class MonitorImpl implements Monitor
         Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
 
         //make sure subscriber id is truncated to 100 characters
-        String subscriberId = alertListener.getSubscriberId();
-        if ( subscriberId.length() > Constants.MAX_SUBSCRIBER_ID_LEN )
-        {
-            subscriberId = subscriberId.substring( 0, Constants.MAX_SUBSCRIBER_ID_LEN );
-        }
+        String subscriberId = StringUtil.trimToSize( alertListener.getSubscriberId(), Constants.MAX_SUBSCRIBER_ID_LEN );
 
         UUID environmentId = UUID.fromString( containerHost.getEnvironmentId() );
 
@@ -421,11 +415,8 @@ public class MonitorImpl implements Monitor
         Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
 
         //make sure subscriber id is truncated to 100 characters
-        String subscriberId = alertListener.getSubscriberId();
-        if ( subscriberId.length() > Constants.MAX_SUBSCRIBER_ID_LEN )
-        {
-            subscriberId = subscriberId.substring( 0, Constants.MAX_SUBSCRIBER_ID_LEN );
-        }
+        String subscriberId = StringUtil.trimToSize( alertListener.getSubscriberId(), Constants.MAX_SUBSCRIBER_ID_LEN );
+
         //remove subscription from database
         try
         {
