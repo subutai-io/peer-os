@@ -212,10 +212,11 @@ public class MonitorForm extends CustomComponent
         chartsLayout.removeAllComponents();
         addCpuMetrics( chartsData );
         addRamMetrics( chartsData );
-        addHomeDiskMetrics( chartsData );
-        addOptDiskMetrics( chartsData );
-        addVarDiskMetrics( chartsData );
-        addRootfsDiskMetrics( chartsData );
+        addDiskMetricsPack( chartsData );
+        //        addHomeDiskMetrics( chartsData );
+        //        addOptDiskMetrics( chartsData );
+        //        addVarDiskMetrics( chartsData );
+        //        addRootfsDiskMetrics( chartsData );
     }
 
 
@@ -358,6 +359,69 @@ public class MonitorForm extends CustomComponent
             /* Step -2:Define the JFreeChart object to create line chart */
             JFreeChart lineChartObject = ChartFactory
                     .createBarChart( chartTitle, categoryAxisLabel, valueAxisLabel, line_chart_dataset,
+                            PlotOrientation.VERTICAL, true, true, false );
+            JFreeChartWrapper jFreeChartWrapper = new JFreeChartWrapper( lineChartObject );
+            chartsLayout.addComponent( jFreeChartWrapper );
+        }
+        catch ( Exception e )
+        {
+            Notification.show( e.getMessage() );
+        }
+    }
+
+
+    private void addDiskMetricsPack( Collection<? extends Metric> hostMetrics )
+    {
+        try
+        {
+            /* Step - 1: Define the data for the line chart  */
+            DefaultCategoryDataset line_chart_dataset = new DefaultCategoryDataset();
+
+            Map<String, Double> rootfsMetrics = new HashMap<>();
+            for ( final Metric hostsMetric : hostMetrics )
+            {
+                rootfsMetrics.put( hostsMetric.getHost(), hostsMetric.getUsedDiskVar() );
+            }
+            for ( final Map.Entry<String, Double> entry : rootfsMetrics.entrySet() )
+            {
+                line_chart_dataset.addValue( entry.getValue(), "rootfs", entry.getKey() );
+            }
+
+            Map<String, Double> optMetrics = new HashMap<>();
+            for ( final Metric hostsMetric : hostMetrics )
+            {
+                optMetrics.put( hostsMetric.getHost(), hostsMetric.getUsedDiskOpt() );
+            }
+            for ( final Map.Entry<String, Double> entry : optMetrics.entrySet() )
+            {
+                line_chart_dataset.addValue( entry.getValue(), "opt", entry.getKey() );
+            }
+
+            Map<String, Double> varMetrics = new HashMap<>();
+            for ( final Metric hostsMetric : hostMetrics )
+            {
+                varMetrics.put( hostsMetric.getHost(), hostsMetric.getUsedDiskVar() );
+            }
+            for ( final Map.Entry<String, Double> entry : varMetrics.entrySet() )
+            {
+                line_chart_dataset.addValue( entry.getValue(), "var", entry.getKey() );
+            }
+
+
+            Map<String, Double> homeMetrics = new HashMap<>();
+            for ( final Metric hostsMetric : hostMetrics )
+            {
+                homeMetrics.put( hostsMetric.getHost(), hostsMetric.getUsedDiskHome() );
+            }
+            for ( final Map.Entry<String, Double> entry : homeMetrics.entrySet() )
+            {
+                line_chart_dataset.addValue( entry.getValue(), "home", entry.getKey() );
+            }
+
+
+            /* Step -2:Define the JFreeChart object to create line chart */
+            JFreeChart lineChartObject = ChartFactory
+                    .createBarChart( "Disk Metrics", "Disk Scale", "Directories", line_chart_dataset,
                             PlotOrientation.VERTICAL, true, true, false );
             JFreeChartWrapper jFreeChartWrapper = new JFreeChartWrapper( lineChartObject );
             chartsLayout.addComponent( jFreeChartWrapper );
