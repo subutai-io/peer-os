@@ -72,4 +72,11 @@ public class CommandsTest
         assertEquals( new RequestBuilder( String.format( "subutai package_manager info %s", ARGUMENT ) ),
                 commands.getPackageInfoCommand( ARGUMENT ) );
     }
+
+
+    @Test
+    public void testGetUpdateRepoCommand() throws Exception
+    {
+        assertEquals( new RequestBuilder( "apt-get update" ).withTimeout( 120 ), commands.getUpdateRepoCommand() );
+    }
 }

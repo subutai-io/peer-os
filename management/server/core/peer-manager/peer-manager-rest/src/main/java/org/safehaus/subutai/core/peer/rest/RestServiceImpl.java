@@ -149,6 +149,23 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
+    public Response getQuotaInfo( final String containerId, final String quotaType )
+    {
+        try
+        {
+            QuotaType q = JsonUtil.fromJson( quotaType, QuotaType.class );
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            QuotaInfo quotaInfo = localPeer.getContainerHostById( UUID.fromString( containerId ) ).getQuotaInfo( q );
+            return Response.ok( JsonUtil.toJson( quotaInfo ) ).build();
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
     private String getRequestIp()
     {
         Message message = PhaseInterceptorChain.getCurrentMessage();
@@ -357,6 +374,22 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response getRamQuotaInfo( final String containerId )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            return Response.ok( localPeer.getContainerHostById( UUID.fromString( containerId ) ).getRamQuotaInfo() )
+                           .build();
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
     public Response setRamQuota( final String containerId, final int ram )
     {
         try
@@ -379,6 +412,22 @@ public class RestServiceImpl implements RestService
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
             return Response.ok( localPeer.getContainerHostById( UUID.fromString( containerId ) ).getCpuQuota() )
+                           .build();
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response getCpuQuotaInfo( final String containerId )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            return Response.ok( localPeer.getContainerHostById( UUID.fromString( containerId ) ).getCpuQuotaInfo() )
                            .build();
         }
         catch ( Exception e )
@@ -428,7 +477,8 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.getContainerHostById( UUID.fromString( containerId ) )
                      .setCpuSet( JsonUtil.<Set<Integer>>fromJson( cpuSet, new TypeToken<Set<Integer>>()
-                     {}.getType() ) );
+                     {
+                     }.getType() ) );
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -447,7 +497,8 @@ public class RestServiceImpl implements RestService
             return Response.ok( JsonUtil.toJson( localPeer.getContainerHostById( UUID.fromString( containerId ) )
                                                           .getDiskQuota( JsonUtil.<DiskPartition>from( diskPartition,
                                                                   new TypeToken<DiskPartition>()
-                                                                  {}.getType() ) ) ) ).build();
+                                                                  {
+                                                                  }.getType() ) ) ) ).build();
         }
         catch ( Exception e )
         {
@@ -464,7 +515,8 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.getContainerHostById( UUID.fromString( containerId ) )
                      .setDiskQuota( JsonUtil.<DiskQuota>fromJson( diskQuota, new TypeToken<DiskQuota>()
-                     {}.getType() ) );
+                     {
+                     }.getType() ) );
             return Response.ok().build();
         }
         catch ( Exception e )

@@ -16,6 +16,14 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 import com.google.common.base.Preconditions;
 
 
+/**
+ * Karaf CLI support command
+ * Execute command synchronously
+ * hostId: target hostId to execute desired command
+ * command: command to execute
+ * timeout: set command execution timeout
+ * daemon: trigger command execution process as daemon or not
+ */
 @Command( scope = "command", name = "exec-sync", description = "Executes command synchronously" )
 public class ExecSyncCommand extends OsgiCommandSupport
 {

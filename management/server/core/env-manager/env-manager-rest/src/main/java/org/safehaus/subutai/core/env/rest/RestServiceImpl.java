@@ -57,7 +57,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response createEnvironment( final String topologyJsonString )
+    public Response createEnvironment( final String topologyJsonString, final String sshKey )
     {
         TopologyJson topologyJson;
 
@@ -86,7 +86,7 @@ public class RestServiceImpl implements RestService
             }
 
             Environment environment =
-                    environmentManager.createEnvironment( topologyJson.getEnvironmentName(), topology, false );
+                    environmentManager.createEnvironment( topologyJson.getEnvironmentName(), topology, sshKey, false );
 
             return Response.ok( JsonUtil.toJson(
                     new EnvironmentJson( environment.getId(), environment.getName(), environment.getStatus(),

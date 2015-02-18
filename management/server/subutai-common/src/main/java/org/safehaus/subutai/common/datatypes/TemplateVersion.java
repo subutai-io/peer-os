@@ -17,7 +17,6 @@ public class TemplateVersion implements Serializable
     @Expose
     private String templateVersion = Common.DEFAULT_TEMPLATE_VERSION;
 
-
     public TemplateVersion( final String templateVersion )
     {
         this.templateVersion = templateVersion;

@@ -14,9 +14,14 @@ import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
+import org.safehaus.subutai.core.key.api.KeyInfo;
+import org.safehaus.subutai.core.key.api.KeyManager;
+import org.safehaus.subutai.core.key.api.KeyManagerException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.metric.api.Monitor;
+import org.safehaus.subutai.core.peer.api.EnvironmentContext;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -61,6 +66,7 @@ public class PeerManagerImpl implements PeerManager
     private MessageResponseListener messageResponseListener;
     private HostRegistry hostRegistry;
     private DaoManager daoManager;
+    private KeyManager keyManager;
 
 
     public PeerManagerImpl( final Messenger messenger )
@@ -87,6 +93,31 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    public void setKeyManager( final KeyManager keyManager )
+    {
+        this.keyManager = keyManager;
+    }
+
+
+    @Override
+    public EnvironmentContext prepareEnvironment( final UUID environmentId, String email )
+    {
+        EnvironmentContext environmentContext = new EnvironmentContext();
+        try
+        {
+            ManagementHost managementHost = localPeer.getManagementHost();
+            KeyInfo keyInfo = keyManager.generateKey( managementHost, environmentId.toString(), email );
+            keyInfo.getPublicKeyId();
+            String gpgPublicKey = keyManager.readKey( managementHost, keyInfo.getPublicKeyId() );
+        }
+        catch ( KeyManagerException | HostNotFoundException e )
+        {
+            LOG.error( e.toString(), e );
+        }
+        return null;
+    }
+
+
     @Override
     public EntityManagerFactory getEntityManagerFactory()
     {
@@ -109,8 +140,10 @@ public class PeerManagerImpl implements PeerManager
         if ( result.isEmpty() )
         {
             peerInfo = new PeerInfo();
+            //TODO generate peer id based on owner/system information
             peerInfo.setId( UUID.randomUUID() );
             peerInfo.setName( "Local Subutai server" );
+            //TODO get ownerId from persistent storage
             peerInfo.setOwnerId( UUID.randomUUID() );
             peerDAO.saveInfo( SOURCE_LOCAL_PEER, peerInfo.getId().toString(), peerInfo );
         }

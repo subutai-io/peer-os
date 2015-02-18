@@ -31,6 +31,10 @@ public interface RestService
     @Path( "ping" )
     public Response ping();
 
+    @GET
+    @Path( "template/get" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getTemplate( @FormParam( "templateName" ) String templateName );
 
     //*************** Peer Registration Handshake REST - BEGIN ***************************
 
@@ -63,6 +67,14 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getQuota( @QueryParam( "containerId" ) String containerId, @QueryParam( "quotaType" ) String quotaType );
 
+
+    @GET
+    @Path( "container/quota/info" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getQuotaInfo( @QueryParam( "containerId" ) String containerId,
+                           @QueryParam( "quotaType" ) String quotaType );
+
+
     @POST
     @Path( "container/destroy" )
     @Produces( { MediaType.APPLICATION_JSON } )
@@ -88,10 +100,6 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getContainerState( @QueryParam( "containerId" ) String containerId );
 
-    @GET
-    @Path( "template/get" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getTemplate( @FormParam( "templateName" ) String templateName );
 
     @GET
     @Path( "container/resource/usage" )
@@ -121,6 +129,12 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getRamQuota( @QueryParam( "containerId" ) String containerId );
 
+
+    @GET
+    @Path( "container/quota/ram/info" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getRamQuotaInfo( @QueryParam( "containerId" ) String containerId );
+
     @POST
     @Path( "container/quota/ram" )
     Response setRamQuota( @FormParam( "containerId" ) String containerId, @FormParam( "ram" ) int ram );
@@ -129,6 +143,13 @@ public interface RestService
     @Path( "container/quota/cpu" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getCpuQuota( @QueryParam( "containerId" ) String containerId );
+
+
+    @GET
+    @Path( "container/quota/cpu/info" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getCpuQuotaInfo( @QueryParam( "containerId" ) String containerId );
+
 
     @POST
     @Path( "container/quota/cpu" )

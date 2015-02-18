@@ -8,7 +8,9 @@ function is_registered {
  
   local template=$1
   local version=$(get_template_version $template)
-  local url=`build_rest_url $SUBUTAI_REST_GET_TEMPLATE_PATH`/$template/$version
+  #Temporary change for template registery
+  #local url=`build_rest_url $SUBUTAI_REST_GET_TEMPLATE_PATH`/$template/$version
+  local url=`build_rest_url $SUBUTAI_REST_GET_TEMPLATE_PATH`/$template
   if [ "$TEST_MODE" == "true" ] || [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
     return
   fi

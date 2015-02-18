@@ -18,7 +18,7 @@ import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
-import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.core.metric.impl.ContainerHostMetricImpl;
 import org.safehaus.subutai.core.metric.impl.ResourceHostMetricImpl;
 
@@ -90,7 +90,7 @@ public class RestServiceImplTest
     @Test
     public void testGetResourceHostMetricsException() throws Exception
     {
-        when( monitor.getResourceHostsMetrics() ).thenThrow( new MonitorException( "" ) );
+        when( monitor.getResourceHostsMetrics() ).thenThrow( new RuntimeException( "" ) );
 
         Response response = restService.getResourceHostsMetrics();
 

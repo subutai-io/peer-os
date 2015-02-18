@@ -8,13 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
@@ -23,6 +20,7 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.ContainersDestructionResult;
 import org.safehaus.subutai.common.peer.Host;
@@ -31,13 +29,17 @@ import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
+import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
@@ -72,10 +74,9 @@ import org.safehaus.subutai.core.peer.impl.entity.ManagementHostEntity;
 import org.safehaus.subutai.core.peer.impl.entity.ResourceHostEntity;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
-import org.safehaus.subutai.core.strategy.api.StrategyNotAvailable;
+import org.safehaus.subutai.core.strategy.api.StrategyNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +95,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
     private static final long HOST_INACTIVE_TIME = 5 * 1000 * 60; // 5 min
-    private static final int MAX_LXC_NAME = 15;
     private PeerManager peerManager;
     private TemplateRegistry templateRegistry;
     private ManagementHost managementHost;
@@ -103,7 +103,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     private StrategyManager strategyManager;
     private QuotaManager quotaManager;
     private Monitor monitor;
-    private ConcurrentMap<String, AtomicInteger> sequences;
     private ManagementHostDataService managementHostDataService;
     private ResourceHostDataService resourceHostDataService;
     private ContainerHostDataService containerHostDataService;
@@ -157,7 +156,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
         hostRegistry.addHostListener( this );
-        sequences = new ConcurrentHashMap<>();
     }
 
 
@@ -167,6 +165,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         {
             ( ( AbstractSubutaiHost ) resourceHost ).setPeer( this );
             ( ( ResourceHostEntity ) resourceHost ).setRegistry( templateRegistry );
+            ( ( ResourceHostEntity ) resourceHost ).setMonitor( monitor );
             ( ( ResourceHostEntity ) resourceHost ).setHostRegistry( hostRegistry );
         }
     }
@@ -250,6 +249,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     }
 
 
+    //TODO wrap all parameters into request object
     public Set<HostInfoModel> createContainers( final UUID environmentId, final UUID initiatorPeerId,
                                                 final UUID ownerId, final List<Template> templates,
                                                 final int numberOfContainers, final String strategyId,
@@ -270,7 +270,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         {
             strategyManager.findStrategyById( strategyId );
         }
-        catch ( StrategyNotAvailable e )
+        catch ( StrategyNotFoundException e )
         {
             throw new PeerException( e );
         }
@@ -293,7 +293,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         }
 
 
-        List<ServerMetric> serverMetricMap = new ArrayList<>();
+        List<ResourceHostMetric> serverMetricMap = new ArrayList<>();
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
             //take connected resource hosts for container creation
@@ -302,7 +302,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             {
                 try
                 {
-                    serverMetricMap.add( resourceHost.getMetric() );
+                    serverMetricMap.add( resourceHost.getHostMetric() );
                     resourceHost.prepareTemplates( templates );
                 }
                 catch ( ResourceHostException e )
@@ -313,7 +313,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         }
 
         //calculate placement strategy
-        Map<ServerMetric, Integer> slots;
+        Map<ResourceHostMetric, Integer> slots;
         try
         {
             slots = strategyManager
@@ -324,21 +324,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             throw new PeerException( e );
         }
 
-        Set<String> existingContainerNames = getContainerNames();
 
         //distribute new containers' names across selected resource hosts
         Map<ResourceHost, Set<String>> containerDistribution = Maps.newHashMap();
         String templateName = templates.get( templates.size() - 1 ).getTemplateName();
 
-        for ( Map.Entry<ServerMetric, Integer> e : slots.entrySet() )
+        for ( Map.Entry<ResourceHostMetric, Integer> e : slots.entrySet() )
         {
             Set<String> hostCloneNames = new HashSet<>();
             for ( int i = 0; i < e.getValue(); i++ )
             {
-                String newContainerName = nextHostName( templateName, existingContainerNames );
+                String newContainerName = StringUtil
+                        .trimToSize( String.format( "%s%s", templateName, UUID.randomUUID() ).replace( "-", "" ),
+                                Common.MAX_CONTAINER_NAME_LEN );
                 hostCloneNames.add( newContainerName );
             }
-            ResourceHost resourceHost = getResourceHostByName( e.getKey().getHostname() );
+            ResourceHost resourceHost = getResourceHostByName( e.getKey().getHost() );
             containerDistribution.put( resourceHost, hostCloneNames );
         }
 
@@ -459,43 +460,23 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
-    public String getFreeHostName( final String prefix )
+    public Set<ContainerGroup> findContainerGroupsByOwnerId( final UUID ownerId )
     {
-        return nextHostName( prefix, getContainerNames() );
-    }
+        Preconditions.checkNotNull( ownerId, "Invalid owner id" );
 
+        Set<ContainerGroup> result = Sets.newHashSet();
 
-    private String nextHostName( String templateName, Set<String> existingNames )
-    {
-        AtomicInteger i = sequences.putIfAbsent( templateName, new AtomicInteger() );
-        if ( i == null )
+        List<ContainerGroupEntity> containerGroups = ( List<ContainerGroupEntity> ) containerGroupDataService.getAll();
+
+        for ( ContainerGroupEntity containerGroup : containerGroups )
         {
-            i = sequences.get( templateName );
-        }
-        while ( true )
-        {
-            String suffix = String.valueOf( i.incrementAndGet() );
-            int prefixLen = MAX_LXC_NAME - suffix.length();
-            String name = ( templateName.length() > prefixLen ? templateName.substring( 0, prefixLen ) : templateName )
-                    + suffix;
-            if ( !existingNames.contains( name ) )
+
+            if ( ownerId.equals( containerGroup.getOwnerId() ) )
             {
-                return name;
+                result.add( containerGroup );
             }
         }
-    }
 
-
-    private Set<String> getContainerNames()
-    {
-        Set<String> result = new HashSet<>();
-        for ( ResourceHost resourceHost : getResourceHosts() )
-        {
-            for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
-            {
-                result.add( containerHost.getHostname() );
-            }
-        }
         return result;
     }
 
@@ -780,6 +761,21 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
+    public QuotaInfo getQuotaInfo( ContainerHost host, final QuotaType quota ) throws PeerException
+    {
+        try
+        {
+            Host c = bindHost( host.getHostId() );
+            return quotaManager.getQuotaInfo( c.getId(), quota );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
     public void setQuota( ContainerHost host, final QuotaInfo quota ) throws PeerException
     {
         try
@@ -961,7 +957,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
     @Override
     public <T, V> V sendRequest( final T request, final String recipient, final int requestTimeout,
-                                 final Class<V> responseType, final int responseTimeout, UUID environmentId )
+                                 final Class<V> responseType, final int responseTimeout, Map<String, String> headers )
             throws PeerException
     {
         Preconditions.checkNotNull( responseType, "Invalid response type" );
@@ -971,8 +967,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
-    public <T> void sendRequest( final T request, final String recipient, final int requestTimeout, UUID environmentId )
-            throws PeerException
+    public <T> void sendRequest( final T request, final String recipient, final int requestTimeout,
+                                 Map<String, String> headers ) throws PeerException
     {
         sendRequestInternal( request, recipient, null );
     }
@@ -1057,10 +1053,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     {
         for ( ContainerHostInfo containerHostInfo : containerHostInfos )
         {
-            if ( containerHostInfo.getInterfaces().size() == 0 )
-            {
-                continue;
-            }
             Host containerHost;
             try
             {
@@ -1070,12 +1062,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             {
                 containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
                 setContainersTransientFields( Sets.newHashSet( ( ContainerHost ) containerHost ) );
-                //                ( ( AbstractSubutaiHost ) containerHost ).setPeer( this );
-                //                ( ( ContainerHostEntity ) containerHost ).setDataService( containerHostDataService );
                 ( ( ResourceHostEntity ) resourceHost ).addContainerHost( ( ContainerHostEntity ) containerHost );
                 containerHostDataService.persist( ( ContainerHostEntity ) containerHost );
             }
-            ( ( AbstractSubutaiHost ) containerHost ).updateHostInfo( containerHostInfo );
+            ( ( ContainerHostEntity ) containerHost ).updateHostInfo( containerHostInfo );
         }
     }
 
@@ -1130,6 +1120,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
+    public MemoryQuotaInfo getRamQuotaInfo( final ContainerHost host ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+
+        try
+        {
+            return quotaManager.getRamQuotaInfo( host.getId() );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
     public void setRamQuota( final ContainerHost host, final int ramInMb ) throws PeerException
     {
         Preconditions.checkNotNull( host, "Invalid container host" );
@@ -1154,6 +1160,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         try
         {
             return quotaManager.getCpuQuota( host.getId() );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
+    public CpuQuotaInfo getCpuQuotaInfo( final ContainerHost host ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+
+        try
+        {
+            return quotaManager.getCpuQuotaInfo( host.getId() );
         }
         catch ( QuotaException e )
         {
@@ -1322,29 +1344,32 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 }
             }
 
-            List<Future<UUID>> taskFutures = Lists.newArrayList();
-            ExecutorService executorService = Executors.newFixedThreadPool( containerHosts.size() );
-
-            for ( ContainerHost containerHost : containerHosts )
+            if ( !containerHosts.isEmpty() )
             {
+                List<Future<UUID>> taskFutures = Lists.newArrayList();
+                ExecutorService executorService = Executors.newFixedThreadPool( containerHosts.size() );
 
-                taskFutures.add( executorService.submit( new DestroyContainerWrapperTask( this, containerHost ) ) );
-            }
-
-            for ( Future<UUID> taskFuture : taskFutures )
-            {
-                try
+                for ( ContainerHost containerHost : containerHosts )
                 {
-                    destroyedContainersIds.add( taskFuture.get() );
+
+                    taskFutures.add( executorService.submit( new DestroyContainerWrapperTask( this, containerHost ) ) );
                 }
-                catch ( ExecutionException | InterruptedException e )
+
+                for ( Future<UUID> taskFuture : taskFutures )
                 {
-                    errors.add( e );
+                    try
+                    {
+                        destroyedContainersIds.add( taskFuture.get() );
+                    }
+                    catch ( ExecutionException | InterruptedException e )
+                    {
+                        errors.add( e );
+                    }
                 }
+
+
+                executorService.shutdown();
             }
-
-
-            executorService.shutdown();
 
             String exception = null;
 

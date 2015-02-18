@@ -135,40 +135,42 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public Environment createEmptyEnvironment( final String name )
+    public UUID createEmptyEnvironment( final String name, final String sshKey )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
-        final EnvironmentImpl environment = new EnvironmentImpl( name );
+
+        final EnvironmentImpl environment = new EnvironmentImpl( name, sshKey );
 
         saveEnvironment( environment );
+
         setEnvironmentTransientFields( environment );
 
         notifyOnEnvironmentCreated( environment );
 
-        return environment;
+        return environment.getId();
     }
 
 
     @Override
-    public Environment createEnvironment( final String name, final Topology topology, boolean async )
-            throws EnvironmentCreationException
+    public Environment createEnvironment( final String name, final Topology topology, final String sshKey,
+                                          boolean async ) throws EnvironmentCreationException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
-        final Environment environment = createEmptyEnvironment( name );
+        final UUID environmentId = createEmptyEnvironment( name, sshKey );
 
         try
         {
-            growEnvironment( environment.getId(), topology, async );
+            growEnvironment( environmentId, topology, async );
+
+            return findEnvironment( environmentId );
         }
         catch ( EnvironmentModificationException | EnvironmentNotFoundException e )
         {
             throw new EnvironmentCreationException( e );
         }
-
-        return environment;
     }
 
 

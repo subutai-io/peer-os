@@ -51,8 +51,4 @@ public interface Message
 
 
     public String getPayload();
-
-    public void setEnvironmentId( UUID environmentId );
-
-    public UUID getEnvironmentId();
 }

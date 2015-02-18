@@ -61,15 +61,11 @@ public class RequestNotifier implements Runnable
         {
             //send response back
             Message responseMessage = messenger.createMessage( messageResponse );
-            if ( message.getEnvironmentId() != null )
-            {
-                responseMessage.setEnvironmentId( message.getEnvironmentId() );
-            }
             Peer sourcePeer = peerManager.getPeer( message.getSourcePeerId() );
             try
             {
                 messenger.sendMessage( sourcePeer, responseMessage, RecipientType.PEER_RESPONSE_LISTENER.name(),
-                        Timeouts.PEER_MESSAGE_TIMEOUT );
+                        Timeouts.PEER_MESSAGE_TIMEOUT, messageRequest.getHeaders() );
             }
             catch ( MessageException e )
             {

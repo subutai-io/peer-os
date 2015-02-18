@@ -7,8 +7,16 @@
 
 function lxc_assert_name {
   local lxc="$1"
-  if [ -n "`echo $lxc | grep '-'`" ]; then
-    msg_error "Arg \"$lxc\" contains illegal dash character."
+  if [ -n "`echo $lxc | grep '-'`" ]  || [ -n "`echo $lxc | grep '_'`" ]; then
+    msg_error "Arg \"$lxc\" contains illegal dash/underscore character."
+    unlock_container_read $1
+    exit 1
+  fi
+
+  local size=${#lxc}
+  local max_size=64
+  if [ "$size" -ge "$max_size" ]; then
+    msg_error "Arg \"$lxc\" exceeds maximum $max_size character limit."
     unlock_container_read $1
     exit 1
   fi

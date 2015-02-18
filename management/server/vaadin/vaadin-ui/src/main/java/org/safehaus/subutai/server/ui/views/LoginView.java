@@ -1,7 +1,6 @@
 package org.safehaus.subutai.server.ui.views;
 
 
-import org.safehaus.subutai.common.helper.UserIdMdcHelper;
 import org.safehaus.subutai.server.ui.MainUI;
 import org.safehaus.subutai.server.ui.util.HelpManager;
 
@@ -124,7 +123,8 @@ public class LoginView extends VerticalLayout implements View
                 try
                 {
                     currentUser.login( usernamePasswordToken );
-//                    UserIdMdcHelper.set( currentUser );
+                    //                    UserIdMdcHelper.set( currentUser );
+
                     mainUI.getUsername().setValue( username.getValue() );
                     VaadinService.reinitializeSession( VaadinService.getCurrentRequest() );
                     getUI().getNavigator().navigateTo( "/core" );

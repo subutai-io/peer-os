@@ -15,9 +15,9 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginException;
 
+import org.safehaus.subutai.common.security.ShiroPrincipal;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
-import org.safehaus.subutai.core.identity.api.ShiroPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,7 +93,7 @@ public class ShiroLoginModule extends AbstractKarafLoginModule
             LOGGER.debug( "Login success." );
 
             principals.add( new UserPrincipal( user ) );
-            principals.add( new ShiroPrincipal( shiroSubject ) );
+            principals.add( new ShiroPrincipal( shiroSubject.getSession().getId() ) );
 
             for ( String roleName : KARAF_ROLES )
             {

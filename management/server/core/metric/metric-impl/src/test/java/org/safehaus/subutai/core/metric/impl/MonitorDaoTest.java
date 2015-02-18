@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.metric.impl;
 
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Set;
 import java.util.UUID;
@@ -11,23 +10,16 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
-import javax.sql.DataSource;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.exception.DaoException;
-import org.safehaus.subutai.common.util.DbUtil;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.anyVararg;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
@@ -54,7 +46,6 @@ public class MonitorDaoTest
         {
             super( emf );
         }
-
     }
 
 
