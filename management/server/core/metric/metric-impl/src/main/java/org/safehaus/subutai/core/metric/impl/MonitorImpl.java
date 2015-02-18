@@ -166,7 +166,7 @@ public class MonitorImpl implements Monitor
             }
             catch ( Exception e )
             {
-                LOG.warn( String.format( "Error obtaining metric for container %s", containerHost.getHostname() ), e );
+                LOG.error( String.format( "Error obtaining metric for container %s", containerHost.getHostname() ), e );
             }
         }
 
@@ -174,6 +174,23 @@ public class MonitorImpl implements Monitor
         result.addAll( metrics );
 
         return result;
+    }
+
+
+    @Override
+    public ContainerHostMetric getLocalContainerHostMetric( final ContainerHost containerHost ) throws MonitorException
+    {
+        Preconditions.checkNotNull( containerHost );
+
+        Set<ContainerHostMetric> metrics = getLocalContainerHostsMetrics( Sets.newHashSet( containerHost ) );
+
+        if ( metrics.isEmpty() )
+        {
+            throw new MonitorException(
+                    String.format( "Failed to obtain metric for container %s", containerHost.getHostname() ) );
+        }
+
+        return metrics.iterator().next();
     }
 
 
@@ -234,7 +251,7 @@ public class MonitorImpl implements Monitor
                 }
                 catch ( HostNotFoundException e )
                 {
-                    LOG.warn( String.format( "Host not found by id %s", containerId ), e );
+                    LOG.error( String.format( "Host not found by id %s", containerId ), e );
                 }
             }
         }
@@ -267,7 +284,7 @@ public class MonitorImpl implements Monitor
                 }
                 else
                 {
-                    LOG.warn( String.format( "Error getting metrics from %s: %s", localContainer.getHostname(),
+                    LOG.error( String.format( "Error getting metrics from %s: %s", localContainer.getHostname(),
                             result.getStdErr() ) );
                 }
             }
@@ -278,7 +295,7 @@ public class MonitorImpl implements Monitor
         }
         else
         {
-            LOG.warn( String.format( "Could not find resource host if %s", localContainer.getHostname() ) );
+            LOG.error( String.format( "Could not find resource host if %s", localContainer.getHostname() ) );
         }
     }
 
@@ -333,7 +350,7 @@ public class MonitorImpl implements Monitor
             }
             else
             {
-                LOG.warn( String.format( "Error getting metrics from %s: %s", resourceHost.getHostname(),
+                LOG.error( String.format( "Error getting metrics from %s: %s", resourceHost.getHostname(),
                         result.getStdErr() ) );
             }
         }
@@ -528,7 +545,7 @@ public class MonitorImpl implements Monitor
                         commands.getActivateMonitoringCommand( containerHost.getHostname(), monitoringSettings ) );
                 if ( !commandResult.hasSucceeded() )
                 {
-                    LOG.warn( String.format( "Error activating metrics on %s: %s %s", containerHost.getHostname(),
+                    LOG.error( String.format( "Error activating metrics on %s: %s %s", containerHost.getHostname(),
                             commandResult.getStatus(), commandResult.getStdErr() ) );
                 }
             }
@@ -588,7 +605,7 @@ public class MonitorImpl implements Monitor
                 }
                 catch ( HostNotFoundException e )
                 {
-                    LOG.warn( String.format( "Host not found by id %s", containerId ), e );
+                    LOG.error( String.format( "Host not found by id %s", containerId ), e );
                 }
             }
         }
