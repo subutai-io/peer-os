@@ -153,7 +153,7 @@ public class Manager extends VerticalLayout
                             Notification.show( e.getMessage() );
                         }
                     }
-                    else
+                    else if ( lxcTable.hasChildren( target ) )
                     {
                         return new Action[] { START_ALL, STOP_ALL, DESTROY_ALL };
                     }
@@ -168,7 +168,7 @@ public class Manager extends VerticalLayout
                 Item row = lxcTable.getItem( target );
                 try
                 {
-                    if ( !lxcTable.hasChildren( target ) )
+                    if ( !lxcTable.areChildrenAllowed( target ) )
                     {
                         final String lxcHostname = ( String ) row.getItemProperty( HOST_NAME ).getValue();
                         LocalPeer localPeer = peerManager.getLocalPeer();
@@ -190,7 +190,7 @@ public class Manager extends VerticalLayout
                         else if ( action == DESTROY_CONTAINER )
                         {
                             ConfirmationDialog alert =
-                                    new ConfirmationDialog( "Do you want to destroy this lxc node?", "Yes", "No" );
+                                    new ConfirmationDialog( "Do you want to destroy this container?", "Yes", "No" );
                             alert.getOk().addClickListener( new Button.ClickListener()
                             {
                                 @Override
@@ -202,7 +202,7 @@ public class Manager extends VerticalLayout
                             getUI().addWindow( alert.getAlert() );
                         }
                     }
-                    else
+                    else if ( lxcTable.hasChildren( target ) )
                     {
                         final String physicalHostname = ( String ) row.getItemProperty( HOST_NAME ).getValue();
                         final ResourceHost resourceHost =
@@ -233,8 +233,8 @@ public class Manager extends VerticalLayout
                         }
                         else if ( action == DESTROY_ALL )
                         {
-                            ConfirmationDialog alert =
-                                    new ConfirmationDialog( "Do you want to destroy this lxc node?", "Yes", "No" );
+                            ConfirmationDialog alert = new ConfirmationDialog(
+                                    "Do you want to destroy all containers of this resource host?", "Yes", "No" );
                             alert.getOk().addClickListener( new Button.ClickListener()
                             {
                                 @Override
