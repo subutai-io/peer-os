@@ -466,6 +466,28 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
+    public Set<ContainerGroup> findContainerGroupsByOwnerId( final UUID ownerId )
+    {
+        Preconditions.checkNotNull( ownerId, "Invalid owner id" );
+
+        Set<ContainerGroup> result = Sets.newHashSet();
+
+        List<ContainerGroupEntity> containerGroups = ( List<ContainerGroupEntity> ) containerGroupDataService.getAll();
+
+        for ( ContainerGroupEntity containerGroup : containerGroups )
+        {
+
+            if ( ownerId.equals( containerGroup.getOwnerId() ) )
+            {
+                result.add( containerGroup );
+            }
+        }
+
+        return result;
+    }
+
+
+    @Override
     public String getFreeHostName( final String prefix )
     {
         return nextHostName( prefix, getContainerNames() );
