@@ -55,6 +55,8 @@ public class Manager extends VerticalLayout
 
     private static final Logger LOG = LoggerFactory.getLogger( Manager.class );
 
+    private Action.Handler contextMenu;
+
 
     public Manager( final ExecutorService executorService, final PeerManager peerManager )
     {
@@ -105,7 +107,19 @@ public class Manager extends VerticalLayout
         grid.setComponentAlignment( indicator, Alignment.MIDDLE_CENTER );
         addComponent( grid );
 
-        final Action.Handler actionHandler = new Action.Handler()
+        addComponent( lxcTable );
+
+        binContextMenu();
+    }
+
+
+    private void binContextMenu()
+    {
+        if ( contextMenu != null )
+        {
+            lxcTable.removeActionHandler( contextMenu );
+        }
+        contextMenu = new Action.Handler()
         {
             @Override
             public Action[] getActions( final Object target, final Object sender )
@@ -242,9 +256,7 @@ public class Manager extends VerticalLayout
                 }
             }
         };
-        lxcTable.addActionHandler( actionHandler );
-
-        addComponent( lxcTable );
+        lxcTable.addActionHandler( contextMenu );
     }
 
 
@@ -283,6 +295,7 @@ public class Manager extends VerticalLayout
                     try
                     {
                         localPeer.destroyContainer( containerHost );
+                        binContextMenu();
                         getUI().access( new Runnable()
                         {
                             @Override
@@ -316,6 +329,7 @@ public class Manager extends VerticalLayout
                     try
                     {
                         localPeer.startContainer( containerHost );
+                        binContextMenu();
                         getUI().access( new Runnable()
                         {
                             @Override
@@ -353,6 +367,7 @@ public class Manager extends VerticalLayout
                     try
                     {
                         localPeer.stopContainer( containerHost );
+                        binContextMenu();
                         getUI().access( new Runnable()
                         {
                             @Override
