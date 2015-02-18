@@ -1053,10 +1053,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     {
         for ( ContainerHostInfo containerHostInfo : containerHostInfos )
         {
-            if ( containerHostInfo.getInterfaces().size() == 0 )
-            {
-                continue;
-            }
             Host containerHost;
             try
             {
@@ -1066,8 +1062,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             {
                 containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
                 setContainersTransientFields( Sets.newHashSet( ( ContainerHost ) containerHost ) );
-                //                ( ( AbstractSubutaiHost ) containerHost ).setPeer( this );
-                //                ( ( ContainerHostEntity ) containerHost ).setDataService( containerHostDataService );
                 ( ( ResourceHostEntity ) resourceHost ).addContainerHost( ( ContainerHostEntity ) containerHost );
                 containerHostDataService.persist( ( ContainerHostEntity ) containerHost );
             }
