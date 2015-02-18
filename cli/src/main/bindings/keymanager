@@ -288,8 +288,8 @@ sign_key(){
 	    sign_level="$2"
 	    ;;
  	  *)
-            msg_error "invalid switch!"
-            echo " Available switches that can be used with \"-l\""
+            msg_error "invalid switch arguments!"
+            echo " Available arguments that can be used with \"-l\""
             echo "  (0) I will not answer. (default)"
 	    echo "  (1) I have not checked at all."
 	    echo "  (2) I have done casual checking."
