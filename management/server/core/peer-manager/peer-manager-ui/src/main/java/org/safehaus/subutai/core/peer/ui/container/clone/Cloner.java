@@ -17,7 +17,9 @@ import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
@@ -363,8 +365,10 @@ public class Cloner extends VerticalLayout
                 List<String> lxcHostNames = new ArrayList<>();
                 for ( int i = 0; i < sortedBestServers.get( serverMetric ); i++ )
                 {
-                    lxcHostNames.add( String.format( "%s%d%s", productName, lxcHostNames.size() + 1,
-                            UUIDUtil.generateTimeBasedUUID().toString().replace( "-", "" ) ).substring( 0, 11 ) );
+                    lxcHostNames.add( StringUtil.trimToSize(
+                            String.format( "%s%d%s", productName, lxcHostNames.size() + 1,
+                                    UUIDUtil.generateTimeBasedUUID().toString().replace( "-", "" ) ),
+                            Common.MAX_CONTAINER_NAME_LEN ) );
                 }
                 resourceHostFamilies.put( rh, lxcHostNames );
             }
@@ -376,8 +380,10 @@ public class Cloner extends VerticalLayout
                 List<String> lxcHostNames = new ArrayList<>();
                 for ( int i = 1; i <= count; i++ )
                 {
-                    lxcHostNames.add( String.format( "%s%d%s", productName, lxcHostNames.size() + 1,
-                            UUIDUtil.generateTimeBasedUUID().toString().replace( "-", "" ) ).substring( 0, 11 ) );
+                    lxcHostNames.add( StringUtil.trimToSize(
+                            String.format( "%s%d%s", productName, lxcHostNames.size() + 1,
+                                    UUIDUtil.generateTimeBasedUUID().toString().replace( "-", "" ) ),
+                            Common.MAX_CONTAINER_NAME_LEN ) );
                 }
                 resourceHostFamilies.put( ( ResourceHost ) resourceHost, lxcHostNames );
             }
