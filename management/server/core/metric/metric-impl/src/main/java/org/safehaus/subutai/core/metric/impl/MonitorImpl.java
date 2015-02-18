@@ -16,6 +16,7 @@ import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
@@ -28,7 +29,6 @@ import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.MonitoringSettings;
-import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.core.peer.api.ContainerGroup;
 import org.safehaus.subutai.core.peer.api.ContainerGroupNotFoundException;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
@@ -134,6 +134,45 @@ public class MonitorImpl implements Monitor
         }
 
         return metrics;
+    }
+
+
+    @Override
+    public Set<ContainerHostMetric> getLocalContainerHostsMetrics( final Set<ContainerHost> containerHosts )
+            throws MonitorException
+    {
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
+
+        Set<ContainerHostMetricImpl> metrics = Sets.newHashSet();
+
+        LocalPeer localPeer = peerManager.getLocalPeer();
+
+        for ( ContainerHost containerHost : containerHosts )
+        {
+            try
+            {
+                Preconditions.checkArgument( containerHost.isLocal(),
+                        String.format( "Container %s is not local", containerHost.getHostname() ) );
+
+                ContainerGroup containerGroup = localPeer.findContainerGroupByContainerId( containerHost.getId() );
+
+                //get container's resource host
+                ResourceHost resourceHost = localPeer.getResourceHostByContainerId( containerHost.getId() );
+
+                //get metric
+                addLocalContainerHostMetric( containerGroup.getEnvironmentId(), resourceHost,
+                        resourceHost.getContainerHostById( containerHost.getId() ), metrics );
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( String.format( "Error obtaining metric for container %s", containerHost.getHostname() ), e );
+            }
+        }
+
+        Set<ContainerHostMetric> result = Sets.newHashSet();
+        result.addAll( metrics );
+
+        return result;
     }
 
 

@@ -24,6 +24,9 @@ public interface Monitor
      */
     public Set<ContainerHostMetric> getContainerHostsMetrics( Environment environment ) throws MonitorException;
 
+    public Set<ContainerHostMetric> getLocalContainerHostsMetrics( Set<ContainerHost> containerHosts )
+            throws MonitorException;
+
 
     /**
      * Returns current metrics of local resource hosts
