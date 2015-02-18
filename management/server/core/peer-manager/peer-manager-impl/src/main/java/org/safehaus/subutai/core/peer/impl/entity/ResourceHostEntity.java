@@ -188,8 +188,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         //wait container connection
         long ts = System.currentTimeMillis();
-        while ( System.currentTimeMillis() - ts < CONNECT_TIMEOUT * 1000 && !ContainerState.RUNNING
-                .equals( getContainerHostState( containerHost ) ) )
+        while ( System.currentTimeMillis() - ts < CONNECT_TIMEOUT * 1000 && !containerHost.isConnected() )
         {
             try
             {
