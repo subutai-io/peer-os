@@ -253,7 +253,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         }
     }
 
-
+    //TODO wrap all parameters into request object
     public Set<HostInfoModel> createContainers( final UUID environmentId, final UUID initiatorPeerId,
                                                 final UUID ownerId, final List<Template> templates,
                                                 final int numberOfContainers, final String strategyId,
