@@ -7,7 +7,6 @@ import java.util.UUID;
 import javax.persistence.EntityManagerFactory;
 
 import org.safehaus.subutai.common.exception.DaoException;
-import org.safehaus.subutai.common.util.DbUtil;
 import org.safehaus.subutai.core.metric.impl.dao.SubscriberDataService;
 
 import com.google.common.base.Preconditions;
@@ -20,7 +19,6 @@ import com.google.common.base.Strings;
 public class MonitorDao
 {
     private static final String INVALID_ENV_ID = "Invalid environment id";
-    protected DbUtil dbUtil;
     private SubscriberDataService dataService;
 
 
