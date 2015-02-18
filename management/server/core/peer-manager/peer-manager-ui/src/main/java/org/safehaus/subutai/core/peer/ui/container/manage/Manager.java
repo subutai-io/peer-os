@@ -112,9 +112,32 @@ public class Manager extends VerticalLayout
             {
                 if ( target != null )
                 {
+
                     if ( !lxcTable.areChildrenAllowed( target ) )
                     {
-                        return new Action[] { START_CONTAINER, STOP_CONTAINER, DESTROY_CONTAINER };
+                        Item row = lxcTable.getItem( target );
+                        final String lxcHostname = ( String ) row.getItemProperty( HOST_NAME ).getValue();
+                        LocalPeer localPeer = peerManager.getLocalPeer();
+                        try
+                        {
+                            final ContainerHost containerHost = localPeer.getContainerHostByName( lxcHostname );
+                            if ( containerHost.getState() == ContainerHostState.RUNNING )
+                            {
+                                return new Action[] { STOP_CONTAINER, DESTROY_CONTAINER };
+                            }
+                            else if ( containerHost.getState() == ContainerHostState.STOPPED )
+                            {
+                                return new Action[] { START_CONTAINER, DESTROY_CONTAINER };
+                            }
+                            else
+                            {
+                                return new Action[] { DESTROY_CONTAINER };
+                            }
+                        }
+                        catch ( PeerException e )
+                        {
+                            Notification.show( e.getMessage() );
+                        }
                     }
                     else
                     {
@@ -138,11 +161,17 @@ public class Manager extends VerticalLayout
                         final ContainerHost containerHost = localPeer.getContainerHostByName( lxcHostname );
                         if ( action == START_CONTAINER )
                         {
-                            startContainer( containerHost );
+                            if ( containerHost.getState() == ContainerHostState.STOPPED )
+                            {
+                                startContainer( containerHost );
+                            }
                         }
                         else if ( action == STOP_CONTAINER )
                         {
-                            stopContainer( containerHost );
+                            if ( containerHost.getState() == ContainerHostState.RUNNING )
+                            {
+                                stopContainer( containerHost );
+                            }
                         }
                         else if ( action == DESTROY_CONTAINER )
                         {
@@ -172,14 +201,20 @@ public class Manager extends VerticalLayout
                         {
                             for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
                             {
-                                startContainer( containerHost );
+                                if ( containerHost.getState() == ContainerHostState.STOPPED )
+                                {
+                                    startContainer( containerHost );
+                                }
                             }
                         }
                         else if ( action == STOP_ALL )
                         {
                             for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
                             {
-                                stopContainer( containerHost );
+                                if ( containerHost.getState() == ContainerHostState.RUNNING )
+                                {
+                                    stopContainer( containerHost );
+                                }
                             }
                         }
                         else if ( action == DESTROY_ALL )
@@ -203,7 +238,7 @@ public class Manager extends VerticalLayout
                 }
                 catch ( PeerException pe )
                 {
-                    pe.printStackTrace();
+                    Notification.show( pe.getMessage() );
                 }
             }
         };
