@@ -15,6 +15,7 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.exception.DaoException;
+import org.safehaus.subutai.common.metric.OwnerResourceUsage;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.peer.ContainerHost;
@@ -23,6 +24,7 @@ import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
@@ -139,7 +141,6 @@ public class MonitorImpl implements Monitor
 
     @Override
     public Set<ContainerHostMetric> getLocalContainerHostsMetrics( final Set<ContainerHost> containerHosts )
-            throws MonitorException
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
 
@@ -165,7 +166,7 @@ public class MonitorImpl implements Monitor
             }
             catch ( Exception e )
             {
-                LOG.warn( String.format( "Error obtaining metric for container %s", containerHost.getHostname() ), e );
+                LOG.error( String.format( "Error obtaining metric for container %s", containerHost.getHostname() ), e );
             }
         }
 
@@ -173,6 +174,23 @@ public class MonitorImpl implements Monitor
         result.addAll( metrics );
 
         return result;
+    }
+
+
+    @Override
+    public ContainerHostMetric getLocalContainerHostMetric( final ContainerHost containerHost ) throws MonitorException
+    {
+        Preconditions.checkNotNull( containerHost );
+
+        Set<ContainerHostMetric> metrics = getLocalContainerHostsMetrics( Sets.newHashSet( containerHost ) );
+
+        if ( metrics.isEmpty() )
+        {
+            throw new MonitorException(
+                    String.format( "Failed to obtain metric for container %s", containerHost.getHostname() ) );
+        }
+
+        return metrics.iterator().next();
     }
 
 
@@ -233,7 +251,7 @@ public class MonitorImpl implements Monitor
                 }
                 catch ( HostNotFoundException e )
                 {
-                    LOG.warn( String.format( "Host not found by id %s", containerId ), e );
+                    LOG.error( String.format( "Host not found by id %s", containerId ), e );
                 }
             }
         }
@@ -266,7 +284,7 @@ public class MonitorImpl implements Monitor
                 }
                 else
                 {
-                    LOG.warn( String.format( "Error getting metrics from %s: %s", localContainer.getHostname(),
+                    LOG.error( String.format( "Error getting metrics from %s: %s", localContainer.getHostname(),
                             result.getStdErr() ) );
                 }
             }
@@ -277,7 +295,7 @@ public class MonitorImpl implements Monitor
         }
         else
         {
-            LOG.warn( String.format( "Could not find resource host if %s", localContainer.getHostname() ) );
+            LOG.error( String.format( "Could not find resource host if %s", localContainer.getHostname() ) );
         }
     }
 
@@ -332,7 +350,7 @@ public class MonitorImpl implements Monitor
             }
             else
             {
-                LOG.warn( String.format( "Error getting metrics from %s: %s", resourceHost.getHostname(),
+                LOG.error( String.format( "Error getting metrics from %s: %s", resourceHost.getHostname(),
                         result.getStdErr() ) );
             }
         }
@@ -355,11 +373,8 @@ public class MonitorImpl implements Monitor
 
 
         //make sure subscriber id is truncated to 100 characters
-        String subscriberId = alertListener.getSubscriberId();
-        if ( subscriberId.length() > Constants.MAX_SUBSCRIBER_ID_LEN )
-        {
-            subscriberId = subscriberId.substring( 0, Constants.MAX_SUBSCRIBER_ID_LEN );
-        }
+        String subscriberId = StringUtil.trimToSize( alertListener.getSubscriberId(), Constants.MAX_SUBSCRIBER_ID_LEN );
+
         //save subscription to database
         try
         {
@@ -387,11 +402,7 @@ public class MonitorImpl implements Monitor
         Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
 
         //make sure subscriber id is truncated to 100 characters
-        String subscriberId = alertListener.getSubscriberId();
-        if ( subscriberId.length() > Constants.MAX_SUBSCRIBER_ID_LEN )
-        {
-            subscriberId = subscriberId.substring( 0, Constants.MAX_SUBSCRIBER_ID_LEN );
-        }
+        String subscriberId = StringUtil.trimToSize( alertListener.getSubscriberId(), Constants.MAX_SUBSCRIBER_ID_LEN );
 
         UUID environmentId = UUID.fromString( containerHost.getEnvironmentId() );
 
@@ -421,11 +432,8 @@ public class MonitorImpl implements Monitor
         Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
 
         //make sure subscriber id is truncated to 100 characters
-        String subscriberId = alertListener.getSubscriberId();
-        if ( subscriberId.length() > Constants.MAX_SUBSCRIBER_ID_LEN )
-        {
-            subscriberId = subscriberId.substring( 0, Constants.MAX_SUBSCRIBER_ID_LEN );
-        }
+        String subscriberId = StringUtil.trimToSize( alertListener.getSubscriberId(), Constants.MAX_SUBSCRIBER_ID_LEN );
+
         //remove subscription from database
         try
         {
@@ -537,7 +545,7 @@ public class MonitorImpl implements Monitor
                         commands.getActivateMonitoringCommand( containerHost.getHostname(), monitoringSettings ) );
                 if ( !commandResult.hasSucceeded() )
                 {
-                    LOG.warn( String.format( "Error activating metrics on %s: %s %s", containerHost.getHostname(),
+                    LOG.error( String.format( "Error activating metrics on %s: %s %s", containerHost.getHostname(),
                             commandResult.getStatus(), commandResult.getStdErr() ) );
                 }
             }
@@ -575,6 +583,59 @@ public class MonitorImpl implements Monitor
                     containerHost.getHostname(), processPid ), e );
             throw new MonitorException( e );
         }
+    }
+
+
+    @Override
+    public OwnerResourceUsage getOwnerResourceUsage( final UUID ownerId ) throws MonitorException
+    {
+        Preconditions.checkNotNull( ownerId, "'Invalid owner id" );
+
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        Set<ContainerGroup> containerGroups = localPeer.findContainerGroupsByOwnerId( ownerId );
+
+        Set<ContainerHost> ownerContainers = Sets.newHashSet();
+        for ( ContainerGroup containerGroup : containerGroups )
+        {
+            for ( UUID containerId : containerGroup.getContainerIds() )
+            {
+                try
+                {
+                    ownerContainers.add( localPeer.getContainerHostById( containerId ) );
+                }
+                catch ( HostNotFoundException e )
+                {
+                    LOG.error( String.format( "Host not found by id %s", containerId ), e );
+                }
+            }
+        }
+
+        if ( ownerContainers.isEmpty() )
+        {
+            throw new MonitorException( String.format( "Could not obtain owner container hosts" ) );
+        }
+
+        Set<ContainerHostMetric> ownerContainerMetrics = getLocalContainerHostsMetrics( ownerContainers );
+
+        double usedRam = 0;
+        double usedCpu = 0;
+        double usedDiskVar = 0;
+        double usedDiskHome = 0;
+        double usedDiskOpt = 0;
+        double usedDiskRootFs = 0;
+
+        for ( ContainerHostMetric ownerContainerMetric : ownerContainerMetrics )
+        {
+            usedRam += ownerContainerMetric.getUsedRam();
+            usedCpu += ownerContainerMetric.getUsedCpu();
+            usedDiskHome += ownerContainerMetric.getUsedDiskHome();
+            usedDiskOpt += ownerContainerMetric.getUsedDiskOpt();
+            usedDiskRootFs += ownerContainerMetric.getUsedDiskRootfs();
+            usedDiskVar += ownerContainerMetric.getUsedDiskVar();
+        }
+
+
+        return new OwnerResourceUsage( usedRam, usedCpu, usedDiskRootFs, usedDiskVar, usedDiskHome, usedDiskOpt );
     }
 
 

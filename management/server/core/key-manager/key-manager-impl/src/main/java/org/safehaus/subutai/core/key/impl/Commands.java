@@ -22,6 +22,12 @@ public class Commands
     }
 
 
+    public RequestBuilder getGenerateCertificateCommand( String keyId )
+    {
+        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "generate_cert", keyId ) );
+    }
+
+
     public RequestBuilder getGenerateSubKeyCommand( String keyId )
     {
         return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "generate_subkey", keyId ) );

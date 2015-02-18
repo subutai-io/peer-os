@@ -497,7 +497,7 @@ public class MonitorForm extends CustomComponent
                 {
                     displayMetrics( monitor.getResourceHostsMetrics() );
                 }
-                catch ( MonitorException e )
+                catch ( Exception e )
                 {
                     LOG.error( "Error getting resource host metrics", e );
 

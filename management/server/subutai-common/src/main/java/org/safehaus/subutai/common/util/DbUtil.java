@@ -1,22 +1,25 @@
 package org.safehaus.subutai.common.util;
 
 
-import com.google.common.base.Preconditions;
-import com.sun.rowset.CachedRowSetImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.sql.DataSource;
 import java.io.Reader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.sql.DataSource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.sun.rowset.CachedRowSetImpl;
+
 
 /**
- * Database utilities
+ * Database utilities. Soon to be removed
  */
+@Deprecated
 public class DbUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger( DbUtil.class.getName() );
@@ -63,11 +66,7 @@ public class DbUtil
             cachedRs.populate( rs );
             return cachedRs;
         }
-        catch ( SQLException ex )
-        {
-            LOG.error( "Error in select", ex );
-            throw ex;
-        }
+
         catch ( Exception ex )
         {
             LOG.error( "Error in select", ex );

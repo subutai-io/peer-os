@@ -1,10 +1,11 @@
 package org.safehaus.subutai.common.util;
 
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+
+import com.google.common.collect.Lists;
 
 
 /**
@@ -19,9 +20,23 @@ public class StringUtil
     }
 
 
+    public static String trimToSize( String str, int size )
+    {
+        if ( !isStringNullOrEmpty( str ) )
+        {
+            if ( str.length() > size )
+            {
+                return str.substring( 0, size );
+            }
+        }
+
+        return str;
+    }
+
+
     public static List<String> splitString( String str, String delimiter )
     {
-        List<String> result = new ArrayList();
+        List<String> result = Lists.newArrayList();
         StringTokenizer t = new StringTokenizer( str, delimiter );
         while ( t.hasMoreTokens() )
         {

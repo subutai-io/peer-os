@@ -2,8 +2,10 @@ package org.safehaus.subutai.core.metric.api;
 
 
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.environment.Environment;
+import org.safehaus.subutai.common.metric.OwnerResourceUsage;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.peer.ContainerHost;
@@ -24,9 +26,10 @@ public interface Monitor
      */
     public Set<ContainerHostMetric> getContainerHostsMetrics( Environment environment ) throws MonitorException;
 
-    public Set<ContainerHostMetric> getLocalContainerHostsMetrics( Set<ContainerHost> containerHosts )
-            throws MonitorException;
+    public Set<ContainerHostMetric> getLocalContainerHostsMetrics( Set<ContainerHost> containerHosts );
 
+
+    public ContainerHostMetric getLocalContainerHostMetric( ContainerHost containerHost ) throws MonitorException;
 
     /**
      * Returns current metrics of local resource hosts
@@ -38,7 +41,7 @@ public interface Monitor
      *
      * @return set of metrics, one per each resource host within the local peer
      */
-    public Set<ResourceHostMetric> getResourceHostsMetrics() throws MonitorException;
+    public Set<ResourceHostMetric> getResourceHostsMetrics();
 
 
     public ResourceHostMetric getResourceHostMetric( ResourceHost resourceHost ) throws MonitorException;
@@ -88,9 +91,26 @@ public interface Monitor
     public void activateMonitoring( ContainerHost containerHost, MonitoringSettings monitoringSettings )
             throws MonitorException;
 
-
+    /**
+     * Returns process resource usage on a given container host
+     *
+     * @param containerHost - container
+     * @param processPid - pid of process
+     *
+     * @return - {@code ProcessResourceUsage}
+     */
     public ProcessResourceUsage getProcessResourceUsage( ContainerHost containerHost, int processPid )
             throws MonitorException;
+
+
+    /**
+     * Returns total owner resource usage on local peer
+     *
+     * @param ownerId - id of owner
+     *
+     * @return - {@code OwnerResourceUsage}
+     */
+    public OwnerResourceUsage getOwnerResourceUsage( UUID ownerId ) throws MonitorException;
 
     /**
      * This method is called by REST endpoint from local peer indicating that some container hosted locally is under
