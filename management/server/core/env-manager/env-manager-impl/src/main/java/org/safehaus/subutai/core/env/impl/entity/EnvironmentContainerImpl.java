@@ -170,6 +170,13 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
 
     @Override
+    public boolean isLocal()
+    {
+        return getPeer().isLocal();
+    }
+
+
+    @Override
     public String getEnvironmentId()
     {
         return environment.getId().toString();

@@ -60,6 +60,8 @@ public interface ContainerHost extends Host
     public Set<String> getTags();
 
 
+    public boolean isLocal();
+
     /**
      * Returns process's resource usage by pid
      *
@@ -79,8 +81,8 @@ public interface ContainerHost extends Host
 
     /**
      * Get RAM quota object in details
+     *
      * @return - MemoryQuotaInfo carries ram quota specific info
-     * @throws PeerException
      */
     public MemoryQuotaInfo getRamQuotaInfo() throws PeerException;
 
