@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -19,11 +18,9 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.safehaus.subutai.common.environment.Environment;
-import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.metric.Metric;
 import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.common.util.UnitUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
@@ -33,19 +30,17 @@ import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.ui.chart.JFreeChartWrapper;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.server.ui.component.HostTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.data.util.HierarchicalContainer;
-import com.vaadin.event.ItemClickEvent;
-import com.vaadin.server.Resource;
+import com.vaadin.event.FieldEvents;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
@@ -56,8 +51,8 @@ import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 
 public class MonitorForm extends CustomComponent
@@ -81,8 +76,7 @@ public class MonitorForm extends CustomComponent
     protected ExecutorService executorService = Executors.newCachedThreadPool();
     private VerticalLayout chartsLayout;
 
-    //Pay attention these values are initialized in methods, later on will refactor this)
-    private Tree envTree;
+    private Window showProgress;
 
 
     public MonitorForm( ServiceLocator serviceLocator, HostRegistry hostRegistry ) throws NamingException
@@ -93,6 +87,29 @@ public class MonitorForm extends CustomComponent
         environmentManager = serviceLocator.getService( EnvironmentManager.class );
         peerManager = serviceLocator.getService( PeerManager.class );
 
+        // Notify user about ongoing progress
+        Label icon = new Label();
+        icon.setId( "indicator" );
+        icon.setIcon( new ThemeResource( "img/spinner.gif" ) );
+        icon.setContentMode( ContentMode.HTML );
+
+        HorizontalLayout indicatorLayout = new HorizontalLayout();
+        indicatorLayout.addComponent( icon );
+        indicatorLayout.setComponentAlignment( icon, Alignment.TOP_LEFT );
+
+        showProgress = new Window( "", indicatorLayout );
+        showProgress.setModal( true );
+        showProgress.setClosable( false );
+        showProgress.setResizable( false );
+        showProgress.center();
+        showProgress.addFocusListener( new FieldEvents.FocusListener()
+        {
+            @Override
+            public void focus( final FieldEvents.FocusEvent event )
+            {
+                loadMetrics();
+            }
+        } );
 
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
         horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
@@ -104,68 +121,11 @@ public class MonitorForm extends CustomComponent
             @Override
             public void buttonClick( final Button.ClickEvent event )
             {
-                List<Metric> metricList = new ArrayList<Metric>();
-                Set<ContainerHost> localContainerHosts = new HashSet<>();
-                for ( final HostInfo hostInfo : hostTree.getSelectedHosts() )
-                {
-                    try
-                    {
-                        if ( hostTree.getNodeContainer().getParent( hostInfo.getId() ) != null )
-                        {
-
-                            ContainerHost containerHost =
-                                    peerManager.getLocalPeer().getContainerHostById( hostInfo.getId() );
-                            localContainerHosts.add( containerHost );
-                        }
-                        else
-                        {
-                            metricList.add( monitor.getResourceHostMetric(
-                                    peerManager.getLocalPeer().getResourceHostById( hostInfo.getId() ) ) );
-                        }
-                    }
-                    catch ( HostNotFoundException e )
-                    {
-                        LOG.error( "Error getting container host by id", e );
-                    }
-                    catch ( MonitorException e )
-                    {
-                        LOG.error( "Error getting resource host metric.", e );
-                    }
-                }
-                try
-                {
-                    metricList.addAll( monitor.getLocalContainerHostsMetrics( localContainerHosts ) );
-                }
-                catch ( MonitorException e )
-                {
-                    LOG.error( "Error getting container hosts metrics", e );
-                }
-                if ( envTree != null )
-                {
-                    Object[] selectedItems = ( ( Set<Object> ) envTree.getValue() ).toArray();
-                    for ( final Object selectedItem : selectedItems )
-                    {
-                        Item item = envTree.getItem( selectedItem );
-                        if ( envTree.getParent( selectedItem ) != null )
-                        {
-                            ContainerHost containerHost =
-                                    ( ContainerHost ) item.getItemProperty( VALUE_PROPERTY ).getValue();
-                            //                            try
-                            //                            {
-                            //                                metricList.add( monitor.getContainerHostMetrics(
-                            // containerHost ) );
-                            //                            }
-                            //                            catch ( MonitorException e )
-                            //                            {
-                            //                                LOG.error( "Error getting metric for container host", e );
-                            //                            }
-                        }
-                    }
-                }
-                showHostsMetrics( metricList );
+                getUI().addWindow( showProgress );
+                showProgress.focus();
             }
         } );
-        VerticalLayout vLayout = new VerticalLayout( hostTree, getEnvironmentsTree(), getMetricsButton );
+        VerticalLayout vLayout = new VerticalLayout( hostTree, getEnvironmentComboBox(), getMetricsButton );
         horizontalSplit.setFirstComponent( vLayout );
 
         chartsLayout = new VerticalLayout();
@@ -174,14 +134,12 @@ public class MonitorForm extends CustomComponent
         HorizontalLayout controls = new HorizontalLayout();
         controls.setSpacing( true );
 
-        //        chartsLayout.addComponent( controls );
-
 
         controls.addComponent( getResourceHostsButton() );
 
         controls.addComponent( new Label( "Environment:" ) );
 
-        controls.addComponent( getEnvironmentComboBox() );
+        //        controls.addComponent( getEnvironmentComboBox() );
 
         controls.addComponent( getContainerHostsButton() );
 
@@ -232,8 +190,8 @@ public class MonitorForm extends CustomComponent
             }
         } );
 
-        horizontalSplit.setSecondComponent( content );
-        //        horizontalSplit.setSecondComponent( chartsLayout );
+        //        horizontalSplit.setSecondComponent( content );
+        horizontalSplit.setSecondComponent( chartsLayout );
 
         horizontalSplit.setSizeFull();
         setCompositionRoot( horizontalSplit );
@@ -249,125 +207,73 @@ public class MonitorForm extends CustomComponent
     }
 
 
-    private Tree getEnvironmentsTree()
-    {
-        try
-        {
-            envTree = new Tree( "Environment Tree" );
-            envTree.setContainerDataSource( createTreeContent( environmentManager.getEnvironments() ) );
-            envTree.setImmediate( true );
-            envTree.setMultiSelect( true );
-            envTree.setItemCaptionMode( AbstractSelect.ItemCaptionMode.PROPERTY );
-            envTree.setItemCaptionPropertyId( CAPTION_PROPERTY );
-            envTree.setItemIconPropertyId( ICON_PROPERTY );
-            envTree.addItemClickListener( new ItemClickEvent.ItemClickListener()
-            {
-                @Override
-                public void itemClick( final ItemClickEvent event )
-                {
-                    if ( envTree.getParent( event.getItemId()) != null )
-                    {
-                        new Thread( new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                envTree.unselect( event.getItemId() );
-                            }
-                        } ).start();
-
-                    }
-                }
-            } );
-
-            envTree.setItemDescriptionGenerator( new AbstractSelect.ItemDescriptionGenerator()
-            {
-
-                @Override
-                public String generateDescription( Component source, Object itemId, Object propertyId )
-                {
-                    String description = "";
-                    Item item = envTree.getItem( itemId );
-                    if ( envTree.getParent( itemId ) != null )
-                    {
-                        //Be careful with this casting, here I'm sure that my object is ContainerHost type
-                        //To find out object type look into Tree initialization.
-                        ContainerHost containerHost =
-                                ( ContainerHost ) item.getItemProperty( VALUE_PROPERTY ).getValue();
-                        description += String.format( "Hostname: %s <br> ID: %s", containerHost.getHostname(),
-                                containerHost.getId().toString() );
-                    }
-
-                    return description;
-                }
-            } );
-        }
-        catch ( PeerException e )
-        {
-            LOG.error( "Error getting environments/container hosts", e );
-        }
-        return envTree;
-    }
-
-
-    private HierarchicalContainer createTreeContent( Set<Environment> oTrees ) throws PeerException
-    {
-        HierarchicalContainer envHostContainer = new HierarchicalContainer();
-        envHostContainer.addContainerProperty( CAPTION_PROPERTY, String.class, "" );
-        envHostContainer.addContainerProperty( VALUE_PROPERTY, Object.class, "" );
-        envHostContainer
-                .addContainerProperty( ICON_PROPERTY, Resource.class, new ThemeResource( "img/lxc/physical.png" ) );
-
-        new Object()
-        {
-            @SuppressWarnings( "unchecked" )
-            public void put( Set<Environment> data, HierarchicalContainer container ) throws PeerException
-            {
-                for ( Environment env : data )
-                {
-                    UUID envId = env.getId();
-                    if ( !container.containsId( envId ) )
-                    {
-                        container.addItem( envId );
-                        container.getItem( envId ).getItemProperty( CAPTION_PROPERTY ).setValue( env.getName() );
-                        container.getItem( envId ).getItemProperty( VALUE_PROPERTY ).setValue( env );
-
-                        container.setChildrenAllowed( envId, true );
-
-                        Set<ContainerHost> envHosts = env.getContainerHosts();
-                        for ( final ContainerHost envHost : envHosts )
-                        {
-                            if ( !container.containsId( envHost.getId() ) )
-                            {
-                                container.addItem( envHost.getId() );
-                                container.getItem( envHost.getId() ).getItemProperty( CAPTION_PROPERTY )
-                                         .setValue( envHost.getHostname() );
-                                container.getItem( envHost.getId() ).getItemProperty( VALUE_PROPERTY )
-                                         .setValue( envHost );
-                                container.getItem( envHost.getId() ).getItemProperty( ICON_PROPERTY ).setValue(
-                                        envHost.getState() == ContainerHostState.RUNNING ?
-                                        new ThemeResource( "img/lxc/virtual.png" ) :
-                                        new ThemeResource( "img/lxc/virtual_offline.png" ) );
-                                container.setChildrenAllowed( envHost.getId(), false );
-
-                                container.setChildrenAllowed( envHost, false );
-                                container.setParent( envHost.getId(), env.getId() );
-                            }
-                        }
-                    }
-                }
-            }
-        }.put( oTrees, envHostContainer );
-
-        return envHostContainer;
-    }
-
-
     private void showHostsMetrics( Collection<? extends Metric> chartsData )
     {
         chartsLayout.removeAllComponents();
         addCpuMetrics( chartsData );
         addRamMetrics( chartsData );
+        addHomeDiskMetrics( chartsData );
+        addOptDiskMetrics( chartsData );
+        addVarDiskMetrics( chartsData );
+        addRootfsDiskMetrics( chartsData );
+    }
+
+
+    private void loadMetrics()
+    {
+        List<Metric> metricList = new ArrayList<>();
+        Set<ContainerHost> localContainerHosts = new HashSet<>();
+        for ( final HostInfo hostInfo : hostTree.getSelectedHosts() )
+        {
+            try
+            {
+                if ( hostTree.getNodeContainer().getParent( hostInfo.getId() ) != null )
+                {
+
+                    ContainerHost containerHost = peerManager.getLocalPeer().getContainerHostById( hostInfo.getId() );
+                    localContainerHosts.add( containerHost );
+                }
+                else
+                {
+                    ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostById( hostInfo.getId() );
+                    metricList.add( monitor.getResourceHostMetric( resourceHost ) );
+                }
+            }
+            catch ( HostNotFoundException e )
+            {
+                LOG.error( "Error getting container host by id", e );
+            }
+            catch ( MonitorException e )
+            {
+                LOG.error( "Error getting resource host metric.", e );
+            }
+        }
+        if ( localContainerHosts.size() > 0 )
+        {
+            metricList.addAll( monitor.getLocalContainerHostsMetrics( localContainerHosts ) );
+        }
+
+        Environment environment = ( Environment ) environmentCombo.getValue();
+        if ( environment != null )
+        {
+            try
+            {
+                metricList.addAll( monitor.getContainerHostsMetrics( environment ) );
+            }
+            catch ( MonitorException e )
+            {
+                LOG.error( "Error getting environment container hosts metrics", e );
+            }
+        }
+
+        showHostsMetrics( metricList );
+        environmentCombo.setValue( null );
+        Object[] selectedItems = ( ( Set<Object> ) hostTree.getTree().getValue() ).toArray();
+        for ( final Object selectedItem : selectedItems )
+        {
+            hostTree.getTree().unselect( selectedItem );
+        }
+        showProgress.close();
     }
 
 
@@ -378,26 +284,7 @@ public class MonitorForm extends CustomComponent
         {
             cpuHostMetrics.put( hostsMetric.getHost(), hostsMetric.getUsedCpu() );
         }
-
-        try
-        {
-            /* Step - 1: Define the data for the line chart  */
-            DefaultCategoryDataset line_chart_dataset = new DefaultCategoryDataset();
-            for ( final Map.Entry<String, Double> entry : cpuHostMetrics.entrySet() )
-            {
-                line_chart_dataset.addValue( entry.getValue(), "CPU", entry.getKey() );
-            }
-            /* Step -2:Define the JFreeChart object to create line chart */
-            JFreeChart lineChartObject = ChartFactory
-                    .createLineChart( "CPU Metric", "Metric Scale", "Metrics", line_chart_dataset,
-                            PlotOrientation.VERTICAL, true, true, false );
-            JFreeChartWrapper jFreeChartWrapper = new JFreeChartWrapper( lineChartObject );
-            chartsLayout.addComponent( jFreeChartWrapper );
-        }
-        catch ( Exception e )
-        {
-            Notification.show( e.getMessage() );
-        }
+        addMetrics( cpuHostMetrics, "CPU", "CPU Metric", "Metric Scale", "Metrics" );
     }
 
 
@@ -408,18 +295,69 @@ public class MonitorForm extends CustomComponent
         {
             ramHostMetrics.put( hostsMetric.getHost(), hostsMetric.getUsedRam() );
         }
+        addMetrics( ramHostMetrics, "RAM", "RAM Metric", "Metric Scale", "Metrics" );
+    }
 
+
+    private void addHomeDiskMetrics( Collection<? extends Metric> hostMetrics )
+    {
+        Map<String, Double> metrics = new HashMap<>();
+        for ( final Metric hostsMetric : hostMetrics )
+        {
+            metrics.put( hostsMetric.getHost(), hostsMetric.getUsedDiskHome() );
+        }
+        addMetrics( metrics, "Home Folder", "Home disk Metric", "Metric Scale", "Metrics" );
+    }
+
+
+    private void addVarDiskMetrics( Collection<? extends Metric> hostMetrics )
+    {
+        Map<String, Double> metrics = new HashMap<>();
+        for ( final Metric hostsMetric : hostMetrics )
+        {
+            metrics.put( hostsMetric.getHost(), hostsMetric.getUsedDiskVar() );
+        }
+        addMetrics( metrics, "Var folder", "Var disk metric", "Metric Scale", "Metrics" );
+    }
+
+
+    private void addOptDiskMetrics( Collection<? extends Metric> hostMetrics )
+    {
+        Map<String, Double> metrics = new HashMap<>();
+        for ( final Metric hostsMetric : hostMetrics )
+        {
+            metrics.put( hostsMetric.getHost(), hostsMetric.getUsedDiskOpt() );
+        }
+        addMetrics( metrics, "Opt folder", "Opt disk metric", "Metric Scale", "Metrics" );
+    }
+
+
+    private void addRootfsDiskMetrics( Collection<? extends Metric> hostMetrics )
+    {
+        Map<String, Double> metrics = new HashMap<>();
+        for ( final Metric hostsMetric : hostMetrics )
+        {
+            metrics.put( hostsMetric.getHost(), hostsMetric.getUsedDiskVar() );
+        }
+        addMetrics( metrics, "Rootfs folder", "Rootfs disk metric", "Metric Scale", "Metrics" );
+    }
+
+
+    private void addMetrics( Map<String, Double> values, String rowKey, String chartTitle, String categoryAxisLabel,
+                             String valueAxisLabel )
+    {
         try
         {
             /* Step - 1: Define the data for the line chart  */
             DefaultCategoryDataset line_chart_dataset = new DefaultCategoryDataset();
-            for ( final Map.Entry<String, Double> entry : ramHostMetrics.entrySet() )
+            for ( final Map.Entry<String, Double> entry : values.entrySet() )
             {
-                line_chart_dataset.addValue( entry.getValue(), "RAM", entry.getKey() );
+                line_chart_dataset.addValue( entry.getValue(), rowKey,
+                        entry.getKey() + "\n" + String.valueOf( entry.getValue() ) );
             }
             /* Step -2:Define the JFreeChart object to create line chart */
             JFreeChart lineChartObject = ChartFactory
-                    .createLineChart( "RAM Metric", "Metric Scale", "Metrics", line_chart_dataset,
+                    .createBarChart( chartTitle, categoryAxisLabel, valueAxisLabel, line_chart_dataset,
                             PlotOrientation.VERTICAL, true, true, false );
             JFreeChartWrapper jFreeChartWrapper = new JFreeChartWrapper( lineChartObject );
             chartsLayout.addComponent( jFreeChartWrapper );

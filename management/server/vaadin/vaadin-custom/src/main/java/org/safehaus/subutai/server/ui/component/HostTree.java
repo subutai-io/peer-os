@@ -118,6 +118,12 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
     }
 
 
+    public Tree getTree()
+    {
+        return tree;
+    }
+
+
     public HierarchicalContainer getNodeContainer()
     {
         container = new HierarchicalContainer();
