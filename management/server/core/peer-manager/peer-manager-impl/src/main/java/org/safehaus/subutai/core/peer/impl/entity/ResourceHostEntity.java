@@ -179,7 +179,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                         .withTimeout( 1 ).daemon();
         try
         {
-            execute( requestBuilder );
+            commandUtil.execute( requestBuilder, this );
         }
         catch ( CommandException e )
         {
