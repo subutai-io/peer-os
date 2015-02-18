@@ -1071,7 +1071,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 ( ( ResourceHostEntity ) resourceHost ).addContainerHost( ( ContainerHostEntity ) containerHost );
                 containerHostDataService.persist( ( ContainerHostEntity ) containerHost );
             }
-            ( ( AbstractSubutaiHost ) containerHost ).updateHostInfo( containerHostInfo );
+            ( ( ContainerHostEntity ) containerHost ).updateHostInfo( containerHostInfo );
         }
     }
 
