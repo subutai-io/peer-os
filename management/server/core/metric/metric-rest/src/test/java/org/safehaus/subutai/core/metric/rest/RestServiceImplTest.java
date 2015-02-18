@@ -90,7 +90,7 @@ public class RestServiceImplTest
     @Test
     public void testGetResourceHostMetricsException() throws Exception
     {
-        when( monitor.getResourceHostsMetrics() ).thenThrow( new MonitorException( "" ) );
+        when( monitor.getResourceHostsMetrics() ).thenThrow( new RuntimeException( "" ) );
 
         Response response = restService.getResourceHostsMetrics();
 

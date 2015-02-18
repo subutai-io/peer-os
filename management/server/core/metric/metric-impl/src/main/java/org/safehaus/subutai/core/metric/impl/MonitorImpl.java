@@ -15,6 +15,7 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.exception.DaoException;
+import org.safehaus.subutai.common.metric.OwnerResourceUsage;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.peer.ContainerHost;
@@ -139,7 +140,6 @@ public class MonitorImpl implements Monitor
 
     @Override
     public Set<ContainerHostMetric> getLocalContainerHostsMetrics( final Set<ContainerHost> containerHosts )
-            throws MonitorException
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
 
@@ -575,6 +575,59 @@ public class MonitorImpl implements Monitor
                     containerHost.getHostname(), processPid ), e );
             throw new MonitorException( e );
         }
+    }
+
+
+    @Override
+    public OwnerResourceUsage getOwnerResourceUsage( final UUID ownerId ) throws MonitorException
+    {
+        Preconditions.checkNotNull( ownerId, "'Invalid owner id" );
+
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        Set<ContainerGroup> containerGroups = localPeer.findContainerGroupsByOwnerId( ownerId );
+
+        Set<ContainerHost> ownerContainers = Sets.newHashSet();
+        for ( ContainerGroup containerGroup : containerGroups )
+        {
+            for ( UUID containerId : containerGroup.getContainerIds() )
+            {
+                try
+                {
+                    ownerContainers.add( localPeer.getContainerHostById( containerId ) );
+                }
+                catch ( HostNotFoundException e )
+                {
+                    LOG.warn( String.format( "Host not found by id %s", containerId ), e );
+                }
+            }
+        }
+
+        if ( ownerContainers.isEmpty() )
+        {
+            throw new MonitorException( String.format( "Could not obtain owner container hosts" ) );
+        }
+
+        Set<ContainerHostMetric> ownerContainerMetrics = getLocalContainerHostsMetrics( ownerContainers );
+
+        double usedRam = 0;
+        double usedCpu = 0;
+        double usedDiskVar = 0;
+        double usedDiskHome = 0;
+        double usedDiskOpt = 0;
+        double usedDiskRootFs = 0;
+
+        for ( ContainerHostMetric ownerContainerMetric : ownerContainerMetrics )
+        {
+            usedRam += ownerContainerMetric.getUsedRam();
+            usedCpu += ownerContainerMetric.getUsedCpu();
+            usedDiskHome += ownerContainerMetric.getUsedDiskHome();
+            usedDiskOpt += ownerContainerMetric.getUsedDiskOpt();
+            usedDiskRootFs += ownerContainerMetric.getUsedDiskRootfs();
+            usedDiskVar += ownerContainerMetric.getUsedDiskVar();
+        }
+
+
+        return new OwnerResourceUsage( usedRam, usedCpu, usedDiskRootFs, usedDiskVar, usedDiskHome, usedDiskOpt );
     }
 
 

@@ -8,12 +8,12 @@ import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
-import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +49,7 @@ public class RestServiceImpl implements RestService
             Set<ResourceHostMetric> metrics = monitor.getResourceHostsMetrics();
             return Response.ok( JsonUtil.toJson( metrics ) ).build();
         }
-        catch ( MonitorException e )
+        catch ( Exception e )
         {
             LOG.error( "Error in getResourceHostsMetrics", e );
             return Response.serverError().entity( e ).build();

@@ -253,7 +253,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         }
     }
 
-
+    //TODO wrap all parameters into request object
     public Set<HostInfoModel> createContainers( final UUID environmentId, final UUID initiatorPeerId,
                                                 final UUID ownerId, final List<Template> templates,
                                                 final int numberOfContainers, final String strategyId,
@@ -462,6 +462,28 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         }
 
         throw new ContainerGroupNotFoundException();
+    }
+
+
+    @Override
+    public Set<ContainerGroup> findContainerGroupsByOwnerId( final UUID ownerId )
+    {
+        Preconditions.checkNotNull( ownerId, "Invalid owner id" );
+
+        Set<ContainerGroup> result = Sets.newHashSet();
+
+        List<ContainerGroupEntity> containerGroups = ( List<ContainerGroupEntity> ) containerGroupDataService.getAll();
+
+        for ( ContainerGroupEntity containerGroup : containerGroups )
+        {
+
+            if ( ownerId.equals( containerGroup.getOwnerId() ) )
+            {
+                result.add( containerGroup );
+            }
+        }
+
+        return result;
     }
 
 
