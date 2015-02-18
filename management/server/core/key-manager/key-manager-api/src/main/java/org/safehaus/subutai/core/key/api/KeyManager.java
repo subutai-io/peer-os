@@ -31,6 +31,18 @@ public interface KeyManager
     public String readKey( Host host, String keyId ) throws KeyManagerException;
 
     /**
+     * Returns a X.509 self-signed certificate content of a key ( generates it if there is no certificate created with
+     * that given key id in the keyring)
+     *
+     * @param host to execute command at
+     * @param keyId - id of pgp key
+     *
+     * @return - content of certificate
+     */
+    public String getCertificate( Host host, String keyId ) throws KeyManagerException;
+
+
+    /**
      * Returns PGP public key as SSH key
      *
      * @param host to execute command at

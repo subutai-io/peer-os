@@ -98,4 +98,13 @@ public interface LocalPeer extends Peer
      */
     public ContainerGroup findContainerGroupByEnvironmentId( UUID environmentId )
             throws ContainerGroupNotFoundException;
+
+    /**
+     * Returns set of container groups by owner id
+     *
+     * @param ownerId - id of owner
+     *
+     * @return - set of {@code ContainerGroup}
+     */
+    public Set<ContainerGroup> findContainerGroupsByOwnerId( UUID ownerId );
 }

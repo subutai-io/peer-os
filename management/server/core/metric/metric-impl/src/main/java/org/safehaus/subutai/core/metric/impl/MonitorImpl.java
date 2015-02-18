@@ -15,7 +15,9 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.exception.DaoException;
+import org.safehaus.subutai.common.metric.OwnerResourceUsage;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
@@ -28,7 +30,6 @@ import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.MonitoringSettings;
-import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.core.peer.api.ContainerGroup;
 import org.safehaus.subutai.core.peer.api.ContainerGroupNotFoundException;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
@@ -134,6 +135,44 @@ public class MonitorImpl implements Monitor
         }
 
         return metrics;
+    }
+
+
+    @Override
+    public Set<ContainerHostMetric> getLocalContainerHostsMetrics( final Set<ContainerHost> containerHosts )
+    {
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
+
+        Set<ContainerHostMetricImpl> metrics = Sets.newHashSet();
+
+        LocalPeer localPeer = peerManager.getLocalPeer();
+
+        for ( ContainerHost containerHost : containerHosts )
+        {
+            try
+            {
+                Preconditions.checkArgument( containerHost.isLocal(),
+                        String.format( "Container %s is not local", containerHost.getHostname() ) );
+
+                ContainerGroup containerGroup = localPeer.findContainerGroupByContainerId( containerHost.getId() );
+
+                //get container's resource host
+                ResourceHost resourceHost = localPeer.getResourceHostByContainerId( containerHost.getId() );
+
+                //get metric
+                addLocalContainerHostMetric( containerGroup.getEnvironmentId(), resourceHost,
+                        resourceHost.getContainerHostById( containerHost.getId() ), metrics );
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( String.format( "Error obtaining metric for container %s", containerHost.getHostname() ), e );
+            }
+        }
+
+        Set<ContainerHostMetric> result = Sets.newHashSet();
+        result.addAll( metrics );
+
+        return result;
     }
 
 
@@ -536,6 +575,59 @@ public class MonitorImpl implements Monitor
                     containerHost.getHostname(), processPid ), e );
             throw new MonitorException( e );
         }
+    }
+
+
+    @Override
+    public OwnerResourceUsage getOwnerResourceUsage( final UUID ownerId ) throws MonitorException
+    {
+        Preconditions.checkNotNull( ownerId, "'Invalid owner id" );
+
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        Set<ContainerGroup> containerGroups = localPeer.findContainerGroupsByOwnerId( ownerId );
+
+        Set<ContainerHost> ownerContainers = Sets.newHashSet();
+        for ( ContainerGroup containerGroup : containerGroups )
+        {
+            for ( UUID containerId : containerGroup.getContainerIds() )
+            {
+                try
+                {
+                    ownerContainers.add( localPeer.getContainerHostById( containerId ) );
+                }
+                catch ( HostNotFoundException e )
+                {
+                    LOG.warn( String.format( "Host not found by id %s", containerId ), e );
+                }
+            }
+        }
+
+        if ( ownerContainers.isEmpty() )
+        {
+            throw new MonitorException( String.format( "Could not obtain owner container hosts" ) );
+        }
+
+        Set<ContainerHostMetric> ownerContainerMetrics = getLocalContainerHostsMetrics( ownerContainers );
+
+        double usedRam = 0;
+        double usedCpu = 0;
+        double usedDiskVar = 0;
+        double usedDiskHome = 0;
+        double usedDiskOpt = 0;
+        double usedDiskRootFs = 0;
+
+        for ( ContainerHostMetric ownerContainerMetric : ownerContainerMetrics )
+        {
+            usedRam += ownerContainerMetric.getUsedRam();
+            usedCpu += ownerContainerMetric.getUsedCpu();
+            usedDiskHome += ownerContainerMetric.getUsedDiskHome();
+            usedDiskOpt += ownerContainerMetric.getUsedDiskOpt();
+            usedDiskRootFs += ownerContainerMetric.getUsedDiskRootfs();
+            usedDiskVar += ownerContainerMetric.getUsedDiskVar();
+        }
+
+
+        return new OwnerResourceUsage( usedRam, usedCpu, usedDiskRootFs, usedDiskVar, usedDiskHome, usedDiskOpt );
     }
 
 

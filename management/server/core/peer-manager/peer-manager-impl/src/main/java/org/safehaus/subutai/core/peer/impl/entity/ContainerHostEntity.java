@@ -144,6 +144,13 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
+    @Override
+    public boolean isLocal()
+    {
+        return true;
+    }
+
+
     public ContainerHostState getState()
     {
         return state;

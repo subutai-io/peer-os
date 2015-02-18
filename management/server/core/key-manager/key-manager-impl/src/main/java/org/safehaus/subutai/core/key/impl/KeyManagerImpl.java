@@ -116,6 +116,16 @@ public class KeyManagerImpl implements KeyManager
 
 
     @Override
+    public String getCertificate( final Host host, final String keyId ) throws KeyManagerException
+    {
+        Preconditions.checkNotNull( host, "Invalid host" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
+
+        return execute( commands.getGenerateCertificateCommand( keyId ), host );
+    }
+
+
+    @Override
     public String readKey( final Host host, final String keyId ) throws KeyManagerException
     {
         Preconditions.checkNotNull( host, "Invalid host" );
