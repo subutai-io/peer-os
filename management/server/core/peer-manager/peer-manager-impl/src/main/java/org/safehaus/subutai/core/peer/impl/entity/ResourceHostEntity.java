@@ -55,10 +55,10 @@ import com.google.common.collect.Sets;
 @Access( AccessType.FIELD )
 public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceHost
 {
-    private static final int DESTROY_TIMEOUT = 180;
+    private static final int CONNECT_TIMEOUT = 300;
+
     protected static final Logger LOG = LoggerFactory.getLogger( ResourceHostEntity.class );
     private static final Pattern LXC_STATE_PATTERN = Pattern.compile( "State:(\\s*)(.*)" );
-    private static final Pattern LOAD_AVERAGE_PATTERN = Pattern.compile( "load average: (.*)" );
 
     @OneToMany( mappedBy = "parent", fetch = FetchType.EAGER,
             targetEntity = ContainerHostEntity.class )
@@ -175,7 +175,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         RequestBuilder requestBuilder =
                 new RequestBuilder( String.format( "/usr/bin/lxc-start -n %s -d", containerHost.getHostname() ) )
-                        .withTimeout( 60 ).daemon();
+                        .withTimeout( 1 ).daemon();
         try
         {
             execute( requestBuilder );
@@ -183,6 +183,21 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         catch ( CommandException e )
         {
             throw new ResourceHostException( "Error on starting container", e );
+        }
+
+        //wait container connection
+        long ts = System.currentTimeMillis();
+        while ( System.currentTimeMillis() - ts < CONNECT_TIMEOUT * 1000 && !ContainerState.RUNNING
+                .equals( getContainerHostState( containerHost ) ) )
+        {
+            try
+            {
+                Thread.sleep( 100 );
+            }
+            catch ( InterruptedException e )
+            {
+                throw new ResourceHostException( e );
+            }
         }
 
         if ( !ContainerState.RUNNING.equals( getContainerHostState( containerHost ) ) )
@@ -209,7 +224,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         RequestBuilder requestBuilder =
                 new RequestBuilder( String.format( "/usr/bin/lxc-stop -n %s", containerHost.getHostname() ) )
-                        .withTimeout( 60 );
+                        .withTimeout( 120 );
         try
         {
             commandUtil.execute( requestBuilder, this );
@@ -500,7 +515,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         LIST_TEMPLATES( "subutai list -t %s" ),
         CLONE( "subutai clone %s %s", 1, true ),
-        DESTROY( "subutai destroy %s", DESTROY_TIMEOUT, true ),
         IMPORT( "subutai import %s" ),
         PROMOTE( "promote %s" ),
         EXPORT( "subutai export %s" ),
