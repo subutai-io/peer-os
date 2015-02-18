@@ -292,13 +292,67 @@ sign_key(){
 }
 
 
-# sends the key to hub after sign operation
+# sends the key to keyserver
 # parameters:
 #   1) key id
-#   2) key_server url (probably hub default)
+#   2) key_server -optional ( default management keyserver )
 send(){
-  msg_info "send"
-  pulic_key_id=$1
+  params=`getopt -o s:  --long server: -n '$0' -- "$@"`
+  eval set -- "$params"
+  local keyserver="$SUBUTAI_REST_IP"
+  # extract options and their arguments into variables.
+  while true ; do
+    case "$1" in
+      -s | --server)
+         keyserver="$2"
+         shift 3
+         break
+         ;;
+      --)
+        shift;
+        break
+        ;;
+      *)
+        echo "Invalid switch!" 
+        exit 1
+        ;;
+    esac
+  done
+  key_id=$1
+  assert_key_exists $key_id
+  gpg2 --keyserver $keyserver --send-keys $key_id # > /dev/null 2>&1
+}
+
+
+# receives the key from keyserver 
+# parameters:
+#   1) key id
+#   2) key_server -optional ( default management key server )
+receive(){
+  params=`getopt -o s:  --long server: -n '$0' -- "$@"`
+  eval set -- "$params"
+  local keyserver="$SUBUTAI_REST_IP"
+  # extract options and their arguments into variables.
+  while true ; do
+    case "$1" in
+      -s | --server)
+         keyserver="$2"
+         shift 3
+         break
+         ;;
+      --)
+        shift;
+        break
+        ;;
+      *)
+        echo "Invalid switch!" 
+        exit 1
+        ;;
+    esac
+  done
+  key_id=$1
+  msg_info "receiving key from $keyserver"
+  gpg2 --keyserver gw.intra.lan --recv-keys $key_id # > /dev/null 2&1
 }
 
 
