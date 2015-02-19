@@ -56,7 +56,7 @@ function clone {
   local environmentId=""
   local monitor_enabled="false"
   shift_amount=0;
-  while getopts ":e:a:N:M:m" opt; do
+  while getopts ":e:a:N:M:m:i:" opt; do
     case $opt in
       e)
         environmentId=$OPTARG
@@ -78,7 +78,7 @@ function clone {
         ;;
       i)
 	network_interface_enabled="true"
-	interfaceProperties="$OPTARG"
+ 	interfaceProperties="$OPTARG"
 	;;
       \?)
         msg_error "Unrecognized option -$OPTARG"
@@ -143,8 +143,8 @@ function clone {
 
   if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
 
-  if [ $network_interface_enabled == "true" ]; then
-     subutai network $child -a $interfaceProperties #"192.168.3.2/24 100" varible should be like this
+  if [ "$network_interface_enabled" == "true" ]; then
+     subutai network $child -s ${interfaceProperties//\"} #"192.168.3.2/24 100" varible should be like this
   fi
 }
 
