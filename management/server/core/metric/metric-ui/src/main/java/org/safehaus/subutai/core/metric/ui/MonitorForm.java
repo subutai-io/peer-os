@@ -231,18 +231,29 @@ public class MonitorForm extends CustomComponent
                 if ( hostTree.getNodeContainer().getParent( hostInfo.getId() ) != null )
                 {
 
-                    ContainerHost containerHost = peerManager.getLocalPeer().getContainerHostById( hostInfo.getId() );
-                    localContainerHosts.add( containerHost );
+                    try
+                    {
+                        ContainerHost containerHost =
+                                peerManager.getLocalPeer().getContainerHostById( hostInfo.getId() );
+                        localContainerHosts.add( containerHost );
+                    }
+                    catch ( HostNotFoundException e )
+                    {
+                        LOG.error( "Error getting container host by id " + hostInfo.getId().toString(), e );
+                    }
                 }
                 else
                 {
-                    ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostById( hostInfo.getId() );
-                    metricList.add( monitor.getResourceHostMetric( resourceHost ) );
+                    try
+                    {
+                        ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostById( hostInfo.getId() );
+                        metricList.add( monitor.getResourceHostMetric( resourceHost ) );
+                    }
+                    catch ( HostNotFoundException e )
+                    {
+                        LOG.info( "Error getting resource host by id " + hostInfo.getId().toString(), e );
+                    }
                 }
-            }
-            catch ( HostNotFoundException e )
-            {
-                LOG.error( "Error getting container host by id", e );
             }
             catch ( MonitorException e )
             {
@@ -267,6 +278,12 @@ public class MonitorForm extends CustomComponent
             }
         }
 
+        if ( metricList.size() < 1 )
+        {
+            Notification.show( "Select host to draw metrics", Notification.Type.WARNING_MESSAGE );
+            return;
+        }
+
         showHostsMetrics( metricList );
         environmentCombo.setValue( null );
         Object[] selectedItems = ( ( Set<Object> ) hostTree.getTree().getValue() ).toArray();
@@ -285,7 +302,7 @@ public class MonitorForm extends CustomComponent
         {
             cpuHostMetrics.put( hostsMetric.getHost(), hostsMetric.getUsedCpu() );
         }
-        addMetrics( cpuHostMetrics, "CPU", "CPU Metric", "Host(s)", "Metrics scale" );
+        addMetrics( cpuHostMetrics, "CPU", "CPU Metric(nanoseconds)", "Host(s)", "Metrics scale" );
     }
 
 
@@ -296,7 +313,7 @@ public class MonitorForm extends CustomComponent
         {
             ramHostMetrics.put( hostsMetric.getHost(), hostsMetric.getUsedRam() );
         }
-        addMetrics( ramHostMetrics, "RAM", "RAM Metric", "Host(s)", "Metrics scale" );
+        addMetrics( ramHostMetrics, "RAM", "RAM Metric(MB)", "Host(s)", "Metrics scale" );
     }
 
 
@@ -421,7 +438,7 @@ public class MonitorForm extends CustomComponent
 
             /* Step -2:Define the JFreeChart object to create line chart */
             JFreeChart lineChartObject = ChartFactory
-                    .createBarChart( "Disk Metrics", "Host(s) directories", "Disk Scale", line_chart_dataset,
+                    .createBarChart( "Disk Metrics(MB)", "Host(s) directories", "Disk Scale", line_chart_dataset,
                             PlotOrientation.VERTICAL, true, true, false );
             JFreeChartWrapper jFreeChartWrapper = new JFreeChartWrapper( lineChartObject );
             chartsLayout.addComponent( jFreeChartWrapper );
