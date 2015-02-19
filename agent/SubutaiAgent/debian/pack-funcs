@@ -107,7 +107,6 @@ getSourcesToRelevantDirectories() {
 }
 
 createDebian() {
-	ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
 	fileName=`ls | grep subutai|  awk '{print $1}' | head -1`
 	lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
 	lineVersion=$(sed $lineNumberVersion!d $fileName/DEBIAN/control)
@@ -126,10 +125,6 @@ createDebian() {
 
 	#when deb is created copy new deb to Automation_ISO/Packages folder.
 	cp $packageName.deb /var/lib/jenkins/Automation/Automation_ISO/Packages/agent/
-	if [ -f $ISOPATH/subutai-agent_*.deb ] ; then	
-		rm -f "$ISOPATH/subutai-agent_*_amd64.deb"
-	fi
-	cp $packageName.deb $ISOPATH
 }
 
 
