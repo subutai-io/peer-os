@@ -87,8 +87,6 @@ public interface NetworkManager
     public void removeVniVLanMapping( String tunnelName, int vni, int vLanId ) throws NetworkManagerException;
 
 
-    public NetworkManager getRemoteManager( String host, int port );
-
     /**
      * Enables passwordless ssh access between containers
      *

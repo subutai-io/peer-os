@@ -18,7 +18,7 @@ public class Common
 
     //constants that can be converted into settings in the future
     public static final String MASTER_TEMPLATE_NAME = "master";
-    public static final String MANAGEMENT_AGENT_HOSTNAME = "management";
+    public static final String MANAGEMENT_HOSTNAME = "management";
     public static final String GIT_REPO_URL = "git@gw.intra.lan:/opt/git/project.git";
     public static final String APT_REPO = "trusty";
     public static final String APT_REPO_PATH = "/repo/ksks/";

@@ -114,7 +114,7 @@ public class MonitorForm extends CustomComponent
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
         horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
 
-        hostTree = new HostTree( hostRegistry );
+        hostTree = new HostTree( hostRegistry, true );
         Button getMetricsButton = new Button( "Get Metrics" );
         getMetricsButton.addClickListener( new Button.ClickListener()
         {

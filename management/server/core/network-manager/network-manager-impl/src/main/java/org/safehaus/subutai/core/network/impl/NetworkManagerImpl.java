@@ -16,7 +16,6 @@ import org.safehaus.subutai.core.network.api.N2NConnection;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.network.api.Tunnel;
-import org.safehaus.subutai.core.network.impl.remote.RemoteNetworkManager;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
@@ -192,13 +191,6 @@ public class NetworkManagerImpl implements NetworkManager
         {
             throw new NetworkManagerException( String.format( "Network info of %s not found", containerName ) );
         }
-    }
-
-
-    @Override
-    public NetworkManager getRemoteManager( String host, int port )
-    {
-        return new RemoteNetworkManager( host, port );
     }
 
 
