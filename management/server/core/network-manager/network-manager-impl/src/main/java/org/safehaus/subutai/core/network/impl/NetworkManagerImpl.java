@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.network.impl;
 
 
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,6 +17,7 @@ import org.safehaus.subutai.core.network.api.N2NConnection;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.network.api.Tunnel;
+import org.safehaus.subutai.core.network.api.VniVlanMapping;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
@@ -29,6 +31,7 @@ import com.google.common.collect.Sets;
  */
 public class NetworkManagerImpl implements NetworkManager
 {
+    private static final String LINE_DELIMITER = "\n";
     private final PeerManager peerManager;
     protected Commands commands = new Commands();
 
@@ -43,12 +46,12 @@ public class NetworkManagerImpl implements NetworkManager
 
     @Override
     public void setupN2NConnection( final String superNodeIp, final int superNodePort, final String interfaceName,
-                                    final String communityName, final String localIp, final String pathToKeyFile )
-            throws NetworkManagerException
+                                    final String communityName, final String localIp, final String keyType,
+                                    final String pathToKeyFile ) throws NetworkManagerException
     {
         execute( getManagementHost(),
                 commands.getSetupN2NConnectionCommand( superNodeIp, superNodePort, interfaceName, communityName,
-                        localIp, pathToKeyFile ) );
+                        localIp, keyType, pathToKeyFile ) );
     }
 
 
@@ -108,15 +111,24 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public Set<Tunnel> listTunnels() throws NetworkManagerException
     {
+        Set<Tunnel> tunnels = Sets.newHashSet();
+
         CommandResult result = execute( getManagementHost(), commands.getListTunnelsCommand() );
 
-        Set<Tunnel> tunnels = Sets.newHashSet();
-        Pattern pattern = Pattern.compile( "(tunnel.+)-(.+)" );
-        Matcher m = pattern.matcher( result.getStdOut() );
-        while ( m.find() && m.groupCount() == 2 )
+        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
+
+        Pattern p = Pattern.compile( "(tunnel.+)-(.+)" );
+
+        while ( st.hasMoreTokens() )
         {
-            tunnels.add( new TunnelImpl( m.group( 1 ), m.group( 2 ) ) );
+            Matcher m = p.matcher( st.nextToken() );
+
+            if ( m.find() && m.groupCount() == 2 )
+            {
+                tunnels.add( new TunnelImpl( m.group( 1 ), m.group( 2 ) ) );
+            }
         }
+
         return tunnels;
     }
 
@@ -124,17 +136,25 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public Set<N2NConnection> listN2NConnections() throws NetworkManagerException
     {
+        Set<N2NConnection> connections = Sets.newHashSet();
+
         CommandResult result = execute( getManagementHost(), commands.getListN2NConnectionsCommand() );
 
-        Set<N2NConnection> connections = Sets.newHashSet();
-        Pattern pattern = Pattern.compile(
+        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
+
+        Pattern p = Pattern.compile(
                 "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(\\d+)"
                         + "\\s+(\\w+)\\s+(\\w+)" );
-        Matcher m = pattern.matcher( result.getStdOut() );
-        while ( m.find() && m.groupCount() == 5 )
+
+        while ( st.hasMoreTokens() )
         {
-            connections.add( new N2NConnectionImpl( m.group( 1 ), m.group( 2 ), Integer.parseInt( m.group( 3 ) ),
-                    m.group( 4 ), m.group( 5 ) ) );
+            Matcher m = p.matcher( st.nextToken() );
+
+            if ( m.find() && m.groupCount() == 5 )
+            {
+                connections.add( new N2NConnectionImpl( m.group( 1 ), m.group( 2 ), Integer.parseInt( m.group( 3 ) ),
+                        m.group( 4 ), m.group( 5 ) ) );
+            }
         }
 
         return connections;
@@ -154,6 +174,32 @@ public class NetworkManagerImpl implements NetworkManager
             throws NetworkManagerException
     {
         execute( getManagementHost(), commands.getRemoveVniVlanMappingCommand( tunnelName, vni, vLanId ) );
+    }
+
+
+    @Override
+    public Set<VniVlanMapping> getVniVlanMappings() throws NetworkManagerException
+    {
+        Set<VniVlanMapping> mappings = Sets.newHashSet();
+
+        CommandResult result = execute( getManagementHost(), commands.getListVniVlanMappingsCommand() );
+
+        Pattern p = Pattern.compile( "(tunnel.+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)" );
+
+        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
+
+        while ( st.hasMoreTokens() )
+        {
+            Matcher m = p.matcher( st.nextToken() );
+
+            if ( m.find() && m.groupCount() == 3 )
+            {
+                mappings.add( new VniVlanMappingImpl( m.group( 1 ), Long.parseLong( m.group( 2 ) ),
+                        Integer.parseInt( m.group( 3 ) ) ) );
+            }
+        }
+
+        return mappings;
     }
 
 

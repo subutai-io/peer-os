@@ -26,7 +26,8 @@ public interface NetworkRestService
 
     @POST
     @Path( "n2n" )
-    Response setupN2NConnection( @FormParam( "n2n" ) String n2n, @FormParam( "keyFile" ) String keyFilePath );
+    Response setupN2NConnection( @FormParam( "n2n" ) String n2n, @FormParam( "keyType" ) String keyType,
+                                 @FormParam( "keyFile" ) String keyFilePath );
 
 
     @DELETE

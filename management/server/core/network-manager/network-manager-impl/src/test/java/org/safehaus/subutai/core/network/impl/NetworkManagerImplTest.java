@@ -63,6 +63,7 @@ public class NetworkManagerImplTest
     private static final String LIST_TUNNELS_OUTPUT = "List of Tunnels\n" + "--------\n" + "tunnel1-10.2.1.3";
     private static final String LIST_N2N_OUTPUT = "LocalPeerIP ServerIP Port LocalInterface Community\n"
             + "10.1.2.3    212.167.154.154 5000    com community1 ";
+    private static final String KEY_TYPE = "key type";
     private static final String PATH_TO_KEY_FILE = "/path/to/key/file";
 
     @Mock
@@ -112,13 +113,14 @@ public class NetworkManagerImplTest
     @Test
     public void testSetupN2NConnection() throws Exception
     {
-        networkManager.setupN2NConnection( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME, LOCAL_IP,
-                PATH_TO_KEY_FILE );
+        networkManager
+                .setupN2NConnection( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME, LOCAL_IP, KEY_TYPE,
+                        PATH_TO_KEY_FILE );
 
         verify( localPeer ).getManagementHost();
         verify( commands )
                 .getSetupN2NConnectionCommand( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME, LOCAL_IP,
-                        PATH_TO_KEY_FILE );
+                        KEY_TYPE, PATH_TO_KEY_FILE );
         verify( managementHost ).execute( any( RequestBuilder.class ) );
     }
 

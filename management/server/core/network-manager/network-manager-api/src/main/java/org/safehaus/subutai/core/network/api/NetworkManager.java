@@ -12,7 +12,7 @@ public interface NetworkManager
      * Sets up an N2N connection to super node on management host
      */
     public void setupN2NConnection( String superNodeIp, int superNodePort, String interfaceName, String communityName,
-                                    String localIp, String pathToKeyFile ) throws NetworkManagerException;
+                                    String localIp, String keyType, String pathToKeyFile ) throws NetworkManagerException;
 
     /**
      * Removes N2N connection to super node on management host
@@ -80,6 +80,8 @@ public interface NetworkManager
      * Sets up VNI-VLAN mapping on management host
      */
     public void setupVniVLanMapping( String tunnelName, int vni, int vLanId ) throws NetworkManagerException;
+
+    public Set<VniVlanMapping> getVniVlanMappings() throws NetworkManagerException;
 
     /**
      * Removes VNI-VLAN mapping on management host

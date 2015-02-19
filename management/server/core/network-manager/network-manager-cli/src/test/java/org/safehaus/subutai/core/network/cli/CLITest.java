@@ -162,7 +162,7 @@ public class CLITest extends SystemOutRedirectTest
 
         doThrow( exception ).when( networkManager )
                             .setupN2NConnection( anyString(), anyInt(), anyString(), anyString(), anyString(),
-                                    anyString() );
+                                    anyString() , anyString());
 
         command.doExecute();
 

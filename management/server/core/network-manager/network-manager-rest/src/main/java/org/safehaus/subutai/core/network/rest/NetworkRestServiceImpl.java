@@ -55,13 +55,14 @@ public class NetworkRestServiceImpl implements NetworkRestService
 
 
     @Override
-    public Response setupN2NConnection( String n2n, String keyFilePath )
+    public Response setupN2NConnection( String n2n, String keyType, String keyFilePath )
     {
         try
         {
             N2NConnection n2nConn = JsonUtil.GSON.fromJson( n2n, N2NConnectionImpl.class );
             networkManager.setupN2NConnection( n2nConn.getSuperNodeIp(), n2nConn.getSuperNodePort(),
-                    n2nConn.getInterfaceName(), n2nConn.getCommunityName(), n2nConn.getLocalIp(), keyFilePath );
+                    n2nConn.getInterfaceName(), n2nConn.getCommunityName(), n2nConn.getLocalIp(), keyType,
+                    keyFilePath );
             return Response.ok().build();
         }
         catch ( NetworkManagerException ex )
