@@ -285,7 +285,7 @@ public class MonitorForm extends CustomComponent
         {
             cpuHostMetrics.put( hostsMetric.getHost(), hostsMetric.getUsedCpu() );
         }
-        addMetrics( cpuHostMetrics, "CPU", "CPU Metric", "Metric Scale", "Metrics" );
+        addMetrics( cpuHostMetrics, "CPU", "CPU Metric", "Host(s)", "Metrics scale" );
     }
 
 
@@ -296,7 +296,7 @@ public class MonitorForm extends CustomComponent
         {
             ramHostMetrics.put( hostsMetric.getHost(), hostsMetric.getUsedRam() );
         }
-        addMetrics( ramHostMetrics, "RAM", "RAM Metric", "Metric Scale", "Metrics" );
+        addMetrics( ramHostMetrics, "RAM", "RAM Metric", "Host(s)", "Metrics scale" );
     }
 
 
@@ -421,7 +421,7 @@ public class MonitorForm extends CustomComponent
 
             /* Step -2:Define the JFreeChart object to create line chart */
             JFreeChart lineChartObject = ChartFactory
-                    .createBarChart( "Disk Metrics", "Disk Scale", "Directories", line_chart_dataset,
+                    .createBarChart( "Disk Metrics", "Host(s) directories", "Disk Scale", line_chart_dataset,
                             PlotOrientation.VERTICAL, true, true, false );
             JFreeChartWrapper jFreeChartWrapper = new JFreeChartWrapper( lineChartObject );
             chartsLayout.addComponent( jFreeChartWrapper );
