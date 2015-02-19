@@ -20,9 +20,9 @@ public class RemoveTunnelCommand extends OsgiCommandSupport
 
     private final NetworkManager networkManager;
 
-    @Argument( index = 0, name = "tunnel name", required = true, multiValued = false,
-            description = "tunnel name" )
-    String tunnelName;
+    @Argument( index = 0, name = "tunnel id", required = true, multiValued = false,
+            description = "tunnel id" )
+    int tunnelId;
 
 
     public RemoveTunnelCommand( final NetworkManager networkManager )
@@ -39,7 +39,7 @@ public class RemoveTunnelCommand extends OsgiCommandSupport
 
         try
         {
-            networkManager.removeTunnel( tunnelName );
+            networkManager.removeTunnel( tunnelId );
             System.out.println( "OK" );
         }
         catch ( NetworkManagerException e )

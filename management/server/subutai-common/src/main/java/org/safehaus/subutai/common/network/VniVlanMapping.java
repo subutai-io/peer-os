@@ -1,18 +1,14 @@
-package org.safehaus.subutai.core.network.impl;
+package org.safehaus.subutai.common.network;
 
 
-import org.safehaus.subutai.core.network.api.VniVlanMapping;
-
-
-public class VniVlanMappingImpl implements VniVlanMapping
+public class VniVlanMapping
 {
-
     private final String tunnelName;
     private final long vni;
     private final int vlan;
 
 
-    public VniVlanMappingImpl( final String tunnelName, final long vni, final int vlan )
+    public VniVlanMapping( final String tunnelName, final long vni, final int vlan )
     {
         this.tunnelName = tunnelName;
         this.vni = vni;
@@ -20,21 +16,18 @@ public class VniVlanMappingImpl implements VniVlanMapping
     }
 
 
-    @Override
     public String getTunnelName()
     {
         return tunnelName;
     }
 
 
-    @Override
     public long getVni()
     {
         return vni;
     }
 
 
-    @Override
     public int getVlan()
     {
         return vlan;

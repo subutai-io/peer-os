@@ -20,6 +20,7 @@ import org.safehaus.subutai.core.key.api.KeyManagerException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.metric.api.Monitor;
+import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.api.EnvironmentContext;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -67,6 +68,7 @@ public class PeerManagerImpl implements PeerManager
     private HostRegistry hostRegistry;
     private DaoManager daoManager;
     private KeyManager keyManager;
+    private NetworkManager networkManager;
 
 
     public PeerManagerImpl( final Messenger messenger )
@@ -96,6 +98,12 @@ public class PeerManagerImpl implements PeerManager
     public void setKeyManager( final KeyManager keyManager )
     {
         this.keyManager = keyManager;
+    }
+
+
+    public void setNetworkManager( final NetworkManager networkManager )
+    {
+        this.networkManager = networkManager;
     }
 
 
@@ -152,7 +160,7 @@ public class PeerManagerImpl implements PeerManager
             peerInfo = result.get( 0 );
         }
         localPeer = new LocalPeerImpl( this, templateRegistry, quotaManager, strategyManager, requestListeners,
-                commandExecutor, hostRegistry, monitor );
+                commandExecutor, hostRegistry, monitor, networkManager );
         localPeer.init();
 
         //add command request listener

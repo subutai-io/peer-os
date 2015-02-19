@@ -50,6 +50,7 @@ import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
+import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.api.ContainerGroup;
 import org.safehaus.subutai.core.peer.api.ContainerGroupNotFoundException;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
@@ -108,12 +109,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     private ContainerHostDataService containerHostDataService;
     private ContainerGroupDataService containerGroupDataService;
     private HostRegistry hostRegistry;
+    private NetworkManager networkManager;
     private Set<RequestListener> requestListeners;
 
 
     public LocalPeerImpl( PeerManager peerManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
                           StrategyManager strategyManager, Set<RequestListener> requestListeners,
-                          CommandExecutor commandExecutor, HostRegistry hostRegistry, Monitor monitor )
+                          CommandExecutor commandExecutor, HostRegistry hostRegistry, Monitor monitor,
+                          NetworkManager networkManager )
 
     {
         this.strategyManager = strategyManager;
@@ -124,6 +127,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         this.requestListeners = requestListeners;
         this.commandExecutor = commandExecutor;
         this.hostRegistry = hostRegistry;
+        this.networkManager = networkManager;
     }
 
 
@@ -1011,7 +1015,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         {
             if ( managementHost == null )
             {
-                managementHost = new ManagementHostEntity( getId().toString(), resourceHostInfo );
+                managementHost = new ManagementHostEntity( getId().toString(), resourceHostInfo, networkManager );
                 try
                 {
                     managementHost.init();

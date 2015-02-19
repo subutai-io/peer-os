@@ -116,7 +116,7 @@ public class Commands
     }
 
 
-    public RequestBuilder getSetupVniVlanMappingCommand( String tunnelName, int vni, int vLanId )
+    public RequestBuilder getSetupVniVlanMappingCommand( String tunnelName, long vni, int vLanId )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
                 .withCmdArgs( Lists.newArrayList( "-m", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ) ) );
@@ -129,7 +129,7 @@ public class Commands
     }
 
 
-    public RequestBuilder getRemoveVniVlanMappingCommand( String tunnelName, int vni, int vLanId )
+    public RequestBuilder getRemoveVniVlanMappingCommand( String tunnelName, long vni, int vLanId )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
                 .withCmdArgs( Lists.newArrayList( "-M", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ) ) );

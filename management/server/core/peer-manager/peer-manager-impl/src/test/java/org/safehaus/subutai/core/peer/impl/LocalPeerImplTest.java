@@ -17,6 +17,7 @@ import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.metric.api.Monitor;
+import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -53,6 +54,8 @@ public class LocalPeerImplTest
     HostRegistry hostRegistry;
     @Mock
     Monitor monitor;
+    @Mock
+    NetworkManager networkManager;
 
 
     @Before
@@ -68,7 +71,7 @@ public class LocalPeerImplTest
     {
         LocalPeerImpl localPeer =
                 new LocalPeerImpl( peerManager, templateRegistry, quotaManager, strategyManager, null, commandExecutor,
-                        hostRegistry, monitor );
+                        hostRegistry, monitor, networkManager );
 
         localPeer.bindHost( UUID.randomUUID().toString() );
     }

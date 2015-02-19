@@ -15,6 +15,7 @@ import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.network.api.ContainerInfo;
 import org.safehaus.subutai.core.network.api.N2NConnection;
+import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.network.api.Tunnel;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
@@ -47,9 +48,9 @@ public class NetworkManagerImplTest
     private static final String INTERFACE_NAME = "interface name";
     private static final String COMMUNITY_NAME = "community name";
     private static final String LOCAL_IP = "local.ip";
-    private static final String TUNNEL_NAME = "tunnel name";
+    private static final String TUNNEL_NAME = "tunnel1";
+    private static final int TUNNEL_ID = 1;
     private static final String TUNNEL_IP = "tunnel.ip";
-    private static final String TUNNEL_TYPE = "tunnel type";
     private static final String GATEWAY_IP = "gateway.ip";
     private static final int VLAN_ID = 100;
     private static final int VNI = 100;
@@ -139,10 +140,10 @@ public class NetworkManagerImplTest
     @Test
     public void testSetupTunnel() throws Exception
     {
-        networkManager.setupTunnel( TUNNEL_NAME, TUNNEL_IP, TUNNEL_TYPE );
+        networkManager.setupTunnel( TUNNEL_ID, TUNNEL_IP );
 
         verify( localPeer ).getManagementHost();
-        verify( commands ).getSetupTunnelCommand( TUNNEL_NAME, TUNNEL_IP, TUNNEL_TYPE );
+        verify( commands ).getSetupTunnelCommand( TUNNEL_NAME, TUNNEL_IP, NetworkManager.TUNNEL_TYPE );
         verify( managementHost ).execute( any( RequestBuilder.class ) );
     }
 
@@ -150,7 +151,7 @@ public class NetworkManagerImplTest
     @Test
     public void testRemoveTunnel() throws Exception
     {
-        networkManager.removeTunnel( TUNNEL_NAME );
+        networkManager.removeTunnel( TUNNEL_ID );
 
         verify( localPeer ).getManagementHost();
         verify( commands ).getRemoveTunnelCommand( TUNNEL_NAME );
@@ -283,7 +284,7 @@ public class NetworkManagerImplTest
     public void testSetupVniVLanMapping() throws Exception
     {
 
-        networkManager.setupVniVLanMapping( TUNNEL_NAME, VNI, VLAN_ID );
+        networkManager.setupVniVLanMapping( TUNNEL_ID, VNI, VLAN_ID );
 
         verify( localPeer ).getManagementHost();
         verify( commands ).getSetupVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID );
@@ -295,7 +296,7 @@ public class NetworkManagerImplTest
     public void testRemoveVniVLanMapping() throws Exception
     {
 
-        networkManager.removeVniVLanMapping( TUNNEL_NAME, VNI, VLAN_ID );
+        networkManager.removeVniVLanMapping( TUNNEL_ID, VNI, VLAN_ID );
 
         verify( localPeer ).getManagementHost();
         verify( commands ).getRemoveVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID );

@@ -111,12 +111,11 @@ public class NetworkRestServiceImpl implements NetworkRestService
 
 
     @Override
-    public Response setupTunnel( String tunnel, String type )
+    public Response setupTunnel( int tunnelId, String tunnelIp )
     {
         try
         {
-            Tunnel t = JsonUtil.fromJson( tunnel, TunnelImpl.class );
-            networkManager.setupTunnel( t.getTunnelName(), t.getTunnelIp(), type );
+            networkManager.setupTunnel( tunnelId, tunnelIp );
             return Response.ok().build();
         }
         catch ( NetworkManagerException ex )
@@ -133,11 +132,11 @@ public class NetworkRestServiceImpl implements NetworkRestService
 
 
     @Override
-    public Response removeTunnel( String tunnelName )
+    public Response removeTunnel( int tunnelId )
     {
         try
         {
-            networkManager.removeTunnel( tunnelName );
+            networkManager.removeTunnel( tunnelId );
             return Response.ok().build();
         }
         catch ( NetworkManagerException ex )
@@ -261,11 +260,11 @@ public class NetworkRestServiceImpl implements NetworkRestService
 
 
     @Override
-    public Response setupVniVLanMapping( String tunnelName, int vni, int vLanId )
+    public Response setupVniVLanMapping( int tunnelId, int vni, int vLanId )
     {
         try
         {
-            networkManager.setupVniVLanMapping( tunnelName, vni, vLanId );
+            networkManager.setupVniVLanMapping( tunnelId, vni, vLanId );
             return Response.ok().build();
         }
         catch ( NetworkManagerException ex )
@@ -277,11 +276,11 @@ public class NetworkRestServiceImpl implements NetworkRestService
 
 
     @Override
-    public Response removeVniVLanMapping( String tunnelName, int vni, int vLanId )
+    public Response removeVniVLanMapping( int tunnelId, int vni, int vLanId )
     {
         try
         {
-            networkManager.removeVniVLanMapping( tunnelName, vni, vLanId );
+            networkManager.removeVniVLanMapping( tunnelId, vni, vLanId );
             return Response.ok().build();
         }
         catch ( NetworkManagerException ex )

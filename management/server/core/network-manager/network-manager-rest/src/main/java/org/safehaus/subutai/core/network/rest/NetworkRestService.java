@@ -43,12 +43,12 @@ public interface NetworkRestService
 
     @POST
     @Path( "tunnel" )
-    Response setupTunnel( @FormParam( "tunnel" ) String tunnel, @FormParam( "type" ) String type );
+    Response setupTunnel( @FormParam( "tunnelId" ) int tunnelId, @FormParam( "type" ) String type );
 
 
     @DELETE
-    @Path( "tunnel/{tunnelName}" )
-    Response removeTunnel( @PathParam( "tunnelName" ) String tunnelName );
+    @Path( "tunnel/{tunnelId}" )
+    Response removeTunnel( @PathParam( "tunnelId" ) int tunnelId );
 
 
     @GET
@@ -91,13 +91,13 @@ public interface NetworkRestService
 
     @POST
     @Path( "mapping" )
-    Response setupVniVLanMapping( @FormParam( "tunnelName" ) String tunnelName, @FormParam( "vni" ) int vni,
+    Response setupVniVLanMapping( @FormParam( "tunnelId" ) int tunnelId, @FormParam( "vni" ) int vni,
                                   @FormParam( "vLanId" ) int vLanId );
 
 
     @DELETE
     @Path( "mapping" )
-    Response removeVniVLanMapping( @FormParam( "tunnelName" ) String tunnelName, @FormParam( "vni" ) int vni,
+    Response removeVniVLanMapping( @FormParam( "tunnelId" ) int tunnelId, @FormParam( "vni" ) int vni,
                                    @FormParam( "vLanId" ) int vLanId );
 }
 

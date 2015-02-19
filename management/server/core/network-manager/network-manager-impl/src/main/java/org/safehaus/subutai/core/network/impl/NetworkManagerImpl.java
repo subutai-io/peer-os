@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.network.VniVlanMapping;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.PeerException;
@@ -17,7 +18,6 @@ import org.safehaus.subutai.core.network.api.N2NConnection;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.network.api.Tunnel;
-import org.safehaus.subutai.core.network.api.VniVlanMapping;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
@@ -64,17 +64,19 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void setupTunnel( final String tunnelName, final String tunnelIp, final String tunnelType )
-            throws NetworkManagerException
+    public void setupTunnel( final int tunnelId, final String tunnelIp ) throws NetworkManagerException
     {
-        execute( getManagementHost(), commands.getSetupTunnelCommand( tunnelName, tunnelIp, tunnelType ) );
+        execute( getManagementHost(),
+                commands.getSetupTunnelCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), tunnelIp,
+                        TUNNEL_TYPE ) );
     }
 
 
     @Override
-    public void removeTunnel( final String tunnelName ) throws NetworkManagerException
+    public void removeTunnel( final int tunnelId ) throws NetworkManagerException
     {
-        execute( getManagementHost(), commands.getRemoveTunnelCommand( tunnelName ) );
+        execute( getManagementHost(),
+                commands.getRemoveTunnelCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ) ) );
     }
 
 
@@ -162,18 +164,22 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void setupVniVLanMapping( final String tunnelName, final int vni, final int vLanId )
+    public void setupVniVLanMapping( final int tunnelId, final long vni, final int vLanId )
             throws NetworkManagerException
     {
-        execute( getManagementHost(), commands.getSetupVniVlanMappingCommand( tunnelName, vni, vLanId ) );
+        execute( getManagementHost(),
+                commands.getSetupVniVlanMappingCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), vni,
+                        vLanId ) );
     }
 
 
     @Override
-    public void removeVniVLanMapping( final String tunnelName, final int vni, final int vLanId )
+    public void removeVniVLanMapping( final int tunnelId, final long vni, final int vLanId )
             throws NetworkManagerException
     {
-        execute( getManagementHost(), commands.getRemoveVniVlanMappingCommand( tunnelName, vni, vLanId ) );
+        execute( getManagementHost(),
+                commands.getRemoveVniVlanMappingCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), vni,
+                        vLanId ) );
     }
 
 
@@ -194,7 +200,7 @@ public class NetworkManagerImpl implements NetworkManager
 
             if ( m.find() && m.groupCount() == 3 )
             {
-                mappings.add( new VniVlanMappingImpl( m.group( 1 ), Long.parseLong( m.group( 2 ) ),
+                mappings.add( new VniVlanMapping( m.group( 1 ), Long.parseLong( m.group( 2 ) ),
                         Integer.parseInt( m.group( 3 ) ) ) );
             }
         }

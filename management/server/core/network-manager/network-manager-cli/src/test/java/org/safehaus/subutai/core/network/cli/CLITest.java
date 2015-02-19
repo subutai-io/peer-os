@@ -106,7 +106,7 @@ public class CLITest extends SystemOutRedirectTest
         assertEquals( "OK", getSysOut() );
 
 
-        doThrow( exception ).when( networkManager ).removeTunnel( anyString() );
+        doThrow( exception ).when( networkManager ).removeTunnel( anyInt() );
 
         removeTunnelCommand.doExecute();
 
@@ -162,7 +162,7 @@ public class CLITest extends SystemOutRedirectTest
 
         doThrow( exception ).when( networkManager )
                             .setupN2NConnection( anyString(), anyInt(), anyString(), anyString(), anyString(),
-                                    anyString() , anyString());
+                                    anyString(), anyString() );
 
         command.doExecute();
 
@@ -189,7 +189,7 @@ public class CLITest extends SystemOutRedirectTest
         assertEquals( "OK", getSysOut() );
 
 
-        doThrow( exception ).when( networkManager ).setupTunnel( anyString(), anyString(), anyString() );
+        doThrow( exception ).when( networkManager ).setupTunnel( anyInt(), anyString() );
 
         command.doExecute();
 
