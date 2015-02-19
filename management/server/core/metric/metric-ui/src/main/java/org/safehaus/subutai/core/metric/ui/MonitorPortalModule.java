@@ -7,6 +7,7 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +22,13 @@ public class MonitorPortalModule implements PortalModule
     public static final String MODULE_NAME = "Monitor";
     private static final Logger LOG = LoggerFactory.getLogger( MonitorPortalModule.class.getName() );
     protected ServiceLocator serviceLocator;
+    private HostRegistry hostRegistry;
 
 
-    public MonitorPortalModule()
+    public MonitorPortalModule(final HostRegistry hostRegistry)
     {
         this.serviceLocator = new ServiceLocator();
+        this.hostRegistry = hostRegistry;
     }
 
 
@@ -55,7 +58,7 @@ public class MonitorPortalModule implements PortalModule
     {
         try
         {
-            return new MonitorForm( serviceLocator );
+            return new MonitorForm( serviceLocator, hostRegistry );
         }
         catch ( NamingException e )
         {

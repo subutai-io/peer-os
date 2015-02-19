@@ -13,6 +13,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.metric.api.Monitor;
 
 import com.google.common.collect.Sets;
@@ -37,13 +38,16 @@ public class MonitorPortalModuleTest
     @Mock
     EnvironmentManager environmentManager;
 
+    @Mock
+    HostRegistry hostRegistry;
+
     MonitorPortalModule module;
 
 
     @Before
     public void setUp() throws Exception
     {
-        module = new MonitorPortalModule();
+        module = new MonitorPortalModule(hostRegistry);
         module.serviceLocator = serviceLocator;
         when( serviceLocator.getService( Monitor.class ) ).thenReturn( monitor );
         when( serviceLocator.getService( EnvironmentManager.class ) ).thenReturn( environmentManager );
