@@ -100,11 +100,13 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public EnvironmentImpl( String name, String sshKey )
+    public EnvironmentImpl( String name, String subnetCidr, String sshKey )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
+        SubnetUtils cidr = new SubnetUtils( subnetCidr );
 
         this.name = name;
+        this.subnetCidr = cidr.getInfo().getCidrSignature();
         this.publicKey = Strings.isNullOrEmpty( sshKey ) ? null : sshKey.trim();
         this.environmentId = UUID.randomUUID().toString();
         this.creationTimestamp = System.currentTimeMillis();

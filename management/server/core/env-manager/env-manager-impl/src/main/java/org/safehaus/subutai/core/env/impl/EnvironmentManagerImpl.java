@@ -135,11 +135,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public UUID createEmptyEnvironment( final String name, final String sshKey )
+    public UUID createEmptyEnvironment( final String name, final String subnetCidr, final String sshKey )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( subnetCidr ), "Invalid subnet CIDR" );
 
-        final EnvironmentImpl environment = new EnvironmentImpl( name, sshKey );
+        final EnvironmentImpl environment = new EnvironmentImpl( name, subnetCidr, sshKey );
 
         saveEnvironment( environment );
 
@@ -152,14 +153,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public Environment createEnvironment( final String name, final Topology topology, final String sshKey,
+    public Environment createEnvironment( final String name, final Topology topology, final String subnetCidr, final String sshKey,
                                           boolean async ) throws EnvironmentCreationException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
         Preconditions.checkNotNull( topology, "Invalid topology" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( subnetCidr ), "Invalid subnet CIDR" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
-        final UUID environmentId = createEmptyEnvironment( name, sshKey );
+        final UUID environmentId = createEmptyEnvironment( name, subnetCidr, sshKey );
 
         try
         {

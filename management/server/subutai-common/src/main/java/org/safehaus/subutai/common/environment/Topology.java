@@ -14,7 +14,7 @@ import com.google.common.collect.Sets;
 
 public class Topology
 {
-    Map<Peer, Set<NodeGroup>> nodeGroupPlacement = Maps.newHashMap();
+    private final Map<Peer, Set<NodeGroup>> nodeGroupPlacement = Maps.newHashMap();
 
 
     public Map<Peer, Set<NodeGroup>> getNodeGroupPlacement()

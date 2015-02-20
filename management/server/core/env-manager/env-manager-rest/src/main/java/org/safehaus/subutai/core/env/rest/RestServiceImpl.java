@@ -57,16 +57,20 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response createEnvironment( final String topologyJsonString, final String sshKey )
+    public Response createEnvironment( final String environmentName, final String topologyJsonString,
+                                       final String subnetCidr, final String sshKey )
     {
         TopologyJson topologyJson;
 
+        //validate params
         try
         {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentName ), "Invalid environment name" );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( subnetCidr ), "Invalid subnet cidr" );
             topologyJson = JsonUtil.fromJson( topologyJsonString, TopologyJson.class );
             checkTopology( topologyJson );
         }
-        catch ( JsonSyntaxException | NullPointerException | EnvironmentCreationException e )
+        catch ( Exception e )
         {
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
                            .build();
@@ -86,7 +90,7 @@ public class RestServiceImpl implements RestService
             }
 
             Environment environment =
-                    environmentManager.createEnvironment( topologyJson.getEnvironmentName(), topology, sshKey, false );
+                    environmentManager.createEnvironment( environmentName, topology, subnetCidr, sshKey, false );
 
             return Response.ok( JsonUtil.toJson(
                     new EnvironmentJson( environment.getId(), environment.getName(), environment.getStatus(),
@@ -101,11 +105,8 @@ public class RestServiceImpl implements RestService
 
     private void checkTopology( TopologyJson topologyJson ) throws EnvironmentCreationException
     {
-        if ( Strings.isNullOrEmpty( topologyJson.getEnvironmentName() ) )
-        {
-            throw new EnvironmentCreationException( "Invalid environment name" );
-        }
-        else if ( topologyJson.getNodeGroupPlacement() == null || topologyJson.getNodeGroupPlacement().isEmpty() )
+
+        if ( topologyJson.getNodeGroupPlacement() == null || topologyJson.getNodeGroupPlacement().isEmpty() )
         {
             throw new EnvironmentCreationException( "Invalid node group placement" );
         }
