@@ -62,6 +62,9 @@ public class GrowEnvironmentTask implements Runnable
         {
             environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
+            //TODO for new peers try to reserve VNI
+            //1) if peers list is empty,
+
             final Set<ContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
 
             try

@@ -3,7 +3,6 @@ package org.safehaus.subutai.core.env.impl.entity;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -11,6 +10,7 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -28,7 +28,6 @@ import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.impl.dao.EnvironmentDataService;
 import org.slf4j.Logger;
@@ -39,9 +38,7 @@ import org.apache.commons.net.util.SubnetUtils;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.gson.reflect.TypeToken;
 
 
 /**
@@ -77,7 +74,7 @@ public class EnvironmentImpl implements Environment, Serializable
     private String peerVlanInfo;
 
     @Column( name = "vni" )
-    private int vni;
+    private Long vni;
 
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = EnvironmentContainerImpl.class,
             cascade = CascadeType.ALL, orphanRemoval = true )
@@ -88,6 +85,9 @@ public class EnvironmentImpl implements Environment, Serializable
 
     @Column( name = "public_key", length = 3000 )
     private String publicKey;
+
+    @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
+    private Set<String> peerIds = Sets.newHashSet();
 
     @Transient
     private EnvironmentDataService dataService;
@@ -250,6 +250,20 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
+    @Override
+    public Set<UUID> getPeerIds()
+    {
+        Set<UUID> ids = Sets.newHashSet();
+
+        for ( String id : peerIds )
+        {
+            ids.add( UUID.fromString( id ) );
+        }
+
+        return ids;
+    }
+
+
     public void removeContainer( UUID containerId )
     {
         Preconditions.checkNotNull( containerId );
@@ -276,6 +290,8 @@ public class EnvironmentImpl implements Environment, Serializable
         for ( EnvironmentContainerImpl container : containers )
         {
             container.setEnvironment( this );
+
+            peerIds.add( container.getPeerId() );
         }
 
         this.containers.addAll( containers );
@@ -347,31 +363,13 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public Map<UUID, Integer> getPeerVlanInfo()
-    {
-        Map<UUID, Integer> map = deserializePeerVlanInfo();
-        return Collections.unmodifiableMap( map );
-    }
-
-
-    public void setPeerVlanInfo( UUID peerId, int vlanId )
-    {
-        Preconditions.checkNotNull( peerId );
-
-        Map<UUID, Integer> map = deserializePeerVlanInfo();
-        map.put( peerId, vlanId );
-        this.peerVlanInfo = JsonUtil.to( map );
-    }
-
-
-    @Override
-    public int getVni()
+    public Long getVni()
     {
         return vni;
     }
 
 
-    public void setVni( int vni )
+    public void setVni( long vni )
     {
         this.vni = vni;
     }
@@ -386,28 +384,6 @@ public class EnvironmentImpl implements Environment, Serializable
     public void setLastUsedIpIndex( int lastUsedIpIndex )
     {
         this.lastUsedIpIndex = lastUsedIpIndex;
-    }
-
-
-    public void setSubnetCidr( String subnetCidr )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( subnetCidr ) );
-
-        // this ctor checks CIDR notation format validity
-        SubnetUtils cidr = new SubnetUtils( subnetCidr );
-        this.subnetCidr = cidr.getInfo().getCidrSignature();
-    }
-
-
-    private Map<UUID, Integer> deserializePeerVlanInfo()
-    {
-        if ( Strings.isNullOrEmpty( peerVlanInfo ) )
-        {
-            return Maps.newHashMap();
-        }
-        TypeToken<Map<UUID, Integer>> typeToken = new TypeToken<Map<UUID, Integer>>()
-        {};
-        return JsonUtil.fromJson( peerVlanInfo, typeToken.getType() );
     }
 
 

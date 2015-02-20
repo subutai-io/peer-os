@@ -397,7 +397,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                     containerIds.add( containerHost.getId() );
                 }
 
-                containerGroup.setContainerIds2( containerIds );
+                containerGroup.setContainerIds( containerIds );
 
                 containerGroupDataService.update( containerGroup );
             }
@@ -698,7 +698,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             }
             else
             {
-                containerGroup.setContainerIds2( containerIds );
+                containerGroup.setContainerIds( containerIds );
 
                 containerGroupDataService.update( containerGroup );
             }

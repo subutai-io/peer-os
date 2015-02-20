@@ -57,17 +57,6 @@ public interface EnvironmentManager
 
 
     /**
-     * Creates empty environment
-     *
-     * @param name - environment name
-     * @param subnetCidr - subnet in CIDR-notation string, e.g. "192.168.0.1/16"
-     * @param sshKey - ssh key content
-     *
-     * @return - id of created environment
-     */
-    public UUID createEmptyEnvironment( String name, String subnetCidr, String sshKey );
-
-    /**
      * Destroys environment by id.
      *
      * @param environmentId - environment id

@@ -133,13 +133,7 @@ public class ContainerGroupEntity implements ContainerGroup
     }
 
 
-    public void setContainerIds( final Set<String> containerIds )
-    {
-        this.containerIds = containerIds;
-    }
-
-
-    public void setContainerIds2( final Set<UUID> containerIds )
+    public void setContainerIds( final Set<UUID> containerIds )
 
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerIds ) );

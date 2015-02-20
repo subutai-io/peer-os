@@ -17,6 +17,7 @@ import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.core.env.api.EnvironmentEventListener;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
@@ -30,6 +31,7 @@ import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
+import org.safehaus.subutai.core.env.impl.tasks.CreateEnvironmentTask;
 import org.safehaus.subutai.core.env.impl.tasks.DestroyContainerTask;
 import org.safehaus.subutai.core.env.impl.tasks.DestroyEnvironmentTask;
 import org.safehaus.subutai.core.env.impl.tasks.GrowEnvironmentTask;
@@ -134,11 +136,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    @Override
-    public UUID createEmptyEnvironment( final String name, final String subnetCidr, final String sshKey )
+    protected EnvironmentImpl createEmptyEnvironment( final String name, final String subnetCidr, final String sshKey )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( subnetCidr ), "Invalid subnet CIDR" );
 
         final EnvironmentImpl environment = new EnvironmentImpl( name, subnetCidr, sshKey );
 
@@ -148,31 +147,59 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         notifyOnEnvironmentCreated( environment );
 
-        return environment.getId();
+        return environment;
     }
 
 
     @Override
-    public Environment createEnvironment( final String name, final Topology topology, final String subnetCidr, final String sshKey,
-                                          boolean async ) throws EnvironmentCreationException
+    public Environment createEnvironment( final String name, final Topology topology, final String subnetCidr,
+                                          final String sshKey, boolean async ) throws EnvironmentCreationException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( subnetCidr ), "Invalid subnet CIDR" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
-        final UUID environmentId = createEmptyEnvironment( name, subnetCidr, sshKey );
+        final EnvironmentImpl environment = createEmptyEnvironment( name, subnetCidr, sshKey );
+
+        final ResultHolder<EnvironmentCreationException> resultHolder = new ResultHolder<>();
+
+        CreateEnvironmentTask createEnvironmentTask =
+                new CreateEnvironmentTask( this, environment, topology, resultHolder );
+
+        executor.submit( createEnvironmentTask );
+
+        if ( !async )
+        {
+            try
+            {
+                createEnvironmentTask.waitCompletion();
+
+                if ( resultHolder.getResult() != null )
+                {
+                    throw resultHolder.getResult();
+                }
+            }
+            catch ( InterruptedException e )
+            {
+                throw new EnvironmentCreationException( e );
+            }
+        }
 
         try
         {
-            growEnvironment( environmentId, topology, async );
-
-            return findEnvironment( environmentId );
+            return findEnvironment( environment.getId() );
         }
-        catch ( EnvironmentModificationException | EnvironmentNotFoundException e )
+        catch ( EnvironmentNotFoundException e )
         {
             throw new EnvironmentCreationException( e );
         }
+    }
+
+
+    public long findFreeVni( final Set<Peer> peers ) throws EnvironmentManagerException
+    {
+        return 100;
     }
 
 
@@ -256,6 +283,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             throw new EnvironmentModificationException(
                     String.format( "Environment status is %s", environment.getStatus() ) );
+        }
+
+        if ( environment.getVni() == null )
+        {
+            throw new EnvironmentModificationException( "Environment VNI is null" );
         }
 
         final Set<ContainerHost> newContainers = Sets.newHashSet();
