@@ -50,7 +50,6 @@ import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
-import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.api.ContainerGroup;
 import org.safehaus.subutai.core.peer.api.ContainerGroupNotFoundException;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
@@ -109,14 +108,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     private ContainerHostDataService containerHostDataService;
     private ContainerGroupDataService containerGroupDataService;
     private HostRegistry hostRegistry;
-    private NetworkManager networkManager;
     private Set<RequestListener> requestListeners;
 
 
     public LocalPeerImpl( PeerManager peerManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
                           StrategyManager strategyManager, Set<RequestListener> requestListeners,
-                          CommandExecutor commandExecutor, HostRegistry hostRegistry, Monitor monitor,
-                          NetworkManager networkManager )
+                          CommandExecutor commandExecutor, HostRegistry hostRegistry, Monitor monitor )
 
     {
         this.strategyManager = strategyManager;
@@ -127,7 +124,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         this.requestListeners = requestListeners;
         this.commandExecutor = commandExecutor;
         this.hostRegistry = hostRegistry;
-        this.networkManager = networkManager;
     }
 
 
@@ -1015,7 +1011,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         {
             if ( managementHost == null )
             {
-                managementHost = new ManagementHostEntity( getId().toString(), resourceHostInfo, networkManager );
+                managementHost = new ManagementHostEntity( getId().toString(), resourceHostInfo );
                 try
                 {
                     managementHost.init();
@@ -1388,6 +1384,23 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         {
             throw new PeerException( e );
         }
+    }
+
+
+    //networking
+
+
+    @Override
+    public void setupTunnels( final Set<String> peerIps, final long vni, final boolean newVni ) throws PeerException
+    {
+        managementHost.setupTunnels( peerIps, vni, newVni );
+    }
+
+
+    @Override
+    public Set<Long> getTakenVniIds() throws PeerException
+    {
+        return managementHost.getTakenVniIds();
     }
 
 

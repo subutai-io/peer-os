@@ -43,11 +43,11 @@ import static org.mockito.Mockito.when;
 public class NetworkManagerImplTest
 {
 
-    private static final String SUPER_NODE_IP = "super.node.ip";
+    private static final String SUPER_NODE_IP = "123.123.123.123";
     private static final int SUPER_NODE_PORT = 1234;
     private static final String INTERFACE_NAME = "interface name";
     private static final String COMMUNITY_NAME = "community name";
-    private static final String LOCAL_IP = "local.ip";
+    private static final String LOCAL_IP = "127.0.0.1";
     private static final String TUNNEL_NAME = "tunnel1";
     private static final int TUNNEL_ID = 1;
     private static final String TUNNEL_IP = "tunnel.ip";

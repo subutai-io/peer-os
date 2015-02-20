@@ -9,6 +9,10 @@ import org.safehaus.subutai.common.peer.ContainerHost;
 
 public interface NetworkManager
 {
+    public static final int MIN_VLAN_ID = 100;
+    public static final int MAX_VLAN_ID = 4096;
+    public static final long MIN_VNI_ID = 0;
+    public static final long MAX_VNI_ID = 16777216;//2^24
     public static final String TUNNEL_PREFIX = "tunnel";
     public static final String TUNNEL_TYPE = "vxlan";
 

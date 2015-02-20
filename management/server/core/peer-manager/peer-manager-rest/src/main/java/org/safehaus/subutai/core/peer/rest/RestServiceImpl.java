@@ -477,8 +477,7 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.getContainerHostById( UUID.fromString( containerId ) )
                      .setCpuSet( JsonUtil.<Set<Integer>>fromJson( cpuSet, new TypeToken<Set<Integer>>()
-                     {
-                     }.getType() ) );
+                     {}.getType() ) );
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -497,8 +496,7 @@ public class RestServiceImpl implements RestService
             return Response.ok( JsonUtil.toJson( localPeer.getContainerHostById( UUID.fromString( containerId ) )
                                                           .getDiskQuota( JsonUtil.<DiskPartition>from( diskPartition,
                                                                   new TypeToken<DiskPartition>()
-                                                                  {
-                                                                  }.getType() ) ) ) ).build();
+                                                                  {}.getType() ) ) ) ).build();
         }
         catch ( Exception e )
         {
@@ -515,8 +513,38 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.getContainerHostById( UUID.fromString( containerId ) )
                      .setDiskQuota( JsonUtil.<DiskQuota>fromJson( diskQuota, new TypeToken<DiskQuota>()
-                     {
-                     }.getType() ) );
+                     {}.getType() ) );
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response getTakenVni()
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            return Response.ok( JsonUtil.toJson( localPeer.getTakenVniIds() ) ).build();
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response setupTunnels( final Set<String> peerIps, final long vni, final boolean newVni )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            localPeer.setupTunnels( peerIps, vni, newVni );
             return Response.ok().build();
         }
         catch ( Exception e )

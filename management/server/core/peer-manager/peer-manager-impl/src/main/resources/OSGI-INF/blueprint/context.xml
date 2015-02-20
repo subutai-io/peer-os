@@ -26,9 +26,6 @@
 
   <reference id="strategyManager" interface="org.safehaus.subutai.core.strategy.api.StrategyManager" />
 
-  <reference id="networkManager" availability="optional"
-             interface="org.safehaus.subutai.core.network.api.NetworkManager" />
-
   <reference id="quotaManager" availability="mandatory"
              interface="org.safehaus.subutai.core.lxc.quota.api.QuotaManager" />
   <reference id="monitor" availability="optional"
@@ -43,7 +40,6 @@
     <property name="monitor" ref="monitor" />
     <property name="commandExecutor" ref="commandExecutor" />
     <property name="daoManager" ref="daoManagerPeer" />
-    <property name="networkManager" ref="networkManager" />
     <argument ref="messenger" />
   </bean>
 

@@ -13,6 +13,8 @@ import org.safehaus.subutai.common.network.VniVlanMapping;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.util.NumUtil;
 import org.safehaus.subutai.core.network.api.ContainerInfo;
 import org.safehaus.subutai.core.network.api.N2NConnection;
 import org.safehaus.subutai.core.network.api.NetworkManager;
@@ -23,6 +25,7 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 
@@ -66,6 +69,8 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public void setupTunnel( final int tunnelId, final String tunnelIp ) throws NetworkManagerException
     {
+        Preconditions.checkArgument( tunnelId > 0, "Tunnel id must be greater than 0" );
+
         execute( getManagementHost(),
                 commands.getSetupTunnelCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), tunnelIp,
                         TUNNEL_TYPE ) );
@@ -75,6 +80,8 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public void removeTunnel( final int tunnelId ) throws NetworkManagerException
     {
+        Preconditions.checkArgument( tunnelId > 0, "Tunnel id must be greater than 0" );
+
         execute( getManagementHost(),
                 commands.getRemoveTunnelCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ) ) );
     }
@@ -83,6 +90,8 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public void setupGateway( final String gatewayIp, final int vLanId ) throws NetworkManagerException
     {
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, MIN_VLAN_ID, MAX_VLAN_ID ) );
+
         execute( getManagementHost(), commands.getSetupGatewayCommand( gatewayIp, vLanId ) );
     }
 
@@ -99,6 +108,8 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public void removeGateway( final int vLanId ) throws NetworkManagerException
     {
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, MIN_VLAN_ID, MAX_VLAN_ID ) );
+
         execute( getManagementHost(), commands.getRemoveGatewayCommand( vLanId ) );
     }
 
@@ -119,7 +130,7 @@ public class NetworkManagerImpl implements NetworkManager
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 
-        Pattern p = Pattern.compile( "(tunnel.+)-(.+)" );
+        Pattern p = Pattern.compile( "(tunnel\\d+)-(.+)" );
 
         while ( st.hasMoreTokens() )
         {
@@ -167,6 +178,10 @@ public class NetworkManagerImpl implements NetworkManager
     public void setupVniVLanMapping( final int tunnelId, final long vni, final int vLanId )
             throws NetworkManagerException
     {
+        Preconditions.checkArgument( tunnelId > 0, "Tunnel id must be greater than 0" );
+        Preconditions.checkArgument( NumUtil.isLongBetween( vni, MIN_VNI_ID, MAX_VNI_ID ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, MIN_VLAN_ID, MAX_VLAN_ID ) );
+
         execute( getManagementHost(),
                 commands.getSetupVniVlanMappingCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), vni,
                         vLanId ) );
@@ -177,6 +192,10 @@ public class NetworkManagerImpl implements NetworkManager
     public void removeVniVLanMapping( final int tunnelId, final long vni, final int vLanId )
             throws NetworkManagerException
     {
+        Preconditions.checkArgument( tunnelId > 0, "Tunnel id must be greater than 0" );
+        Preconditions.checkArgument( NumUtil.isLongBetween( vni, MIN_VNI_ID, MAX_VNI_ID ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, MIN_VLAN_ID, MAX_VLAN_ID ) );
+
         execute( getManagementHost(),
                 commands.getRemoveVniVlanMappingCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), vni,
                         vLanId ) );
@@ -190,7 +209,8 @@ public class NetworkManagerImpl implements NetworkManager
 
         CommandResult result = execute( getManagementHost(), commands.getListVniVlanMappingsCommand() );
 
-        Pattern p = Pattern.compile( "(tunnel.+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)" );
+        Pattern p = Pattern.compile(
+                String.format( "(%s\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)", NetworkManager.TUNNEL_PREFIX ) );
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 
@@ -200,8 +220,9 @@ public class NetworkManagerImpl implements NetworkManager
 
             if ( m.find() && m.groupCount() == 3 )
             {
-                mappings.add( new VniVlanMapping( m.group( 1 ), Long.parseLong( m.group( 2 ) ),
-                        Integer.parseInt( m.group( 3 ) ) ) );
+                mappings.add( new VniVlanMapping(
+                        Integer.parseInt( m.group( 1 ).replace( NetworkManager.TUNNEL_PREFIX, "" ) ),
+                        Long.parseLong( m.group( 2 ) ), Integer.parseInt( m.group( 3 ) ) ) );
             }
         }
 
@@ -213,6 +234,9 @@ public class NetworkManagerImpl implements NetworkManager
     public void setContainerIp( final String containerName, final String ip, final int netMask, final int vLanId )
             throws NetworkManagerException
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ) && ip.matches( Common.IP_REGEX ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, MIN_VLAN_ID, MAX_VLAN_ID ) );
+
         execute( getResourceHost( containerName ),
                 commands.getSetContainerIpCommand( containerName, ip, netMask, vLanId ) );
     }
