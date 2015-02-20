@@ -3,16 +3,25 @@ package org.safehaus.subutai.core.network.api;
 
 import java.util.Set;
 
+import org.safehaus.subutai.common.network.VniVlanMapping;
 import org.safehaus.subutai.common.peer.ContainerHost;
 
 
 public interface NetworkManager
 {
+    public static final int MIN_VLAN_ID = 100;
+    public static final int MAX_VLAN_ID = 4096;
+    public static final long MIN_VNI_ID = 0;
+    public static final long MAX_VNI_ID = 16777216;//2^24
+    public static final String TUNNEL_PREFIX = "tunnel";
+    public static final String TUNNEL_TYPE = "vxlan";
+
     /**
      * Sets up an N2N connection to super node on management host
      */
     public void setupN2NConnection( String superNodeIp, int superNodePort, String interfaceName, String communityName,
-                                    String localIp, String pathToKeyFile ) throws NetworkManagerException;
+                                    String localIp, String keyType, String pathToKeyFile )
+            throws NetworkManagerException;
 
     /**
      * Removes N2N connection to super node on management host
@@ -22,12 +31,12 @@ public interface NetworkManager
     /**
      * Sets up tunnel to another peer on management host
      */
-    public void setupTunnel( String tunnelName, String tunnelIp, String tunnelType ) throws NetworkManagerException;
+    public void setupTunnel( int tunnelId, String tunnelIp ) throws NetworkManagerException;
 
     /**
      * Removes tunnel to another peer on management host
      */
-    public void removeTunnel( String tunnelName ) throws NetworkManagerException;
+    public void removeTunnel( int tunnelId ) throws NetworkManagerException;
 
     /**
      * Sets container environment IP and VLAN ID on container
@@ -79,15 +88,15 @@ public interface NetworkManager
     /**
      * Sets up VNI-VLAN mapping on management host
      */
-    public void setupVniVLanMapping( String tunnelName, int vni, int vLanId ) throws NetworkManagerException;
+    public void setupVniVLanMapping( int tunnelId, long vni, int vLanId ) throws NetworkManagerException;
+
+    public Set<VniVlanMapping> getVniVlanMappings() throws NetworkManagerException;
 
     /**
      * Removes VNI-VLAN mapping on management host
      */
-    public void removeVniVLanMapping( String tunnelName, int vni, int vLanId ) throws NetworkManagerException;
+    public void removeVniVLanMapping( int tunnelId, long vni, int vLanId ) throws NetworkManagerException;
 
-
-    public NetworkManager getRemoteManager( String host, int port );
 
     /**
      * Enables passwordless ssh access between containers

@@ -1387,6 +1387,23 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     }
 
 
+    //networking
+
+
+    @Override
+    public void setupTunnels( final Set<String> peerIps, final long vni, final boolean newVni ) throws PeerException
+    {
+        managementHost.setupTunnels( peerIps, vni, newVni );
+    }
+
+
+    @Override
+    public Set<Long> getTakenVniIds() throws PeerException
+    {
+        return managementHost.getTakenVniIds();
+    }
+
+
     @Override
     public boolean equals( final Object o )
     {

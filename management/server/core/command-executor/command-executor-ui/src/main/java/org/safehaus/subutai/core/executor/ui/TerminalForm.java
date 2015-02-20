@@ -61,7 +61,7 @@ public class TerminalForm extends CustomComponent implements Disposable
 
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
         horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
-        hostTree = new HostTree( hostRegistry );
+        hostTree = new HostTree( hostRegistry, false );
         horizontalSplit.setFirstComponent( hostTree );
 
         GridLayout grid = new GridLayout( 20, 11 );

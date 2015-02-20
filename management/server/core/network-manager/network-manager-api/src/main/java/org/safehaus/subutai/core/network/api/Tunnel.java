@@ -9,4 +9,6 @@ public interface Tunnel
     public String getTunnelName();
 
     public String getTunnelIp();
+
+    public int getTunnelId();
 }

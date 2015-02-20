@@ -9,7 +9,7 @@ import static org.junit.Assert.assertEquals;
 public class TunnelImplTest
 {
 
-    private static final String TUNNEL_NAME = "tunnel name";
+    private static final String TUNNEL_NAME = "tunnel1";
     private static final String TUNNEL_IP = "tunnel ip";
 
 

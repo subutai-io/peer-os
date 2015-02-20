@@ -227,4 +227,10 @@ public interface Peer
      * @return {@code ContainersDestructionResult}
      */
     public ContainersDestructionResult destroyEnvironmentContainers( UUID environmentId ) throws PeerException;
+
+    //networking
+
+    public Set<Long> getTakenVniIds() throws PeerException;
+
+    public void setupTunnels( Set<String> peerIps, long vni, boolean newVni ) throws PeerException;
 }

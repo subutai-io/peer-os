@@ -323,8 +323,7 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<ProcessResourceUsage>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         catch ( Exception e )
         {
@@ -533,8 +532,7 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<Set<Integer>>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         catch ( Exception e )
         {
@@ -590,8 +588,7 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<DiskQuota>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         catch ( Exception e )
         {
@@ -699,8 +696,7 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<DiskQuota>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         catch ( Exception e )
         {
@@ -729,8 +725,7 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<PeerQuotaInfo>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         catch ( Exception e )
         {
@@ -759,8 +754,7 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<QuotaInfo>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         catch ( Exception e )
         {
@@ -1004,6 +998,49 @@ public class RemotePeerImpl implements RemotePeer
 
 
     //************ END ENVIRONMENT SPECIFIC REST
+
+
+    //networking
+
+
+    @Override
+    public Set<Long> getTakenVniIds() throws PeerException
+    {
+        String path = "peer/vni";
+
+        try
+        {
+            String response = get( path, null, null );
+
+            return JsonUtil.fromJson( response, new TypeToken<Set<Long>>() {}.getType() );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( String.format( "Error obtaining taken VNI from peer %s", getName() ), e );
+        }
+    }
+
+
+    @Override
+    public void setupTunnels( final Set<String> peerIps, final long vni, final boolean newVni ) throws PeerException
+    {
+        String path = "peer/tunnels";
+
+        try
+        {
+            Map<String, String> params = Maps.newHashMap();
+
+            params.put( "peerIps", peerIps.toString() );
+            params.put( "vni", String.valueOf( vni ) );
+            params.put( "newVni", String.valueOf( newVni ) );
+
+            post( path, params, null );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( String.format( "Error setting up tunnels", getName() ), e );
+        }
+    }
 
 
     @Override
