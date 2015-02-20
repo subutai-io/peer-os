@@ -60,11 +60,15 @@ public class CreateEnvironmentTask implements Runnable
                 }
             }
 
+            //TODO fix when environment is created on local peer only
+            //            if ( !remotePeerIps.isEmpty() )
+            //            {
             int vlan = localPeer.setupTunnels( remotePeerIps, vni, true );
 
             //save container group
             localPeer.createEmptyContainerGroup( environment.getId(), localPeer.getId(), localPeer.getOwnerId(), vni,
                     vlan );
+            //            }
 
             environment.setVni( vni );
 

@@ -13,7 +13,6 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.peer.api.ContainerGroup;
 
 import com.google.common.base.Preconditions;
@@ -134,7 +133,7 @@ public class ContainerGroupEntity implements ContainerGroup
     public void setContainerIds( final Set<UUID> containerIds )
 
     {
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerIds ) );
+        Preconditions.checkNotNull( containerIds );
 
         Set<String> ids = Sets.newHashSet();
 
