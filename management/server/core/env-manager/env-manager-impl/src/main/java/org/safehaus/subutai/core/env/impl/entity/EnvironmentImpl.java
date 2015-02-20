@@ -372,6 +372,8 @@ public class EnvironmentImpl implements Environment, Serializable
     public void setVni( long vni )
     {
         this.vni = vni;
+
+        dataService.update( this );
     }
 
 

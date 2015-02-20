@@ -20,7 +20,7 @@ public interface ManagementHost extends Host
 
     public String readFile( String path ) throws IOException;
 
-    public void setupTunnels( Set<String> peerIps, long vni, boolean newVni ) throws PeerException;
+    public int setupTunnels( Set<String> peerIps, long vni, boolean newVni ) throws PeerException;
 
     public Set<Long> getTakenVniIds() throws PeerException;
 }

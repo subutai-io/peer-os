@@ -12,6 +12,7 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.CommandStatus;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
@@ -33,10 +34,12 @@ import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.common.util.NumUtil;
 import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageException;
 import org.safehaus.subutai.core.messenger.api.Messenger;
+import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.Payload;
 import org.safehaus.subutai.core.peer.api.RemotePeer;
@@ -45,6 +48,7 @@ import org.safehaus.subutai.core.peer.impl.command.CommandRequest;
 import org.safehaus.subutai.core.peer.impl.command.CommandResponseListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandResultImpl;
 import org.safehaus.subutai.core.peer.impl.container.ContainersDestructionResultImpl;
+import org.safehaus.subutai.core.peer.impl.container.CreateContainerGroupResponse;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainersRequest;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainersResponse;
 import org.safehaus.subutai.core.peer.impl.container.DestroyEnvironmentContainersRequest;
@@ -940,6 +944,40 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public Set<HostInfoModel> createContainerGroup( final CreateContainerGroupRequest request ) throws PeerException
+    {
+
+        Preconditions.checkNotNull( request, "Invalid request" );
+        Preconditions.checkNotNull( request.getEnvironmentId(), "Invalid environment id" );
+        Preconditions.checkNotNull( request.getInitiatorPeerId(), "Invalid initiator peer id" );
+        Preconditions.checkNotNull( request.getOwnerId(), "Invalid owner id" );
+        Preconditions.checkArgument(
+                NumUtil.isLongBetween( request.getVni(), NetworkManager.MIN_VNI_ID, NetworkManager.MAX_VNI_ID ) );
+        Preconditions
+                .checkArgument( !CollectionUtil.isCollectionEmpty( request.getTemplates() ), "Invalid template set" );
+        Preconditions.checkArgument( request.getNumberOfContainers() > 0, "Invalid number of containers" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( request.getStrategyId() ), "Invalid strategy id" );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, request.getEnvironmentId().toString() );
+
+        CreateContainerGroupResponse response =
+                sendRequest( request, RecipientType.CREATE_CONTAINER_GROUP_REQUEST.name(),
+                        Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateContainerGroupResponse.class,
+                        Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT, headers );
+
+        if ( response != null )
+        {
+            return response.getHosts();
+        }
+        else
+        {
+            throw new PeerException( "Command timed out" );
+        }
+    }
+
+
+    @Override
     public Set<HostInfoModel> createContainers( final UUID environmentId, final UUID initiatorPeerId,
                                                 final UUID ownerId, final List<Template> templates,
                                                 final int numberOfContainers, final String strategyId,
@@ -1022,7 +1060,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setupTunnels( final Set<String> peerIps, final long vni, final boolean newVni ) throws PeerException
+    public int setupTunnels( final Set<String> peerIps, final long vni, final boolean newVni ) throws PeerException
     {
         String path = "peer/tunnels";
 
@@ -1034,7 +1072,9 @@ public class RemotePeerImpl implements RemotePeer
             params.put( "vni", String.valueOf( vni ) );
             params.put( "newVni", String.valueOf( newVni ) );
 
-            post( path, params, null );
+            String response = post( path, params, null );
+
+            return Integer.parseInt( response );
         }
         catch ( Exception e )
         {

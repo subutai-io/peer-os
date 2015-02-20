@@ -185,7 +185,7 @@ public interface RestService
 
     @POST
     @Path( "tunnels" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( { MediaType.TEXT_PLAIN } )
     Response setupTunnels( @FormParam( "peerIps" ) Set<String> peerIps, @FormParam( "vni" ) long vni,
                            @FormParam( "newVni" ) boolean newVni );
 }

@@ -13,12 +13,10 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.peer.api.ContainerGroup;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 
@@ -37,34 +35,47 @@ public class ContainerGroupEntity implements ContainerGroup
     private String initiatorPeerId;
     @Column( name = "owner_id", nullable = false )
     private String ownerId;
-    @Column( name = "template_name", nullable = false )
-    private String templateName;
+    @Column( name = "vlan", nullable = false )
+    private Integer vlan;
+    @Column( name = "vni", nullable = false )
+    private Long vni;
 
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
     private Set<String> containerIds = Sets.newHashSet();
 
 
-    public ContainerGroupEntity( final UUID environmentId, final UUID initiatorPeerId, final UUID ownerId,
-                                 final String templateName, final Set<ContainerHost> containerHosts )
+    public ContainerGroupEntity( final Long vni, final Integer vlan, final UUID environmentId,
+                                 final UUID initiatorPeerId, final UUID ownerId )
     {
+        Preconditions.checkNotNull( vni );
+        Preconditions.checkNotNull( vlan );
         Preconditions.checkNotNull( environmentId );
         Preconditions.checkNotNull( initiatorPeerId );
         Preconditions.checkNotNull( ownerId );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
 
+        this.vni = vni;
+        this.vlan = vlan;
         this.environmentId = environmentId.toString();
         this.initiatorPeerId = initiatorPeerId.toString();
         this.ownerId = ownerId.toString();
-        this.templateName = templateName;
-        for ( ContainerHost containerHost : containerHosts )
-        {
-            containerIds.add( containerHost.getHostId() );
-        }
     }
 
 
     protected ContainerGroupEntity() {}
+
+
+    @Override
+    public Long getVni()
+    {
+        return vni;
+    }
+
+
+    @Override
+    public Integer getVlan()
+    {
+        return vlan;
+    }
 
 
     @Override
@@ -103,19 +114,6 @@ public class ContainerGroupEntity implements ContainerGroup
     public void setOwnerId( final String ownerId )
     {
         this.ownerId = ownerId;
-    }
-
-
-    @Override
-    public String getTemplateName()
-    {
-        return templateName;
-    }
-
-
-    public void setTemplateName( final String templateName )
-    {
-        this.templateName = templateName;
     }
 
 

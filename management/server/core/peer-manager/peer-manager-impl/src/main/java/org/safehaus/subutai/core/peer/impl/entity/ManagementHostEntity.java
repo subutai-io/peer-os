@@ -163,7 +163,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
-    public void setupTunnels( final Set<String> peerIps, final long vni, final boolean newVni ) throws PeerException
+    public int setupTunnels( final Set<String> peerIps, final long vni, final boolean newVni ) throws PeerException
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
         Preconditions.checkArgument( NumUtil.isLongBetween( vni, NetworkManager.MIN_VNI_ID, NetworkManager.MAX_VNI_ID ),
@@ -171,10 +171,10 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
                         NetworkManager.MAX_VNI_ID ) );
 
         //need to execute sequentially since other parallel executions can take the same VNI
-        Future future = queueSequentialTask( new Callable<Object>()
+        Future<Integer> future = queueSequentialTask( new Callable<Integer>()
         {
             @Override
-            public Object call() throws Exception
+            public Integer call() throws Exception
             {
 
                 NetworkManager networkManager = getNetworkManager();
@@ -213,13 +213,13 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
                     setupVniVlanMapping( tunnelId, vni, vlanId, mappings );
                 }
 
-                return null;
+                return vlanId;
             }
         } );
 
         try
         {
-            future.get();
+            return future.get();
         }
         catch ( InterruptedException e )
         {

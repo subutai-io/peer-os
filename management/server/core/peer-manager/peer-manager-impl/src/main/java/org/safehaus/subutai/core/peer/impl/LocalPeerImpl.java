@@ -17,6 +17,7 @@ import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
@@ -39,6 +40,7 @@ import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.util.NumUtil;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
@@ -50,6 +52,7 @@ import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
+import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.api.ContainerGroup;
 import org.safehaus.subutai.core.peer.api.ContainerGroupNotFoundException;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
@@ -95,6 +98,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
     private static final long HOST_INACTIVE_TIME = 5 * 1000 * 60; // 5 min
+    private static final int WAIT_CONTAINER_CONNECTION_SEC = 180;
     private PeerManager peerManager;
     private TemplateRegistry templateRegistry;
     private ManagementHost managementHost;
@@ -249,7 +253,214 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     }
 
 
-    //TODO wrap all parameters into request object
+    @Override
+    public void createEmptyContainerGroup( UUID environmentId, UUID initiatorPeerId, UUID ownerId, long vni, int vlan )
+            throws PeerException
+    {
+        try
+        {
+            findContainerGroupByEnvironmentId( environmentId );
+            throw new PeerException( String.format( "Container group with environment id %s exists", environmentId ) );
+        }
+        catch ( ContainerGroupNotFoundException e )
+        {
+            ContainerGroupEntity containerGroup =
+                    new ContainerGroupEntity( vni, vlan, environmentId, initiatorPeerId, ownerId );
+
+            containerGroupDataService.persist( containerGroup );
+        }
+    }
+
+
+    @Override
+    public Set<HostInfoModel> createContainerGroup( final CreateContainerGroupRequest request ) throws PeerException
+    {
+
+        Preconditions.checkNotNull( request, "Invalid request" );
+        Preconditions.checkNotNull( request.getEnvironmentId(), "Invalid environment id" );
+        Preconditions.checkNotNull( request.getInitiatorPeerId(), "Invalid initiator peer id" );
+        Preconditions.checkNotNull( request.getOwnerId(), "Invalid owner id" );
+        Preconditions.checkArgument(
+                NumUtil.isLongBetween( request.getVni(), NetworkManager.MIN_VNI_ID, NetworkManager.MAX_VNI_ID ) );
+        Preconditions
+                .checkArgument( !CollectionUtil.isCollectionEmpty( request.getTemplates() ), "Invalid template set" );
+        Preconditions.checkArgument( request.getNumberOfContainers() > 0, "Invalid number of containers" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( request.getStrategyId() ), "Invalid strategy id" );
+
+
+        //check if strategy exists
+        try
+        {
+            strategyManager.findStrategyById( request.getStrategyId() );
+        }
+        catch ( StrategyNotFoundException e )
+        {
+            throw new PeerException( e );
+        }
+
+
+        //setup networking
+        Set<String> remotePeerIps = request.getRemotePeerIps();
+        remotePeerIps.remove( getManagementHost().getIpByInterfaceName( "eth1" ) );
+        try
+        {
+            //container group of the target environment already exists
+            ContainerGroup containerGroup = findContainerGroupByEnvironmentId( request.getEnvironmentId() );
+            if ( containerGroup.getVni() != request.getVni() )
+            {
+                throw new PeerException(
+                        String.format( "Supplied VNI %d and found VNI %d do not match", request.getVni(),
+                                containerGroup.getVni() ) );
+            }
+
+            //use existing VNI
+            setupTunnels( remotePeerIps, containerGroup.getVni(), false );
+        }
+        catch ( ContainerGroupNotFoundException e )
+        {
+            //setup tunnels using supplied VNI as new VNI
+            int vlan = setupTunnels( remotePeerIps, request.getVni(), true );
+            //create container group  entity
+            createEmptyContainerGroup( request.getEnvironmentId(), request.getInitiatorPeerId(), request.getOwnerId(),
+                    request.getVni(), vlan );
+        }
+
+
+        //try to register remote templates with local registry
+        try
+        {
+            for ( Template t : request.getTemplates() )
+            {
+                if ( t.isRemote() )
+                {
+                    tryToRegister( t );
+                }
+            }
+        }
+        catch ( RegistryException e )
+        {
+            throw new PeerException( e );
+        }
+
+
+        //collect resource host metrics  & prepare templates on each of them
+        List<ResourceHostMetric> serverMetricMap = new ArrayList<>();
+        for ( ResourceHost resourceHost : getResourceHosts() )
+        {
+            //take connected resource hosts for container creation
+            //and prepare needed templates
+            if ( resourceHost.isConnected() )
+            {
+                try
+                {
+                    serverMetricMap.add( resourceHost.getHostMetric() );
+                    resourceHost.prepareTemplates( request.getTemplates() );
+                }
+                catch ( ResourceHostException e )
+                {
+                    throw new PeerException( e );
+                }
+            }
+        }
+
+        //calculate placement strategy
+        Map<ResourceHostMetric, Integer> slots;
+        try
+        {
+            slots = strategyManager.getPlacementDistribution( serverMetricMap, request.getNumberOfContainers(),
+                    request.getStrategyId(), request.getCriteria() );
+        }
+        catch ( StrategyException e )
+        {
+            throw new PeerException( e );
+        }
+
+
+        //distribute new containers' names across selected resource hosts
+        Map<ResourceHost, Set<String>> containerDistribution = Maps.newHashMap();
+        String templateName = request.getTemplates().get( request.getTemplates().size() - 1 ).getTemplateName();
+
+        for ( Map.Entry<ResourceHostMetric, Integer> e : slots.entrySet() )
+        {
+            Set<String> hostCloneNames = new HashSet<>();
+            for ( int i = 0; i < e.getValue(); i++ )
+            {
+                String newContainerName = StringUtil
+                        .trimToSize( String.format( "%s%s", templateName, UUID.randomUUID() ).replace( "-", "" ),
+                                Common.MAX_CONTAINER_NAME_LEN );
+                hostCloneNames.add( newContainerName );
+            }
+            ResourceHost resourceHost = getResourceHostByName( e.getKey().getHost() );
+            containerDistribution.put( resourceHost, hostCloneNames );
+        }
+
+
+        List<Future<ContainerHost>> taskFutures = Lists.newArrayList();
+        ExecutorService executorService = Executors.newFixedThreadPool( request.getNumberOfContainers() );
+
+        //create containers in parallel on each resource host
+        for ( Map.Entry<ResourceHost, Set<String>> resourceHostDistribution : containerDistribution.entrySet() )
+        {
+            ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) resourceHostDistribution.getKey();
+
+            for ( String hostname : resourceHostDistribution.getValue() )
+            {
+                taskFutures.add( executorService.submit(
+                        new CreateContainerWrapperTask( resourceHostEntity, templateName, hostname,
+                                WAIT_CONTAINER_CONNECTION_SEC ) ) );
+            }
+        }
+
+        Set<HostInfoModel> result = Sets.newHashSet();
+        Set<ContainerHost> newContainers = Sets.newHashSet();
+
+        //wait for succeeded containers
+        for ( Future<ContainerHost> future : taskFutures )
+        {
+            try
+            {
+                ContainerHost containerHost = future.get();
+                newContainers.add( new ContainerHostEntity( getId().toString(),
+                        hostRegistry.getContainerHostInfoById( containerHost.getId() ) ) );
+                result.add( new HostInfoModel( containerHost ) );
+            }
+            catch ( ExecutionException | InterruptedException | HostDisconnectedException e )
+            {
+                LOG.error( "Error creating container", e );
+            }
+        }
+
+        executorService.shutdown();
+
+        if ( !CollectionUtil.isCollectionEmpty( newContainers ) )
+        {
+            try
+            {
+                //update existing container group to include new containers
+                ContainerGroupEntity containerGroup =
+                        ( ContainerGroupEntity ) findContainerGroupByEnvironmentId( request.getEnvironmentId() );
+
+                Set<UUID> containerIds = Sets.newHashSet( containerGroup.getContainerIds() );
+
+                for ( ContainerHost containerHost : newContainers )
+                {
+                    containerIds.add( containerHost.getId() );
+                }
+
+                containerGroup.setContainerIds( containerIds );
+
+                containerGroupDataService.update( containerGroup );
+            }
+            catch ( ContainerGroupNotFoundException e )
+            {
+                LOG.error( "Could not find container group", e );
+            }
+        }
+
+        return result;
+    }
+
+
     public Set<HostInfoModel> createContainers( final UUID environmentId, final UUID initiatorPeerId,
                                                 final UUID ownerId, final List<Template> templates,
                                                 final int numberOfContainers, final String strategyId,
@@ -404,8 +615,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             catch ( ContainerGroupNotFoundException e )
             {
                 //create container group for new containers
-                containerGroup = new ContainerGroupEntity( environmentId, initiatorPeerId, ownerId, templateName,
-                        newContainers );
+                containerGroup = new ContainerGroupEntity( 0L, 0, environmentId, initiatorPeerId, ownerId );
 
 
                 containerGroupDataService.persist( containerGroup );
@@ -692,16 +902,17 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             Set<UUID> containerIds = containerGroup.getContainerIds();
             containerIds.remove( host.getId() );
 
-            if ( containerIds.isEmpty() )
-            {
-                containerGroupDataService.remove( containerGroup.getEnvironmentId().toString() );
-            }
-            else
-            {
-                containerGroup.setContainerIds( containerIds );
+            //            if ( containerIds.isEmpty() )
+            //            {
+            //we should not remove container group since it remembers vni
+            // containerGroupDataService.remove( containerGroup.getEnvironmentId().toString() );
+            //            }
+            //            else
+            //            {
+            containerGroup.setContainerIds( containerIds );
 
-                containerGroupDataService.update( containerGroup );
-            }
+            containerGroupDataService.update( containerGroup );
+            //            }
         }
         catch ( ResourceHostException e )
         {
@@ -1391,9 +1602,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
-    public void setupTunnels( final Set<String> peerIps, final long vni, final boolean newVni ) throws PeerException
+    public int setupTunnels( final Set<String> peerIps, final long vni, final boolean newVni ) throws PeerException
     {
-        managementHost.setupTunnels( peerIps, vni, newVni );
+        return managementHost.setupTunnels( peerIps, vni, newVni );
     }
 
 

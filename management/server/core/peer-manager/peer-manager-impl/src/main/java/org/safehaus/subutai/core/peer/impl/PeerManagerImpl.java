@@ -28,6 +28,7 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandRequestListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandResponseListener;
+import org.safehaus.subutai.core.peer.impl.container.CreateContainerGroupRequestListener;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainersRequestListener;
 import org.safehaus.subutai.core.peer.impl.container.DestroyEnvironmentContainersRequestListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
@@ -167,6 +168,7 @@ public class PeerManagerImpl implements PeerManager
         messenger.addMessageListener( messageResponseListener );
         //add create container requests listener
         addRequestListener( new CreateContainersRequestListener( localPeer ) );
+        addRequestListener( new CreateContainerGroupRequestListener( localPeer ) );
         //add destroy environment containers requests listener
         addRequestListener( new DestroyEnvironmentContainersRequestListener( localPeer ) );
         //add echo listener
@@ -301,6 +303,15 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public PeerInfo getLocalPeerInfo()
     {
+        try
+        {
+            peerInfo.setIp( localPeer.getManagementHost().getIpByInterfaceName( "eth1" ) );
+        }
+        catch ( HostNotFoundException e )
+        {
+            LOG.warn( "Error setting local peer info IP", e );
+        }
+
         return peerInfo;
     }
 

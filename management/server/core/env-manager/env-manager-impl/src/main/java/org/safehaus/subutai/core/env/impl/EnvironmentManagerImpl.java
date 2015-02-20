@@ -18,6 +18,7 @@ import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.env.api.EnvironmentEventListener;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
@@ -165,7 +166,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         final ResultHolder<EnvironmentCreationException> resultHolder = new ResultHolder<>();
 
         CreateEnvironmentTask createEnvironmentTask =
-                new CreateEnvironmentTask( this, environment, topology, resultHolder );
+                new CreateEnvironmentTask( peerManager.getLocalPeer(), this, environment, topology, resultHolder );
 
         executor.submit( createEnvironmentTask );
 
@@ -199,7 +200,39 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     public long findFreeVni( final Set<Peer> peers ) throws EnvironmentManagerException
     {
-        return 100;
+
+        Set<Long> takenVnis = Sets.newHashSet();
+        for ( Peer peer : peers )
+        {
+            try
+            {
+                takenVnis.addAll( peer.getTakenVniIds() );
+            }
+            catch ( PeerException e )
+            {
+                throw new EnvironmentManagerException(
+                        String.format( "Error obtaining used VNIs from peer %s", peer.getName() ), e );
+            }
+        }
+
+        int maxIterations = 10000;
+        int currentIteration = 0;
+        long vni;
+
+        do
+        {
+            vni = ( long ) ( Math.random() * ( NetworkManager.MAX_VNI_ID - NetworkManager.MIN_VNI_ID ) )
+                    + NetworkManager.MIN_VNI_ID;
+            currentIteration++;
+        }
+        while ( takenVnis.contains( vni ) && currentIteration < maxIterations );
+
+        if ( takenVnis.contains( vni ) )
+        {
+            throw new EnvironmentManagerException( "No free VNi found", null );
+        }
+
+        return vni;
     }
 
 

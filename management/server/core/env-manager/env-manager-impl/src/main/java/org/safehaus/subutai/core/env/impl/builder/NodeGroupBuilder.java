@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
+import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.environment.NodeGroup;
 import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.common.peer.Peer;
@@ -36,16 +37,18 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
     private final Peer peer;
     private final Set<NodeGroup> nodeGroups;
     private final String defaultDomain;
+    private final Set<Peer> allPeers;
 
 
     public NodeGroupBuilder( final EnvironmentImpl environment, final TemplateRegistry templateRegistry,
                              final PeerManager peerManager, final Peer peer, final Set<NodeGroup> nodeGroups,
-                             final String defaultDomain )
+                             final Set<Peer> allPeers, final String defaultDomain )
     {
         Preconditions.checkNotNull( environment );
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( peer );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( allPeers ) );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( nodeGroups ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( defaultDomain ) );
 
@@ -53,6 +56,7 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
         this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
         this.peer = peer;
+        this.allPeers = Sets.newHashSet( allPeers );
         this.nodeGroups = nodeGroups;
         this.defaultDomain = defaultDomain;
     }
@@ -60,10 +64,11 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
 
     /**
      * Before triggering container host creation process force to verify for all required templates existence
+     *
      * @param sourcePeerId - initializer peer id
      * @param templateName - template name to fetch
+     *
      * @return - list of templates with parent dependencies
-     * @throws NodeGroupBuildException
      */
     public List<Template> fetchRequiredTemplates( UUID sourcePeerId, final String templateName )
             throws NodeGroupBuildException
@@ -101,6 +106,7 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
      * Computes a result, or throws an exception if unable to do so.
      *
      * @return computed result
+     *
      * @throws NodeGroupBuildException if unable to compute a result
      */
     @Override
@@ -118,26 +124,51 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
             try
             {
 
-                Set<HostInfoModel> newHosts =
-                        peer.createContainers( environment.getId(), localPeer.getId(), localPeer.getOwnerId(),
+                //                Set<HostInfoModel> newHosts =
+                //                        peer.createContainers( environment.getId(), localPeer.getId(), localPeer
+                // .getOwnerId(),
+                //                                fetchRequiredTemplates( peer.getId(), nodeGroup.getTemplateName() ),
+                //                                nodeGroup.getNumberOfContainers(),
+                //                                nodeGroup.getContainerPlacementStrategy().getStrategyId(),
+                //                                nodeGroup.getContainerPlacementStrategy().getCriteriaAsList() );
+
+
+                Set<String> remotePeerIps = Sets.newHashSet();
+                //add initiator peer mandatorily
+                allPeers.add( localPeer );
+                for ( Peer aPeer : allPeers )
+                {
+
+                    if ( aPeer.getId().equals( localPeer.getId() ) )
+                    {
+                        remotePeerIps.add( localPeer.getManagementHost().getIpByInterfaceName( "eth1" ) );
+                    }
+                    else if ( !aPeer.getId().equals( peer.getId() ) )
+                    {
+                        remotePeerIps.add( aPeer.getPeerInfo().getIp() );
+                    }
+                }
+                Set<HostInfoModel> newHosts = peer.createContainerGroup(
+                        new CreateContainerGroupRequest( remotePeerIps, environment.getId(), localPeer.getId(),
+                                localPeer.getOwnerId(), environment.getVni(),
                                 fetchRequiredTemplates( peer.getId(), nodeGroup.getTemplateName() ),
                                 nodeGroup.getNumberOfContainers(),
                                 nodeGroup.getContainerPlacementStrategy().getStrategyId(),
-                                nodeGroup.getContainerPlacementStrategy().getCriteriaAsList() );
-
+                                nodeGroup.getContainerPlacementStrategy().getCriteriaAsList() ) );
 
                 for ( HostInfoModel newHost : newHosts )
                 {
                     containers.add( new EnvironmentContainerImpl( localPeer.getId(), peer, nodeGroup.getName(), newHost,
                             templateRegistry.getTemplate( nodeGroup.getTemplateName() ), nodeGroup.getSshGroupId(),
-                            nodeGroup.getHostsGroupId(), defaultDomain) );
+                            nodeGroup.getHostsGroupId(), defaultDomain ) );
                 }
 
 
                 if ( containers.size() < nodeGroup.getNumberOfContainers() )
                 {
-                    exception = new NodeGroupBuildException( String.format( "Requested %d but created only %d containers",
-                            nodeGroup.getNumberOfContainers(), containers.size() ), null );
+                    exception = new NodeGroupBuildException(
+                            String.format( "Requested %d but created only %d containers",
+                                    nodeGroup.getNumberOfContainers(), containers.size() ), null );
                 }
             }
             catch ( Exception e )

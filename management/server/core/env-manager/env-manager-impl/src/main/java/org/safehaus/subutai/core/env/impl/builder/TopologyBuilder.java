@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.env.impl.builder;
 
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletionService;
@@ -64,7 +65,8 @@ public class TopologyBuilder
         {
             taskCompletionService.submit(
                     new NodeGroupBuilder( environment, templateRegistry, peerManager, peerPlacement.getKey(),
-                            peerPlacement.getValue(), defaultDomain ) );
+                            peerPlacement.getValue(), Collections.unmodifiableSet( placement.keySet() ),
+                            defaultDomain ) );
         }
 
         Set<Exception> errors = Sets.newHashSet();

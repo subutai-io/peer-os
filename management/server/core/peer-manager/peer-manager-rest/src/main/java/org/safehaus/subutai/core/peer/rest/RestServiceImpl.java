@@ -544,8 +544,8 @@ public class RestServiceImpl implements RestService
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            localPeer.setupTunnels( peerIps, vni, newVni );
-            return Response.ok().build();
+            int vlan = localPeer.setupTunnels( peerIps, vni, newVni );
+            return Response.ok( vlan ).build();
         }
         catch ( Exception e )
         {

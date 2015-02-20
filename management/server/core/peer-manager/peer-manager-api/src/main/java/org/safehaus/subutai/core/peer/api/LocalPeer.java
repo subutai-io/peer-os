@@ -70,6 +70,9 @@ public interface LocalPeer extends Peer
 
     public void cleanDb();
 
+    public void createEmptyContainerGroup( UUID environmentId, UUID initiatorPeerId, UUID ownerId, long vni, int vlan )
+            throws PeerException;
+
     public ContainerHost createContainer( final ResourceHost resourceHost, final Template template,
                                           final String containerName ) throws PeerException;
 

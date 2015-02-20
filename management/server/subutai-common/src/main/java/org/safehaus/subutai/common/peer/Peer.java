@@ -10,6 +10,7 @@ import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Criteria;
@@ -36,6 +37,8 @@ public interface Peer
     public UUID getOwnerId();
 
     public PeerInfo getPeerInfo();
+
+    public Set<HostInfoModel> createContainerGroup( CreateContainerGroupRequest request ) throws PeerException;
 
     public Set<HostInfoModel> createContainers( final UUID environmentId, final UUID initiatorPeerId,
                                                 final UUID ownerId, final List<Template> templates,
@@ -232,5 +235,6 @@ public interface Peer
 
     public Set<Long> getTakenVniIds() throws PeerException;
 
-    public void setupTunnels( Set<String> peerIps, long vni, boolean newVni ) throws PeerException;
+    //TODO move this method to LocalPeer
+    public int setupTunnels( Set<String> peerIps, long vni, boolean newVni ) throws PeerException;
 }
