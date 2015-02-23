@@ -1,31 +1,70 @@
 package org.safehaus.subutai.common.security.crypto.keystore;
 
+import org.safehaus.subutai.common.settings.Common;
 
 public class KeyStoreData
 {
 	private KeyStoreType keyStoreType = null;
-	private String  keyStoreLocation = "";
+	private String  keyStoreFile = "";
 	private String  password = "";
 	private String  alias = "";
 	private String  importFileLocation = "";
 	private String  exportFileLocation = "";
+
 	private boolean override  = false;
 	private String  HEXCert = "";
 
-	
 	/*
 	 * **********************************************************************
 	*/
-	public void setupKeyStore()
+	public void setupKeyStorePx1()
 	{
 		keyStoreType = KeyStoreType.JKS;
+		keyStoreFile = Common.KEYSTORE_PX1_FILE;
+		password     = Common.KEYSTORE_PX1_PSW;
+		alias        = Common.KEYSTORE_PX1_ROOT_ALIAS;
+		importFileLocation = Common.CERT_IMPORT_DIR;
+		exportFileLocation = Common.CERT_EXPORT_DIR;
 	}
-	public void setupTrustStore()
+
+	/*
+	 * **********************************************************************
+	*/
+	public void setupKeyStorePx2()
 	{
 		keyStoreType = KeyStoreType.JKS;
+		keyStoreFile = Common.KEYSTORE_PX2_FILE;
+		password     = Common.KEYSTORE_PX2_PSW;
+		alias        = Common.KEYSTORE_PX2_ROOT_ALIAS;
+		importFileLocation = Common.CERT_IMPORT_DIR;
+		exportFileLocation = Common.CERT_EXPORT_DIR;
 	}
-	
-	
+
+	/*
+	 * **********************************************************************
+	*/
+	public void setupTrustStorePx1()
+	{
+		keyStoreType = KeyStoreType.JKS;
+		keyStoreFile = Common.TRUSTSTORE_PX1_FILE;
+		password     = Common.TRUSTSTORE_PX1_PSW;
+		alias        = Common.TRUSTSTORE_PX1_ROOT_ALIAS;
+		importFileLocation = Common.CERT_IMPORT_DIR;
+		exportFileLocation = Common.CERT_EXPORT_DIR;
+	}
+	/*
+	 * **********************************************************************
+	*/
+	public void setupTrustStorePx2()
+	{
+		keyStoreType = KeyStoreType.JKS;
+		keyStoreFile = Common.TRUSTSTORE_PX2_FILE;
+		password     = Common.TRUSTSTORE_PX2_PSW;
+		alias        = Common.TRUSTSTORE_PX2_ROOT_ALIAS;
+		importFileLocation = Common.CERT_IMPORT_DIR;
+		exportFileLocation = Common.CERT_EXPORT_DIR;
+	}
+
 	/*
 	 * **********************************************************************
 	*/
@@ -36,14 +75,6 @@ public class KeyStoreData
 	public void setKeyStoreType( KeyStoreType keyStoreType )
 	{
 		this.keyStoreType = keyStoreType;
-	}
-	public String getKeyStoreLocation()
-	{
-		return keyStoreLocation;
-	}
-	public void setKeyStoreLocation( String keyStoreLocation )
-	{
-		this.keyStoreLocation = keyStoreLocation;
 	}
 	public String getPassword()
 	{
@@ -93,7 +124,16 @@ public class KeyStoreData
 	{
 		HEXCert = hEXCert;
 	}
-	
-	
-	
+
+
+	public String getKeyStoreFile()
+	{
+		return keyStoreFile;
+	}
+
+
+	public void setKeyStoreFile( final String keyStoreFile )
+	{
+		this.keyStoreFile = keyStoreFile;
+	}
 }

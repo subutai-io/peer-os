@@ -59,7 +59,7 @@ public class KeyStoreManager
 			}
 			else
 			{
-				File file = new File( keyStoreData.getKeyStoreLocation() );
+				File file = new File( keyStoreData.getKeyStoreFile() );
 				finStream = new FileInputStream( file );
 				
 				if(file.exists())
@@ -120,7 +120,7 @@ public class KeyStoreManager
 			}
 			else
 			{
-				File file = new File( keyStoreData.getKeyStoreLocation() );
+				File file = new File( keyStoreData.getKeyStoreFile() );
 				foutStream = new FileOutputStream( file );
 				keyStore.store(foutStream, keyStoreData.getPassword().toCharArray() );
 			}
