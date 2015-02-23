@@ -64,7 +64,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response processRegisterRequest( String peer )
+    public Response processRegisterRequest( String peer,String root_cert_px2,String peer_cert_px2 )
     {
         PeerInfo p = JsonUtil.fromJson( peer, PeerInfo.class );
         p.setIp( getRequestIp() );
