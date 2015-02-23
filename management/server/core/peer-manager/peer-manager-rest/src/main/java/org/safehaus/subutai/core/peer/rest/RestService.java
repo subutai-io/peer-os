@@ -44,8 +44,8 @@ public interface RestService
     @Path( "register" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response processRegisterRequest( @FormParam( "peer" ) String peer,
-                                            @FormParam( "peer" ) String root_cert_px2,
-                                            @FormParam( "peer" ) String peer_cert_px2 );
+                                            @FormParam( "root_cert_px2" ) String root_cert_px2,
+                                            @FormParam( "peer_cert_px2" ) String peer_cert_px2 );
 
     @DELETE
     @Path( "unregister" )
