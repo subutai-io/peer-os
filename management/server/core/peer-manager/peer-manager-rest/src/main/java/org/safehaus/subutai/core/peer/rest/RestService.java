@@ -1,8 +1,6 @@
 package org.safehaus.subutai.core.peer.rest;
 
 
-import java.util.Set;
-
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -181,11 +179,15 @@ public interface RestService
     @GET
     @Path( "vni" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response getTakenVni();
+    Response getReservedVnis();
+
+    @POST
+    @Path( "vni" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response reserveVni( @FormParam( "vni" ) String vni );
 
     @POST
     @Path( "tunnels" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    Response setupTunnels( @FormParam( "peerIps" ) Set<String> peerIps, @FormParam( "vni" ) long vni,
-                           @FormParam( "newVni" ) boolean newVni );
+    Response setupTunnels( @FormParam( "peerIps" ) String peerIps, @FormParam( "vni" ) String vni );
 }

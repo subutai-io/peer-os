@@ -16,9 +16,11 @@ import org.safehaus.subutai.common.environment.EnvironmentModificationException;
 import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
+import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.env.api.EnvironmentEventListener;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
@@ -201,17 +203,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public long findFreeVni( final Set<Peer> peers ) throws EnvironmentManagerException
     {
 
-        Set<Long> takenVnis = Sets.newHashSet();
+        Set<Long> reservedVnis = Sets.newHashSet();
         for ( Peer peer : peers )
         {
             try
             {
-                takenVnis.addAll( peer.getTakenVniIds() );
+                for ( Vni vni : peer.getReservedVnis() )
+                {
+                    reservedVnis.add( vni.getVni() );
+                }
             }
             catch ( PeerException e )
             {
                 throw new EnvironmentManagerException(
-                        String.format( "Error obtaining used VNIs from peer %s", peer.getName() ), e );
+                        String.format( "Error obtaining reserved vnis from peer %s", peer.getName() ), e );
             }
         }
 
@@ -221,15 +226,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         do
         {
-            vni = ( long ) ( Math.random() * ( NetworkManager.MAX_VNI_ID - NetworkManager.MIN_VNI_ID ) )
-                    + NetworkManager.MIN_VNI_ID;
+            vni = ( long ) ( Math.random() * ( Common.MAX_VNI_ID - Common.MIN_VNI_ID ) ) + Common.MIN_VNI_ID;
             currentIteration++;
         }
-        while ( takenVnis.contains( vni ) && currentIteration < maxIterations );
+        while ( reservedVnis.contains( vni ) && currentIteration < maxIterations );
 
-        if ( takenVnis.contains( vni ) )
+        if ( reservedVnis.contains( vni ) )
         {
-            throw new EnvironmentManagerException( "No free VNi found", null );
+            throw new EnvironmentManagerException( "No free Vni found", null );
         }
 
         return vni;
@@ -316,11 +320,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             throw new EnvironmentModificationException(
                     String.format( "Environment status is %s", environment.getStatus() ) );
-        }
-
-        if ( environment.getVni() == null )
-        {
-            throw new EnvironmentModificationException( "Environment VNI is null" );
         }
 
         final Set<ContainerHost> newContainers = Sets.newHashSet();

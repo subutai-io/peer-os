@@ -3,12 +3,14 @@ package org.safehaus.subutai.core.network.impl;
 
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.network.VniVlanMapping;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
@@ -175,30 +177,30 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void setupVniVLanMapping( final int tunnelId, final long vni, final int vLanId )
+    public void setupVniVLanMapping( final int tunnelId, final long vni, final int vLanId, final UUID environmentId )
             throws NetworkManagerException
     {
         Preconditions.checkArgument( tunnelId > 0, "Tunnel id must be greater than 0" );
-        Preconditions.checkArgument( NumUtil.isLongBetween( vni, MIN_VNI_ID, MAX_VNI_ID ) );
+        Preconditions.checkArgument( NumUtil.isLongBetween( vni, Common.MIN_VNI_ID, Common.MAX_VNI_ID ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, MIN_VLAN_ID, MAX_VLAN_ID ) );
 
         execute( getManagementHost(),
-                commands.getSetupVniVlanMappingCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), vni,
-                        vLanId ) );
+                commands.getSetupVniVlanMappingCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), vni, vLanId,
+                        environmentId ) );
     }
 
 
     @Override
-    public void removeVniVLanMapping( final int tunnelId, final long vni, final int vLanId )
+    public void removeVniVLanMapping( final int tunnelId, final long vni, final int vLanId, final UUID environmentId )
             throws NetworkManagerException
     {
         Preconditions.checkArgument( tunnelId > 0, "Tunnel id must be greater than 0" );
-        Preconditions.checkArgument( NumUtil.isLongBetween( vni, MIN_VNI_ID, MAX_VNI_ID ) );
+        Preconditions.checkArgument( NumUtil.isLongBetween( vni, Common.MIN_VNI_ID, Common.MAX_VNI_ID ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, MIN_VLAN_ID, MAX_VLAN_ID ) );
 
         execute( getManagementHost(),
-                commands.getRemoveVniVlanMappingCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), vni,
-                        vLanId ) );
+                commands.getRemoveVniVlanMappingCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), vni, vLanId,
+                        environmentId ) );
     }
 
 
@@ -209,8 +211,9 @@ public class NetworkManagerImpl implements NetworkManager
 
         CommandResult result = execute( getManagementHost(), commands.getListVniVlanMappingsCommand() );
 
-        Pattern p = Pattern.compile(
-                String.format( "(%s\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)", NetworkManager.TUNNEL_PREFIX ) );
+        Pattern p = Pattern.compile( String.format(
+                "\\s*(%s\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3"
+                        + "}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\\s*", NetworkManager.TUNNEL_PREFIX ) );
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 
@@ -222,11 +225,48 @@ public class NetworkManagerImpl implements NetworkManager
             {
                 mappings.add( new VniVlanMapping(
                         Integer.parseInt( m.group( 1 ).replace( NetworkManager.TUNNEL_PREFIX, "" ) ),
-                        Long.parseLong( m.group( 2 ) ), Integer.parseInt( m.group( 3 ) ) ) );
+                        Long.parseLong( m.group( 2 ) ), Integer.parseInt( m.group( 3 ) ),
+                        UUID.fromString( m.group( 4 ) ) ) );
             }
         }
 
         return mappings;
+    }
+
+
+    @Override
+    public void reserveVni( Vni vni ) throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( vni );
+
+        execute( getManagementHost(), commands.getReserveVniCommand( vni.getVni(), vni.getEnvironmentId() ) );
+    }
+
+
+    @Override
+    public Set<Vni> listReservedVnis() throws NetworkManagerException
+    {
+        Set<Vni> reservedVnis = Sets.newHashSet();
+
+        CommandResult result = execute( getManagementHost(), commands.getListReservedVnisCommand() );
+
+        Pattern p = Pattern.compile( "\\s*(\\d+)\\s*,\\s*([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3"
+                + "}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\\s*" );
+
+
+        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
+
+        while ( st.hasMoreTokens() )
+        {
+            Matcher m = p.matcher( st.nextToken() );
+
+            if ( m.find() && m.groupCount() == 2 )
+            {
+                reservedVnis.add( new Vni( Long.parseLong( m.group( 1 ) ), UUID.fromString( m.group( 2 ) ) ) );
+            }
+        }
+
+        return reservedVnis;
     }
 
 

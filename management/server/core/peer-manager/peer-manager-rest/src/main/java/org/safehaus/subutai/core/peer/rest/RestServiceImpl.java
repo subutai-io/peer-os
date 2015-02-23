@@ -9,6 +9,7 @@ import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.PeerInfo;
@@ -524,12 +525,12 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getTakenVni()
+    public Response getReservedVnis()
     {
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            return Response.ok( JsonUtil.toJson( localPeer.getTakenVniIds() ) ).build();
+            return Response.ok( JsonUtil.toJson( localPeer.getReservedVnis() ) ).build();
         }
         catch ( Exception e )
         {
@@ -539,12 +540,30 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setupTunnels( final Set<String> peerIps, final long vni, final boolean newVni )
+    public Response reserveVni( final String vni )
     {
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            int vlan = localPeer.setupTunnels( peerIps, vni, newVni );
+            localPeer.reserveVni( JsonUtil.fromJson( vni, Vni.class ) );
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response setupTunnels( final String peerIps, final String vni )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            int vlan = localPeer
+                    .setupTunnels( JsonUtil.<Set<String>>fromJson( peerIps, new TypeToken<Set<String>>() {}.getType() ),
+                            JsonUtil.fromJson( vni, Vni.class ) );
             return Response.ok( vlan ).build();
         }
         catch ( Exception e )

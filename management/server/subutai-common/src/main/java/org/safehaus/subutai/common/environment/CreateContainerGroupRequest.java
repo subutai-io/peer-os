@@ -11,27 +11,27 @@ import org.safehaus.subutai.common.protocol.Template;
 
 public class CreateContainerGroupRequest
 {
-    private final Set<String> remotePeerIps;
+    private final Set<String> peerIps;
     private final UUID environmentId;
     private final UUID initiatorPeerId;
     private final UUID ownerId;
-    private final long vni;
+    private final String subnetCidr;
     private final List<Template> templates;
     private final int numberOfContainers;
     private final String strategyId;
     private final List<Criteria> criteria;
 
 
-    public CreateContainerGroupRequest( final Set<String> remotePeerIps, final UUID environmentId,
-                                        final UUID initiatorPeerId, final UUID ownerId, final long vni,
-                                        final List<Template> templates, final int numberOfContainers,
-                                        final String strategyId, final List<Criteria> criteria )
+    public CreateContainerGroupRequest( final Set<String> peerIps, final UUID environmentId, final UUID initiatorPeerId,
+                                        final UUID ownerId, final String subnetCidr, final List<Template> templates,
+                                        final int numberOfContainers, final String strategyId,
+                                        final List<Criteria> criteria )
     {
-        this.remotePeerIps = remotePeerIps;
+        this.peerIps = peerIps;
         this.environmentId = environmentId;
         this.initiatorPeerId = initiatorPeerId;
         this.ownerId = ownerId;
-        this.vni = vni;
+        this.subnetCidr = subnetCidr;
         this.templates = templates;
         this.numberOfContainers = numberOfContainers;
         this.strategyId = strategyId;
@@ -39,9 +39,9 @@ public class CreateContainerGroupRequest
     }
 
 
-    public Set<String> getRemotePeerIps()
+    public Set<String> getPeerIps()
     {
-        return remotePeerIps;
+        return peerIps;
     }
 
 
@@ -63,9 +63,9 @@ public class CreateContainerGroupRequest
     }
 
 
-    public long getVni()
+    public String getSubnetCidr()
     {
-        return vni;
+        return subnetCidr;
     }
 
 

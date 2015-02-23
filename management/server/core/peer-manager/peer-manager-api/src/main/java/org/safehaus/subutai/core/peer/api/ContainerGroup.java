@@ -7,10 +7,6 @@ import java.util.UUID;
 
 public interface ContainerGroup
 {
-    public Long getVni();
-
-    public Integer getVlan();
-
     public UUID getEnvironmentId();
 
     public UUID getInitiatorPeerId();

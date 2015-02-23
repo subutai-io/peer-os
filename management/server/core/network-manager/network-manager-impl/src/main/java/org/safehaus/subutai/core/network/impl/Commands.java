@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.network.impl;
 
 
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.peer.ContainerHost;
@@ -116,10 +117,19 @@ public class Commands
     }
 
 
-    public RequestBuilder getSetupVniVlanMappingCommand( String tunnelName, long vni, int vLanId )
+    public RequestBuilder getSetupVniVlanMappingCommand( String tunnelName, long vni, int vLanId, UUID environmentId )
     {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-m", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ) ) );
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
+                Lists.newArrayList( "-m", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ),
+                        environmentId.toString() ) );
+    }
+
+
+    public RequestBuilder getRemoveVniVlanMappingCommand( String tunnelName, long vni, int vLanId, UUID environmentId )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
+                Lists.newArrayList( "-M", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ),
+                        environmentId.toString() ) );
     }
 
 
@@ -129,10 +139,17 @@ public class Commands
     }
 
 
-    public RequestBuilder getRemoveVniVlanMappingCommand( String tunnelName, long vni, int vLanId )
+    public RequestBuilder getReserveVniCommand( long vni, UUID environmentId )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-M", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ) ) );
+                .withCmdArgs( Lists.newArrayList( "-E", String.valueOf( vni ), environmentId.toString() ) );
+    }
+
+
+    public RequestBuilder getListReservedVnisCommand()
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( "-Z" ) );
     }
 
     // ssh and hosts

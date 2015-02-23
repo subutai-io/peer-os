@@ -101,7 +101,7 @@ public class TopologyBuilder
         if ( !errors.isEmpty() )
         {
             throw new EnvironmentBuildException(
-                    String.format( "There were errors during node group creation:  %s", errors ), null );
+                    String.format( "There were errors during container creation:  %s", errors ), null );
         }
     }
 }

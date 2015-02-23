@@ -5,7 +5,9 @@ import java.util.Set;
 import java.util.concurrent.Semaphore;
 
 import org.safehaus.subutai.common.environment.Topology;
+import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
@@ -50,26 +52,56 @@ public class CreateEnvironmentTask implements Runnable
             //figure out free VNI
             long vni = environmentManager.findFreeVni( topology.getNodeGroupPlacement().keySet() );
 
-            //setup tunnels to all remote peers on local peer
-            Set<String> remotePeerIps = Sets.newHashSet();
+            //reserve VNI on all peers
+            Set<Peer> allPeers = Sets.newHashSet( topology.getNodeGroupPlacement().keySet() );
+            //add local peer mandatorily
+            allPeers.add( localPeer );
+
+            for ( Peer peer : allPeers )
+            {
+                try
+                {
+                    peer.reserveVni( new Vni( vni, environment.getId() ) );
+                }
+                catch ( PeerException e )
+                {
+                    if ( peer.isLocal() )
+                    {
+                        throw new EnvironmentCreationException( e );
+                    }
+                    else
+                    {
+                        LOG.error( String.format( "Failed to reserve VNI %d on peer %s. Peer excluded", vni,
+                                peer.getName() ) );
+                        topology.excludePeer( peer );
+                    }
+                }
+            }
+
+
+            if ( topology.getNodeGroupPlacement().keySet().isEmpty() )
+            {
+                throw new EnvironmentCreationException( "Failed to reserve VNi on all peers" );
+            }
+
+            //setup tunnels to all participating peers on local peer in case local peer is not included as provider peer
+            Set<String> peerIps = Sets.newHashSet();
+
+            peerIps.add( localPeer.getManagementHost().getIpByInterfaceName( "eth1" ) );
+
             for ( Peer peer : topology.getNodeGroupPlacement().keySet() )
             {
                 if ( !peer.getId().equals( localPeer.getId() ) )
                 {
-                    remotePeerIps.add( peer.getPeerInfo().getIp() );
+                    peerIps.add( peer.getPeerInfo().getIp() );
                 }
             }
 
-            //TODO fix when environment is created on local peer only
-            //            if ( !remotePeerIps.isEmpty() )
-            //            {
-            int vlan = localPeer.setupTunnels( remotePeerIps, vni, true );
 
-            //save container group
-            localPeer.createEmptyContainerGroup( environment.getId(), localPeer.getId(), localPeer.getOwnerId(), vni,
-                    vlan );
-            //            }
+            int vlan = localPeer.setupTunnels( peerIps, new Vni( vni, environment.getId() ) );
 
+
+            //save environment VNI
             environment.setVni( vni );
 
             environmentManager.growEnvironment( environment.getId(), topology, false );
@@ -79,7 +111,9 @@ public class CreateEnvironmentTask implements Runnable
             LOG.error( String.format( "Error creating environment %s, topology %s", environment.getId(), topology ),
                     e );
 
-            resultHolder.setResult( new EnvironmentCreationException( e ) );
+            resultHolder.setResult(
+                    e instanceof EnvironmentCreationException ? ( EnvironmentCreationException ) e.getCause() :
+                    new EnvironmentCreationException( e ) );
         }
         finally
         {

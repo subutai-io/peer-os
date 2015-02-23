@@ -23,6 +23,14 @@ public class Topology
     }
 
 
+    public void excludePeer( Peer peer )
+    {
+        Preconditions.checkNotNull( peer );
+
+        nodeGroupPlacement.remove( peer );
+    }
+
+
     public void addNodeGroupPlacement( Peer peer, NodeGroup nodeGroup )
     {
         Preconditions.checkNotNull( peer, "Invalid peer" );

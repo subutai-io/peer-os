@@ -22,6 +22,7 @@ import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.metric.ResourceHostMetric;
+import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.ContainersDestructionResult;
 import org.safehaus.subutai.common.peer.Host;
@@ -40,7 +41,6 @@ import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.common.util.NumUtil;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
@@ -52,7 +52,6 @@ import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
-import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.api.ContainerGroup;
 import org.safehaus.subutai.core.peer.api.ContainerGroupNotFoundException;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
@@ -254,39 +253,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
-    public void createEmptyContainerGroup( UUID environmentId, UUID initiatorPeerId, UUID ownerId, long vni, int vlan )
-            throws PeerException
-    {
-        try
-        {
-            findContainerGroupByEnvironmentId( environmentId );
-            throw new PeerException( String.format( "Container group with environment id %s exists", environmentId ) );
-        }
-        catch ( ContainerGroupNotFoundException e )
-        {
-            ContainerGroupEntity containerGroup =
-                    new ContainerGroupEntity( vni, vlan, environmentId, initiatorPeerId, ownerId );
-
-            containerGroupDataService.persist( containerGroup );
-        }
-    }
-
-
-    @Override
     public Set<HostInfoModel> createContainerGroup( final CreateContainerGroupRequest request ) throws PeerException
     {
 
         Preconditions.checkNotNull( request, "Invalid request" );
-        Preconditions.checkNotNull( request.getEnvironmentId(), "Invalid environment id" );
-        Preconditions.checkNotNull( request.getInitiatorPeerId(), "Invalid initiator peer id" );
-        Preconditions.checkNotNull( request.getOwnerId(), "Invalid owner id" );
-        Preconditions.checkArgument(
-                NumUtil.isLongBetween( request.getVni(), NetworkManager.MIN_VNI_ID, NetworkManager.MAX_VNI_ID ) );
-        Preconditions
-                .checkArgument( !CollectionUtil.isCollectionEmpty( request.getTemplates() ), "Invalid template set" );
-        Preconditions.checkArgument( request.getNumberOfContainers() > 0, "Invalid number of containers" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( request.getStrategyId() ), "Invalid strategy id" );
-
 
         //check if strategy exists
         try
@@ -298,32 +268,25 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             throw new PeerException( e );
         }
 
+        //check reserved VNI
+        Vni environmentVni = null;
+        for ( Vni reservedVni : getReservedVnis() )
+        {
+            if ( reservedVni.getEnvironmentId().equals( request.getEnvironmentId() ) )
+            {
+                environmentVni = reservedVni;
+                break;
+            }
+        }
+
+        if ( environmentVni == null )
+        {
+            throw new PeerException(
+                    String.format( "Environment %s has no VNI reserved", request.getEnvironmentId() ) );
+        }
 
         //setup networking
-        Set<String> remotePeerIps = request.getRemotePeerIps();
-        remotePeerIps.remove( getManagementHost().getIpByInterfaceName( "eth1" ) );
-        try
-        {
-            //container group of the target environment already exists
-            ContainerGroup containerGroup = findContainerGroupByEnvironmentId( request.getEnvironmentId() );
-            if ( containerGroup.getVni() != request.getVni() )
-            {
-                throw new PeerException(
-                        String.format( "Supplied VNI %d and found VNI %d do not match", request.getVni(),
-                                containerGroup.getVni() ) );
-            }
-
-            //use existing VNI
-            setupTunnels( remotePeerIps, containerGroup.getVni(), false );
-        }
-        catch ( ContainerGroupNotFoundException e )
-        {
-            //setup tunnels using supplied VNI as new VNI
-            int vlan = setupTunnels( remotePeerIps, request.getVni(), true );
-            //create container group  entity
-            createEmptyContainerGroup( request.getEnvironmentId(), request.getInitiatorPeerId(), request.getOwnerId(),
-                    request.getVni(), vlan );
-        }
+        int vlan = setupTunnels( request.getPeerIps(), environmentVni );
 
 
         //try to register remote templates with local registry
@@ -434,11 +397,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
         if ( !CollectionUtil.isCollectionEmpty( newContainers ) )
         {
+            ContainerGroupEntity containerGroup;
             try
             {
                 //update existing container group to include new containers
-                ContainerGroupEntity containerGroup =
+                containerGroup =
                         ( ContainerGroupEntity ) findContainerGroupByEnvironmentId( request.getEnvironmentId() );
+
 
                 Set<UUID> containerIds = Sets.newHashSet( containerGroup.getContainerIds() );
 
@@ -453,7 +418,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             }
             catch ( ContainerGroupNotFoundException e )
             {
-                LOG.error( "Could not find container group", e );
+                //create container group for new containers
+                containerGroup = new ContainerGroupEntity( request.getEnvironmentId(), request.getInitiatorPeerId(),
+                        request.getOwnerId() );
+
+                Set<UUID> containerIds = Sets.newHashSet();
+
+                for ( ContainerHost containerHost : newContainers )
+                {
+                    containerIds.add( containerHost.getId() );
+                }
+
+                containerGroup.setContainerIds( containerIds );
+
+                containerGroupDataService.persist( containerGroup );
             }
         }
 
@@ -615,7 +593,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             catch ( ContainerGroupNotFoundException e )
             {
                 //create container group for new containers
-                containerGroup = new ContainerGroupEntity( 0L, 0, environmentId, initiatorPeerId, ownerId );
+                containerGroup = new ContainerGroupEntity( environmentId, initiatorPeerId, ownerId );
 
 
                 containerGroupDataService.persist( containerGroup );
@@ -902,17 +880,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             Set<UUID> containerIds = containerGroup.getContainerIds();
             containerIds.remove( host.getId() );
 
-            //            if ( containerIds.isEmpty() )
-            //            {
-            //we should not remove container group since it remembers vni
-            // containerGroupDataService.remove( containerGroup.getEnvironmentId().toString() );
-            //            }
-            //            else
-            //            {
-            containerGroup.setContainerIds( containerIds );
+            if ( containerIds.isEmpty() )
+            {
+                containerGroupDataService.remove( containerGroup.getEnvironmentId().toString() );
+            }
+            else
+            {
+                containerGroup.setContainerIds( containerIds );
 
-            containerGroupDataService.update( containerGroup );
-            //            }
+                containerGroupDataService.update( containerGroup );
+            }
         }
         catch ( ResourceHostException e )
         {
@@ -1602,16 +1579,28 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
-    public int setupTunnels( final Set<String> peerIps, final long vni, final boolean newVni ) throws PeerException
+    public void reserveVni( final Vni vni ) throws PeerException
     {
-        return managementHost.setupTunnels( peerIps, vni, newVni );
+        Preconditions.checkNotNull( vni, "Invalid vni" );
+
+        getManagementHost().reserveVni( vni );
     }
 
 
     @Override
-    public Set<Long> getTakenVniIds() throws PeerException
+    public Set<Vni> getReservedVnis() throws PeerException
     {
-        return managementHost.getTakenVniIds();
+        return getManagementHost().getReservedVnis();
+    }
+
+
+    @Override
+    public int setupTunnels( final Set<String> peerIps, final Vni vni ) throws PeerException
+    {
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
+        Preconditions.checkNotNull( vni, "Invalid vni" );
+
+        return managementHost.setupTunnels( peerIps, vni );
     }
 
 

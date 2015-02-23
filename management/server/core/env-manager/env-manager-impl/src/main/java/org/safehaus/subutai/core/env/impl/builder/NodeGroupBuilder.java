@@ -8,8 +8,10 @@ import java.util.concurrent.Callable;
 
 import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.environment.NodeGroup;
+import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
@@ -116,6 +118,35 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
         Set<NodeGroupBuildResult> results = Sets.newHashSet();
         LocalPeer localPeer = peerManager.getLocalPeer();
 
+
+        //check if environment has reserved VNI
+        Set<Vni> reservedVnis;
+        try
+        {
+            reservedVnis = peer.getReservedVnis();
+        }
+        catch ( PeerException e )
+        {
+            throw new NodeGroupBuildException( "Error obtaining reserved vnis", e );
+        }
+
+        Vni environmentVni = null;
+        for ( Vni reservedVni : reservedVnis )
+        {
+            if ( reservedVni.getEnvironmentId().equals( environment.getId() ) )
+            {
+                environmentVni = reservedVni;
+                break;
+            }
+        }
+
+        if ( environmentVni == null )
+        {
+            throw new NodeGroupBuildException(
+                    String.format( "Environment %s does not have reserved VNI on peer %s", environment.getId(),
+                            peer.getName() ), null );
+        }
+
         for ( NodeGroup nodeGroup : nodeGroups )
         {
             NodeGroupBuildException exception = null;
@@ -124,33 +155,24 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
             try
             {
 
-                //                Set<HostInfoModel> newHosts =
-                //                        peer.createContainers( environment.getId(), localPeer.getId(), localPeer
-                // .getOwnerId(),
-                //                                fetchRequiredTemplates( peer.getId(), nodeGroup.getTemplateName() ),
-                //                                nodeGroup.getNumberOfContainers(),
-                //                                nodeGroup.getContainerPlacementStrategy().getStrategyId(),
-                //                                nodeGroup.getContainerPlacementStrategy().getCriteriaAsList() );
+                Set<String> peerIps = Sets.newHashSet();
 
-
-                Set<String> remotePeerIps = Sets.newHashSet();
                 //add initiator peer mandatorily
-                allPeers.add( localPeer );
+                peerIps.add( localPeer.getManagementHost().getIpByInterfaceName( "eth1" ) );
+
+
                 for ( Peer aPeer : allPeers )
                 {
-
-                    if ( aPeer.getId().equals( localPeer.getId() ) )
+                    if ( !aPeer.getId().equals( localPeer.getId() ) && !aPeer.getId().equals( peer.getId() ) )
                     {
-                        remotePeerIps.add( localPeer.getManagementHost().getIpByInterfaceName( "eth1" ) );
-                    }
-                    else if ( !aPeer.getId().equals( peer.getId() ) )
-                    {
-                        remotePeerIps.add( aPeer.getPeerInfo().getIp() );
+                        peerIps.add( aPeer.getPeerInfo().getIp() );
                     }
                 }
+
+
                 Set<HostInfoModel> newHosts = peer.createContainerGroup(
-                        new CreateContainerGroupRequest( remotePeerIps, environment.getId(), localPeer.getId(),
-                                localPeer.getOwnerId(), environment.getVni(),
+                        new CreateContainerGroupRequest( peerIps, environment.getId(), localPeer.getId(),
+                                localPeer.getOwnerId(), environment.getSubnetCidr(),
                                 fetchRequiredTemplates( peer.getId(), nodeGroup.getTemplateName() ),
                                 nodeGroup.getNumberOfContainers(),
                                 nodeGroup.getContainerPlacementStrategy().getStrategyId(),

@@ -13,6 +13,7 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.CpuQuotaInfo;
@@ -233,8 +234,9 @@ public interface Peer
 
     //networking
 
-    public Set<Long> getTakenVniIds() throws PeerException;
+    public void reserveVni( Vni vni ) throws PeerException;
 
-    //TODO move this method to LocalPeer
-    public int setupTunnels( Set<String> peerIps, long vni, boolean newVni ) throws PeerException;
+    public Set<Vni> getReservedVnis() throws PeerException;
+
+    public int setupTunnels( Set<String> peerIps, Vni vni ) throws PeerException;
 }
