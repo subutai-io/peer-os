@@ -210,6 +210,21 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+     @Override
+    public boolean trustRequest( final UUID peerId, final String root_server_px1 ) throws PeerException
+    {
+        return false;
+    }
+
+
+    @Override
+    public boolean trustResponse( final UUID peerId, final String root_server_px1, final short status )
+            throws PeerException
+    {
+        return false;
+    }
+
+
     @Override
     public boolean register( final PeerInfo peerInfo ) throws PeerException
     {

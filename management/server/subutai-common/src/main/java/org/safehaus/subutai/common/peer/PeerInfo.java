@@ -23,6 +23,8 @@ public class PeerInfo
     private int lastUsedVlanId = 100;
     private String keyId;
 
+    private String rootCertPx2;
+
 
     public UUID getId()
     {
@@ -150,6 +152,18 @@ public class PeerInfo
             return Objects.equals( this.id, other.id );
         }
         return false;
+    }
+
+
+    public String getRootCertPx2()
+    {
+        return rootCertPx2;
+    }
+
+
+    public void setRootCertPx2( final String rootCertPx2 )
+    {
+        this.rootCertPx2 = rootCertPx2;
     }
 }
 
