@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.peer.ui.forms;
 
 
+import java.security.KeyStore;
 import java.util.List;
 import java.util.UUID;
 
@@ -10,7 +11,6 @@ import javax.ws.rs.core.Response;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.peer.PeerStatus;
-import java.security.KeyStore;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
 import org.safehaus.subutai.common.util.StringUtil;
@@ -311,7 +311,7 @@ public class PeerRegisterForm extends CustomComponent
             WebClient client = WebClient.create( baseUrl );
             if ( StringUtil.isNumeric( servicePort ) && !Strings.isNullOrEmpty( ip ) )
             {
-                String peerId = client.path( "peer/id" ).accept( MediaType.TEXT_PLAIN ).get( String.class );
+                String peerId = client.path( "peer/me" ).accept( MediaType.TEXT_PLAIN ).get( String.class );
                 LOG.warn( peerId );
 
                 if ( !UUIDUtil.isStringAUuid( peerId ) )
