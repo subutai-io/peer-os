@@ -183,6 +183,10 @@
                 <feature>jdbc</feature>
                 <feature>openjpa</feature>
                 <feature>subutai-application</feature>
+                <feature>pax-jetty</feature>
+                <feature>pax-http</feature>
+                <feature>pax-http-whiteboard</feature>
+                <feature>pax-war</feature>
               </features>
               <repository>${assembly.directory}/system</repository>
             </configuration>
