@@ -83,23 +83,6 @@ public class CreateEnvironmentTask implements Runnable
                 throw new EnvironmentCreationException( "Failed to reserve VNI on all remote peers" );
             }
 
-            //setup tunnels to all participating peers on local peer in case local peer is not included as provider peer
-            Set<String> peerIps = Sets.newHashSet();
-
-            for ( Peer peer : topology.getNodeGroupPlacement().keySet() )
-            {
-                if ( !peer.getId().equals( localPeer.getId() ) )
-                {
-                    peerIps.add( peer.getPeerInfo().getIp() );
-                }
-            }
-
-
-            if ( !peerIps.isEmpty() )
-            {
-                int vlan = localPeer.setupTunnels( peerIps, new Vni( vni, environment.getId() ) );
-            }
-
             //save environment VNI
             environment.setVni( vni );
 

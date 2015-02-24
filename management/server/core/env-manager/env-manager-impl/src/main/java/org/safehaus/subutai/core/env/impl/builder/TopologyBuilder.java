@@ -12,10 +12,13 @@ import java.util.concurrent.Future;
 
 import org.safehaus.subutai.common.environment.NodeGroup;
 import org.safehaus.subutai.common.environment.Topology;
+import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
@@ -66,6 +69,33 @@ public class TopologyBuilder
         {
             allPeers.add( aPeer );
         }
+
+        //setup tunnels to all participating peers on local peer in case local peer is not included as provider peer
+        LocalPeer localPeer = peerManager.getLocalPeer();
+
+        Set<String> peerIps = Sets.newHashSet();
+
+        for ( Peer peer : allPeers )
+        {
+            if ( !peer.getId().equals( localPeer.getId() ) )
+            {
+                peerIps.add( peer.getPeerInfo().getIp() );
+            }
+        }
+
+
+        if ( !peerIps.isEmpty() )
+        {
+            try
+            {
+                int vlan = localPeer.setupTunnels( peerIps, new Vni( environment.getVni(), environment.getId() ) );
+            }
+            catch ( PeerException e )
+            {
+                throw new EnvironmentBuildException( "Error setting up tunnels to remote peers", e );
+            }
+        }
+
 
         for ( Map.Entry<Peer, Set<NodeGroup>> peerPlacement : placement.entrySet() )
         {
