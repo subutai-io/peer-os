@@ -24,9 +24,11 @@ import javax.persistence.Transient;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandUtil;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.network.VniVlanMapping;
 import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.NumUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
@@ -38,6 +40,8 @@ import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.impl.Commands;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 
@@ -128,6 +132,29 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     {
         byte[] encoded = Files.readAllBytes( Paths.get( path ) );
         return new String( encoded, Charset.defaultCharset() );
+    }
+
+
+    @Override
+    public void createGateway( final String gatewayIp, final int vlan ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( gatewayIp ) && gatewayIp.matches( Common.IP_REGEX ),
+                "Invalid gateway IP" );
+        Preconditions
+                .checkArgument( NumUtil.isIntBetween( vlan, NetworkManager.MIN_VLAN_ID, NetworkManager.MAX_VLAN_ID ),
+                        String.format( "VLAN must be in the range from %d to %d", NetworkManager.MIN_VLAN_ID,
+                                NetworkManager.MAX_VLAN_ID ) );
+
+        try
+        {
+            commandUtil.execute( new RequestBuilder( "subutai management_network" )
+                    .withCmdArgs( Lists.newArrayList( "-T", gatewayIp, String.valueOf( vlan ) ) ), this );
+        }
+        catch ( CommandException e )
+        {
+            throw new PeerException(
+                    String.format( "Error creating gateway tap device with IP %s and VLAN %d", gatewayIp, vlan ), e );
+        }
     }
 
 
