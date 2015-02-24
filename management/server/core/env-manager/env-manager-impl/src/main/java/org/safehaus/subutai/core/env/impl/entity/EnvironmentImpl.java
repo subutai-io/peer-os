@@ -69,9 +69,6 @@ public class EnvironmentImpl implements Environment, Serializable
     @Column( name = "last_used_ip_idx" )
     private int lastUsedIpIndex;
 
-    @Column( name = "peer_vlan_info" )
-    private String peerVlanInfo;
-
     @Column( name = "vni" )
     private Long vni;
 
