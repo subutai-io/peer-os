@@ -23,7 +23,6 @@ public class PeerInfo
     private int lastUsedVlanId = 100;
     private String keyId;
 
-    private String Cert;
 
 
     public UUID getId()
@@ -155,15 +154,5 @@ public class PeerInfo
     }
 
 
-    public String getCert()
-    {
-        return Cert;
-    }
-
-
-    public void setCert( final String cert )
-    {
-        Cert = cert;
-    }
 }
 

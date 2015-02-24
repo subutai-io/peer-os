@@ -64,9 +64,8 @@ public interface RestService
     @POST
     @Path( "register" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response processRegisterRequest( @QueryParam( "peer" ) String peer );
-
-
+    public Response processRegisterRequest( @FormParam( "peer" ) String peer,
+                                            @FormParam( "root_cert_px2" ) String root_cert_px2 );
     @DELETE
     @Path( "unregister" )
     @Produces( { MediaType.APPLICATION_JSON } )
@@ -75,7 +74,8 @@ public interface RestService
     @PUT
     @Path( "update" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response updatePeer( @QueryParam( "peer" ) String peer);
+    public Response updatePeer(  @FormParam( "peer" ) String peer,
+                                 @FormParam( "root_cert_px2" ) String root_cert_px2 );
 
     //*************** Peer Registration Handshake REST - END ***************************
 
