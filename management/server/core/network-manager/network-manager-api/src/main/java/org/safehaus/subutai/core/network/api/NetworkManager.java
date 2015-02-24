@@ -94,7 +94,7 @@ public interface NetworkManager
     /**
      * Removes VNI-VLAN mapping on management host
      */
-    public void removeVniVLanMapping( int tunnelId, long vni, int vLanId, UUID environmentId )
+    public void removeVniVLanMapping( int tunnelId, long vni, int vLanId )
             throws NetworkManagerException;
 
     public Set<VniVlanMapping> getVniVlanMappings() throws NetworkManagerException;

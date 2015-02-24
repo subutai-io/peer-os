@@ -191,7 +191,7 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void removeVniVLanMapping( final int tunnelId, final long vni, final int vLanId, final UUID environmentId )
+    public void removeVniVLanMapping( final int tunnelId, final long vni, final int vLanId )
             throws NetworkManagerException
     {
         Preconditions.checkArgument( tunnelId > 0, "Tunnel id must be greater than 0" );
@@ -199,8 +199,8 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, MIN_VLAN_ID, MAX_VLAN_ID ) );
 
         execute( getManagementHost(),
-                commands.getRemoveVniVlanMappingCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), vni, vLanId,
-                        environmentId ) );
+                commands.getRemoveVniVlanMappingCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), vni,
+                        vLanId ) );
     }
 
 

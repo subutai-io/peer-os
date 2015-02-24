@@ -125,11 +125,10 @@ public class Commands
     }
 
 
-    public RequestBuilder getRemoveVniVlanMappingCommand( String tunnelName, long vni, int vLanId, UUID environmentId )
+    public RequestBuilder getRemoveVniVlanMappingCommand( String tunnelName, long vni, int vLanId )
     {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
-                Lists.newArrayList( "-M", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ),
-                        environmentId.toString() ) );
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( "-M", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ) ) );
     }
 
 
@@ -148,8 +147,7 @@ public class Commands
 
     public RequestBuilder getListReservedVnisCommand()
     {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-Z" ) );
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-Z", "list" ) );
     }
 
     // ssh and hosts
