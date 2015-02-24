@@ -10,6 +10,9 @@ import javax.ws.rs.core.Response;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.peer.PeerStatus;
+import java.security.KeyStore;
+import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
+import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.peer.ui.PeerManagerPortalModule;
@@ -216,6 +219,25 @@ public class PeerRegisterForm extends CustomComponent
                                     {
                                         selfPeer = getPeerJsonRepresentation( "127.0.0.1", "8181" );
                                         selfPeer.setStatus( PeerStatus.APPROVED );
+
+                                        //************ Send Trust SSL Cert **************************************
+
+                                        KeyStore keyStore;
+                                        KeyStoreData keyStoreData;
+                                        KeyStoreManager keyStoreManager;
+
+                                        keyStoreData = new KeyStoreData();
+                                        keyStoreData.setupKeyStorePx2();
+
+                                        keyStoreManager = new KeyStoreManager();
+                                        keyStore = keyStoreManager.load( keyStoreData );
+
+                                        String HEXCert = keyStoreManager.exportCertificateHEXString ( keyStore, keyStoreData );
+
+                                        selfPeer.setCert( HEXCert );
+
+                                        //***********************************************************************
+
                                         updatePeerOnAnother( selfPeer, peer.getIp(), "8181" );
                                     }
                                     catch ( PeerException e )
