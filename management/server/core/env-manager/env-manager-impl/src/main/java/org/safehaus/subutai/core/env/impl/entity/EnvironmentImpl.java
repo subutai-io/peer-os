@@ -105,6 +105,7 @@ public class EnvironmentImpl implements Environment, Serializable
         this.environmentId = UUID.randomUUID().toString();
         this.creationTimestamp = System.currentTimeMillis();
         this.status = EnvironmentStatus.EMPTY;
+        this.lastUsedIpIndex = 0;
     }
 
 
