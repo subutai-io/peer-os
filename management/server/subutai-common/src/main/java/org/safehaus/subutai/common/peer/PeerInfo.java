@@ -23,7 +23,7 @@ public class PeerInfo
     private int lastUsedVlanId = 100;
     private String keyId;
 
-    private String rootCertPx2;
+    private String Cert;
 
 
     public UUID getId()
@@ -155,15 +155,15 @@ public class PeerInfo
     }
 
 
-    public String getRootCertPx2()
+    public String getCert()
     {
-        return rootCertPx2;
+        return Cert;
     }
 
 
-    public void setRootCertPx2( final String rootCertPx2 )
+    public void setCert( final String cert )
     {
-        this.rootCertPx2 = rootCertPx2;
+        Cert = cert;
     }
 }
 
