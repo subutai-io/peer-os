@@ -132,6 +132,6 @@ public class CommandsTest
     @Test
     public void testGetRemoveVniVlanMappingCommand() throws Exception
     {
-        assertNotNull( commands.getRemoveVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID, ENVIRONMENT_ID ) );
+        assertNotNull( commands.getRemoveVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID ) );
     }
 }

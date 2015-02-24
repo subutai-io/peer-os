@@ -298,10 +298,10 @@ public class NetworkManagerImplTest
     public void testRemoveVniVLanMapping() throws Exception
     {
 
-        networkManager.removeVniVLanMapping( TUNNEL_ID, VNI, VLAN_ID, ENVIRONMENT_ID );
+        networkManager.removeVniVLanMapping( TUNNEL_ID, VNI, VLAN_ID );
 
         verify( localPeer ).getManagementHost();
-        verify( commands ).getRemoveVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID, ENVIRONMENT_ID );
+        verify( commands ).getRemoveVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID );
         verify( managementHost ).execute( any( RequestBuilder.class ) );
     }
 
