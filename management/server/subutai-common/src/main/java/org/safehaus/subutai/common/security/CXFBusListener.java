@@ -14,10 +14,13 @@ import org.apache.cxf.feature.AbstractFeature;
 public class CXFBusListener extends AbstractFeature
 {
     private final static Logger LOG = LoggerFactory.getLogger( CXFBusListener.class );
-    public void busRegistered(Bus bus) {
-        LOG.info("Adding LoggingFeature interceptor on bus: " + bus);
+
+
+    public void busRegistered( Bus bus )
+    {
+        LOG.info( "Adding LoggingFeature interceptor on bus: " + bus );
         // initialise the feature on the bus, which will add the interceptors
         bus.getInInterceptors().add( new RestInterceptor() );
-        LOG.info("Successfully added LoggingFeature interceptor on bus: " + bus);
+        LOG.info( "Successfully added LoggingFeature interceptor on bus: " + bus );
     }
 }

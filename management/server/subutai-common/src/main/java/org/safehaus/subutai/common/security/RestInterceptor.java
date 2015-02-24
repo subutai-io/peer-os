@@ -4,8 +4,6 @@ package org.safehaus.subutai.common.security;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.cxf.feature.AbstractFeature;
-import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -22,6 +20,7 @@ public class RestInterceptor extends AbstractPhaseInterceptor<Message>
         super( Phase.RECEIVE );
     }
 
+
     /**
      * Intercepts a message. Interceptors should NOT invoke handleMessage or handleFault on the next interceptor - the
      * interceptor chain will take care of this.
@@ -33,7 +32,7 @@ public class RestInterceptor extends AbstractPhaseInterceptor<Message>
         try
         {
             URL url = new URL( ( String ) message.get( Message.REQUEST_URL ) );
-            if ( basePath.contains( "peer/register" ) && url.getPort() != 8444 )
+            if ( !basePath.contains( "peer/register" ) && url.getPort() != 8443 )
             {
                 message.put( Message.RESPONSE_CODE, 403 );
                 message.getInterceptorChain().abort();
