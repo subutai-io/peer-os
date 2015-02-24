@@ -2,7 +2,6 @@ package org.safehaus.subutai.core.env.impl.entity;
 
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 
@@ -10,7 +9,6 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -27,6 +25,7 @@ import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.impl.dao.EnvironmentDataService;
@@ -86,8 +85,6 @@ public class EnvironmentImpl implements Environment, Serializable
     @Column( name = "public_key", length = 3000 )
     private String publicKey;
 
-    @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
-    private Set<String> peerIds = Sets.newHashSet();
 
     @Transient
     private EnvironmentDataService dataService;
@@ -221,7 +218,10 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public Set<ContainerHost> getContainerHosts()
     {
-        return containers == null ? Sets.<ContainerHost>newHashSet() : Collections.unmodifiableSet( containers );
+        synchronized ( containers )
+        {
+            return Sets.newConcurrentHashSet( containers );
+        }
     }
 
 
@@ -251,16 +251,16 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public Set<UUID> getPeerIds()
+    public Set<Peer> getPeers()
     {
-        Set<UUID> ids = Sets.newHashSet();
+        Set<Peer> peers = Sets.newHashSet();
 
-        for ( String id : peerIds )
+        for ( ContainerHost containerHost : getContainerHosts() )
         {
-            ids.add( UUID.fromString( id ) );
+            peers.add( containerHost.getPeer() );
         }
 
-        return ids;
+        return peers;
     }
 
 
@@ -272,7 +272,10 @@ public class EnvironmentImpl implements Environment, Serializable
         {
             ContainerHost container = getContainerHostById( containerId );
 
-            containers.remove( container );
+            synchronized ( containers )
+            {
+                containers.remove( container );
+            }
 
             dataService.update( this );
         }
@@ -290,11 +293,12 @@ public class EnvironmentImpl implements Environment, Serializable
         for ( EnvironmentContainerImpl container : containers )
         {
             container.setEnvironment( this );
-
-            peerIds.add( container.getPeerId() );
         }
 
-        this.containers.addAll( containers );
+        synchronized ( this.containers )
+        {
+            this.containers.addAll( containers );
+        }
 
         dataService.update( this );
     }
@@ -394,6 +398,6 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         return Objects.toStringHelper( this ).add( "environmentId", environmentId ).add( "name", name )
                       .add( "creationTimestamp", creationTimestamp ).add( "status", status )
-                      .add( "containers", containers ).toString();
+                      .add( "containers", getContainerHosts() ).toString();
     }
 }

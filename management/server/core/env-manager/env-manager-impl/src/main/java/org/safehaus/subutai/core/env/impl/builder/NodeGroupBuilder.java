@@ -58,7 +58,7 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
         this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
         this.peer = peer;
-        this.allPeers = Sets.newHashSet( allPeers );
+        this.allPeers = allPeers;
         this.nodeGroups = nodeGroups;
         this.defaultDomain = defaultDomain;
     }
@@ -127,7 +127,8 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
         }
         catch ( PeerException e )
         {
-            throw new NodeGroupBuildException( "Error obtaining reserved vnis", e );
+            throw new NodeGroupBuildException(
+                    String.format( "Error obtaining reserved vnis on peer %s", peer.getName() ), e );
         }
 
         Vni environmentVni = null;

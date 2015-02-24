@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Peer;
 
 
 /**
@@ -35,7 +36,7 @@ public interface Environment
 
     public void setSshKey( String sshKey, boolean async ) throws EnvironmentModificationException;
 
-    public Set<UUID> getPeerIds();
+    public Set<Peer> getPeers();
 
     /**
      * Network subnet of the environment in CIDR format notation.
