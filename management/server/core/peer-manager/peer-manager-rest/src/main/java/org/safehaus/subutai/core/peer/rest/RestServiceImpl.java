@@ -64,7 +64,31 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response processRegisterRequest( String peer,String root_cert_px2,String peer_cert_px2 )
+    public Response processTrustRequest( String peer,String root_cert_px2)
+    {
+        try
+        {
+            return null;
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.NOT_FOUND ).entity( e.toString() ).build();
+        }
+    }
+    @Override
+    public Response processTrustResponse( String peer,String root_cert_px2,short status)
+    {
+        try
+        {
+            return null;
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.NOT_FOUND ).entity( e.toString() ).build();
+        }
+    }
+    @Override
+    public Response processRegisterRequest( String peer)
     {
         PeerInfo p = JsonUtil.fromJson( peer, PeerInfo.class );
         p.setIp( getRequestIp() );
@@ -105,7 +129,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response updatePeer( String peer )
+    public Response updatePeer( String peer)
     {
         PeerInfo p = JsonUtil.fromJson( peer, PeerInfo.class );
         p.setIp( getRequestIp() );

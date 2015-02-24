@@ -19,10 +19,10 @@ public class KeyStoreData
 	*/
 	public void setupKeyStorePx1()
 	{
-		keyStoreType = KeyStoreType.JKS;
-		keyStoreFile = Common.KEYSTORE_PX1_FILE;
-		password     = Common.KEYSTORE_PX1_PSW;
-		alias        = Common.KEYSTORE_PX1_ROOT_ALIAS;
+		keyStoreType       = KeyStoreType.JKS;
+		keyStoreFile       = Common.KEYSTORE_PX1_FILE;
+		password           = Common.KEYSTORE_PX1_PSW;
+		alias              = Common.KEYSTORE_PX1_ROOT_ALIAS;
 		importFileLocation = Common.CERT_IMPORT_DIR;
 		exportFileLocation = Common.CERT_EXPORT_DIR;
 	}
@@ -45,10 +45,10 @@ public class KeyStoreData
 	*/
 	public void setupTrustStorePx1()
 	{
-		keyStoreType = KeyStoreType.JKS;
-		keyStoreFile = Common.TRUSTSTORE_PX1_FILE;
-		password     = Common.TRUSTSTORE_PX1_PSW;
-		alias        = Common.TRUSTSTORE_PX1_ROOT_ALIAS;
+		keyStoreType       = KeyStoreType.JKS;
+		keyStoreFile       = Common.TRUSTSTORE_PX1_FILE;
+		password    	   = Common.TRUSTSTORE_PX1_PSW;
+		alias        	   = Common.TRUSTSTORE_PX1_ROOT_ALIAS;
 		importFileLocation = Common.CERT_IMPORT_DIR;
 		exportFileLocation = Common.CERT_EXPORT_DIR;
 	}
