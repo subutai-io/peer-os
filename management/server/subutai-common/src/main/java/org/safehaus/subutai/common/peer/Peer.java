@@ -52,6 +52,9 @@ public interface Peer
 
     public void destroyContainer( ContainerHost containerHost ) throws PeerException;
 
+    public void setDefaultGateway( ContainerHost host, String gatewayIp ) throws PeerException;
+
+
     public boolean isConnected( Host host );
 
 

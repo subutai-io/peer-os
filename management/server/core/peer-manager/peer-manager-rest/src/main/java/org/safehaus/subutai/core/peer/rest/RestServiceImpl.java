@@ -525,6 +525,22 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response setDefaultGateway( final String containerId, final String gatewayIp )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            localPeer.setDefaultGateway( localPeer.getContainerHostById( UUID.fromString( containerId ) ), gatewayIp );
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
     public Response getReservedVnis()
     {
         try

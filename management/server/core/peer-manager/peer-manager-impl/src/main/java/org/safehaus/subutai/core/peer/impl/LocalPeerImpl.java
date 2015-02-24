@@ -16,6 +16,7 @@ import java.util.concurrent.Future;
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.CommandUtil;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.host.ContainerHostState;
@@ -112,6 +113,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     private ContainerGroupDataService containerGroupDataService;
     private HostRegistry hostRegistry;
     private Set<RequestListener> requestListeners;
+    private CommandUtil commandUtil = new CommandUtil();
 
 
     public LocalPeerImpl( PeerManager peerManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
@@ -905,6 +907,26 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
+    public void setDefaultGateway( final ContainerHost host, final String gatewayIp ) throws PeerException
+    {
+
+        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( gatewayIp ) && gatewayIp.matches( Common.IP_REGEX ),
+                "Invalid gateway IP" );
+
+        try
+        {
+            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s eth1", gatewayIp ) ),
+                    bindHost( host.getId() ) );
+        }
+        catch ( CommandException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
     public boolean isConnected( final Host host )
     {
         Preconditions.checkNotNull( host, "Container host is null" );
@@ -1105,7 +1127,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     {
         if ( managementHost != null && managementHost.getId() != null )
         {
-            //            peerDAO.deleteInfo( SOURCE_MANAGEMENT_HOST, managementHost.getId().toString() );
             managementHostDataService.remove( managementHost.getHostId() );
             managementHost = null;
         }
@@ -1118,7 +1139,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 ( ( ResourceHostEntity ) resourceHost ).removeContainerHost( containerHost );
             }
             resourceHostDataService.remove( resourceHost.getHostId() );
-            //            peerDAO.deleteInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString() );
         }
         synchronized ( resourceHosts )
         {

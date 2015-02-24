@@ -280,6 +280,33 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public void setDefaultGateway( final ContainerHost host, final String gatewayIp ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( gatewayIp ) && gatewayIp.matches( Common.IP_REGEX ),
+                "Invalid gateway IP" );
+
+        String path = "peer/container/gateway";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", host.getId().toString() );
+        params.put( "gatewayIp", gatewayIp );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
+
+        try
+        {
+            post( path, params, headers );
+        }
+        catch ( HTTPException e )
+        {
+            throw new PeerException( "Error setting container gateway ip", e );
+        }
+    }
+
+
+    @Override
     public boolean isConnected( final Host host )
     {
         Preconditions.checkNotNull( host, "Container host is null" );

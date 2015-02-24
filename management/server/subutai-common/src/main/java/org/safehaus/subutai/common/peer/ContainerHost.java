@@ -59,6 +59,7 @@ public interface ContainerHost extends Host
 
     public Set<String> getTags();
 
+    public void setDefaultGateway( String gatewayIp ) throws PeerException;
 
     public boolean isLocal();
 
