@@ -186,8 +186,8 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response reserveVni( @FormParam( "vni" ) String vni );
 
-    @POST
-    @Path( "tunnels" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    Response setupTunnels( @FormParam( "peerIps" ) String peerIps, @FormParam( "vni" ) String vni );
+//    @POST
+//    @Path( "tunnels" )
+//    @Produces( { MediaType.TEXT_PLAIN } )
+//    Response setupTunnels( @FormParam( "peerIps" ) String peerIps, @FormParam( "vni" ) String vni );
 }

@@ -555,20 +555,21 @@ public class RestServiceImpl implements RestService
     }
 
 
-    @Override
-    public Response setupTunnels( final String peerIps, final String vni )
-    {
-        try
-        {
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            int vlan = localPeer
-                    .setupTunnels( JsonUtil.<Set<String>>fromJson( peerIps, new TypeToken<Set<String>>() {}.getType() ),
-                            JsonUtil.fromJson( vni, Vni.class ) );
-            return Response.ok( vlan ).build();
-        }
-        catch ( Exception e )
-        {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
+    //    @Override
+    //    public Response setupTunnels( final String peerIps, final String vni )
+    //    {
+    //        try
+    //        {
+    //            LocalPeer localPeer = peerManager.getLocalPeer();
+    //            int vlan = localPeer
+    //                    .setupTunnels( JsonUtil.<Set<String>>fromJson( peerIps, new TypeToken<Set<String>>() {}
+    // .getType() ),
+    //                            JsonUtil.fromJson( vni, Vni.class ) );
+    //            return Response.ok( vlan ).build();
+    //        }
+    //        catch ( Exception e )
+    //        {
+    //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+    //        }
+    //    }
 }
