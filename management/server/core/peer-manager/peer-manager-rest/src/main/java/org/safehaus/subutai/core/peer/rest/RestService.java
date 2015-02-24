@@ -17,6 +17,10 @@ import javax.ws.rs.core.Response;
 
 public interface RestService
 {
+    @GET
+    @Path( "me" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getSelfPeerInfo();
 
 
     @GET
@@ -28,6 +32,12 @@ public interface RestService
     @Path( "registered_peers" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getRegisteredPeers();
+
+
+    @GET
+    @Path( "/" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getRegisteredPeerInfo( @QueryParam( "peerId" ) String peerId );
 
     @GET
     @Path( "ping" )

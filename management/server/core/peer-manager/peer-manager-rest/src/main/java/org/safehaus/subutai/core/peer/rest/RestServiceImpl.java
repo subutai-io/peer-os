@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.host.ContainerHostState;
@@ -42,6 +43,16 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response getSelfPeerInfo()
+    {
+        PeerInfo selfInfo = peerManager.getLocalPeerInfo();
+        selfInfo.setIp( getRequestIp() );
+        selfInfo.setName( String.format( "Peer on %s", selfInfo.getIp() ) );
+        return Response.ok( JsonUtil.toJson( selfInfo ) ).build();
+    }
+
+
+    @Override
     public String getId()
     {
         LocalPeer localPeer = peerManager.getLocalPeer();
@@ -57,6 +68,14 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response getRegisteredPeerInfo( @QueryParam( "peerId" ) final String peerId )
+    {
+        PeerInfo peerInfo = peerManager.getPeer( peerId ).getPeerInfo();
+        return Response.ok( JsonUtil.toJson( peerInfo ) ).build();
+    }
+
+
+    @Override
     public Response ping()
     {
         return Response.ok().build();
@@ -64,7 +83,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response processTrustRequest( String peer,String root_cert_px2)
+    public Response processTrustRequest( String peer, String root_cert_px2 )
     {
         try
         {
@@ -75,8 +94,10 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.NOT_FOUND ).entity( e.toString() ).build();
         }
     }
+
+
     @Override
-    public Response processTrustResponse( String peer,String root_cert_px2,short status)
+    public Response processTrustResponse( String peer, String root_cert_px2, short status )
     {
         try
         {
@@ -87,8 +108,10 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.NOT_FOUND ).entity( e.toString() ).build();
         }
     }
+
+
     @Override
-    public Response processRegisterRequest( String peer)
+    public Response processRegisterRequest( String peer )
     {
         PeerInfo p = JsonUtil.fromJson( peer, PeerInfo.class );
         p.setIp( getRequestIp() );
@@ -129,7 +152,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response updatePeer( String peer)
+    public Response updatePeer( String peer )
     {
         PeerInfo p = JsonUtil.fromJson( peer, PeerInfo.class );
         p.setIp( getRequestIp() );
@@ -355,7 +378,8 @@ public class RestServiceImpl implements RestService
                                                           .getAvailableDiskQuota(
                                                                   JsonUtil.<DiskPartition>from( diskPartition,
                                                                           new TypeToken<DiskPartition>()
-                                                                          {}.getType() ) ) ) ).build();
+                                                                          {
+                                                                          }.getType() ) ) ) ).build();
         }
         catch ( Exception e )
         {
@@ -501,7 +525,8 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.getContainerHostById( UUID.fromString( containerId ) )
                      .setCpuSet( JsonUtil.<Set<Integer>>fromJson( cpuSet, new TypeToken<Set<Integer>>()
-                     {}.getType() ) );
+                     {
+                     }.getType() ) );
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -520,7 +545,8 @@ public class RestServiceImpl implements RestService
             return Response.ok( JsonUtil.toJson( localPeer.getContainerHostById( UUID.fromString( containerId ) )
                                                           .getDiskQuota( JsonUtil.<DiskPartition>from( diskPartition,
                                                                   new TypeToken<DiskPartition>()
-                                                                  {}.getType() ) ) ) ).build();
+                                                                  {
+                                                                  }.getType() ) ) ) ).build();
         }
         catch ( Exception e )
         {
@@ -537,7 +563,8 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.getContainerHostById( UUID.fromString( containerId ) )
                      .setDiskQuota( JsonUtil.<DiskQuota>fromJson( diskQuota, new TypeToken<DiskQuota>()
-                     {}.getType() ) );
+                     {
+                     }.getType() ) );
             return Response.ok().build();
         }
         catch ( Exception e )
