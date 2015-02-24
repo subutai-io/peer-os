@@ -317,7 +317,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
     protected int calculateNextTunnelId( Set<Tunnel> tunnels )
     {
-        int maxTunnelId = 1;
+        int maxTunnelId = 0;
         for ( Tunnel tunnel : tunnels )
         {
             if ( tunnel.getTunnelId() > maxTunnelId )
