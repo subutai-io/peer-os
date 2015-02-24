@@ -187,6 +187,7 @@
                 <feature>pax-http</feature>
                 <feature>pax-http-whiteboard</feature>
                 <feature>pax-war</feature>
+
               </features>
               <repository>${assembly.directory}/system</repository>
             </configuration>
