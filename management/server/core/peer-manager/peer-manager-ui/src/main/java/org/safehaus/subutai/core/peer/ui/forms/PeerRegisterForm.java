@@ -311,7 +311,8 @@ public class PeerRegisterForm extends CustomComponent
             WebClient client = WebClient.create( baseUrl );
             if ( StringUtil.isNumeric( servicePort ) && !Strings.isNullOrEmpty( ip ) )
             {
-                String peerId = client.path( "peer/me" ).accept( MediaType.TEXT_PLAIN ).get( String.class );
+                client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
+                String peerId = client.path( "peer/me" ).get( String.class );
                 LOG.warn( peerId );
 
                 if ( !UUIDUtil.isStringAUuid( peerId ) )

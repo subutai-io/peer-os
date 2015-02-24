@@ -13,6 +13,7 @@ import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.PeerInfo;
+import org.safehaus.subutai.common.peer.PeerStatus;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
@@ -115,6 +116,7 @@ public class RestServiceImpl implements RestService
     {
         PeerInfo p = JsonUtil.fromJson( peer, PeerInfo.class );
         p.setIp( getRequestIp() );
+        p.setStatus( PeerStatus.REQUESTED );
         p.setName( String.format( "Peer on %s", p.getIp() ) );
         try
         {
@@ -152,12 +154,15 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response updatePeer( String peer )
+    public Response updatePeer( String peer, String key )
     {
         PeerInfo p = JsonUtil.fromJson( peer, PeerInfo.class );
         p.setIp( getRequestIp() );
         p.setName( String.format( "Peer on %s", p.getIp() ) );
         peerManager.update( p );
+
+        //TODO store pk in trust store.
+
         return Response.ok( JsonUtil.toJson( p ) ).build();
     }
 
