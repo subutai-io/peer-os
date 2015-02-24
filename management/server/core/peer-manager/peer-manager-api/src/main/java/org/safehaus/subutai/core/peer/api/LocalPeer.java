@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.peer.api;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.Peer;
@@ -107,4 +108,6 @@ public interface LocalPeer extends Peer
     public Set<ContainerGroup> findContainerGroupsByOwnerId( UUID ownerId );
 
     //networking
+
+    public int setupTunnels( Set<String> peerIps, Vni vni ) throws PeerException;
 }

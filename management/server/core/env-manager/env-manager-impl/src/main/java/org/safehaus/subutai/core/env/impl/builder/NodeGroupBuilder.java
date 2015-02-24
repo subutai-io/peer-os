@@ -142,9 +142,19 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
 
         if ( environmentVni == null )
         {
-            throw new NodeGroupBuildException(
-                    String.format( "Environment %s does not have reserved VNI on peer %s", environment.getId(),
-                            peer.getName() ), null );
+
+            //try to reserve VNI
+            environmentVni = new Vni( environment.getVni(), environment.getId() );
+
+            try
+            {
+                peer.reserveVni( environmentVni );
+            }
+            catch ( PeerException e )
+            {
+                throw new NodeGroupBuildException( String.format( "Could not reserve VNI on peer %s", peer.getName() ),
+                        e );
+            }
         }
 
         for ( NodeGroup nodeGroup : nodeGroups )

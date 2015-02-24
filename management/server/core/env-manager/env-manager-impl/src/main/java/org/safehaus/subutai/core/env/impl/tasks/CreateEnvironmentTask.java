@@ -52,36 +52,35 @@ public class CreateEnvironmentTask implements Runnable
             //figure out free VNI
             long vni = environmentManager.findFreeVni( topology.getNodeGroupPlacement().keySet() );
 
-            //reserve VNI on all peers
+
+            //reserve VNI on local peer
+            Vni newVni = new Vni( vni, environment.getId() );
+
+            localPeer.reserveVni( newVni );
+
+            //reserve VNI on remote peers
             Set<Peer> allPeers = Sets.newHashSet( topology.getNodeGroupPlacement().keySet() );
-            //add local peer mandatorily
-            allPeers.add( localPeer );
+            allPeers.remove( localPeer );
 
             for ( Peer peer : allPeers )
             {
                 try
                 {
-                    peer.reserveVni( new Vni( vni, environment.getId() ) );
+                    peer.reserveVni( newVni );
                 }
                 catch ( PeerException e )
                 {
-                    if ( peer.isLocal() )
-                    {
-                        throw new EnvironmentCreationException( e );
-                    }
-                    else
-                    {
-                        LOG.error( String.format( "Failed to reserve VNI %d on peer %s. Peer excluded", vni,
-                                peer.getName() ) );
-                        topology.excludePeer( peer );
-                    }
+                    LOG.error( String.format( "Failed to reserve VNI %d on peer %s. Peer excluded", vni,
+                            peer.getName() ) );
+                    //exclude peer from environment in case VNI reservation failed
+                    topology.excludePeer( peer );
                 }
             }
 
 
             if ( topology.getNodeGroupPlacement().keySet().isEmpty() )
             {
-                throw new EnvironmentCreationException( "Failed to reserve VNi on all peers" );
+                throw new EnvironmentCreationException( "Failed to reserve VNI on all remote peers" );
             }
 
             //setup tunnels to all participating peers on local peer in case local peer is not included as provider peer

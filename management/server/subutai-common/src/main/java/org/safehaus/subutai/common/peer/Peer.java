@@ -237,6 +237,4 @@ public interface Peer
     public void reserveVni( Vni vni ) throws PeerException;
 
     public Set<Vni> getReservedVnis() throws PeerException;
-
-    public int setupTunnels( Set<String> peerIps, Vni vni ) throws PeerException;
 }
