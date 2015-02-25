@@ -316,7 +316,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     @Override
     public ContainerHost createContainer( final String templateName, final String hostname, final String ip,
-                                          final int vlan, final int timeout ) throws ResourceHostException
+                                          final int vlan, final String gateway, final int timeout )
+            throws ResourceHostException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
@@ -337,8 +338,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             //ignore
         }
 
-        Future<ContainerHost> containerHostFuture =
-                queueSequentialTask( new CreateContainerTask( this, templateName, hostname, ip, vlan, timeout ) );
+        Future<ContainerHost> containerHostFuture = queueSequentialTask(
+                new CreateContainerTask( this, templateName, hostname, ip, vlan, gateway, timeout ) );
 
         try
         {
@@ -355,7 +356,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public ContainerHost createContainer( final String templateName, final String hostname, final int timeout )
             throws ResourceHostException
     {
-        return createContainer( templateName, hostname, null, 0, timeout );
+        return createContainer( templateName, hostname, null, 0, null, timeout );
     }
 
 

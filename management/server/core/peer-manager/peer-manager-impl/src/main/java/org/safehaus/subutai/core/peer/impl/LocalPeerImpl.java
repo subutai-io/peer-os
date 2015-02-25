@@ -99,7 +99,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
     private static final long HOST_INACTIVE_TIME = 5 * 1000 * 60; // 5 min
-    private static final int WAIT_CONTAINER_CONNECTION_SEC = 180;
+    private static final int WAIT_CONTAINER_CONNECTION_SEC = 300;
     private PeerManager peerManager;
     private TemplateRegistry templateRegistry;
     private ManagementHost managementHost;
@@ -363,6 +363,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
         String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
         String[] allAddresses = cidr.getInfo().getAllAddresses();
+        String gateway = cidr.getInfo().getLowAddress();
         int currentIpAddressOffset = 0;
 
         //create containers in parallel on each resource host
@@ -376,7 +377,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 String ipAddress = allAddresses[request.getIpAddressOffset() + currentIpAddressOffset];
                 taskFutures.add( executorService.submit(
                         new CreateContainerWrapperTask( resourceHostEntity, templateName, hostname,
-                                String.format( "%s/%s", ipAddress, networkPrefix ), vlan,
+                                String.format( "%s/%s", ipAddress, networkPrefix ), vlan, gateway,
                                 WAIT_CONTAINER_CONNECTION_SEC ) ) );
 
                 currentIpAddressOffset++;

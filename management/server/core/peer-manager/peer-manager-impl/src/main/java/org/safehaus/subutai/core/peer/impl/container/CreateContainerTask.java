@@ -24,12 +24,13 @@ public class CreateContainerTask implements Callable<ContainerHost>
     private final String templateName;
     private final String ip;
     private final int vlan;
+    private final String gateway;
     private final int timeoutSec;
     private CommandUtil commandUtil = new CommandUtil();
 
 
     public CreateContainerTask( final ResourceHost resourceHost, final String templateName, final String hostname,
-                                final String ip, final int vlan, final int timeoutSec )
+                                final String ip, final int vlan, final String gateway, final int timeoutSec )
     {
         Preconditions.checkNotNull( resourceHost );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
@@ -37,10 +38,11 @@ public class CreateContainerTask implements Callable<ContainerHost>
         Preconditions.checkArgument( timeoutSec > 0 );
 
         this.resourceHost = resourceHost;
+        this.templateName = templateName;
         this.hostname = hostname;
         this.ip = ip;
         this.vlan = vlan;
-        this.templateName = templateName;
+        this.gateway = gateway;
         this.timeoutSec = timeoutSec;
     }
 
@@ -81,6 +83,10 @@ public class CreateContainerTask implements Callable<ContainerHost>
         {
             throw new ContainerCreationException(
                     String.format( "Container %s did not connect within timeout", hostname ) );
+        }
+        else
+        {
+            containerHost.setDefaultGateway( gateway );
         }
 
         return containerHost;
