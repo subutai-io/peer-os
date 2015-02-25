@@ -84,7 +84,7 @@ public class CreateContainerTask implements Callable<ContainerHost>
             throw new ContainerCreationException(
                     String.format( "Container %s did not connect within timeout", hostname ) );
         }
-        else
+        else if ( !Strings.isNullOrEmpty( gateway ) && gateway.matches( Common.IP_REGEX ) )
         {
             containerHost.setDefaultGateway( gateway );
         }
