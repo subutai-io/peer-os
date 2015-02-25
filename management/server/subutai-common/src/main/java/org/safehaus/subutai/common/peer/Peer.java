@@ -1,7 +1,6 @@
 package org.safehaus.subutai.common.peer;
 
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -14,7 +13,6 @@ import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.network.Vni;
-import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
@@ -40,11 +38,6 @@ public interface Peer
     public PeerInfo getPeerInfo();
 
     public Set<HostInfoModel> createContainerGroup( CreateContainerGroupRequest request ) throws PeerException;
-
-    public Set<HostInfoModel> createContainers( final UUID environmentId, final UUID initiatorPeerId,
-                                                final UUID ownerId, final List<Template> templates,
-                                                final int numberOfContainers, final String strategyId,
-                                                final List<Criteria> criteria ) throws PeerException;
 
     public void startContainer( ContainerHost containerHost ) throws PeerException;
 

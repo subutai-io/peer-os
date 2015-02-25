@@ -30,7 +30,6 @@ import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
-import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
@@ -362,16 +361,24 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         List<Future<ContainerHost>> taskFutures = Lists.newArrayList();
         ExecutorService executorService = Executors.newFixedThreadPool( request.getNumberOfContainers() );
 
+        String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
         //create containers in parallel on each resource host
         for ( Map.Entry<ResourceHost, Set<String>> resourceHostDistribution : containerDistribution.entrySet() )
         {
             ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) resourceHostDistribution.getKey();
 
+            int currentIpAddressOffset = 0;
             for ( String hostname : resourceHostDistribution.getValue() )
             {
+
+                String ipAddress =
+                        cidr.getInfo().getAllAddresses()[request.getIpAddressOffset() + currentIpAddressOffset];
                 taskFutures.add( executorService.submit(
                         new CreateContainerWrapperTask( resourceHostEntity, templateName, hostname,
+                                String.format( "%s/%s", ipAddress, networkPrefix ), vlan,
                                 WAIT_CONTAINER_CONNECTION_SEC ) ) );
+
+                currentIpAddressOffset++;
             }
         }
 
@@ -431,171 +438,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 }
 
                 containerGroup.setContainerIds( containerIds );
-
-                containerGroupDataService.persist( containerGroup );
-            }
-        }
-
-        return result;
-    }
-
-
-    public Set<HostInfoModel> createContainers( final UUID environmentId, final UUID initiatorPeerId,
-                                                final UUID ownerId, final List<Template> templates,
-                                                final int numberOfContainers, final String strategyId,
-                                                final List<Criteria> criteria ) throws PeerException
-    {
-
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-        Preconditions.checkNotNull( initiatorPeerId, "Invalid initiator peer id" );
-        Preconditions.checkNotNull( ownerId, "Invalid owner id" );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( templates ), "Invalid template set" );
-        Preconditions.checkArgument( numberOfContainers > 0, "Invalid number of containers" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( strategyId ), "Invalid strategy id" );
-
-        final int waitContainerTimeoutSec = 180;
-
-        //check if strategy exists
-        try
-        {
-            strategyManager.findStrategyById( strategyId );
-        }
-        catch ( StrategyNotFoundException e )
-        {
-            throw new PeerException( e );
-        }
-
-
-        //try to register remote templates with local registry
-        try
-        {
-            for ( Template t : templates )
-            {
-                if ( t.isRemote() )
-                {
-                    tryToRegister( t );
-                }
-            }
-        }
-        catch ( RegistryException e )
-        {
-            throw new PeerException( e );
-        }
-
-
-        List<ResourceHostMetric> serverMetricMap = new ArrayList<>();
-        for ( ResourceHost resourceHost : getResourceHosts() )
-        {
-            //take connected resource hosts for container creation
-            //and prepare needed templates
-            if ( resourceHost.isConnected() )
-            {
-                try
-                {
-                    serverMetricMap.add( resourceHost.getHostMetric() );
-                    resourceHost.prepareTemplates( templates );
-                }
-                catch ( ResourceHostException e )
-                {
-                    throw new PeerException( e );
-                }
-            }
-        }
-
-        //calculate placement strategy
-        Map<ResourceHostMetric, Integer> slots;
-        try
-        {
-            slots = strategyManager
-                    .getPlacementDistribution( serverMetricMap, numberOfContainers, strategyId, criteria );
-        }
-        catch ( StrategyException e )
-        {
-            throw new PeerException( e );
-        }
-
-
-        //distribute new containers' names across selected resource hosts
-        Map<ResourceHost, Set<String>> containerDistribution = Maps.newHashMap();
-        String templateName = templates.get( templates.size() - 1 ).getTemplateName();
-
-        for ( Map.Entry<ResourceHostMetric, Integer> e : slots.entrySet() )
-        {
-            Set<String> hostCloneNames = new HashSet<>();
-            for ( int i = 0; i < e.getValue(); i++ )
-            {
-                String newContainerName = StringUtil
-                        .trimToSize( String.format( "%s%s", templateName, UUID.randomUUID() ).replace( "-", "" ),
-                                Common.MAX_CONTAINER_NAME_LEN );
-                hostCloneNames.add( newContainerName );
-            }
-            ResourceHost resourceHost = getResourceHostByName( e.getKey().getHost() );
-            containerDistribution.put( resourceHost, hostCloneNames );
-        }
-
-
-        List<Future<ContainerHost>> taskFutures = Lists.newArrayList();
-        ExecutorService executorService = Executors.newFixedThreadPool( numberOfContainers );
-
-        //create containers in parallel on each resource host
-        for ( Map.Entry<ResourceHost, Set<String>> resourceHostDistribution : containerDistribution.entrySet() )
-        {
-            ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) resourceHostDistribution.getKey();
-
-            for ( String hostname : resourceHostDistribution.getValue() )
-            {
-                taskFutures.add( executorService.submit(
-                        new CreateContainerWrapperTask( resourceHostEntity, templateName, hostname,
-                                waitContainerTimeoutSec ) ) );
-            }
-        }
-
-        Set<HostInfoModel> result = Sets.newHashSet();
-        Set<ContainerHost> newContainers = Sets.newHashSet();
-
-        //wait for succeeded containers
-        for ( Future<ContainerHost> future : taskFutures )
-        {
-            try
-            {
-                ContainerHost containerHost = future.get();
-                newContainers.add( new ContainerHostEntity( getId().toString(),
-                        hostRegistry.getContainerHostInfoById( containerHost.getId() ) ) );
-                result.add( new HostInfoModel( containerHost ) );
-            }
-            catch ( ExecutionException | InterruptedException | HostDisconnectedException e )
-            {
-                LOG.error( "Error creating containers", e );
-            }
-        }
-
-        executorService.shutdown();
-
-        if ( !CollectionUtil.isCollectionEmpty( newContainers ) )
-        {
-            ContainerGroupEntity containerGroup;
-
-            try
-            {
-                //update existing container group to include new containers
-                containerGroup = ( ContainerGroupEntity ) findContainerGroupByEnvironmentId( environmentId );
-
-                Set<UUID> containerIds = Sets.newHashSet( containerGroup.getContainerIds() );
-
-                for ( ContainerHost containerHost : newContainers )
-                {
-                    containerIds.add( containerHost.getId() );
-                }
-
-                containerGroup.setContainerIds( containerIds );
-
-                containerGroupDataService.update( containerGroup );
-            }
-            catch ( ContainerGroupNotFoundException e )
-            {
-                //create container group for new containers
-                containerGroup = new ContainerGroupEntity( environmentId, initiatorPeerId, ownerId );
-
 
                 containerGroupDataService.persist( containerGroup );
             }

@@ -45,4 +45,7 @@ public interface ResourceHost extends Host
 
     public ContainerHost createContainer( String templateName, String hostname, int timeout )
             throws ResourceHostException;
+
+    public ContainerHost createContainer( String templateName, String hostname, String ip, int vlan, int timeout )
+            throws ResourceHostException;
 }

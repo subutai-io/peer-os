@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -23,7 +22,6 @@ import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
-import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
@@ -48,8 +46,6 @@ import org.safehaus.subutai.core.peer.impl.command.CommandResponseListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandResultImpl;
 import org.safehaus.subutai.core.peer.impl.container.ContainersDestructionResultImpl;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerGroupResponse;
-import org.safehaus.subutai.core.peer.impl.container.CreateContainersRequest;
-import org.safehaus.subutai.core.peer.impl.container.CreateContainersResponse;
 import org.safehaus.subutai.core.peer.impl.container.DestroyEnvironmentContainersRequest;
 import org.safehaus.subutai.core.peer.impl.container.DestroyEnvironmentContainersResponse;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequest;
@@ -982,39 +978,6 @@ public class RemotePeerImpl implements RemotePeer
                 sendRequest( request, RecipientType.CREATE_CONTAINER_GROUP_REQUEST.name(),
                         Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateContainerGroupResponse.class,
                         Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT, headers );
-
-        if ( response != null )
-        {
-            return response.getHosts();
-        }
-        else
-        {
-            throw new PeerException( "Command timed out" );
-        }
-    }
-
-
-    @Override
-    public Set<HostInfoModel> createContainers( final UUID environmentId, final UUID initiatorPeerId,
-                                                final UUID ownerId, final List<Template> templates,
-                                                final int numberOfContainers, final String strategyId,
-                                                final List<Criteria> criteria ) throws PeerException
-    {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-        Preconditions.checkNotNull( initiatorPeerId, "Invalid initiator peer id" );
-        Preconditions.checkNotNull( ownerId, "Invalid owner id" );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( templates ), "Invalid template set" );
-        Preconditions.checkArgument( numberOfContainers > 0, "Invalid number of containers" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( strategyId ), "Invalid strategy id" );
-
-        Map<String, String> headers = Maps.newHashMap();
-        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, environmentId.toString() );
-
-        CreateContainersResponse response = sendRequest(
-                new CreateContainersRequest( environmentId, initiatorPeerId, ownerId, templates, numberOfContainers,
-                        strategyId, criteria ), RecipientType.CONTAINER_CREATE_REQUEST.name(),
-                Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateContainersResponse.class,
-                Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT, headers );
 
         if ( response != null )
         {
