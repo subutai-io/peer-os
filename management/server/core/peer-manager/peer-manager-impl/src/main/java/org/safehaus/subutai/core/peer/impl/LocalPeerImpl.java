@@ -363,13 +363,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
         String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
         String[] allAddresses = cidr.getInfo().getAllAddresses();
+        int currentIpAddressOffset = 0;
 
         //create containers in parallel on each resource host
         for ( Map.Entry<ResourceHost, Set<String>> resourceHostDistribution : containerDistribution.entrySet() )
         {
             ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) resourceHostDistribution.getKey();
 
-            int currentIpAddressOffset = 0;
             for ( String hostname : resourceHostDistribution.getValue() )
             {
 
