@@ -353,19 +353,9 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     {
         SortedSet<Integer> takenIds = Sets.newTreeSet();
 
-        Set<VniVlanMapping> mappings;
-        try
+        for ( Vni vni : getReservedVnis() )
         {
-            mappings = getNetworkManager().getVniVlanMappings();
-        }
-        catch ( NetworkManagerException e )
-        {
-            throw new PeerException( e );
-        }
-
-        for ( VniVlanMapping mapping : mappings )
-        {
-            takenIds.add( mapping.getVlan() );
+            takenIds.add( vni.getVlan() );
         }
 
         for ( int i = Common.MIN_VLAN_ID; i <= Common.MAX_VLAN_ID; i++ )
