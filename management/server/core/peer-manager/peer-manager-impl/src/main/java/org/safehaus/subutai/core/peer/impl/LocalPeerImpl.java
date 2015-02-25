@@ -362,6 +362,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         ExecutorService executorService = Executors.newFixedThreadPool( request.getNumberOfContainers() );
 
         String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
+        String[] allAddresses = cidr.getInfo().getAllAddresses();
+
         //create containers in parallel on each resource host
         for ( Map.Entry<ResourceHost, Set<String>> resourceHostDistribution : containerDistribution.entrySet() )
         {
@@ -371,8 +373,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             for ( String hostname : resourceHostDistribution.getValue() )
             {
 
-                String ipAddress =
-                        cidr.getInfo().getAllAddresses()[request.getIpAddressOffset() + currentIpAddressOffset];
+                String ipAddress = allAddresses[request.getIpAddressOffset() + currentIpAddressOffset];
                 taskFutures.add( executorService.submit(
                         new CreateContainerWrapperTask( resourceHostEntity, templateName, hostname,
                                 String.format( "%s/%s", ipAddress, networkPrefix ), vlan,
