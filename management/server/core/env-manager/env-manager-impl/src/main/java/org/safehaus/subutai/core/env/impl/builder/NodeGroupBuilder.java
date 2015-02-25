@@ -160,6 +160,8 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
             }
         }
 
+        int currentIpAddressOffset = 0;
+
         for ( NodeGroup nodeGroup : nodeGroups )
         {
             NodeGroupBuildException exception = null;
@@ -189,7 +191,10 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
                                 fetchRequiredTemplates( peer.getId(), nodeGroup.getTemplateName() ),
                                 nodeGroup.getNumberOfContainers(),
                                 nodeGroup.getContainerPlacementStrategy().getStrategyId(),
-                                nodeGroup.getContainerPlacementStrategy().getCriteriaAsList(), ipAddressOffset ) );
+                                nodeGroup.getContainerPlacementStrategy().getCriteriaAsList(),
+                                ipAddressOffset + currentIpAddressOffset ) );
+
+                currentIpAddressOffset += nodeGroup.getNumberOfContainers();
 
                 for ( HostInfoModel newHost : newHosts )
                 {
