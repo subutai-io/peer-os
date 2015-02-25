@@ -290,6 +290,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         //setup networking
         int vlan = setupTunnels( request.getPeerIps(), environmentVni );
 
+        //TODO create gateway
+
 
         //try to register remote templates with local registry
         try
