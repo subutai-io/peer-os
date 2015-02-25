@@ -34,6 +34,7 @@ public class Common
     public static final String APT_REPO_PATH = "/repo/ksks/";
     public static final String APT_REPO_AMD64_PACKAGES_SUBPATH = "amd64/trusty/";
     public static final String DEFAULT_LXC_ARCH = "amd64";
+    public static final String DEFAULT_NET_INTERFACE = "eth0";
     public static String DEFAULT_TEMPLATE_VERSION = "2.1.0";
     public static final String PACKAGE_PREFIX = "subutai-";
     public static final String PACKAGE_PREFIX_WITHOUT_DASH = "subutai";
