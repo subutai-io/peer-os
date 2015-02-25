@@ -52,7 +52,7 @@ public class CreateContainerTask implements Callable<ContainerHost>
                 .isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) )
         {
             commandUtil.execute( new RequestBuilder( "subutai clone" ).withCmdArgs(
-                    Lists.newArrayList( templateName, hostname, "-i", String.format( "%s %s", ip, vlan ) ) )
+                    Lists.newArrayList( templateName, hostname, "-i", String.format( "\"%s %s\"", ip, vlan ) ) )
                                                                       .withTimeout( 1 ).daemon(), resourceHost );
         }
         else
