@@ -21,8 +21,11 @@ import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -33,7 +36,7 @@ import com.google.gson.reflect.TypeToken;
 
 public class RestServiceImpl implements RestService
 {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
     private PeerManager peerManager;
 
 
@@ -47,6 +50,14 @@ public class RestServiceImpl implements RestService
     public Response getSelfPeerInfo()
     {
         PeerInfo selfInfo = peerManager.getLocalPeerInfo();
+        try
+        {
+            peerManager.getLocalPeer().getManagementHost().getIpByInterfaceName( "eth1" );
+        }
+        catch ( HostNotFoundException e )
+        {
+            LOGGER.error( "Error getting host ip address.", e );
+        }
         selfInfo.setIp( getRequestIp() );
         selfInfo.setName( String.format( "Peer on %s", selfInfo.getIp() ) );
         return Response.ok( JsonUtil.toJson( selfInfo ) ).build();
