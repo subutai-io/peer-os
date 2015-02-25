@@ -227,12 +227,15 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
                 Set<VniVlanMapping> mappings = networkManager.getVniVlanMappings();
 
                 //find vlan by vni
+                //TODO find vlan by vni from reserved vlans
                 int vlanId = findVlanByVni( vni, mappings );
 
                 //vlan not found, obtain available
                 if ( vlanId == -1 )
                 {
                     vlanId = findAvailableVlanId( mappings );
+
+                    //TODO reserve vlan by vni
                 }
 
                 //setup tunnels to each remote peer
