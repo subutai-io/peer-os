@@ -337,10 +337,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             //ignore
         }
 
-        LOG.info( String.format( "NEW CLONE: ip = %s, vlan =%d", ip, vlan ) );
-
         Future<ContainerHost> containerHostFuture =
-                queueSequentialTask( new CreateContainerTask( this, templateName, hostname, timeout ) );
+                queueSequentialTask( new CreateContainerTask( this, templateName, hostname, ip, vlan, timeout ) );
 
         try
         {
