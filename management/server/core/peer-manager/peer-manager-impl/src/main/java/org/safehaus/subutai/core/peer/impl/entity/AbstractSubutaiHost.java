@@ -1,9 +1,7 @@
 package org.safehaus.subutai.core.peer.impl.entity;
 
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -56,9 +54,6 @@ public abstract class AbstractSubutaiHost implements Host
     @Enumerated
     private HostArchitecture hostArchitecture;
 
-    @Column( name = "net_intf" )
-    private String netInterfaces;
-
     @OneToMany( mappedBy = "host", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity = HostInterface
             .class )
     protected Set<Interface> interfaces = new HashSet<>();
@@ -87,14 +82,10 @@ public abstract class AbstractSubutaiHost implements Host
         this.hostId = hostInfo.getId().toString();
         this.hostname = hostInfo.getHostname();
 
-        StringBuilder sb = new StringBuilder();
-
         for ( Interface s : hostInfo.getInterfaces() )
         {
-            sb.append( s.getIp().replace( "addr:", "" ) ).append( ";" );
             addInterface( new HostInterface( s ) );
         }
-        this.netInterfaces = sb.toString();
     }
 
 
@@ -246,8 +237,6 @@ public abstract class AbstractSubutaiHost implements Host
 
         return null;
     }
-
-
 
 
     public String getHostId()
