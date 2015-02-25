@@ -83,6 +83,8 @@ import org.safehaus.subutai.core.strategy.api.StrategyNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.net.util.SubnetUtils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -287,10 +289,21 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                     String.format( "Environment %s has no VNI reserved", request.getEnvironmentId() ) );
         }
 
+        SubnetUtils cidr;
+        try
+        {
+            cidr = new SubnetUtils( request.getSubnetCidr() );
+        }
+        catch ( IllegalArgumentException e )
+        {
+            throw new PeerException( "Failed to parse subnet CIDR", e );
+        }
+
         //setup networking
         int vlan = setupTunnels( request.getPeerIps(), environmentVni );
 
-        //TODO create gateway
+        //create gateway
+        managementHost.createGateway( cidr.getInfo().getLowAddress(), vlan );
 
 
         //try to register remote templates with local registry
