@@ -1104,19 +1104,30 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     {
         for ( ContainerHostInfo containerHostInfo : containerHostInfos )
         {
-            Host containerHost;
+
+            boolean isNewHost = false;
             try
             {
-                containerHost = bindHost( containerHostInfo.getId() );
+                resourceHost.getContainerHostById( containerHostInfo.getId() );
             }
-            catch ( HostNotFoundException hnfe )
+            catch ( HostNotFoundException e )
             {
-                containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
-                setContainersTransientFields( Sets.newHashSet( ( ContainerHost ) containerHost ) );
-                ( ( ResourceHostEntity ) resourceHost ).addContainerHost( ( ContainerHostEntity ) containerHost );
-                containerHostDataService.persist( ( ContainerHostEntity ) containerHost );
+                isNewHost = true;
             }
-            ( ( ContainerHostEntity ) containerHost ).updateHostInfo( containerHostInfo );
+
+
+            ContainerHostEntity containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
+            setContainersTransientFields( Sets.newHashSet( ( ContainerHost ) containerHost ) );
+            ( ( ResourceHostEntity ) resourceHost ).addContainerHost( containerHost );
+            if ( isNewHost )
+            {
+                containerHostDataService.persist( containerHost );
+            }
+            else
+            {
+                containerHostDataService.update( containerHost );
+            }
+            containerHost.updateHostInfo( containerHostInfo );
         }
     }
 

@@ -66,7 +66,8 @@ public class CreateContainerTask implements Callable<ContainerHost>
         long start = System.currentTimeMillis();
 
         ContainerHost containerHost = null;
-        while ( System.currentTimeMillis() - start < timeoutSec * 1000 && containerHost == null )
+        while ( System.currentTimeMillis() - start < timeoutSec * 1000 && ( containerHost == null || Strings
+                .isNullOrEmpty( containerHost.getIpByInterfaceName( Common.DEFAULT_NET_INTERFACE ) ) ) )
         {
             Thread.sleep( 100 );
             try
@@ -82,7 +83,7 @@ public class CreateContainerTask implements Callable<ContainerHost>
         if ( containerHost == null )
         {
             throw new ContainerCreationException(
-                    String.format( "Container %s did not connect within timeout", hostname ) );
+                    String.format( "Container %s did not connect within timeout with proper IP", hostname ) );
         }
         else if ( !Strings.isNullOrEmpty( gateway ) && gateway.matches( Common.IP_REGEX ) )
         {

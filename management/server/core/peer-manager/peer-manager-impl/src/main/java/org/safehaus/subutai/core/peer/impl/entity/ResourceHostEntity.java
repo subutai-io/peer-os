@@ -508,6 +508,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         synchronized ( containersHosts )
         {
+            //replace host
+            containersHosts.remove( host );
             containersHosts.add( host );
         }
     }
