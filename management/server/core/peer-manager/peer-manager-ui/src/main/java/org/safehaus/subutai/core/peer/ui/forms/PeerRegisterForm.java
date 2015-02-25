@@ -235,14 +235,13 @@ public class PeerRegisterForm extends CustomComponent
                                         keyStoreManager = new KeyStoreManager();
                                         keyStore = keyStoreManager.load( keyStoreData );
 
-                                        String HEXCert =
-                                                keyStoreManager.exportCertificateHEXString( keyStore, keyStoreData );
+                                        String HEXCert = keyStoreManager.exportCertificateHEXString( keyStore,
+                                                keyStoreData );
 
-                                        selfPeer.setCert( HEXCert );
 
                                         //***********************************************************************
 
-                                        updatePeerOnAnother( selfPeer, peer.getIp(), "8181" );
+                                        updatePeerOnAnother( selfPeer, peer.getIp(), "8181" ,HEXCert );
                                     }
                                     catch ( PeerException e )
                                     {
@@ -252,11 +251,11 @@ public class PeerRegisterForm extends CustomComponent
                                     break;
                                 case REGISTERED:
                                     peer.setStatus( PeerStatus.BLOCKED );
-                                    updatePeerOnAnother( peer, peer.getIp(), "8181" );
+                                    updatePeerOnAnother( peer, peer.getIp(), "8181" ,"" );
                                     break;
                                 case BLOCKED:
                                     peer.setStatus( PeerStatus.REGISTERED );
-                                    updatePeerOnAnother( peer, peer.getIp(), "8181" );
+                                    updatePeerOnAnother( peer, peer.getIp(), "8181" ,"" );
                                     break;
                             }
                             Property property = peersTable.getItem( peer.getId() ).getItemProperty( "Status" );
@@ -289,7 +288,7 @@ public class PeerRegisterForm extends CustomComponent
                                                 peersTable.getItem( peer.getId() ).getItemProperty( "Status" );
                                         property.setValue( peer.getStatus() );
                                         selfPeer.setStatus( PeerStatus.BLOCKED_PEER );
-                                        updatePeerOnAnother( selfPeer, peer.getIp(), "8181" );
+                                        updatePeerOnAnother( selfPeer, peer.getIp(), "8181", "" );
                                         break;
                                 }
                             }
@@ -394,7 +393,7 @@ public class PeerRegisterForm extends CustomComponent
     }
 
 
-    private void updatePeerOnAnother( PeerInfo peer, String ip, String servicePort )
+    private void updatePeerOnAnother( PeerInfo peer, String ip, String servicePort , String cert)
     {
         //TODO add cert saving process
         //TODO pass self cert to request
