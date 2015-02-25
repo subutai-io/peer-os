@@ -123,7 +123,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response processRegisterRequest( String peer , String root_cert_px1)
+    public Response processRegisterRequest( String peer )
     {
         PeerInfo p = JsonUtil.fromJson( peer, PeerInfo.class );
         p.setIp( getRequestIp() );
@@ -165,7 +165,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response updatePeer( String peer , String root_cert_px1 )
+    public Response updatePeer( String peer, String root_cert_px1 )
     {
         PeerInfo p = JsonUtil.fromJson( peer, PeerInfo.class );
         p.setIp( getRequestIp() );
