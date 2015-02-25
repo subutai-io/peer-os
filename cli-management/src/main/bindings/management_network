@@ -47,13 +47,24 @@ Usage:   Delete a gateway tap device
         "subutai \[-qh\] management_network -D VLANID
 ******************************************************************************
 Usage:   Create VNI-VLAN Mapping on a Tunnel                
-        "subutai \[-qh\] management_network -m TUNNELPORTNAME VNI VLANID
+        "subutai \[-qh\] management_network -m TUNNELPORTNAME VNI VLANID ENV_ID
 
 Usage:   Delete VNI-VLAN Mapping on a Tunnel                 
         "subutai \[-qh\] management_network -M TUNNELPORTNAME VNI VLANID
 
 Usage:   List  VNI-VLAN Mapping on a Tunnel                 
         "subutai \[-qh\] management_network -v 
+
+******************************************************************************
+Usage:   Reserve VNI                 
+         "subutai \[-qh\] management_network -E
+         Example: subutai management_network -E 5343 205
+         Where: 5343 is VNI number, 205 vlan number 
+******************************************************************************
+Usage:   LIST Reserved VNI                 
+         "subutai \[-qh\] management_network -Z list
+         Example: subutai management_network -Z list
+
 -------------------------------------------------------------------------------
 EOF
 }
@@ -92,9 +103,10 @@ function management_network {
   local listVNImapping="false"
   local listTapDevices="false"
   local removeTapDevice="false"
-
+  local reserveVNI="false"
+  local lresVNI="false"
   shift_amount=0;
-  while getopts ":clrfspdNLRSVTDmvM:" opt; do
+  while getopts ":clrfspdNLRSVTDmvMEZ:" opt; do
      case $opt in
        c)
 	 createTunnel="true"	
@@ -157,6 +169,14 @@ function management_network {
          ;;
        v)
          listVNImapping="true"
+         shift
+         ;;
+       E)
+         reserveVNI="true"
+         shift
+         ;;
+       Z)
+         lresVNI="true"
          shift
          ;;
        M)
@@ -495,23 +515,110 @@ function management_network {
       search_dir="/var/subutai-network"
       if [ -d "$search_dir" ]; then
          # Control will enter here if $DIRECTORY exists.
-         echo "#################################################################################"
-         echo -e "  Tunnel name\t |  VNI \t| VLAN ID   "
-         for entry in "$search_dir"/*
+#         echo "#################################################################################"
+#         echo -e "  Tunnel name\t |  VNI \t| VLAN ID   "
+         for entry in "$search_dir"/tunnel*
            do
              if [ -f "$entry" ]; then  
-               echo "---------------------------------------------------------------------------------"
-               echo $(basename $entry)} | awk -F"_" '{print "\t",$1,""}'
-               cat $entry | awk -F" " '{print "\t\t | ",$1,"\t\t| ",$2}';
+#               echo "---------------------------------------------------------------------------------"
+             local tunname=$(echo $(basename $entry)} | awk -F"_" '{print $1}')
+#		echo "$tunname"
+#		cat $entry | awk -v var="$tunname"  -F" " '{print $var "," $1 "," $2}'
+		cat $entry | awk -v var="$tunname"  -F" " '{print var ","  $1 "," $2 "," $3 }'
+
              fi
            done
-         echo "#################################################################################"
+#         echo "#################################################################################"
       else 
          echo "It seems no VNi mapping yet cause I can't open folder $search_dir"
       fi
    fi
 
+   if [  "true" == "$lresVNI"  ]; then 
+      file_name="/var/subutai-network/vni_reserve"
+#      echo "$file_name"
+#      cat $file_name
+      if [ ! -f "$file_name" ]; then
+            msg_info "No reserved VNIs,not exist file for reserved VNI" >&2
+            exit 10
+        fi
+      local status=$1
+      if   [ "$status" == "list"  ]; then
+         cat $file_name | awk -F " " '{print $1 "," $2}'
+         exit 0              
+      elif [ "$status" == "delete" ]; then 
+    vni_id=$2
+    ENV_ID=$3
+    if [  -z "$vni_id" ] || [ -z "$ENV_ID" ]; then
+       msg_error "Provide VNI_ID ENV_ID" >&2
+    fi
+    file_name2="/var/subutai-network/vni_reserve"
+    sed -i "/$vni_id\s$ENV_ID/d" $file_name2
+         exit 0
+      fi
 
+
+#     echo "RESREVED VNIS:"
+   fi
+
+
+    if [  "true" == "$reserveVNI"  ]; then
+        local file_name="/var/subutai-network/vni_reserve"
+        if [ ! -d '/var/subutai-network' ]
+        then
+            mkdir -p "/var/subutai-network"
+        fi
+        if [ ! -f "$file_name" ]
+        then
+            touch $file_name
+        fi
+        local VNI=$1
+        local ENV_ID=$2
+        if [ -z "$VNI" ] || [ -z $ENV_ID ]; 
+        then
+#         show_usage "`management_network_usage`"
+         msg_error "Provide VNI and ENV_ID" >&2
+         exit 10
+        fi
+        check=$(cat $file_name | grep $VNI | awk -F " " '{print $2}')
+#        echo "check: $check"
+        if [ "$check" == "$ENV_ID" ]; then
+          msg_ok "Pair VNI-ENV_ID exists" >&2
+          exit 0
+        fi
+        local existingVNI=$(cat $file_name | awk -F " " '{ print $1}' | grep $VNI)
+        local count=$(cat $file_name | awk -F " " '{ print $1}' | grep $VNI | wc -l)
+        if [ $count -gt 1 ]; then
+          msg_error "double setting for VNI" >&2
+          exit 10
+        fi
+        local existingENV=$(cat $file_name | awk -F " " '{ print $2}' | grep $ENV_ID)
+        local count=$(cat $file_name | awk -F " " '{ print $2}' | grep $ENV_ID | wc -l)
+        if [ $count -gt 1 ]; then
+          msg_error "double setting for ENV" >&2
+          exit 10
+        fi
+        
+#        echo "VNI=$existingVNI, ENV_ID=$existingENV"
+        if [ "$existingVNI" == $VNI ] && [ "$existingENV" == $ENV_ID ];then
+             msg_error "VNI or ENV_ID reserved already">&2
+             exit 1
+        elif [ "$existingVNI" == $VNI    ];then
+                 msg_error "VNI is existing for different ENV" >&2
+                 exit 1
+        elif [ "$existingENV" == $ENV_ID ];then
+                  msg_error "ENV is existing for different VNI" >&2
+                  exit 2
+        fi
+#        if [ ];then
+#           msg_error "" >&2
+#           exit
+#        fi
+        echo "$VNI $ENV_ID" >> $file_name
+        msg_ok "Added $VNI $ENV_ID" >&2
+        exit 0
+        
+    fi 
    if [ "true" == "$delvnivlanMap" ]; then
      tunnelName="$1"
      vni_id="$2"
@@ -580,7 +687,8 @@ function management_network {
     tunnelName="$1"
     vni_id="$2"
     vlan_id="$3"
-    extra="$4"
+    ENV_ID="$4"
+    extra="$5"
     vni_list=()
     vlan_list=()
 
@@ -598,11 +706,54 @@ function management_network {
         msg_error "VLAN ID Parameter not provided. Aborting ..."
         show_usage "`management_network_usage`"
     fi
+
+    if [ -z "$ENV_ID" ]; then
+        msg_error "ENV ID Parameter not provided. Aborting ..."
+        exit 10
+#        show_usage "`management_network_usage`"
+    fi
+
+      file_name2="/var/subutai-network/vni_reserve"
+#      echo "$file_name"
+#      cat $file_name
+      if [ ! -f "$file_name2" ]; then
+            msg_info "No reserved VNIs,not exist file for reserved VNI" >&2
+            exit 10
+        fi
+
+
+#    file_name="/var/subutai-network/vni_reserve"
+#    cat $file_name
+#    if [ ! -f 'file_name' ]; then
+#       msg_error "Please do reserve VNI-ENV_ID first" >&2
+#       exit 10
+#    fi
+    check=$(cat $file_name2 | awk -F " " '{print $1 "," $2}' | grep $vni_id,$ENV_ID)
+    checkVNI=$(cat $file_name2 | grep $vni_id | awk -F" " '{print $1}')
+    checkENV=$(cat $file_name2 | grep $vni_id | awk -F" " '{print $2}')
+
+    checkVNI1=$(cat $file_name2 | grep $ENV_ID | awk -F" " '{print $1}')
+    checkENV1=$(cat $file_name2 | grep $ENV_ID | awk -F" " '{print $2}')
+
+#    echo "check=$check"
+#    echo "vni=$vni_id,ENV=$ENV_ID"
+#    echo "check:  vni=$checkVNI,ENV=$checkENV"
+     
+    if [ "$checkVNI" == "$vni_id" ] && [ "$checkENV" != "$ENV_ID"  ]; then
+       msg_error "VNI reserved for different ENV" >&2
+       exit 2
+    elif [ "$checkENV1" == "$ENV_ID" ] && [ "$checkVNI1" != "$vni_id" ]; then
+       msg_error "ENV reserved for different VNI" >&2
+       exit 3
+    elif [ -z "$check" ]; then
+       msg_error "VNI with ENV not reserved" >&2
+       exit 1
+    fi
+
     if [ "$extra" ]; then
         msg_error "extra Parameter provided. Aborting ..."
         show_usage "`management_network_usage`"
     fi
-
     tunnel_port=`ovs-ofctl show br-tun|grep $tunnelName|cut -d"(" -f1 | cut -d" " -f2`
     if [[ -z "$tunnel_port" ]]
     then
@@ -629,13 +780,14 @@ function management_network {
 
     if [[ ${vlan_list[*]} =~ $vlan_id ]] || [[ ${vni_list[*]} =~ $vni_id ]]
     then
-      msg_fail "Vlan ID: $vlan_id or VNI: $vni_id is already in use!"
-      exit 1
+      msg_ok "Vlan ID: $vlan_id or VNI: $vni_id is already in use!"
+      exit 0
     fi
     ovs-ofctl add-flow br-tun "in_port=$peer_port,dl_vlan=$vlan_id,actions=set_field:$vni_id->tun_id,output:$tunnel_port"
     ovs-ofctl add-flow br-tun "in_port=$tunnel_port,tun_id=$vni_id,actions=set_field:$vlan_id->vlan_vid,output:$peer_port"
-    echo "$vni_id $vlan_id" >> $file_name 
-    msg_ok "Tunnel: $tunnelName VNI: $vni_id VLAN: $vlan_id"
+    echo "$vni_id $vlan_id $ENV_ID" >> $file_name 
+    msg_ok "Tunnel: $tunnelName VNI: $vni_id VLAN: $vlan_id ENV_ID: $ENV_ID"
+    exit 0
   fi
 
 }
