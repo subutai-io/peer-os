@@ -14,8 +14,7 @@ import org.safehaus.subutai.common.peer.PeerStatus;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.common.util.StringUtil;
-import org.safehaus.subutai.common.util.UUIDUtil;
+import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.core.peer.ui.PeerManagerPortalModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
 
-import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -38,6 +36,17 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 
 
+/**
+ * Registration process should be handled in save manner so no middleware attacks occur. In order to get there peers
+ * need to exchange with public keys. This will create ssl layer by encrypting all traffic passing through their
+ * connection. So first initial handshake will be one direction, to pass keys through encrypted channel and register
+ * them in peers' trust stores. These newly saved keys will be used further for safe communication, with bidirectional
+ * authentication.
+ *
+ *
+ * TODO here still exists some issues concerned via registration/reject/approve requests. Some of them must pass through
+ * secure channel such as unregister process. Which already must be in bidirectional auth completed stage.
+ */
 public class PeerRegisterForm extends CustomComponent
 {
 
@@ -206,6 +215,9 @@ public class PeerRegisterForm extends CustomComponent
             {
                 continue;
             }
+            /**
+             * According to peer status perform sufficient action
+             */
             PeerManageActionsComponent.PeerManagerActionsListener listener =
                     new PeerManageActionsComponent.PeerManagerActionsListener()
 
@@ -216,46 +228,38 @@ public class PeerRegisterForm extends CustomComponent
                             switch ( peer.getStatus() )
                             {
                                 case REQUESTED:
-                                    peer.setStatus( PeerStatus.APPROVED );
                                     PeerInfo selfPeer;
-                                    try
+
+                                    selfPeer = module.getPeerManager().getLocalPeerInfo();
+
+                                    //************ Send Trust SSL Cert **************************************
+
+                                    KeyStore keyStore;
+                                    KeyStoreData keyStoreData;
+                                    KeyStoreManager keyStoreManager;
+
+                                    keyStoreData = new KeyStoreData();
+                                    keyStoreData.setupKeyStorePx2();
+
+                                    keyStoreManager = new KeyStoreManager();
+                                    keyStore = keyStoreManager.load( keyStoreData );
+
+                                    String HEXCert =
+                                            keyStoreManager.exportCertificateHEXString( keyStore, keyStoreData );
+
+
+                                    //***********************************************************************
+
+                                    if ( approvePeerRegistration( selfPeer, peer, HEXCert ) )
                                     {
-                                        selfPeer = getPeerJsonRepresentation( "127.0.0.1", "8181" );
-                                        selfPeer.setStatus( PeerStatus.APPROVED );
-
-                                        //************ Send Trust SSL Cert **************************************
-
-                                        KeyStore keyStore;
-                                        KeyStoreData keyStoreData;
-                                        KeyStoreManager keyStoreManager;
-
-                                        keyStoreData = new KeyStoreData();
-                                        keyStoreData.setupKeyStorePx2();
-
-                                        keyStoreManager = new KeyStoreManager();
-                                        keyStore = keyStoreManager.load( keyStoreData );
-
-                                        String HEXCert = keyStoreManager.exportCertificateHEXString( keyStore,
-                                                keyStoreData );
-
-
-                                        //***********************************************************************
-
-                                        updatePeerOnAnother( selfPeer, peer.getIp(), "8181" ,HEXCert );
+                                        peer.setStatus( PeerStatus.APPROVED );
                                     }
-                                    catch ( PeerException e )
-                                    {
-                                        Notification.show( "Error accessing remote peer", e.getMessage(),
-                                                Notification.Type.ERROR_MESSAGE );
-                                    }
+
                                     break;
                                 case REGISTERED:
-                                    peer.setStatus( PeerStatus.BLOCKED );
-                                    updatePeerOnAnother( peer, peer.getIp(), "8181" ,"" );
+                                    //TODO In further devs plan to support several states
                                     break;
                                 case BLOCKED:
-                                    peer.setStatus( PeerStatus.REGISTERED );
-                                    updatePeerOnAnother( peer, peer.getIp(), "8181" ,"" );
                                     break;
                             }
                             Property property = peersTable.getItem( peer.getId() ).getItemProperty( "Status" );
@@ -269,26 +273,28 @@ public class PeerRegisterForm extends CustomComponent
                         {
                             try
                             {
-                                PeerInfo selfPeer = getPeerJsonRepresentation( "127.0.0.1", "8181" );
+                                //TODO perform different actions on peer rejected request
+                                PeerInfo selfPeer = module.getPeerManager().getLocalPeerInfo();
                                 switch ( peer.getStatus() )
                                 {
                                     case REJECTED:
-                                    case APPROVED:
                                     case BLOCKED:
                                     case BLOCKED_PEER:
-                                    case REQUEST_SENT:
-                                        module.getPeerManager().unregister( peer.getId().toString() );
-                                        peersTable.removeItem( peer.getId() );
-                                        unregisterPeerFromAnother( selfPeer, peer.getIp(), "8181" );
-                                        break;
                                     case REQUESTED:
-                                        peer.setStatus( PeerStatus.REJECTED );
-                                        module.getPeerManager().update( peer );
+                                    case REQUEST_SENT:
+                                        if ( rejectPeerRegistration( selfPeer, peer ) )
+                                        {
+                                            peer.setStatus( PeerStatus.REJECTED );
+                                        }
                                         Property property =
                                                 peersTable.getItem( peer.getId() ).getItemProperty( "Status" );
                                         property.setValue( peer.getStatus() );
-                                        selfPeer.setStatus( PeerStatus.BLOCKED_PEER );
-                                        updatePeerOnAnother( selfPeer, peer.getIp(), "8181", "" );
+                                        module.getPeerManager().update( peer );
+                                        break;
+                                    case APPROVED:
+                                        module.getPeerManager().unregister( peer.getId().toString() );
+                                        peersTable.removeItem( peer.getId() );
+                                        unregisterMeFromRemote( selfPeer, peer );
                                         break;
                                 }
                             }
@@ -306,58 +312,31 @@ public class PeerRegisterForm extends CustomComponent
     }
 
 
-    private PeerInfo getPeerJsonRepresentation( String ip, String servicePort ) throws PeerException
+    /**
+     * Send peer to register on remote peer. To construct secure connection. For now initializer peer doesn't send its
+     * px2 (public key requiring bidirectional authentication).
+     *
+     * @param peerToRegister - initializer peer info for registration process
+     * @param ip - target peer ip address
+     * @param servicePort - target peer service port
+     *
+     * @return - remote peer info to whom registration is requested
+     */
+    private PeerInfo registerMeToRemote( PeerInfo peerToRegister, String ip, String servicePort )
     {
-        String baseUrl = String.format( "http://%s:%s/cxf", ip, servicePort );
-        try
-        {
-            WebClient client = WebClient.create( baseUrl );
-            if ( StringUtil.isNumeric( servicePort ) && !Strings.isNullOrEmpty( ip ) )
-            {
-                client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
-                String peerId = client.path( "peer/me" ).get( String.class );
-                LOG.warn( peerId );
-
-                if ( !UUIDUtil.isStringAUuid( peerId ) )
-                {
-                    throw new PeerException( "Failed to obtain peer id" );
-                }
-
-                PeerInfo peerInfo = new PeerInfo();
-                peerInfo.setId( UUID.fromString( peerId ) );
-                peerInfo.setIp( ip );
-                peerInfo.setPort( Integer.parseInt( servicePort ) );
-                peerInfo.setName( "Peer on " + ip );
-
-                return peerInfo;
-            }
-            else
-            {
-                throw new PeerException( "Please supply valid values" );
-            }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "PeerRegisterForm@createRegisterButton!clickListener" + e.getMessage(), e );
-            throw new PeerException( e );
-        }
-    }
-
-
-    private PeerInfo registerPeerToAnother( PeerInfo peer, String ip, String servicePort )
-    {
-        String baseUrl = String.format( "http://%s:%s/cxf", ip, servicePort );
-        WebClient client = WebClient.create( baseUrl );
-        client.type( MediaType.APPLICATION_JSON ).accept( MediaType.APPLICATION_JSON );
+        String baseUrl = String.format( "https://%s:8443/cxf", ip );
+        WebClient client = RestUtil.createTrustedWebClient( baseUrl );//WebClient.create( baseUrl );
+        client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
         Form form = new Form();
-        form.set( "peer", GSON.toJson( peer ) );
-        client.form( form );
-        Response response = client.path( "peer/register" ).post( "" );
+        form.set( "peer", GSON.toJson( peerToRegister ) );
+
+        Response response = client.path( "peer/register" ).form( form );
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             Notification.show( String.format( "Request sent to %s!", ip ) );
+            String responseString = response.readEntity( String.class );
             LOG.info( response.toString() );
-            PeerInfo remotePeerInfo = JsonUtil.from( response.getEntity().toString(), new TypeToken<PeerInfo>()
+            PeerInfo remotePeerInfo = JsonUtil.from( responseString, new TypeToken<PeerInfo>()
             {
             }.getType() );
             if ( remotePeerInfo != null )
@@ -374,17 +353,32 @@ public class PeerRegisterForm extends CustomComponent
     }
 
 
-    private void unregisterPeerFromAnother( PeerInfo peer, String ip, String servicePort )
+    private void unregisterMeFromRemote( PeerInfo peerToUnregister, PeerInfo remotePeerInfo )
     {
-        String baseUrl = String.format( "http://%s:%s/cxf", ip, servicePort );
-        WebClient client = WebClient.create( baseUrl );
+        //TODO remove peer certificate from trust store
+        String baseUrl = String.format( "https://%s:8444/cxf", remotePeerInfo.getIp() );
+        WebClient client = RestUtil.createTrustedWebClientWithAuth( baseUrl );// WebClient.create( baseUrl );
         Response response =
-                client.path( "peer/unregister" ).type( MediaType.TEXT_PLAIN ).accept( MediaType.APPLICATION_JSON )
-                      .query( "peerId", GSON.toJson( peer.getId().toString() ) ).delete();
+                client.path( "peer/unregister" ).type( MediaType.APPLICATION_JSON ).accept( MediaType.APPLICATION_JSON )
+                      .query( "peerId", GSON.toJson( peerToUnregister.getId().toString() ) ).delete();
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             LOG.info( response.toString() );
-            Notification.show( String.format( "Request sent to %s!", ip ) );
+            Notification.show( String.format( "Request sent to %s!", remotePeerInfo.getName() ) );
+            //************ Delete Trust SSL Cert **************************************
+            KeyStore keyStore;
+            KeyStoreData keyStoreData;
+            KeyStoreManager keyStoreManager;
+
+            keyStoreData = new KeyStoreData();
+            keyStoreData.setupTrustStorePx2();
+            keyStoreData.setAlias( remotePeerInfo.getId().toString() );
+
+            keyStoreManager = new KeyStoreManager();
+            keyStore = keyStoreManager.load( keyStoreData );
+
+            keyStoreManager.deleteEntry( keyStore, keyStoreData );
+            //***********************************************************************
         }
         else
         {
@@ -393,27 +387,101 @@ public class PeerRegisterForm extends CustomComponent
     }
 
 
-    private void updatePeerOnAnother( PeerInfo peer, String ip, String servicePort , String cert)
+    private boolean approvePeerRegistration( PeerInfo peerToUpdateOnRemote, PeerInfo remotePeer, String cert )
     {
-        //TODO add cert saving process
-        //TODO pass self cert to request
-        String baseUrl = String.format( "http://%s:%s/cxf", ip, servicePort );
-        WebClient client = WebClient.create( baseUrl );
-        Response response =
-                client.path( "peer/update" ).type( MediaType.TEXT_PLAIN ).accept( MediaType.APPLICATION_JSON )
-                      .query( "peer", GSON.toJson( peer ) ).put( "" );
+        String baseUrl = String.format( "https://%s:8443/cxf", remotePeer.getIp() );
+        WebClient client = RestUtil.createTrustedWebClient( baseUrl );//WebClient.create( baseUrl );
+        client.type( MediaType.APPLICATION_FORM_URLENCODED ).accept( MediaType.APPLICATION_JSON );
+
+        Form form = new Form();
+        form.set( "approvedPeer", GSON.toJson( peerToUpdateOnRemote ) );
+        form.set( "root_cert_px2", cert );
+
+        Response response = client.path( "peer/approve" ).put( form );
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
-            LOG.info( response.toString() );
-            Notification.show( String.format( "Request sent to %s!", ip ) );
+            LOG.info( response.readEntity( String.class ) );
+            remotePeer.setStatus( PeerStatus.APPROVED );
+            String root_cert_px2 = response.readEntity( String.class );
+            Notification.show( String.format( "Request sent to %s!", remotePeer.getName() ) );
+            //************ Save Trust SSL Cert **************************************
+            KeyStore keyStore;
+            KeyStoreData keyStoreData;
+            KeyStoreManager keyStoreManager;
+
+            keyStoreData = new KeyStoreData();
+            keyStoreData.setupTrustStorePx2();
+            keyStoreData.setHEXCert( root_cert_px2 );
+
+            keyStoreManager = new KeyStoreManager();
+            keyStore = keyStoreManager.load( keyStoreData );
+
+            keyStoreManager.importCertificateHEXString( keyStore, keyStoreData );
+            //***********************************************************************
+            return true;
         }
         else
         {
             LOG.warn( "Response for registering peer: " + response.toString() );
+            return false;
         }
     }
 
 
+    /**
+     * Peer request rejection intented to be handled before they exchange with keys
+     *
+     * @param peerToUpdateOnRemote - local peer info to update/send to remote peer
+     * @param remotePeer - remote peer whose request was rejected
+     *
+     * @return - status mentioning does remote has responded with 202 status code.
+     */
+    private boolean rejectPeerRegistration( PeerInfo peerToUpdateOnRemote, PeerInfo remotePeer )
+    {
+        String baseUrl = String.format( "https://%s:8443/cxf", remotePeer.getIp() );
+        WebClient client = RestUtil.createTrustedWebClient( baseUrl );// WebClient.create( baseUrl );
+        client.type( MediaType.APPLICATION_FORM_URLENCODED ).accept( MediaType.APPLICATION_JSON );
+
+        Form form = new Form();
+        form.set( "rejectedPeerId", peerToUpdateOnRemote.getId().toString() );
+
+        Response response = client.path( "peer/reject" ).put( form );
+        if ( response.getStatus() == Response.Status.NO_CONTENT.getStatusCode() )
+        {
+            LOG.info( "Successfully reject peer request" );
+            Notification.show( String.format( "Request sent to %s!", remotePeer.getName() ) );
+
+            //TODO maybe will implement certificates exchange later on initial request, before peer approves
+            // initializer' request
+            //************ Delete Trust SSL Cert **************************************
+            //            KeyStore keyStore;
+            //            KeyStoreData keyStoreData;
+            //            KeyStoreManager keyStoreManager;
+            //
+            //            keyStoreData = new KeyStoreData();
+            //            keyStoreData.setupTrustStorePx2();
+            //            keyStoreData.setAlias( remotePeer.getId().toString() );
+            //
+            //            keyStoreManager = new KeyStoreManager();
+            //            keyStore = keyStoreManager.load( keyStoreData );
+            //
+            //            keyStoreManager.deleteEntry( keyStore, keyStoreData );
+            //***********************************************************************
+            return true;
+        }
+        else
+        {
+            LOG.warn( "Response for registering peer: " + response.toString() );
+            return false;
+        }
+    }
+
+
+    /**
+     * Send peer registration request for further handshakes.
+     *
+     * @return - vaadin button with request initializing click listener
+     */
     private Button createRegisterButton()
     {
         registerRequestButton = new Button();
@@ -438,14 +506,8 @@ public class PeerRegisterForm extends CustomComponent
 
                         try
                         {
-                            //                            PeerInfo remotePeer = getPeerJsonRepresentation( ip,
-                            // servicePort );
-                            //                            remotePeer.setStatus( PeerStatus.REQUEST_SENT );
-
                             PeerInfo selfPeer = module.getPeerManager().getLocalPeerInfo();
-                            selfPeer.setIp( module.getPeerManager().getLocalPeer().getManagementHost()
-                                                  .getIpByInterfaceName( "eth1" ) );
-                            PeerInfo remotePeer = registerPeerToAnother( selfPeer, ip, servicePort );
+                            PeerInfo remotePeer = registerMeToRemote( selfPeer, ip, servicePort );
                             if ( remotePeer != null )
                             {
                                 module.getPeerManager().register( remotePeer );

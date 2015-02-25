@@ -76,11 +76,24 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response unregisterPeer( @QueryParam( "peerId" ) String peerId );
 
+
+    @PUT
+    @Path( "reject" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response rejectForRegistrationRequest( @FormParam( "rejectedPeerId" ) String rejectedPeerId );
+
+
+    @PUT
+    @Path( "approve" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response approveForRegistrationRequest( @FormParam( "approvedPeer" ) String approvedPeer,
+                                                   @FormParam( "root_cert_px2" ) String root_cert_px2 );
+
+
     @PUT
     @Path( "update" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response updatePeer(  @FormParam( "peer" ) String peer,
-                                 @FormParam( "root_cert_px2" ) String root_cert_px2 );
+    public Response updatePeer( @FormParam( "peer" ) String peer, @FormParam( "root_cert_px2" ) String root_cert_px2 );
 
     //*************** Peer Registration Handshake REST - END ***************************
 

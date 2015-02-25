@@ -32,11 +32,11 @@ public class RestInterceptor extends AbstractPhaseInterceptor<Message>
         try
         {
             URL url = new URL( ( String ) message.get( Message.REQUEST_URL ) );
-            if ( !basePath.contains( "peer/register" ) && url.getPort() != 8443 )
-            {
-                message.put( Message.RESPONSE_CODE, 403 );
-                message.getInterceptorChain().abort();
-            }
+            //            if ( !basePath.contains( "peer/register" ) && url.getPort() != 8443 )
+            //            {
+            //                message.put( Message.RESPONSE_CODE, 403 );
+            //                message.getInterceptorChain().abort();
+            //            }
         }
         catch ( MalformedURLException ignore )
         {

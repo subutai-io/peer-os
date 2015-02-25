@@ -35,7 +35,7 @@ public class Common
 
     //************* Certificates / KeyStore Settings *********************************************************
 
-    public static final String KARAF_HOME = "~/scr/subutai-2.0.0/";
+    public static final String KARAF_HOME = "/root/scr/subutai-2.0.0/";
 
     public static final String KEYSTORE_PX1_FILE   = KARAF_HOME+"etc/keystores/keystore_server_px1";
     public static final String KEYSTORE_PX2_FILE   = KARAF_HOME+"etc/keystores/keystore_server_px2";

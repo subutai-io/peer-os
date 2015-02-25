@@ -1,7 +1,12 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.sql.SQLException;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -145,6 +150,25 @@ public class PeerManagerImpl implements PeerManager
             peerInfo.setName( "Local Subutai server" );
             //TODO get ownerId from persistent storage
             peerInfo.setOwnerId( UUID.randomUUID() );
+
+            try
+            {
+                Enumeration<InetAddress> addressEnumeration = NetworkInterface.getByName( "eth1" ).getInetAddresses();
+                while ( addressEnumeration.hasMoreElements() )
+                {
+                    InetAddress address = addressEnumeration.nextElement();
+                    if ( ( address instanceof Inet4Address ) )
+                    {
+                        peerInfo.setIp( address.getHostAddress() );
+                    }
+                }
+            }
+            catch ( SocketException e )
+            {
+                LOG.error( "Error getting network interfaces", e );
+            }
+            peerInfo.setName( String.format( "Peer on %s", peerInfo.getIp() ) );
+
             peerDAO.saveInfo( SOURCE_LOCAL_PEER, peerInfo.getId().toString(), peerInfo );
         }
         else

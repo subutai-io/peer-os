@@ -1,11 +1,11 @@
 package org.safehaus.subutai.core.peer.rest;
 
 
+import java.security.KeyStore;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.host.ContainerHostState;
@@ -20,8 +20,9 @@ import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
+import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
@@ -50,16 +51,6 @@ public class RestServiceImpl implements RestService
     public Response getSelfPeerInfo()
     {
         PeerInfo selfInfo = peerManager.getLocalPeerInfo();
-        try
-        {
-            peerManager.getLocalPeer().getManagementHost().getIpByInterfaceName( "eth1" );
-        }
-        catch ( HostNotFoundException e )
-        {
-            LOGGER.error( "Error getting host ip address.", e );
-        }
-        selfInfo.setIp( getRequestIp() );
-        selfInfo.setName( String.format( "Peer on %s", selfInfo.getIp() ) );
         return Response.ok( JsonUtil.toJson( selfInfo ) ).build();
     }
 
@@ -80,7 +71,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getRegisteredPeerInfo( @QueryParam( "peerId" ) final String peerId )
+    public Response getRegisteredPeerInfo( final String peerId )
     {
         PeerInfo peerInfo = peerManager.getPeer( peerId ).getPeerInfo();
         return Response.ok( JsonUtil.toJson( peerInfo ) ).build();
@@ -126,17 +117,16 @@ public class RestServiceImpl implements RestService
     public Response processRegisterRequest( String peer )
     {
         PeerInfo p = JsonUtil.fromJson( peer, PeerInfo.class );
-        p.setIp( getRequestIp() );
         p.setStatus( PeerStatus.REQUESTED );
         p.setName( String.format( "Peer on %s", p.getIp() ) );
         try
         {
             peerManager.register( p );
-            return Response.ok( JsonUtil.toJson( p ) ).build();
+            return Response.ok( JsonUtil.toJson( peerManager.getLocalPeerInfo() ) ).build();
         }
         catch ( Exception e )
         {
-            return Response.status( Response.Status.NOT_FOUND ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
 
@@ -161,6 +151,61 @@ public class RestServiceImpl implements RestService
         {
             return Response.status( Response.Status.NOT_FOUND ).entity( pe.toString() ).build();
         }
+    }
+
+
+    @Override
+    public Response rejectForRegistrationRequest( final String rejectedPeerId )
+    {
+        PeerInfo p = peerManager.getPeerInfo( UUID.fromString( rejectedPeerId ) );
+        p.setStatus( PeerStatus.REJECTED );
+        peerManager.update( p );
+
+        return Response.noContent().build();
+    }
+
+
+    @Override
+    public Response approveForRegistrationRequest( final String approvedPeer, final String root_cert_px2 )
+    {
+        PeerInfo p = JsonUtil.fromJson( approvedPeer, PeerInfo.class );
+        p.setStatus( PeerStatus.APPROVED );
+        peerManager.update( p );
+
+        //************ Save Trust SSL Cert **************************************
+        KeyStore keyStore;
+        KeyStoreData keyStoreData;
+        KeyStoreManager keyStoreManager;
+
+        keyStoreData = new KeyStoreData();
+        keyStoreData.setupTrustStorePx2();
+        keyStoreData.setHEXCert( root_cert_px2 );
+
+        keyStoreManager = new KeyStoreManager();
+        keyStore = keyStoreManager.load( keyStoreData );
+        keyStoreData.setAlias( p.getId().toString() );
+
+        keyStoreManager.importCertificateHEXString( keyStore, keyStoreData );
+        //***********************************************************************
+
+        //************ Send Trust SSL Cert **************************************
+
+        KeyStore myKeyStore;
+        KeyStoreData myKeyStoreData;
+        KeyStoreManager myKeyStoreManager;
+
+        myKeyStoreData = new KeyStoreData();
+        myKeyStoreData.setupKeyStorePx2();
+
+        myKeyStoreManager = new KeyStoreManager();
+        myKeyStore = myKeyStoreManager.load( myKeyStoreData );
+
+        String HEXCert = myKeyStoreManager.exportCertificateHEXString( myKeyStore, myKeyStoreData );
+
+
+        //***********************************************************************
+
+        return Response.ok( HEXCert ).build();
     }
 
 
