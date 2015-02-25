@@ -21,6 +21,8 @@ public class Common
 
     public static final long MIN_VNI_ID = 0;
     public static final long MAX_VNI_ID = 16777216;//2^24
+    public static final int MIN_VLAN_ID = 100;
+    public static final int MAX_VLAN_ID = 4096;
 
     //constants that can be converted into settings in the future
     public static final String MASTER_TEMPLATE_NAME = "master";

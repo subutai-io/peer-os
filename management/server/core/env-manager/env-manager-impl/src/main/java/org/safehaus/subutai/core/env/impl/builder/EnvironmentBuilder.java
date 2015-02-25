@@ -12,7 +12,6 @@ import java.util.concurrent.Future;
 
 import org.safehaus.subutai.common.environment.NodeGroup;
 import org.safehaus.subutai.common.environment.Topology;
-import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.CollectionUtil;
@@ -119,7 +118,7 @@ public class EnvironmentBuilder
         {
             try
             {
-                int vlan = localPeer.setupTunnels( peerIps, new Vni( environment.getVni(), environment.getId() ) );
+                localPeer.setupTunnels( peerIps, environment.getId() );
             }
             catch ( PeerException e )
             {

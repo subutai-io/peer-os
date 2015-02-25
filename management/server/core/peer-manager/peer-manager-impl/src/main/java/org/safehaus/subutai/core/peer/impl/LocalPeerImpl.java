@@ -272,22 +272,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             throw new PeerException( e );
         }
 
-        //check reserved VNI
-        Vni environmentVni = null;
-        for ( Vni reservedVni : getReservedVnis() )
-        {
-            if ( reservedVni.getEnvironmentId().equals( request.getEnvironmentId() ) )
-            {
-                environmentVni = reservedVni;
-                break;
-            }
-        }
-
-        if ( environmentVni == null )
-        {
-            throw new PeerException(
-                    String.format( "Environment %s has no VNI reserved", request.getEnvironmentId() ) );
-        }
 
         SubnetUtils cidr;
         try
@@ -300,7 +284,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         }
 
         //setup networking
-        int vlan = setupTunnels( request.getPeerIps(), environmentVni );
+        int vlan = setupTunnels( request.getPeerIps(), request.getEnvironmentId() );
 
         //create gateway
         managementHost.createGateway( cidr.getInfo().getLowAddress(), vlan );
@@ -1630,12 +1614,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
-    public int setupTunnels( final Set<String> peerIps, final Vni vni ) throws PeerException
+    public int setupTunnels( final Set<String> peerIps, final UUID environmentId ) throws PeerException
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
-        Preconditions.checkNotNull( vni, "Invalid vni" );
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        return managementHost.setupTunnels( peerIps, vni );
+        return managementHost.setupTunnels( peerIps, environmentId );
     }
 
 

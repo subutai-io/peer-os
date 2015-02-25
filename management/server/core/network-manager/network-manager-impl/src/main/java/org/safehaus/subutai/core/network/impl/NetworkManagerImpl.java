@@ -92,7 +92,7 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public void setupGateway( final String gatewayIp, final int vLanId ) throws NetworkManagerException
     {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, MIN_VLAN_ID, MAX_VLAN_ID ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
 
         execute( getManagementHost(), commands.getSetupGatewayCommand( gatewayIp, vLanId ) );
     }
@@ -110,7 +110,7 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public void removeGateway( final int vLanId ) throws NetworkManagerException
     {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, MIN_VLAN_ID, MAX_VLAN_ID ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
 
         execute( getManagementHost(), commands.getRemoveGatewayCommand( vLanId ) );
     }
@@ -182,7 +182,7 @@ public class NetworkManagerImpl implements NetworkManager
     {
         Preconditions.checkArgument( tunnelId > 0, "Tunnel id must be greater than 0" );
         Preconditions.checkArgument( NumUtil.isLongBetween( vni, Common.MIN_VNI_ID, Common.MAX_VNI_ID ) );
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, MIN_VLAN_ID, MAX_VLAN_ID ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
 
         execute( getManagementHost(),
                 commands.getSetupVniVlanMappingCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), vni, vLanId,
@@ -196,7 +196,7 @@ public class NetworkManagerImpl implements NetworkManager
     {
         Preconditions.checkArgument( tunnelId > 0, "Tunnel id must be greater than 0" );
         Preconditions.checkArgument( NumUtil.isLongBetween( vni, Common.MIN_VNI_ID, Common.MAX_VNI_ID ) );
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, MIN_VLAN_ID, MAX_VLAN_ID ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
 
         execute( getManagementHost(),
                 commands.getRemoveVniVlanMappingCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), vni,
@@ -239,20 +239,23 @@ public class NetworkManagerImpl implements NetworkManager
     public void reserveVni( Vni vni ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( vni );
+        Preconditions.checkArgument( NumUtil.isIntBetween( vni.getVlan(), Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
 
-        execute( getManagementHost(), commands.getReserveVniCommand( vni.getVni(), vni.getEnvironmentId() ) );
+
+        execute( getManagementHost(),
+                commands.getReserveVniCommand( vni.getVni(), vni.getVlan(), vni.getEnvironmentId() ) );
     }
 
 
     @Override
-    public Set<Vni> listReservedVnis() throws NetworkManagerException
+    public Set<Vni> getReservedVnis() throws NetworkManagerException
     {
         Set<Vni> reservedVnis = Sets.newHashSet();
 
         CommandResult result = execute( getManagementHost(), commands.getListReservedVnisCommand() );
 
-        Pattern p = Pattern.compile(
-                "\\s*(\\d+)\\s*,\\s*([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\\s*",
+        Pattern p = Pattern.compile( "\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*"
+                        + "([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\\s*",
                 Pattern.CASE_INSENSITIVE );
 
 
@@ -262,9 +265,10 @@ public class NetworkManagerImpl implements NetworkManager
         {
             Matcher m = p.matcher( st.nextToken() );
 
-            if ( m.find() && m.groupCount() == 2 )
+            if ( m.find() && m.groupCount() == 3 )
             {
-                reservedVnis.add( new Vni( Long.parseLong( m.group( 1 ) ), UUID.fromString( m.group( 2 ) ) ) );
+                reservedVnis.add( new Vni( Long.parseLong( m.group( 1 ) ), Integer.parseInt( m.group( 2 ) ),
+                        UUID.fromString( m.group( 3 ) ) ) );
             }
         }
 
@@ -277,7 +281,7 @@ public class NetworkManagerImpl implements NetworkManager
             throws NetworkManagerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ) && ip.matches( Common.IP_REGEX ) );
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, MIN_VLAN_ID, MAX_VLAN_ID ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
 
         execute( getResourceHost( containerName ),
                 commands.getSetContainerIpCommand( containerName, ip, netMask, vLanId ) );

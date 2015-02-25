@@ -140,10 +140,8 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( gatewayIp ) && gatewayIp.matches( Common.IP_REGEX ),
                 "Invalid gateway IP" );
-        Preconditions
-                .checkArgument( NumUtil.isIntBetween( vlan, NetworkManager.MIN_VLAN_ID, NetworkManager.MAX_VLAN_ID ),
-                        String.format( "VLAN must be in the range from %d to %d", NetworkManager.MIN_VLAN_ID,
-                                NetworkManager.MAX_VLAN_ID ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
+                String.format( "VLAN must be in the range from %d to %d", Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
 
         try
         {
@@ -176,7 +174,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     {
         try
         {
-            return getNetworkManager().listReservedVnis();
+            return getNetworkManager().getReservedVnis();
         }
         catch ( NetworkManagerException e )
         {
@@ -190,9 +188,19 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     {
         Preconditions.checkNotNull( vni, "Invalid vni" );
 
+        //check if vni is already reserved
+        if ( findVniByEnvironmentId( vni.getEnvironmentId() ) != null )
+        {
+            return;
+        }
+
+        //figure out available vlan
+        int vlan = findAvailableVlanId();
+
+        //reserve vni & vlan for environment
         try
         {
-            getNetworkManager().reserveVni( vni );
+            getNetworkManager().reserveVni( new Vni( vni.getVni(), vlan, vni.getEnvironmentId() ) );
         }
         catch ( NetworkManagerException e )
         {
@@ -202,10 +210,10 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
-    public int setupTunnels( final Set<String> peerIps, final Vni vni ) throws PeerException
+    public int setupTunnels( final Set<String> peerIps, final UUID environmentId ) throws PeerException
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
-        Preconditions.checkNotNull( vni, "Invalid vni" );
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         //need to execute sequentially since other parallel executions can take the same VNI
         Future<Integer> future = queueSequentialTask( new Callable<Integer>()
@@ -217,26 +225,14 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
                 NetworkManager networkManager = getNetworkManager();
 
                 //fail if vni is not reserved
-                if ( !isVniReserved( vni ) )
+                Vni environmentVni = findVniByEnvironmentId( environmentId );
+
+                if ( environmentVni == null )
                 {
                     throw new PeerException(
-                            String.format( "Vni %s is either not reserved or reserved for different environment",
-                                    vni ) );
+                            String.format( "No reserved vni found for environment %s", environmentId ) );
                 }
 
-                Set<VniVlanMapping> mappings = networkManager.getVniVlanMappings();
-
-                //find vlan by vni
-                //TODO find vlan by vni from reserved vlans
-                int vlanId = findVlanByVni( vni, mappings );
-
-                //vlan not found, obtain available
-                if ( vlanId == -1 )
-                {
-                    vlanId = findAvailableVlanId( mappings );
-
-                    //TODO reserve vlan by vni
-                }
 
                 //setup tunnels to each remote peer
                 Set<Tunnel> tunnels = networkManager.listTunnels();
@@ -258,10 +254,11 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
                     }
 
                     //create vni-vlan mapping
-                    setupVniVlanMapping( tunnelId, vni.getVni(), vlanId, vni.getEnvironmentId(), mappings );
+                    setupVniVlanMapping( tunnelId, environmentVni.getVni(), environmentVni.getVlan(),
+                            environmentVni.getEnvironmentId() );
                 }
 
-                return vlanId;
+                return environmentVni.getVlan();
             }
         } );
 
@@ -284,50 +281,42 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    private boolean isVniReserved( Vni vni ) throws PeerException, NetworkManagerException
+    private Vni findVniByEnvironmentId( UUID environmentId ) throws PeerException
     {
-        Set<Vni> reservedVnis = getNetworkManager().listReservedVnis();
-
-        for ( Vni reservedVni : reservedVnis )
+        //check if vni is already reserved
+        for ( Vni aVni : getReservedVnis() )
         {
-            if ( reservedVni.getVni() == vni.getVni() && reservedVni.getEnvironmentId()
-                                                                    .equals( vni.getEnvironmentId() ) )
+            if ( aVni.getEnvironmentId().equals( environmentId ) )
             {
-                return true;
+                return aVni;
             }
         }
-        return false;
+
+        return null;
     }
 
 
-    private void setupVniVlanMapping( final int tunnelId, final long vni, final int vlanId, final UUID environmentId,
-                                      final Set<VniVlanMapping> mappings ) throws PeerException, NetworkManagerException
+    private void setupVniVlanMapping( final int tunnelId, final long vni, final int vlanId, final UUID environmentId )
+            throws PeerException
     {
-        for ( VniVlanMapping mapping : mappings )
+        try
         {
-            //assume that for one vni there is always one vlan and environment id
-            if ( mapping.getTunnelId() == tunnelId && mapping.getVni() == vni )
+            Set<VniVlanMapping> mappings = getNetworkManager().getVniVlanMappings();
+
+            for ( VniVlanMapping mapping : mappings )
             {
-                return;
+                if ( mapping.getTunnelId() == tunnelId && mapping.getEnvironmentId().equals( environmentId ) )
+                {
+                    return;
+                }
             }
+
+            getNetworkManager().setupVniVLanMapping( tunnelId, vni, vlanId, environmentId );
         }
-
-        getNetworkManager().setupVniVLanMapping( tunnelId, vni, vlanId, environmentId );
-    }
-
-
-    protected int findVlanByVni( Vni vni, Set<VniVlanMapping> mappings ) throws PeerException
-    {
-
-        for ( VniVlanMapping mapping : mappings )
+        catch ( NetworkManagerException e )
         {
-            if ( mapping.getVni() == vni.getVni() && mapping.getEnvironmentId().equals( vni.getEnvironmentId() ) )
-            {
-                return mapping.getVlan();
-            }
+            throw new PeerException( e );
         }
-
-        return -1;
     }
 
 
@@ -360,22 +349,26 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    protected int findAvailableVlanId( Set<VniVlanMapping> mappings )
+    protected int findAvailableVlanId() throws PeerException
     {
         SortedSet<Integer> takenIds = Sets.newTreeSet();
 
-        int maxId = NetworkManager.MIN_VLAN_ID;
+        Set<VniVlanMapping> mappings;
+        try
+        {
+            mappings = getNetworkManager().getVniVlanMappings();
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( e );
+        }
 
         for ( VniVlanMapping mapping : mappings )
         {
             takenIds.add( mapping.getVlan() );
-            if ( mapping.getVlan() > maxId )
-            {
-                maxId = mapping.getVlan();
-            }
         }
 
-        for ( int i = NetworkManager.MIN_VLAN_ID; i <= NetworkManager.MAX_VLAN_ID; i++ )
+        for ( int i = Common.MIN_VLAN_ID; i <= Common.MAX_VLAN_ID; i++ )
         {
             if ( !takenIds.contains( i ) )
             {
@@ -383,13 +376,6 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
             }
         }
 
-        if ( !NumUtil.isIntBetween( maxId + 1, NetworkManager.MIN_VLAN_ID, NetworkManager.MAX_VLAN_ID ) )
-        {
-            throw new IllegalArgumentException(
-                    String.format( "Next VLAN id exceeds possible range %d - %d", NetworkManager.MIN_VLAN_ID,
-                            NetworkManager.MAX_VLAN_ID ) );
-        }
-
-        return maxId + 1;
+        throw new PeerException( "No available vlan found" );
     }
 }

@@ -11,8 +11,6 @@ import org.safehaus.subutai.common.peer.ContainerHost;
 
 public interface NetworkManager
 {
-    public static final int MIN_VLAN_ID = 100;
-    public static final int MAX_VLAN_ID = 4096;
     public static final String TUNNEL_PREFIX = "tunnel";
     public static final String TUNNEL_TYPE = "vxlan";
 
@@ -94,15 +92,14 @@ public interface NetworkManager
     /**
      * Removes VNI-VLAN mapping on management host
      */
-    public void removeVniVLanMapping( int tunnelId, long vni, int vLanId )
-            throws NetworkManagerException;
+    public void removeVniVLanMapping( int tunnelId, long vni, int vLanId ) throws NetworkManagerException;
 
     public Set<VniVlanMapping> getVniVlanMappings() throws NetworkManagerException;
 
 
     public void reserveVni( Vni vni ) throws NetworkManagerException;
 
-    public Set<Vni> listReservedVnis() throws NetworkManagerException;
+    public Set<Vni> getReservedVnis() throws NetworkManagerException;
 
     /**
      * Enables passwordless ssh access between containers

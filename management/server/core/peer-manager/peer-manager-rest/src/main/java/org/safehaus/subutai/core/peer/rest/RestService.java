@@ -179,20 +179,15 @@ public interface RestService
     Response setDefaultGateway( @FormParam( "containerId" ) String containerId,
                                 @FormParam( "gatewayIp" ) String gatewayIp );
 
+    @POST
+    @Path( "vni" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response reserveVni( @FormParam( "vni" ) String vni );
+
     //*********** Environment Specific REST - END ***************
 
     @GET
     @Path( "vni" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getReservedVnis();
-
-    @POST
-    @Path( "vni" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response reserveVni( @FormParam( "vni" ) String vni );
-
-    //    @POST
-    //    @Path( "tunnels" )
-    //    @Produces( { MediaType.TEXT_PLAIN } )
-    //    Response setupTunnels( @FormParam( "peerIps" ) String peerIps, @FormParam( "vni" ) String vni );
 }

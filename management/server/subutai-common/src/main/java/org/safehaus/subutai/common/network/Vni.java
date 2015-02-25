@@ -14,6 +14,18 @@ public class Vni
 {
     private final long vni;
     private final UUID environmentId;
+    private int vlan = Common.MIN_VLAN_ID - 1;
+
+
+    public Vni( final long vni, final int vlan, final UUID environmentId )
+    {
+        this( vni, environmentId );
+
+        Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
+                String.format( "Vlan must be in range %d - %d", Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+
+        this.vlan = vlan;
+    }
 
 
     public Vni( final long vni, final UUID environmentId )
@@ -24,6 +36,12 @@ public class Vni
 
         this.vni = vni;
         this.environmentId = environmentId;
+    }
+
+
+    public int getVlan()
+    {
+        return vlan;
     }
 
 
@@ -42,6 +60,7 @@ public class Vni
     @Override
     public String toString()
     {
-        return Objects.toStringHelper( this ).add( "vni", vni ).add( "environmentId", environmentId ).toString();
+        return Objects.toStringHelper( this ).add( "vni", vni ).add( "environmentId", environmentId )
+                      .add( "vlan", vlan ).toString();
     }
 }

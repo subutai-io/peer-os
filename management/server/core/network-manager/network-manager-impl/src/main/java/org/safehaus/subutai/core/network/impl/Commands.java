@@ -138,10 +138,10 @@ public class Commands
     }
 
 
-    public RequestBuilder getReserveVniCommand( long vni, UUID environmentId )
+    public RequestBuilder getReserveVniCommand( long vni, int vlan, UUID environmentId )
     {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-E", String.valueOf( vni ), environmentId.toString() ) );
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
+                Lists.newArrayList( "-E", String.valueOf( vni ), String.valueOf( vlan ), environmentId.toString() ) );
     }
 
 
