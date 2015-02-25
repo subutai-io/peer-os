@@ -105,7 +105,7 @@ public class EnvironmentImpl implements Environment, Serializable
         this.environmentId = UUID.randomUUID().toString();
         this.creationTimestamp = System.currentTimeMillis();
         this.status = EnvironmentStatus.EMPTY;
-        this.lastUsedIpIndex = 0;
+        this.lastUsedIpIndex = 0;//0 is reserved for gateway
     }
 
 
@@ -388,6 +388,8 @@ public class EnvironmentImpl implements Environment, Serializable
     public void setLastUsedIpIndex( int lastUsedIpIndex )
     {
         this.lastUsedIpIndex = lastUsedIpIndex;
+
+        dataService.update( this );
     }
 
 

@@ -22,6 +22,8 @@ import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
+import org.apache.commons.net.util.SubnetUtils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -30,7 +32,7 @@ import com.google.common.collect.Sets;
 /**
  * Builds node groups across peers
  */
-public class TopologyBuilder
+public class EnvironmentBuilder
 {
 
     private final TemplateRegistry templateRegistry;
@@ -38,8 +40,8 @@ public class TopologyBuilder
     private final String defaultDomain;
 
 
-    public TopologyBuilder( final TemplateRegistry templateRegistry, final PeerManager peerManager,
-                            final String defaultDomain )
+    public EnvironmentBuilder( final TemplateRegistry templateRegistry, final PeerManager peerManager,
+                               final String defaultDomain )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
@@ -58,11 +60,40 @@ public class TopologyBuilder
 
         Map<Peer, Set<NodeGroup>> placement = topology.getNodeGroupPlacement();
 
+        SubnetUtils cidr = new SubnetUtils( environment.getSubnetCidr() );
+
+        //obtain available ip address count
+        int totalAvailableIpCount = cidr.getInfo().getAddressCount() - 1;//one ip is for gateway
+
+        //subtract already used ip range
+        totalAvailableIpCount -= environment.getLastUsedIpIndex();
+
+        //obtain used ip address count
+        int requestedContainerCount = 0;
+        for ( Set<NodeGroup> nodeGroups : placement.values() )
+        {
+            for ( NodeGroup nodeGroup : nodeGroups )
+            {
+                requestedContainerCount += nodeGroup.getNumberOfContainers();
+            }
+        }
+
+        //check if available ip addresses are enough
+        if ( requestedContainerCount > totalAvailableIpCount )
+        {
+            throw new EnvironmentBuildException(
+                    String.format( "Requested %d containers but only %d ip addresses available",
+                            requestedContainerCount, totalAvailableIpCount ), null );
+        }
+
+
         ExecutorService taskExecutor = Executors.newFixedThreadPool( placement.size() );
 
         CompletionService<Set<NodeGroupBuildResult>> taskCompletionService =
                 new ExecutorCompletionService<>( taskExecutor );
 
+
+        //collect all existing and new peers
         Set<Peer> allPeers = Sets.newHashSet( placement.keySet() );
 
         for ( Peer aPeer : environment.getPeers() )
@@ -83,7 +114,7 @@ public class TopologyBuilder
             }
         }
 
-
+        //setup tunnels to all remote peers
         if ( !peerIps.isEmpty() )
         {
             try
@@ -96,14 +127,23 @@ public class TopologyBuilder
             }
         }
 
-
+        int currentLastUsedIpIndex = environment.getLastUsedIpIndex();
+        //submit parallel environment part creation tasks across peers
         for ( Map.Entry<Peer, Set<NodeGroup>> peerPlacement : placement.entrySet() )
         {
             taskCompletionService.submit(
                     new NodeGroupBuilder( environment, templateRegistry, peerManager, peerPlacement.getKey(),
-                            peerPlacement.getValue(), allPeers, defaultDomain ) );
+                            peerPlacement.getValue(), allPeers, defaultDomain, currentLastUsedIpIndex + 1 ) );
+
+            for ( NodeGroup nodeGroup : peerPlacement.getValue() )
+            {
+                currentLastUsedIpIndex += nodeGroup.getNumberOfContainers();
+            }
+
+            environment.setLastUsedIpIndex( currentLastUsedIpIndex );
         }
 
+        //collect results
         Set<Exception> errors = Sets.newHashSet();
 
         for ( int i = 0; i < placement.size(); i++ )

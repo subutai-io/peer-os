@@ -26,7 +26,7 @@ import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
-import org.safehaus.subutai.core.env.impl.builder.TopologyBuilder;
+import org.safehaus.subutai.core.env.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.env.impl.dao.BlueprintDataService;
 import org.safehaus.subutai.core.env.impl.dao.EnvironmentContainerDataService;
 import org.safehaus.subutai.core.env.impl.dao.EnvironmentDataService;
@@ -61,7 +61,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     private final PeerManager peerManager;
     private final NetworkManager networkManager;
-    private final TopologyBuilder topologyBuilder;
+    private final EnvironmentBuilder environmentBuilder;
     private final ExecutorService executor = Executors.newCachedThreadPool();
     private final String defaultDomain;
 
@@ -90,7 +90,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         this.networkManager = networkManager;
         this.daoManager = daoManager;
         this.defaultDomain = defaultDomain;
-        this.topologyBuilder = new TopologyBuilder( templateRegistry, peerManager, defaultDomain );
+        this.environmentBuilder = new EnvironmentBuilder( templateRegistry, peerManager, defaultDomain );
     }
 
 
@@ -248,7 +248,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     public void build( EnvironmentImpl environment, Topology topology ) throws EnvironmentBuildException
     {
-        topologyBuilder.build( environment, topology );
+        environmentBuilder.build( environment, topology );
     }
 
 

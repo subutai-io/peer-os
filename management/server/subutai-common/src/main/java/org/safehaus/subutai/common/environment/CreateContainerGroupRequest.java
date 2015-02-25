@@ -20,12 +20,13 @@ public class CreateContainerGroupRequest
     private final int numberOfContainers;
     private final String strategyId;
     private final List<Criteria> criteria;
+    private final int ipAddressOffset;
 
 
     public CreateContainerGroupRequest( final Set<String> peerIps, final UUID environmentId, final UUID initiatorPeerId,
                                         final UUID ownerId, final String subnetCidr, final List<Template> templates,
                                         final int numberOfContainers, final String strategyId,
-                                        final List<Criteria> criteria )
+                                        final List<Criteria> criteria, final int ipAddressOffset )
     {
         this.peerIps = peerIps;
         this.environmentId = environmentId;
@@ -36,6 +37,7 @@ public class CreateContainerGroupRequest
         this.numberOfContainers = numberOfContainers;
         this.strategyId = strategyId;
         this.criteria = criteria;
+        this.ipAddressOffset = ipAddressOffset;
     }
 
 
@@ -90,5 +92,11 @@ public class CreateContainerGroupRequest
     public List<Criteria> getCriteria()
     {
         return criteria;
+    }
+
+
+    public int getIpAddressOffset()
+    {
+        return ipAddressOffset;
     }
 }

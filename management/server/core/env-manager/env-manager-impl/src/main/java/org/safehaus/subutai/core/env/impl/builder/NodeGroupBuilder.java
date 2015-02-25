@@ -40,11 +40,12 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
     private final Set<NodeGroup> nodeGroups;
     private final String defaultDomain;
     private final Set<Peer> allPeers;
+    private final int ipAddressOffset;
 
 
     public NodeGroupBuilder( final EnvironmentImpl environment, final TemplateRegistry templateRegistry,
                              final PeerManager peerManager, final Peer peer, final Set<NodeGroup> nodeGroups,
-                             final Set<Peer> allPeers, final String defaultDomain )
+                             final Set<Peer> allPeers, final String defaultDomain, final int ipAddressOffset )
     {
         Preconditions.checkNotNull( environment );
         Preconditions.checkNotNull( templateRegistry );
@@ -61,6 +62,7 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
         this.allPeers = allPeers;
         this.nodeGroups = nodeGroups;
         this.defaultDomain = defaultDomain;
+        this.ipAddressOffset = ipAddressOffset;
     }
 
 
@@ -187,7 +189,7 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
                                 fetchRequiredTemplates( peer.getId(), nodeGroup.getTemplateName() ),
                                 nodeGroup.getNumberOfContainers(),
                                 nodeGroup.getContainerPlacementStrategy().getStrategyId(),
-                                nodeGroup.getContainerPlacementStrategy().getCriteriaAsList() ) );
+                                nodeGroup.getContainerPlacementStrategy().getCriteriaAsList(), ipAddressOffset ) );
 
                 for ( HostInfoModel newHost : newHosts )
                 {
