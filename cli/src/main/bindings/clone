@@ -145,10 +145,10 @@ function clone {
 
   if [ "$network_interface_enabled" == "true" ]; then
      subutai network $child -s ${interfaceProperties//\"} #"192.168.3.2/24 100" varible should be like this
+     #restart the container to get container ip online
+     lxc-stop -n $child
+     lxc-start -n $child -d
   fi
-  #restart the container to get container ip online
-  lxc-stop -n $child
-  lxc-start -n $child -d
 }
 
 function clone_description {
