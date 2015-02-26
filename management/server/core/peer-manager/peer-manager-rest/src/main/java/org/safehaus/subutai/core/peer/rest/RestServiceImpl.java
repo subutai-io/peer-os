@@ -65,7 +65,7 @@ public class RestServiceImpl implements RestService
         LocalPeer localPeer = peerManager.getLocalPeer();
         PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( UUID.fromString( peerId ) );
         if ( peerPolicy == null ) {
-            return Response.noContent().build();
+            return Response.ok().build();
         } else {
             return Response.ok( JsonUtil.toJson( JsonUtil.toJson( peerPolicy ) ) ).build();
         }
