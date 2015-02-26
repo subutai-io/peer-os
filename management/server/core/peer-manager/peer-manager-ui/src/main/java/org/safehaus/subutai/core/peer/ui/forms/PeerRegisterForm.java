@@ -154,7 +154,7 @@ public class PeerRegisterForm extends CustomComponent
         peersTable = new Table();
         peersTable.setCaption( "Peers" );
         peersTable.setImmediate( false );
-        peersTable.setWidth( "850px" );
+        peersTable.setWidth( "1000px" );
         peersTable.setHeight( "283px" );
         absoluteLayout.addComponent( peersTable, "top:294.0px;left:20.0px;" );
 
@@ -273,7 +273,7 @@ public class PeerRegisterForm extends CustomComponent
                             }
                         }
                     };
-            PeerManageActionsComponent component = new PeerManageActionsComponent( peer, listener );
+            PeerManageActionsComponent component = new PeerManageActionsComponent( module, peer, listener );
             peersTable
                     .addItem( new Object[] { peer.getId(), peer.getName(), peer.getIp(), peer.getStatus(), component },
                             peer.getId() );
