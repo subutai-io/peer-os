@@ -145,6 +145,13 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
 
     @Override
+    public void setDefaultGateway( final String gatewayIp ) throws PeerException
+    {
+        getPeer().setDefaultGateway( this, gatewayIp );
+    }
+
+
+    @Override
     public boolean isLocal()
     {
         return true;

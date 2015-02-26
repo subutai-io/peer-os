@@ -51,26 +51,13 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
     private HierarchicalContainer container;
     private Set<ContainerHost> selectedContainers = new HashSet<>();
     private Environment environment;
-    private final ScheduledExecutorService scheduler;
+    private ScheduledExecutorService scheduler;
 
 
     public EnvironmentTree( final EnvironmentManager environmentManager )
     {
 
-        scheduler = Executors.newScheduledThreadPool( 1 );
 
-        scheduler.scheduleWithFixedDelay( new Runnable()
-        {
-            public void run()
-            {
-                LOG.info( "Refreshing containers state..." );
-                if ( environment != null )
-                {
-                    refreshContainers();
-                }
-                LOG.info( "Refreshing done." );
-            }
-        }, 5, 60, TimeUnit.SECONDS );
         setSizeFull();
         setMargin( true );
 
@@ -152,6 +139,43 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         grid.addComponent( tree, 0, 2 );
 
         addComponent( grid );
+
+        addDetachListener( new DetachListener()
+        {
+            @Override
+            public void detach( final DetachEvent event )
+            {
+                scheduler.shutdown();
+            }
+        } );
+
+        addAttachListener( new AttachListener()
+        {
+            @Override
+            public void attach( final AttachEvent event )
+            {
+                startTreeUpdate();
+            }
+        } );
+    }
+
+
+    private void startTreeUpdate()
+    {
+        scheduler = Executors.newScheduledThreadPool( 1 );
+
+        scheduler.scheduleWithFixedDelay( new Runnable()
+        {
+            public void run()
+            {
+                LOG.info( "Refreshing containers state..." );
+                if ( environment != null )
+                {
+                    refreshContainers();
+                }
+                LOG.info( "Refreshing done." );
+            }
+        }, 3, 30, TimeUnit.SECONDS );
     }
 
 

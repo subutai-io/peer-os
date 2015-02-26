@@ -105,4 +105,8 @@ public interface LocalPeer extends Peer
      * @return - set of {@code ContainerGroup}
      */
     public Set<ContainerGroup> findContainerGroupsByOwnerId( UUID ownerId );
+
+    //networking
+
+    public int setupTunnels( Set<String> peerIps, UUID environmentId ) throws PeerException;
 }

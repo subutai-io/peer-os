@@ -6,15 +6,12 @@ import java.util.Set;
 import org.safehaus.subutai.common.peer.HostInfoModel;
 
 
-/**
- * Create container response
- */
-public class CreateContainersResponse
+public class CreateContainerGroupResponse
 {
     private Set<HostInfoModel> hosts;
 
 
-    public CreateContainersResponse( final Set<HostInfoModel> hosts )
+    public CreateContainerGroupResponse( final Set<HostInfoModel> hosts )
     {
         this.hosts = hosts;
     }
@@ -25,4 +22,3 @@ public class CreateContainersResponse
         return hosts;
     }
 }
-

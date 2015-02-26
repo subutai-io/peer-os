@@ -16,18 +16,20 @@ import java.util.concurrent.Future;
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.CommandUtil;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.metric.ResourceHostMetric;
+import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.ContainersDestructionResult;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
-import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
@@ -80,6 +82,8 @@ import org.safehaus.subutai.core.strategy.api.StrategyNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.net.util.SubnetUtils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -95,6 +99,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
     private static final long HOST_INACTIVE_TIME = 5 * 1000 * 60; // 5 min
+    private static final int WAIT_CONTAINER_CONNECTION_SEC = 300;
     private PeerManager peerManager;
     private TemplateRegistry templateRegistry;
     private ManagementHost managementHost;
@@ -109,6 +114,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     private ContainerGroupDataService containerGroupDataService;
     private HostRegistry hostRegistry;
     private Set<RequestListener> requestListeners;
+    private CommandUtil commandUtil = new CommandUtil();
 
 
     public LocalPeerImpl( PeerManager peerManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
@@ -249,26 +255,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     }
 
 
-    //TODO wrap all parameters into request object
-    public Set<HostInfoModel> createContainers( final UUID environmentId, final UUID initiatorPeerId,
-                                                final UUID ownerId, final List<Template> templates,
-                                                final int numberOfContainers, final String strategyId,
-                                                final List<Criteria> criteria ) throws PeerException
+    @Override
+    public Set<HostInfoModel> createContainerGroup( final CreateContainerGroupRequest request ) throws PeerException
     {
 
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-        Preconditions.checkNotNull( initiatorPeerId, "Invalid initiator peer id" );
-        Preconditions.checkNotNull( ownerId, "Invalid owner id" );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( templates ), "Invalid template set" );
-        Preconditions.checkArgument( numberOfContainers > 0, "Invalid number of containers" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( strategyId ), "Invalid strategy id" );
-
-        final int waitContainerTimeoutSec = 180;
+        Preconditions.checkNotNull( request, "Invalid request" );
 
         //check if strategy exists
         try
         {
-            strategyManager.findStrategyById( strategyId );
+            strategyManager.findStrategyById( request.getStrategyId() );
         }
         catch ( StrategyNotFoundException e )
         {
@@ -276,10 +272,27 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         }
 
 
+        SubnetUtils cidr;
+        try
+        {
+            cidr = new SubnetUtils( request.getSubnetCidr() );
+        }
+        catch ( IllegalArgumentException e )
+        {
+            throw new PeerException( "Failed to parse subnet CIDR", e );
+        }
+
+        //setup networking
+        int vlan = setupTunnels( request.getPeerIps(), request.getEnvironmentId() );
+
+        //create gateway
+        managementHost.createGateway( cidr.getInfo().getLowAddress(), vlan );
+
+
         //try to register remote templates with local registry
         try
         {
-            for ( Template t : templates )
+            for ( Template t : request.getTemplates() )
             {
                 if ( t.isRemote() )
                 {
@@ -293,6 +306,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         }
 
 
+        //collect resource host metrics  & prepare templates on each of them
         List<ResourceHostMetric> serverMetricMap = new ArrayList<>();
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
@@ -303,7 +317,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 try
                 {
                     serverMetricMap.add( resourceHost.getHostMetric() );
-                    resourceHost.prepareTemplates( templates );
+                    resourceHost.prepareTemplates( request.getTemplates() );
                 }
                 catch ( ResourceHostException e )
                 {
@@ -316,8 +330,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         Map<ResourceHostMetric, Integer> slots;
         try
         {
-            slots = strategyManager
-                    .getPlacementDistribution( serverMetricMap, numberOfContainers, strategyId, criteria );
+            slots = strategyManager.getPlacementDistribution( serverMetricMap, request.getNumberOfContainers(),
+                    request.getStrategyId(), request.getCriteria() );
         }
         catch ( StrategyException e )
         {
@@ -327,7 +341,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
         //distribute new containers' names across selected resource hosts
         Map<ResourceHost, Set<String>> containerDistribution = Maps.newHashMap();
-        String templateName = templates.get( templates.size() - 1 ).getTemplateName();
+        String templateName = request.getTemplates().get( request.getTemplates().size() - 1 ).getTemplateName();
 
         for ( Map.Entry<ResourceHostMetric, Integer> e : slots.entrySet() )
         {
@@ -345,7 +359,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
         List<Future<ContainerHost>> taskFutures = Lists.newArrayList();
-        ExecutorService executorService = Executors.newFixedThreadPool( numberOfContainers );
+        ExecutorService executorService = Executors.newFixedThreadPool( request.getNumberOfContainers() );
+
+        String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
+        String[] allAddresses = cidr.getInfo().getAllAddresses();
+        String gateway = cidr.getInfo().getLowAddress();
+        int currentIpAddressOffset = 0;
 
         //create containers in parallel on each resource host
         for ( Map.Entry<ResourceHost, Set<String>> resourceHostDistribution : containerDistribution.entrySet() )
@@ -354,9 +373,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
             for ( String hostname : resourceHostDistribution.getValue() )
             {
+
+                String ipAddress = allAddresses[request.getIpAddressOffset() + currentIpAddressOffset];
                 taskFutures.add( executorService.submit(
                         new CreateContainerWrapperTask( resourceHostEntity, templateName, hostname,
-                                waitContainerTimeoutSec ) ) );
+                                String.format( "%s/%s", ipAddress, networkPrefix ), vlan, gateway,
+                                WAIT_CONTAINER_CONNECTION_SEC ) ) );
+
+                currentIpAddressOffset++;
             }
         }
 
@@ -375,7 +399,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             }
             catch ( ExecutionException | InterruptedException | HostDisconnectedException e )
             {
-                LOG.error( "Error creating containers", e );
+                LOG.error( "Error creating container", e );
             }
         }
 
@@ -384,11 +408,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         if ( !CollectionUtil.isCollectionEmpty( newContainers ) )
         {
             ContainerGroupEntity containerGroup;
-
             try
             {
                 //update existing container group to include new containers
-                containerGroup = ( ContainerGroupEntity ) findContainerGroupByEnvironmentId( environmentId );
+                containerGroup =
+                        ( ContainerGroupEntity ) findContainerGroupByEnvironmentId( request.getEnvironmentId() );
+
 
                 Set<UUID> containerIds = Sets.newHashSet( containerGroup.getContainerIds() );
 
@@ -397,16 +422,24 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                     containerIds.add( containerHost.getId() );
                 }
 
-                containerGroup.setContainerIds2( containerIds );
+                containerGroup.setContainerIds( containerIds );
 
                 containerGroupDataService.update( containerGroup );
             }
             catch ( ContainerGroupNotFoundException e )
             {
                 //create container group for new containers
-                containerGroup = new ContainerGroupEntity( environmentId, initiatorPeerId, ownerId, templateName,
-                        newContainers );
+                containerGroup = new ContainerGroupEntity( request.getEnvironmentId(), request.getInitiatorPeerId(),
+                        request.getOwnerId() );
 
+                Set<UUID> containerIds = Sets.newHashSet();
+
+                for ( ContainerHost containerHost : newContainers )
+                {
+                    containerIds.add( containerHost.getId() );
+                }
+
+                containerGroup.setContainerIds( containerIds );
 
                 containerGroupDataService.persist( containerGroup );
             }
@@ -698,7 +731,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             }
             else
             {
-                containerGroup.setContainerIds2( containerIds );
+                containerGroup.setContainerIds( containerIds );
 
                 containerGroupDataService.update( containerGroup );
             }
@@ -712,6 +745,26 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         catch ( ContainerGroupNotFoundException e )
         {
             LOG.error( "Could not find container group", e );
+        }
+    }
+
+
+    @Override
+    public void setDefaultGateway( final ContainerHost host, final String gatewayIp ) throws PeerException
+    {
+
+        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( gatewayIp ) && gatewayIp.matches( Common.IP_REGEX ),
+                "Invalid gateway IP" );
+
+        try
+        {
+            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s eth1", gatewayIp ) ),
+                    bindHost( host.getId() ) );
+        }
+        catch ( CommandException e )
+        {
+            throw new PeerException( e );
         }
     }
 
@@ -917,7 +970,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     {
         if ( managementHost != null && managementHost.getId() != null )
         {
-            //            peerDAO.deleteInfo( SOURCE_MANAGEMENT_HOST, managementHost.getId().toString() );
             managementHostDataService.remove( managementHost.getHostId() );
             managementHost = null;
         }
@@ -930,7 +982,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 ( ( ResourceHostEntity ) resourceHost ).removeContainerHost( containerHost );
             }
             resourceHostDataService.remove( resourceHost.getHostId() );
-            //            peerDAO.deleteInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString() );
         }
         synchronized ( resourceHosts )
         {
@@ -1053,19 +1104,30 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     {
         for ( ContainerHostInfo containerHostInfo : containerHostInfos )
         {
-            Host containerHost;
+
+            boolean isNewHost = false;
             try
             {
-                containerHost = bindHost( containerHostInfo.getId() );
+                resourceHost.getContainerHostById( containerHostInfo.getId() );
             }
-            catch ( HostNotFoundException hnfe )
+            catch ( HostNotFoundException e )
             {
-                containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
-                setContainersTransientFields( Sets.newHashSet( ( ContainerHost ) containerHost ) );
-                ( ( ResourceHostEntity ) resourceHost ).addContainerHost( ( ContainerHostEntity ) containerHost );
-                containerHostDataService.persist( ( ContainerHostEntity ) containerHost );
+                isNewHost = true;
             }
-            ( ( ContainerHostEntity ) containerHost ).updateHostInfo( containerHostInfo );
+
+
+            ContainerHostEntity containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
+            setContainersTransientFields( Sets.newHashSet( ( ContainerHost ) containerHost ) );
+            ( ( ResourceHostEntity ) resourceHost ).addContainerHost( containerHost );
+            if ( isNewHost )
+            {
+                containerHostDataService.persist( containerHost );
+            }
+            else
+            {
+                containerHostDataService.update( containerHost );
+            }
+            containerHost.updateHostInfo( containerHostInfo );
         }
     }
 
@@ -1391,16 +1453,28 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
-    public void setupTunnels( final Set<String> peerIps, final long vni, final boolean newVni ) throws PeerException
+    public void reserveVni( final Vni vni ) throws PeerException
     {
-        managementHost.setupTunnels( peerIps, vni, newVni );
+        Preconditions.checkNotNull( vni, "Invalid vni" );
+
+        getManagementHost().reserveVni( vni );
     }
 
 
     @Override
-    public Set<Long> getTakenVniIds() throws PeerException
+    public Set<Vni> getReservedVnis() throws PeerException
     {
-        return managementHost.getTakenVniIds();
+        return getManagementHost().getReservedVnis();
+    }
+
+
+    @Override
+    public int setupTunnels( final Set<String> peerIps, final UUID environmentId ) throws PeerException
+    {
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        return managementHost.setupTunnels( peerIps, environmentId );
     }
 
 

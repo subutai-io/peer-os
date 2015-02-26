@@ -35,7 +35,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>network-manager-api</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>commons-net</groupId>
+      <artifactId>commons-net</artifactId>
+    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>template-registry-api</artifactId>

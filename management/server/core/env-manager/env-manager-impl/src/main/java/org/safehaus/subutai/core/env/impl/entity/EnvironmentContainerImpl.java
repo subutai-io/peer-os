@@ -170,6 +170,13 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
 
     @Override
+    public void setDefaultGateway( final String gatewayIp ) throws PeerException
+    {
+        getPeer().setDefaultGateway( this, gatewayIp );
+    }
+
+
+    @Override
     public boolean isLocal()
     {
         return getPeer().isLocal();

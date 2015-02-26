@@ -41,7 +41,8 @@ public class ListEnvironmentsCommand extends OsgiCommandSupport
             System.out.println(
                     String.format( "Environment creation time %s", new Date( environment.getCreationTimestamp() ) ) );
             System.out.println( String.format( "Environment status %s", environment.getStatus() ) );
-            System.out.println("-----------------------------------------------------------------");
+            System.out.println( String.format( "Subnet CIDR %s", environment.getSubnetCidr() ) );
+            System.out.println( "-----------------------------------------------------------------" );
         }
 
         return null;
