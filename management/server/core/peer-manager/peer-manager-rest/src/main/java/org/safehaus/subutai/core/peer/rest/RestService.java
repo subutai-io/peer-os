@@ -83,6 +83,12 @@ public interface RestService
     public Response rejectForRegistrationRequest( @FormParam( "rejectedPeerId" ) String rejectedPeerId );
 
 
+    @DELETE
+    @Path( "remove" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response removeRegistrationRequest( @FormParam( "rejectedPeerId" ) String rejectedPeerId );
+
+
     @PUT
     @Path( "approve" )
     @Produces( { MediaType.APPLICATION_JSON } )

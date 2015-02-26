@@ -180,8 +180,8 @@ public class RestUtil
         KeyStore keyStore = keyStoreManager.load( keyStoreData );
 
         KeyStoreData trustStoreData = new KeyStoreData();
-        keyStoreData.setupTrustStorePx2();
-        KeyStore trustStore = keyStoreManager.load( keyStoreData );
+        trustStoreData.setupTrustStorePx2();
+        KeyStore trustStore = keyStoreManager.load( trustStoreData );
 
         SSLManager sslManager = new SSLManager( keyStore, keyStoreData, trustStore, trustStoreData );
 

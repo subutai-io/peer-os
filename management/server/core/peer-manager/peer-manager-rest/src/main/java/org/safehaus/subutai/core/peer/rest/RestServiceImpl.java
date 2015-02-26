@@ -12,6 +12,7 @@ import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.peer.PeerStatus;
 import org.safehaus.subutai.common.protocol.Template;
@@ -140,6 +141,20 @@ public class RestServiceImpl implements RestService
             boolean result = peerManager.unregister( id.toString() );
             if ( result )
             {
+                //************ Delete Trust SSL Cert **************************************
+                KeyStore keyStore;
+                KeyStoreData keyStoreData;
+                KeyStoreManager keyStoreManager;
+
+                keyStoreData = new KeyStoreData();
+                keyStoreData.setupTrustStorePx2();
+                keyStoreData.setAlias( peerId );
+
+                keyStoreManager = new KeyStoreManager();
+                keyStore = keyStoreManager.load( keyStoreData );
+
+                keyStoreManager.deleteEntry( keyStore, keyStoreData );
+                //***********************************************************************
                 return Response.ok( "Successfully unregistered peer: " + peerId ).build();
             }
             else
@@ -162,6 +177,21 @@ public class RestServiceImpl implements RestService
         peerManager.update( p );
 
         return Response.noContent().build();
+    }
+
+
+    @Override
+    public Response removeRegistrationRequest( final String rejectedPeerId )
+    {
+        try
+        {
+            peerManager.unregister( rejectedPeerId );
+            return Response.status( Response.Status.NO_CONTENT ).build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+        }
     }
 
 
