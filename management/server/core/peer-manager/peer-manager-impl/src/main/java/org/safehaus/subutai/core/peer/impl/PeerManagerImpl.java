@@ -233,7 +233,14 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public boolean update( final PeerInfo peerInfo )
     {
-        return peerDAO.saveInfo( SOURCE_REMOTE_PEER, peerInfo.getId().toString(), peerInfo );
+        String source;
+        if ( peerInfo.getId().compareTo( localPeer.getId() ) == 0 ) {
+            source = SOURCE_LOCAL_PEER;
+        }
+        else {
+            source = SOURCE_REMOTE_PEER;
+        }
+        return peerDAO.saveInfo( source, peerInfo.getId().toString(), peerInfo );
     }
 
 
@@ -262,7 +269,14 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public PeerInfo getPeerInfo( UUID uuid )
     {
-        return peerDAO.getInfo( SOURCE_REMOTE_PEER, uuid.toString(), PeerInfo.class );
+        String source;
+        if ( uuid.compareTo( localPeer.getId() ) == 0 ) {
+            source = SOURCE_LOCAL_PEER;
+        }
+        else {
+            source = SOURCE_REMOTE_PEER;
+        }
+        return peerDAO.getInfo( source, uuid.toString(), PeerInfo.class );
     }
 
 
