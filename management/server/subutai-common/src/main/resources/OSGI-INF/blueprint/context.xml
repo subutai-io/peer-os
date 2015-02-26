@@ -4,7 +4,7 @@
 
   <reference-list id="busListener" interface="org.apache.cxf.Bus" availability="optional">
     <reference-listener bind-method="busRegistered">
-      <bean class="org.safehaus.subutai.common.security.CXFBusListener" />
+      <bean class="org.safehaus.subutai.core.channel.impl.interceptor.CXFBusListener" />
     </reference-listener>
   </reference-list>
 

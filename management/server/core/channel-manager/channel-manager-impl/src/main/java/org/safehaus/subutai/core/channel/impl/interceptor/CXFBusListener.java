@@ -1,4 +1,4 @@
-package org.safehaus.subutai.common.security;
+package org.safehaus.subutai.core.channel.impl.interceptor;
 
 
 import org.slf4j.Logger;
