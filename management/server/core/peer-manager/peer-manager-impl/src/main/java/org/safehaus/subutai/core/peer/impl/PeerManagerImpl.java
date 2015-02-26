@@ -12,6 +12,7 @@ import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
+import org.safehaus.subutai.common.peer.PeerPolicy;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.key.api.KeyInfo;
@@ -224,8 +225,15 @@ public class PeerManagerImpl implements PeerManager
     public boolean unregister( final String uuid ) throws PeerException
     {
         ManagementHost managementHost = getLocalPeer().getManagementHost();
-        PeerInfo p = getPeerInfo( UUID.fromString( uuid ) );
+        UUID remotePeerId = UUID.fromString( uuid );
+        PeerInfo p = getPeerInfo( remotePeerId );
         managementHost.removeAptSource( p.getId().toString(), p.getIp() );
+        PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( remotePeerId );
+        // Remove peer policy of the target remote peer from the local peer
+        if ( peerPolicy != null ) {
+            localPeer.getPeerInfo().getPeerPolicies().remove( peerPolicy );
+            peerDAO.saveInfo( SOURCE_LOCAL_PEER, localPeer.getId().toString(), localPeer );
+        }
         return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, uuid );
     }
 
