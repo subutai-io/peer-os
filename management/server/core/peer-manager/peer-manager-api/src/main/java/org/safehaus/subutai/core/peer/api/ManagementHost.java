@@ -3,7 +3,9 @@ package org.safehaus.subutai.core.peer.api;
 
 import java.io.IOException;
 import java.util.Set;
+import java.util.UUID;
 
+import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.PeerException;
 
@@ -20,7 +22,11 @@ public interface ManagementHost extends Host
 
     public String readFile( String path ) throws IOException;
 
-    public void setupTunnels( Set<String> peerIps, long vni, boolean newVni ) throws PeerException;
+    public int setupTunnels( Set<String> peerIps, UUID environmentId ) throws PeerException;
 
-    public Set<Long> getTakenVniIds() throws PeerException;
+    public Set<Vni> getReservedVnis() throws PeerException;
+
+    public void reserveVni( Vni vni ) throws PeerException;
+
+    public void createGateway( String gatewayIp, int vlan ) throws PeerException;
 }

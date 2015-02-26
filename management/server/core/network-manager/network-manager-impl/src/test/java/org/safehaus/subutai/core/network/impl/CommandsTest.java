@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.network.impl;
 
 
+import java.util.UUID;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
@@ -18,6 +20,7 @@ public class CommandsTest
     private static final String TUNNEL_TYPE = "tunnel type";
     private static final String GATEWAY_IP = "gateway.ip";
     private static final int VLAN_ID = 100;
+    private static final UUID ENVIRONMENT_ID = UUID.randomUUID();
     private static final String CONTAINER_NAME = "container";
     private static final String PATH_TO_KEY_FILE = "/path/to/key/file";
     private static final String KEY_TYPE = "key type";
@@ -122,7 +125,7 @@ public class CommandsTest
     @Test
     public void testGetSetupVniVlanMappingCommand() throws Exception
     {
-        assertNotNull( commands.getSetupVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID ) );
+        assertNotNull( commands.getSetupVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID, ENVIRONMENT_ID ) );
     }
 
 

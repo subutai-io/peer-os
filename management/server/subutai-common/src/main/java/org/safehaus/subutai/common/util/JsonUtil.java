@@ -28,13 +28,6 @@ public class JsonUtil
     }
 
 
-    public static <T> String toJson( T value )
-    {
-
-        return GSON.toJson( value );
-    }
-
-
     public static <T> T fromJson( String value, Class<T> clazz )
     {
 
@@ -49,13 +42,6 @@ public class JsonUtil
     }
 
 
-    public static <T> String toJson( T value, Type type )
-    {
-
-        return GSON.toJson( value, type );
-    }
-
-
     public <T> T from( String value, Class<T> clazz )
     {
 
@@ -63,17 +49,34 @@ public class JsonUtil
     }
 
 
-    public static <T> String to( T value )
+    public static <T> T from( String value, Type type )
+    {
+
+        return GSON.fromJson( value, type );
+    }
+
+
+    //to
+
+
+    public static <T> String toJson( T value, Type type )
+    {
+
+        return GSON.toJson( value, type );
+    }
+
+
+    public static <T> String toJson( T value )
     {
 
         return GSON.toJson( value );
     }
 
 
-    public static <T> T from( String value, Type type )
+    public static <T> String to( T value )
     {
 
-        return GSON.fromJson( value, type );
+        return GSON.toJson( value );
     }
 
 

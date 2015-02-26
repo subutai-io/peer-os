@@ -1,8 +1,6 @@
 package org.safehaus.subutai.core.peer.rest;
 
 
-import java.util.Set;
-
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -176,16 +174,20 @@ public interface RestService
     @Path( "container/quota/disk" )
     Response setDiskQuota( @FormParam( "containerId" ) String containerId, @FormParam( "diskQuota" ) String diskQuota );
 
+    @POST
+    @Path( "container/gateway" )
+    Response setDefaultGateway( @FormParam( "containerId" ) String containerId,
+                                @FormParam( "gatewayIp" ) String gatewayIp );
+
+    @POST
+    @Path( "vni" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response reserveVni( @FormParam( "vni" ) String vni );
+
     //*********** Environment Specific REST - END ***************
 
     @GET
     @Path( "vni" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response getTakenVni();
-
-    @POST
-    @Path( "tunnels" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response setupTunnels( @FormParam( "peerIps" ) Set<String> peerIps, @FormParam( "vni" ) long vni,
-                           @FormParam( "newVni" ) boolean newVni );
+    Response getReservedVnis();
 }

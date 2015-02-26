@@ -13,7 +13,5 @@ public interface ContainerGroup
 
     public UUID getOwnerId();
 
-    public String getTemplateName();
-
     public Set<UUID> getContainerIds();
 }

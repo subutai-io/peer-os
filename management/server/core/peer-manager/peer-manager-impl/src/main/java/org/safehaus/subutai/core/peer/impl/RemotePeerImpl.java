@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -12,16 +11,17 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.CommandStatus;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.ContainersDestructionResult;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
-import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
@@ -45,8 +45,7 @@ import org.safehaus.subutai.core.peer.impl.command.CommandRequest;
 import org.safehaus.subutai.core.peer.impl.command.CommandResponseListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandResultImpl;
 import org.safehaus.subutai.core.peer.impl.container.ContainersDestructionResultImpl;
-import org.safehaus.subutai.core.peer.impl.container.CreateContainersRequest;
-import org.safehaus.subutai.core.peer.impl.container.CreateContainersResponse;
+import org.safehaus.subutai.core.peer.impl.container.CreateContainerGroupResponse;
 import org.safehaus.subutai.core.peer.impl.container.DestroyEnvironmentContainersRequest;
 import org.safehaus.subutai.core.peer.impl.container.DestroyEnvironmentContainersResponse;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequest;
@@ -272,6 +271,33 @@ public class RemotePeerImpl implements RemotePeer
         catch ( HTTPException e )
         {
             throw new PeerException( "Error destroying container", e );
+        }
+    }
+
+
+    @Override
+    public void setDefaultGateway( final ContainerHost host, final String gatewayIp ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( gatewayIp ) && gatewayIp.matches( Common.IP_REGEX ),
+                "Invalid gateway IP" );
+
+        String path = "peer/container/gateway";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", host.getId().toString() );
+        params.put( "gatewayIp", gatewayIp );
+
+        Map<String, String> headers = Maps.newHashMap();
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
+
+        try
+        {
+            post( path, params, headers );
+        }
+        catch ( HTTPException e )
+        {
+            throw new PeerException( "Error setting container gateway ip", e );
         }
     }
 
@@ -940,26 +966,18 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public Set<HostInfoModel> createContainers( final UUID environmentId, final UUID initiatorPeerId,
-                                                final UUID ownerId, final List<Template> templates,
-                                                final int numberOfContainers, final String strategyId,
-                                                final List<Criteria> criteria ) throws PeerException
+    public Set<HostInfoModel> createContainerGroup( final CreateContainerGroupRequest request ) throws PeerException
     {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-        Preconditions.checkNotNull( initiatorPeerId, "Invalid initiator peer id" );
-        Preconditions.checkNotNull( ownerId, "Invalid owner id" );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( templates ), "Invalid template set" );
-        Preconditions.checkArgument( numberOfContainers > 0, "Invalid number of containers" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( strategyId ), "Invalid strategy id" );
+
+        Preconditions.checkNotNull( request, "Invalid request" );
 
         Map<String, String> headers = Maps.newHashMap();
-        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, environmentId.toString() );
+        headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, request.getEnvironmentId().toString() );
 
-        CreateContainersResponse response = sendRequest(
-                new CreateContainersRequest( environmentId, initiatorPeerId, ownerId, templates, numberOfContainers,
-                        strategyId, criteria ), RecipientType.CONTAINER_CREATE_REQUEST.name(),
-                Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateContainersResponse.class,
-                Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT, headers );
+        CreateContainerGroupResponse response =
+                sendRequest( request, RecipientType.CREATE_CONTAINER_GROUP_REQUEST.name(),
+                        Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateContainerGroupResponse.class,
+                        Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT, headers );
 
         if ( response != null )
         {
@@ -997,14 +1015,68 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    //************ END ENVIRONMENT SPECIFIC REST
-
-
     //networking
 
 
     @Override
-    public Set<Long> getTakenVniIds() throws PeerException
+    public void reserveVni( final Vni vni ) throws PeerException
+    {
+        Preconditions.checkNotNull( vni, "Invalid vni" );
+
+        String path = "peer/vni";
+
+        try
+        {
+            Map<String, String> headers = Maps.newHashMap();
+            headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, vni.getEnvironmentId().toString() );
+
+            Map<String, String> params = Maps.newHashMap();
+
+            params.put( "vni", JsonUtil.to( vni ) );
+
+            post( path, params, headers );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( String.format( "Error reserving vni %s on peer %s", vni, getName() ), e );
+        }
+    }
+
+    //
+    //    @Override
+    //    public int setupTunnels( final Set<String> peerIps, final Vni vni ) throws PeerException
+    //    {
+    //        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
+    //        Preconditions.checkNotNull( vni, "Invalid vni" );
+    //
+    //        String path = "peer/tunnels";
+    //
+    //        try
+    //        {
+    //            Map<String, String> headers = Maps.newHashMap();
+    //            headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, vni.getEnvironmentId().toString() );
+    //
+    //            Map<String, String> params = Maps.newHashMap();
+    //
+    //            params.put( "peerIps", JsonUtil.to( peerIps ) );
+    //            params.put( "vni", JsonUtil.to( vni ) );
+    //
+    //            String response = post( path, params, headers );
+    //
+    //            return Integer.parseInt( response );
+    //        }
+    //        catch ( Exception e )
+    //        {
+    //            throw new PeerException( String.format( "Error setting up tunnels on peer %s", getName() ), e );
+    //        }
+    //    }
+
+
+    //************ END ENVIRONMENT SPECIFIC REST
+
+
+    @Override
+    public Set<Vni> getReservedVnis() throws PeerException
     {
         String path = "peer/vni";
 
@@ -1012,33 +1084,11 @@ public class RemotePeerImpl implements RemotePeer
         {
             String response = get( path, null, null );
 
-            return JsonUtil.fromJson( response, new TypeToken<Set<Long>>() {}.getType() );
+            return JsonUtil.fromJson( response, new TypeToken<Set<Vni>>() {}.getType() );
         }
         catch ( Exception e )
         {
-            throw new PeerException( String.format( "Error obtaining taken VNI from peer %s", getName() ), e );
-        }
-    }
-
-
-    @Override
-    public void setupTunnels( final Set<String> peerIps, final long vni, final boolean newVni ) throws PeerException
-    {
-        String path = "peer/tunnels";
-
-        try
-        {
-            Map<String, String> params = Maps.newHashMap();
-
-            params.put( "peerIps", peerIps.toString() );
-            params.put( "vni", String.valueOf( vni ) );
-            params.put( "newVni", String.valueOf( newVni ) );
-
-            post( path, params, null );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( String.format( "Error setting up tunnels", getName() ), e );
+            throw new PeerException( String.format( "Error obtaining reserved VNIs from peer %s", getName() ), e );
         }
     }
 

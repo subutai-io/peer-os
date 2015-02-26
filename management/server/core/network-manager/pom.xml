@@ -18,6 +18,5 @@
     <module>network-manager-api</module>
     <module>network-manager-impl</module>
     <module>network-manager-cli</module>
-    <module>network-manager-rest</module>
   </modules>
 </project>

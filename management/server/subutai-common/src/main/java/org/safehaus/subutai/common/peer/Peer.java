@@ -1,7 +1,6 @@
 package org.safehaus.subutai.common.peer;
 
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -10,9 +9,10 @@ import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
-import org.safehaus.subutai.common.protocol.Criteria;
+import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
@@ -37,16 +37,16 @@ public interface Peer
 
     public PeerInfo getPeerInfo();
 
-    public Set<HostInfoModel> createContainers( final UUID environmentId, final UUID initiatorPeerId,
-                                                final UUID ownerId, final List<Template> templates,
-                                                final int numberOfContainers, final String strategyId,
-                                                final List<Criteria> criteria ) throws PeerException;
+    public Set<HostInfoModel> createContainerGroup( CreateContainerGroupRequest request ) throws PeerException;
 
     public void startContainer( ContainerHost containerHost ) throws PeerException;
 
     public void stopContainer( ContainerHost containerHost ) throws PeerException;
 
     public void destroyContainer( ContainerHost containerHost ) throws PeerException;
+
+    public void setDefaultGateway( ContainerHost host, String gatewayIp ) throws PeerException;
+
 
     public boolean isConnected( Host host );
 
@@ -230,7 +230,7 @@ public interface Peer
 
     //networking
 
-    public Set<Long> getTakenVniIds() throws PeerException;
+    public void reserveVni( Vni vni ) throws PeerException;
 
-    public void setupTunnels( Set<String> peerIps, long vni, boolean newVni ) throws PeerException;
+    public Set<Vni> getReservedVnis() throws PeerException;
 }
