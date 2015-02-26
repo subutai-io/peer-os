@@ -12,6 +12,7 @@ import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.PeerInfo;
+import org.safehaus.subutai.common.peer.PeerPolicy;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
@@ -19,6 +20,7 @@ import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
@@ -26,6 +28,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
+import com.google.common.base.Preconditions;
 import com.google.gson.reflect.TypeToken;
 
 
@@ -53,6 +56,19 @@ public class RestServiceImpl implements RestService
     public Response getRegisteredPeers()
     {
         return Response.ok( JsonUtil.toJson( peerManager.peers() ) ).build();
+    }
+
+
+    @Override
+    public Response getPeerPolicy( final String peerId ) {
+        Preconditions.checkState( UUIDUtil.isStringAUuid( peerId ) );
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( UUID.fromString( peerId ) );
+        if ( peerPolicy == null ) {
+            return Response.noContent().build();
+        } else {
+            return Response.ok( JsonUtil.toJson( JsonUtil.toJson( peerPolicy ) ) ).build();
+        }
     }
 
 

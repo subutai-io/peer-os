@@ -29,6 +29,12 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getRegisteredPeers();
 
+
+    @GET
+    @Path( "peer_policy" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getPeerPolicy( @QueryParam( "peerId" ) String peerId );
+
     @GET
     @Path( "ping" )
     public Response ping();
