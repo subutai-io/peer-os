@@ -23,7 +23,6 @@ public class OutputJsonTest
     {
         TopologyJson topology = new TopologyJson();
 
-        topology.setEnvironmentName( "My environment" );
 
         Map<UUID, Set<NodeGroup>> placement = Maps.newHashMap();
 

@@ -18,6 +18,7 @@ import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
@@ -29,17 +30,20 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Slider;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 
 public class TopologyWindow extends Window
 {
+    private static final String DEFAULT_SUBNET_CIDR = "192.168.1.2/24";
     private final Blueprint blueprint;
     private final PeerManager peerManager;
     private Table placementTable;
     private Button buildBtn;
     private ComboBox envCombo;
+    private TextField subnetTxt;
 
 
     public TopologyWindow( final Blueprint blueprint, final PeerManager peerManager,
@@ -90,6 +94,10 @@ public class TopologyWindow extends Window
                 {
                     Notification.show( "Please, select environment to grow" );
                 }
+                else if ( !grow && Strings.isNullOrEmpty( subnetTxt.getValue() ) )
+                {
+                    Notification.show( "Please, enter subnet CIDR" );
+                }
                 else
                 {
 
@@ -114,8 +122,8 @@ public class TopologyWindow extends Window
                         else
                         {
                             environmentManager.createEnvironment(
-                                    String.format( "%s-%s", blueprint.getName(), UUID.randomUUID() ), topology, null,
-                                    true );
+                                    String.format( "%s-%s", blueprint.getName(), UUID.randomUUID() ), topology,
+                                    subnetTxt.getValue(), null, true );
                             Notification.show( "Environment creation started" );
                         }
                     }
@@ -146,6 +154,14 @@ public class TopologyWindow extends Window
                 envCombo.setItemCaption( environment, environment.getName() );
             }
             content.addComponent( envCombo );
+        }
+        else
+        {
+            subnetTxt = new TextField( "Subnet CIDR" );
+            subnetTxt.setId( "subnetTxt" );
+            subnetTxt.setImmediate( true );
+            subnetTxt.setValue( DEFAULT_SUBNET_CIDR );
+            content.addComponent( subnetTxt );
         }
         content.addComponent( buildBtn );
         content.setComponentAlignment( buildBtn, Alignment.TOP_RIGHT );

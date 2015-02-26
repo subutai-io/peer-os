@@ -14,12 +14,20 @@ import com.google.common.collect.Sets;
 
 public class Topology
 {
-    Map<Peer, Set<NodeGroup>> nodeGroupPlacement = Maps.newHashMap();
+    private final Map<Peer, Set<NodeGroup>> nodeGroupPlacement = Maps.newHashMap();
 
 
     public Map<Peer, Set<NodeGroup>> getNodeGroupPlacement()
     {
         return Collections.unmodifiableMap( nodeGroupPlacement );
+    }
+
+
+    public void excludePeer( Peer peer )
+    {
+        Preconditions.checkNotNull( peer );
+
+        nodeGroupPlacement.remove( peer );
     }
 
 

@@ -10,6 +10,7 @@ import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.PeerException;
@@ -666,12 +667,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getTakenVni()
+    public Response setDefaultGateway( final String containerId, final String gatewayIp )
     {
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            return Response.ok( JsonUtil.toJson( localPeer.getTakenVniIds() ) ).build();
+            localPeer.setDefaultGateway( localPeer.getContainerHostById( UUID.fromString( containerId ) ), gatewayIp );
+            return Response.ok().build();
         }
         catch ( Exception e )
         {
@@ -681,12 +683,27 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setupTunnels( final Set<String> peerIps, final long vni, final boolean newVni )
+    public Response getReservedVnis()
     {
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            localPeer.setupTunnels( peerIps, vni, newVni );
+            return Response.ok( JsonUtil.toJson( localPeer.getReservedVnis() ) ).build();
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response reserveVni( final String vni )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            localPeer.reserveVni( JsonUtil.fromJson( vni, Vni.class ) );
             return Response.ok().build();
         }
         catch ( Exception e )

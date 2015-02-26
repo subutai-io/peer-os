@@ -11,6 +11,7 @@ function quota_usage {
   echo "                             "cpu -- quota for cpu \(in percentage\)
   echo "                             "cpuset -- quota for cpusets
   echo "                             "diskHome\|diskOpt\|diskVar\|diskRootfs\] -- quota for disk datasets \(no default units, can be \"none\" or in K\|M\|G\|T\|P\|E\|... \)
+  echo "                             "networkRate -- quota for network rate \(in kbps\)
   echo "           "output_types:
   echo "                             "json -- prints all quota related information in json format
   echo "           "flags:
@@ -93,6 +94,9 @@ function quota {
       "diskRootfs")
         fs_set_quota $container "rootfs" $quota_value
       ;;
+      "networkRate")
+        network_set_rate_quota $container $quota_value
+      ;;
       *)
         msg_error "$resource_type is not a supported type! Aborting.."
         exit 1
@@ -145,6 +149,9 @@ function quota {
       "diskRootfs")
         fs_get_quota $container "rootfs"
       ;;
+      "networkRate")
+        network_get_rate_quota $container
+      ;;
       "json")
         local memory_value=$(lxc_get_memory_in_megabytes $container)
         local memory_value=$( [ -z $memory_value ] &&  echo "none" || echo $memory_value )
@@ -156,7 +163,8 @@ function quota {
         local hdd_var_value=$(fs_get_quota $container "var")
         local hdd_opt_value=$(fs_get_quota $container "opt")
         local hdd_rootfs_value=$(fs_get_quota $container "rootfs")
-        printf "{ram=$memory_value,cpu=$cpu_value,diskHome=$hdd_home_value, diskVar=$hdd_var_value, diskOpt=$hdd_opt_value, diskRootfs=$hdd_rootfs_value}"
+        local network_rate=$(network_get_rate_quota $container)
+        printf "{ram=$memory_value,cpu=$cpu_value,diskHome=$hdd_home_value, diskVar=$hdd_var_value, diskOpt=$hdd_opt_value, diskRootfs=$hdd_rootfs_value, networkRate=$network_rate}"
       ;;
       *)
         msg_error "$resource_type is not a supported type! Aborting.."
