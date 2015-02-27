@@ -220,7 +220,7 @@ public class RemotePeerImpl implements RemotePeer
         {
             post( path, params, headers );
         }
-        catch ( HTTPException e )
+        catch ( Exception e )
         {
             throw new PeerException( "Error starting container", e );
         }
@@ -244,7 +244,7 @@ public class RemotePeerImpl implements RemotePeer
         {
             post( path, params, headers );
         }
-        catch ( HTTPException e )
+        catch ( Exception e )
         {
             throw new PeerException( "Error stopping container", e );
         }
@@ -268,7 +268,7 @@ public class RemotePeerImpl implements RemotePeer
         {
             post( path, params, headers );
         }
-        catch ( HTTPException e )
+        catch ( Exception e )
         {
             throw new PeerException( "Error destroying container", e );
         }
@@ -295,7 +295,7 @@ public class RemotePeerImpl implements RemotePeer
         {
             post( path, params, headers );
         }
-        catch ( HTTPException e )
+        catch ( Exception e )
         {
             throw new PeerException( "Error setting container gateway ip", e );
         }
@@ -455,7 +455,7 @@ public class RemotePeerImpl implements RemotePeer
         {
             post( path, params, headers );
         }
-        catch ( HTTPException e )
+        catch ( Exception e )
         {
             throw new PeerException( "Error setting container ram quota", e );
         }
@@ -533,7 +533,7 @@ public class RemotePeerImpl implements RemotePeer
         {
             post( path, params, headers );
         }
-        catch ( HTTPException e )
+        catch ( Exception e )
         {
             throw new PeerException( "Error setting container cpu quota", e );
         }
@@ -586,7 +586,7 @@ public class RemotePeerImpl implements RemotePeer
         {
             post( path, params, headers );
         }
-        catch ( HTTPException e )
+        catch ( Exception e )
         {
             throw new PeerException( "Error setting container cpu set", e );
         }
@@ -642,7 +642,7 @@ public class RemotePeerImpl implements RemotePeer
         {
             post( path, params, headers );
         }
-        catch ( HTTPException e )
+        catch ( Exception e )
         {
             throw new PeerException( "Error setting container disk quota", e );
         }
@@ -809,7 +809,7 @@ public class RemotePeerImpl implements RemotePeer
         {
             post( path, params, headers );
         }
-        catch ( HTTPException e )
+        catch ( Exception e )
         {
             throw new PeerException( "Error setting container quota", e );
         }
