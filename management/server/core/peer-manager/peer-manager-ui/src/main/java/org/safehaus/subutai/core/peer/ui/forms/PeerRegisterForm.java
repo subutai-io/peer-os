@@ -138,14 +138,6 @@ public class PeerRegisterForm extends CustomComponent
         ipTextField.setMaxLength( 15 );
         absoluteLayout.addComponent( ipTextField, "top:36.0px;left:150.0px;" );
 
-        // port label
-        final Label servicePort = new Label();
-        servicePort.setImmediate( false );
-        servicePort.setWidth( "-1px" );
-        servicePort.setHeight( "-1px" );
-        servicePort.setValue( "Service Port:" );
-        absoluteLayout.addComponent( servicePort, "top:80.0px;left:20.0px;" );
-
         // registerRequestButton
         registerRequestButton = createRegisterButton();
         absoluteLayout.addComponent( registerRequestButton, "top:160.0px;left:20.0px;" );
@@ -159,7 +151,7 @@ public class PeerRegisterForm extends CustomComponent
         peersTable = new Table();
         peersTable.setCaption( "Peers" );
         peersTable.setImmediate( false );
-        peersTable.setWidth( "850px" );
+        peersTable.setWidth( "1000px" );
         peersTable.setHeight( "283px" );
         absoluteLayout.addComponent( peersTable, "top:294.0px;left:20.0px;" );
 
@@ -298,7 +290,7 @@ public class PeerRegisterForm extends CustomComponent
                             }
                         }
                     };
-            PeerManageActionsComponent component = new PeerManageActionsComponent( peer, listener );
+            PeerManageActionsComponent component = new PeerManageActionsComponent( module, peer, listener );
             peersTable
                     .addItem( new Object[] { peer.getId(), peer.getName(), peer.getIp(), peer.getStatus(), component },
                             peer.getId() );
