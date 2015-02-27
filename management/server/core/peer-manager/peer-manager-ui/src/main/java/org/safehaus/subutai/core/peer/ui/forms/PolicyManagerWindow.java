@@ -45,7 +45,10 @@ public class PolicyManagerWindow extends Window {
         WINDOW_CAPTION = "Manage Peer Policy for \"" + this.remotePeerInfo.getName() +"\"";
         setCaption( WINDOW_CAPTION );
         VerticalLayout verticalLayout = new VerticalLayout();
+        verticalLayout.setSpacing( true );
+        verticalLayout.setMargin( true );
         HorizontalLayout saveCancelButtonLayout = new HorizontalLayout();
+        saveCancelButtonLayout.setSpacing( true );
         Button cancelButton = createCancelButton();
         Button saveButton = createSaveButton();
 
@@ -84,6 +87,7 @@ public class PolicyManagerWindow extends Window {
                 continue;
             }
             HorizontalLayout rule = new HorizontalLayout();
+            rule.setSpacing( true );
             TextField textField = new TextField( getCaptionNameByVariableName( field.getName() ) );
             textField.setId( field.getName() );
             if ( peerPolicy != null ) {
@@ -107,7 +111,7 @@ public class PolicyManagerWindow extends Window {
         for ( String word : r ) {
             captionName += word + " ";
         }
-        return  Character.toUpperCase( captionName.charAt(0) ) + captionName.substring(1) + ":";
+        return  Character.toUpperCase( captionName.charAt(0) ) + captionName.substring(1, captionName.length() -1 ) + ":";
     }
 
 
