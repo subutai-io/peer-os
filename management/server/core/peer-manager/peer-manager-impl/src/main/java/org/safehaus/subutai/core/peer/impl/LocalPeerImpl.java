@@ -1392,65 +1392,66 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
         Set<Throwable> errors = Sets.newHashSet();
         Set<UUID> destroyedContainersIds = Sets.newHashSet();
+        ContainerGroup containerGroup;
 
         try
         {
-            ContainerGroup containerGroup = findContainerGroupByEnvironmentId( environmentId );
-
-            Set<ContainerHost> containerHosts = Sets.newHashSet();
-
-            for ( UUID containerId : containerGroup.getContainerIds() )
-            {
-                try
-                {
-                    containerHosts.add( getContainerHostById( containerId ) );
-                }
-                catch ( HostNotFoundException e )
-                {
-                    errors.add( e );
-                }
-            }
-
-            if ( !containerHosts.isEmpty() )
-            {
-                List<Future<UUID>> taskFutures = Lists.newArrayList();
-                ExecutorService executorService = Executors.newFixedThreadPool( containerHosts.size() );
-
-                for ( ContainerHost containerHost : containerHosts )
-                {
-
-                    taskFutures.add( executorService.submit( new DestroyContainerWrapperTask( this, containerHost ) ) );
-                }
-
-                for ( Future<UUID> taskFuture : taskFutures )
-                {
-                    try
-                    {
-                        destroyedContainersIds.add( taskFuture.get() );
-                    }
-                    catch ( ExecutionException | InterruptedException e )
-                    {
-                        errors.add( ExceptionUtils.getRootCause( e ) );
-                    }
-                }
-
-
-                executorService.shutdown();
-            }
-
-            String exception = null;
-
-            if ( !errors.isEmpty() )
-            {
-                exception = String.format( "There were errors while destroying containers: %s", errors );
-            }
-
-            return new ContainersDestructionResultImpl( getId(), destroyedContainersIds, exception );
+            containerGroup = findContainerGroupByEnvironmentId( environmentId );
         }
         catch ( ContainerGroupNotFoundException e )
         {
-            throw new PeerException( e );
+            return new ContainersDestructionResultImpl( getId(), destroyedContainersIds, "Container group not found" );
         }
+
+        Set<ContainerHost> containerHosts = Sets.newHashSet();
+
+        for ( UUID containerId : containerGroup.getContainerIds() )
+        {
+            try
+            {
+                containerHosts.add( getContainerHostById( containerId ) );
+            }
+            catch ( HostNotFoundException e )
+            {
+                errors.add( e );
+            }
+        }
+
+        if ( !containerHosts.isEmpty() )
+        {
+            List<Future<UUID>> taskFutures = Lists.newArrayList();
+            ExecutorService executorService = Executors.newFixedThreadPool( containerHosts.size() );
+
+            for ( ContainerHost containerHost : containerHosts )
+            {
+
+                taskFutures.add( executorService.submit( new DestroyContainerWrapperTask( this, containerHost ) ) );
+            }
+
+            for ( Future<UUID> taskFuture : taskFutures )
+            {
+                try
+                {
+                    destroyedContainersIds.add( taskFuture.get() );
+                }
+                catch ( ExecutionException | InterruptedException e )
+                {
+                    errors.add( ExceptionUtils.getRootCause( e ) );
+                }
+            }
+
+
+            executorService.shutdown();
+        }
+
+        String exception = null;
+
+        if ( !errors.isEmpty() )
+        {
+            exception = String.format( "There were errors while destroying containers: %s", errors );
+        }
+
+        return new ContainersDestructionResultImpl( getId(), destroyedContainersIds, exception );
     }
 
 
