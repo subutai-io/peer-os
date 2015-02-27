@@ -2,10 +2,4 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd">
 
-  <reference-list id="busListener" interface="org.apache.cxf.Bus" availability="optional">
-    <reference-listener bind-method="busRegistered">
-      <bean class="org.safehaus.subutai.core.channel.impl.interceptor.CXFBusListener" />
-    </reference-listener>
-  </reference-list>
-
 </blueprint>

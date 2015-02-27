@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.channel.api;
+package org.safehaus.subutai.core.channel.impl;
 
 
 /**
