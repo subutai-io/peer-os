@@ -83,6 +83,7 @@ import org.safehaus.subutai.core.strategy.api.StrategyNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
@@ -1389,7 +1390,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        Set<Exception> errors = Sets.newHashSet();
+        Set<Throwable> errors = Sets.newHashSet();
         Set<UUID> destroyedContainersIds = Sets.newHashSet();
 
         try
@@ -1429,7 +1430,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                     }
                     catch ( ExecutionException | InterruptedException e )
                     {
-                        errors.add( e );
+                        errors.add( ExceptionUtils.getRootCause( e ) );
                     }
                 }
 
