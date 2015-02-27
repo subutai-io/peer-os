@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.identity.impl.dao;
 
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -176,7 +177,11 @@ public class UserDataService implements DataService<Long, User>
                     em.createQuery( "select u from UserEntity u where u.username = :username", UserEntity.class );
             query.setParameter( "username", username );
 
-            result = query.getSingleResult();
+            List<UserEntity> users = query.getResultList();
+            if ( users.size() > 0 )
+            {
+                result = users.iterator().next();
+            }
             em.getTransaction().commit();
         }
         catch ( Exception e )

@@ -72,6 +72,7 @@ public class PeerManageActionsComponent extends HorizontalLayout
     }
 
 
+    //TODO update correct peer registration and further relationship management
     public void updateView()
     {
         removeComponent( positiveButton );

@@ -101,15 +101,8 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="peer/get-taken-vni">
-      <action class="org.safehaus.subutai.core.peer.cli.GetTakenVnisCommand">
-        <property name="peerManager" ref="peerManager" />
-      </action>
-    </command>
-  </command-bundle>
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="peer/setup-tunnels">
-      <action class="org.safehaus.subutai.core.peer.cli.SetupTunnels">
+    <command name="peer/get-reserved-vni">
+      <action class="org.safehaus.subutai.core.peer.cli.GetReservedVnisCommand">
         <property name="peerManager" ref="peerManager" />
       </action>
     </command>

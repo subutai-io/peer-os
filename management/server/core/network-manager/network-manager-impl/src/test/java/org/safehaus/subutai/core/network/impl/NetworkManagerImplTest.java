@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.network.impl;
 
 
 import java.util.Set;
+import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -54,6 +55,7 @@ public class NetworkManagerImplTest
     private static final String GATEWAY_IP = "gateway.ip";
     private static final int VLAN_ID = 100;
     private static final int VNI = 100;
+    private static final UUID ENVIRONMENT_ID = UUID.randomUUID();
     private static final String CONTAINER_NAME = "container";
     private static final int NET_MASK = 24;
     private static final String CONTAINER_IP_OUTPUT =
@@ -284,10 +286,10 @@ public class NetworkManagerImplTest
     public void testSetupVniVLanMapping() throws Exception
     {
 
-        networkManager.setupVniVLanMapping( TUNNEL_ID, VNI, VLAN_ID );
+        networkManager.setupVniVLanMapping( TUNNEL_ID, VNI, VLAN_ID, ENVIRONMENT_ID );
 
         verify( localPeer ).getManagementHost();
-        verify( commands ).getSetupVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID );
+        verify( commands ).getSetupVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID, ENVIRONMENT_ID );
         verify( managementHost ).execute( any( RequestBuilder.class ) );
     }
 

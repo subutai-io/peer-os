@@ -6,9 +6,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
+import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.environment.NodeGroup;
+import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
@@ -36,16 +39,19 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
     private final Peer peer;
     private final Set<NodeGroup> nodeGroups;
     private final String defaultDomain;
+    private final Set<Peer> allPeers;
+    private final int ipAddressOffset;
 
 
     public NodeGroupBuilder( final EnvironmentImpl environment, final TemplateRegistry templateRegistry,
                              final PeerManager peerManager, final Peer peer, final Set<NodeGroup> nodeGroups,
-                             final String defaultDomain )
+                             final Set<Peer> allPeers, final String defaultDomain, final int ipAddressOffset )
     {
         Preconditions.checkNotNull( environment );
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( peer );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( allPeers ) );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( nodeGroups ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( defaultDomain ) );
 
@@ -53,17 +59,20 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
         this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
         this.peer = peer;
+        this.allPeers = allPeers;
         this.nodeGroups = nodeGroups;
         this.defaultDomain = defaultDomain;
+        this.ipAddressOffset = ipAddressOffset;
     }
 
 
     /**
      * Before triggering container host creation process force to verify for all required templates existence
+     *
      * @param sourcePeerId - initializer peer id
      * @param templateName - template name to fetch
+     *
      * @return - list of templates with parent dependencies
-     * @throws NodeGroupBuildException
      */
     public List<Template> fetchRequiredTemplates( UUID sourcePeerId, final String templateName )
             throws NodeGroupBuildException
@@ -101,6 +110,7 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
      * Computes a result, or throws an exception if unable to do so.
      *
      * @return computed result
+     *
      * @throws NodeGroupBuildException if unable to compute a result
      */
     @Override
@@ -110,6 +120,48 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
         Set<NodeGroupBuildResult> results = Sets.newHashSet();
         LocalPeer localPeer = peerManager.getLocalPeer();
 
+
+        //check if environment has reserved VNI
+        Set<Vni> reservedVnis;
+        try
+        {
+            reservedVnis = peer.getReservedVnis();
+        }
+        catch ( PeerException e )
+        {
+            throw new NodeGroupBuildException(
+                    String.format( "Error obtaining reserved vnis on peer %s", peer.getName() ), e );
+        }
+
+        Vni environmentVni = null;
+        for ( Vni reservedVni : reservedVnis )
+        {
+            if ( reservedVni.getEnvironmentId().equals( environment.getId() ) )
+            {
+                environmentVni = reservedVni;
+                break;
+            }
+        }
+
+        if ( environmentVni == null )
+        {
+
+            //try to reserve VNI
+            environmentVni = new Vni( environment.getVni(), environment.getId() );
+
+            try
+            {
+                peer.reserveVni( environmentVni );
+            }
+            catch ( PeerException e )
+            {
+                throw new NodeGroupBuildException( String.format( "Could not reserve VNI on peer %s", peer.getName() ),
+                        e );
+            }
+        }
+
+        int currentIpAddressOffset = 0;
+
         for ( NodeGroup nodeGroup : nodeGroups )
         {
             NodeGroupBuildException exception = null;
@@ -118,26 +170,45 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
             try
             {
 
-                Set<HostInfoModel> newHosts =
-                        peer.createContainers( environment.getId(), localPeer.getId(), localPeer.getOwnerId(),
+                Set<String> peerIps = Sets.newHashSet();
+
+                //add initiator peer mandatorily
+                peerIps.add( localPeer.getManagementHost().getIpByInterfaceName( "eth1" ) );
+
+
+                for ( Peer aPeer : allPeers )
+                {
+                    if ( !aPeer.getId().equals( localPeer.getId() ) && !aPeer.getId().equals( peer.getId() ) )
+                    {
+                        peerIps.add( aPeer.getPeerInfo().getIp() );
+                    }
+                }
+
+
+                Set<HostInfoModel> newHosts = peer.createContainerGroup(
+                        new CreateContainerGroupRequest( peerIps, environment.getId(), localPeer.getId(),
+                                localPeer.getOwnerId(), environment.getSubnetCidr(),
                                 fetchRequiredTemplates( peer.getId(), nodeGroup.getTemplateName() ),
                                 nodeGroup.getNumberOfContainers(),
                                 nodeGroup.getContainerPlacementStrategy().getStrategyId(),
-                                nodeGroup.getContainerPlacementStrategy().getCriteriaAsList() );
+                                nodeGroup.getContainerPlacementStrategy().getCriteriaAsList(),
+                                ipAddressOffset + currentIpAddressOffset ) );
 
+                currentIpAddressOffset += nodeGroup.getNumberOfContainers();
 
                 for ( HostInfoModel newHost : newHosts )
                 {
                     containers.add( new EnvironmentContainerImpl( localPeer.getId(), peer, nodeGroup.getName(), newHost,
                             templateRegistry.getTemplate( nodeGroup.getTemplateName() ), nodeGroup.getSshGroupId(),
-                            nodeGroup.getHostsGroupId(), defaultDomain) );
+                            nodeGroup.getHostsGroupId(), defaultDomain ) );
                 }
 
 
                 if ( containers.size() < nodeGroup.getNumberOfContainers() )
                 {
-                    exception = new NodeGroupBuildException( String.format( "Requested %d but created only %d containers",
-                            nodeGroup.getNumberOfContainers(), containers.size() ), null );
+                    exception = new NodeGroupBuildException(
+                            String.format( "Requested %d but created only %d containers",
+                                    nodeGroup.getNumberOfContainers(), containers.size() ), null );
                 }
             }
             catch ( Exception e )

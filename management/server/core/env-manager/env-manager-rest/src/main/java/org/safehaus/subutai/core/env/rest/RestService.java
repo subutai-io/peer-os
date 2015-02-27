@@ -41,8 +41,9 @@ public interface RestService
     public Response viewEnvironment( @PathParam( "environmentId" ) String environmentId );
 
     @POST
-    public Response createEnvironment( @FormParam( "topology" ) String topologyJsonString,
-                                       @FormParam( "key" ) String sshKey );
+    public Response createEnvironment( @FormParam( "name" ) String environmentName,
+                                       @FormParam( "topology" ) String topologyJsonString,
+                                       @FormParam( "subnet" ) String subnetCidr, @FormParam( "key" ) String sshKey );
 
     @POST
     @Path( "grow" )

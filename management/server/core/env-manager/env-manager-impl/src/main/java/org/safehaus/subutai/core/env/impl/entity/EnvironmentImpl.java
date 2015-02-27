@@ -2,8 +2,6 @@ package org.safehaus.subutai.core.env.impl.entity;
 
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -27,8 +25,8 @@ import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.impl.dao.EnvironmentDataService;
 import org.slf4j.Logger;
@@ -39,9 +37,7 @@ import org.apache.commons.net.util.SubnetUtils;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.gson.reflect.TypeToken;
 
 
 /**
@@ -73,11 +69,8 @@ public class EnvironmentImpl implements Environment, Serializable
     @Column( name = "last_used_ip_idx" )
     private int lastUsedIpIndex;
 
-    @Column( name = "peer_vlan_info" )
-    private String peerVlanInfo;
-
     @Column( name = "vni" )
-    private int vni;
+    private Long vni;
 
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = EnvironmentContainerImpl.class,
             cascade = CascadeType.ALL, orphanRemoval = true )
@@ -88,6 +81,7 @@ public class EnvironmentImpl implements Environment, Serializable
 
     @Column( name = "public_key", length = 3000 )
     private String publicKey;
+
 
     @Transient
     private EnvironmentDataService dataService;
@@ -100,15 +94,18 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public EnvironmentImpl( String name, String sshKey )
+    public EnvironmentImpl( String name, String subnetCidr, String sshKey )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
+        SubnetUtils cidr = new SubnetUtils( subnetCidr );
 
         this.name = name;
+        this.subnetCidr = cidr.getInfo().getCidrSignature();
         this.publicKey = Strings.isNullOrEmpty( sshKey ) ? null : sshKey.trim();
         this.environmentId = UUID.randomUUID().toString();
         this.creationTimestamp = System.currentTimeMillis();
         this.status = EnvironmentStatus.EMPTY;
+        this.lastUsedIpIndex = 0;//0 is reserved for gateway
     }
 
 
@@ -219,7 +216,10 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public Set<ContainerHost> getContainerHosts()
     {
-        return containers == null ? Sets.<ContainerHost>newHashSet() : Collections.unmodifiableSet( containers );
+        synchronized ( containers )
+        {
+            return Sets.newConcurrentHashSet( containers );
+        }
     }
 
 
@@ -248,6 +248,20 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
+    @Override
+    public Set<Peer> getPeers()
+    {
+        Set<Peer> peers = Sets.newHashSet();
+
+        for ( ContainerHost containerHost : getContainerHosts() )
+        {
+            peers.add( containerHost.getPeer() );
+        }
+
+        return peers;
+    }
+
+
     public void removeContainer( UUID containerId )
     {
         Preconditions.checkNotNull( containerId );
@@ -256,7 +270,10 @@ public class EnvironmentImpl implements Environment, Serializable
         {
             ContainerHost container = getContainerHostById( containerId );
 
-            containers.remove( container );
+            synchronized ( containers )
+            {
+                containers.remove( container );
+            }
 
             dataService.update( this );
         }
@@ -276,7 +293,10 @@ public class EnvironmentImpl implements Environment, Serializable
             container.setEnvironment( this );
         }
 
-        this.containers.addAll( containers );
+        synchronized ( this.containers )
+        {
+            this.containers.addAll( containers );
+        }
 
         dataService.update( this );
     }
@@ -345,33 +365,17 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public Map<UUID, Integer> getPeerVlanInfo()
-    {
-        Map<UUID, Integer> map = deserializePeerVlanInfo();
-        return Collections.unmodifiableMap( map );
-    }
-
-
-    public void setPeerVlanInfo( UUID peerId, int vlanId )
-    {
-        Preconditions.checkNotNull( peerId );
-
-        Map<UUID, Integer> map = deserializePeerVlanInfo();
-        map.put( peerId, vlanId );
-        this.peerVlanInfo = JsonUtil.to( map );
-    }
-
-
-    @Override
-    public int getVni()
+    public Long getVni()
     {
         return vni;
     }
 
 
-    public void setVni( int vni )
+    public void setVni( long vni )
     {
         this.vni = vni;
+
+        dataService.update( this );
     }
 
 
@@ -384,28 +388,8 @@ public class EnvironmentImpl implements Environment, Serializable
     public void setLastUsedIpIndex( int lastUsedIpIndex )
     {
         this.lastUsedIpIndex = lastUsedIpIndex;
-    }
 
-
-    public void setSubnetCidr( String subnetCidr )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( subnetCidr ) );
-
-        // this ctor checks CIDR notation format validity
-        SubnetUtils cidr = new SubnetUtils( subnetCidr );
-        this.subnetCidr = cidr.getInfo().getCidrSignature();
-    }
-
-
-    private Map<UUID, Integer> deserializePeerVlanInfo()
-    {
-        if ( Strings.isNullOrEmpty( peerVlanInfo ) )
-        {
-            return Maps.newHashMap();
-        }
-        TypeToken<Map<UUID, Integer>> typeToken = new TypeToken<Map<UUID, Integer>>()
-        {};
-        return JsonUtil.fromJson( peerVlanInfo, typeToken.getType() );
+        dataService.update( this );
     }
 
 
@@ -414,6 +398,6 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         return Objects.toStringHelper( this ).add( "environmentId", environmentId ).add( "name", name )
                       .add( "creationTimestamp", creationTimestamp ).add( "status", status )
-                      .add( "containers", containers ).toString();
+                      .add( "containers", getContainerHosts() ).toString();
     }
 }
