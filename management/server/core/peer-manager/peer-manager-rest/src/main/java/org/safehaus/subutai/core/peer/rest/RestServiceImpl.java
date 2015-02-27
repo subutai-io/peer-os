@@ -211,6 +211,7 @@ public class RestServiceImpl implements RestService
         keyStoreData = new KeyStoreData();
         keyStoreData.setupTrustStorePx2();
         keyStoreData.setHEXCert( root_cert_px2 );
+        keyStoreData.setAlias( p.getId().toString() );
 
         keyStoreManager = new KeyStoreManager();
         keyStore = keyStoreManager.load( keyStoreData );

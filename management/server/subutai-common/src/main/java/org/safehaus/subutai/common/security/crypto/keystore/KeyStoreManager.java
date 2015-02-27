@@ -60,15 +60,18 @@ public class KeyStoreManager
 			else
 			{
 				File file = new File( keyStoreData.getKeyStoreFile() );
-				finStream = new FileInputStream( file );
 				
 				if(file.exists())
 				{
+					finStream = new FileInputStream( file );
 					keyStore = KeyStore.getInstance( KeyStore.getDefaultType() );
 					keyStore.load( finStream, keyStoreData.getPassword().toCharArray() );						
 				}
 				else
 				{
+					File keyStoresFolder = new File( file.getParent() );
+					keyStoresFolder.mkdirs();
+					file.createNewFile();
 					keyStore = KeyStore.getInstance( keyStoreData.getKeyStoreType().jce() );
 					keyStore.load( null,null);
 					foutStream = new FileOutputStream( file );

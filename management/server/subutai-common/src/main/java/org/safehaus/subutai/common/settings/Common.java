@@ -44,10 +44,10 @@ public class Common
 
     public static final String KARAF_HOME = System.getProperty( "karaf.base" );
 
-    public static final String KEYSTORE_PX1_FILE = KARAF_HOME + "/etc/keystores/keystore_server_px1";
-    public static final String KEYSTORE_PX2_FILE = KARAF_HOME + "/etc/keystores/keystore_server_px2";
-    public static final String TRUSTSTORE_PX1_FILE = KARAF_HOME + "/etc/keystores/truststore_server_px1";
-    public static final String TRUSTSTORE_PX2_FILE = KARAF_HOME + "/etc/keystores/truststore_server_px2";
+    public static final String KEYSTORE_PX1_FILE = KARAF_HOME + "/etc/keystores/keystore_server_px1.jks";
+    public static final String KEYSTORE_PX2_FILE = KARAF_HOME + "/etc/keystores/keystore_server_px2.jks";
+    public static final String TRUSTSTORE_PX1_FILE = KARAF_HOME + "/etc/keystores/truststore_server_px1.jks";
+    public static final String TRUSTSTORE_PX2_FILE = KARAF_HOME + "/etc/keystores/truststore_server_px2.jks";
 
     public static final String KEYSTORE_PX1_PSW = "123";
     public static final String KEYSTORE_PX2_PSW = "123";
@@ -64,4 +64,8 @@ public class Common
 
 
     //*****************************************************************************************
+
+    public static final String SECURE_HANDSHAKE_PORT = "8443";
+    public static final String SECURE_PEER_OPERATIONS_PORT = "8444";
+    public static final String SECURE_ENVIRONMENT_OPERATIONS_PORT = "8445";
 }

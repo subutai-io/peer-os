@@ -4,13 +4,13 @@ package org.safehaus.subutai.common.security.crypto.certificate;
 public class CertificateData
 {
 	
-	private String commonName = "";
-	private String organizationName = "";
-	private String organizationUnit = "";
+	private String commonName = "";//peerId | environmentId
+	private String organizationName = "Subutai";
+	private String organizationUnit = "Subutai";
 	private String localityName = "";
 	private String country = "";
 	private String state = "";
-	private String email = "";
+	private String email = "support@subut.ai";
 	
 	/************************************************************************
 	 * ******************* Getter Setters **********************************

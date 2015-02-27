@@ -13,6 +13,7 @@ import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.peer.PeerStatus;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.core.peer.ui.PeerManagerPortalModule;
@@ -316,7 +317,7 @@ public class PeerRegisterForm extends CustomComponent
      */
     private PeerInfo registerMeToRemote( PeerInfo peerToRegister, String ip )
     {
-        String baseUrl = String.format( "https://%s:8443/cxf", ip );
+        String baseUrl = String.format( "https://%s:%s/cxf", ip, Common.SECURE_HANDSHAKE_PORT );
         WebClient client = RestUtil.createTrustedWebClient( baseUrl );//WebClient.create( baseUrl );
         client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
         Form form = new Form();
@@ -348,7 +349,7 @@ public class PeerRegisterForm extends CustomComponent
     private void unregisterMeFromRemote( PeerInfo peerToUnregister, PeerInfo remotePeerInfo )
     {
         //TODO remove peer certificate from trust store
-        String baseUrl = String.format( "https://%s:8444/cxf", remotePeerInfo.getIp() );
+        String baseUrl = String.format( "https://%s:%s/cxf", remotePeerInfo.getIp(), Common.SECURE_PEER_OPERATIONS_PORT );
         WebClient client = RestUtil.createTrustedWebClientWithAuth( baseUrl );// WebClient.create( baseUrl );
         Response response =
                 client.path( "peer/unregister" ).type( MediaType.APPLICATION_JSON ).accept( MediaType.APPLICATION_JSON )
@@ -382,7 +383,7 @@ public class PeerRegisterForm extends CustomComponent
     private void removeMeFromRemote( PeerInfo peerToUnregister, PeerInfo remotePeerInfo )
     {
         //TODO remove peer certificate from trust store
-        String baseUrl = String.format( "https://%s:8443/cxf", remotePeerInfo.getIp() );
+        String baseUrl = String.format( "https://%s:%s/cxf", remotePeerInfo.getIp(), Common.SECURE_HANDSHAKE_PORT );
         WebClient client = RestUtil.createTrustedWebClient( baseUrl );// WebClient.create( baseUrl );
         Response response =
                 client.path( "peer/remove" ).type( MediaType.APPLICATION_JSON ).accept( MediaType.APPLICATION_JSON )
@@ -401,7 +402,7 @@ public class PeerRegisterForm extends CustomComponent
 
     private boolean approvePeerRegistration( PeerInfo peerToUpdateOnRemote, PeerInfo remotePeer, String cert )
     {
-        String baseUrl = String.format( "https://%s:8443/cxf", remotePeer.getIp() );
+        String baseUrl = String.format( "https://%s:%s/cxf", remotePeer.getIp(), Common.SECURE_HANDSHAKE_PORT );
         WebClient client = RestUtil.createTrustedWebClient( baseUrl );//WebClient.create( baseUrl );
         client.type( MediaType.APPLICATION_FORM_URLENCODED ).accept( MediaType.APPLICATION_JSON );
 
@@ -424,6 +425,7 @@ public class PeerRegisterForm extends CustomComponent
             keyStoreData = new KeyStoreData();
             keyStoreData.setupTrustStorePx2();
             keyStoreData.setHEXCert( root_cert_px2 );
+            keyStoreData.setAlias( remotePeer.getId().toString() );
 
             keyStoreManager = new KeyStoreManager();
             keyStore = keyStoreManager.load( keyStoreData );
@@ -450,7 +452,7 @@ public class PeerRegisterForm extends CustomComponent
      */
     private boolean rejectPeerRegistration( PeerInfo peerToUpdateOnRemote, PeerInfo remotePeer )
     {
-        String baseUrl = String.format( "https://%s:8443/cxf", remotePeer.getIp() );
+        String baseUrl = String.format( "https://%s:%s/cxf", remotePeer.getIp(), Common.SECURE_HANDSHAKE_PORT );
         WebClient client = RestUtil.createTrustedWebClient( baseUrl );// WebClient.create( baseUrl );
         client.type( MediaType.APPLICATION_FORM_URLENCODED ).accept( MediaType.APPLICATION_JSON );
 
