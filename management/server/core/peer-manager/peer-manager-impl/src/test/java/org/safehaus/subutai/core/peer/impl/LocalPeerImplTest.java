@@ -14,6 +14,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.metric.api.Monitor;
@@ -54,6 +55,9 @@ public class LocalPeerImplTest
     @Mock
     Monitor monitor;
 
+    @Mock
+    IdentityManager identityManager;
+
 
     @Before
     public void setup()
@@ -68,7 +72,7 @@ public class LocalPeerImplTest
     {
         LocalPeerImpl localPeer =
                 new LocalPeerImpl( peerManager, templateRegistry, quotaManager, strategyManager, null, commandExecutor,
-                        hostRegistry, monitor );
+                        hostRegistry, monitor, identityManager);
 
         localPeer.bindHost( UUID.randomUUID().toString() );
     }

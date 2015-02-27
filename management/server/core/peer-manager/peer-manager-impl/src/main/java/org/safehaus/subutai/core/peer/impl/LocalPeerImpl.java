@@ -49,6 +49,7 @@ import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
@@ -108,6 +109,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     private StrategyManager strategyManager;
     private QuotaManager quotaManager;
     private Monitor monitor;
+    private IdentityManager identityManager;
     private ManagementHostDataService managementHostDataService;
     private ResourceHostDataService resourceHostDataService;
     private ContainerHostDataService containerHostDataService;
@@ -119,7 +121,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
     public LocalPeerImpl( PeerManager peerManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
                           StrategyManager strategyManager, Set<RequestListener> requestListeners,
-                          CommandExecutor commandExecutor, HostRegistry hostRegistry, Monitor monitor )
+                          CommandExecutor commandExecutor, HostRegistry hostRegistry, Monitor monitor,
+                          IdentityManager identityManager )
 
     {
         this.strategyManager = strategyManager;
@@ -130,6 +133,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         this.requestListeners = requestListeners;
         this.commandExecutor = commandExecutor;
         this.hostRegistry = hostRegistry;
+        this.identityManager = identityManager;
     }
 
 
@@ -236,6 +240,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         Preconditions.checkNotNull( template, "Invalid template" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerName ), "Invalid container name" );
 
+        LOG.debug(
+                String.format( "Current user: %s %s", identityManager.getUser(), identityManager.isAuthenticated() ) );
         getResourceHostByName( resourceHost.getHostname() );
 
         if ( templateRegistry.getTemplate( template.getTemplateName() ) == null )
@@ -260,6 +266,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     {
 
         Preconditions.checkNotNull( request, "Invalid request" );
+        LOG.debug(
+                String.format( "Current user: %s %s", identityManager.getUser(), identityManager.isAuthenticated() ) );
 
         //check if strategy exists
         try

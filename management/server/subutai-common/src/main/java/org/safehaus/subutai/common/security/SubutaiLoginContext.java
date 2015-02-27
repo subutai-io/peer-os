@@ -11,7 +11,6 @@ public class SubutaiLoginContext
     private String username = "*UNKNOWN*";
     private String remoteAddress = "*UNKNOWN*";
 
-
     public SubutaiLoginContext()
     {
     }

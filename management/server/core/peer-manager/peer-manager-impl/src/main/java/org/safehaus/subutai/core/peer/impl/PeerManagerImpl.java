@@ -29,6 +29,7 @@ import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.key.api.KeyInfo;
 import org.safehaus.subutai.core.key.api.KeyManager;
 import org.safehaus.subutai.core.key.api.KeyManagerException;
@@ -82,6 +83,7 @@ public class PeerManagerImpl implements PeerManager
     private HostRegistry hostRegistry;
     private DaoManager daoManager;
     private KeyManager keyManager;
+    private IdentityManager identityManager;
 
 
     public PeerManagerImpl( final Messenger messenger )
@@ -111,6 +113,12 @@ public class PeerManagerImpl implements PeerManager
     public void setKeyManager( final KeyManager keyManager )
     {
         this.keyManager = keyManager;
+    }
+
+
+    public void setIdentityManager( final IdentityManager identityManager )
+    {
+        this.identityManager = identityManager;
     }
 
 
@@ -186,7 +194,7 @@ public class PeerManagerImpl implements PeerManager
             peerInfo = result.get( 0 );
         }
         localPeer = new LocalPeerImpl( this, templateRegistry, quotaManager, strategyManager, requestListeners,
-                commandExecutor, hostRegistry, monitor );
+                commandExecutor, hostRegistry, monitor, identityManager );
         localPeer.init();
 
         //add command request listener
@@ -243,7 +251,8 @@ public class PeerManagerImpl implements PeerManager
 
 
             X509Certificate certPx1 = certManagerPx1
-                    .generateSelfSignedCertificate( keyStorePx1, keyPairPx1, SecurityProvider.BOUNCY_CASTLE, certDataPx1 );
+                    .generateSelfSignedCertificate( keyStorePx1, keyPairPx1, SecurityProvider.BOUNCY_CASTLE,
+                            certDataPx1 );
 
             keyStoreManager.saveX509Certificate( keyStorePx1, keyStoreDataPx1, certPx1, keyPairPx1 );
         }

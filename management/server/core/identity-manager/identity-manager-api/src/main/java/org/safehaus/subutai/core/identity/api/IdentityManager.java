@@ -246,5 +246,7 @@ public interface IdentityManager
      * @return - result for erase operation
      */
     public boolean deleteRole( Role role );
+
+    public boolean isAuthenticated();
 }
 
