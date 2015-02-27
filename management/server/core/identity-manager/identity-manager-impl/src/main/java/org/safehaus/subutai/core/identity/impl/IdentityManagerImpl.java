@@ -7,6 +7,9 @@ import java.util.List;
 
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.peer.Host;
+import org.safehaus.subutai.common.security.SubutaiLoginContext;
+import org.safehaus.subutai.common.security.SubutaiThreadContext;
+import org.safehaus.subutai.common.util.SecurityUtil;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.PermissionGroup;
@@ -29,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
@@ -80,7 +84,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     public void init()
     {
-        LOG.info( "Initializing security manager..." );
+        LOG.info( "Initializing identity manager..." );
 
         userDataService = new UserDataService( daoManager.getEntityManagerFactory() );
         permissionDataService = new PermissionDataService( daoManager.getEntityManagerFactory() );
@@ -91,7 +95,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         SecurityUtils.setSecurityManager( securityManager );
 
-        LOG.info( String.format( "Security manager initialized: %s", securityManager ) );
+        LOG.info( String.format( "Identity manager initialized: %s", securityManager ) );
     }
 
 
@@ -136,7 +140,6 @@ public class IdentityManagerImpl implements IdentityManager
         generateKey( user );
         userDataService.persist( user );
         LOG.debug( String.format( "User: %s", user.getId() ) );
-
     }
 
 
@@ -161,13 +164,62 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     @Override
+    public User getUser()
+    {
+        SubutaiLoginContext loginContext = SubutaiThreadContext.get();
+        LOG.debug( String.format( "Login context: [%s] ", loginContext ) );
+
+
+        String username = null;
+        if ( loginContext != null && isAuthenticated( loginContext.getSessionId() ) )
+        {
+            username = loginContext.getUsername();
+        }
+        else
+        {
+            Serializable sessionId = SecurityUtil.getSessionId();
+            Subject subject = getSubject( sessionId );
+            if ( subject != null )
+            {
+                username = subject.getPrincipal().toString();
+            }
+        }
+
+        return username != null ? userDataService.findByUsername( username ) : null;
+    }
+
+
+    @Override
     public Subject login( final AuthenticationToken token )
     {
+
         SecurityUtils.setSecurityManager( securityManager );
         Subject subject = SecurityUtils.getSubject();
         subject.login( token );
-
+        //        UserIdMdcHelper.set( subject.getSession().getId() );
         return subject;
+    }
+
+
+    @Override
+    public Serializable login( final String username, final String password )
+    {
+        UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken( username, password );
+        SecurityUtils.setSecurityManager( securityManager );
+        Subject subject = SecurityUtils.getSubject();
+        subject.login( usernamePasswordToken );
+
+        return subject.getSession().getId();
+    }
+
+
+    @Override
+    public boolean isAuthenticated( final Serializable sessionId )
+    {
+
+        Subject subject = getSubject( sessionId );
+
+        return subject != null && subject.isAuthenticated();
     }
 
 

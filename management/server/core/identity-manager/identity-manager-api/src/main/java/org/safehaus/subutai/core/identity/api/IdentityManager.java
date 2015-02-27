@@ -32,6 +32,8 @@ public interface IdentityManager
      */
     public User getUser( String username );
 
+    User getUser();
+
     /**
      * Logs in user with token passed
      *
@@ -42,6 +44,10 @@ public interface IdentityManager
 
     public Subject login( AuthenticationToken token );
 
+
+    Serializable login( String username, String password );
+
+    boolean isAuthenticated( Serializable sessionId );
 
     /**
      * Get {@code Subject} for target session
