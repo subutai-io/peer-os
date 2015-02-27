@@ -1,9 +1,14 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.cert.X509Certificate;
 import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.List;
@@ -16,6 +21,12 @@ import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
+import org.safehaus.subutai.common.security.SecurityProvider;
+import org.safehaus.subutai.common.security.crypto.certificate.CertificateData;
+import org.safehaus.subutai.common.security.crypto.certificate.CertificateManager;
+import org.safehaus.subutai.common.security.crypto.key.KeyPairType;
+import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
+import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.key.api.KeyInfo;
@@ -145,23 +156,29 @@ public class PeerManagerImpl implements PeerManager
         {
             peerInfo = new PeerInfo();
             //TODO generate peer id based on owner/system information
-            try
-            {
-                Enumeration<InetAddress> addresses = NetworkInterface.getByName( "eth1" ).getInetAddresses();
-                while ( addresses.hasMoreElements() )
-                {
-                    InetAddress inetAddress = addresses.nextElement();
-                    LOG.error( inetAddress.getHostAddress() );
-                }
-            }
-            catch ( SocketException e )
-            {
-                LOG.error( "Error in sockets", e );
-            }
             peerInfo.setId( UUID.randomUUID() );
             peerInfo.setName( "Local Subutai server" );
             //TODO get ownerId from persistent storage
             peerInfo.setOwnerId( UUID.randomUUID() );
+
+            try
+            {
+                Enumeration<InetAddress> addressEnumeration = NetworkInterface.getByName( "eth1" ).getInetAddresses();
+                while ( addressEnumeration.hasMoreElements() )
+                {
+                    InetAddress address = addressEnumeration.nextElement();
+                    if ( ( address instanceof Inet4Address ) )
+                    {
+                        peerInfo.setIp( address.getHostAddress() );
+                    }
+                }
+            }
+            catch ( SocketException e )
+            {
+                LOG.error( "Error getting network interfaces", e );
+            }
+            peerInfo.setName( String.format( "Peer on %s", peerInfo.getIp() ) );
+
             peerDAO.saveInfo( SOURCE_LOCAL_PEER, peerInfo.getId().toString(), peerInfo );
         }
         else
@@ -188,6 +205,48 @@ public class PeerManagerImpl implements PeerManager
         addRequestListener( new DestroyEnvironmentContainersRequestListener( localPeer ) );
         //add echo listener
         addRequestListener( new EchoRequestListener() );
+
+
+        //<<<<<Generate PX1
+
+        KeyStoreData keyStoreDataPx1 = new KeyStoreData();
+
+        keyStoreDataPx1.setupKeyStorePx1();
+        generateCertificateAccordingToKeyStoreData( keyStoreDataPx1, true );
+
+        keyStoreDataPx1.setupKeyStorePx2();
+        generateCertificateAccordingToKeyStoreData( keyStoreDataPx1, true );
+
+        keyStoreDataPx1.setupTrustStorePx2();
+        generateCertificateAccordingToKeyStoreData( keyStoreDataPx1, false );
+
+        //>>>>>Generate PX1
+    }
+
+
+    private void generateCertificateAccordingToKeyStoreData( KeyStoreData keyStoreDataPx1, boolean isKeyStore )
+    {
+        CertificateData certDataPx1 = new CertificateData();
+        certDataPx1.setCommonName( peerInfo.getId().toString() );
+        CertificateManager certManagerPx1 = new CertificateManager();
+        certManagerPx1.setDateParamaters();
+
+        KeyStoreManager keyStoreManager = new KeyStoreManager();
+        KeyStore keyStorePx1 = keyStoreManager.load( keyStoreDataPx1 );
+
+        if ( isKeyStore )
+        {
+            org.safehaus.subutai.common.security.crypto.key.KeyManager keyManagerPx1 =
+                    new org.safehaus.subutai.common.security.crypto.key.KeyManager();
+            KeyPairGenerator keyPairGeneratorPx1 = keyManagerPx1.prepareKeyPairGeneration( KeyPairType.RSA, 1024 );
+            KeyPair keyPairPx1 = keyManagerPx1.generateKeyPair( keyPairGeneratorPx1 );
+
+
+            X509Certificate certPx1 = certManagerPx1
+                    .generateSelfSignedCertificate( keyStorePx1, keyPairPx1, SecurityProvider.BOUNCY_CASTLE, certDataPx1 );
+
+            keyStoreManager.saveX509Certificate( keyStorePx1, keyStoreDataPx1, certPx1, keyPairPx1 );
+        }
     }
 
 
@@ -333,15 +392,6 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public PeerInfo getLocalPeerInfo()
     {
-        try
-        {
-            peerInfo.setIp( localPeer.getManagementHost().getIpByInterfaceName( "eth1" ) );
-        }
-        catch ( HostNotFoundException e )
-        {
-            LOG.warn( "Error setting local peer info IP", e );
-        }
-
         return peerInfo;
     }
 
