@@ -1008,7 +1008,8 @@ public class RemotePeerImpl implements RemotePeer
 
         if ( response != null )
         {
-            return new ContainersDestructionResultImpl( response.getDestroyedContainersIds(), response.getException() );
+            return new ContainersDestructionResultImpl( getId(), response.getDestroyedContainersIds(),
+                    response.getException() );
         }
         else
         {

@@ -1444,7 +1444,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 exception = String.format( "There were errors while destroying containers: %s", errors );
             }
 
-            return new ContainersDestructionResultImpl( destroyedContainersIds, exception );
+            return new ContainersDestructionResultImpl( getId(), destroyedContainersIds, exception );
         }
         catch ( ContainerGroupNotFoundException e )
         {
