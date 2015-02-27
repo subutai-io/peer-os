@@ -138,14 +138,6 @@ public class PeerRegisterForm extends CustomComponent
         ipTextField.setMaxLength( 15 );
         absoluteLayout.addComponent( ipTextField, "top:36.0px;left:150.0px;" );
 
-        // port label
-        final Label servicePort = new Label();
-        servicePort.setImmediate( false );
-        servicePort.setWidth( "-1px" );
-        servicePort.setHeight( "-1px" );
-        servicePort.setValue( "Service Port:" );
-        absoluteLayout.addComponent( servicePort, "top:80.0px;left:20.0px;" );
-
         // registerRequestButton
         registerRequestButton = createRegisterButton();
         absoluteLayout.addComponent( registerRequestButton, "top:160.0px;left:20.0px;" );
