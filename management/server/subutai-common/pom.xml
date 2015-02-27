@@ -91,15 +91,26 @@
       <artifactId>shiro-web</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk15on</artifactId>
-      <version>1.51</version>
+      <artifactId>bcmail-jdk16</artifactId>
+      <version>${org.bouncycastle.version}</version>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
-      <artifactId>bcpg-jdk15on</artifactId>
-      <version>1.51</version>
+      <artifactId>bcpg-jdk16</artifactId>
+      <version>${org.bouncycastle.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk16</artifactId>
+      <version>${org.bouncycastle.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-ext-jdk16</artifactId>
+      <version>${org.bouncycastle.version}</version>
     </dependency>
   </dependencies>
 
