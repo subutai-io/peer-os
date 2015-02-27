@@ -12,8 +12,11 @@ import org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 
 /**
@@ -68,8 +71,8 @@ public class DestroyContainerTask implements Runnable
                 catch ( PeerException e )
                 {
                     boolean skipError = false;
-                    if ( e.getCause() != null && e.getCause().getMessage().contains(
-                            "org.safehaus.subutai.core.peer.api.HostNotFoundException" ) )
+                    if ( e instanceof HostNotFoundException || ( ExceptionUtils.getRootCauseMessage( e )
+                                                                               .contains( "HostNotFoundException" ) ) )
                     {
                         //skip error since host is not found
                         skipError = true;
