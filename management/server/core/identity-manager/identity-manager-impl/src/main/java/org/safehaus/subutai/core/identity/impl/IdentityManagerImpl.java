@@ -3,9 +3,12 @@ package org.safehaus.subutai.core.identity.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.safehaus.subutai.common.dao.DaoManager;
+import org.safehaus.subutai.common.security.NullSubutaiLoginContext;
 import org.safehaus.subutai.common.security.SubutaiLoginContext;
 import org.safehaus.subutai.common.security.SubutaiThreadContext;
 import org.safehaus.subutai.common.util.SecurityUtil;
@@ -26,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.mgt.SecurityManager;
@@ -50,19 +52,19 @@ public class IdentityManagerImpl implements IdentityManager
     private UserDataService userDataService;
     private PermissionDataService permissionDataService;
     private RoleDataService roleDataService;
-//    private ManagementHost managementHost;
+    //    private ManagementHost managementHost;
 
 
     public void setSecurityManager( final SecurityManager securityManager )
     {
         this.securityManager = securityManager;
     }
-//
-//
-//    public void setManagementHost( final ManagementHost managementHost )
-//    {
-//        this.managementHost = managementHost;
-//    }
+    //
+    //
+    //    public void setManagementHost( final ManagementHost managementHost )
+    //    {
+    //        this.managementHost = managementHost;
+    //    }
 
 
     public void setKeyManager( final KeyManager keyManager )
@@ -151,11 +153,11 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    @Override
-    public User getUser( String username )
-    {
-        return userDataService.findByUsername( username );
-    }
+    //    @Override
+    //    public User getUser( String username )
+    //    {
+    //        return userDataService.findByUsername( username );
+    //    }
 
 
     @Override
@@ -164,51 +166,45 @@ public class IdentityManagerImpl implements IdentityManager
         SubutaiLoginContext loginContext = getSubutaiLoginContext();
         LOG.debug( String.format( "Login context: [%s] ", loginContext ) );
 
-
-        String username = null;
-        if ( loginContext != null && isAuthenticated( loginContext.getSessionId() ) )
+        if ( loginContext instanceof NullSubutaiLoginContext )
         {
-            username = loginContext.getUsername();
+            return null;
+        }
+
+        if ( isAuthenticated( loginContext.getSessionId() ) )
+        {
+            return userDataService.findByUsername( loginContext.getUsername() );
         }
         else
         {
-            Serializable sessionId = SecurityUtil.getSessionId();
-            Subject subject = getSubject( sessionId );
-            if ( subject != null )
-            {
-                username = subject.getPrincipal().toString();
-            }
+            return null;
         }
-
-        return username != null ? userDataService.findByUsername( username ) : null;
     }
 
 
     private SubutaiLoginContext getSubutaiLoginContext()
     {
         SubutaiLoginContext loginContext = SubutaiThreadContext.get();
-        //TODO: implement login context for cli too
-        return loginContext;
+        return loginContext instanceof NullSubutaiLoginContext ? SecurityUtil.getSubutaiLoginContext() : loginContext;
     }
 
 
-    @Override
-    public Subject login( final AuthenticationToken token )
-    {
-
-        SecurityUtils.setSecurityManager( securityManager );
-        Subject subject = SecurityUtils.getSubject();
-        subject.login( token );
-        //        UserIdMdcHelper.set( subject.getSession().getId() );
-        return subject;
-    }
+    //    @Override
+    //    public Subject login( final AuthenticationToken token )
+    //    {
+    //
+    //        SecurityUtils.setSecurityManager( securityManager );
+    //        Subject subject = SecurityUtils.getSubject();
+    //        subject.login( token );
+    //        //        UserIdMdcHelper.set( subject.getSession().getId() );
+    //        return subject;
+    //    }
 
 
     @Override
     public Serializable login( final String username, final String password )
     {
         UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken( username, password );
-        SecurityUtils.setSecurityManager( securityManager );
         Subject subject = SecurityUtils.getSubject();
         subject.login( usernamePasswordToken );
 
@@ -216,8 +212,7 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    @Override
-    public boolean isAuthenticated( final Serializable sessionId )
+    private boolean isAuthenticated( final Serializable sessionId )
     {
 
         Subject subject = getSubject( sessionId );
@@ -230,7 +225,25 @@ public class IdentityManagerImpl implements IdentityManager
     public boolean isAuthenticated()
     {
         SubutaiLoginContext loginContext = getSubutaiLoginContext();
-        return isAuthenticated( loginContext.getSessionId() );
+
+        return !( loginContext instanceof NullSubutaiLoginContext ) && isAuthenticated( loginContext.getSessionId() );
+    }
+
+
+    @Override
+    public Set<String> getRoles( final Serializable shiroSessionId )
+    {
+        Set<String> result = new HashSet<>();
+        Subject subject = getSubject( shiroSessionId );
+
+        for ( String role : IdentityManager.ROLES )
+        {
+            if ( subject.hasRole( role ) )
+            {
+                result.add( role );
+            }
+        }
+        return result;
     }
 
 

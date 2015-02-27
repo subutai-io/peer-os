@@ -1,15 +1,14 @@
 package org.safehaus.subutai.core.peer.cli;
 
 
-import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.common.util.SecurityUtil;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
+import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -19,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.apache.shiro.subject.Subject;
 
 
 @Command( scope = "peer", name = "hosts" )
@@ -52,15 +50,8 @@ public class HostsCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Serializable sessionId = SecurityUtil.getSessionId();
 
-        log.debug( String.format( "Session ID: %s", sessionId ) );
-
-        Subject subject = identityManager.getSubject( sessionId );
-
-        log.debug( String.format( "Subject: %s", subject ) );
-
-        identityManager.getUser( subject.getPrincipal().toString() );
+        User user = identityManager.getUser();
 
         LocalPeer localPeer = peerManager.getLocalPeer();
         //        localPeer.init();
@@ -71,7 +62,8 @@ public class HostsCommand extends OsgiCommandSupport
             return null;
         }
 
-        System.out.println( "Time:" + fmt.format( System.currentTimeMillis() ) );
+        System.out.println( String.format( "Current user %s. Time: %s", user.getUsername(),
+                fmt.format( System.currentTimeMillis() ) ) );
         System.out.println( "List of hosts in local peer:" );
         print( managementHost, "" );
         for ( ResourceHost resourceHost : localPeer.getResourceHosts() )

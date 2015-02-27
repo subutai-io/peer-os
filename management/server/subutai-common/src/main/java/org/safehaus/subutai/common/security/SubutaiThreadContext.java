@@ -23,6 +23,7 @@ public class SubutaiThreadContext
 
     public static SubutaiLoginContext get()
     {
-        return context.get();
+        SubutaiLoginContext result = context.get();
+        return result == null ? NullSubutaiLoginContext.getInstance(): result;
     }
 }

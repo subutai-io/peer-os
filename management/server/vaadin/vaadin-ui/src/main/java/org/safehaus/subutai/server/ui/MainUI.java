@@ -25,6 +25,7 @@ import java.util.Locale;
 
 import javax.naming.NamingException;
 
+import org.safehaus.subutai.common.security.NullSubutaiLoginContext;
 import org.safehaus.subutai.common.security.SubutaiLoginContext;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.ServiceLocator;
@@ -251,28 +252,23 @@ public class MainUI extends UI implements ViewChangeListener
     public boolean beforeViewChange( final ViewChangeListener.ViewChangeEvent event )
     {
         helpManager.closeAll();
-
-        SubutaiLoginContext loginContext = ( SubutaiLoginContext ) VaadinService.getCurrentRequest().getWrappedSession()
-                                                                                .getAttribute(
-                                                                                        SubutaiLoginContext
-                                                                                                .SUBUTAI_LOGIN_CONTEXT_NAME );
-        LOG.debug(
-                String.format( "Current user: %s", loginContext != null ? loginContext.getUsername() : "ANONYMOUS" ) );
+        SubutaiLoginContext loginContext = SubutaiVaadinUtils.getSubutaiLoginContext();
+        LOG.debug( String.format( "Current subutai login context: %s", loginContext ) );
         LOG.debug( String.format( "View: %s", event.getViewName() ) );
 
-        boolean isAuthenticated;
+        boolean isAuthenticated = false;
 
-        try
+        if ( !( loginContext instanceof NullSubutaiLoginContext ) )
         {
-            IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-
-
-            isAuthenticated = loginContext != null && identityManager.isAuthenticated( loginContext.getSessionId() );
-        }
-        catch ( NamingException e )
-        {
-            LOG.error( e.toString(), e );
-            isAuthenticated = false;
+            try
+            {
+                IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+                isAuthenticated = identityManager.isAuthenticated();
+            }
+            catch ( NamingException e )
+            {
+                LOG.error( e.toString(), e );
+            }
         }
 
         if ( isAuthenticated && event.getViewName().equals( "" ) )
