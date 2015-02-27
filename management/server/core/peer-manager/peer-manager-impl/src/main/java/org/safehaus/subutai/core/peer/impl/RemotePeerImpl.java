@@ -914,7 +914,7 @@ public class RemotePeerImpl implements RemotePeer
 
         //wait for response here
         MessageResponse messageResponse =
-                messageResponseListener.waitResponse( messageRequest.getId(), requestTimeout, responseTimeout );
+                messageResponseListener.waitResponse( messageRequest, requestTimeout, responseTimeout );
 
         if ( messageResponse != null )
         {
@@ -951,6 +951,8 @@ public class RemotePeerImpl implements RemotePeer
         MessageRequest messageRequest =
                 new MessageRequest( new Payload( request, localPeer.getId() ), recipient, headers );
         Message message = messenger.createMessage( messageRequest );
+
+        messageRequest.setMessageId( message.getId() );
 
         try
         {
