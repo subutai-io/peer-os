@@ -1,3 +1,4 @@
+#!/bin/bash
 HBASE_CONF=/etc/hbase/
 
 usage="Usage: master.sh \"List of machine names which will be HQourumPeer, do NOT use comma between machine names\""
