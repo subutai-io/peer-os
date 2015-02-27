@@ -30,6 +30,9 @@
              interface="org.safehaus.subutai.core.lxc.quota.api.QuotaManager" />
   <reference id="monitor" availability="optional"
              interface="org.safehaus.subutai.core.metric.api.Monitor" />
+  <reference id="identityManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
+
 
   <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
         class="org.safehaus.subutai.core.peer.impl.PeerManagerImpl">
@@ -40,6 +43,7 @@
     <property name="monitor" ref="monitor" />
     <property name="commandExecutor" ref="commandExecutor" />
     <property name="daoManager" ref="daoManagerPeer" />
+    <property name="identityManager" ref="identityManager" />
     <argument ref="messenger" />
   </bean>
 
