@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# Exit on error
+set -e
+
+# Remove Subutai Files and Folders
+if [ -d "/opt/subutai-management" ]; then
+        echo "/opt/subutai exists!"
+	rm -r /opt/subutai-management
+else
+        echo "/opt/subutai-management does not exist!"
+fi
+#Remove paths and exports from relevant files
+FilePath="/etc/profile"
+subutaiHome="\/opt\/subutai-management"
+
+if grep -q "export SUBUTAI_MANAGEMENT_HOME=" $FilePath
+then
+        echo "subutai-management home is being deleted!"
+        sed -i "/export SUBUTAI_MANAGEMENT_HOME=$subutaiHome/d" $FilePath
+else
+        echo "subutai-management home does not exist"
+fi
+
+if [ -f "/etc/init.d/subutai-management" ]; then
+	rm  /etc/init.d/subutai-management
+fi
+
+if [ -f "/opt/subutai-management" ]; then
+        sudo rm -rf /opt/subutai-management
+fi
+. $FilePath

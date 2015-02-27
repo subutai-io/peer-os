@@ -108,6 +108,13 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/jetty">
+      <action class="org.safehaus.subutai.core.peer.cli.JettyCommand">
+      </action>
+    </command>
+  </command-bundle>
+
   <reference id="peerManager" availability="mandatory" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
   <reference id="identityManager" availability="mandatory"
              interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
