@@ -240,8 +240,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         Preconditions.checkNotNull( template, "Invalid template" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerName ), "Invalid container name" );
 
-        LOG.debug(
-                String.format( "Current user: %s %s", identityManager.getUser(), identityManager.isAuthenticated() ) );
         getResourceHostByName( resourceHost.getHostname() );
 
         if ( templateRegistry.getTemplate( template.getTemplateName() ) == null )
@@ -266,8 +264,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     {
 
         Preconditions.checkNotNull( request, "Invalid request" );
-        LOG.debug(
-                String.format( "Current user: %s %s", identityManager.getUser(), identityManager.isAuthenticated() ) );
 
         //check if strategy exists
         try
