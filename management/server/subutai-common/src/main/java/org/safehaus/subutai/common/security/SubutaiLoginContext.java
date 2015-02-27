@@ -7,13 +7,9 @@ package org.safehaus.subutai.common.security;
 public class SubutaiLoginContext
 {
     public static String SUBUTAI_LOGIN_CONTEXT_NAME = SubutaiLoginContext.class.getName();
-    private String sessionId = "*UNKNOWN*";
-    private String username = "*UNKNOWN*";
-    private String remoteAddress = "*UNKNOWN*";
-
-    public SubutaiLoginContext()
-    {
-    }
+    protected String sessionId;
+    protected String username;
+    protected String remoteAddress;
 
 
     public SubutaiLoginContext( final String sessionId, final String username, final String remoteAddress )

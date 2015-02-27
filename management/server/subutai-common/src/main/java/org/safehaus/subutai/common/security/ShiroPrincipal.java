@@ -1,29 +1,28 @@
 package org.safehaus.subutai.common.security;
 
 
-import java.io.Serializable;
 import java.security.Principal;
 
 
 /**
- * Shiro session id
+ * Shiro principal to store SubutaiLoginContext
  */
 public class ShiroPrincipal implements Principal
 {
-    private static String PRINCIPAL_NAME = "SHIRO_SESSION_ID";
+    private static String PRINCIPAL_NAME = SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME;
 
-    private Serializable sessionId;
+    private SubutaiLoginContext loginContext;
 
 
-    public ShiroPrincipal( final Serializable subject )
+    public ShiroPrincipal( final SubutaiLoginContext loginContext )
     {
-        this.sessionId = subject;
+        this.loginContext = loginContext;
     }
 
 
-    public Serializable getSessionId()
+    public SubutaiLoginContext getSubutaiLoginContext()
     {
-        return sessionId;
+        return loginContext;
     }
 
 
