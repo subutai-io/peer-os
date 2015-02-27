@@ -69,7 +69,7 @@ public class DestroyContainerTask implements Runnable
                 {
                     boolean skipError = false;
                     if ( e.getCause() != null && e.getCause().getMessage().contains(
-                            "HTTPException: org.safehaus.subutai.core.peer.api.HostNotFoundException" ) )
+                            "org.safehaus.subutai.core.peer.api.HostNotFoundException" ) )
                     {
                         //skip error since host is not found
                         skipError = true;
