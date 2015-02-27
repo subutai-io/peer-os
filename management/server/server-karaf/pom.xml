@@ -156,6 +156,7 @@
             <feature>jndi</feature>
             <feature>transaction</feature>
             <feature>jdbc</feature>
+            <feature>shiro-core</feature>
           </bootFeatures>
         </configuration>
         <executions>
@@ -172,6 +173,7 @@
                 <descriptor>mvn:org.apache.karaf.features/enterprise/${karaf.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/spring/${karaf.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.cxf.karaf/apache-cxf/${org.apache.cxf.version}/xml/features</descriptor>
+                <descriptor>mvn:org.apache.shiro/shiro-features/${org.apache.shiro.version}/xml/features</descriptor>
                 <descriptor>mvn:org.safehaus.subutai/subutai-application/${project.version}/xml/features</descriptor>
               </descriptors>
               <features>
@@ -180,6 +182,7 @@
                 <feature>war</feature>
                 <feature>ssh</feature>
                 <feature>cxf</feature>
+                <feature>shiro-core</feature>
                 <feature>jdbc</feature>
                 <feature>openjpa</feature>
                 <feature>subutai-application</feature>
