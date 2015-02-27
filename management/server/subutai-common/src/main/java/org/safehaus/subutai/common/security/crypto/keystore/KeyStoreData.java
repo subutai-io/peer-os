@@ -1,6 +1,8 @@
 package org.safehaus.subutai.common.security.crypto.keystore;
 
-import org.safehaus.subutai.common.settings.Common;
+
+import org.safehaus.subutai.common.settings.SecuritySettings;
+
 
 public class KeyStoreData
 {
@@ -20,11 +22,11 @@ public class KeyStoreData
 	public void setupKeyStorePx1()
 	{
 		keyStoreType       = KeyStoreType.JKS;
-		keyStoreFile       = Common.KEYSTORE_PX1_FILE;
-		password           = Common.KEYSTORE_PX1_PSW;
-		alias              = Common.KEYSTORE_PX1_ROOT_ALIAS;
-		importFileLocation = Common.CERT_IMPORT_DIR;
-		exportFileLocation = Common.CERT_EXPORT_DIR;
+		keyStoreFile = SecuritySettings.KEYSTORE_PX1_FILE;
+		password = SecuritySettings.KEYSTORE_PX1_PSW;
+		alias = SecuritySettings.KEYSTORE_PX1_ROOT_ALIAS;
+		importFileLocation = SecuritySettings.CERT_IMPORT_DIR;
+		exportFileLocation = SecuritySettings.CERT_EXPORT_DIR;
 	}
 
 	/*
@@ -33,11 +35,11 @@ public class KeyStoreData
 	public void setupKeyStorePx2()
 	{
 		keyStoreType = KeyStoreType.JKS;
-		keyStoreFile = Common.KEYSTORE_PX2_FILE;
-		password     = Common.KEYSTORE_PX2_PSW;
-		alias        = Common.KEYSTORE_PX2_ROOT_ALIAS;
-		importFileLocation = Common.CERT_IMPORT_DIR;
-		exportFileLocation = Common.CERT_EXPORT_DIR;
+		keyStoreFile = SecuritySettings.KEYSTORE_PX2_FILE;
+		password = SecuritySettings.KEYSTORE_PX2_PSW;
+		alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
+		importFileLocation = SecuritySettings.CERT_IMPORT_DIR;
+		exportFileLocation = SecuritySettings.CERT_EXPORT_DIR;
 	}
 
 	/*
@@ -46,11 +48,11 @@ public class KeyStoreData
 	public void setupTrustStorePx1()
 	{
 		keyStoreType       = KeyStoreType.JKS;
-		keyStoreFile       = Common.TRUSTSTORE_PX1_FILE;
-		password    	   = Common.TRUSTSTORE_PX1_PSW;
-		alias        	   = Common.TRUSTSTORE_PX1_ROOT_ALIAS;
-		importFileLocation = Common.CERT_IMPORT_DIR;
-		exportFileLocation = Common.CERT_EXPORT_DIR;
+		keyStoreFile = SecuritySettings.TRUSTSTORE_PX1_FILE;
+		password = SecuritySettings.TRUSTSTORE_PX1_PSW;
+		alias = SecuritySettings.TRUSTSTORE_PX1_ROOT_ALIAS;
+		importFileLocation = SecuritySettings.CERT_IMPORT_DIR;
+		exportFileLocation = SecuritySettings.CERT_EXPORT_DIR;
 	}
 	/*
 	 * **********************************************************************
@@ -58,11 +60,11 @@ public class KeyStoreData
 	public void setupTrustStorePx2()
 	{
 		keyStoreType = KeyStoreType.JKS;
-		keyStoreFile = Common.TRUSTSTORE_PX2_FILE;
-		password     = Common.TRUSTSTORE_PX2_PSW;
-		alias        = Common.TRUSTSTORE_PX2_ROOT_ALIAS;
-		importFileLocation = Common.CERT_IMPORT_DIR;
-		exportFileLocation = Common.CERT_EXPORT_DIR;
+		keyStoreFile = SecuritySettings.TRUSTSTORE_PX2_FILE;
+		password = SecuritySettings.TRUSTSTORE_PX2_PSW;
+		alias = SecuritySettings.TRUSTSTORE_PX2_ROOT_ALIAS;
+		importFileLocation = SecuritySettings.CERT_IMPORT_DIR;
+		exportFileLocation = SecuritySettings.CERT_EXPORT_DIR;
 	}
 
 	/*
