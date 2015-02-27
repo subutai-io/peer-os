@@ -36,7 +36,6 @@ public interface PeerManager
 
     public List<Peer> getPeers();
 
-
     public LocalPeer getLocalPeer();
 
     public void addRequestListener( RequestListener listener );

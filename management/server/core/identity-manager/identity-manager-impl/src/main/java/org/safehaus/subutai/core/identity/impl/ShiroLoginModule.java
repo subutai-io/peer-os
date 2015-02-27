@@ -2,9 +2,10 @@ package org.safehaus.subutai.core.identity.impl;
 
 
 import java.io.IOException;
-import java.security.Principal;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.naming.NamingException;
 import javax.security.auth.Subject;
@@ -16,6 +17,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginException;
 
 import org.safehaus.subutai.common.security.ShiroPrincipal;
+import org.safehaus.subutai.common.security.SubutaiLoginContext;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.slf4j.Logger;
@@ -25,7 +27,6 @@ import org.apache.karaf.jaas.boot.principal.RolePrincipal;
 import org.apache.karaf.jaas.boot.principal.UserPrincipal;
 import org.apache.karaf.jaas.config.JaasRealm;
 import org.apache.karaf.jaas.modules.AbstractKarafLoginModule;
-import org.apache.shiro.authc.UsernamePasswordToken;
 
 
 /**
@@ -34,8 +35,8 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 public class ShiroLoginModule extends AbstractKarafLoginModule
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( ShiroLoginModule.class.getName() );
-    private static final String[] KARAF_ROLES = { "admin", "manager", "viewer" };
-    org.apache.shiro.subject.Subject shiroSubject;
+
+    private Serializable sessionId;
 
 
     public void initialize( Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
@@ -82,25 +83,21 @@ public class ShiroLoginModule extends AbstractKarafLoginModule
             tmpPassword = new char[0];
         }
         String password = new String( tmpPassword );
-        principals = new HashSet<Principal>();
+        principals = new HashSet<>();
 
         try
         {
-            UsernamePasswordToken token = new UsernamePasswordToken( user, password );
-
             IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-            shiroSubject = identityManager.login( token );
+            sessionId = identityManager.login( user, password );
             LOGGER.debug( "Login success." );
 
             principals.add( new UserPrincipal( user ) );
-            principals.add( new ShiroPrincipal( shiroSubject.getSession().getId() ) );
-
-            for ( String roleName : KARAF_ROLES )
+            SubutaiLoginContext loginContext = new SubutaiLoginContext( sessionId.toString(), user, "127.0.0.1" );
+            principals.add( new ShiroPrincipal( loginContext ) );
+            Set<String> roles = identityManager.getRoles( sessionId );
+            for ( String roleName : roles )
             {
-                if ( shiroSubject.hasRole( roleName ) )
-                {
-                    principals.add( new RolePrincipal( roleName ) );
-                }
+                principals.add( new RolePrincipal( roleName ) );
             }
         }
         catch ( Exception e )
@@ -138,7 +135,7 @@ public class ShiroLoginModule extends AbstractKarafLoginModule
         try
         {
             IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-            identityManager.logout( shiroSubject.getSession().getId() );
+            identityManager.logout( sessionId );
         }
         catch ( NamingException e )
         {
