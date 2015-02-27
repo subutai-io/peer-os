@@ -185,12 +185,7 @@ public class IdentityManagerImpl implements IdentityManager
     private SubutaiLoginContext getSubutaiLoginContext()
     {
         SubutaiLoginContext loginContext = SubutaiThreadContext.get();
-        if ( loginContext instanceof NullSubutaiLoginContext )
-        {
-            loginContext = SecurityUtil.getSubutaiLoginContext();
-        }
-
-        return loginContext;
+        return loginContext instanceof NullSubutaiLoginContext ? SecurityUtil.getSubutaiLoginContext() : loginContext;
     }
 
 
@@ -230,7 +225,8 @@ public class IdentityManagerImpl implements IdentityManager
     public boolean isAuthenticated()
     {
         SubutaiLoginContext loginContext = getSubutaiLoginContext();
-        return isAuthenticated( loginContext.getSessionId() );
+
+        return !( loginContext instanceof NullSubutaiLoginContext ) && isAuthenticated( loginContext.getSessionId() );
     }
 
 

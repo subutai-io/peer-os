@@ -6,18 +6,17 @@ package org.safehaus.subutai.common.security;
  */
 public class NullSubutaiLoginContext extends SubutaiLoginContext
 {
-    public NullSubutaiLoginContext()
+    private static NullSubutaiLoginContext instance = new NullSubutaiLoginContext( "NULL", "NULL", "NULL" );
+
+
+    private NullSubutaiLoginContext( final String sessionId, final String username, final String remoteAddress )
     {
-        super( "*UNKNOWN*", "*UNKNOWN*", "*UNKNOWN*" );
+        super( sessionId, username, remoteAddress );
     }
 
-    @Override
-    public String toString()
+
+    public static SubutaiLoginContext getInstance()
     {
-        return "NullSubutaiLoginContext{" +
-                "sessionId='" + sessionId + '\'' +
-                ", username='" + username + '\'' +
-                ", remoteAddress='" + remoteAddress + '\'' +
-                '}';
+        return instance;
     }
 }

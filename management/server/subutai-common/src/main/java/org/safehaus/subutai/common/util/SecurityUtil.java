@@ -18,19 +18,19 @@ import org.safehaus.subutai.common.security.SubutaiLoginContext;
 public abstract class SecurityUtil
 {
     /**
-     * Retrives shiro session ID from karaf session.
+     * Retrieves SubutaiLoginContext object from karaf session.
      */
     public static SubutaiLoginContext getSubutaiLoginContext()
     {
-        SubutaiLoginContext nullResult = new NullSubutaiLoginContext();
+        SubutaiLoginContext nullLoginContext = NullSubutaiLoginContext.getInstance();
         AccessControlContext acc = AccessController.getContext();
         Subject subject = Subject.getSubject( acc );
         if ( subject == null )
         {
-            return nullResult;
+            return nullLoginContext;
         }
         Set<ShiroPrincipal> shiroPrincipal = subject.getPrincipals( ShiroPrincipal.class );
 
-        return shiroPrincipal.isEmpty() ? nullResult : shiroPrincipal.iterator().next().getSubutaiLoginContext();
+        return shiroPrincipal.isEmpty() ? nullLoginContext : shiroPrincipal.iterator().next().getSubutaiLoginContext();
     }
 }

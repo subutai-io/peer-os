@@ -4,6 +4,7 @@ package org.safehaus.subutai.server.ui.views;
 import java.io.Serializable;
 
 import org.safehaus.subutai.common.security.SubutaiLoginContext;
+import org.safehaus.subutai.common.security.SubutaiThreadContext;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.server.ui.MainUI;
@@ -124,12 +125,16 @@ public class LoginView extends VerticalLayout implements View
                     Serializable sessionId = identityManager.login( username.getValue(), password.getValue() );
 
                     VaadinRequest request = VaadinService.getCurrentRequest();
-                    request.getWrappedSession().setAttribute( SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME,
+                    SubutaiLoginContext loginContext =
                             new SubutaiLoginContext( sessionId.toString(), username.getValue(),
-                                    request.getRemoteAddr() ) );
+                                    request.getRemoteAddr() );
+
+                    request.getWrappedSession()
+                           .setAttribute( SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME, loginContext );
+                    SubutaiThreadContext.set( loginContext );
 
                     mainUI.getUsername().setValue( username.getValue() );
-                    VaadinService.reinitializeSession( VaadinService.getCurrentRequest() );
+                    VaadinService.reinitializeSession( request );
                     getUI().getNavigator().navigateTo( "/core" );
                 }
                 catch ( Exception e )

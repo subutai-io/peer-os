@@ -17,7 +17,14 @@ public abstract class SubutaiVaadinUtils
     public static SubutaiLoginContext getSubutaiLoginContext()
     {
         VaadinRequest request = VaadinService.getCurrentRequest();
-        return request != null ? ( SubutaiLoginContext ) request.getWrappedSession().getAttribute(
-                SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME ) : new NullSubutaiLoginContext();
+        SubutaiLoginContext loginContext = NullSubutaiLoginContext.getInstance();
+
+        if ( request != null
+                && request.getWrappedSession().getAttribute( SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME ) != null )
+        {
+            loginContext = ( SubutaiLoginContext ) request.getWrappedSession().getAttribute(
+                    SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME );
+        }
+        return loginContext;
     }
 }
