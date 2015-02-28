@@ -1,12 +1,10 @@
 package org.safehaus.subutai.common.helper;
 
 
+import org.safehaus.subutai.common.security.SubutaiLoginContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 
 import com.google.common.base.Strings;
 
@@ -28,17 +26,17 @@ public class UserIdMdcHelper
         return !( Strings.isNullOrEmpty( userId ) || UNKNOWN.equals( userId ) );
     }
 
+    //
+    //    public static void setIfNeeded()
+    //    {
+    //        if ( !isSet() )
+    //        {
+    //            set();
+    //        }
+    //    }
 
-    public static void setIfNeeded()
-    {
-        if ( !isSet() )
-        {
-            set();
-        }
-    }
 
-
-    public static void set( final Subject subject )
+    public static void set( final SubutaiLoginContext subject )
     {
         checkNotNull( subject );
         String userId = userId( subject );
@@ -47,32 +45,24 @@ public class UserIdMdcHelper
     }
 
 
-    static String userId( final Subject subject )
+    static String userId( final SubutaiLoginContext subject )
     {
-        if ( subject != null )
-        {
-            Object principal = subject.getPrincipal();
-            if ( principal != null )
-            {
-                return principal.toString();
-            }
-        }
-        return UNKNOWN;
+        return subject.getUsername();
     }
 
 
-    public static void set()
-    {
-        Subject subject = SecurityUtils.getSubject();
-        if ( subject == null )
-        {
-            MDC.put( KEY, UNKNOWN );
-        }
-        else
-        {
-            set( subject );
-        }
-    }
+    //    public static void set()
+    //    {
+    //        Subject subject = SecurityUtils.getSubject();
+    //        if ( subject == null )
+    //        {
+    //            MDC.put( KEY, UNKNOWN );
+    //        }
+    //        else
+    //        {
+    //            set( subject );
+    //        }
+    //    }
 
 
     public static String get()

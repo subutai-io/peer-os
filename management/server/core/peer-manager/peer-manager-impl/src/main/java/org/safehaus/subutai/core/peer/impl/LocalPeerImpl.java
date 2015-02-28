@@ -49,6 +49,7 @@ import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
@@ -82,6 +83,7 @@ import org.safehaus.subutai.core.strategy.api.StrategyNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
@@ -108,6 +110,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     private StrategyManager strategyManager;
     private QuotaManager quotaManager;
     private Monitor monitor;
+    private IdentityManager identityManager;
     private ManagementHostDataService managementHostDataService;
     private ResourceHostDataService resourceHostDataService;
     private ContainerHostDataService containerHostDataService;
@@ -119,7 +122,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
     public LocalPeerImpl( PeerManager peerManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
                           StrategyManager strategyManager, Set<RequestListener> requestListeners,
-                          CommandExecutor commandExecutor, HostRegistry hostRegistry, Monitor monitor )
+                          CommandExecutor commandExecutor, HostRegistry hostRegistry, Monitor monitor,
+                          IdentityManager identityManager )
 
     {
         this.strategyManager = strategyManager;
@@ -130,6 +134,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         this.requestListeners = requestListeners;
         this.commandExecutor = commandExecutor;
         this.hostRegistry = hostRegistry;
+        this.identityManager = identityManager;
     }
 
 
@@ -1385,67 +1390,68 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        Set<Exception> errors = Sets.newHashSet();
+        Set<Throwable> errors = Sets.newHashSet();
         Set<UUID> destroyedContainersIds = Sets.newHashSet();
+        ContainerGroup containerGroup;
 
         try
         {
-            ContainerGroup containerGroup = findContainerGroupByEnvironmentId( environmentId );
-
-            Set<ContainerHost> containerHosts = Sets.newHashSet();
-
-            for ( UUID containerId : containerGroup.getContainerIds() )
-            {
-                try
-                {
-                    containerHosts.add( getContainerHostById( containerId ) );
-                }
-                catch ( HostNotFoundException e )
-                {
-                    errors.add( e );
-                }
-            }
-
-            if ( !containerHosts.isEmpty() )
-            {
-                List<Future<UUID>> taskFutures = Lists.newArrayList();
-                ExecutorService executorService = Executors.newFixedThreadPool( containerHosts.size() );
-
-                for ( ContainerHost containerHost : containerHosts )
-                {
-
-                    taskFutures.add( executorService.submit( new DestroyContainerWrapperTask( this, containerHost ) ) );
-                }
-
-                for ( Future<UUID> taskFuture : taskFutures )
-                {
-                    try
-                    {
-                        destroyedContainersIds.add( taskFuture.get() );
-                    }
-                    catch ( ExecutionException | InterruptedException e )
-                    {
-                        errors.add( e );
-                    }
-                }
-
-
-                executorService.shutdown();
-            }
-
-            String exception = null;
-
-            if ( !errors.isEmpty() )
-            {
-                exception = String.format( "There were errors while destroying containers: %s", errors );
-            }
-
-            return new ContainersDestructionResultImpl( destroyedContainersIds, exception );
+            containerGroup = findContainerGroupByEnvironmentId( environmentId );
         }
         catch ( ContainerGroupNotFoundException e )
         {
-            throw new PeerException( e );
+            return new ContainersDestructionResultImpl( getId(), destroyedContainersIds, "Container group not found" );
         }
+
+        Set<ContainerHost> containerHosts = Sets.newHashSet();
+
+        for ( UUID containerId : containerGroup.getContainerIds() )
+        {
+            try
+            {
+                containerHosts.add( getContainerHostById( containerId ) );
+            }
+            catch ( HostNotFoundException e )
+            {
+                errors.add( e );
+            }
+        }
+
+        if ( !containerHosts.isEmpty() )
+        {
+            List<Future<UUID>> taskFutures = Lists.newArrayList();
+            ExecutorService executorService = Executors.newFixedThreadPool( containerHosts.size() );
+
+            for ( ContainerHost containerHost : containerHosts )
+            {
+
+                taskFutures.add( executorService.submit( new DestroyContainerWrapperTask( this, containerHost ) ) );
+            }
+
+            for ( Future<UUID> taskFuture : taskFutures )
+            {
+                try
+                {
+                    destroyedContainersIds.add( taskFuture.get() );
+                }
+                catch ( ExecutionException | InterruptedException e )
+                {
+                    errors.add( ExceptionUtils.getRootCause( e ) );
+                }
+            }
+
+
+            executorService.shutdown();
+        }
+
+        String exception = null;
+
+        if ( !errors.isEmpty() )
+        {
+            exception = String.format( "There were errors while destroying containers: %s", errors );
+        }
+
+        return new ContainersDestructionResultImpl( getId(), destroyedContainersIds, exception );
     }
 
 

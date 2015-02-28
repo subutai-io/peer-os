@@ -128,9 +128,8 @@ public class ContainersWindow extends Window
                             }
                             catch ( PeerException e )
                             {
-                                Notification.show( String
-                                        .format( "Error starting container %s: %s", containerHost.getHostname(), e ),
-                                        Notification.Type.ERROR_MESSAGE );
+                                Notification.show( String.format( "Error starting container %s: %s",
+                                                containerHost.getHostname(), e ), Notification.Type.ERROR_MESSAGE );
                             }
                             finally
                             {
@@ -203,9 +202,8 @@ public class ContainersWindow extends Window
                             }
                             catch ( PeerException e )
                             {
-                                Notification.show( String
-                                        .format( "Error destroying container %s: %s", containerHost.getHostname(), e ),
-                                        Notification.Type.ERROR_MESSAGE );
+                                Notification.show( String.format( "Error destroying container %s: %s",
+                                                containerHost.getHostname(), e ), Notification.Type.ERROR_MESSAGE );
                             }
                             finally
                             {
@@ -234,6 +232,7 @@ public class ContainersWindow extends Window
     {
         if ( environment.getStatus() != EnvironmentStatus.UNDER_MODIFICATION )
         {
+            updateContainersTable();
             containersTable.setEnabled( true );
         }
     }

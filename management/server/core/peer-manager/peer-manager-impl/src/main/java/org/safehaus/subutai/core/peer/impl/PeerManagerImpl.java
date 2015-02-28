@@ -21,6 +21,7 @@ import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
+import org.safehaus.subutai.common.peer.PeerPolicy;
 import org.safehaus.subutai.common.security.SecurityProvider;
 import org.safehaus.subutai.common.security.crypto.certificate.CertificateData;
 import org.safehaus.subutai.common.security.crypto.certificate.CertificateManager;
@@ -29,6 +30,7 @@ import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.key.api.KeyInfo;
 import org.safehaus.subutai.core.key.api.KeyManager;
 import org.safehaus.subutai.core.key.api.KeyManagerException;
@@ -82,6 +84,7 @@ public class PeerManagerImpl implements PeerManager
     private HostRegistry hostRegistry;
     private DaoManager daoManager;
     private KeyManager keyManager;
+    private IdentityManager identityManager;
 
 
     public PeerManagerImpl( final Messenger messenger )
@@ -111,6 +114,12 @@ public class PeerManagerImpl implements PeerManager
     public void setKeyManager( final KeyManager keyManager )
     {
         this.keyManager = keyManager;
+    }
+
+
+    public void setIdentityManager( final IdentityManager identityManager )
+    {
+        this.identityManager = identityManager;
     }
 
 
@@ -186,7 +195,7 @@ public class PeerManagerImpl implements PeerManager
             peerInfo = result.get( 0 );
         }
         localPeer = new LocalPeerImpl( this, templateRegistry, quotaManager, strategyManager, requestListeners,
-                commandExecutor, hostRegistry, monitor );
+                commandExecutor, hostRegistry, monitor, identityManager );
         localPeer.init();
 
         //add command request listener
@@ -197,7 +206,7 @@ public class PeerManagerImpl implements PeerManager
         //subscribe to peer message requests
         messenger.addMessageListener( new MessageRequestListener( this, messenger, requestListeners ) );
         //subscribe to peer message responses
-        messageResponseListener = new MessageResponseListener();
+        messageResponseListener = new MessageResponseListener(messenger);
         messenger.addMessageListener( messageResponseListener );
         //add create container requests listener
         addRequestListener( new CreateContainerGroupRequestListener( localPeer ) );
@@ -243,7 +252,8 @@ public class PeerManagerImpl implements PeerManager
 
 
             X509Certificate certPx1 = certManagerPx1
-                    .generateSelfSignedCertificate( keyStorePx1, keyPairPx1, SecurityProvider.BOUNCY_CASTLE, certDataPx1 );
+                    .generateSelfSignedCertificate( keyStorePx1, keyPairPx1, SecurityProvider.BOUNCY_CASTLE,
+                            certDataPx1 );
 
             keyStoreManager.saveX509Certificate( keyStorePx1, keyStoreDataPx1, certPx1, keyPairPx1 );
         }
@@ -315,8 +325,15 @@ public class PeerManagerImpl implements PeerManager
     public boolean unregister( final String uuid ) throws PeerException
     {
         ManagementHost managementHost = getLocalPeer().getManagementHost();
-        PeerInfo p = getPeerInfo( UUID.fromString( uuid ) );
+        UUID remotePeerId = UUID.fromString( uuid );
+        PeerInfo p = getPeerInfo( remotePeerId );
         managementHost.removeAptSource( p.getId().toString(), p.getIp() );
+        PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( remotePeerId );
+        // Remove peer policy of the target remote peer from the local peer
+        if ( peerPolicy != null ) {
+            localPeer.getPeerInfo().getPeerPolicies().remove( peerPolicy );
+            peerDAO.saveInfo( SOURCE_LOCAL_PEER, localPeer.getId().toString(), localPeer );
+        }
         return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, uuid );
     }
 
@@ -324,7 +341,14 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public boolean update( final PeerInfo peerInfo )
     {
-        return peerDAO.saveInfo( SOURCE_REMOTE_PEER, peerInfo.getId().toString(), peerInfo );
+        String source;
+        if ( peerInfo.getId().compareTo( localPeer.getId() ) == 0 ) {
+            source = SOURCE_LOCAL_PEER;
+        }
+        else {
+            source = SOURCE_REMOTE_PEER;
+        }
+        return peerDAO.saveInfo( source, peerInfo.getId().toString(), peerInfo );
     }
 
 
@@ -353,7 +377,14 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public PeerInfo getPeerInfo( UUID uuid )
     {
-        return peerDAO.getInfo( SOURCE_REMOTE_PEER, uuid.toString(), PeerInfo.class );
+        String source;
+        if ( uuid.compareTo( localPeer.getId() ) == 0 ) {
+            source = SOURCE_LOCAL_PEER;
+        }
+        else {
+            source = SOURCE_REMOTE_PEER;
+        }
+        return peerDAO.getInfo( source, uuid.toString(), PeerInfo.class );
     }
 
 

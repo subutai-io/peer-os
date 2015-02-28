@@ -7,6 +7,8 @@ import java.util.UUID;
 
 public interface ContainersDestructionResult
 {
+    public UUID peerId();
+
     public Set<UUID> getDestroyedContainersIds();
 
     public String getException();

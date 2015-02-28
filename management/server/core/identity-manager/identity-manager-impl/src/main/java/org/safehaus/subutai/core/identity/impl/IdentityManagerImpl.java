@@ -3,10 +3,15 @@ package org.safehaus.subutai.core.identity.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.safehaus.subutai.common.dao.DaoManager;
-import org.safehaus.subutai.common.peer.Host;
+import org.safehaus.subutai.common.security.NullSubutaiLoginContext;
+import org.safehaus.subutai.common.security.SubutaiLoginContext;
+import org.safehaus.subutai.common.security.SubutaiThreadContext;
+import org.safehaus.subutai.common.util.SecurityUtil;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.PermissionGroup;
@@ -19,16 +24,12 @@ import org.safehaus.subutai.core.identity.impl.entity.PermissionEntity;
 import org.safehaus.subutai.core.identity.impl.entity.PermissionPK;
 import org.safehaus.subutai.core.identity.impl.entity.RoleEntity;
 import org.safehaus.subutai.core.identity.impl.entity.UserEntity;
-import org.safehaus.subutai.core.key.api.KeyInfo;
 import org.safehaus.subutai.core.key.api.KeyManager;
-import org.safehaus.subutai.core.key.api.KeyManagerException;
-import org.safehaus.subutai.core.peer.api.HostNotFoundException;
-import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
@@ -51,19 +52,19 @@ public class IdentityManagerImpl implements IdentityManager
     private UserDataService userDataService;
     private PermissionDataService permissionDataService;
     private RoleDataService roleDataService;
-    private PeerManager peerManager;
+    //    private ManagementHost managementHost;
 
 
     public void setSecurityManager( final SecurityManager securityManager )
     {
         this.securityManager = securityManager;
     }
-
-
-    public void setPeerManager( final PeerManager peerManager )
-    {
-        this.peerManager = peerManager;
-    }
+    //
+    //
+    //    public void setManagementHost( final ManagementHost managementHost )
+    //    {
+    //        this.managementHost = managementHost;
+    //    }
 
 
     public void setKeyManager( final KeyManager keyManager )
@@ -80,7 +81,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     public void init()
     {
-        LOG.info( "Initializing security manager..." );
+        LOG.info( "Initializing identity manager..." );
 
         userDataService = new UserDataService( daoManager.getEntityManagerFactory() );
         permissionDataService = new PermissionDataService( daoManager.getEntityManagerFactory() );
@@ -91,7 +92,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         SecurityUtils.setSecurityManager( securityManager );
 
-        LOG.info( String.format( "Security manager initialized: %s", securityManager ) );
+        LOG.info( String.format( "Identity manager initialized: %s", securityManager ) );
     }
 
 
@@ -133,10 +134,9 @@ public class IdentityManagerImpl implements IdentityManager
         user.setSalt( salt );
         user.addRole( adminRole );
         user.addRole( managerRole );
-        generateKey( user );
+        //        generateKey( user );
         userDataService.persist( user );
         LOG.debug( String.format( "User: %s", user.getId() ) );
-
     }
 
 
@@ -153,21 +153,97 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+    //    @Override
+    //    public User getUser( String username )
+    //    {
+    //        return userDataService.findByUsername( username );
+    //    }
+
+
     @Override
-    public User getUser( String username )
+    public User getUser()
     {
-        return userDataService.findByUsername( username );
+        SubutaiLoginContext loginContext = getSubutaiLoginContext();
+        LOG.debug( String.format( "Login context: [%s] ", loginContext ) );
+
+        if ( loginContext instanceof NullSubutaiLoginContext )
+        {
+            return null;
+        }
+
+        if ( isAuthenticated( loginContext.getSessionId() ) )
+        {
+            return userDataService.findByUsername( loginContext.getUsername() );
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+
+    private SubutaiLoginContext getSubutaiLoginContext()
+    {
+        SubutaiLoginContext loginContext = SubutaiThreadContext.get();
+        return loginContext instanceof NullSubutaiLoginContext ? SecurityUtil.getSubutaiLoginContext() : loginContext;
+    }
+
+
+    //    @Override
+    //    public Subject login( final AuthenticationToken token )
+    //    {
+    //
+    //        SecurityUtils.setSecurityManager( securityManager );
+    //        Subject subject = SecurityUtils.getSubject();
+    //        subject.login( token );
+    //        //        UserIdMdcHelper.set( subject.getSession().getId() );
+    //        return subject;
+    //    }
+
+
+    @Override
+    public Serializable login( final String username, final String password )
+    {
+        UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken( username, password );
+        Subject subject = SecurityUtils.getSubject();
+        subject.login( usernamePasswordToken );
+
+        return subject.getSession().getId();
+    }
+
+
+    private boolean isAuthenticated( final Serializable sessionId )
+    {
+
+        Subject subject = getSubject( sessionId );
+
+        return subject != null && subject.isAuthenticated();
     }
 
 
     @Override
-    public Subject login( final AuthenticationToken token )
+    public boolean isAuthenticated()
     {
-        SecurityUtils.setSecurityManager( securityManager );
-        Subject subject = SecurityUtils.getSubject();
-        subject.login( token );
+        SubutaiLoginContext loginContext = getSubutaiLoginContext();
 
-        return subject;
+        return !( loginContext instanceof NullSubutaiLoginContext ) && isAuthenticated( loginContext.getSessionId() );
+    }
+
+
+    @Override
+    public Set<String> getRoles( final Serializable shiroSessionId )
+    {
+        Set<String> result = new HashSet<>();
+        Subject subject = getSubject( shiroSessionId );
+
+        for ( String role : IdentityManager.ROLES )
+        {
+            if ( subject.hasRole( role ) )
+            {
+                result.add( role );
+            }
+        }
+        return result;
     }
 
 
@@ -207,17 +283,17 @@ public class IdentityManagerImpl implements IdentityManager
         user.setSalt( salt );
         user.setPassword( saltedHash( password, salt.getBytes() ) );
 
-        try
-        {
-            Host host = peerManager.getLocalPeer().getManagementHost();
-            KeyInfo keyInfo = keyManager.generateKey( host, fullname, email );
-            user.setKey( keyInfo.getPublicKeyId() );
-            LOG.debug( String.format( "%s", keyInfo.toString() ) );
-        }
-        catch ( HostNotFoundException | KeyManagerException e )
-        {
-            LOG.error( e.toString(), e );
-        }
+        //        try
+        //        {
+        //            Host host = managementHost;
+        //            KeyInfo keyInfo = keyManager.generateKey( host, fullname, email );
+        //            user.setKey( keyInfo.getPublicKeyId() );
+        //            LOG.debug( String.format( "%s", keyInfo.toString() ) );
+        //        }
+        //        catch ( KeyManagerException e )
+        //        {
+        //            LOG.error( e.toString(), e );
+        //        }
 
         userDataService.persist( user );
         return user.getId() != null;
@@ -262,60 +338,60 @@ public class IdentityManagerImpl implements IdentityManager
             user.setPassword( saltedHash( user.getPassword(), ( ( UserEntity ) user ).getSalt().getBytes() ) );
         }
 
-        if ( user.getId() == null )
-        {
-            generateKey( user );
-        }
+        //        if ( user.getId() == null )
+        //        {
+        //            generateKey( user );
+        //        }
 
         userDataService.update( user );
         return true;
     }
 
-
-    private void generateKey( final User user )
-    {
-
-        Host host = null;
-        long threshold = System.currentTimeMillis() + 1000 * 60;
-        do
-        {
-            try
-            {
-                host = peerManager.getLocalPeer().getManagementHost();
-            }
-            catch ( HostNotFoundException ignore )
-            {
-            }
-            try
-            {
-                LOG.debug( String.format( "Waiting for management host...[%s]", host == null ? "OFF" : "ON" ) );
-                Thread.sleep( 1000 );
-            }
-            catch ( InterruptedException ignore )
-            {
-            }
-        }
-        while ( host == null && threshold > System.currentTimeMillis() );
-
-        if ( host != null )
-        {
-            KeyInfo keyInfo = null;
-            try
-            {
-                keyInfo = keyManager.generateKey( host, user.getUsername(), user.getEmail() );
-                user.setKey( keyInfo.getPublicKeyId() );
-                LOG.debug( String.format( "%s", keyInfo.toString() ) );
-            }
-            catch ( KeyManagerException e )
-            {
-                LOG.error( e.toString(), e );
-            }
-        }
-        else
-        {
-            LOG.warn( "Management host not available on generating keys." );
-        }
-    }
+    //
+    //    private void generateKey( final User user )
+    //    {
+    //
+    //        Host host = null;
+    //        long threshold = System.currentTimeMillis() + 1000 * 60;
+    //        do
+    //        {
+    //            try
+    //            {
+    //                host = managementHost;
+    //            }
+    //            catch ( HostNotFoundException ignore )
+    //            {
+    //            }
+    //            try
+    //            {
+    //                LOG.debug( String.format( "Waiting for management host...[%s]", host == null ? "OFF" : "ON" ) );
+    //                Thread.sleep( 1000 );
+    //            }
+    //            catch ( InterruptedException ignore )
+    //            {
+    //            }
+    //        }
+    //        while ( host == null && threshold > System.currentTimeMillis() );
+    //
+    //        if ( host != null )
+    //        {
+    //            KeyInfo keyInfo = null;
+    //            try
+    //            {
+    //                keyInfo = keyManager.generateKey( host, user.getUsername(), user.getEmail() );
+    //                user.setKey( keyInfo.getPublicKeyId() );
+    //                LOG.debug( String.format( "%s", keyInfo.toString() ) );
+    //            }
+    //            catch ( KeyManagerException e )
+    //            {
+    //                LOG.error( e.toString(), e );
+    //            }
+    //        }
+    //        else
+    //        {
+    //            LOG.warn( "Management host not available on generating keys." );
+    //        }
+    //    }
 
 
     private boolean isPasswordChanged( final User user )
