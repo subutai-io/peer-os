@@ -25,10 +25,6 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
-import org.osgi.framework.FrameworkUtil;
 import org.safehaus.subutai.common.security.utils.io.HexUtil;
 import org.safehaus.subutai.common.security.utils.io.SafeCloseUtil;
 import org.slf4j.Logger;
@@ -38,7 +34,6 @@ import org.slf4j.LoggerFactory;
 public class KeyStoreManager
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( KeyStoreManager.class );
-    private final String PAX_WEB_JETTY_BUNDLE_NAME = "org.eclipse.jetty.aggregate.jetty-all-server";
     private FileInputStream finStream = null;
     private FileOutputStream foutStream = null;
 
@@ -185,53 +180,11 @@ public class KeyStoreManager
                     keyStoreData.getPassword().toCharArray(), new java.security.cert.Certificate[] { x509Cert } );
 
             save( keyStore, keyStoreData );
-            //            restartServlet();
         }
         catch ( KeyStoreException e )
         {
             LOGGER.error( "Error setting keyEntry", e );
         }
-    }
-
-
-    private void restartServlet()
-    {
-        LOGGER.error( "Restarting jetty servlet" );
-        new Thread( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    Thread.sleep( 20 * 1000 );
-                }
-                catch ( InterruptedException e )
-                {
-                    LOGGER.error( "Interruption error while restarting thread", e );
-                    return;
-                }
-                //        getBundleContext().getBundles()
-                BundleContext ctx = FrameworkUtil.getBundle( KeyStoreManager.class ).getBundleContext();
-                Bundle[] bundles = ctx.getBundles();
-                for ( Bundle bundle : bundles )
-                {
-                    if ( PAX_WEB_JETTY_BUNDLE_NAME.equals( bundle.getSymbolicName() ) )
-                    {
-                        try
-                        {
-                            bundle.stop();
-                            bundle.start();
-                        }
-                        catch ( BundleException e )
-                        {
-                            LOGGER.error( "Error restarting jetty servlet.", e );
-                        }
-                        break;
-                    }
-                }
-            }
-        } ).start();
     }
 
 
