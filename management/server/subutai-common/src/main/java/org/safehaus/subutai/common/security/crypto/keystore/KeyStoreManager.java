@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 public class KeyStoreManager
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( KeyStoreManager.class );
-    private final String PAX_WEB_JETTY_BUNDLE_NAME = "org.ops4j.pax.web.pax-web-jetty";
+    private final String PAX_WEB_JETTY_BUNDLE_NAME = "org.eclipse.jetty.aggregate.jetty-all-server";
     private FileInputStream finStream = null;
     private FileOutputStream foutStream = null;
 

@@ -13,7 +13,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command( scope = "peer", name = "jetty" )
 public class JettyCommand extends OsgiCommandSupport
 {
-    private final String PAX_WEB_JETTY_BUNDLE_NAME = "org.ops4j.pax.web.pax-web-jetty";
+    private String PAX_WEB_JETTY_BUNDLE_NAME = "org.eclipse.jetty.aggregate.jetty-all-server";
     private static Logger log = LoggerFactory.getLogger( JettyCommand.class );
 
 
