@@ -41,10 +41,9 @@ generate_truststore_certificate() {
     local file_path=$3
     local client_cert="client.cer"
     #first generate certificate
-    keytool -export -alias $alias -file $client_cert -keystore $keystore -storepass subutai
+    $(keytool -export -alias $alias -file $client_cert -keystore $keystore -storepass subutai)
 
-    keytool -import -trustcacerts -alias "" -file $client_cert \
-    -keystore $file_path -storepass subutai -noprompt
+    $(keytool -import -trustcacerts -alias "" -file $client_cert -keystore $file_path -storepass subutai -noprompt)
 	rm $client_cert
 }
 

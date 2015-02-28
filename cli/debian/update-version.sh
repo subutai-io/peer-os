@@ -87,7 +87,7 @@ git checkout -- $changelogFile > /dev/null 2>&1
 #------------------------------------------------------
 #(0) exit if there are uncommitted or unstaged files under the specified directory
 #------------------------------------------------------
-#require_clean_work_directory
+require_clean_work_directory
 #------------------------------------------------------
 #(1) check if there are local commits and they are related with specified path
 #------------------------------------------------------
@@ -129,7 +129,7 @@ sed -i "s/$version/$updatedVersion/1" $changelogFile
 git add .
 git commit -m "Incrementing patch version of $package_name package"
 isSuccesful=$?
-#git push origin $branch_name
+git push origin $branch_name
 isSuccesful=`expr $? + $isSuccesful`
 
 #------------------------------------------------------
