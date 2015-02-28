@@ -218,16 +218,16 @@ public class PeerManagerImpl implements PeerManager
 
         //<<<<<Generate PX1
 
-        KeyStoreData keyStoreDataPx1 = new KeyStoreData();
-
-        keyStoreDataPx1.setupKeyStorePx1();
-        generateCertificateAccordingToKeyStoreData( keyStoreDataPx1, true );
-
-        keyStoreDataPx1.setupKeyStorePx2();
-        generateCertificateAccordingToKeyStoreData( keyStoreDataPx1, true );
-
-        keyStoreDataPx1.setupTrustStorePx2();
-        generateCertificateAccordingToKeyStoreData( keyStoreDataPx1, false );
+        //        KeyStoreData keyStoreDataPx1 = new KeyStoreData();
+        //
+        //        keyStoreDataPx1.setupKeyStorePx1();
+        //        generateCertificateAccordingToKeyStoreData( keyStoreDataPx1, true );
+        //
+        //        keyStoreDataPx1.setupKeyStorePx2();
+        //        generateCertificateAccordingToKeyStoreData( keyStoreDataPx1, true );
+        //
+        //        keyStoreDataPx1.setupTrustStorePx2();
+        //        generateCertificateAccordingToKeyStoreData( keyStoreDataPx1, false );
 
         //>>>>>Generate PX1
     }
