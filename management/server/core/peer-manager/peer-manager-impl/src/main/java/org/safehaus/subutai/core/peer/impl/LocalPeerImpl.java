@@ -83,6 +83,7 @@ import org.safehaus.subutai.core.strategy.api.StrategyNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
@@ -240,8 +241,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         Preconditions.checkNotNull( template, "Invalid template" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerName ), "Invalid container name" );
 
-        LOG.debug(
-                String.format( "Current user: %s %s", identityManager.getUser(), identityManager.isAuthenticated() ) );
         getResourceHostByName( resourceHost.getHostname() );
 
         if ( templateRegistry.getTemplate( template.getTemplateName() ) == null )
@@ -266,8 +265,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     {
 
         Preconditions.checkNotNull( request, "Invalid request" );
-        LOG.debug(
-                String.format( "Current user: %s %s", identityManager.getUser(), identityManager.isAuthenticated() ) );
 
         //check if strategy exists
         try
@@ -1393,67 +1390,68 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        Set<Exception> errors = Sets.newHashSet();
+        Set<Throwable> errors = Sets.newHashSet();
         Set<UUID> destroyedContainersIds = Sets.newHashSet();
+        ContainerGroup containerGroup;
 
         try
         {
-            ContainerGroup containerGroup = findContainerGroupByEnvironmentId( environmentId );
-
-            Set<ContainerHost> containerHosts = Sets.newHashSet();
-
-            for ( UUID containerId : containerGroup.getContainerIds() )
-            {
-                try
-                {
-                    containerHosts.add( getContainerHostById( containerId ) );
-                }
-                catch ( HostNotFoundException e )
-                {
-                    errors.add( e );
-                }
-            }
-
-            if ( !containerHosts.isEmpty() )
-            {
-                List<Future<UUID>> taskFutures = Lists.newArrayList();
-                ExecutorService executorService = Executors.newFixedThreadPool( containerHosts.size() );
-
-                for ( ContainerHost containerHost : containerHosts )
-                {
-
-                    taskFutures.add( executorService.submit( new DestroyContainerWrapperTask( this, containerHost ) ) );
-                }
-
-                for ( Future<UUID> taskFuture : taskFutures )
-                {
-                    try
-                    {
-                        destroyedContainersIds.add( taskFuture.get() );
-                    }
-                    catch ( ExecutionException | InterruptedException e )
-                    {
-                        errors.add( e );
-                    }
-                }
-
-
-                executorService.shutdown();
-            }
-
-            String exception = null;
-
-            if ( !errors.isEmpty() )
-            {
-                exception = String.format( "There were errors while destroying containers: %s", errors );
-            }
-
-            return new ContainersDestructionResultImpl( destroyedContainersIds, exception );
+            containerGroup = findContainerGroupByEnvironmentId( environmentId );
         }
         catch ( ContainerGroupNotFoundException e )
         {
-            throw new PeerException( e );
+            return new ContainersDestructionResultImpl( getId(), destroyedContainersIds, "Container group not found" );
         }
+
+        Set<ContainerHost> containerHosts = Sets.newHashSet();
+
+        for ( UUID containerId : containerGroup.getContainerIds() )
+        {
+            try
+            {
+                containerHosts.add( getContainerHostById( containerId ) );
+            }
+            catch ( HostNotFoundException e )
+            {
+                errors.add( e );
+            }
+        }
+
+        if ( !containerHosts.isEmpty() )
+        {
+            List<Future<UUID>> taskFutures = Lists.newArrayList();
+            ExecutorService executorService = Executors.newFixedThreadPool( containerHosts.size() );
+
+            for ( ContainerHost containerHost : containerHosts )
+            {
+
+                taskFutures.add( executorService.submit( new DestroyContainerWrapperTask( this, containerHost ) ) );
+            }
+
+            for ( Future<UUID> taskFuture : taskFutures )
+            {
+                try
+                {
+                    destroyedContainersIds.add( taskFuture.get() );
+                }
+                catch ( ExecutionException | InterruptedException e )
+                {
+                    errors.add( ExceptionUtils.getRootCause( e ) );
+                }
+            }
+
+
+            executorService.shutdown();
+        }
+
+        String exception = null;
+
+        if ( !errors.isEmpty() )
+        {
+            exception = String.format( "There were errors while destroying containers: %s", errors );
+        }
+
+        return new ContainersDestructionResultImpl( getId(), destroyedContainersIds, exception );
     }
 
 

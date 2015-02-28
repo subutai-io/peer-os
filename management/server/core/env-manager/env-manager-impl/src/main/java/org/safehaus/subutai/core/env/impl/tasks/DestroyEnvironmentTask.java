@@ -28,8 +28,7 @@ import com.google.common.collect.Sets;
 
 
 /**
- * Destroys Environment with all values carried with it.
- * Destroys all container hosts across peers if any.
+ * Destroys Environment with all values carried with it. Destroys all container hosts across peers if any.
  *
  * @see org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl
  * @see org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl
@@ -67,6 +66,13 @@ public class DestroyEnvironmentTask implements Runnable
     {
         try
         {
+
+            if ( environment.getStatus() == EnvironmentStatus.EMPTY || environment.getContainerHosts().isEmpty() )
+            {
+                environmentManager.removeEnvironment( environment.getId() );
+                return;
+            }
+
             environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
             Set<Peer> environmentPeers = Sets.newHashSet();
@@ -104,11 +110,29 @@ public class DestroyEnvironmentTask implements Runnable
 
             for ( ContainersDestructionResult result : results )
             {
+                boolean deleteAllPeerContainers = false;
                 if ( !Strings.isNullOrEmpty( result.getException() ) )
                 {
                     exceptions.add( new EnvironmentDestructionException( result.getException() ) );
+
+                    if ( result.getException().equals( "Container group not found" ) )
+                    {
+                        deleteAllPeerContainers = true;
+                    }
                 }
-                if ( !CollectionUtil.isCollectionEmpty( result.getDestroyedContainersIds() ) )
+                if ( deleteAllPeerContainers )
+                {
+                    for ( ContainerHost containerHost : environment.getContainerHosts() )
+                    {
+                        if ( containerHost.getPeerId().equals( result.peerId().toString() ) )
+                        {
+                            environment.removeContainer( containerHost.getId() );
+
+                            environmentManager.notifyOnContainerDestroyed( environment, containerHost.getId() );
+                        }
+                    }
+                }
+                else if ( !CollectionUtil.isCollectionEmpty( result.getDestroyedContainersIds() ) )
                 {
                     for ( UUID containerId : result.getDestroyedContainersIds() )
                     {

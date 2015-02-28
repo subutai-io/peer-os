@@ -206,7 +206,7 @@ public class PeerManagerImpl implements PeerManager
         //subscribe to peer message requests
         messenger.addMessageListener( new MessageRequestListener( this, messenger, requestListeners ) );
         //subscribe to peer message responses
-        messageResponseListener = new MessageResponseListener();
+        messageResponseListener = new MessageResponseListener(messenger);
         messenger.addMessageListener( messageResponseListener );
         //add create container requests listener
         addRequestListener( new CreateContainerGroupRequestListener( localPeer ) );
