@@ -25,6 +25,7 @@ public class RestUtil
 {
     private static long defaultReceiveTimeout = 1000 * 60 * 5;
     private static long defaultConnectionTimeout = 1000 * 60;
+    private static int defaultMaxRetransmits = 3;
 
 
     public static enum RequestType
@@ -38,13 +39,14 @@ public class RestUtil
     }
 
 
-    public RestUtil( final long defaultReceiveTimeout, final long defaultConnectionTimeout )
+    public RestUtil( final long defaultReceiveTimeout, final long defaultConnectionTimeout, final int maxRetransmits )
     {
         Preconditions.checkArgument( defaultReceiveTimeout > 0, "Receive timeout must be greater than 0" );
         Preconditions.checkArgument( defaultConnectionTimeout > 0, "Connection timeout must be greater than 0" );
 
         RestUtil.defaultReceiveTimeout = defaultReceiveTimeout;
         RestUtil.defaultConnectionTimeout = defaultConnectionTimeout;
+        RestUtil.defaultMaxRetransmits = maxRetransmits;
     }
 
 
@@ -135,6 +137,7 @@ public class RestUtil
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
         httpClientPolicy.setConnectionTimeout( defaultConnectionTimeout );
         httpClientPolicy.setReceiveTimeout( defaultReceiveTimeout );
+        httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
 
         httpConduit.setClient( httpClientPolicy );
         return client;
@@ -149,6 +152,8 @@ public class RestUtil
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
         httpClientPolicy.setConnectionTimeout( defaultConnectionTimeout );
         httpClientPolicy.setReceiveTimeout( defaultReceiveTimeout );
+        httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
+
 
         httpConduit.setClient( httpClientPolicy );
 
@@ -171,6 +176,8 @@ public class RestUtil
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
         httpClientPolicy.setConnectionTimeout( defaultConnectionTimeout );
         httpClientPolicy.setReceiveTimeout( defaultReceiveTimeout );
+        httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
+
 
         httpConduit.setClient( httpClientPolicy );
 

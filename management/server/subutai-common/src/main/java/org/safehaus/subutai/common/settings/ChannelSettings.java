@@ -6,7 +6,7 @@ package org.safehaus.subutai.common.settings;
  */
 public class ChannelSettings
 {
-    public static final String SECURE_PORT_X1 = "8443";
-    public static final String SECURE_PORT_X2 = "8444";
-    public static final String SECURE_PORT_X3 = "8445";
+    public static final String SECURE_PORT_X1 = "8543";
+    public static final String SECURE_PORT_X2 = "8544";
+    public static final String SECURE_PORT_X3 = "8545";
 }

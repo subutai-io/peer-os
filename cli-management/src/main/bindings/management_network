@@ -543,7 +543,7 @@ function management_network {
 #      cat $file_name
       if [ ! -f "$file_name" ]; then
             msg_info "No reserved VNIs,not exist file for reserved VNI" >&2
-            exit 10
+            exit 0
         fi
       local status=$1
       if   [ "$status" == "list"  ]; then

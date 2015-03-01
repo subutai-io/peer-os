@@ -12,15 +12,17 @@ import org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 
 /**
- * Environment Container host destroy task. This destroys, removes
- * {@link org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl}
- * from {@link org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl} metadata.
- * And consequently destroys container host on existing Peer#ResourceHost
+ * Environment Container host destroy task. This destroys, removes {@link org.safehaus.subutai.core.env.impl.entity
+ * .EnvironmentContainerImpl} from {@link org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl} metadata. And
+ * consequently destroys container host on existing Peer#ResourceHost
  *
  * @see org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl
  * @see org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl
@@ -68,13 +70,23 @@ public class DestroyContainerTask implements Runnable
                 }
                 catch ( PeerException e )
                 {
-                    if ( forceMetadataRemoval )
+                    boolean skipError = false;
+                    if ( e instanceof HostNotFoundException || ( ExceptionUtils.getRootCauseMessage( e )
+                                                                               .contains( "HostNotFoundException" ) ) )
                     {
-                        resultHolder.setResult( new EnvironmentModificationException( e ) );
+                        //skip error since host is not found
+                        skipError = true;
                     }
-                    else
+                    if ( !skipError )
                     {
-                        throw e;
+                        if ( forceMetadataRemoval )
+                        {
+                            resultHolder.setResult( new EnvironmentModificationException( e ) );
+                        }
+                        else
+                        {
+                            throw e;
+                        }
                     }
                 }
 

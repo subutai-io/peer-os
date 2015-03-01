@@ -1,17 +1,20 @@
 package org.safehaus.subutai.server.ui.views;
 
 
+import java.io.Serializable;
+
+import org.safehaus.subutai.common.security.SubutaiLoginContext;
+import org.safehaus.subutai.common.security.SubutaiThreadContext;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.server.ui.MainUI;
 import org.safehaus.subutai.server.ui.util.HelpManager;
-
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.subject.Subject;
 
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
+import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
@@ -116,17 +119,22 @@ public class LoginView extends VerticalLayout implements View
             public void buttonClick( Button.ClickEvent event )
             {
 
-                Subject currentUser = SecurityUtils.getSubject();
-
-                UsernamePasswordToken usernamePasswordToken =
-                        new UsernamePasswordToken( username.getValue(), password.getValue() );
                 try
                 {
-                    currentUser.login( usernamePasswordToken );
-                    //                    UserIdMdcHelper.set( currentUser );
+                    IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+                    Serializable sessionId = identityManager.login( username.getValue(), password.getValue() );
+
+                    VaadinRequest request = VaadinService.getCurrentRequest();
+                    SubutaiLoginContext loginContext =
+                            new SubutaiLoginContext( sessionId.toString(), username.getValue(),
+                                    request.getRemoteAddr() );
+
+                    request.getWrappedSession()
+                           .setAttribute( SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME, loginContext );
+                    SubutaiThreadContext.set( loginContext );
 
                     mainUI.getUsername().setValue( username.getValue() );
-                    VaadinService.reinitializeSession( VaadinService.getCurrentRequest() );
+                    VaadinService.reinitializeSession( request );
                     getUI().getNavigator().navigateTo( "/core" );
                 }
                 catch ( Exception e )

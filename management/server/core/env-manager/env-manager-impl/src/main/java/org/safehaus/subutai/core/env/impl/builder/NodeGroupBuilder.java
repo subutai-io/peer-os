@@ -21,6 +21,8 @@ import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -214,7 +216,8 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
             catch ( Exception e )
             {
                 exception = new NodeGroupBuildException(
-                        String.format( "Error creating node group %s on peer %s", nodeGroup, peer ), e );
+                        String.format( "Error creating node group %s on peer %s", nodeGroup, peer.getName() ),
+                        ExceptionUtils.getRootCause( e ) );
             }
 
             results.add( new NodeGroupBuildResult( containers, exception ) );

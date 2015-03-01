@@ -11,16 +11,27 @@ import com.google.common.base.Preconditions;
 
 public class ContainersDestructionResultImpl implements ContainersDestructionResult
 {
+    private final UUID peerId;
     private final Set<UUID> destroyedContainersIds;
     private final String exception;
 
 
-    public ContainersDestructionResultImpl( final Set<UUID> destroyedContainersIds, final String exception )
+    public ContainersDestructionResultImpl( final UUID peerId, final Set<UUID> destroyedContainersIds,
+                                            final String exception )
     {
+        Preconditions.checkNotNull( peerId );
         Preconditions.checkNotNull( destroyedContainersIds );
 
+        this.peerId = peerId;
         this.destroyedContainersIds = destroyedContainersIds;
         this.exception = exception;
+    }
+
+
+    @Override
+    public UUID peerId()
+    {
+        return peerId;
     }
 
 

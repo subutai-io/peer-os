@@ -33,6 +33,11 @@ public interface RestService
 
 
     @GET
+    @Path( "peer_policy" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getPeerPolicy( @QueryParam( "peerId" ) String peerId );
+
+
     @Path( "/" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getRegisteredPeerInfo( @QueryParam( "peerId" ) String peerId );
@@ -84,7 +89,7 @@ public interface RestService
     @DELETE
     @Path( "remove" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response removeRegistrationRequest( @FormParam( "rejectedPeerId" ) String rejectedPeerId );
+    public Response removeRegistrationRequest( @QueryParam( "rejectedPeerId" ) String rejectedPeerId );
 
 
     @PUT
