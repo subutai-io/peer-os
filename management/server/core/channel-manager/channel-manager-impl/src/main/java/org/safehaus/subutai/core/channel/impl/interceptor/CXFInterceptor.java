@@ -13,9 +13,9 @@ import org.apache.cxf.phase.Phase;
 /**
  * Created by talas on 2/23/15.
  */
-public class RestInterceptor extends AbstractPhaseInterceptor<Message>
+public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
 {
-    public RestInterceptor()
+    public CXFInterceptor()
     {
         super( Phase.RECEIVE );
     }

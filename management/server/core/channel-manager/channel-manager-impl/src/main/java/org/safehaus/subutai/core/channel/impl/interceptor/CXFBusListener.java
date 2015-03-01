@@ -20,7 +20,7 @@ public class CXFBusListener extends AbstractFeature
     {
         LOG.info( "Adding LoggingFeature interceptor on bus: " + bus );
         // initialise the feature on the bus, which will add the interceptors
-        bus.getInInterceptors().add( new RestInterceptor() );
+        bus.getInInterceptors().add( new CXFInterceptor() );
         LOG.info( "Successfully added LoggingFeature interceptor on bus: " + bus );
     }
 }
