@@ -276,8 +276,6 @@ public class RestServiceImpl implements RestService
         p.setName( String.format( "Peer on %s", p.getIp() ) );
         peerManager.update( p );
 
-        //TODO store pk in trust store.
-
         return Response.ok( JsonUtil.toJson( p ) ).build();
     }
 

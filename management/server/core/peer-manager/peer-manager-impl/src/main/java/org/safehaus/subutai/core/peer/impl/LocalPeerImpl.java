@@ -1546,7 +1546,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
         keyStoreManager.saveX509Certificate( keyStore, environmentKeyStoreData, cert, keyPair );
 
-        //TODO restart servlet
         return keyStoreManager.exportCertificateHEXString( keyStore, environmentKeyStoreData );
     }
 

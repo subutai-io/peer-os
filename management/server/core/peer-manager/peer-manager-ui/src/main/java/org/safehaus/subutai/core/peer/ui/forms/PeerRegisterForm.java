@@ -341,7 +341,6 @@ public class PeerRegisterForm extends CustomComponent
 
     private void unregisterMeFromRemote( PeerInfo peerToUnregister, PeerInfo remotePeerInfo )
     {
-        //TODO remove peer certificate from trust store
         String baseUrl = String.format( "https://%s:%s/cxf", remotePeerInfo.getIp(), ChannelSettings.SECURE_PORT_X2 );
         WebClient client = RestUtil.createTrustedWebClientWithAuth( baseUrl );// WebClient.create( baseUrl );
         Response response =
@@ -376,7 +375,6 @@ public class PeerRegisterForm extends CustomComponent
 
     private void removeMeFromRemote( PeerInfo peerToUnregister, PeerInfo remotePeerInfo )
     {
-        //TODO remove peer certificate from trust store
         String baseUrl = String.format( "https://%s:%s/cxf", remotePeerInfo.getIp(), ChannelSettings.SECURE_PORT_X1 );
         WebClient client = RestUtil.createTrustedWebClient( baseUrl );// WebClient.create( baseUrl );
         Response response =

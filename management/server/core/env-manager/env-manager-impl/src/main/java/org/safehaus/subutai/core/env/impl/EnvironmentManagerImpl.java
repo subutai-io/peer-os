@@ -168,7 +168,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final ResultHolder<EnvironmentCreationException> resultHolder = new ResultHolder<>();
 
-        //TODO Generate and exchange environment certs between Peers before proceeding further
         setupEnvironmentTunnel( environment, topology.getNodeGroupPlacement().keySet() );
 
         CreateEnvironmentTask createEnvironmentTask =
