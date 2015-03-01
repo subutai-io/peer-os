@@ -201,4 +201,41 @@ public class RestUtil
 
         return client;
     }
+
+    public static WebClient createTrustedWebClientWithEnvAuth( String url, String envId )
+    {
+        envId = "env_" + envId;
+
+        WebClient client = WebClient.create( url );
+        HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
+
+        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+        httpClientPolicy.setConnectionTimeout( defaultConnectionTimeout );
+        httpClientPolicy.setReceiveTimeout( defaultReceiveTimeout );
+        httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
+
+
+        httpConduit.setClient( httpClientPolicy );
+
+        KeyStoreManager keyStoreManager = new KeyStoreManager();
+        KeyStoreData keyStoreData = new KeyStoreData();
+        keyStoreData.setupKeyStorePx2();
+        keyStoreData.setAlias( envId );
+        KeyStore keyStore = keyStoreManager.load( keyStoreData );
+
+        KeyStoreData trustStoreData = new KeyStoreData();
+        trustStoreData.setupTrustStorePx2();
+        KeyStore trustStore = keyStoreManager.load( trustStoreData );
+
+        SSLManager sslManager = new SSLManager( keyStore, keyStoreData, trustStore, trustStoreData );
+
+
+        TLSClientParameters tlsClientParameters = new TLSClientParameters();
+        tlsClientParameters.setDisableCNCheck( true );
+        tlsClientParameters.setTrustManagers( sslManager.getClientTrustManagers() );
+        tlsClientParameters.setKeyManagers( sslManager.getClientKeyManagers() );
+        httpConduit.setTlsClientParameters( tlsClientParameters );
+
+        return client;
+    }
 }

@@ -235,6 +235,17 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response reserveVni( @FormParam( "vni" ) String vni );
 
+
+    @POST
+    @Path( "cert/import" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response importEnvironmentCert( @FormParam( "cert" ) String envCert, @FormParam( "alias" ) String alias );
+
+    @POST
+    @Path( "cert/export" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response exportEnvironmentCert( @FormParam( "alias" ) String alias );
+
     //*********** Environment Specific REST - END ***************
 
     @GET

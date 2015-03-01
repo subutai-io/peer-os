@@ -1,6 +1,10 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -39,6 +43,14 @@ import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.common.security.SecurityProvider;
+import org.safehaus.subutai.common.security.crypto.certificate.CertificateData;
+import org.safehaus.subutai.common.security.crypto.certificate.CertificateManager;
+import org.safehaus.subutai.common.security.crypto.key.KeyManager;
+import org.safehaus.subutai.common.security.crypto.key.KeyPairType;
+import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
+import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
+import org.safehaus.subutai.common.security.utils.RestartCoreServlet;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.StringUtil;
@@ -1471,6 +1483,71 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     public Set<Vni> getReservedVnis() throws PeerException
     {
         return getManagementHost().getReservedVnis();
+    }
+
+
+    @Override
+    public void importCertificate( final String cert, final String alias )
+    {
+        //************ Save Trust SSL Cert **************************************
+        KeyStore keyStore;
+        KeyStoreData keyStoreData;
+        KeyStoreManager keyStoreManager;
+
+        keyStoreData = new KeyStoreData();
+        keyStoreData.setupTrustStorePx2();
+        keyStoreData.setHEXCert( cert );
+        keyStoreData.setAlias( alias );
+
+        keyStoreManager = new KeyStoreManager();
+        keyStore = keyStoreManager.load( keyStoreData );
+        keyStoreData.setAlias( alias );
+
+        keyStoreManager.importCertificateHEXString( keyStore, keyStoreData );
+        //***********************************************************************
+        new Thread( new RestartCoreServlet() ).start();
+    }
+
+
+    /**
+     * Exports certificate with alias passed and returns cert in HEX String format. And stores new certificate in
+     * keyStore.
+     *
+     * @param alias - certificate alias
+     *
+     * @return - certificate in HEX format
+     */
+    @Override
+    public String exportEnvironmentCertificate( final String alias ) throws PeerException
+    {
+        KeyStoreData environmentKeyStoreData = new KeyStoreData();
+        environmentKeyStoreData.setupKeyStorePx2();
+        environmentKeyStoreData.setAlias( alias );
+
+        CertificateData certData = new CertificateData();
+        //TODO Instead of envId CN Will be gpg fingerprint.
+        certData.setCommonName( alias );
+
+
+        CertificateManager certManager = new CertificateManager();
+        certManager.setDateParamaters();
+
+        KeyStoreManager keyStoreManager = new KeyStoreManager();
+        KeyStore keyStore = keyStoreManager.load( environmentKeyStoreData );
+
+
+        KeyManager keyManager = new KeyManager();
+        KeyPairGenerator keyPairGenerator = keyManager.prepareKeyPairGeneration( KeyPairType.RSA, 1024 );
+        KeyPair keyPair = keyManager.generateKeyPair( keyPairGenerator );
+
+
+        X509Certificate cert = certManager
+                .generateSelfSignedCertificate( keyStore, keyPair, SecurityProvider.BOUNCY_CASTLE, certData );
+
+        keyStoreManager.saveX509Certificate( keyStore, environmentKeyStoreData, cert, keyPair );
+
+        //TODO restart servlet
+        return keyStoreManager.exportCertificateHEXString( keyStore, environmentKeyStoreData );
     }
 
 

@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
+import javax.ws.rs.core.Response;
+
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
@@ -30,6 +32,7 @@ import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.common.settings.ChannelSettings;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
@@ -53,6 +56,9 @@ import org.safehaus.subutai.core.peer.impl.request.MessageResponse;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.ext.form.Form;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -349,7 +355,8 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<ProcessResourceUsage>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -558,7 +565,8 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<Set<Integer>>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -614,7 +622,8 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<DiskQuota>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -722,7 +731,8 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<DiskQuota>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -751,7 +761,8 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<PeerQuotaInfo>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -780,7 +791,8 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<QuotaInfo>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -1045,6 +1057,93 @@ public class RemotePeerImpl implements RemotePeer
         }
     }
 
+
+    /**
+     * Imports certificate to trustStore. Important note here is to restart servlet after trustStore update.
+     *
+     * @param cert - cert in HEX representation
+     * @param alias - cert alias
+     */
+    @Override
+    public void importCertificate( final String cert, final String alias ) throws PeerException
+    {
+        Preconditions.checkNotNull( cert, "Invalid cert" );
+        Preconditions.checkNotNull( alias, "Invalid alias" );
+
+        String path = "peer/cert/import";
+        String envId = alias.split( "_" )[2];
+
+        try
+        {
+            String url = String.format( "https://%s:%s/cxf", peerInfo.getIp(), ChannelSettings.SECURE_PORT_X2 );
+            WebClient client = RestUtil.createTrustedWebClientWithAuth( url );
+            client.path( path );
+
+            Form form = new Form();
+            form.set( "cert", cert );
+            form.set( "alias", alias );
+
+            client.header( Common.ENVIRONMENT_ID_HEADER_NAME, envId );
+
+            Response response = client.post( form );
+            if ( response.getStatus() != Response.Status.NO_CONTENT.getStatusCode() )
+            {
+                throw new Exception( "Invalid status code." );
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException(
+                    String.format( "Error importing environment certificate %s on peer %s", alias, getName() ), e );
+        }
+    }
+
+
+    /**
+     * Exports certificate with alias passed and returns cert in HEX String format. And stores new certificate in
+     * keyStore.
+     *
+     * @param alias - certificate alias
+     *
+     * @return - certificate in HEX format
+     */
+    @Override
+    public String exportEnvironmentCertificate( final String alias ) throws PeerException
+    {
+        Preconditions.checkNotNull( alias, "Invalid parameter alias" );
+
+        String path = "peer/cert/export";
+        String envId = alias.split( "_" )[2];
+
+        try
+        {
+            String url = String.format( "https://%s:%s/cxf", peerInfo.getIp(), ChannelSettings.SECURE_PORT_X2 );
+            WebClient client = RestUtil.createTrustedWebClientWithAuth( url );
+            client.path( path );
+
+            Form form = new Form();
+            form.set( "alias", alias );
+
+            client.header( Common.ENVIRONMENT_ID_HEADER_NAME, envId );
+
+            Response response = client.post( form );
+            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+            {
+                return response.readEntity( String.class );
+            }
+            else
+            {
+                throw new Exception( "Invalid status code." );
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException(
+                    String.format( "Error importing environment certificate %s on peer %s", alias, getName() ), e );
+        }
+    }
+
+
     //
     //    @Override
     //    public int setupTunnels( final Set<String> peerIps, final Vni vni ) throws PeerException
@@ -1087,7 +1186,9 @@ public class RemotePeerImpl implements RemotePeer
         {
             String response = get( path, null, null );
 
-            return JsonUtil.fromJson( response, new TypeToken<Set<Vni>>() {}.getType() );
+            return JsonUtil.fromJson( response, new TypeToken<Set<Vni>>()
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {

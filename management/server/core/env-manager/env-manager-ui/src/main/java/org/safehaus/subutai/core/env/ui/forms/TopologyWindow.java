@@ -121,7 +121,7 @@ public class TopologyWindow extends Window
                         }
                         else
                         {
-                            environmentManager.createEnvironment(
+                            Environment env = environmentManager.createEnvironment(
                                     String.format( "%s-%s", blueprint.getName(), UUID.randomUUID() ), topology,
                                     subnetTxt.getValue(), null, true );
                             Notification.show( "Environment creation started" );
