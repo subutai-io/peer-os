@@ -17,7 +17,6 @@ import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
 import org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl;
-import org.safehaus.subutai.core.env.impl.PeerEnvironmentDestructionTask;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
 import org.slf4j.Logger;
