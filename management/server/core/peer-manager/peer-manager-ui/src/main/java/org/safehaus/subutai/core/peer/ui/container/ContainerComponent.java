@@ -42,7 +42,8 @@ public class ContainerComponent extends CustomComponent implements Disposable
         horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
 
 
-        final ContainerTree containerTree = new ContainerTree( peerManager.getLocalPeer() );
+        final ContainerTree containerTree =
+                new ContainerTree( peerManager.getLocalPeer(), peerManagerPortalModule.getHostRegistry() );
 
         VerticalLayout treeLayout = new VerticalLayout();
         treeLayout.addComponent( containerTree );

@@ -6,14 +6,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.common.protocol.Disposable;
+import org.safehaus.subutai.core.hostregistry.api.HostListener;
+import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
+import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
@@ -31,7 +30,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Tree;
 
 
-public class ContainerTree extends ConcurrentComponent implements Disposable
+public class ContainerTree extends ConcurrentComponent implements HostListener
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( ContainerTree.class.getName() );
@@ -39,11 +38,11 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
     private final Tree tree;
     private HierarchicalContainer container;
     private Set<Host> selectedHosts = new HashSet<>();
-    private final ScheduledExecutorService scheduler;
+    //    private final ScheduledExecutorService scheduler;
     private Item managementHostItem;
 
 
-    public ContainerTree( LocalPeer localPeer )
+    public ContainerTree( LocalPeer localPeer, final HostRegistry hostRegistry )
     {
 
         this.localPeer = localPeer;
@@ -112,17 +111,37 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
             }
         } );
         addComponent( tree );
-        scheduler = Executors.newScheduledThreadPool( 1 );
+        //        scheduler = Executors.newScheduledThreadPool( 1 );
+        //
+        //        scheduler.scheduleWithFixedDelay( new Runnable()
+        //        {
+        //            public void run()
+        //            {
+        //                LOG.info( "Refreshing containers state..." );
+        //                refreshHosts();
+        //                LOG.info( "Refreshing done." );
+        //            }
+        //        }, 5, 30, TimeUnit.SECONDS );
 
-        scheduler.scheduleWithFixedDelay( new Runnable()
+        final ContainerTree THIS = this;
+        addAttachListener( new AttachListener()
         {
-            public void run()
+            @Override
+            public void attach( final AttachEvent event )
             {
-                LOG.info( "Refreshing containers state..." );
-                refreshHosts();
-                LOG.info( "Refreshing done." );
+                hostRegistry.addHostListener( THIS );
             }
-        }, 5, 30, TimeUnit.SECONDS );
+        } );
+
+        addDetachListener( new DetachListener()
+        {
+            @Override
+            public void detach( final DetachEvent event )
+            {
+                hostRegistry.removeHostListener( THIS );
+            }
+        } );
+
         try
         {
             if ( localPeer.getManagementHost() != null )
@@ -251,8 +270,9 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
     }
 
 
-    public void dispose()
+    @Override
+    public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
     {
-        scheduler.shutdown();
+        refreshHosts();
     }
 }

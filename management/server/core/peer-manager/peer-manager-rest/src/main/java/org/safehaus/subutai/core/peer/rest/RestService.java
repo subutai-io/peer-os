@@ -89,7 +89,7 @@ public interface RestService
     @DELETE
     @Path( "remove" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response removeRegistrationRequest( @FormParam( "rejectedPeerId" ) String rejectedPeerId );
+    public Response removeRegistrationRequest( @QueryParam( "rejectedPeerId" ) String rejectedPeerId );
 
 
     @PUT

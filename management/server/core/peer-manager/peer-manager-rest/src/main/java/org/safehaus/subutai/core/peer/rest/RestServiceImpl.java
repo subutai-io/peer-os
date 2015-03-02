@@ -25,6 +25,7 @@ import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
+import org.safehaus.subutai.common.security.utils.RestartCoreServlet;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -173,6 +174,9 @@ public class RestServiceImpl implements RestService
 
                 keyStoreManager.deleteEntry( keyStore, keyStoreData );
                 //***********************************************************************
+
+                new Thread( new RestartCoreServlet() ).start();
+
                 return Response.ok( "Successfully unregistered peer: " + peerId ).build();
             }
             else
@@ -203,7 +207,8 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            peerManager.unregister( rejectedPeerId );
+            UUID id = JsonUtil.fromJson( rejectedPeerId, UUID.class );
+            peerManager.unregister( id.toString() );
             return Response.status( Response.Status.NO_CONTENT ).build();
         }
         catch ( PeerException e )
@@ -253,6 +258,8 @@ public class RestServiceImpl implements RestService
 
 
         //***********************************************************************
+
+        new Thread( new RestartCoreServlet() ).start();
 
         return Response.ok( HEXCert ).build();
     }

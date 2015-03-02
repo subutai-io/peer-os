@@ -288,6 +288,11 @@ public class KeyStoreManager
 
             File file = new File( keyStoreData.getExportFileLocation() );
 
+            if ( !file.exists() )
+            {
+                file.mkdirs();
+            }
+
             byte[] buf = cert.getEncoded();
 
             FileOutputStream os = new FileOutputStream( file );

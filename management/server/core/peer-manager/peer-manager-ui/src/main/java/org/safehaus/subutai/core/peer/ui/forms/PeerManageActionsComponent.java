@@ -26,14 +26,15 @@ public class PeerManageActionsComponent extends HorizontalLayout
     }
 
 
-    public PeerManageActionsComponent( final PeerManagerPortalModule module, PeerInfo p, PeerManagerActionsListener callback )
+    public PeerManageActionsComponent( final PeerManagerPortalModule module, PeerInfo p,
+                                       PeerManagerActionsListener callback )
     {
         this.listener = callback;
 
         peer = p;
         positiveButton = new Button();
         negativeButton = new Button();
-        managePolicyButton = new Button("Manage Policy");
+        managePolicyButton = new Button( "Manage Policy" );
 
         positiveButton.addClickListener( new Button.ClickListener()
         {
@@ -62,9 +63,11 @@ public class PeerManageActionsComponent extends HorizontalLayout
         } );
         updateView();
 
-        managePolicyButton.addClickListener( new Button.ClickListener() {
+        managePolicyButton.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( final Button.ClickEvent clickEvent ) {
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
                 PolicyManagerWindow policyManagerWindow = new PolicyManagerWindow( module.getPeerManager(), peer );
                 UI.getCurrent().addWindow( policyManagerWindow );
             }
@@ -72,7 +75,8 @@ public class PeerManageActionsComponent extends HorizontalLayout
     }
 
 
-    //TODO update correct peer registration and further relationship management
+    //TODO update correct peer registration and further relationship management, also will need to check on server
+    // side for relevance of incoming request
     public void updateView()
     {
         removeComponent( positiveButton );

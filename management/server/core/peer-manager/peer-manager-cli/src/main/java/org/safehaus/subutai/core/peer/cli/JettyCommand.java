@@ -13,13 +13,15 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command( scope = "peer", name = "jetty" )
 public class JettyCommand extends OsgiCommandSupport
 {
-    private final String PAX_WEB_JETTY_BUNDLE_NAME = "org.ops4j.pax.web.pax-web-jetty";
     private static Logger log = LoggerFactory.getLogger( JettyCommand.class );
 
 
     @Argument( index = 0, name = "command", multiValued = false, description = "start/stop/restart", required = true )
     private String command;
 
+    @Argument( index = 1, name = "bundleName", multiValued = false, description = "start/stop/restart", required =
+            false )
+    private String PAX_WEB_JETTY_BUNDLE_NAME = "org.ops4j.pax.web.pax-web-jetty";
 
     @Override
     protected Object doExecute() throws Exception
@@ -33,6 +35,7 @@ public class JettyCommand extends OsgiCommandSupport
                 if ( "start".equals( command ) )
                 {
                     bundle.start();
+                    //                    bundle.update();
                     System.out.println( "Jetty successfully started." );
                 }
                 else if ( "stop".equals( command ) )
@@ -49,6 +52,11 @@ public class JettyCommand extends OsgiCommandSupport
                 else if ( "status".equals( command ) )
                 {
                     System.out.println( String.format( "Jetty bundle id: %d", bundle.getState() ) );
+                }
+                else if ( "update".equals( command ) )
+                {
+                    bundle.update();
+                    System.out.println( "Successfully updated bundle." );
                 }
                 else
                 {
