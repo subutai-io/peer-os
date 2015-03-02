@@ -2,6 +2,8 @@ package org.safehaus.subutai.core.env.ui.forms;
 
 
 import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.util.IndexedContainer;
@@ -18,12 +20,18 @@ import com.vaadin.ui.Window;
 public class TagsWindow extends Window
 {
 
-    private final ContainerHost containerHost;
 
-
-    public TagsWindow( final ContainerHost containerHost )
+    public TagsWindow( final ContainerHost containerHost, LocalPeer localPeer )
     {
-        this.containerHost = containerHost;
+        ContainerHost localContainer = null;
+        try
+        {
+            localContainer = localPeer.getContainerHostById( containerHost.getId() );
+        }
+        catch ( HostNotFoundException e )
+        {
+            //ignore, this is a remote container
+        }
 
         setCaption( "Tags" );
         setWidth( "600px" );
@@ -31,13 +39,11 @@ public class TagsWindow extends Window
         setModal( true );
         setClosable( true );
 
-
         VerticalLayout content = new VerticalLayout();
         content.setSpacing( true );
         content.setMargin( true );
         content.setStyleName( "default" );
         content.setSizeFull();
-
 
         final ListSelect tagsSelect = new ListSelect( "Tags", containerHost.getTags() );
         tagsSelect.setNullSelectionAllowed( false );
@@ -63,6 +69,7 @@ public class TagsWindow extends Window
 
         Button addTagBtn = new Button( "Add" );
 
+        final ContainerHost finalLocalContainer = localContainer;
         addTagBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -73,6 +80,10 @@ public class TagsWindow extends Window
                 {
                     containerHost.addTag( tagTxt.getValue().trim() );
                     tagsSelect.setContainerDataSource( new IndexedContainer( containerHost.getTags() ) );
+                    if ( finalLocalContainer != null )
+                    {
+                        finalLocalContainer.addTag( tagTxt.getValue().trim() );
+                    }
                 }
                 else
                 {
@@ -94,6 +105,10 @@ public class TagsWindow extends Window
                 {
                     containerHost.removeTag( String.valueOf( tagsSelect.getValue() ) );
                     tagsSelect.setContainerDataSource( new IndexedContainer( containerHost.getTags() ) );
+                    if ( finalLocalContainer != null )
+                    {
+                        finalLocalContainer.removeTag( String.valueOf( tagsSelect.getValue() ) );
+                    }
                 }
                 else
                 {

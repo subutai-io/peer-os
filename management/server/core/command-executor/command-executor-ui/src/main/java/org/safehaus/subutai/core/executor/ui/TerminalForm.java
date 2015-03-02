@@ -230,7 +230,7 @@ public class TerminalForm extends CustomComponent implements Disposable
 
     public void addOutput( final String output )
     {
-        getUI().access( new Runnable()
+        commandOutputTxtArea.getUI().access( new Runnable()
         {
             @Override
             public void run()
