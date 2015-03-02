@@ -105,8 +105,18 @@ public class ContainersWindow extends Window
         for ( final ContainerHost containerHost : environment.getContainerHosts() )
         {
             final Button startBtn = new Button( "Start" );
+            final Button tagsBtn = new Button( "Tags" );
             final Button stopBtn = new Button( "Stop" );
             final Button destroyBtn = new Button( "Destroy" );
+
+            tagsBtn.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( final Button.ClickEvent event )
+                {
+                    getUI().addWindow( new TagsWindow( containerHost ) );
+                }
+            } );
 
             startBtn.addClickListener( new Button.ClickListener()
             {
@@ -216,7 +226,7 @@ public class ContainersWindow extends Window
 
             containersTable.addItem( new Object[] {
                     containerHost.getId().toString(), containerHost.getTemplateName(), containerHost.getHostname(),
-                    containerHost.getIpByInterfaceName( "eth0" ), startBtn, stopBtn, destroyBtn
+                    containerHost.getIpByInterfaceName( "eth0" ), tagsBtn, startBtn, stopBtn, destroyBtn
             }, null );
 
             boolean isContainerConnected = containerHost.isConnected();
@@ -253,6 +263,7 @@ public class ContainersWindow extends Window
         table.addContainerProperty( "Template", String.class, null );
         table.addContainerProperty( "Hostname", String.class, null );
         table.addContainerProperty( "IP", String.class, null );
+        table.addContainerProperty( "Tags", Button.class, null );
         table.addContainerProperty( "Start", Button.class, null );
         table.addContainerProperty( "Stop", Button.class, null );
         table.addContainerProperty( "Destroy", Button.class, null );
