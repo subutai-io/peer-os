@@ -1507,7 +1507,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
         keyStoreManager.importCertificateHEXString( keyStore, keyStoreData );
         //***********************************************************************
-        new Thread( new RestartCoreServlet() ).start();
+        new Thread( new RestartCoreServlet( 4 ) ).start();
     }
 
 
@@ -1577,12 +1577,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             while ( aliases.hasMoreElements() )
             {
                 String alias = aliases.nextElement();
-                UUID envIdFromAlias = UUID.fromString( alias.split( "_" )[2] );
-                if ( envIdFromAlias.equals( environmentId ) )
+                String parseId[] = alias.split( "_" );
+                if ( parseId.length == 2 )
                 {
-                    keyStoreData.setAlias( alias );
-                    KeyStore keyStoreToRemove = keyStoreManager.load( keyStoreData );
-                    keyStoreManager.deleteEntry( keyStoreToRemove, keyStoreData );
+                    UUID envIdFromAlias = UUID.fromString( parseId[2] );
+                    if ( envIdFromAlias.equals( environmentId ) )
+                    {
+                        keyStoreData.setAlias( alias );
+                        KeyStore keyStoreToRemove = keyStoreManager.load( keyStoreData );
+                        keyStoreManager.deleteEntry( keyStoreToRemove, keyStoreData );
+                    }
                 }
             }
 

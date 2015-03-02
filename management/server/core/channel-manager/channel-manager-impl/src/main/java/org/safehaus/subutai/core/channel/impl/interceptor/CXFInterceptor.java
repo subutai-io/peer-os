@@ -63,7 +63,7 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
 
             if(status == 0)
             {
-                LOG.info( "*********  Access to" +basePath+"  is blocked **********************" );
+                LOG.warn( "*********  Access to" + basePath + "  is blocked **********************" );
 
                 message.put( Message.RESPONSE_CODE, 403 );
                 message.getInterceptorChain().abort();

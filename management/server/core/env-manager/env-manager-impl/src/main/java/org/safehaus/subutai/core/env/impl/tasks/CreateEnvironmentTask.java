@@ -49,6 +49,9 @@ public class CreateEnvironmentTask implements Runnable
     {
         try
         {
+            //delay to wait for servlet up
+            Thread.sleep( 6 * 1000 );
+
             //figure out free VNI
             long vni = environmentManager.findFreeVni( topology.getNodeGroupPlacement().keySet() );
 
