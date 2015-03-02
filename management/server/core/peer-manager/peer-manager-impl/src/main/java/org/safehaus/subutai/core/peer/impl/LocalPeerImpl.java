@@ -1121,8 +1121,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
     private void saveResourceHostContainers( ResourceHost resourceHost, Set<ContainerHostInfo> containerHostInfos )
     {
+        Set<ContainerHost> oldHosts = resourceHost.getContainerHosts();
+        Set<UUID> newContainerIds = Sets.newHashSet();
         for ( ContainerHostInfo containerHostInfo : containerHostInfos )
         {
+
+            newContainerIds.add( containerHostInfo.getId() );
 
             boolean isNewHost = false;
             try
@@ -1147,6 +1151,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 containerHostDataService.update( containerHost );
             }
             containerHost.updateHostInfo( containerHostInfo );
+        }
+
+        for ( ContainerHost oldHost : oldHosts )
+        {
+            if ( !newContainerIds.contains( oldHost.getId() ) )
+            {
+                //remove container which is missing in heartbeat
+                containerHostDataService.remove( oldHost.getHostId() );
+                ( ( ResourceHostEntity ) resourceHost ).removeContainerHost( oldHost );
+            }
         }
     }
 

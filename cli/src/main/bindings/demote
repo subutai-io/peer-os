@@ -5,7 +5,9 @@ function demote_usage {
   echo -----------------------------------------------------------------------
   echo Usage: Demotes a temlate back into a container instance.
   echo
-  echo "        "subutai \[-qh\] demote template
+  echo " "subutai \[-qh\] demote template \[-i Network Configuration\]
+  echo "             "parameters:
+  echo "                "i -- set network configuration i.e. "192.168.1.2/24 100"
   echo
   echo -----------------------------------------------------------------------
 }
@@ -25,6 +27,31 @@ function demote {
      msg_error "Container(s) locked by a subutai process"
      exit 1
   fi
+
+  OPTIND=0
+  if [ "$1" == $temp ]; then
+    shift
+  fi
+
+  local network_enabled="false"
+  local network_properties=""
+  shift_amount=0;
+  while getopts ":i:" opt; do
+    case $opt in
+      i)
+	network_enabled="true"
+        network_properties=$OPTARG
+        ;;
+      \?)
+        msg_error "Unrecognized option -$OPTARG"
+        exit 1
+        ;;
+      :)
+        msg_error "Option -$OPTARG requires an argument." >&2
+        exit 1
+    esac
+      shift_amount=$(($shift_amount + 1))
+  done
 
   lock_container_read $temp
   if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
@@ -74,6 +101,11 @@ function demote {
   msg_ok "Successfully demoted $temp"
   unlock_container_read $temp
   if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+  
+  if [ "$network_enabled" == "true" ]; then
+     subutai network $temp -s ${network_properties//\"} #"192.168.3.2/24 100" varible should be like this
+  fi
+
 }
 
 

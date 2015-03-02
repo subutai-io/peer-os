@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.peer.ui;
 import java.io.File;
 
 import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.server.ui.api.PortalModule;
@@ -18,6 +19,7 @@ public class PeerManagerPortalModule implements PortalModule
     public static final String MODULE_NAME = "Peer";
     private PeerManager peerManager;
     private TemplateRegistry registry;
+    private HostRegistry hostRegistry;
 
 
     public PeerManager getPeerManager()
@@ -32,10 +34,18 @@ public class PeerManagerPortalModule implements PortalModule
     }
 
 
-    public PeerManagerPortalModule( final PeerManager peerManager, final TemplateRegistry registry )
+    public HostRegistry getHostRegistry()
+    {
+        return hostRegistry;
+    }
+
+
+    public PeerManagerPortalModule( final PeerManager peerManager, final TemplateRegistry registry,
+                                    final HostRegistry hostRegistry )
     {
         this.peerManager = peerManager;
         this.registry = registry;
+        this.hostRegistry = hostRegistry;
     }
 
 
