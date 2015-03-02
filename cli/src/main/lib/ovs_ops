@@ -34,7 +34,7 @@ function ovs_configure_lxc {
   sed -i "/$add_before_line/i \lxc.network.veth.pair = $ovs_port_name-2" $config
   sed -i "/$add_before_line/i \lxc.network.mtu = 1340" $config
   sed -i "/$add_before_line/a \lxc.network.script.up = $subutai_script_base/create_ovs_interface" $config
-  sed -i '/lxc.network.hwaddr.*/d' $config
+  sed -i 's/^lxc.network.hwaddr/#lxc.network.hwaddr/' $config
   msg_info "    - configured $lxc's network with openvswitch"
 }
 
@@ -59,6 +59,7 @@ function ovs_revert_configuration {
   sed -i '/lxc.network.link.*/d' $config
   sed -i '/lxc.network.veth.pair.*/d' $config
   sed -i '/lxc.network.script.up.*/d' $config
+  sed -i '/lxc.network.mtu.*/d' $config
 
   # Insert default network configurations
   add_before_line="lxc.network.hwaddr"
