@@ -6,6 +6,8 @@ import org.safehaus.subutai.common.peer.ContainerHost;
 import com.google.common.base.Strings;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
@@ -38,28 +40,38 @@ public class TagsWindow extends Window
 
 
         final ListSelect tagsSelect = new ListSelect( "Tags", containerHost.getTags() );
-        //        tagsSelect.setReadOnly( true );
+        tagsSelect.setNullSelectionAllowed( false );
         tagsSelect.setRows( 5 );
         tagsSelect.setWidth( "100px" );
         tagsSelect.setMultiSelect( false );
 
         content.addComponent( tagsSelect );
 
-        final TextField newTagTxt = new TextField( "New tag" );
+        HorizontalLayout controls = new HorizontalLayout();
+        controls.setSpacing( true );
 
-        content.addComponent( newTagTxt );
+        content.addComponent( controls );
 
-        Button addNewTagBtn = new Button( "Add" );
 
-        addNewTagBtn.addClickListener( new Button.ClickListener()
+        Label tagLbl = new Label( "Enter tag" );
+
+        controls.addComponent( tagLbl );
+
+        final TextField tagTxt = new TextField();
+
+        controls.addComponent( tagTxt );
+
+        Button addTagBtn = new Button( "Add" );
+
+        addTagBtn.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( final Button.ClickEvent event )
             {
 
-                if ( !Strings.isNullOrEmpty( newTagTxt.getValue() ) )
+                if ( !Strings.isNullOrEmpty( tagTxt.getValue() ) )
                 {
-                    containerHost.addTag( newTagTxt.getValue().trim() );
+                    containerHost.addTag( tagTxt.getValue().trim() );
                     tagsSelect.setContainerDataSource( new IndexedContainer( containerHost.getTags() ) );
                 }
                 else
@@ -69,7 +81,28 @@ public class TagsWindow extends Window
             }
         } );
 
-        content.addComponent( addNewTagBtn );
+        controls.addComponent( addTagBtn );
+
+        Button removeTagBtn = new Button( "Remove" );
+
+        removeTagBtn.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
+            {
+                if ( tagsSelect.getValue() != null )
+                {
+                    containerHost.removeTag( String.valueOf( tagsSelect.getValue() ) );
+                    tagsSelect.setContainerDataSource( new IndexedContainer( containerHost.getTags() ) );
+                }
+                else
+                {
+                    Notification.show( "Please, enter valid tag" );
+                }
+            }
+        } );
+
+        controls.addComponent( removeTagBtn );
 
         setContent( content );
     }
