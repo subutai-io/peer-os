@@ -34,8 +34,8 @@ public class TagsWindow extends Window
         }
 
         setCaption( "Tags" );
-        setWidth( "600px" );
-        setHeight( "400px" );
+        setWidth( "500px" );
+        setHeight( "300px" );
         setModal( true );
         setClosable( true );
 
