@@ -1144,6 +1144,49 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    /**
+     * Remove specific environment related certificates from trustStore of local peer.
+     *
+     * @param environmentId - environment whose certificates need to be removed
+     * @param peerIds - peers where environment exists
+     */
+    @Override
+    public void removeEnvironmentCertificates( final UUID environmentId, final Set<UUID> peerIds ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid parameter environmentId" );
+        Preconditions.checkNotNull( peerIds, "Invalid parameter peerIds" );
+
+        String path = "peer/cert/remove";
+        String envId = environmentId.toString();
+
+        try
+        {
+            String url = String.format( "https://%s:%s/cxf", peerInfo.getIp(), ChannelSettings.SECURE_PORT_X2 );
+            String environmentRequestAlias = String.format( "env_%s_%s", peerInfo.getId().toString(), envId );
+
+            WebClient client = RestUtil.createTrustedWebClientWithEnvAuth( url, environmentRequestAlias );
+            client.path( path );
+            client.query( "environmentId", JsonUtil.toJson( environmentId ) );
+            client.query( "peerIds", JsonUtil.toJson( peerIds, new TypeToken<Set<UUID>>()
+            {
+            }.getType() ) );
+
+            client.header( Common.ENVIRONMENT_ID_HEADER_NAME, envId );
+
+            Response response = client.delete();
+            if ( response.getStatus() != Response.Status.NO_CONTENT.getStatusCode() )
+            {
+                throw new Exception( "Invalid status code." );
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException(
+                    String.format( "Error removing environment certificate %s on peer %s", envId, getName() ), e );
+        }
+    }
+
+
     //
     //    @Override
     //    public int setupTunnels( final Set<String> peerIps, final Vni vni ) throws PeerException

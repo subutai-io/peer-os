@@ -302,8 +302,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final Set<EnvironmentDestructionException> exceptions = Sets.newHashSet();
 
+        Set<Peer> peersToRemoveCertFrom = new HashSet<>( environment.getPeers() );
+        peersToRemoveCertFrom.add( peerManager.getLocalPeer() );
+
+
         DestroyEnvironmentTask destroyEnvironmentTask =
-                new DestroyEnvironmentTask( this, environment, exceptions, resultHolder, forceMetadataRemoval );
+                new DestroyEnvironmentTask( this, environment, exceptions, resultHolder, forceMetadataRemoval,
+                        peersToRemoveCertFrom );
 
         executor.submit( destroyEnvironmentTask );
 

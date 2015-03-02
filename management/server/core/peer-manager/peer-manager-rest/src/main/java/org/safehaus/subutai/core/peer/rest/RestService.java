@@ -246,6 +246,13 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response exportEnvironmentCert( @FormParam( "alias" ) String alias );
 
+
+    @DELETE
+    @Path( "cert/remove" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response removeEnvironmentCert( @QueryParam( "environmentId" ) String environmentId,
+                                    @QueryParam( "peerIds" ) String peerIds );
+
     //*********** Environment Specific REST - END ***************
 
     @GET

@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.env.impl.tasks;
 
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -14,6 +15,7 @@ import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.ContainersDestructionResult;
 import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
 import org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl;
@@ -45,12 +47,12 @@ public class DestroyEnvironmentTask implements Runnable
     private final ResultHolder<EnvironmentDestructionException> resultHolder;
     private final boolean forceMetadataRemoval;
     private final Semaphore semaphore;
-
+    private final Set<Peer> peersToUpdateStores;
 
     public DestroyEnvironmentTask( final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
                                    final Set<EnvironmentDestructionException> exceptions,
                                    final ResultHolder<EnvironmentDestructionException> resultHolder,
-                                   final boolean forceMetadataRemoval )
+                                   final boolean forceMetadataRemoval, final Set<Peer> peersToRemoveCertFrom )
     {
         this.environmentManager = environmentManager;
         this.environment = environment;
@@ -58,6 +60,7 @@ public class DestroyEnvironmentTask implements Runnable
         this.resultHolder = resultHolder;
         this.forceMetadataRemoval = forceMetadataRemoval;
         this.semaphore = new Semaphore( 0 );
+        this.peersToUpdateStores = peersToRemoveCertFrom;
     }
 
 
@@ -143,6 +146,19 @@ public class DestroyEnvironmentTask implements Runnable
                 }
             }
 
+            for ( final Peer peer : peersToUpdateStores )
+            {
+                Set<UUID> peerIds = new HashSet<>();
+                for ( final Peer peer1 : peersToUpdateStores )
+                {
+                    if ( !peer.equals( peer1 ) )
+                    {
+                        peerIds.add( peer1.getId() );
+                    }
+                }
+                peer.removeEnvironmentCertificates( environment.getId(), peerIds );
+            }
+
             if ( forceMetadataRemoval || environment.getContainerHosts().isEmpty() )
             {
                 environmentManager.removeEnvironment( environment.getId() );
@@ -152,7 +168,7 @@ public class DestroyEnvironmentTask implements Runnable
                 environment.setStatus( EnvironmentStatus.UNHEALTHY );
             }
         }
-        catch ( EnvironmentNotFoundException e )
+        catch ( EnvironmentNotFoundException | PeerException e )
         {
             LOG.error( String.format( "Error destroying environment %s", environment.getId() ), e );
 

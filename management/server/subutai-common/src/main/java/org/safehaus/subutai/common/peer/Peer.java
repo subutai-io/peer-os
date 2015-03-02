@@ -253,5 +253,12 @@ public interface Peer
      */
     public String exportEnvironmentCertificate( String alias ) throws PeerException;
 
-    ;
+
+    /**
+     * Remove specific environment related certificates from trustStore of local peer.
+     *
+     * @param environmentId - environment whose certificates need to be removed
+     * @param peerIds - peers where environment exists
+     */
+    public void removeEnvironmentCertificates( UUID environmentId, Set<UUID> peerIds ) throws PeerException;
 }

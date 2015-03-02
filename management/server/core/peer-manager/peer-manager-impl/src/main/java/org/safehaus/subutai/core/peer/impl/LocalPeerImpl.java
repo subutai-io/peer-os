@@ -1487,7 +1487,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
-    public void importCertificate( final String cert, final String alias )
+    public void importCertificate( final String cert, final String alias ) throws PeerException
     {
         //************ Save Trust SSL Cert **************************************
         KeyStore keyStore;
@@ -1547,6 +1547,37 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         keyStoreManager.saveX509Certificate( keyStore, environmentKeyStoreData, cert, keyPair );
 
         return keyStoreManager.exportCertificateHEXString( keyStore, environmentKeyStoreData );
+    }
+
+
+    /**
+     * Remove specific environment related certificates from trustStore of local peer.
+     *
+     * @param environmentId - environment whose certificates need to be removed
+     * @param peerIds - peers where environment exists
+     */
+    @Override
+    public void removeEnvironmentCertificates( final UUID environmentId, final Set<UUID> peerIds ) throws PeerException
+    {
+        //************ Delete Trust SSL Cert **************************************
+        KeyStore keyStore;
+        KeyStoreData keyStoreData;
+        KeyStoreManager keyStoreManager;
+
+        keyStoreData = new KeyStoreData();
+        keyStoreData.setupTrustStorePx2();
+        keyStoreManager = new KeyStoreManager();
+
+
+        for ( final UUID peerId : peerIds )
+        {
+            String environmentAlias = String.format( "env_%s_%s", peerId.toString(), environmentId.toString() );
+            keyStoreData.setAlias( environmentAlias );
+            keyStore = keyStoreManager.load( keyStoreData );
+            keyStoreManager.deleteEntry( keyStore, keyStoreData );
+        }
+        //***********************************************************************
+        new Thread( new RestartCoreServlet() ).start();
     }
 
 
