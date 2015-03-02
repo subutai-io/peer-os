@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.host.ContainerHostState;
@@ -773,17 +772,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response removeEnvironmentCert( @QueryParam( "environmentId" ) final String environmentId,
-                                           @QueryParam( "peerIds" ) final String peerIds )
+    public Response removeEnvironmentCert( final String environmentId )
     {
         try
         {
             UUID environmentUUID = JsonUtil.fromJson( environmentId, UUID.class );
-            Set<UUID> peersUUID = JsonUtil.fromJson( peerIds, new TypeToken<Set<UUID>>()
-            {
-            }.getType() );
             LocalPeer localPeer = peerManager.getLocalPeer();
-            localPeer.removeEnvironmentCertificates( environmentUUID, peersUUID );
+            localPeer.removeEnvironmentCertificates( environmentUUID );
             return Response.noContent().build();
         }
         catch ( PeerException e )

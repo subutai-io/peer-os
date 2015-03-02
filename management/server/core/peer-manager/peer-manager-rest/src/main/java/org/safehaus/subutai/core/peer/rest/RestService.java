@@ -250,8 +250,7 @@ public interface RestService
     @DELETE
     @Path( "cert/remove" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response removeEnvironmentCert( @QueryParam( "environmentId" ) String environmentId,
-                                    @QueryParam( "peerIds" ) String peerIds );
+    Response removeEnvironmentCert( @QueryParam( "environmentId" ) String environmentId );
 
     //*********** Environment Specific REST - END ***************
 

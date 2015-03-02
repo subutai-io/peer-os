@@ -1148,13 +1148,11 @@ public class RemotePeerImpl implements RemotePeer
      * Remove specific environment related certificates from trustStore of local peer.
      *
      * @param environmentId - environment whose certificates need to be removed
-     * @param peerIds - peers where environment exists
      */
     @Override
-    public void removeEnvironmentCertificates( final UUID environmentId, final Set<UUID> peerIds ) throws PeerException
+    public void removeEnvironmentCertificates( final UUID environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Invalid parameter environmentId" );
-        Preconditions.checkNotNull( peerIds, "Invalid parameter peerIds" );
 
         String path = "peer/cert/remove";
         String envId = environmentId.toString();
@@ -1167,9 +1165,6 @@ public class RemotePeerImpl implements RemotePeer
             WebClient client = RestUtil.createTrustedWebClientWithEnvAuth( url, environmentRequestAlias );
             client.path( path );
             client.query( "environmentId", JsonUtil.toJson( environmentId ) );
-            client.query( "peerIds", JsonUtil.toJson( peerIds, new TypeToken<Set<UUID>>()
-            {
-            }.getType() ) );
 
             client.header( Common.ENVIRONMENT_ID_HEADER_NAME, envId );
 

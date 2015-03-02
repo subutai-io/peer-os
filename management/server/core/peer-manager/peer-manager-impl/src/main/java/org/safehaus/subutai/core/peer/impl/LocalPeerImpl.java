@@ -4,9 +4,11 @@ package org.safehaus.subutai.core.peer.impl;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -1554,30 +1556,43 @@ public class LocalPeerImpl implements LocalPeer, HostListener
      * Remove specific environment related certificates from trustStore of local peer.
      *
      * @param environmentId - environment whose certificates need to be removed
-     * @param peerIds - peers where environment exists
      */
     @Override
-    public void removeEnvironmentCertificates( final UUID environmentId, final Set<UUID> peerIds ) throws PeerException
+    public void removeEnvironmentCertificates( final UUID environmentId ) throws PeerException
     {
-        //************ Delete Trust SSL Cert **************************************
-        KeyStore keyStore;
-        KeyStoreData keyStoreData;
-        KeyStoreManager keyStoreManager;
-
-        keyStoreData = new KeyStoreData();
-        keyStoreData.setupTrustStorePx2();
-        keyStoreManager = new KeyStoreManager();
-
-
-        for ( final UUID peerId : peerIds )
+        try
         {
-            String environmentAlias = String.format( "env_%s_%s", peerId.toString(), environmentId.toString() );
-            keyStoreData.setAlias( environmentAlias );
+            //************ Delete Trust SSL Cert **************************************
+            KeyStore keyStore;
+            KeyStoreData keyStoreData;
+            KeyStoreManager keyStoreManager;
+
+            keyStoreData = new KeyStoreData();
+            keyStoreData.setupTrustStorePx2();
+            keyStoreManager = new KeyStoreManager();
+
             keyStore = keyStoreManager.load( keyStoreData );
-            keyStoreManager.deleteEntry( keyStore, keyStoreData );
+
+            Enumeration<String> aliases = keyStore.aliases();
+            while ( aliases.hasMoreElements() )
+            {
+                String alias = aliases.nextElement();
+                UUID envIdFromAlias = UUID.fromString( alias.split( "_" )[2] );
+                if ( envIdFromAlias.equals( environmentId ) )
+                {
+                    keyStoreData.setAlias( alias );
+                    KeyStore keyStoreToRemove = keyStoreManager.load( keyStoreData );
+                    keyStoreManager.deleteEntry( keyStoreToRemove, keyStoreData );
+                }
+            }
+
+            //***********************************************************************
+            new Thread( new RestartCoreServlet() ).start();
         }
-        //***********************************************************************
-        new Thread( new RestartCoreServlet() ).start();
+        catch ( KeyStoreException e )
+        {
+            LOG.error( "Error removing environment certificate.", e );
+        }
     }
 
 

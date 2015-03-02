@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.env.impl.tasks;
 
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -47,7 +46,7 @@ public class DestroyEnvironmentTask implements Runnable
     private final ResultHolder<EnvironmentDestructionException> resultHolder;
     private final boolean forceMetadataRemoval;
     private final Semaphore semaphore;
-    private final Set<Peer> peersToUpdateStores;
+    private final Set<Peer> peerStoresToUpdate;
 
     public DestroyEnvironmentTask( final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
                                    final Set<EnvironmentDestructionException> exceptions,
@@ -60,7 +59,7 @@ public class DestroyEnvironmentTask implements Runnable
         this.resultHolder = resultHolder;
         this.forceMetadataRemoval = forceMetadataRemoval;
         this.semaphore = new Semaphore( 0 );
-        this.peersToUpdateStores = peersToRemoveCertFrom;
+        this.peerStoresToUpdate = peersToRemoveCertFrom;
     }
 
 
@@ -146,17 +145,9 @@ public class DestroyEnvironmentTask implements Runnable
                 }
             }
 
-            for ( final Peer peer : peersToUpdateStores )
+            for ( final Peer peer : peerStoresToUpdate )
             {
-                Set<UUID> peerIds = new HashSet<>();
-                for ( final Peer peer1 : peersToUpdateStores )
-                {
-                    if ( !peer.equals( peer1 ) )
-                    {
-                        peerIds.add( peer1.getId() );
-                    }
-                }
-                peer.removeEnvironmentCertificates( environment.getId(), peerIds );
+                peer.removeEnvironmentCertificates( environment.getId() );
             }
 
             if ( forceMetadataRemoval || environment.getContainerHosts().isEmpty() )
