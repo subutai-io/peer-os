@@ -125,7 +125,8 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
 
                     for ( Object o : ( Iterable<?> ) t.getValue() )
                     {
-                        if ( tree.getItem( o ).getItemProperty( VALUE_PROPERTY ).getValue() != null )
+                        if ( tree.getItem( o ) != null && tree.getItem( o ).getItemProperty( VALUE_PROPERTY ) != null
+                                && tree.getItem( o ).getItemProperty( VALUE_PROPERTY ).getValue() != null )
                         {
                             ContainerHost containerHost =
                                     ( ContainerHost ) tree.getItem( o ).getItemProperty( VALUE_PROPERTY ).getValue();
