@@ -58,7 +58,7 @@ checkPackageVersion() {
   fi
 }
 
-checkPackageVersion
+#checkPackageVersion
 
 #Setting SOURCE and BASE folder paths
 BASE=$(pwd)
