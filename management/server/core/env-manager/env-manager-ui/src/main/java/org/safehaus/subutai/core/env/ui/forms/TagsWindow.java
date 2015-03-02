@@ -34,8 +34,8 @@ public class TagsWindow extends Window
         }
 
         setCaption( "Tags" );
-        setWidth( "600px" );
-        setHeight( "400px" );
+        setWidth( "500px" );
+        setHeight( "300px" );
         setModal( true );
         setClosable( true );
 
@@ -78,11 +78,12 @@ public class TagsWindow extends Window
 
                 if ( !Strings.isNullOrEmpty( tagTxt.getValue() ) )
                 {
-                    containerHost.addTag( tagTxt.getValue().trim() );
+                    String tag = tagTxt.getValue().trim();
+                    containerHost.addTag( tag );
                     tagsSelect.setContainerDataSource( new IndexedContainer( containerHost.getTags() ) );
                     if ( finalLocalContainer != null )
                     {
-                        finalLocalContainer.addTag( tagTxt.getValue().trim() );
+                        finalLocalContainer.addTag( tag );
                     }
                 }
                 else
@@ -103,11 +104,12 @@ public class TagsWindow extends Window
             {
                 if ( tagsSelect.getValue() != null )
                 {
-                    containerHost.removeTag( String.valueOf( tagsSelect.getValue() ) );
+                    String tag = String.valueOf( tagsSelect.getValue() ).trim();
+                    containerHost.removeTag( tag );
                     tagsSelect.setContainerDataSource( new IndexedContainer( containerHost.getTags() ) );
                     if ( finalLocalContainer != null )
                     {
-                        finalLocalContainer.removeTag( String.valueOf( tagsSelect.getValue() ) );
+                        finalLocalContainer.removeTag( tag );
                     }
                 }
                 else

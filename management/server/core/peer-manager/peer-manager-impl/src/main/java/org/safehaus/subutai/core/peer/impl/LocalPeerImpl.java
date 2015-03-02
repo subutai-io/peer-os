@@ -1114,10 +1114,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
             newContainerIds.add( containerHostInfo.getId() );
 
-            ContainerHost oldHost = null;
+            ContainerHost containerHost = null;
             try
             {
-                oldHost = resourceHost.getContainerHostById( containerHostInfo.getId() );
+                containerHost = resourceHost.getContainerHostById( containerHostInfo.getId() );
             }
             catch ( HostNotFoundException e )
             {
@@ -1125,23 +1125,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             }
 
 
-            ContainerHostEntity containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
-            setContainersTransientFields( Sets.newHashSet( ( ContainerHost ) containerHost ) );
-            ( ( ResourceHostEntity ) resourceHost ).addContainerHost( containerHost );
-            if ( oldHost == null )
+            if ( containerHost == null )
             {
-                containerHostDataService.persist( containerHost );
+                containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
+                setContainersTransientFields( Sets.newHashSet( containerHost ) );
+                ( ( ResourceHostEntity ) resourceHost ).addContainerHost( containerHost );
+                containerHostDataService.persist( ( ContainerHostEntity ) containerHost );
             }
             else
             {
-                containerHostDataService.update( containerHost );
-                //restore tags
-                for ( String tag : oldHost.getTags() )
-                {
-                    containerHost.addTag( tag );
-                }
+                //update network interfaces
+                ( ( AbstractSubutaiHost ) containerHost ).setNetInterfaces( containerHost.getNetInterfaces() );
+                containerHostDataService.update( ( ContainerHostEntity ) containerHost );
             }
-            containerHost.updateHostInfo( containerHostInfo );
+            ( ( AbstractSubutaiHost ) containerHost ).updateHostInfo( containerHostInfo );
         }
 
         for ( ContainerHost oldHost : oldHosts )
