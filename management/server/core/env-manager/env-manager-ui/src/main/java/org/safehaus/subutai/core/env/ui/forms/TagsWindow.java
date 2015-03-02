@@ -7,13 +7,12 @@ import org.safehaus.subutai.core.peer.api.LocalPeer;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 
@@ -33,13 +32,15 @@ public class TagsWindow extends Window
             //ignore, this is a remote container
         }
 
+        final ContainerHost finalLocalContainer = localContainer;
+
         setCaption( "Tags" );
-        setWidth( "500px" );
+        setWidth( "300px" );
         setHeight( "300px" );
         setModal( true );
         setClosable( true );
 
-        VerticalLayout content = new VerticalLayout();
+        GridLayout content = new GridLayout( 2, 2 );
         content.setSpacing( true );
         content.setMargin( true );
         content.setStyleName( "default" );
@@ -47,29 +48,49 @@ public class TagsWindow extends Window
 
         final ListSelect tagsSelect = new ListSelect( "Tags", containerHost.getTags() );
         tagsSelect.setNullSelectionAllowed( false );
-        tagsSelect.setRows( 5 );
-        tagsSelect.setWidth( "100px" );
+        //        tagsSelect.setRows( 5 );
+        tagsSelect.setWidth( "150px" );
         tagsSelect.setMultiSelect( false );
 
-        content.addComponent( tagsSelect );
+        content.addComponent( tagsSelect, 0, 0 );
 
-        HorizontalLayout controls = new HorizontalLayout();
-        controls.setSpacing( true );
+        content.setComponentAlignment( tagsSelect, Alignment.BOTTOM_LEFT );
 
-        content.addComponent( controls );
+        Button removeTagBtn = new Button( "Remove" );
 
+        removeTagBtn.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
+            {
+                if ( tagsSelect.getValue() != null )
+                {
+                    String tag = String.valueOf( tagsSelect.getValue() ).trim();
+                    containerHost.removeTag( tag );
+                    tagsSelect.setContainerDataSource( new IndexedContainer( containerHost.getTags() ) );
+                    if ( finalLocalContainer != null )
+                    {
+                        finalLocalContainer.removeTag( tag );
+                    }
+                }
+                else
+                {
+                    Notification.show( "Please, select a tag" );
+                }
+            }
+        } );
 
-        Label tagLbl = new Label( "Enter tag" );
+        content.addComponent( removeTagBtn, 1, 0 );
+        content.setComponentAlignment( removeTagBtn, Alignment.BOTTOM_LEFT );
 
-        controls.addComponent( tagLbl );
 
         final TextField tagTxt = new TextField();
+        tagTxt.setWidth( "150px" );
 
-        controls.addComponent( tagTxt );
+        content.addComponent( tagTxt, 0, 1 );
 
         Button addTagBtn = new Button( "Add" );
 
-        final ContainerHost finalLocalContainer = localContainer;
         addTagBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -93,33 +114,8 @@ public class TagsWindow extends Window
             }
         } );
 
-        controls.addComponent( addTagBtn );
+        content.addComponent( addTagBtn, 1, 1 );
 
-        Button removeTagBtn = new Button( "Remove" );
-
-        removeTagBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( final Button.ClickEvent event )
-            {
-                if ( tagsSelect.getValue() != null )
-                {
-                    String tag = String.valueOf( tagsSelect.getValue() ).trim();
-                    containerHost.removeTag( tag );
-                    tagsSelect.setContainerDataSource( new IndexedContainer( containerHost.getTags() ) );
-                    if ( finalLocalContainer != null )
-                    {
-                        finalLocalContainer.removeTag( tag );
-                    }
-                }
-                else
-                {
-                    Notification.show( "Please, enter valid tag" );
-                }
-            }
-        } );
-
-        controls.addComponent( removeTagBtn );
 
         setContent( content );
     }
