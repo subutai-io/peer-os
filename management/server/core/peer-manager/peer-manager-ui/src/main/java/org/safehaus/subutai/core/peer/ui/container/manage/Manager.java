@@ -295,7 +295,6 @@ public class Manager extends VerticalLayout
                     try
                     {
                         localPeer.destroyContainer( containerHost );
-                        binContextMenu();
                         getUI().access( new Runnable()
                         {
                             @Override
@@ -329,12 +328,12 @@ public class Manager extends VerticalLayout
                     try
                     {
                         localPeer.startContainer( containerHost );
-                        binContextMenu();
                         getUI().access( new Runnable()
                         {
                             @Override
                             public void run()
                             {
+                                binContextMenu();
                                 Property lxcStatus =
                                         lxcTable.getItem( containerHost.getHostname() ).getItemProperty( LXC_STATUS );
                                 Label lbl = ( Label ) lxcStatus.getValue();
@@ -367,12 +366,12 @@ public class Manager extends VerticalLayout
                     try
                     {
                         localPeer.stopContainer( containerHost );
-                        binContextMenu();
                         getUI().access( new Runnable()
                         {
                             @Override
                             public void run()
                             {
+                                binContextMenu();
                                 Property lxcStatus =
                                         lxcTable.getItem( containerHost.getHostname() ).getItemProperty( LXC_STATUS );
                                 Label lbl = ( Label ) lxcStatus.getValue();
