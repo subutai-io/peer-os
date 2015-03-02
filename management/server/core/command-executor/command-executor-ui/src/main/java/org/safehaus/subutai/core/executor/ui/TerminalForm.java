@@ -228,13 +228,20 @@ public class TerminalForm extends CustomComponent implements Disposable
     }
 
 
-    public void addOutput( String output )
+    public void addOutput( final String output )
     {
-        if ( !Strings.isNullOrEmpty( output ) )
+        getUI().access( new Runnable()
         {
-            commandOutputTxtArea.setValue( String.format( "%s%s", commandOutputTxtArea.getValue(), output ) );
-            commandOutputTxtArea.setCursorPosition( commandOutputTxtArea.getValue().length() - 1 );
-        }
+            @Override
+            public void run()
+            {
+                if ( !Strings.isNullOrEmpty( output ) )
+                {
+                    commandOutputTxtArea.setValue( String.format( "%s%s", commandOutputTxtArea.getValue(), output ) );
+                    commandOutputTxtArea.setCursorPosition( commandOutputTxtArea.getValue().length() - 1 );
+                }
+            }
+        } );
     }
 
 

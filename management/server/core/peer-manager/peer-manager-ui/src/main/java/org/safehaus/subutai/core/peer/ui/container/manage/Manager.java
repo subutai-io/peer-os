@@ -148,9 +148,17 @@ public class Manager extends VerticalLayout
                                 return new Action[] { DESTROY_CONTAINER };
                             }
                         }
-                        catch ( PeerException e )
+                        catch ( final PeerException e )
                         {
-                            Notification.show( e.getMessage() );
+                            getUI().access( new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+
+                                    Notification.show( e.getMessage() );
+                                }
+                            } );
                         }
                     }
                     else if ( lxcTable.hasChildren( target ) )
