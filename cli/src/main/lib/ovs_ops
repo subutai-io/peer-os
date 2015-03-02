@@ -60,6 +60,8 @@ function ovs_revert_configuration {
   sed -i '/lxc.network.veth.pair.*/d' $config
   sed -i '/lxc.network.script.up.*/d' $config
   sed -i '/lxc.network.mtu.*/d' $config
+  sed -i '/lxc.network.ipv4.*/d' $config
+  sed -i '/#vlan_id.*/d' $config
 
   # Insert default network configurations
   add_before_line="lxc.network.hwaddr"
