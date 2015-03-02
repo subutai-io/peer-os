@@ -47,7 +47,7 @@ public class EnvironmentManagerComponent extends CustomComponent
         formSheet.addTab( blueprintForm.getContentRoot(), "Blueprints" );
         formSheet.getTab( 0 ).setId( "Blueprints" );
 
-        final EnvironmentForm environmentForm = new EnvironmentForm( environmentManager );
+        final EnvironmentForm environmentForm = new EnvironmentForm( environmentManager, peerManager );
         formSheet.addTab( environmentForm.getContentRoot(), "Environments" );
         formSheet.getTab( 1 ).setId( "Environments" );
 
