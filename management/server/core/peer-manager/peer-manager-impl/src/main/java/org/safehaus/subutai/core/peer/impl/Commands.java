@@ -34,7 +34,7 @@ public class Commands
                                                       String templateDownloadToken, String downloadDir )
     {
         return new RequestBuilder( "curl" ).withCmdArgs( Lists.newArrayList( "-O", "-J", "-L",
-                String.format( "http://%s:%d/cxf/registry/templates/%s/download/%s", peerIp, peerPort, templateName,
+                String.format( "https://%s:%d/cxf/registry/templates/%s/download/%s", peerIp, peerPort, templateName,
                         templateDownloadToken ) ) ).withCwd( downloadDir ).withTimeout( 24 * 60 * 60 );
     }
 

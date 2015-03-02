@@ -56,7 +56,7 @@ public class RestUtil
     }
 
 
-    public String request( RequestType requestType, String url, Map<String, String> params,
+    public String request( RequestType requestType, String url, String alias, Map<String, String> params,
                            Map<String, String> headers ) throws HTTPException
     {
 
@@ -75,7 +75,7 @@ public class RestUtil
                     client = createTrustedWebClient( url );
                     break;
                 case ChannelSettings.SECURE_PORT_X2:
-                    client = createTrustedWebClientWithAuth( url );
+                    client = createTrustedWebClientWithAuth( url, alias );
                     break;
                 case ChannelSettings.SECURE_PORT_X3:
                     client = createTrustedWebClientWithEnvAuth( url, "environment certificate alias" );
@@ -194,7 +194,7 @@ public class RestUtil
     }
 
 
-    public static WebClient createTrustedWebClientWithAuth( String url )
+    public static WebClient createTrustedWebClientWithAuth( String url, String alias )
     {
         WebClient client = WebClient.create( url );
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
@@ -204,12 +204,12 @@ public class RestUtil
         httpClientPolicy.setReceiveTimeout( defaultReceiveTimeout );
         httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
 
-
         httpConduit.setClient( httpClientPolicy );
 
         KeyStoreManager keyStoreManager = new KeyStoreManager();
         KeyStoreData keyStoreData = new KeyStoreData();
         keyStoreData.setupKeyStorePx2();
+        keyStoreData.setAlias( alias );
         KeyStore keyStore = keyStoreManager.load( keyStoreData );
 
         KeyStoreData trustStoreData = new KeyStoreData();
@@ -217,7 +217,6 @@ public class RestUtil
         KeyStore trustStore = keyStoreManager.load( trustStoreData );
 
         SSLManager sslManager = new SSLManager( keyStore, keyStoreData, trustStore, trustStoreData );
-
 
         TLSClientParameters tlsClientParameters = new TLSClientParameters();
         tlsClientParameters.setDisableCNCheck( true );
@@ -238,7 +237,6 @@ public class RestUtil
         httpClientPolicy.setReceiveTimeout( defaultReceiveTimeout );
         httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
 
-
         httpConduit.setClient( httpClientPolicy );
 
         KeyStoreManager keyStoreManager = new KeyStoreManager();
@@ -252,7 +250,6 @@ public class RestUtil
         KeyStore trustStore = keyStoreManager.load( trustStoreData );
 
         SSLManager sslManager = new SSLManager( keyStore, keyStoreData, trustStore, trustStoreData );
-
 
         TLSClientParameters tlsClientParameters = new TLSClientParameters();
         tlsClientParameters.setDisableCNCheck( true );

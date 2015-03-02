@@ -15,6 +15,7 @@ import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
 import org.safehaus.subutai.common.security.utils.RestartCoreServlet;
 import org.safehaus.subutai.common.settings.ChannelSettings;
+import org.safehaus.subutai.common.settings.SecuritySettings;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.core.peer.ui.PeerManagerPortalModule;
@@ -342,7 +343,8 @@ public class PeerRegisterForm extends CustomComponent
     private void unregisterMeFromRemote( PeerInfo peerToUnregister, PeerInfo remotePeerInfo )
     {
         String baseUrl = String.format( "https://%s:%s/cxf", remotePeerInfo.getIp(), ChannelSettings.SECURE_PORT_X2 );
-        WebClient client = RestUtil.createTrustedWebClientWithAuth( baseUrl );// WebClient.create( baseUrl );
+        WebClient client = RestUtil.createTrustedWebClientWithAuth( baseUrl,
+                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS );// WebClient.create( baseUrl );
         Response response =
                 client.path( "peer/unregister" ).type( MediaType.APPLICATION_JSON ).accept( MediaType.APPLICATION_JSON )
                       .query( "peerId", GSON.toJson( peerToUnregister.getId().toString() ) ).delete();

@@ -39,22 +39,18 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>channel-manager-api</artifactId>
-      <version>2.0.0</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>channel-manager-impl</artifactId>
-      <version>2.0.0</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>channel-manager-cli</artifactId>
-      <version>2.0.0</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>channel-manager-ui</artifactId>
-      <version>2.0.0</version>
     </dependency>
     
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
