@@ -50,14 +50,13 @@
   </bean>
 
   <bean id="securityManager" class="org.apache.shiro.mgt.DefaultSecurityManager">
-    <!--<property name="sessionManager.sessionDAO" ref="sessionMgr" />
+    <property name="sessionManager.sessionDAO" ref="sessionMgr" />
     <property
         name="subjectDAO.sessionStorageEvaluator.sessionStorageEnabled"
         value="true" />
     <property name="sessionManager.sessionValidationSchedulerEnabled"
               value="true" />
     <property name="cacheManager" ref="ehCacheMgr" />
-    -->
     <property name="realm" ref="subutaiJdbcRealm" />
   </bean>
 
