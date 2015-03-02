@@ -93,6 +93,8 @@ public class IdentityManagerImpl implements IdentityManager
         SecurityUtils.setSecurityManager( securityManager );
 
         LOG.info( String.format( "Identity manager initialized: %s", securityManager ) );
+
+        org.apache.shiro.session.mgt.SimpleSession simpleSession = null;
     }
 
 
