@@ -281,6 +281,7 @@ public class MonitorForm extends CustomComponent
         if ( metricList.size() < 1 )
         {
             Notification.show( "Select host to draw metrics", Notification.Type.WARNING_MESSAGE );
+            showProgress.close();
             return;
         }
 
