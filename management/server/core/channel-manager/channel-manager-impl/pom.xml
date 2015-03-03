@@ -19,6 +19,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>channel-manager-api</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

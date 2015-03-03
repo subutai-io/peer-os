@@ -7,15 +7,20 @@ package org.safehaus.subutai.common.settings;
 public class ChannelSettings
 {
     public static final String OPEN_PORT = "8181";
-    public static final String SECURE_PORT_X1 = "8543";
-    public static final String SECURE_PORT_X2 = "8544";
-    public static final String SECURE_PORT_X3 = "8545";
+    public static final String SPECIAL_PORT_X1 = "8542";
+    public static final String SECURE_PORT_X1  = "8543";
+    public static final String SECURE_PORT_X2  = "8544";
+    public static final String SECURE_PORT_X3  = "8545";
 
 
     public static String[] URL_ACCESS_PX1 =
     {
-            "/cxf/peer/register", "/cxf/peer/reject", "/cxf/peer/approve", "/cxf/peer/remove",
-            "/cxf/peer/trust_request", "/cxf/peer/trust_response",
+            "/cxf/peer/register",
+            "/cxf/peer/reject",
+            "/cxf/peer/approve",
+            "/cxf/peer/remove",
+            "/cxf/peer/trust_request",
+            "/cxf/peer/trust_response",
     };
 
     public static String[] URL_ACCESS_PX2 =
@@ -87,6 +92,15 @@ public class ChannelSettings
     {
             ""
     };
+
+
+
+    public static String[] URL_ACCESS_SPECIAL_PORT_PX1 =
+    {
+            ""
+    };
+
+
 
     public static short checkURL(String uri, String[] URL_ACCESS)
     {
