@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.sql.DataSource;
+
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.security.NullSubutaiLoginContext;
 import org.safehaus.subutai.common.security.SubutaiLoginContext;
@@ -30,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
@@ -52,24 +55,25 @@ public class IdentityManagerImpl implements IdentityManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( IdentityManagerImpl.class );
 
-    private DaoManager daoManager;
-    private SecurityManager securityManager;
+    private final DaoManager daoManager;
+    private final DataSource dataSource;
+    private DefaultSecurityManager securityManager;
 
     private UserDataService userDataService;
     private PermissionDataService permissionDataService;
     private RoleDataService roleDataService;
 
 
-    public void setSecurityManager( final SecurityManager securityManager )
-    {
-        this.securityManager = securityManager;
-    }
+    //    public void setSecurityManager( final SecurityManager securityManager )
+    //    {
+    //        this.securityManager = securityManager;
+    //    }
 
 
-    public void setDaoManager( final DaoManager daoManager )
-    {
-        this.daoManager = daoManager;
-    }
+    //    public void setDaoManager( final DaoManager daoManager )
+    //    {
+    //        this.daoManager = daoManager;
+    //    }
 
 
     private String getSimpleSalt( String username )
@@ -78,13 +82,45 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+    public IdentityManagerImpl( final DaoManager daoManager, final DataSource dataSource )
+    {
+        this.daoManager = daoManager;
+        this.dataSource = dataSource;
+    }
+
+
     public void init()
     {
         LOG.info( "Initializing identity manager..." );
 
-        userDataService = new UserDataService( daoManager.getEntityManagerFactory() );
+        userDataService = new UserDataService( daoManager );
         permissionDataService = new PermissionDataService( daoManager.getEntityManagerFactory() );
         roleDataService = new RoleDataService( daoManager.getEntityManagerFactory() );
+
+
+        securityManager = new DefaultSecurityManager();
+
+        DefaultSessionManager sessionManager = new DefaultSessionManager();
+        sessionManager.setGlobalSessionTimeout( 3600000 );
+
+        securityManager.setSessionManager( sessionManager );
+
+        SubutaiJdbcRealm realm = new SubutaiJdbcRealm( dataSource );
+        realm.setPermissionsLookupEnabled( false );
+        realm.setAuthenticationQuery( "select password, salt from subutai_user where user_name = ?" );
+        realm.setUserRolesQuery(
+                "select r.role_name from subutai_user_role r inner join subutai_user u on u.user_id = r.user_id where"
+                        + " u.user_name = ?" );
+        realm.setPermissionsQuery( "select permission from subutai_roles_permissions where role_name = ?" );
+
+        securityManager.setRealm( realm );
+
+        HashedCredentialsMatcher credentialsMatcher = new HashedCredentialsMatcher();
+        credentialsMatcher.setHashAlgorithmName( "SHA-256" );
+        credentialsMatcher.setHashIterations( 1 );
+
+        realm.setCredentialsMatcher( credentialsMatcher );
+
 
         checkDefaultUser( "karaf" );
         checkDefaultUser( "admin" );
@@ -181,7 +217,16 @@ public class IdentityManagerImpl implements IdentityManager
 
         if ( isAuthenticated( loginContext.getSessionId() ) )
         {
-            return userDataService.findByUsername( loginContext.getUsername() );
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            Thread.currentThread().setContextClassLoader( this.getClass().getClassLoader() );
+            try
+            {
+                return userDataService.findByUsername( loginContext.getUsername() );
+            }
+            finally
+            {
+                Thread.currentThread().setContextClassLoader( cl );
+            }
         }
         else
         {

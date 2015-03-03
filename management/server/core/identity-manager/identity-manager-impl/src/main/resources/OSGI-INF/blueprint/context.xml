@@ -5,7 +5,7 @@
     >
 
   <reference id="securityDS" interface="javax.sql.DataSource"
-             filter="(osgi.jndi.service.name=openjpa/securityManagerDS)" availability="mandatory" />
+             filter="(osgi.jndi.service.name=openjpa/securityManagerDS)" availability="mandatory" activation="eager" />
 
   <!--*****************************************************************-->
   <bean id="daoManagerSecurity" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager"
@@ -15,12 +15,13 @@
   <!--*****************************************************************-->
 
   <bean id="identityManager" scope="singleton" class="org.safehaus.subutai.core.identity.impl.IdentityManagerImpl"
-        init-method="init" activation="eager" depends-on="securityDS">
-    <property name="daoManager" ref="daoManagerSecurity" />
-    <property name="securityManager" ref="securityManager" />
+        activation="eager" init-method="init" depends-on="daoManagerSecurity">
+    <argument ref="daoManagerSecurity" />
+    <argument ref="securityDS" />
   </bean>
 
-  <service ref="identityManager" interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
+  <service ref="identityManager" interface="org.safehaus.subutai.core.identity.api.IdentityManager"
+           activation="eager" />
 
   <jaas:config name="karaf" rank="5">
     <jaas:module className="org.safehaus.subutai.core.identity.impl.ShiroLoginModule"
@@ -28,47 +29,47 @@
     </jaas:module>
   </jaas:config>
 
-  <bean id="sessionMgr"
-        class="org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO" scope="singleton" activation="eager">
-    <property name="activeSessionsCacheName"
-              value="shiro-activeSessionCache" />
-  </bean>
+  <!--<bean id="sessionMgr"-->
+  <!--class="org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO" scope="singleton" activation="eager">-->
+  <!--<property name="activeSessionsCacheName"-->
+  <!--value="shiro-activeSessionCache" />-->
+  <!--</bean>-->
 
-  <bean id="ehCacheMgr"
-        class="org.apache.shiro.cache.ehcache.EhCacheManager" init-method="init"
-        destroy-method="destroy" scope="singleton" activation="eager">
-    <property name="cacheManagerConfigFile"
-              value="file:./etc/ehcache.xml" />
-  </bean>
+  <!--<bean id="ehCacheMgr"-->
+  <!--class="org.apache.shiro.cache.ehcache.EhCacheManager" init-method="init"-->
+  <!--destroy-method="destroy" scope="singleton" activation="eager">-->
+  <!--<property name="cacheManagerConfigFile"-->
+  <!--value="file:./etc/ehcache.xml" />-->
+  <!--</bean>-->
 
-  <bean id="securityManager" class="org.apache.shiro.mgt.DefaultSecurityManager" scope="singleton" activation="eager">
-    <property name="sessionManager.sessionDAO" ref="sessionMgr" />
-    <property
-        name="subjectDAO.sessionStorageEvaluator.sessionStorageEnabled"
-        value="true" />
-    <property name="sessionManager.sessionValidationSchedulerEnabled"
-              value="true" />
-    <property name="sessionManager.globalSessionTimeout" value="3600000" />
-    <property name="cacheManager" ref="ehCacheMgr" />
-    <property name="realm" ref="subutaiJdbcRealm" />
-  </bean>
+  <!--<bean id="securityManager" class="org.apache.shiro.mgt.DefaultSecurityManager" scope="singleton" activation="eager">-->
+  <!--<property name="sessionManager.sessionDAO" ref="sessionMgr" />-->
+  <!--<property-->
+  <!--name="subjectDAO.sessionStorageEvaluator.sessionStorageEnabled"-->
+  <!--value="true" />-->
+  <!--<property name="sessionManager.sessionValidationSchedulerEnabled"-->
+  <!--value="true" />-->
+  <!--<property name="sessionManager.globalSessionTimeout" value="3600000" />-->
+  <!--<property name="cacheManager" ref="ehCacheMgr" />-->
+  <!--<property name="realm" ref="subutaiJdbcRealm" />-->
+  <!--</bean>-->
 
-  <bean id="sha256Matcher" class="org.apache.shiro.authc.credential.HashedCredentialsMatcher" scope="singleton"
-        activation="eager">
-    <property name="hashAlgorithmName" value="SHA-256" />
-    <property name="hashIterations" value="1" />
-  </bean>
+  <!--<bean id="sha256Matcher" class="org.apache.shiro.authc.credential.HashedCredentialsMatcher" scope="singleton"-->
+  <!--activation="eager">-->
+  <!--<property name="hashAlgorithmName" value="SHA-256" />-->
+  <!--<property name="hashIterations" value="1" />-->
+  <!--</bean>-->
 
-  <bean id="subutaiJdbcRealm" class="org.safehaus.subutai.core.identity.impl.SubutaiJdbcRealm" scope="singleton"
-        activation="eager">
-    <argument ref="securityDS" />
-    <property name="permissionsLookupEnabled" value="false" />
-    <property name="authenticationQuery" value="select password, salt from subutai_user where user_name = ?" />
-    <property name="userRolesQuery"
-              value="select r.role_name from subutai_user_role r inner join subutai_user u on u.user_id = r.user_id where u.user_name = ?" />
-    <property name="permissionsQuery" value="select permission from subutai_roles_permissions where role_name = ?" />
-    <property name="credentialsMatcher" ref="sha256Matcher" />
-  </bean>
+  <!--<bean id="subutaiJdbcRealm" class="org.safehaus.subutai.core.identity.impl.SubutaiJdbcRealm" scope="singleton"-->
+  <!--activation="eager">-->
+  <!--<argument ref="securityDS" />-->
+  <!--<property name="permissionsLookupEnabled" value="false" />-->
+  <!--<property name="authenticationQuery" value="select password, salt from subutai_user where user_name = ?" />-->
+  <!--<property name="userRolesQuery"-->
+  <!--value="select r.role_name from subutai_user_role r inner join subutai_user u on u.user_id = r.user_id where u.user_name = ?" />-->
+  <!--<property name="permissionsQuery" value="select permission from subutai_roles_permissions where role_name = ?" />-->
+  <!--<property name="credentialsMatcher" ref="sha256Matcher" />-->
+  <!--</bean>-->
 
   <!--<service ref="securityManager"-->
   <!--interface="org.apache.shiro.mgt.SecurityManager" />-->
