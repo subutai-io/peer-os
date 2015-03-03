@@ -217,7 +217,16 @@ public class IdentityManagerImpl implements IdentityManager
 
         if ( isAuthenticated( loginContext.getSessionId() ) )
         {
-            return userDataService.findByUsername( loginContext.getUsername() );
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            Thread.currentThread().setContextClassLoader( this.getClass().getClassLoader() );
+            try
+            {
+                return userDataService.findByUsername( loginContext.getUsername() );
+            }
+            finally
+            {
+                Thread.currentThread().setContextClassLoader( cl );
+            }
         }
         else
         {
