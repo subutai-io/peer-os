@@ -28,7 +28,6 @@ import org.safehaus.subutai.core.key.api.KeyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.mgt.SecurityManager;
@@ -90,7 +89,7 @@ public class IdentityManagerImpl implements IdentityManager
         checkDefaultUser( "karaf" );
         checkDefaultUser( "admin" );
 
-        SecurityUtils.setSecurityManager( securityManager );
+        //SecurityUtils.setSecurityManager( securityManager );
 
         LOG.info( String.format( "Identity manager initialized: %s", securityManager ) );
 
@@ -207,7 +206,9 @@ public class IdentityManagerImpl implements IdentityManager
     public Serializable login( final String username, final String password )
     {
         UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken( username, password );
-        Subject subject = SecurityUtils.getSubject();
+        Subject subject = new Subject.Builder( securityManager ).buildSubject();
+
+        subject = securityManager.login( subject, usernamePasswordToken );
         subject.login( usernamePasswordToken );
 
         return subject.getSession().getId();
