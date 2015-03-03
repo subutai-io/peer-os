@@ -23,6 +23,8 @@
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
   <reference id="networkManager"
              interface="org.safehaus.subutai.core.network.api.NetworkManager" />
+  <reference id="identityManager"
+             interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
 
   <!-- ************************************************************************************************* -->
   <bean id="daoManagerEnv" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager" activation="eager">
@@ -44,6 +46,7 @@
     <argument ref="networkManager" />
     <argument ref="daoManagerEnv" />
     <argument value="${defaultDomain}" />
+    <argument ref="identityManager" />
   </bean>
 
   <service ref="environmentManager" interface="org.safehaus.subutai.core.env.api.EnvironmentManager" />

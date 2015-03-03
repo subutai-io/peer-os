@@ -39,6 +39,7 @@ import org.safehaus.subutai.core.env.impl.tasks.DestroyContainerTask;
 import org.safehaus.subutai.core.env.impl.tasks.DestroyEnvironmentTask;
 import org.safehaus.subutai.core.env.impl.tasks.GrowEnvironmentTask;
 import org.safehaus.subutai.core.env.impl.tasks.SetSshKeyTask;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -64,6 +65,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private final EnvironmentBuilder environmentBuilder;
     private final ExecutorService executor = Executors.newCachedThreadPool();
     private final String defaultDomain;
+    private final IdentityManager identityManager;
 
     private final Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
 
@@ -78,19 +80,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager,
                                    final NetworkManager networkManager, final DaoManager daoManager,
-                                   final String defaultDomain )
+                                   final String defaultDomain, final IdentityManager identityManager )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( networkManager );
         Preconditions.checkNotNull( daoManager );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( defaultDomain ) );
+        Preconditions.checkNotNull( identityManager );
 
         this.peerManager = peerManager;
         this.networkManager = networkManager;
         this.daoManager = daoManager;
         this.defaultDomain = defaultDomain;
         this.environmentBuilder = new EnvironmentBuilder( templateRegistry, peerManager, defaultDomain );
+        this.identityManager = identityManager;
     }
 
 
