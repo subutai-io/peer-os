@@ -4,5 +4,5 @@ Section: devel
 Installed-Size: 100
 Maintainer: safehaus.org
 Architecture: amd64
-Version: 2.0.0-10
+Version: 2.0.0-11
 Description: This is a Subutai-management package distribution.
