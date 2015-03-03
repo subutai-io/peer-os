@@ -29,7 +29,7 @@
     <property name="password" value="" />
   </bean>
 
-  <service interface="javax.sql.DataSource" ref="securityManagerJDBC" activation="eager" ranking="0">
+  <service interface="javax.sql.DataSource" ref="securityManagerJDBC" activation="eager">
     <service-properties>
       <entry key="osgi.jndi.service.name" value="openjpa/securityManagerDS" />
     </service-properties>
