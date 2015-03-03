@@ -519,6 +519,11 @@
         <artifactId>identity-manager-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>identity-manager-ssl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- Vaadin -->
       <dependency>

@@ -13,7 +13,6 @@ import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.peer.PeerStatus;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
-import org.safehaus.subutai.common.security.utils.RestartCoreServlet;
 import org.safehaus.subutai.common.settings.ChannelSettings;
 import org.safehaus.subutai.common.settings.SecuritySettings;
 import org.safehaus.subutai.common.util.JsonUtil;
@@ -366,7 +365,9 @@ public class PeerRegisterForm extends CustomComponent
 
             keyStoreManager.deleteEntry( keyStore, keyStoreData );
             //***********************************************************************
-            new Thread( new RestartCoreServlet() ).start();
+
+            module.getSslContextFactory().reloadTrustStore();
+            //            new Thread( new RestartCoreServlet() ).start();
         }
         else
         {
@@ -427,7 +428,9 @@ public class PeerRegisterForm extends CustomComponent
             keyStoreManager.importCertificateHEXString( keyStore, keyStoreData );
             //***********************************************************************
 
-            new Thread( new RestartCoreServlet() ).start();
+            module.getSslContextFactory().reloadTrustStore();
+
+            //            new Thread( new RestartCoreServlet() ).start();
             return true;
         }
         else
