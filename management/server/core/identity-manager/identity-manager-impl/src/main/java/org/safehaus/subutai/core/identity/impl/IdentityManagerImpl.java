@@ -16,6 +16,7 @@ import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.PermissionGroup;
 import org.safehaus.subutai.core.identity.api.Role;
+import org.safehaus.subutai.core.identity.api.Roles;
 import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.identity.impl.dao.PermissionDataService;
 import org.safehaus.subutai.core.identity.impl.dao.RoleDataService;
@@ -24,7 +25,6 @@ import org.safehaus.subutai.core.identity.impl.entity.PermissionEntity;
 import org.safehaus.subutai.core.identity.impl.entity.PermissionPK;
 import org.safehaus.subutai.core.identity.impl.entity.RoleEntity;
 import org.safehaus.subutai.core.identity.impl.entity.UserEntity;
-import org.safehaus.subutai.core.key.api.KeyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +35,7 @@ import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListener;
+import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
@@ -52,7 +53,6 @@ public class IdentityManagerImpl implements IdentityManager
     private static final Logger LOG = LoggerFactory.getLogger( IdentityManagerImpl.class );
 
     private DaoManager daoManager;
-    private KeyManager keyManager;
     private SecurityManager securityManager;
 
     private UserDataService userDataService;
@@ -66,9 +66,9 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    public void setKeyManager( final KeyManager keyManager )
+    public void setDaoManager( final DaoManager daoManager )
     {
-        this.keyManager = keyManager;
+        this.daoManager = daoManager;
     }
 
 
@@ -144,12 +144,6 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    public void setDaoManager( final DaoManager daoManager )
-    {
-        this.daoManager = daoManager;
-    }
-
-
     @Override
     public SecurityManager getSecurityManager()
     {
@@ -211,9 +205,17 @@ public class IdentityManagerImpl implements IdentityManager
         SecurityUtils.setSecurityManager( securityManager );
         Subject subject = SecurityUtils.getSubject();
 
-        subject.login( usernamePasswordToken );
-
-        return subject.getSession().getId();
+        try
+        {
+            subject.login( usernamePasswordToken );
+            return subject.getSession().getId();
+        }
+        catch ( UnknownSessionException e )
+        {
+            subject = new Subject.Builder().buildSubject();
+            subject.login( usernamePasswordToken );
+            return subject.getSession( true ).getId();
+        }
     }
 
 
@@ -241,11 +243,11 @@ public class IdentityManagerImpl implements IdentityManager
         Set<String> result = new HashSet<>();
         Subject subject = getSubject( shiroSessionId );
 
-        for ( String role : IdentityManager.ROLES )
+        for ( Roles role : Roles.values() )
         {
-            if ( subject.hasRole( role ) )
+            if ( subject.hasRole( role.getRoleName() ) )
             {
-                result.add( role );
+                result.add( role.getRoleName() );
             }
         }
         return result;

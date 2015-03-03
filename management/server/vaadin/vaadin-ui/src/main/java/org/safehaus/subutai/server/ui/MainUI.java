@@ -31,6 +31,7 @@ import org.safehaus.subutai.common.security.SubutaiLoginContext;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
+import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.server.ui.util.HelpManager;
 import org.safehaus.subutai.server.ui.util.HelpOverlay;
 import org.safehaus.subutai.server.ui.util.SubutaiVaadinUtils;
@@ -354,6 +355,23 @@ public class MainUI extends UI implements ViewChangeListener
                                 username = new Label( "unknown" );
                                 username.setSizeUndefined();
                                 addComponent( username );
+
+                                try
+                                {
+                                    IdentityManager identityManager =
+                                            ServiceLocator.getServiceNoCache( IdentityManager.class );
+
+                                    User user = identityManager.getUser();
+
+                                    if ( user != null )
+                                    {
+                                        username.setValue( user.getUsername() );
+                                    }
+                                }
+                                catch ( NamingException e )
+                                {
+                                    LOG.error( e.toString(), e );
+                                }
 
                                 MenuBar.Command cmd = new MenuBar.Command()
                                 {

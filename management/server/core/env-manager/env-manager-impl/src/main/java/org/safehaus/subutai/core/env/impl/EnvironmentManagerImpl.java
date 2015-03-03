@@ -2,7 +2,9 @@ package org.safehaus.subutai.core.env.impl;
 
 
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -32,6 +34,7 @@ import org.safehaus.subutai.core.env.impl.dao.EnvironmentContainerDataService;
 import org.safehaus.subutai.core.env.impl.dao.EnvironmentDataService;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
+import org.safehaus.subutai.core.env.impl.exception.EnvironmentAccessDeniedException;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
 import org.safehaus.subutai.core.env.impl.tasks.CreateEnvironmentTask;
@@ -39,6 +42,7 @@ import org.safehaus.subutai.core.env.impl.tasks.DestroyContainerTask;
 import org.safehaus.subutai.core.env.impl.tasks.DestroyEnvironmentTask;
 import org.safehaus.subutai.core.env.impl.tasks.GrowEnvironmentTask;
 import org.safehaus.subutai.core.env.impl.tasks.SetSshKeyTask;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -64,6 +68,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private final EnvironmentBuilder environmentBuilder;
     private final ExecutorService executor = Executors.newCachedThreadPool();
     private final String defaultDomain;
+    private final IdentityManager identityManager;
 
     private final Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
 
@@ -78,19 +83,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager,
                                    final NetworkManager networkManager, final DaoManager daoManager,
-                                   final String defaultDomain )
+                                   final String defaultDomain, final IdentityManager identityManager )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( networkManager );
         Preconditions.checkNotNull( daoManager );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( defaultDomain ) );
+        Preconditions.checkNotNull( identityManager );
 
         this.peerManager = peerManager;
         this.networkManager = networkManager;
         this.daoManager = daoManager;
         this.defaultDomain = defaultDomain;
         this.environmentBuilder = new EnvironmentBuilder( templateRegistry, peerManager, defaultDomain );
+        this.identityManager = identityManager;
     }
 
 
@@ -99,6 +106,27 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         this.blueprintDataService = new BlueprintDataService( daoManager );
         this.environmentDataService = new EnvironmentDataService( daoManager );
         this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager );
+    }
+
+
+    protected boolean isUserAdmin()
+    {
+        return identityManager.getUser().isAdmin();
+    }
+
+
+    protected Long getUserId()
+    {
+        return identityManager.getUser().getId();
+    }
+
+
+    protected void checkAccess( Environment environment )
+    {
+        if ( !( isUserAdmin() || Objects.equals( environment.getUserId(), getUserId() ) ) )
+        {
+            throw new EnvironmentAccessDeniedException();
+        }
     }
 
 
@@ -114,6 +142,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             setContainersTransientFields( environment.getContainerHosts() );
         }
 
+        if ( !isUserAdmin() )
+        {
+            Long userId = getUserId();
+            for ( Iterator<Environment> iterator = environments.iterator(); iterator.hasNext(); )
+            {
+                final Environment environment = iterator.next();
+                if ( !Objects.equals( environment.getUserId(), userId ) )
+                {
+                    iterator.remove();
+                }
+            }
+        }
+
         return environments;
     }
 
@@ -124,10 +165,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         EnvironmentImpl environment = environmentDataService.find( environmentId.toString() );
+
         if ( environment == null )
         {
             throw new EnvironmentNotFoundException();
         }
+
+        //check user access
+        checkAccess( environment );
 
         //set environment's transient fields
         setEnvironmentTransientFields( environment );
@@ -142,7 +187,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     protected EnvironmentImpl createEmptyEnvironment( final String name, final String subnetCidr, final String sshKey )
     {
 
-        final EnvironmentImpl environment = new EnvironmentImpl( name, subnetCidr, sshKey );
+        final EnvironmentImpl environment = new EnvironmentImpl( name, subnetCidr, sshKey, getUserId() );
 
         saveEnvironment( environment );
 

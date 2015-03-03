@@ -19,6 +19,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import org.safehaus.subutai.core.identity.api.Role;
+import org.safehaus.subutai.core.identity.api.Roles;
 import org.safehaus.subutai.core.identity.api.User;
 
 
@@ -186,5 +187,20 @@ public class UserEntity implements User
     public Set<Role> getRoles()
     {
         return roles;
+    }
+
+
+    @Override
+    public boolean isAdmin()
+    {
+        for ( Role role : roles )
+        {
+            if ( role.getName().equalsIgnoreCase( Roles.ADMIN.getRoleName() ) )
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

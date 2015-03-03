@@ -82,6 +82,9 @@ public class EnvironmentImpl implements Environment, Serializable
     @Column( name = "public_key", length = 3000 )
     private String publicKey;
 
+    @Column( name = "user_id" )
+    private Long userId;
+
 
     @Transient
     private EnvironmentDataService dataService;
@@ -94,7 +97,7 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public EnvironmentImpl( String name, String subnetCidr, String sshKey )
+    public EnvironmentImpl( String name, String subnetCidr, String sshKey, Long userId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
         SubnetUtils cidr = new SubnetUtils( subnetCidr );
@@ -106,6 +109,7 @@ public class EnvironmentImpl implements Environment, Serializable
         this.creationTimestamp = System.currentTimeMillis();
         this.status = EnvironmentStatus.EMPTY;
         this.lastUsedIpIndex = 0;//0 is reserved for gateway
+        this.userId = userId;
     }
 
 
@@ -150,6 +154,13 @@ public class EnvironmentImpl implements Environment, Serializable
     public String getName()
     {
         return name;
+    }
+
+
+    @Override
+    public Long getUserId()
+    {
+        return userId;
     }
 
 

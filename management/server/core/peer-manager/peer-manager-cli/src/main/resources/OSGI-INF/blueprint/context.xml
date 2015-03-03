@@ -124,7 +124,4 @@
   <reference id="environmentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.env.api.EnvironmentManager" />
 
-  <reference id="securityManager" availability="mandatory"
-             interface="org.apache.shiro.mgt.SecurityManager" />
-
 </blueprint>

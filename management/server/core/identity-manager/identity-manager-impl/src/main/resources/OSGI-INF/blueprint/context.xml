@@ -4,6 +4,9 @@
            xmlns:jaas="http://karaf.apache.org/xmlns/jaas/v1.1.0"
     >
 
+  <reference id="securityDS" interface="javax.sql.DataSource"
+             filter="(osgi.jndi.service.name=openjpa/securityManagerDS)" availability="mandatory" />
+
   <!--*****************************************************************-->
   <bean id="daoManagerSecurity" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager"
         activation="eager" scope="singleton">
@@ -11,17 +14,10 @@
   </bean>
   <!--*****************************************************************-->
 
-  <reference id="keyManager" interface="org.safehaus.subutai.core.key.api.KeyManager" />
-  <!--<reference id="peerManager" interface="org.safehaus.subutai.core.peer.api.PeerManager" />-->
-
   <bean id="identityManager" scope="singleton" class="org.safehaus.subutai.core.identity.impl.IdentityManagerImpl"
-        init-method="init">
+        init-method="init" activation="eager" depends-on="securityDS">
     <property name="daoManager" ref="daoManagerSecurity" />
-    <property name="keyManager" ref="keyManager" />
     <property name="securityManager" ref="securityManager" />
-    <!--    <property name="peerManager" ref="peerManager" />-->
-
-    <!--    <property name="bundleContext" ref="blueprintBundleContext" />-->
   </bean>
 
   <service ref="identityManager" interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
@@ -31,26 +27,21 @@
                  flags="required" name="Subutai">
     </jaas:module>
   </jaas:config>
-  <!--
-    <service interface="org.apache.karaf.jaas.modules.BackingEngineFactory">
-      <bean class="org.apache.karaf.jaas.modules.syncope.SyncopeBackingEngineFactory" />
-    </service>
-  -->
 
   <bean id="sessionMgr"
-        class="org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO" scope="singleton">
+        class="org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO" scope="singleton" activation="eager">
     <property name="activeSessionsCacheName"
               value="shiro-activeSessionCache" />
   </bean>
 
   <bean id="ehCacheMgr"
-        class="org.apache.shiro.cache.ehcache.EhCacheManager"
-        destroy-method="destroy" scope="singleton">
+        class="org.apache.shiro.cache.ehcache.EhCacheManager" init-method="init"
+        destroy-method="destroy" scope="singleton" activation="eager">
     <property name="cacheManagerConfigFile"
               value="file:./etc/ehcache.xml" />
   </bean>
 
-  <bean id="securityManager" class="org.apache.shiro.mgt.DefaultSecurityManager" scope="singleton">
+  <bean id="securityManager" class="org.apache.shiro.mgt.DefaultSecurityManager" scope="singleton" activation="eager">
     <property name="sessionManager.sessionDAO" ref="sessionMgr" />
     <property
         name="subjectDAO.sessionStorageEvaluator.sessionStorageEnabled"
@@ -62,15 +53,14 @@
     <property name="realm" ref="subutaiJdbcRealm" />
   </bean>
 
-  <bean id="sha256Matcher" class="org.apache.shiro.authc.credential.HashedCredentialsMatcher" scope="singleton">
+  <bean id="sha256Matcher" class="org.apache.shiro.authc.credential.HashedCredentialsMatcher" scope="singleton"
+        activation="eager">
     <property name="hashAlgorithmName" value="SHA-256" />
     <property name="hashIterations" value="1" />
   </bean>
 
-  <reference id="securityDS" interface="javax.sql.DataSource"
-             filter="(osgi.jndi.service.name=openjpa/securityManagerDS)" />
-
-  <bean id="subutaiJdbcRealm" class="org.safehaus.subutai.core.identity.impl.SubutaiJdbcRealm" scope="singleton">
+  <bean id="subutaiJdbcRealm" class="org.safehaus.subutai.core.identity.impl.SubutaiJdbcRealm" scope="singleton"
+        activation="eager">
     <argument ref="securityDS" />
     <property name="permissionsLookupEnabled" value="false" />
     <property name="authenticationQuery" value="select password, salt from subutai_user where user_name = ?" />
@@ -80,6 +70,6 @@
     <property name="credentialsMatcher" ref="sha256Matcher" />
   </bean>
 
-  <service ref="securityManager"
-           interface="org.apache.shiro.mgt.SecurityManager" />
+  <!--<service ref="securityManager"-->
+  <!--interface="org.apache.shiro.mgt.SecurityManager" />-->
 </blueprint>
