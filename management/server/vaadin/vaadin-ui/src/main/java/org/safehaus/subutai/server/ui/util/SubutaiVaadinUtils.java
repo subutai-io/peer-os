@@ -8,6 +8,7 @@ import org.safehaus.subutai.common.security.SubutaiLoginContext;
 import org.safehaus.subutai.common.util.JsonUtil;
 
 import com.google.common.base.Strings;
+import com.google.gson.JsonSyntaxException;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
 
@@ -37,7 +38,14 @@ public abstract class SubutaiVaadinUtils
                     if ( cookie.getName().equals( SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME ) && !Strings
                             .isNullOrEmpty( cookie.getValue() ) )
                     {
-                        loginContext = JsonUtil.fromJson( cookie.getValue(), SubutaiLoginContext.class );
+                        try
+                        {
+                            loginContext = JsonUtil.fromJson( cookie.getValue(), SubutaiLoginContext.class );
+                        }
+                        catch ( JsonSyntaxException e )
+                        {
+                            //ignore
+                        }
                         break;
                     }
                 }
