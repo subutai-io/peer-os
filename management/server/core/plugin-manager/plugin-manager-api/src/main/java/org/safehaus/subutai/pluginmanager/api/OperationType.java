@@ -1,4 +1,4 @@
-package org.safehaus.subutai.pluginmanager.impl;
+package org.safehaus.subutai.pluginmanager.api;
 
 
 public enum OperationType
