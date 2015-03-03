@@ -36,27 +36,27 @@
     </service>
   -->
 
-  <!-- <bean id="sessionMgr"
-         class="org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO">
-     <property name="activeSessionsCacheName"
-               value="shiro-activeSessionCache" />
-   </bean>
+  <bean id="sessionMgr"
+        class="org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO">
+    <property name="activeSessionsCacheName"
+              value="shiro-activeSessionCache" />
+  </bean>
 
-   <bean id="ehCacheMgr"
-         class="org.apache.shiro.cache.ehcache.EhCacheManager"
-         destroy-method="destroy">
-     <property name="cacheManagerConfigFile"
-               value="file:./etc/ehcache.xml" />
-   </bean>-->
+  <bean id="ehCacheMgr"
+        class="org.apache.shiro.cache.ehcache.EhCacheManager"
+        destroy-method="destroy">
+    <property name="cacheManagerConfigFile"
+              value="file:./etc/ehcache.xml" />
+  </bean>
 
   <bean id="securityManager" class="org.apache.shiro.mgt.DefaultSecurityManager">
-    <!--    <property name="sessionManager.sessionDAO" ref="sessionMgr" />
-        <property
-            name="subjectDAO.sessionStorageEvaluator.sessionStorageEnabled"
-            value="false" />
-        <property name="sessionManager.sessionValidationSchedulerEnabled"
-                  value="false" />
-        <property name="cacheManager" ref="ehCacheMgr" />-->
+    <property name="sessionManager.sessionDAO" ref="sessionMgr" />
+    <property
+        name="subjectDAO.sessionStorageEvaluator.sessionStorageEnabled"
+        value="true" />
+    <property name="sessionManager.sessionValidationSchedulerEnabled"
+              value="true" />
+    <property name="cacheManager" ref="ehCacheMgr" />
     <property name="realm" ref="subutaiJdbcRealm" />
   </bean>
 
