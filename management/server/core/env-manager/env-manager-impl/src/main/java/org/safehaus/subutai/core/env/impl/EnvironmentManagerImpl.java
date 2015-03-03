@@ -34,6 +34,7 @@ import org.safehaus.subutai.core.env.impl.dao.EnvironmentContainerDataService;
 import org.safehaus.subutai.core.env.impl.dao.EnvironmentDataService;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
+import org.safehaus.subutai.core.env.impl.exception.EnvironmentAccessDeniedException;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
 import org.safehaus.subutai.core.env.impl.tasks.CreateEnvironmentTask;
@@ -120,6 +121,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    protected void checkAccess( Environment environment )
+    {
+        if ( !( isUserAdmin() || Objects.equals( environment.getUserId(), getUserId() ) ) )
+        {
+            throw new EnvironmentAccessDeniedException();
+        }
+    }
+
+
     @Override
     public Set<Environment> getEnvironments()
     {
@@ -155,10 +165,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         EnvironmentImpl environment = environmentDataService.find( environmentId.toString() );
+
         if ( environment == null )
         {
             throw new EnvironmentNotFoundException();
         }
+
+        //check user access
+        checkAccess( environment );
 
         //set environment's transient fields
         setEnvironmentTransientFields( environment );
