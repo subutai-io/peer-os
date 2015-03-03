@@ -1,7 +1,7 @@
 #!/bin/bash
 . /usr/share/subutai-cli/subutai/lib/net-ops
 
-function management_network_usage {
+function management_network_usage { 
 cat <<EOF
 -------------------------------------------------------------------------------
 Usage:   Establish a tunnnel to a subutai peer whose address information provided
