@@ -11,7 +11,7 @@ function clone_usage {
   echo "                    "m -- starts monitoring of container
   echo "                    "a -- after cloning container run the specified scripts
   echo "		    "N -- User Name for Key
-  echo "		    "M -- Email Address for Key
+  echo "		    "M -- Email Address for Key 
   echo
   echo -----------------------------------------------------------------------
 }
