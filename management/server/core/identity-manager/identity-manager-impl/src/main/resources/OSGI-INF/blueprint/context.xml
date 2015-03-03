@@ -5,7 +5,8 @@
     >
 
   <!--*****************************************************************-->
-  <bean id="daoManagerSecurity" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager" scope="prototype">
+  <bean id="daoManagerSecurity" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager"
+        activation="eager" scope="singleton">
     <jpa:unit unitname="securityManagerPUnit" property="entityManagerFactory" />
   </bean>
   <!--*****************************************************************-->
@@ -37,19 +38,19 @@
   -->
 
   <bean id="sessionMgr"
-        class="org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO">
+        class="org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO" scope="singleton">
     <property name="activeSessionsCacheName"
               value="shiro-activeSessionCache" />
   </bean>
 
   <bean id="ehCacheMgr"
         class="org.apache.shiro.cache.ehcache.EhCacheManager"
-        destroy-method="destroy">
+        destroy-method="destroy" scope="singleton">
     <property name="cacheManagerConfigFile"
               value="file:./etc/ehcache.xml" />
   </bean>
 
-  <bean id="securityManager" class="org.apache.shiro.mgt.DefaultSecurityManager">
+  <bean id="securityManager" class="org.apache.shiro.mgt.DefaultSecurityManager" scope="singleton">
     <property name="sessionManager.sessionDAO" ref="sessionMgr" />
     <property
         name="subjectDAO.sessionStorageEvaluator.sessionStorageEnabled"
@@ -61,14 +62,16 @@
     <property name="realm" ref="subutaiJdbcRealm" />
   </bean>
 
-  <bean id="sha256Matcher" class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+  <bean id="sha256Matcher" class="org.apache.shiro.authc.credential.HashedCredentialsMatcher" scope="singleton">
     <property name="hashAlgorithmName" value="SHA-256" />
     <property name="hashIterations" value="1" />
   </bean>
 
-  <bean id="subutaiJdbcRealm" class="org.safehaus.subutai.core.identity.impl.SubutaiJdbcRealm">
-    <property name="jndiDataSourceName"
-              value="osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/securityManagerDS)" />
+  <reference id="securityDS" interface="javax.sql.DataSource"
+             filter="(osgi.jndi.service.name=openjpa/securityManagerDS)" />
+
+  <bean id="subutaiJdbcRealm" class="org.safehaus.subutai.core.identity.impl.SubutaiJdbcRealm" scope="singleton">
+    <argument ref="securityDS" />
     <property name="permissionsLookupEnabled" value="false" />
     <property name="authenticationQuery" value="select password, salt from subutai_user where user_name = ?" />
     <property name="userRolesQuery"

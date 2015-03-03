@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import javax.naming.NamingException;
+import javax.servlet.http.Cookie;
 
 import org.safehaus.subutai.common.security.NullSubutaiLoginContext;
 import org.safehaus.subutai.common.security.SubutaiLoginContext;
@@ -48,6 +49,7 @@ import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
@@ -389,6 +391,11 @@ public class MainUI extends UI implements ViewChangeListener
 
                                             VaadinService.getCurrentRequest().getWrappedSession().removeAttribute(
                                                     SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME );
+                                            Cookie removeCookie =
+                                                    new Cookie( SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME, null );
+                                            removeCookie.setMaxAge( 0 );
+                                            VaadinService.getCurrentResponse().addCookie( removeCookie );
+                                            VaadinSession.getCurrent().close();
                                         }
                                         catch ( NamingException e )
                                         {
