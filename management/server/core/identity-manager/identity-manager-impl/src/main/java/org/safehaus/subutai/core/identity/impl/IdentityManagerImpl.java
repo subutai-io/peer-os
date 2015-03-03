@@ -28,6 +28,7 @@ import org.safehaus.subutai.core.key.api.KeyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.mgt.SecurityManager;
@@ -206,9 +207,10 @@ public class IdentityManagerImpl implements IdentityManager
     public Serializable login( final String username, final String password )
     {
         UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken( username, password );
-        Subject subject = new Subject.Builder( securityManager ).buildSubject();
 
-        subject = securityManager.login( subject, usernamePasswordToken );
+        SecurityUtils.setSecurityManager( securityManager );
+        Subject subject = SecurityUtils.getSubject();
+
         subject.login( usernamePasswordToken );
 
         return subject.getSession().getId();
