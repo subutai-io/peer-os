@@ -90,9 +90,11 @@ public class IdentityManagerImpl implements IdentityManager
         checkDefaultUser( "karaf" );
         checkDefaultUser( "admin" );
 
-        SecurityUtils.setSecurityManager( securityManager );
+        //SecurityUtils.setSecurityManager( securityManager );
 
         LOG.info( String.format( "Identity manager initialized: %s", securityManager ) );
+
+        org.apache.shiro.session.mgt.SimpleSession simpleSession = null;
     }
 
 
@@ -205,7 +207,10 @@ public class IdentityManagerImpl implements IdentityManager
     public Serializable login( final String username, final String password )
     {
         UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken( username, password );
+
+        SecurityUtils.setSecurityManager( securityManager );
         Subject subject = SecurityUtils.getSubject();
+
         subject.login( usernamePasswordToken );
 
         return subject.getSession().getId();

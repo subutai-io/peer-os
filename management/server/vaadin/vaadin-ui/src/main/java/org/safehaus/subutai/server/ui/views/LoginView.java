@@ -3,8 +3,11 @@ package org.safehaus.subutai.server.ui.views;
 
 import java.io.Serializable;
 
+import javax.servlet.http.Cookie;
+
 import org.safehaus.subutai.common.security.SubutaiLoginContext;
 import org.safehaus.subutai.common.security.SubutaiThreadContext;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.server.ui.MainUI;
@@ -15,6 +18,7 @@ import com.vaadin.event.ShortcutListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinService;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
@@ -131,6 +135,9 @@ public class LoginView extends VerticalLayout implements View
 
                     request.getWrappedSession()
                            .setAttribute( SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME, loginContext );
+                    VaadinResponse response = VaadinService.getCurrentResponse();
+                    response.addCookie( new Cookie( SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME,
+                            JsonUtil.toJson( loginContext ) ) );
                     SubutaiThreadContext.set( loginContext );
 
                     mainUI.getUsername().setValue( username.getValue() );

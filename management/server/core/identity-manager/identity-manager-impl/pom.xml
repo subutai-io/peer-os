@@ -66,6 +66,12 @@
       <version>${org.apache.shiro.version}</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-ehcache</artifactId>
+      <version>${org.apache.shiro.version}</version>
+      <scope>provided</scope>
+    </dependency>
 
     <!--Tests-->
     <dependency>

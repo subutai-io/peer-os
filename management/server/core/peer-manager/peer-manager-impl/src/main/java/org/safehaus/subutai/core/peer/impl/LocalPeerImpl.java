@@ -1128,29 +1128,31 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
             newContainerIds.add( containerHostInfo.getId() );
 
-            boolean isNewHost = false;
+            ContainerHost containerHost = null;
             try
             {
-                resourceHost.getContainerHostById( containerHostInfo.getId() );
+                containerHost = resourceHost.getContainerHostById( containerHostInfo.getId() );
             }
             catch ( HostNotFoundException e )
             {
-                isNewHost = true;
+                //ignore
             }
 
 
-            ContainerHostEntity containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
-            setContainersTransientFields( Sets.newHashSet( ( ContainerHost ) containerHost ) );
-            ( ( ResourceHostEntity ) resourceHost ).addContainerHost( containerHost );
-            if ( isNewHost )
+            if ( containerHost == null )
             {
-                containerHostDataService.persist( containerHost );
+                containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
+                setContainersTransientFields( Sets.newHashSet( containerHost ) );
+                ( ( ResourceHostEntity ) resourceHost ).addContainerHost( containerHost );
+                containerHostDataService.persist( ( ContainerHostEntity ) containerHost );
             }
             else
             {
-                containerHostDataService.update( containerHost );
+                //update network interfaces
+                ( ( AbstractSubutaiHost ) containerHost ).setNetInterfaces( containerHost.getNetInterfaces() );
+                containerHostDataService.update( ( ContainerHostEntity ) containerHost );
             }
-            containerHost.updateHostInfo( containerHostInfo );
+            ( ( AbstractSubutaiHost ) containerHost ).updateHostInfo( containerHostInfo );
         }
 
         for ( ContainerHost oldHost : oldHosts )

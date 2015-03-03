@@ -12,8 +12,10 @@ import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.server.ui.component.HostTree;
 
 import com.vaadin.ui.TextArea;
+import com.vaadin.ui.UI;
 
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,6 +33,8 @@ public class TerminalFormTest
     TextArea commandOutputTxtArea;
     @Mock
     HostTree hostTree;
+    @Mock
+    UI ui;
 
     TerminalForm terminalForm;
 
@@ -40,6 +44,7 @@ public class TerminalFormTest
     {
         terminalForm = new TerminalForm( commandExecutor, hostRegistry );
         when( commandOutputTxtArea.getValue() ).thenReturn( OUTPUT );
+        when( commandOutputTxtArea.getUI() ).thenReturn( ui );
     }
 
 
@@ -65,7 +70,7 @@ public class TerminalFormTest
 
         terminalForm.addOutput( OUTPUT );
 
-        verify( commandOutputTxtArea ).setValue( anyString() );
+        verify( ui ).access( any(Runnable.class) );
     }
 
 

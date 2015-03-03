@@ -157,6 +157,7 @@
             <feature>transaction</feature>
             <feature>jdbc</feature>
             <feature>shiro-core</feature>
+            <feature>shiro-ehcache</feature>
           </bootFeatures>
         </configuration>
         <executions>
@@ -183,6 +184,7 @@
                 <feature>ssh</feature>
                 <feature>cxf</feature>
                 <feature>shiro-core</feature>
+                <feature>shiro-ehcache</feature>
                 <feature>jdbc</feature>
                 <feature>openjpa</feature>
                 <feature>subutai-application</feature>
