@@ -13,6 +13,9 @@ import org.safehaus.subutai.common.peer.Peer;
  */
 public interface Environment
 {
+
+    public Long getUserId();
+
     public UUID getId();
 
     public String getName();
@@ -57,6 +60,6 @@ public interface Environment
 
     public ContainerHost getContainerHostByHostname( String hostname ) throws ContainerHostNotFoundException;
 
-
+    @Deprecated
     public Set<ContainerHost> getContainerHostsByIds( Set<UUID> ids ) throws ContainerHostNotFoundException;
 }

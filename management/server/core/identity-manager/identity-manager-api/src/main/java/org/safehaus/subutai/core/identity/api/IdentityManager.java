@@ -14,7 +14,7 @@ import org.apache.shiro.subject.Subject;
  */
 public interface IdentityManager
 {
-    public static final String[] ROLES = { "admin", "manager", "viewer" };
+
 
     /**
      * Returns shiro SecurityManager

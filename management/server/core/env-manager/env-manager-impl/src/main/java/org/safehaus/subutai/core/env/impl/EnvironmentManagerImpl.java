@@ -2,7 +2,9 @@ package org.safehaus.subutai.core.env.impl;
 
 
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -106,6 +108,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    protected boolean isUserAdmin()
+    {
+        return identityManager.getUser().isAdmin();
+    }
+
+
+    protected Long getUserId()
+    {
+        return identityManager.getUser().getId();
+    }
+
+
     @Override
     public Set<Environment> getEnvironments()
     {
@@ -116,6 +130,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             setEnvironmentTransientFields( environment );
             setContainersTransientFields( environment.getContainerHosts() );
+        }
+
+        if ( !isUserAdmin() )
+        {
+            Long userId = getUserId();
+            for ( Iterator<Environment> iterator = environments.iterator(); iterator.hasNext(); )
+            {
+                final Environment environment = iterator.next();
+                if ( !Objects.equals( environment.getUserId(), userId ) )
+                {
+                    iterator.remove();
+                }
+            }
         }
 
         return environments;
@@ -146,7 +173,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     protected EnvironmentImpl createEmptyEnvironment( final String name, final String subnetCidr, final String sshKey )
     {
 
-        final EnvironmentImpl environment = new EnvironmentImpl( name, subnetCidr, sshKey );
+        final EnvironmentImpl environment = new EnvironmentImpl( name, subnetCidr, sshKey, getUserId() );
 
         saveEnvironment( environment );
 
