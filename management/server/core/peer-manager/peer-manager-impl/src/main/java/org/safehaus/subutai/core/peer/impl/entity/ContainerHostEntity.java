@@ -108,7 +108,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         }
         catch ( ContainerGroupNotFoundException e )
         {
-            throw new UnsupportedOperationException( "This operation is not allowed for non environment containers" );
+            return null;
         }
     }
 
