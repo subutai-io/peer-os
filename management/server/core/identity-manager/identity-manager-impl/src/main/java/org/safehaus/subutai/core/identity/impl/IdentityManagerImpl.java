@@ -58,19 +58,12 @@ public class IdentityManagerImpl implements IdentityManager
     private UserDataService userDataService;
     private PermissionDataService permissionDataService;
     private RoleDataService roleDataService;
-    //    private ManagementHost managementHost;
 
 
     public void setSecurityManager( final SecurityManager securityManager )
     {
         this.securityManager = securityManager;
     }
-    //
-    //
-    //    public void setManagementHost( final ManagementHost managementHost )
-    //    {
-    //        this.managementHost = managementHost;
-    //    }
 
 
     public void setKeyManager( final KeyManager keyManager )
@@ -164,13 +157,6 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    //    @Override
-    //    public User getUser( String username )
-    //    {
-    //        return userDataService.findByUsername( username );
-    //    }
-
-
     private void logActiveSessions()
     {
         LOG.debug( "Active sessions:" );
@@ -215,18 +201,6 @@ public class IdentityManagerImpl implements IdentityManager
         SubutaiLoginContext loginContext = SubutaiThreadContext.get();
         return loginContext instanceof NullSubutaiLoginContext ? SecurityUtil.getSubutaiLoginContext() : loginContext;
     }
-
-
-    //    @Override
-    //    public Subject login( final AuthenticationToken token )
-    //    {
-    //
-    //        SecurityUtils.setSecurityManager( securityManager );
-    //        Subject subject = SecurityUtils.getSubject();
-    //        subject.login( token );
-    //        //        UserIdMdcHelper.set( subject.getSession().getId() );
-    //        return subject;
-    //    }
 
 
     @Override
