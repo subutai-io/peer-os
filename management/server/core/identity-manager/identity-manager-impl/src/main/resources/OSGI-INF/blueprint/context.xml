@@ -56,6 +56,7 @@
         value="true" />
     <property name="sessionManager.sessionValidationSchedulerEnabled"
               value="true" />
+    <property name="sessionManager.globalSessionTimeout" value="3600000" />
     <property name="cacheManager" ref="ehCacheMgr" />
     <property name="realm" ref="subutaiJdbcRealm" />
   </bean>
@@ -66,7 +67,8 @@
   </bean>
 
   <bean id="subutaiJdbcRealm" class="org.safehaus.subutai.core.identity.impl.SubutaiJdbcRealm">
-    <property name="jndiDataSourceName" value="osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/securityManagerDS)" />
+    <property name="jndiDataSourceName"
+              value="osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/securityManagerDS)" />
     <property name="permissionsLookupEnabled" value="false" />
     <property name="authenticationQuery" value="select password, salt from subutai_user where user_name = ?" />
     <property name="userRolesQuery"
@@ -74,6 +76,7 @@
     <property name="permissionsQuery" value="select permission from subutai_roles_permissions where role_name = ?" />
     <property name="credentialsMatcher" ref="sha256Matcher" />
   </bean>
+
   <service ref="securityManager"
            interface="org.apache.shiro.mgt.SecurityManager" />
 </blueprint>

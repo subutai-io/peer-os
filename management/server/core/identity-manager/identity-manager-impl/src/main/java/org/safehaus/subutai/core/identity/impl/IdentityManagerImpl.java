@@ -31,8 +31,14 @@ import org.slf4j.LoggerFactory;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.crypto.hash.Sha256Hash;
+import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.session.SessionListener;
+import org.apache.shiro.session.mgt.DefaultSessionManager;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.apache.shiro.util.SimpleByteSource;
 
 import com.google.common.collect.Lists;
@@ -90,11 +96,14 @@ public class IdentityManagerImpl implements IdentityManager
         checkDefaultUser( "karaf" );
         checkDefaultUser( "admin" );
 
-        //SecurityUtils.setSecurityManager( securityManager );
+        List<SessionListener> sessionListeners = new ArrayList<>();
+        sessionListeners.add( new SubutaiSessionListener() );
+
+        DefaultSecurityManager defaultSecurityManager = ( DefaultSecurityManager ) securityManager;
+        ( ( DefaultSessionManager ) defaultSecurityManager.getSessionManager() )
+                .setSessionListeners( sessionListeners );
 
         LOG.info( String.format( "Identity manager initialized: %s", securityManager ) );
-
-        org.apache.shiro.session.mgt.SimpleSession simpleSession = null;
     }
 
 
@@ -162,9 +171,26 @@ public class IdentityManagerImpl implements IdentityManager
     //    }
 
 
+    private void logActiveSessions()
+    {
+        LOG.debug( "Active sessions:" );
+        DefaultSecurityManager defaultSecurityManager = ( DefaultSecurityManager ) securityManager;
+        DefaultSessionManager sm = ( DefaultSessionManager ) defaultSecurityManager.getSessionManager();
+        for ( Session session : sm.getSessionDAO().getActiveSessions() )
+        {
+            SimplePrincipalCollection p =
+                    ( SimplePrincipalCollection ) session.getAttribute( DefaultSubjectContext.PRINCIPALS_SESSION_KEY );
+
+            LOG.debug( String.format( "%s %s", session.getId(), p ) );
+        }
+    }
+
+
     @Override
     public User getUser()
     {
+        logActiveSessions();
+
         SubutaiLoginContext loginContext = getSubutaiLoginContext();
         LOG.debug( String.format( "Login context: [%s] ", loginContext ) );
 
