@@ -12,6 +12,7 @@ import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
@@ -23,15 +24,18 @@ import com.vaadin.ui.Window;
 public class ContainersWindow extends Window
 {
     private final EnvironmentManager environmentManager;
+    private final PeerManager peerManager;
     private Environment environment;
     private Table containersTable;
     private ScheduledExecutorService updater;
     private ExecutorService taskExecutor;
 
 
-    public ContainersWindow( final EnvironmentManager environmentManager, final Environment environment )
+    public ContainersWindow( final EnvironmentManager environmentManager, final Environment environment,
+                             final PeerManager peerManager )
     {
         this.environmentManager = environmentManager;
+        this.peerManager = peerManager;
         this.environment = environment;
 
         setCaption( "Containers" );
@@ -105,8 +109,18 @@ public class ContainersWindow extends Window
         for ( final ContainerHost containerHost : environment.getContainerHosts() )
         {
             final Button startBtn = new Button( "Start" );
+            final Button tagsBtn = new Button( "Tags" );
             final Button stopBtn = new Button( "Stop" );
             final Button destroyBtn = new Button( "Destroy" );
+
+            tagsBtn.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( final Button.ClickEvent event )
+                {
+                    getUI().addWindow( new TagsWindow( containerHost, peerManager.getLocalPeer() ) );
+                }
+            } );
 
             startBtn.addClickListener( new Button.ClickListener()
             {
@@ -216,7 +230,7 @@ public class ContainersWindow extends Window
 
             containersTable.addItem( new Object[] {
                     containerHost.getId().toString(), containerHost.getTemplateName(), containerHost.getHostname(),
-                    containerHost.getIpByInterfaceName( "eth0" ), startBtn, stopBtn, destroyBtn
+                    containerHost.getIpByInterfaceName( "eth0" ), tagsBtn, startBtn, stopBtn, destroyBtn
             }, null );
 
             boolean isContainerConnected = containerHost.isConnected();
@@ -253,6 +267,7 @@ public class ContainersWindow extends Window
         table.addContainerProperty( "Template", String.class, null );
         table.addContainerProperty( "Hostname", String.class, null );
         table.addContainerProperty( "IP", String.class, null );
+        table.addContainerProperty( "Tags", Button.class, null );
         table.addContainerProperty( "Start", Button.class, null );
         table.addContainerProperty( "Stop", Button.class, null );
         table.addContainerProperty( "Destroy", Button.class, null );

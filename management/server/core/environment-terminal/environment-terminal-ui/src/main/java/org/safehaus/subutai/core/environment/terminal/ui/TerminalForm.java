@@ -57,6 +57,9 @@ public class TerminalForm extends CustomComponent implements Disposable
         grid.setSizeFull();
         grid.setMargin( true );
         grid.setSpacing( true );
+
+        horizontalSplit.setSecondComponent( grid );
+
         commandOutputTxtArea = new TextArea( "Commands output" );
         commandOutputTxtArea.setSizeFull();
         commandOutputTxtArea.setImmediate( true );
@@ -117,12 +120,6 @@ public class TerminalForm extends CustomComponent implements Disposable
             }
         } );
 
-
-        grid.addComponent( filterControls, 0, 10, 19, 10 );
-
-        horizontalSplit.setSecondComponent( grid );
-        setCompositionRoot( horizontalSplit );
-
         programTxtFld.addShortcutListener( new ShortcutListener( "Shortcut Name", ShortcutAction.KeyCode.ENTER, null )
         {
             @Override
@@ -142,6 +139,11 @@ public class TerminalForm extends CustomComponent implements Disposable
                 commandOutputTxtArea.setValue( "" );
             }
         } );
+
+        grid.addComponent( filterControls, 0, 10, 19, 10 );
+
+
+        setCompositionRoot( horizontalSplit );
     }
 
 
