@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.sql.DataSource;
+
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.security.NullSubutaiLoginContext;
 import org.safehaus.subutai.common.security.SubutaiLoginContext;
@@ -16,6 +18,7 @@ import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.PermissionGroup;
 import org.safehaus.subutai.core.identity.api.Role;
+import org.safehaus.subutai.core.identity.api.Roles;
 import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.identity.impl.dao.PermissionDataService;
 import org.safehaus.subutai.core.identity.impl.dao.RoleDataService;
@@ -24,53 +27,45 @@ import org.safehaus.subutai.core.identity.impl.entity.PermissionEntity;
 import org.safehaus.subutai.core.identity.impl.entity.PermissionPK;
 import org.safehaus.subutai.core.identity.impl.entity.RoleEntity;
 import org.safehaus.subutai.core.identity.impl.entity.UserEntity;
-import org.safehaus.subutai.core.key.api.KeyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.felix.gogo.api.CommandSessionListener;
+import org.apache.felix.service.command.CommandSession;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.crypto.hash.Sha256Hash;
+import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.realm.Realm;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.session.SessionListener;
+import org.apache.shiro.session.UnknownSessionException;
+import org.apache.shiro.session.mgt.DefaultSessionManager;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.apache.shiro.util.SimpleByteSource;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 
 /**
  * Implementation of Identity Manager
  */
-public class IdentityManagerImpl implements IdentityManager
+public class IdentityManagerImpl implements IdentityManager, CommandSessionListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( IdentityManagerImpl.class );
 
-    private DaoManager daoManager;
-    private KeyManager keyManager;
-    private SecurityManager securityManager;
+    private final DaoManager daoManager;
+    private final DataSource dataSource;
+    private DefaultSecurityManager securityManager;
 
     private UserDataService userDataService;
     private PermissionDataService permissionDataService;
     private RoleDataService roleDataService;
-    //    private ManagementHost managementHost;
-
-
-    public void setSecurityManager( final SecurityManager securityManager )
-    {
-        this.securityManager = securityManager;
-    }
-    //
-    //
-    //    public void setManagementHost( final ManagementHost managementHost )
-    //    {
-    //        this.managementHost = managementHost;
-    //    }
-
-
-    public void setKeyManager( final KeyManager keyManager )
-    {
-        this.keyManager = keyManager;
-    }
 
 
     private String getSimpleSalt( String username )
@@ -79,22 +74,59 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+    public IdentityManagerImpl( final DaoManager daoManager, final DataSource dataSource )
+    {
+        this.daoManager = daoManager;
+        this.dataSource = dataSource;
+    }
+
+
     public void init()
     {
         LOG.info( "Initializing identity manager..." );
 
-        userDataService = new UserDataService( daoManager.getEntityManagerFactory() );
+        userDataService = new UserDataService( daoManager );
         permissionDataService = new PermissionDataService( daoManager.getEntityManagerFactory() );
         roleDataService = new RoleDataService( daoManager.getEntityManagerFactory() );
+
+
+        securityManager = new DefaultSecurityManager();
+
+        DefaultSessionManager sessionManager = new DefaultSessionManager();
+        sessionManager.setGlobalSessionTimeout( 3600000 );
+
+        securityManager.setSessionManager( sessionManager );
+
+        SubutaiJdbcRealm realm = new SubutaiJdbcRealm( dataSource );
+        realm.setPermissionsLookupEnabled( false );
+        realm.setAuthenticationQuery( "select password, salt from subutai_user where user_name = ?" );
+        realm.setUserRolesQuery(
+                "select r.role_name from subutai_user_role r inner join subutai_user u on u.user_id = r.user_id where"
+                        + " u.user_name = ?" );
+        realm.setPermissionsQuery( "select permission from subutai_roles_permissions where role_name = ?" );
+
+
+        HashedCredentialsMatcher credentialsMatcher = new HashedCredentialsMatcher();
+        credentialsMatcher.setHashAlgorithmName( "SHA-256" );
+        credentialsMatcher.setHashIterations( 1 );
+
+        realm.setCredentialsMatcher( credentialsMatcher );
+
+
+        securityManager.setRealms( Sets.<Realm>newHashSet( realm, new TokenRealm( this ) ) );
+
 
         checkDefaultUser( "karaf" );
         checkDefaultUser( "admin" );
 
-        //SecurityUtils.setSecurityManager( securityManager );
+        List<SessionListener> sessionListeners = new ArrayList<>();
+        sessionListeners.add( new SubutaiSessionListener() );
+
+        DefaultSecurityManager defaultSecurityManager = securityManager;
+        ( ( DefaultSessionManager ) defaultSecurityManager.getSessionManager() )
+                .setSessionListeners( sessionListeners );
 
         LOG.info( String.format( "Identity manager initialized: %s", securityManager ) );
-
-        org.apache.shiro.session.mgt.SimpleSession simpleSession = null;
     }
 
 
@@ -136,15 +168,8 @@ public class IdentityManagerImpl implements IdentityManager
         user.setSalt( salt );
         user.addRole( adminRole );
         user.addRole( managerRole );
-        //        generateKey( user );
         userDataService.persist( user );
         LOG.debug( String.format( "User: %s", user.getId() ) );
-    }
-
-
-    public void setDaoManager( final DaoManager daoManager )
-    {
-        this.daoManager = daoManager;
     }
 
 
@@ -155,16 +180,26 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    //    @Override
-    //    public User getUser( String username )
-    //    {
-    //        return userDataService.findByUsername( username );
-    //    }
+    private void logActiveSessions()
+    {
+        LOG.debug( "Active sessions:" );
+        DefaultSecurityManager defaultSecurityManager = securityManager;
+        DefaultSessionManager sm = ( DefaultSessionManager ) defaultSecurityManager.getSessionManager();
+        for ( Session session : sm.getSessionDAO().getActiveSessions() )
+        {
+            SimplePrincipalCollection p =
+                    ( SimplePrincipalCollection ) session.getAttribute( DefaultSubjectContext.PRINCIPALS_SESSION_KEY );
+
+            LOG.debug( String.format( "%s %s", session.getId(), p ) );
+        }
+    }
 
 
     @Override
     public User getUser()
     {
+        logActiveSessions();
+
         SubutaiLoginContext loginContext = getSubutaiLoginContext();
         LOG.debug( String.format( "Login context: [%s] ", loginContext ) );
 
@@ -175,7 +210,16 @@ public class IdentityManagerImpl implements IdentityManager
 
         if ( isAuthenticated( loginContext.getSessionId() ) )
         {
-            return userDataService.findByUsername( loginContext.getUsername() );
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            Thread.currentThread().setContextClassLoader( this.getClass().getClassLoader() );
+            try
+            {
+                return userDataService.findByUsername( loginContext.getUsername() );
+            }
+            finally
+            {
+                Thread.currentThread().setContextClassLoader( cl );
+            }
         }
         else
         {
@@ -191,18 +235,6 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    //    @Override
-    //    public Subject login( final AuthenticationToken token )
-    //    {
-    //
-    //        SecurityUtils.setSecurityManager( securityManager );
-    //        Subject subject = SecurityUtils.getSubject();
-    //        subject.login( token );
-    //        //        UserIdMdcHelper.set( subject.getSession().getId() );
-    //        return subject;
-    //    }
-
-
     @Override
     public Serializable login( final String username, final String password )
     {
@@ -211,9 +243,38 @@ public class IdentityManagerImpl implements IdentityManager
         SecurityUtils.setSecurityManager( securityManager );
         Subject subject = SecurityUtils.getSubject();
 
-        subject.login( usernamePasswordToken );
+        try
+        {
+            subject.login( usernamePasswordToken );
+            return subject.getSession().getId();
+        }
+        catch ( UnknownSessionException e )
+        {
+            subject = new Subject.Builder().buildSubject();
+            subject.login( usernamePasswordToken );
+            return subject.getSession( true ).getId();
+        }
+    }
 
-        return subject.getSession().getId();
+
+    public Serializable loginWithToken( final String tokenId, final String ip )
+    {
+        UserToken userToken = new UserToken( tokenId, ip );
+
+        SecurityUtils.setSecurityManager( securityManager );
+        Subject subject = SecurityUtils.getSubject();
+
+        try
+        {
+            subject.login( userToken );
+            return subject.getSession().getId();
+        }
+        catch ( UnknownSessionException e )
+        {
+            subject = new Subject.Builder().buildSubject();
+            subject.login( userToken );
+            return subject.getSession( true ).getId();
+        }
     }
 
 
@@ -241,11 +302,11 @@ public class IdentityManagerImpl implements IdentityManager
         Set<String> result = new HashSet<>();
         Subject subject = getSubject( shiroSessionId );
 
-        for ( String role : IdentityManager.ROLES )
+        for ( Roles role : Roles.values() )
         {
-            if ( subject.hasRole( role ) )
+            if ( subject.hasRole( role.getRoleName() ) )
             {
-                result.add( role );
+                result.add( role.getRoleName() );
             }
         }
         return result;
@@ -255,8 +316,18 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public Subject getSubject( Serializable sessionId )
     {
-        Subject subject = new Subject.Builder( securityManager ).sessionId( sessionId ).buildSubject();
-        return subject;
+        return new Subject.Builder( securityManager ).sessionId( sessionId ).buildSubject();
+    }
+
+
+    @Override
+    public void touch( Serializable sessionId )
+    {
+        Subject subject = getSubject( sessionId );
+        if ( subject != null && subject.isAuthenticated() )
+        {
+            subject.getSession().touch();
+        }
     }
 
 
@@ -302,6 +373,13 @@ public class IdentityManagerImpl implements IdentityManager
 
         userDataService.persist( user );
         return user.getId() != null;
+    }
+
+
+    @Override
+    public User getUser( final String username )
+    {
+        return userDataService.findByUsername( username );
     }
 
 
@@ -493,8 +571,7 @@ public class IdentityManagerImpl implements IdentityManager
     public Role createMockRole( final String permissionName, final PermissionGroup permissionGroup,
                                 final String description )
     {
-        RoleEntity role = new RoleEntity( "" );
-        return role;
+        return new RoleEntity( "" );
     }
 
 
@@ -527,7 +604,31 @@ public class IdentityManagerImpl implements IdentityManager
     private String saltedHash( String password, byte[] salt )
     {
         Sha256Hash sha256Hash = new Sha256Hash( password, salt );
-        String result = sha256Hash.toHex();
-        return result;
+        return sha256Hash.toHex();
+    }
+
+
+    @Override
+    public void beforeExecute( final CommandSession commandSession, final CharSequence charSequence )
+    {
+        SubutaiLoginContext loginContext = getSubutaiLoginContext();
+        if ( !( loginContext instanceof NullSubutaiLoginContext ) && isAuthenticated( loginContext.getSessionId() ) )
+        {
+            touch( loginContext.getSessionId() );
+        }
+    }
+
+
+    @Override
+    public void afterExecute( final CommandSession commandSession, final CharSequence charSequence, final Exception e )
+    {
+
+    }
+
+
+    @Override
+    public void afterExecute( final CommandSession commandSession, final CharSequence charSequence, final Object o )
+    {
+
     }
 }

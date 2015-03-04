@@ -1,7 +1,11 @@
 package org.safehaus.subutai.server.ui;
 
 
+import org.safehaus.subutai.common.security.NullSubutaiLoginContext;
+import org.safehaus.subutai.common.security.SubutaiLoginContext;
 import org.safehaus.subutai.common.security.SubutaiThreadContext;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.server.ui.util.SubutaiVaadinUtils;
 
 import com.vaadin.server.DeploymentConfiguration;
@@ -18,6 +22,9 @@ import com.vaadin.server.VaadinSession;
  */
 public class SubutaiVaadinServlet extends VaadinServlet
 {
+    ServiceLocator serviceLocator = new ServiceLocator();
+
+
     @Override
     protected VaadinServletService createServletService( DeploymentConfiguration deploymentConfiguration )
             throws ServiceException
@@ -30,7 +37,21 @@ public class SubutaiVaadinServlet extends VaadinServlet
             {
                 super.requestStart( request, response );
 
-                SubutaiThreadContext.set( SubutaiVaadinUtils.getSubutaiLoginContext() );
+                SubutaiLoginContext subutaiLoginContext = SubutaiVaadinUtils.getSubutaiLoginContext();
+                SubutaiThreadContext.set( subutaiLoginContext );
+
+                if ( !( subutaiLoginContext instanceof NullSubutaiLoginContext ) )
+                {
+                    try
+                    {
+                        IdentityManager identityManager = serviceLocator.getService( IdentityManager.class );
+                        identityManager.touch( subutaiLoginContext.getSessionId() );
+                    }
+                    catch ( Exception e )
+                    {
+                        //ignore
+                    }
+                }
             }
 
 

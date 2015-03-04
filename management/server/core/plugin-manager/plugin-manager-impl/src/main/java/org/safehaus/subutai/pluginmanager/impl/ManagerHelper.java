@@ -4,18 +4,23 @@ package org.safehaus.subutai.pluginmanager.impl;
 import java.util.List;
 import java.util.Set;
 
+import javax.management.Notification;
+
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.CommandUtil;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.pluginmanager.api.PluginInfo;
 import org.safehaus.subutai.pluginmanager.api.PluginManagerException;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import com.google.gson.reflect.TypeToken;
 
@@ -28,10 +33,22 @@ public class ManagerHelper
     private static final String INFO_JSON = String.format(
             "[{\"type\":\"plugin\", \"pluginName\":\"lucene\", \"version\":\"2.0.5\", \"rating\":\"5\" }, " +
                     "{\"type\":\"plugin\", \"pluginName\":\"hipi\", \"version\":\"2.0.4\", \"rating\":\"6\" }," +
-                    " {\"type\":\"plugin\", \"pluginName\":\"hadoop\", \"version\":\"2.1.4\", \"rating\":\"6\" }," +
+                    " {\"type\":\"plugin\", \"pluginName\":\"hadoop\", \"version\":\"2.0.4\", \"rating\":\"6\" }," +
                     "{\"type\":\"plugin\", \"pluginName\":\"presto\", \"version\":\"2.1.1\", \"rating\":\"8\" }," +
                     "{\"type\":\"plugin\", \"pluginName\":\"spark\", \"version\":\"2.0.4\", \"rating\":\"1\" }," +
-                    "{\"type\":\"plugin\", \"pluginName\":\"shark\", \"version\":\"2.0.4\", \"rating\":\"9\" }]" );
+                    "{\"type\":\"plugin\", \"pluginName\":\"shark\", \"version\":\"2.0.4\", \"rating\":\"9\" }]" +
+                    "{\"type\":\"plugin\", \"pluginName\":\"accumulo\", \"version\":\"2.0.4\", \"rating\":\"9\" }]"+
+                    "{\"type\":\"plugin\", \"pluginName\":\"flume\", \"version\":\"2.0.4\", \"rating\":\"9\" }]" +
+                    "{\"type\":\"plugin\", \"pluginName\":\"pig\", \"version\":\"2.0.4\", \"rating\":\"9\" }]" +
+                    "{\"type\":\"plugin\", \"pluginName\":\"nutch\", \"version\":\"2.0.4\", \"rating\":\"9\" }]"+
+                    "{\"type\":\"plugin\", \"pluginName\":\"elasticsearch\", \"version\":\"2.0.4\", \"rating\":\"9\" }]"+
+                    "{\"type\":\"plugin\", \"pluginName\":\"zookeeper\", \"version\":\"2.0.4\", \"rating\":\"9\" }]"+
+                    "{\"type\":\"plugin\", \"pluginName\":\"sqoop\", \"version\":\"2.0.4\", \"rating\":\"9\" }]" +
+                    "{\"type\":\"plugin\", \"pluginName\":\"storm\", \"version\":\"2.0.4\", \"rating\":\"9\" }]" +
+                    "{\"type\":\"plugin\", \"pluginName\":\"hbase\", \"version\":\"2.0.4\", \"rating\":\"9\" }]" +
+                    "{\"type\":\"plugin\", \"pluginName\":\"hive\", \"version\":\"2.0.4\", \"rating\":\"9\" }]" +
+                    "{\"type\":\"plugin\", \"pluginName\":\"lucene\", \"version\":\"2.0.4\", \"rating\":\"9\" }]" +
+                    "{\"type\":\"plugin\", \"pluginName\":\"mahout\", \"version\":\"2.0.4\", \"rating\":\"9\" }]" );
 
 
     public ManagerHelper( PeerManager peerManager )
@@ -59,12 +76,16 @@ public class ManagerHelper
         try
         {
             CommandResult result = commandUtil.execute( requestBuilder, getManagementHost() );
-            return result.getStdOut();
+            if( result.hasSucceeded() )
+            {
+                return result.getStdOut();
+            }
         }
         catch ( CommandException e )
         {
             throw new PluginManagerException( e );
         }
+        return null;
     }
 
 
@@ -77,33 +98,56 @@ public class ManagerHelper
     }
 
 
+    protected Set<String> parsePluginNames( String result )
+    {
+        Set<String> pluginNames = Sets.newHashSet();
+        for( String line : parseLines( result ))
+        {
+            List<String> words = parseLineIntoWords( line );
+            pluginNames.add( parsePluginNameFromWord( words.get( 0 ) ) );
+        }
+        return pluginNames;
+    }
+
+    protected Set<String> parseAvailablePluginsNames( String result)
+    {
+        Preconditions.checkNotNull( result );
+        Set<String> pluginNames = Sets.newHashSet();
+        for( String line : parseLines( result ))
+        {
+            pluginNames.add( line );
+        }
+        return pluginNames;
+    }
+
     protected Set<PluginInfo> parsePluginNamesAndVersions( String result )
     {
-        Set<PluginInfo> plugins = Sets.newHashSet();
-        for ( String line : parseLines( result ) )
-        {
-            if ( line.contains( Commands.PACKAGE_POSTFIX_WITHOUT_DASH ) )
-            {
-                PluginInfo plugin = new PluginInfoImpl();
-                for ( String word : parseLineIntoWords( line ) )
+
+                Set<PluginInfo> plugins = Sets.newHashSet();
+                for ( String line : parseLines( result ) )
                 {
-                    if ( word.contains( Commands.PACKAGE_POSTFIX_WITHOUT_DASH ) )
+                    if ( line.contains( Commands.PACKAGE_POSTFIX_WITHOUT_DASH ) && !( line.contains( "repo" )) )
                     {
-                        String pluginName = parsePluginNameFromWord( word );
-                        plugin.setPluginName( pluginName );
-                        plugin.setType( "plugin" );
-                        plugin.setRating( findRating( parseJson(), pluginName ) );
-                    }
-                    else if ( word.contains( "." ) && !word.contains( "application" ) )
-                    {
-                        String version = word;
-                        plugin.setVersion( version );
+                        PluginInfo plugin = new PluginInfoImpl();
+                        for ( String word : parseLineIntoWords( line ) )
+                        {
+                            if ( word.contains( Commands.PACKAGE_POSTFIX_WITHOUT_DASH ) )
+                            {
+                                String pluginName = parsePluginNameFromWord( word );
+                                plugin.setPluginName( pluginName );
+                                plugin.setType( "plugin" );
+                                plugin.setRating( findRating( parseJson(), pluginName ) );
+                            }
+                            else if ( word.contains( "." ) && !word.contains( "application" ) )
+                            {
+                                String version = word;
+                                plugin.setVersion( version );
+                            }
+                        }
+                        plugins.add( plugin );
                     }
                 }
-                plugins.add( plugin );
-            }
-        }
-        return plugins;
+                return plugins;
     }
 
 

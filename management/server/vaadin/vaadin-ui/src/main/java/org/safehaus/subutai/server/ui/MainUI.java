@@ -24,12 +24,14 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import javax.naming.NamingException;
+import javax.servlet.http.Cookie;
 
 import org.safehaus.subutai.common.security.NullSubutaiLoginContext;
 import org.safehaus.subutai.common.security.SubutaiLoginContext;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
+import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.server.ui.util.HelpManager;
 import org.safehaus.subutai.server.ui.util.HelpOverlay;
 import org.safehaus.subutai.server.ui.util.SubutaiVaadinUtils;
@@ -48,6 +50,7 @@ import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
@@ -353,6 +356,23 @@ public class MainUI extends UI implements ViewChangeListener
                                 username.setSizeUndefined();
                                 addComponent( username );
 
+                                try
+                                {
+                                    IdentityManager identityManager =
+                                            ServiceLocator.getServiceNoCache( IdentityManager.class );
+
+                                    User user = identityManager.getUser();
+
+                                    if ( user != null )
+                                    {
+                                        username.setValue( user.getUsername() );
+                                    }
+                                }
+                                catch ( NamingException e )
+                                {
+                                    LOG.error( e.toString(), e );
+                                }
+
                                 MenuBar.Command cmd = new MenuBar.Command()
                                 {
                                     @Override
@@ -389,6 +409,11 @@ public class MainUI extends UI implements ViewChangeListener
 
                                             VaadinService.getCurrentRequest().getWrappedSession().removeAttribute(
                                                     SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME );
+                                            Cookie removeCookie =
+                                                    new Cookie( SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME, null );
+                                            removeCookie.setMaxAge( 0 );
+                                            VaadinService.getCurrentResponse().addCookie( removeCookie );
+                                            VaadinSession.getCurrent().close();
                                         }
                                         catch ( NamingException e )
                                         {

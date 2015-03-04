@@ -45,6 +45,7 @@ public class Manager extends VerticalLayout
 
     private static final AtomicInteger processPending = new AtomicInteger( 0 );
 
+    private static final Action TAG_CONTAINER = new Action( "Tags" );
     private static final Action START_CONTAINER = new Action( "Start" );
     private static final Action STOP_CONTAINER = new Action( "Stop" );
     private static final Action DESTROY_CONTAINER = new Action( "Destroy" );
@@ -137,15 +138,15 @@ public class Manager extends VerticalLayout
                             final ContainerHost containerHost = localPeer.getContainerHostByName( lxcHostname );
                             if ( containerHost.getState() == ContainerHostState.RUNNING )
                             {
-                                return new Action[] { STOP_CONTAINER, DESTROY_CONTAINER };
+                                return new Action[] { STOP_CONTAINER, DESTROY_CONTAINER, TAG_CONTAINER };
                             }
                             else if ( containerHost.getState() == ContainerHostState.STOPPED )
                             {
-                                return new Action[] { START_CONTAINER, DESTROY_CONTAINER };
+                                return new Action[] { START_CONTAINER, DESTROY_CONTAINER, TAG_CONTAINER };
                             }
                             else
                             {
-                                return new Action[] { DESTROY_CONTAINER };
+                                return new Action[] { DESTROY_CONTAINER, TAG_CONTAINER };
                             }
                         }
                         catch ( final PeerException e )
@@ -208,6 +209,10 @@ public class Manager extends VerticalLayout
                                 }
                             } );
                             getUI().addWindow( alert.getAlert() );
+                        }
+                        else if ( action == TAG_CONTAINER )
+                        {
+                            getUI().addWindow( new TagsWindow( containerHost ) );
                         }
                     }
                     else if ( lxcTable.hasChildren( target ) )

@@ -19,6 +19,8 @@ public interface User
     public void setPassword( String password );
 
 
+    public boolean isAdmin();
+
     public List<String> getPermissions();
 
     public void setSalt( String salt );

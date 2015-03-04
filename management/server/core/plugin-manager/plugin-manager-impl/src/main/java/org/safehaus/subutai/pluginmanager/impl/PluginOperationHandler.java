@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
+import org.safehaus.subutai.pluginmanager.api.OperationType;
 import org.safehaus.subutai.pluginmanager.api.PluginManagerException;
 
 
@@ -15,6 +16,8 @@ public class PluginOperationHandler implements Runnable
     private String pluginName;
     private OperationType operationType;
     private TrackerOperation trackerOperation;
+    public static boolean isInstallSuccessful = false;
+    public static boolean isRemoveSuccessful = false;
 
 
     public PluginOperationHandler( PluginManagerImpl manager, ManagerHelper managerHelper, String pluginName,
@@ -56,32 +59,52 @@ public class PluginOperationHandler implements Runnable
     public void removePlugin()
     {
         trackerOperation.addLog( "Removing plugin.." );
-        RequestBuilder command = manager.getCommands().makeRemoveCommand( pluginName );
+
         try
         {
-            managerHelper.execute( command );
+            RequestBuilder command = manager.getCommands().makeRemoveCommand( pluginName );
+            if( managerHelper.execute( command ) == null )
+            {
+                throw new PluginManagerException( "Remove operation is failed." );
+            }
         }
         catch ( PluginManagerException e )
         {
+            isRemoveSuccessful = false;
             trackerOperation.addLogFailed( String.format( "%s, Removing operation is failed...", e.getMessage() ) );
+            return;
         }
+        isRemoveSuccessful = true;
         trackerOperation.addLogDone( "Plugin is removed successfully." );
+
     }
 
 
     private void installPlugin()
     {
         trackerOperation.addLog( "Installing plugin.." );
-        RequestBuilder command = manager.getCommands().makeInstallCommand( pluginName );
         try
         {
-            managerHelper.execute( command );
+            RequestBuilder command = manager.getCommands().makeInstallCommand( pluginName );
+            if( managerHelper.execute( command ) == null )
+            {
+                throw  new PluginManagerException( "Installation is failed" );
+            }
+            if( !manager.isInstalled( pluginName ))
+            {
+                trackerOperation.addLogFailed( "Installation failed" );
+                return;
+            }
         }
         catch ( PluginManagerException e )
         {
+            isInstallSuccessful = false;
             trackerOperation.addLogFailed( String.format( "%s, Installing operation is failed...", e.getMessage() ) );
+            return;
         }
+        isInstallSuccessful = true;
         trackerOperation.addLogDone( "Plugin is installed successfully." );
+
     }
 
 

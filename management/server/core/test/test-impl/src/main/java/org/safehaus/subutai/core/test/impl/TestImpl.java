@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.test.impl;
 
 
+import java.io.Serializable;
+
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.test.api.Test;
@@ -33,5 +35,12 @@ public class TestImpl implements Test
     public String getUserName()
     {
         return identityManager.getUser().getUsername();
+    }
+
+
+    @Override
+    public Serializable loginWithToken( String tokenId, String ip )
+    {
+        return identityManager.loginWithToken( tokenId, ip );
     }
 }
