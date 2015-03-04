@@ -257,23 +257,35 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     }
 
 
-    public Serializable loginWithToken( final String tokenId, final String ip )
+    public Serializable loginWithToken( final String username )
     {
-        UserToken userToken = new UserToken( tokenId, ip );
+        UserToken userToken = new UserToken( username );
 
         SecurityUtils.setSecurityManager( securityManager );
         Subject subject = SecurityUtils.getSubject();
 
+        Session session = null;
         try
         {
             subject.login( userToken );
-            return subject.getSession().getId();
+            session = subject.getSession();
+            return session.getId();
         }
         catch ( UnknownSessionException e )
         {
             subject = new Subject.Builder().buildSubject();
             subject.login( userToken );
-            return subject.getSession( true ).getId();
+            session = subject.getSession( true );
+            return session.getId();
+        }
+        finally
+        {
+            if ( session != null )
+            {
+                SubutaiLoginContext loginContext =
+                        new SubutaiLoginContext( session.getId().toString(), subject.getPrincipal().toString(), null );
+                SubutaiThreadContext.set( loginContext );
+            }
         }
     }
 

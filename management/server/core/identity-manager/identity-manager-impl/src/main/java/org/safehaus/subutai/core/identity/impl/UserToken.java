@@ -6,33 +6,25 @@ import org.apache.shiro.authc.AuthenticationToken;
 
 public class UserToken implements AuthenticationToken
 {
-    private final String tokenId;
-    private final String ip;
+    private final String username;
 
 
-    public UserToken( final String tokenId, final String ip )
+    public UserToken( final String username )
     {
-        this.tokenId = tokenId;
-        this.ip = ip;
-    }
-
-
-    public String getIp()
-    {
-        return ip;
+        this.username = username;
     }
 
 
     @Override
     public Object getPrincipal()
     {
-        return null;
+        return username;
     }
 
 
     @Override
     public Object getCredentials()
     {
-        return tokenId;
+        return null;
     }
 }

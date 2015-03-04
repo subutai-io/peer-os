@@ -1,0 +1,26 @@
+<blueprint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
+           xmlns:cxf="http://cxf.apache.org/blueprint/core" xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xsi:schemaLocation=
+               "http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+                 http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
+
+  <cxf:bus id="cxfBusTestManager">
+    <cxf:features>
+      <cxf:logging />
+    </cxf:features>
+  </cxf:bus>
+
+  <reference id="test-impl" interface="org.safehaus.subutai.core.test.api.Test" />
+
+  <bean id="testRestImpl" class="org.safehaus.subutai.core.test.rest.TestRestImpl">
+    <argument ref="test-impl" />
+  </bean>
+
+  <jaxrs:server address="/test" id="testRest">
+    <jaxrs:serviceBeans>
+      <ref component-id="testRestImpl" />
+    </jaxrs:serviceBeans>
+  </jaxrs:server>
+
+</blueprint>
