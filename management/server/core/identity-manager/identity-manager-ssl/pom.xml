@@ -11,8 +11,8 @@
 
   <artifactId>identity-manager-ssl</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Ssl Factory</name>
-  <description>Subutai Ssl Factory</description>
+  <name>Subutai Ssl Context Factory</name>
+  <description>Subutai Ssl Context Factory</description>
 
   <properties>
     <bundle.namespace>org.safehaus.subutai.identity.ssl</bundle.namespace>
@@ -52,6 +52,10 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>identity-manager-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-common</artifactId>
     </dependency>
 
   </dependencies>

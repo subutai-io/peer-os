@@ -1,6 +1,6 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <bean id="customSslContextFactory"
+  <bean id="customSslContextFactory" scope="singleton" activation="eager"
         class="org.safehaus.subutai.core.identity.ssl.CustomSslContextFactoryImpl">
 
   </bean>

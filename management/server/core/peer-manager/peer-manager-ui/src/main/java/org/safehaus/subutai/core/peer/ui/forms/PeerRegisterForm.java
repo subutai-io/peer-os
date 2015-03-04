@@ -261,9 +261,11 @@ public class PeerRegisterForm extends CustomComponent
                                 switch ( peer.getStatus() )
                                 {
                                     case REJECTED:
-                                        removeMeFromRemote( selfPeer, peer );
-                                        peersTable.removeItem( peer.getId() );
-                                        module.getPeerManager().unregister( peer.getId().toString() );
+                                        if ( removeMeFromRemote( selfPeer, peer ) )
+                                        {
+                                            peersTable.removeItem( peer.getId() );
+                                            module.getPeerManager().unregister( peer.getId().toString() );
+                                        }
                                         break;
                                     case BLOCKED:
                                     case BLOCKED_PEER:
@@ -279,9 +281,11 @@ public class PeerRegisterForm extends CustomComponent
                                         module.getPeerManager().update( peer );
                                         break;
                                     case APPROVED:
-                                        module.getPeerManager().unregister( peer.getId().toString() );
-                                        peersTable.removeItem( peer.getId() );
-                                        unregisterMeFromRemote( selfPeer, peer );
+                                        if ( unregisterMeFromRemote( selfPeer, peer ) )
+                                        {
+                                            module.getPeerManager().unregister( peer.getId().toString() );
+                                            peersTable.removeItem( peer.getId() );
+                                        }
                                         break;
                                 }
                             }
@@ -339,7 +343,7 @@ public class PeerRegisterForm extends CustomComponent
     }
 
 
-    private void unregisterMeFromRemote( PeerInfo peerToUnregister, PeerInfo remotePeerInfo )
+    private boolean unregisterMeFromRemote( PeerInfo peerToUnregister, PeerInfo remotePeerInfo )
     {
         String baseUrl = String.format( "https://%s:%s/cxf", remotePeerInfo.getIp(), ChannelSettings.SECURE_PORT_X2 );
         WebClient client = RestUtil.createTrustedWebClientWithAuth( baseUrl,
@@ -368,15 +372,17 @@ public class PeerRegisterForm extends CustomComponent
 
             module.getSslContextFactory().reloadTrustStore();
             //            new Thread( new RestartCoreServlet() ).start();
+            return true;
         }
         else
         {
-            LOG.warn( "Response for registering peer: " + response.toString() );
+            LOG.warn( "Failed to unregister remote peer " + String.valueOf( response.getStatus() ) );
+            return false;
         }
     }
 
 
-    private void removeMeFromRemote( PeerInfo peerToUnregister, PeerInfo remotePeerInfo )
+    private boolean removeMeFromRemote( PeerInfo peerToUnregister, PeerInfo remotePeerInfo )
     {
         String baseUrl = String.format( "https://%s:%s/cxf", remotePeerInfo.getIp(), ChannelSettings.SECURE_PORT_X1 );
         WebClient client = RestUtil.createTrustedWebClient( baseUrl );// WebClient.create( baseUrl );
@@ -387,10 +393,12 @@ public class PeerRegisterForm extends CustomComponent
         {
             LOG.info( response.toString() );
             Notification.show( String.format( "Request sent to %s!", remotePeerInfo.getName() ) );
+            return true;
         }
         else
         {
             LOG.warn( "Response for registering peer: " + response.toString() );
+            return false;
         }
     }
 
