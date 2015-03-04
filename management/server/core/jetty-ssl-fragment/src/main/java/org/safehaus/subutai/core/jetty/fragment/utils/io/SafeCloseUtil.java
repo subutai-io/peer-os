@@ -24,7 +24,7 @@ public class SafeCloseUtil
     /**
      * Safely close an input stream.
      *
-     * @param fileinputStream Input stream
+     * @param finStream Input stream
      */
     public static void close( FileInputStream finStream )
     {
