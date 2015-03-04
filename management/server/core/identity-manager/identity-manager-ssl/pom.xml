@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <artifactId>identity-manager-parent</artifactId>
@@ -51,6 +51,32 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>jetty-ssl-fragment</artifactId>
+    </dependency>
+
+    <!--BouncyCastle-->
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcmail-jdk15on</artifactId>
+      <version>${org.bouncycastle.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpg-jdk15on</artifactId>
+      <version>${org.bouncycastle.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk15on</artifactId>
+      <version>${org.bouncycastle.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-ext-jdk15on</artifactId>
+      <version>${org.bouncycastle.version}</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -65,10 +91,11 @@
         <configuration>
           <instructions>
             <Export-Package>
+              sun.security.validator.KeyStores;
+              sun.security.validator;
               {local-packages};version=${project.version};
             </Export-Package>
             <Bundle-SymbolicName>${project.groupId}.core.identity.ssl</Bundle-SymbolicName>
-            <Bundle-Version>${project.version}</Bundle-Version>
             <Import-Package>*</Import-Package>
           </instructions>
         </configuration>

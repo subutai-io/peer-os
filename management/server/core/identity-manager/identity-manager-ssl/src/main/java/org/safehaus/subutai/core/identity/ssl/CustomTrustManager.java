@@ -7,8 +7,8 @@ import java.security.cert.X509Certificate;
 
 import javax.net.ssl.X509TrustManager;
 
-import org.safehaus.subutai.core.identity.ssl.crypto.keystore.KeyStoreData;
-import org.safehaus.subutai.core.identity.ssl.crypto.keystore.KeyStoreManager;
+import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
+import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,14 +25,10 @@ public class CustomTrustManager implements X509TrustManager
 
     private KeyStoreManager trustStoreManager;
     private KeyStoreData trustStoreData;
-    private String trustStorePath;
-    private String trustStorePassword;
 
 
-    public CustomTrustManager( final String trustStorePath, final String trustStorePassword )
+    public CustomTrustManager()
     {
-        this.trustStorePath = trustStorePath;
-        this.trustStorePassword = trustStorePassword;
         this.trustStoreManager = new KeyStoreManager();
         this.trustStoreData = new KeyStoreData();
         this.trustStoreData.setupTrustStorePx2();

@@ -21,8 +21,9 @@ import java.util.Set;
 
 import javax.net.ssl.X509KeyManager;
 
-import org.safehaus.subutai.core.identity.ssl.crypto.keystore.KeyStoreData;
-import org.safehaus.subutai.core.identity.ssl.crypto.keystore.KeyStoreManager;
+import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
+import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
+import org.safehaus.subutai.common.settings.SecuritySettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,19 +35,13 @@ public class CustomKeyManager implements X509KeyManager
 {
     private static final Logger log = LoggerFactory.getLogger( CustomKeyManager.class );
 
-    private String keyStorePath;
-
-    private String keyStorePassword;
-
     private KeyStoreManager keyStoreManager;
 
     private KeyStoreData keyStoreData;
 
 
-    public CustomKeyManager( final String keyStorePath, final String keyStorePassword )
+    public CustomKeyManager()
     {
-        this.keyStorePath = keyStorePath;
-        this.keyStorePassword = keyStorePassword;
         keyStoreManager = new KeyStoreManager();
         keyStoreData = new KeyStoreData();
         keyStoreData.setupKeyStorePx2();
@@ -123,8 +118,8 @@ public class CustomKeyManager implements X509KeyManager
         KeyStore.PrivateKeyEntry entry = null;
         try
         {
-            KeyStore.Entry newEntry =
-                    keyStore.getEntry( alias, new KeyStore.PasswordProtection( keyStorePassword.toCharArray() ) );
+            KeyStore.Entry newEntry = keyStore.getEntry( alias,
+                    new KeyStore.PasswordProtection( SecuritySettings.KEYSTORE_PX1_PSW.toCharArray() ) );
             if ( !( newEntry instanceof KeyStore.PrivateKeyEntry ) )
             {
                 // unexpected type of entry

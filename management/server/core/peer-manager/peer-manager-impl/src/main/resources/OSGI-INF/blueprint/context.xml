@@ -3,8 +3,7 @@
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
 
-           xsi:schemaLocation="http://www.w3.org/201/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance
-            http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0
+           xsi:schemaLocation="http://aries.apache.org/xmlns/jpa/v1..0 http://aries.apache.org/xmlns/jpa/v1.0.0
             0">
 
   <!-- ***************************************************************** -->
@@ -28,11 +27,15 @@
 
   <reference id="quotaManager" availability="mandatory"
              interface="org.safehaus.subutai.core.lxc.quota.api.QuotaManager" />
+
   <reference id="monitor" availability="optional"
              interface="org.safehaus.subutai.core.metric.api.Monitor" />
+
   <reference id="identityManager" availability="mandatory"
              interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
 
+  <reference id="sslContextFactory" availability="optional"
+             interface="org.safehaus.subutai.core.identity.api.CustomSslContextFactory" />
 
   <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
         class="org.safehaus.subutai.core.peer.impl.PeerManagerImpl">
@@ -44,6 +47,7 @@
     <property name="commandExecutor" ref="commandExecutor" />
     <property name="daoManager" ref="daoManagerPeer" />
     <property name="identityManager" ref="identityManager" />
+    <property name="sslContextFactory" ref="sslContextFactory" />
     <argument ref="messenger" />
   </bean>
 

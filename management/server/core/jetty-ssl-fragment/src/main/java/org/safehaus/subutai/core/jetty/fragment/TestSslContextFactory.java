@@ -8,8 +8,6 @@ import java.util.UUID;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509KeyManager;
-import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
@@ -22,8 +20,8 @@ public class TestSslContextFactory extends SslContextFactory
 
     private static UUID id;
 
-    private static X509KeyManager keyManager;
-    private static X509TrustManager trustManager;
+    private static KeyManager keyManager[];
+    private static TrustManager trustManager[];
 
 
     public TestSslContextFactory()
@@ -40,19 +38,14 @@ public class TestSslContextFactory extends SslContextFactory
     }
 
 
-    private String keyStorePath;
-    private String keyStorePassword;
-    private String trustStorePath;
-    private String trustStorePassword;
-
-
     @Override
     protected KeyManager[] getKeyManagers( final KeyStore keyStore ) throws Exception
     {
-        //        return super.getKeyManagers( keyStore );
-        return new KeyManager[] {
-                keyManager
-        };//new KeyManager[] { new CustomKeyManager( keyStorePath, keyStorePassword ) };
+        if ( keyManager == null )
+        {
+            return super.getKeyManagers( keyStore );
+        }
+        return keyManager;
     }
 
 
@@ -60,8 +53,23 @@ public class TestSslContextFactory extends SslContextFactory
     protected TrustManager[] getTrustManagers( final KeyStore trustStore, final Collection<? extends CRL> crls )
             throws Exception
     {
-        //        return super.getTrustManagers( trustStore, crls );
-        return new TrustManager[] { trustManager };
+        if ( trustManager == null )
+        {
+            return super.getTrustManagers( trustStore, crls );
+        }
+        return trustManager;
+    }
+
+
+    public static void setKeyManager( final KeyManager[] keyManager )
+    {
+        TestSslContextFactory.keyManager = keyManager;
+    }
+
+
+    public static void setTrustManager( final TrustManager[] trustManager )
+    {
+        TestSslContextFactory.trustManager = trustManager;
     }
 
 
@@ -70,7 +78,6 @@ public class TestSslContextFactory extends SslContextFactory
     {
         LOG.warn( String.format( "KeyStorePath %s", keyStorePath ) );
         super.setKeyStorePath( keyStorePath );
-        this.keyStorePath = keyStorePath;
     }
 
 
@@ -79,7 +86,6 @@ public class TestSslContextFactory extends SslContextFactory
     {
         LOG.warn( String.format( "TrustStorePath %s", trustStorePath ) );
         super.setTrustStore( trustStorePath );
-        this.trustStorePath = trustStorePath;
     }
 
 
@@ -88,7 +94,6 @@ public class TestSslContextFactory extends SslContextFactory
     {
         LOG.warn( String.format( "KeyStorePassword: %s", password ) );
         super.setKeyStorePassword( password );
-        this.keyStorePassword = password;
     }
 
 
@@ -97,6 +102,5 @@ public class TestSslContextFactory extends SslContextFactory
     {
         LOG.warn( String.format( "TrustStore password %s", password ) );
         super.setTrustStorePassword( password );
-        this.trustStorePassword = password;
     }
 }

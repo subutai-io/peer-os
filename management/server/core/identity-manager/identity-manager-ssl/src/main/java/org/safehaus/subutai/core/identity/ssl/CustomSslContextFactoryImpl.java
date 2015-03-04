@@ -5,6 +5,7 @@ import javax.net.ssl.KeyManager;
 import javax.net.ssl.TrustManager;
 
 import org.safehaus.subutai.core.identity.api.CustomSslContextFactory;
+import org.safehaus.subutai.core.jetty.fragment.TestSslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,23 +23,28 @@ public class CustomSslContextFactoryImpl implements CustomSslContextFactory
     private KeyManager keyManager[];
     private TrustManager trustManager[];
 
+
     public CustomSslContextFactoryImpl()
     {
-        keyManager = new KeyManager[] { new CustomKeyManager( keyStorePath, keyStorePassword ) };
-        trustManager = new TrustManager[] { new CustomTrustManager( trustStorePath, trustStorePassword ) };
+        keyManager = new KeyManager[] { new CustomKeyManager() };
+        trustManager = new TrustManager[] { new CustomTrustManager() };
+        TestSslContextFactory.setKeyManager( keyManager );
+        TestSslContextFactory.setTrustManager( trustManager );
     }
 
 
     @Override
     public void reloadKeyStore()
     {
-        keyManager = new KeyManager[] { new CustomKeyManager( keyStorePath, keyStorePassword ) };
+        keyManager = new KeyManager[] { new CustomKeyManager() };
+        TestSslContextFactory.setKeyManager( keyManager );
     }
 
 
     @Override
     public void reloadTrustStore()
     {
-        trustManager = new TrustManager[] { new CustomTrustManager( trustStorePath, trustStorePassword ) };
+        trustManager = new TrustManager[] { new CustomTrustManager() };
+        TestSslContextFactory.setTrustManager( trustManager );
     }
 }
