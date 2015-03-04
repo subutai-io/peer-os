@@ -46,7 +46,7 @@ public class TestComponent extends CustomComponent
             @Override
             public void buttonClick( final Button.ClickEvent event )
             {
-                Notification.show( test.loginWithToken( UUID.randomUUID().toString() ).toString() );
+                Notification.show( test.loginWithToken( UUID.randomUUID().toString(), "127.0.0.1" ).toString() );
             }
         } );
 

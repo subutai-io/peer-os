@@ -3,6 +3,10 @@ package org.safehaus.subutai.core.identity.impl;
 
 import java.util.Set;
 
+import org.safehaus.subutai.core.identity.api.IdentityManager;
+import org.safehaus.subutai.core.identity.api.Role;
+import org.safehaus.subutai.core.identity.api.User;
+
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -19,9 +23,12 @@ import com.google.common.collect.Sets;
 public class TokenRealm extends AuthorizingRealm
 {
 
+    private final IdentityManager identityManager;
 
-    public TokenRealm()
+
+    public TokenRealm( final IdentityManager identityManager )
     {
+        this.identityManager = identityManager;
         setCredentialsMatcher( new CredentialsMatcher()
         {
             @Override
@@ -37,9 +44,12 @@ public class TokenRealm extends AuthorizingRealm
     protected AuthorizationInfo doGetAuthorizationInfo( final PrincipalCollection principals )
     {
         String username = ( String ) principals.getPrimaryPrincipal();
-        //TODO lookup roles by username
-        //SecurityManager.getUser(username) and obtain its roles
-        Set<String> roles = Sets.newHashSet( "admin" );
+        User user = identityManager.getUser( username );
+        Set<String> roles = Sets.newHashSet();
+        for ( Role role : user.getRoles() )
+        {
+            roles.add( role.getName() );
+        }
         return new SimpleAuthorizationInfo( roles );
     }
 
@@ -57,26 +67,12 @@ public class TokenRealm extends AuthorizingRealm
         UserToken userToken = ( UserToken ) token;
 
         String tokenId = ( String ) userToken.getCredentials();
-        //TODO (1) lookup username by tokenId
+        //TODO lookup username by tokenId  in your custom tokens table (which is filled in token module UI)
 
-        String username = "username-from-db";
-        //throw  AuthenticationException if not found or other checks not met
+        String username = "karaf";
+
+        //TODO throw  AuthenticationException if not found or other checks not met (ip-range or ttl)
 
         return new SimpleAccount( username, tokenId, getName() );
-        //        return new AuthenticationInfo() {
-        //            @Override
-        //            public PrincipalCollection getPrincipals()
-        //            {
-        //
-        //                return null;
-        //            }
-        //
-        //
-        //            @Override
-        //            public Object getCredentials()
-        //            {
-        //                return null;
-        //            }
-        //        };
     }
 }

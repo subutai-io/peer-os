@@ -14,7 +14,6 @@ import org.safehaus.subutai.common.security.NullSubutaiLoginContext;
 import org.safehaus.subutai.common.security.SubutaiLoginContext;
 import org.safehaus.subutai.common.security.SubutaiThreadContext;
 import org.safehaus.subutai.common.util.SecurityUtil;
-import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.PermissionGroup;
@@ -67,19 +66,6 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     private UserDataService userDataService;
     private PermissionDataService permissionDataService;
     private RoleDataService roleDataService;
-    private ServiceLocator serviceLocator = new ServiceLocator();
-
-
-    //    public void setSecurityManager( final SecurityManager securityManager )
-    //    {
-    //        this.securityManager = securityManager;
-    //    }
-
-
-    //    public void setDaoManager( final DaoManager daoManager )
-    //    {
-    //        this.daoManager = daoManager;
-    //    }
 
 
     private String getSimpleSalt( String username )
@@ -127,7 +113,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         realm.setCredentialsMatcher( credentialsMatcher );
 
 
-        securityManager.setRealms( Sets.<Realm>newHashSet( realm, new TokenRealm() ) );
+        securityManager.setRealms( Sets.<Realm>newHashSet( realm, new TokenRealm( this ) ) );
 
 
         checkDefaultUser( "karaf" );
@@ -136,7 +122,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         List<SessionListener> sessionListeners = new ArrayList<>();
         sessionListeners.add( new SubutaiSessionListener() );
 
-        DefaultSecurityManager defaultSecurityManager = ( DefaultSecurityManager ) securityManager;
+        DefaultSecurityManager defaultSecurityManager = securityManager;
         ( ( DefaultSessionManager ) defaultSecurityManager.getSessionManager() )
                 .setSessionListeners( sessionListeners );
 
@@ -182,7 +168,6 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         user.setSalt( salt );
         user.addRole( adminRole );
         user.addRole( managerRole );
-        //        generateKey( user );
         userDataService.persist( user );
         LOG.debug( String.format( "User: %s", user.getId() ) );
     }
@@ -198,7 +183,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     private void logActiveSessions()
     {
         LOG.debug( "Active sessions:" );
-        DefaultSecurityManager defaultSecurityManager = ( DefaultSecurityManager ) securityManager;
+        DefaultSecurityManager defaultSecurityManager = securityManager;
         DefaultSessionManager sm = ( DefaultSessionManager ) defaultSecurityManager.getSessionManager();
         for ( Session session : sm.getSessionDAO().getActiveSessions() )
         {
@@ -272,9 +257,9 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     }
 
 
-    public Serializable login( final String tokenId )
+    public Serializable loginWithToken( final String tokenId, final String ip )
     {
-        UserToken userToken = new UserToken( tokenId );
+        UserToken userToken = new UserToken( tokenId, ip );
 
         SecurityUtils.setSecurityManager( securityManager );
         Subject subject = SecurityUtils.getSubject();
@@ -331,8 +316,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     @Override
     public Subject getSubject( Serializable sessionId )
     {
-        Subject subject = new Subject.Builder( securityManager ).sessionId( sessionId ).buildSubject();
-        return subject;
+        return new Subject.Builder( securityManager ).sessionId( sessionId ).buildSubject();
     }
 
 
@@ -389,6 +373,13 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
 
         userDataService.persist( user );
         return user.getId() != null;
+    }
+
+
+    @Override
+    public User getUser( final String username )
+    {
+        return userDataService.findByUsername( username );
     }
 
 
@@ -580,8 +571,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     public Role createMockRole( final String permissionName, final PermissionGroup permissionGroup,
                                 final String description )
     {
-        RoleEntity role = new RoleEntity( "" );
-        return role;
+        return new RoleEntity( "" );
     }
 
 
@@ -614,8 +604,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     private String saltedHash( String password, byte[] salt )
     {
         Sha256Hash sha256Hash = new Sha256Hash( password, salt );
-        String result = sha256Hash.toHex();
-        return result;
+        return sha256Hash.toHex();
     }
 
 
