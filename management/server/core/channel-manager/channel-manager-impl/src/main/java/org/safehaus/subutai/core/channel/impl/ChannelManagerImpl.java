@@ -18,8 +18,10 @@ public class ChannelManagerImpl implements ChannelManager
     public void init()
     {
         ChannelTokenManagerImpl.setEntityManagerFactory( daoManager.getEntityManagerFactory() );
-        ChannelTokenController channelTokenController = new ChannelTokenController();
-        channelTokenController.run();
+
+        //-------------------------------------------------------------
+        new Thread( new ChannelTokenController() ).start();
+        //-------------------------------------------------------------
     }
 
 
