@@ -84,76 +84,9 @@ public class MonitorFormTest
 
 
     @Test
-    public void testGetContainerHostsButton() throws Exception
-    {
-        assertTrue( monitorForm.getContainerHostsButton() instanceof Button );
-    }
-
-
-    @Test
-    public void testGetResourceHostsButton() throws Exception
-    {
-        assertTrue( monitorForm.getResourceHostsButton() instanceof Button );
-    }
-
-
-    @Test
     public void testGetEnvironmentComboBox() throws Exception
     {
         assertTrue( monitorForm.getEnvironmentComboBox() instanceof ComboBox );
     }
 
-
-    @Test
-    public void testPrintResourceHostMetrics() throws Exception
-    {
-        when( monitor.getResourceHostsMetrics() ).thenReturn( Sets.newHashSet( resourceHostMetric ) );
-
-        monitorForm.printResourceHostMetrics();
-
-        //        verify( metricsTable ).addItem( any( Object[].class ), anyObject() );
-
-        verify( executorService ).submit( any( Runnable.class ) );
-
-//        MonitorException exception = mock( MonitorException.class );
-//        when( exception.getMessage() ).thenReturn( ERR );
-//        doThrow( exception ).when( monitor ).getResourceHostsMetrics();
-//
-//        try
-//        {
-//            monitorForm.printResourceHostMetrics();
-//        }
-//        catch ( NullPointerException e )
-//        {
-//        }
-//
-//        verify( exception ).printStackTrace( any( PrintStream.class ) );
-    }
-
-
-    @Test
-    public void testPrintContainerHostMetrics() throws Exception
-    {
-        Environment environment = mock( Environment.class );
-        when( monitor.getContainerHostsMetrics( environment ) ).thenReturn( Sets.newHashSet( containerHostMetric ) );
-
-
-        monitorForm.printContainerMetrics( environment );
-
-//        verify( metricsTable ).addItem( any( Object[].class ), anyObject() );
-
-        verify( executorService ).submit( any( Runnable.class ) );
-
-//        MonitorException exception = mock( MonitorException.class );
-//        doThrow( exception ).when( monitor ).getContainerHostsMetrics( environment );
-//        when( exception.getMessage() ).thenReturn( ERR );
-//        try
-//        {
-//            monitorForm.printContainerMetrics( environment );
-//        }
-//        catch ( NullPointerException e )
-//        {
-//        }
-//        verify( exception ).printStackTrace( any( PrintStream.class ) );
-    }
 }

@@ -2,6 +2,8 @@ package org.safehaus.subutai.core.metric.impl;
 
 
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.peer.Host;
+import org.safehaus.subutai.common.metric.MetricType;
 import org.safehaus.subutai.core.metric.api.MonitoringSettings;
 
 
@@ -11,10 +13,15 @@ import org.safehaus.subutai.core.metric.api.MonitoringSettings;
 public class Commands
 {
 
-
     public RequestBuilder getCurrentMetricCommand( String hostname )
     {
         return new RequestBuilder( String.format( "subutai monitor %s", hostname ) );
+    }
+
+
+    public RequestBuilder getHistoricalMetricCommand( Host host, MetricType metricType )
+    {
+        return new RequestBuilder( String.format( "subutai monitor -q %s %s | grep e+", metricType.getName(), host.getHostname() ) );
     }
 
 
