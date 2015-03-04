@@ -60,6 +60,8 @@ public interface IdentityManager
     public Subject getSubject( Serializable sessionId );
 
 
+    public void touch( Serializable sessionId );
+
     /**
      * Logout user by sessions id
      *

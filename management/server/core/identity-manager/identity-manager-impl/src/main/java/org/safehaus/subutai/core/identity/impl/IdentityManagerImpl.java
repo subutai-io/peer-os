@@ -308,6 +308,17 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     @Override
+    public void touch( Serializable sessionId )
+    {
+        Subject subject = getSubject( sessionId );
+        if ( subject != null && subject.isAuthenticated() )
+        {
+            subject.getSession().touch();
+        }
+    }
+
+
+    @Override
     public void logout( Serializable sessionId )
     {
         Subject subject = this.getSubject( sessionId );
