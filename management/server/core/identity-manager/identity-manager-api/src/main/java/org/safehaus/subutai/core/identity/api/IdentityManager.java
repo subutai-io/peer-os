@@ -45,6 +45,9 @@ public interface IdentityManager
      */
     public Serializable login( String username, String password );
 
+    public Serializable login( String tokenId );
+
+
     //    public Subject login( AuthenticationToken token );
 
 

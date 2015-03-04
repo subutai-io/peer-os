@@ -39,6 +39,7 @@ import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListener;
 import org.apache.shiro.session.UnknownSessionException;
@@ -49,6 +50,7 @@ import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.apache.shiro.util.SimpleByteSource;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 
 /**
@@ -117,13 +119,15 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
                         + " u.user_name = ?" );
         realm.setPermissionsQuery( "select permission from subutai_roles_permissions where role_name = ?" );
 
-        securityManager.setRealm( realm );
 
         HashedCredentialsMatcher credentialsMatcher = new HashedCredentialsMatcher();
         credentialsMatcher.setHashAlgorithmName( "SHA-256" );
         credentialsMatcher.setHashIterations( 1 );
 
         realm.setCredentialsMatcher( credentialsMatcher );
+
+
+        securityManager.setRealms( Sets.<Realm>newHashSet( realm, new TokenRealm() ) );
 
 
         checkDefaultUser( "karaf" );
@@ -263,6 +267,27 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         {
             subject = new Subject.Builder().buildSubject();
             subject.login( usernamePasswordToken );
+            return subject.getSession( true ).getId();
+        }
+    }
+
+
+    public Serializable login( final String tokenId )
+    {
+        UserToken userToken = new UserToken( tokenId );
+
+        SecurityUtils.setSecurityManager( securityManager );
+        Subject subject = SecurityUtils.getSubject();
+
+        try
+        {
+            subject.login( userToken );
+            return subject.getSession().getId();
+        }
+        catch ( UnknownSessionException e )
+        {
+            subject = new Subject.Builder().buildSubject();
+            subject.login( userToken );
             return subject.getSession( true ).getId();
         }
     }

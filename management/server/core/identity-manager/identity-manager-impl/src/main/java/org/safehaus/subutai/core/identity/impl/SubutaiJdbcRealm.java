@@ -36,6 +36,13 @@ public class SubutaiJdbcRealm extends JdbcRealm
 
 
     @Override
+    public boolean supports( final AuthenticationToken token )
+    {
+        return token instanceof UsernamePasswordToken;
+    }
+
+
+    @Override
     protected AuthenticationInfo doGetAuthenticationInfo( AuthenticationToken token ) throws AuthenticationException
     {
         //identify account to log to
