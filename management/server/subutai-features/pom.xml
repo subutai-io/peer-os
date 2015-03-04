@@ -35,6 +35,11 @@
 
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>jetty-ssl-fragment</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>test-api</artifactId>
     </dependency>
     <dependency>
