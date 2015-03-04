@@ -3,13 +3,13 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <artifactId>identity-manager-parent</artifactId>
+    <artifactId>ssl-context-manager</artifactId>
     <groupId>org.safehaus.subutai</groupId>
     <version>2.0.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>identity-manager-ssl</artifactId>
+  <artifactId>ssl-context-manager-impl</artifactId>
   <packaging>bundle</packaging>
   <name>Subutai Ssl Context Factory</name>
   <description>Subutai Ssl Context Factory</description>
@@ -28,26 +28,6 @@
       <artifactId>slf4j-simple</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${servlet.spec.groupId}</groupId>
-      <artifactId>${servlet.spec.artifactId}</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>identity-manager-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
@@ -55,28 +35,32 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>jetty-ssl-fragment</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ssl-context-manager-api</artifactId>
+    </dependency>
 
     <!--BouncyCastle-->
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcmail-jdk15on</artifactId>
-      <version>${org.bouncycastle.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcpg-jdk15on</artifactId>
-      <version>${org.bouncycastle.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk15on</artifactId>
-      <version>${org.bouncycastle.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-ext-jdk15on</artifactId>
-      <version>${org.bouncycastle.version}</version>
-    </dependency>
+    <!--<dependency>-->
+    <!--<groupId>org.bouncycastle</groupId>-->
+    <!--<artifactId>bcmail-jdk15on</artifactId>-->
+    <!--<version>${org.bouncycastle.version}</version>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+    <!--<groupId>org.bouncycastle</groupId>-->
+    <!--<artifactId>bcpg-jdk15on</artifactId>-->
+    <!--<version>${org.bouncycastle.version}</version>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+    <!--<groupId>org.bouncycastle</groupId>-->
+    <!--<artifactId>bcprov-jdk15on</artifactId>-->
+    <!--<version>${org.bouncycastle.version}</version>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+    <!--<groupId>org.bouncycastle</groupId>-->
+    <!--<artifactId>bcprov-ext-jdk15on</artifactId>-->
+    <!--<version>${org.bouncycastle.version}</version>-->
+    <!--</dependency>-->
   </dependencies>
 
   <build>
@@ -95,7 +79,7 @@
               sun.security.validator;
               {local-packages};version=${project.version};
             </Export-Package>
-            <Bundle-SymbolicName>${project.groupId}.core.identity.ssl</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.ssl.manager.impl</Bundle-SymbolicName>
             <Import-Package>*</Import-Package>
           </instructions>
         </configuration>

@@ -19,12 +19,9 @@
 
   <bean id="peerRestServiceImpl" class="org.safehaus.subutai.core.peer.rest.RestServiceImpl">
     <argument ref="peerManager" />
-    <property name="sslContextFactory" ref="sslContextFactory" />
   </bean>
 
   <reference id="peerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
-  <reference id="sslContextFactory" availability="optional"
-             interface="org.safehaus.subutai.core.identity.api.CustomSslContextFactory" />
 
 </blueprint>

@@ -370,7 +370,7 @@ public class PeerRegisterForm extends CustomComponent
             keyStoreManager.deleteEntry( keyStore, keyStoreData );
             //***********************************************************************
 
-            module.getSslContextFactory().reloadTrustStore();
+            //            module.getSslContextFactory().reloadTrustStore();
             //            new Thread( new RestartCoreServlet() ).start();
             return true;
         }
@@ -436,7 +436,7 @@ public class PeerRegisterForm extends CustomComponent
             keyStoreManager.importCertificateHEXString( keyStore, keyStoreData );
             //***********************************************************************
 
-            module.getSslContextFactory().reloadTrustStore();
+            //            module.getSslContextFactory().reloadTrustStore();
             //            new Thread( new RestartCoreServlet() ).start();
             return true;
         }

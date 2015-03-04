@@ -1,11 +1,11 @@
-package org.safehaus.subutai.core.identity.ssl;
+package org.safehaus.subutai.core.ssl.manager.impl;
 
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.TrustManager;
 
-import org.safehaus.subutai.core.identity.api.CustomSslContextFactory;
 import org.safehaus.subutai.core.jetty.fragment.TestSslContextFactory;
+import org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

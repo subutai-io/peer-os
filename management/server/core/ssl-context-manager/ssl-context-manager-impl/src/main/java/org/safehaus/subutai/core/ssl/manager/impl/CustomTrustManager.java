@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.identity.ssl;
+package org.safehaus.subutai.core.ssl.manager.impl;
 
 
 import java.security.KeyStore;

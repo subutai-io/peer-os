@@ -3,21 +3,18 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <groupId>org.safehaus.subutai</groupId>
     <artifactId>mgmt-server-core-parent</artifactId>
+    <groupId>org.safehaus.subutai</groupId>
     <version>2.0.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>identity-manager-parent</artifactId>
-  <name>Subutai Identity Manager Parent</name>
-  <description>Subutai Identity Manager Parent</description>
+  <artifactId>ssl-context-manager</artifactId>
   <packaging>pom</packaging>
 
   <modules>
-    <module>identity-manager-api</module>
-    <module>identity-manager-impl</module>
-    <module>identity-manager-rest</module>
-    <module>identity-manager-ui</module>
+    <module>ssl-context-manager-impl</module>
+    <module>ssl-context-manager-api</module>
   </modules>
+
 </project>
