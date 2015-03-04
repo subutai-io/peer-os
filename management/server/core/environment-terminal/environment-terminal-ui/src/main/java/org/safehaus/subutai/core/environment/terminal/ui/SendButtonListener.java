@@ -136,7 +136,7 @@ public class SendButtonListener implements Button.ClickListener
                     @Override
                     public void onResponse( final Response response, final CommandResult commandResult )
                     {
-                        displayResponse( response, commandResult );
+                        displayResponse( host, response, commandResult );
                     }
                 } );
             }
@@ -156,7 +156,7 @@ public class SendButtonListener implements Button.ClickListener
         }
 
 
-        private void displayResponse( Response response, CommandResult commandResult )
+        private void displayResponse( Host host, Response response, CommandResult commandResult )
         {
             StringBuilder out = new StringBuilder();
             if ( !Strings.isNullOrEmpty( response.getStdOut() ) )
@@ -181,7 +181,7 @@ public class SendButtonListener implements Button.ClickListener
 
             if ( out.length() > 0 )
             {
-                form.addOutput( out.toString() );
+                form.addOutput( String.format( "%s [%d]:%n%s", host.getHostname(), response.getPid(), out ) );
             }
         }
     }

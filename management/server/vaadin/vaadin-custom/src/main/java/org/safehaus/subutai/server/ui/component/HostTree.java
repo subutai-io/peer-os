@@ -49,8 +49,8 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
     private final HostRegistry hostRegistry;
     private final Tree tree;
     private HierarchicalContainer container;
-    private Set<HostInfo> presentHosts = Sets.newHashSet();
-    private Set<HostInfo> selectedHosts = Sets.newHashSet();
+    private Set<HostInfo> presentHosts = Sets.newConcurrentHashSet();
+    private Set<HostInfo> selectedHosts = Sets.newConcurrentHashSet();
     private static final String VALUE_PROPERTY = "value";
     private static final String ICON_PROPERTY = "icon";
     private final boolean hideManagement;

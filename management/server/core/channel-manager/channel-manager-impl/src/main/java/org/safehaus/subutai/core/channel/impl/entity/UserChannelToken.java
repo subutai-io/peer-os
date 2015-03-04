@@ -23,13 +23,19 @@ public class UserChannelToken
 {
     @Id
     @Column( name = "user_id" )
-    private Long id;
+    private Long userId;
 
     @Column(name = "valid_period")
     private short validPeriod = 0;
 
     @Column(name = "status")
     private short status;
+
+    @Column(name = "ip_range_start")
+    private short ipRangeStart;
+
+    @Column(name = "ip_range_end")
+    private short ipRangeEnd;
 
     @Column( name = "token")
     private String token;
@@ -41,17 +47,16 @@ public class UserChannelToken
     /************************************************************************
      *
      */
-    public Long getId()
+    public Long getUserId()
     {
-        return id;
-    }
-
-    public void setId( Long id )
-    {
-        this.id = id;
+        return userId;
     }
 
 
+    public void setUserId( final Long userId )
+    {
+        this.userId = userId;
+    }
 
     public short getStatus()
     {
@@ -93,4 +98,27 @@ public class UserChannelToken
         this.validPeriod = validPeriod;
     }
 
+
+    public short getIpRangeStart()
+    {
+        return ipRangeStart;
+    }
+
+
+    public void setIpRangeStart( final short ipRangeStart )
+    {
+        this.ipRangeStart = ipRangeStart;
+    }
+
+
+    public short getIpRangeEnd()
+    {
+        return ipRangeEnd;
+    }
+
+
+    public void setIpRangeEnd( final short ipRangeEnd )
+    {
+        this.ipRangeEnd = ipRangeEnd;
+    }
 }

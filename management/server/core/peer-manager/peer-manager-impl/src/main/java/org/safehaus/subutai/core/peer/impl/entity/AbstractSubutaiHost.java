@@ -257,6 +257,16 @@ public abstract class AbstractSubutaiHost implements Host
     }
 
 
+    public void setNetInterfaces( Set<Interface> interfaces )
+    {
+        interfaces.clear();
+        for ( Interface iface : interfaces )
+        {
+            addInterface( new HostInterface( iface ) );
+        }
+    }
+
+
     @Override
     public HostArchitecture getHostArchitecture()
     {

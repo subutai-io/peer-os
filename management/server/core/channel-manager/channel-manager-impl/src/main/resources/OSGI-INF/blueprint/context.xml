@@ -9,11 +9,11 @@
             http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0">
 
   <!-- ************************************************************************************************* -->
-  <!--
+
   <bean id="daoManagerChannel" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager" activation="eager">
-    <jpa:unit unitname="envExtManagerPUnit" property="entityManagerFactory" />
+    <jpa:unit unitname="channelManagerPUnit" property="entityManagerFactory" />
   </bean>
-  -->
+
   <!-- ************************************************************************************************** -->
 
 
@@ -25,10 +25,10 @@
   </reference-list>
   <!-- ************************************************************************************************** -->
 
-  <!--
+
   <bean id="channelManager" scope="singleton" init-method="init"
-        class="org.safehaus.subutai.core.channel.api.ChannelManagerImpl">
+        class="org.safehaus.subutai.core.channel.impl.ChannelManagerImpl">
     <argument ref="daoManagerChannel" />
   </bean>
-  -->
+
 </blueprint>

@@ -40,7 +40,7 @@
     <module>identity-manager</module>
     <module>template-wizard</module>
     <module>channel-manager</module>
-    <!--    <module>shiro-manager-parent</module>-->
+    <module>test</module>
   </modules>
 
 </project>

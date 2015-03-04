@@ -59,8 +59,14 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
             {
 
             }
+            else if(url.getPort() == Integer.parseInt( ChannelSettings.SPECIAL_PORT_X1))
+            {
+
+            }
 
 
+            //----------------------------------------------------------------------------------------------
+            //--------------- Redirect ---------------------------------------------------------------------
             if(status == 0)
             {
                 LOG.warn( "*********  Access to" + basePath + "  is blocked **********************" );
@@ -72,6 +78,7 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
             {
 
             }
+            //-----------------------------------------------------------------------------------------------
         }
         catch ( MalformedURLException ignore )
         {

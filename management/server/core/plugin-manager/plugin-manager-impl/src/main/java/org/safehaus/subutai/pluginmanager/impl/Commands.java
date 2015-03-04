@@ -55,4 +55,20 @@ public class Commands
     {
         return new RequestBuilder( CHECK_COMMAND );
     }
+
+    public RequestBuilder makeCheckIfInstalledCommand()
+    {
+        return new RequestBuilder( String.format( "dpkg-query -W *%s | grep -v repo", PACKAGE_POSTFIX ) );
+    }
+
+    public RequestBuilder makeListLocalPluginsCommand()
+    {
+        return new RequestBuilder( String.format( "apt-cache search %s | grep -v repo | awk -F '-' '{ print $1 }' ", PACKAGE_POSTFIX_WITHOUT_DASH ) );
+    }
+
+    public RequestBuilder makeIsInstalledCommand( String pluginName )
+    {
+        //return new RequestBuilder( String.format( "dpkg-query -W %s-%s | grep -v repo", pluginName,PACKAGE_POSTFIX_WITHOUT_DASH ) );
+        return new RequestBuilder( String.format( "dpkg -s %s-%s", pluginName,PACKAGE_POSTFIX_WITHOUT_DASH ) );
+    }
 }

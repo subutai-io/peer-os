@@ -1,7 +1,11 @@
 package org.safehaus.subutai.core.channel.impl;
 
 
+import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.core.channel.api.ChannelManager;
+import org.safehaus.subutai.core.channel.impl.token.ChannelTokenController;
+import org.safehaus.subutai.core.channel.impl.token.ChannelTokenManagerImpl;
+
 
 
 /**
@@ -9,5 +13,28 @@ import org.safehaus.subutai.core.channel.api.ChannelManager;
  */
 public class ChannelManagerImpl implements ChannelManager
 {
+    private DaoManager daoManager = null;
 
+    public void init()
+    {
+        ChannelTokenManagerImpl.setEntityManagerFactory( daoManager.getEntityManagerFactory() );
+        ChannelTokenController channelTokenController = new ChannelTokenController();
+        channelTokenController.run();
+    }
+
+
+
+    public DaoManager getDaoManager()
+    {
+
+        return daoManager;
+    }
+
+    public void setDaoManager( DaoManager daoManager )
+    {
+
+
+        this.daoManager = daoManager;
+    }
 }
+

@@ -6,8 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.slf4j.Logger;
@@ -18,7 +16,6 @@ import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.realm.jdbc.JdbcRealm;
 import org.apache.shiro.util.JdbcUtils;
 import org.apache.shiro.util.SimpleByteSource;
@@ -28,49 +25,13 @@ public class SubutaiJdbcRealm extends JdbcRealm
 {
     private static final Logger log = LoggerFactory.getLogger( SubutaiJdbcRealm.class );
 
+
     protected String jndiDataSourceName;
 
 
-    public SubutaiJdbcRealm()
+    public SubutaiJdbcRealm( DataSource dataSource1 )
     {
-    }
-
-
-    public String getJndiDataSourceName()
-    {
-        return jndiDataSourceName;
-    }
-
-
-    public void setJndiDataSourceName( String jndiDataSourceName )
-    {
-        this.jndiDataSourceName = jndiDataSourceName;
-        this.dataSource = getDataSourceFromJNDI( jndiDataSourceName );
-    }
-
-
-    private DataSource getDataSourceFromJNDI( String jndiDataSourceName )
-    {
-        try
-        {
-            InitialContext ic;
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
-            Thread.currentThread().setContextClassLoader( this.getClass().getClassLoader() );
-            try
-            {
-                ic = new InitialContext();
-            }
-            finally
-            {
-                Thread.currentThread().setContextClassLoader( cl );
-            }
-            return ( DataSource ) ic.lookup( jndiDataSourceName );
-        }
-        catch ( NamingException e )
-        {
-            log.error( "JNDI error while retrieving " + jndiDataSourceName, e );
-            throw new AuthorizationException( e );
-        }
+        this.dataSource = dataSource1;
     }
 
 

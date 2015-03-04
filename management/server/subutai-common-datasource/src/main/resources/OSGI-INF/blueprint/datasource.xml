@@ -20,16 +20,29 @@
             <entry key="osgi.jndi.service.name" value="jdbc/testxa"/>
         </service-properties>
     </service>-->
+  <!-- *********************Channel Manager ************************ -->
+
+  <bean id="channelManagerJDBC" class="org.h2.jdbcx.JdbcDataSource" activation="eager">
+    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/channelManagerDb" />
+    <property name="user" value="sa" />
+    <property name="password" value="" />
+  </bean>
+
+  <service interface="javax.sql.DataSource" ref="channelManagerJDBC" activation="eager">
+    <service-properties>
+      <entry key="osgi.jndi.service.name" value="openjpa/channelManagerDS" />
+    </service-properties>
+  </service>
 
   <!-- *********************Security Manager ************************ -->
 
-  <bean id="securityManagerJDBC" class="org.h2.jdbcx.JdbcDataSource">
+  <bean id="securityManagerJDBC" class="org.h2.jdbcx.JdbcDataSource" activation="eager">
     <property name="URL" value="jdbc:h2:/var/lib/subutai/db/securityDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
 
-  <service interface="javax.sql.DataSource" ref="securityManagerJDBC">
+  <service interface="javax.sql.DataSource" ref="securityManagerJDBC" activation="eager">
     <service-properties>
       <entry key="osgi.jndi.service.name" value="openjpa/securityManagerDS" />
     </service-properties>
