@@ -121,4 +121,33 @@ public class ChannelTokenManagerImpl
                 entityManager.close();
         }
     }
+    /***********************************************************************************************************
+     *
+     * */
+    public static UserChannelToken getUserChannelTokenData(long userId)
+    {
+        UserChannelToken userChannelToken = null;
+
+        EntityManager entityManager = EntityManagerFactory.createEntityManager();
+
+        try
+        {
+            Query query;
+            query = entityManager.createQuery( "select * FROM UserChannelToken AS ucht WHERE and ucht.user_id=:user_id" );
+            query.setParameter( "user_id", userId );
+            userChannelToken = (UserChannelToken)query.getSingleResult();
+        }
+        catch ( Exception e )
+        {
+        }
+        finally
+        {
+            if(entityManager.isOpen())
+                entityManager.close();
+        }
+
+        return  userChannelToken;
+
+    }
+
 }

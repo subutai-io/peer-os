@@ -28,7 +28,7 @@
 
   <bean id="channelManager" scope="singleton" init-method="init"
         class="org.safehaus.subutai.core.channel.impl.ChannelManagerImpl">
-    <argument ref="daoManagerChannel" />
+    <property name="daoManager" ref="daoManagerChannel"/>
   </bean>
 
 </blueprint>
