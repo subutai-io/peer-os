@@ -4,8 +4,10 @@ package org.safehaus.subutai.core.identity.ssl;
 import java.net.Socket;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.PrivateKey;
+import java.security.UnrecoverableEntryException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -19,8 +21,8 @@ import java.util.Set;
 
 import javax.net.ssl.X509KeyManager;
 
-import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
-import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
+import org.safehaus.subutai.core.identity.ssl.crypto.keystore.KeyStoreData;
+import org.safehaus.subutai.core.identity.ssl.crypto.keystore.KeyStoreManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,18 +58,6 @@ public class CustomKeyManager implements X509KeyManager
     {
         log.warn( String.format( "%s %s", keyType, Arrays.asList( issuers ) ) );
         log.warn( "################ getClientAliases" );
-        //
-        //        KeyStore keyStore = keyStoreManager.load( keyStoreData );
-        //        List<String> aliases = new ArrayList<>();
-        //        try
-        //        {
-        //            aliases = Collections.list( keyStore.aliases() );
-        //        }
-        //        catch ( KeyStoreException e )
-        //        {
-        //            log.error( "Error accessing aliases", e );
-        //        }
-        //        return aliases.toArray( new String[aliases.size()] );
         return getAliases( issuers );
     }
 
@@ -85,7 +75,7 @@ public class CustomKeyManager implements X509KeyManager
     public String[] getServerAliases( final String keyType, final Principal[] issuers )
     {
         log.warn( "############## getServerAliases" );
-        return new String[0];
+        return getAliases( issuers );
     }
 
 
@@ -93,7 +83,7 @@ public class CustomKeyManager implements X509KeyManager
     public String chooseServerAlias( final String keyType, final Principal[] issuers, final Socket socket )
     {
         log.warn( "################# chooseServerAlias" );
-        return null;
+        return getAliases( issuers )[0];
     }
 
 
@@ -101,7 +91,27 @@ public class CustomKeyManager implements X509KeyManager
     public X509Certificate[] getCertificateChain( final String alias )
     {
         log.warn( "################## getCertificateChain" );
-        return new X509Certificate[0];
+
+        try
+        {
+            KeyStore keyStore = keyStoreManager.load( keyStoreData );
+            Certificate chain[] = keyStore.getCertificateChain( alias );
+            List<X509Certificate> xchain = new ArrayList<>();
+            for ( final Certificate certificate : chain )
+            {
+                if ( certificate instanceof X509Certificate )
+                {
+                    xchain.add( ( X509Certificate ) certificate );
+                }
+            }
+            return xchain.toArray( new X509Certificate[xchain.size()] );
+        }
+        catch ( KeyStoreException e )
+        {
+            log.warn( "no keyStore chain is found.", e );
+            return new X509Certificate[0];
+        }
+        //        return new X509Certificate[0];
     }
 
 
@@ -109,7 +119,26 @@ public class CustomKeyManager implements X509KeyManager
     public PrivateKey getPrivateKey( final String alias )
     {
         log.warn( "################## getPrivateKey" );
-        return null;
+        KeyStore keyStore = keyStoreManager.load( keyStoreData );
+        KeyStore.PrivateKeyEntry entry = null;
+        try
+        {
+            KeyStore.Entry newEntry =
+                    keyStore.getEntry( alias, new KeyStore.PasswordProtection( keyStorePassword.toCharArray() ) );
+            if ( !( newEntry instanceof KeyStore.PrivateKeyEntry ) )
+            {
+                // unexpected type of entry
+                return null;
+            }
+            entry = ( KeyStore.PrivateKeyEntry ) newEntry;
+        }
+        catch ( NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException e )
+        {
+            log.error( "Error getting keyStore entry", e );
+        }
+        //        keyStore.get
+        return entry == null ? null : entry.getPrivateKey();
+        //        return null;
     }
 
 
@@ -138,6 +167,20 @@ public class CustomKeyManager implements X509KeyManager
             {
                 String alias = enumeration.nextElement();
                 Certificate[] chain = keyStore.getCertificateChain( alias );
+
+                boolean compatible = true;
+                for ( final Certificate certificate : chain )
+                {
+                    if ( ( certificate instanceof X509Certificate ) )
+                    {
+                        compatible = false;
+                    }
+                }
+                if ( !compatible )
+                {
+                    continue;
+                }
+
                 if ( issuerSet != null )
                 {
                     boolean found = false;
@@ -172,5 +215,6 @@ public class CustomKeyManager implements X509KeyManager
             log.error( "Error accessing keyStore aliases.", e );
         }
         return result.toArray( new String[result.size()] );
+        //        return null;
     }
 }

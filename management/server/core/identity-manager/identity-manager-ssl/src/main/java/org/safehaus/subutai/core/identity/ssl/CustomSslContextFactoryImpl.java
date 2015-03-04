@@ -4,21 +4,19 @@ package org.safehaus.subutai.core.identity.ssl;
 import java.security.KeyStore;
 import java.security.cert.CRL;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.TrustManager;
 
 import org.eclipse.jetty.http.ssl.SslContextFactory;
-import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
-import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
-import org.safehaus.subutai.core.identity.api.CustomSslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+//import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
+//import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
 
-public class CustomSslContextFactoryImpl extends SslContextFactory implements CustomSslContextFactory
+
+public class CustomSslContextFactoryImpl extends SslContextFactory
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( CustomSslContextFactoryImpl.class );
@@ -29,6 +27,10 @@ public class CustomSslContextFactoryImpl extends SslContextFactory implements Cu
     //    <Set name="TrustStore">/var/lib/subutai/keystores/truststore_server_px2.jks</Set>
     //    <Set name="TrustStorePassword">subutai</Set>
     //    <Set name="needClientAuth">true</Set>
+    private String keyStorePath;
+    private String keyStorePassword;
+    private String trustStorePath;
+    private String trustStorePassword;
 
 
     public CustomSslContextFactoryImpl()
@@ -53,26 +55,10 @@ public class CustomSslContextFactoryImpl extends SslContextFactory implements Cu
 
 
     @Override
-    public void reloadKeyStore()
-    {
-    }
-
-
-    @Override
-    public void reloadTrustStore()
-    {
-    }
-
-
-    @Override
     protected KeyManager[] getKeyManagers( final KeyStore keyStore ) throws Exception
     {
-        KeyStoreManager keyStoreManager = new KeyStoreManager();
-        KeyStoreData keyStoreData = new KeyStoreData();
-        keyStoreData.setupKeyStorePx2();
-        KeyStore keyStore1 = keyStoreManager.load( keyStoreData );
-        List<String> aliases = Collections.list( keyStore1.aliases() );
         return super.getKeyManagers( keyStore );
+        //        return new KeyManager[] { new CustomKeyManager( keyStorePath, keyStorePassword ) };
     }
 
 
@@ -81,5 +67,41 @@ public class CustomSslContextFactoryImpl extends SslContextFactory implements Cu
             throws Exception
     {
         return super.getTrustManagers( trustStore, crls );
+        //        return new TrustManager[] { new CustomTrustManager( trustStorePath, trustStorePassword ) };
+    }
+
+
+    @Override
+    public void setKeyStorePath( final String keyStorePath )
+    {
+        super.setKeyStorePath( keyStorePath );
+        this.keyStorePath = keyStorePath;
+    }
+
+
+    @Override
+    public void setTrustStore( final String trustStorePath )
+    {
+        LOG.debug( String.format( "TrustStorePath %s", trustStorePath ) );
+        super.setTrustStore( trustStorePath );
+        this.trustStorePath = trustStorePath;
+    }
+
+
+    @Override
+    public void setKeyStorePassword( final String password )
+    {
+        LOG.debug( String.format( "KeyStorePassword: %s", password ) );
+        super.setKeyStorePassword( password );
+        this.keyStorePassword = password;
+    }
+
+
+    @Override
+    public void setTrustStorePassword( final String password )
+    {
+        LOG.debug( String.format( "TrustStore password %s", password ) );
+        super.setTrustStorePassword( password );
+        this.trustStorePassword = password;
     }
 }

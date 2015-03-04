@@ -27,7 +27,6 @@ import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.identity.api.CustomSslContextFactory;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
@@ -45,13 +44,11 @@ public class RestServiceImpl implements RestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
     private PeerManager peerManager;
-    private CustomSslContextFactory sslContextFactory;
 
 
-    public RestServiceImpl( final PeerManager peerManager, final CustomSslContextFactory sslContextFactory )
+    public RestServiceImpl( final PeerManager peerManager)
     {
         this.peerManager = peerManager;
-        this.sslContextFactory = sslContextFactory;
     }
 
 
@@ -181,7 +178,6 @@ public class RestServiceImpl implements RestService
                 //***********************************************************************
 
                 //                new Thread( new RestartCoreServlet() ).start();
-                sslContextFactory.reloadTrustStore();
 
                 return Response.ok( "Successfully unregistered peer: " + peerId ).build();
             }
@@ -265,7 +261,7 @@ public class RestServiceImpl implements RestService
 
         //***********************************************************************
 
-        sslContextFactory.reloadTrustStore();
+
         //        new Thread( new RestartCoreServlet() ).start();
 
 
