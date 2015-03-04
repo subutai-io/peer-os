@@ -41,6 +41,7 @@
     <module>template-wizard</module>
     <module>test</module>
     <module>channel-manager</module>
+    <module>jetty-ssl-fragment</module>
     <!--    <module>shiro-manager-parent</module>-->
   </modules>
 
