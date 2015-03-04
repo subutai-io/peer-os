@@ -361,11 +361,14 @@ public class MainUI extends UI implements ViewChangeListener
                                     IdentityManager identityManager =
                                             ServiceLocator.getServiceNoCache( IdentityManager.class );
 
-                                    User user = identityManager.getUser();
-
-                                    if ( user != null )
+                                    if ( identityManager != null )
                                     {
-                                        username.setValue( user.getUsername() );
+                                        User user = identityManager.getUser();
+
+                                        if ( user != null )
+                                        {
+                                            username.setValue( user.getUsername() );
+                                        }
                                     }
                                 }
                                 catch ( Exception e )
