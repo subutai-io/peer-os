@@ -20,6 +20,5 @@
     <module>identity-manager-rest</module>
     <module>identity-manager-ui</module>
     <module>identity-manager-ssl</module>
-
   </modules>
 </project>
