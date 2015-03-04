@@ -97,7 +97,7 @@
               {local-packages};version=${project.version};
             </Export-Package>
             <Bundle-SymbolicName>${project.groupId}.core.identity.ssl</Bundle-SymbolicName>
-            <Fragment-Host>org.ops4j.pax.web.pax-web-jetty</Fragment-Host>
+            <!--<Fragment-Host>org.ops4j.pax.web.pax-web-jetty</Fragment-Host>-->
             <Bundle-Version>${project.version}</Bundle-Version>
             <Import-Package>*</Import-Package>
           </instructions>
