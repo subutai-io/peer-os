@@ -34,7 +34,7 @@ public class TokenRealm extends AuthorizingRealm
             @Override
             public boolean doCredentialsMatch( final AuthenticationToken token, final AuthenticationInfo info )
             {
-                return token.getCredentials().equals( info.getCredentials() );
+                return token.getPrincipal().equals( info.getPrincipals().getPrimaryPrincipal() );
             }
         } );
     }
@@ -66,13 +66,8 @@ public class TokenRealm extends AuthorizingRealm
     {
         UserToken userToken = ( UserToken ) token;
 
-        String tokenId = ( String ) userToken.getCredentials();
-        //TODO lookup username by tokenId  in your custom tokens table (which is filled in token module UI)
+        String username = ( String ) userToken.getPrincipal();
 
-        String username = "karaf";
-
-        //TODO throw  AuthenticationException if not found or other checks not met (ip-range or ttl)
-
-        return new SimpleAccount( username, tokenId, getName() );
+        return new SimpleAccount( username, null, getName() );
     }
 }
