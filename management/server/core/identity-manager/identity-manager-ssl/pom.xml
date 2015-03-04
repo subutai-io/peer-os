@@ -24,12 +24,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.eclipse.jetty.aggregate</groupId>
-      <artifactId>jetty-all-server</artifactId>
-      <version>8.1.15.v20140411</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
     </dependency>
@@ -49,37 +43,14 @@
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
     </dependency>
-    <!--<dependency>-->
-    <!--<groupId>${project.groupId}</groupId>-->
-    <!--<artifactId>identity-manager-api</artifactId>-->
-    <!--</dependency>-->
-    <!--<dependency>-->
-    <!--<groupId>${project.groupId}</groupId>-->
-    <!--<artifactId>subutai-common</artifactId>-->
-    <!--</dependency>-->
-
-    <!--BouncyCastle-->
-    <!--<dependency>-->
-    <!--<groupId>org.bouncycastle</groupId>-->
-    <!--<artifactId>bcmail-jdk15on</artifactId>-->
-    <!--<version>${org.bouncycastle.version}</version>-->
-    <!--</dependency>-->
-    <!--<dependency>-->
-    <!--<groupId>org.bouncycastle</groupId>-->
-    <!--<artifactId>bcpg-jdk15on</artifactId>-->
-    <!--<version>${org.bouncycastle.version}</version>-->
-    <!--</dependency>-->
-    <!--<dependency>-->
-    <!--<groupId>org.bouncycastle</groupId>-->
-    <!--<artifactId>bcprov-jdk15on</artifactId>-->
-    <!--<version>${org.bouncycastle.version}</version>-->
-    <!--</dependency>-->
-    <!--<dependency>-->
-    <!--<groupId>org.bouncycastle</groupId>-->
-    <!--<artifactId>bcprov-ext-jdk15on</artifactId>-->
-    <!--<version>${org.bouncycastle.version}</version>-->
-    <!--</dependency>-->
-
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>identity-manager-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-common</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -97,7 +68,6 @@
               {local-packages};version=${project.version};
             </Export-Package>
             <Bundle-SymbolicName>${project.groupId}.core.identity.ssl</Bundle-SymbolicName>
-            <!--<Fragment-Host>org.ops4j.pax.web.pax-web-jetty</Fragment-Host>-->
             <Bundle-Version>${project.version}</Bundle-Version>
             <Import-Package>*</Import-Package>
           </instructions>
