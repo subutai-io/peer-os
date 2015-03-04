@@ -20,8 +20,6 @@
     <module>identity-manager-rest</module>
     <module>identity-manager-ui</module>
     <module>identity-manager-ssl</module>
-    <module>test-ssl-context</module>
-    <module>whiteboard-blueprint</module>
-    <module>whiteboard</module>
+
   </modules>
 </project>

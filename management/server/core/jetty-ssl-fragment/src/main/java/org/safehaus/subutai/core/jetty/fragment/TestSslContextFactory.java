@@ -8,6 +8,8 @@ import java.util.UUID;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509KeyManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
@@ -19,6 +21,9 @@ public class TestSslContextFactory extends SslContextFactory
     private static Logger LOG = LoggerFactory.getLogger( TestSslContextFactory.class.getName() );
 
     private static UUID id;
+
+    private static X509KeyManager keyManager;
+    private static X509TrustManager trustManager;
 
 
     public TestSslContextFactory()
@@ -45,7 +50,9 @@ public class TestSslContextFactory extends SslContextFactory
     protected KeyManager[] getKeyManagers( final KeyStore keyStore ) throws Exception
     {
         //        return super.getKeyManagers( keyStore );
-        return new KeyManager[] { new CustomKeyManager( keyStorePath, keyStorePassword ) };
+        return new KeyManager[] {
+                keyManager
+        };//new KeyManager[] { new CustomKeyManager( keyStorePath, keyStorePassword ) };
     }
 
 
@@ -54,7 +61,7 @@ public class TestSslContextFactory extends SslContextFactory
             throws Exception
     {
         //        return super.getTrustManagers( trustStore, crls );
-        return new TrustManager[] { new CustomTrustManager( trustStorePath, trustStorePassword ) };
+        return new TrustManager[] { trustManager };
     }
 
 
