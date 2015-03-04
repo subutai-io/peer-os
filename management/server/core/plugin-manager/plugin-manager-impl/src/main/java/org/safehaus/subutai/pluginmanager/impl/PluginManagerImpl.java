@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.pluginmanager.api.OperationType;
 import org.safehaus.subutai.pluginmanager.api.PluginInfo;
 import org.safehaus.subutai.pluginmanager.api.PluginManager;
 import org.safehaus.subutai.pluginmanager.api.PluginManagerException;
@@ -91,7 +92,7 @@ public class PluginManagerImpl implements PluginManager
         String result = null;
         try
         {
-            result = managerHelper.execute( commands.makeCheckCommand() );
+            result = managerHelper.execute( commands.makeCheckIfInstalledCommand() );
         }
         catch ( PluginManagerException e )
         {
@@ -111,9 +112,20 @@ public class PluginManagerImpl implements PluginManager
 
 
     @Override
-    public List<String> getAvailablePluginNames()
+    public Set<String> getAvailablePluginNames()
     {
-        return null;
+        String result = null;
+        try
+        {
+            result = managerHelper.execute( commands.makeListLocalPluginsCommand() );
+        }
+        catch ( PluginManagerException e )
+        {
+            LOG.error( e.getMessage() );
+            e.printStackTrace();
+        }
+
+        return managerHelper.parseAvailablePluginsNames( result );
     }
 
 
@@ -137,15 +149,32 @@ public class PluginManagerImpl implements PluginManager
     }
 
 
+//    @Override
+//    public List<String> getInstalledPluginNames()
+//    {
+//        List<String> names = new ArrayList<>();
+//        for ( PluginInfo p : getInstalledPlugins() )
+//        {
+//            names.add( p.getPluginName() );
+//        }
+//        return names;
+//    }
+
     @Override
-    public List<String> getInstalledPluginNames()
+    public Set<String> getInstalledPluginNames()
     {
-        List<String> names = new ArrayList<>();
-        for ( PluginInfo p : getInstalledPlugins() )
+        String result = null;
+        try
         {
-            names.add( p.getPluginName() );
+            result = managerHelper.execute( commands.makeCheckIfInstalledCommand() );
         }
-        return names;
+        catch ( PluginManagerException e )
+        {
+            LOG.error( e.getMessage() );
+            e.printStackTrace();
+        }
+
+        return managerHelper.parsePluginNames( result );
     }
 
 
@@ -175,5 +204,42 @@ public class PluginManagerImpl implements PluginManager
     public String getProductKey()
     {
         return PRODUCT_KEY;
+    }
+
+
+    @Override
+    public boolean isInstalled( final String p )
+    {
+        String result = null;
+        try
+        {
+            result = managerHelper.execute( commands.makeIsInstalledCommand( p ) );
+        }
+        catch ( PluginManagerException e )
+        {
+            return false;
+        }
+        if( result.contains( "install ok installed" ))
+        {
+            return true;
+        }
+        return false;
+    }
+
+
+    @Override
+    public boolean operationSuccessful( final OperationType operationType )
+    {
+        boolean result = false;
+        switch ( operationType )
+        {
+            case INSTALL:
+                result = PluginOperationHandler.isInstallSuccessful;
+                break;
+            case REMOVE:
+                result = PluginOperationHandler.isRemoveSuccessful;
+                break;
+        }
+        return result;
     }
 }

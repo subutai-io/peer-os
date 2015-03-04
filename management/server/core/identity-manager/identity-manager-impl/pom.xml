@@ -72,7 +72,10 @@
       <version>${org.apache.shiro.version}</version>
       <scope>provided</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.apache.karaf.shell</groupId>
+      <artifactId>org.apache.karaf.shell.console</artifactId>
+    </dependency>
     <!--Tests-->
     <dependency>
       <groupId>junit</groupId>

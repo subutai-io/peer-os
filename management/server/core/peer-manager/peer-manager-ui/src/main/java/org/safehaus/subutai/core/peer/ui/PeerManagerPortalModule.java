@@ -21,7 +21,6 @@ public class PeerManagerPortalModule implements PortalModule
     private PeerManager peerManager;
     private TemplateRegistry registry;
     private HostRegistry hostRegistry;
-    private CustomSslContextFactory sslContextFactory;
 
 
     public PeerManager getPeerManager()
@@ -42,19 +41,12 @@ public class PeerManagerPortalModule implements PortalModule
     }
 
 
-    public CustomSslContextFactory getSslContextFactory()
-    {
-        return sslContextFactory;
-    }
-
-
     public PeerManagerPortalModule( final PeerManager peerManager, final TemplateRegistry registry,
-                                    final HostRegistry hostRegistry, final CustomSslContextFactory sslContextFactory )
+                                    final HostRegistry hostRegistry)
     {
         this.peerManager = peerManager;
         this.registry = registry;
         this.hostRegistry = hostRegistry;
-        this.sslContextFactory = sslContextFactory;
     }
 
 

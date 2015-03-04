@@ -1,9 +1,13 @@
-package org.safehaus.subutai.core.env.ui.forms;
+package org.safehaus.subutai.core.peer.ui.container.manage;
 
 
+import java.util.UUID;
+
+import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.core.peer.api.HostNotFoundException;
-import org.safehaus.subutai.core.peer.api.LocalPeer;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.common.util.UUIDUtil;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.util.IndexedContainer;
@@ -18,21 +22,28 @@ import com.vaadin.ui.Window;
 
 public class TagsWindow extends Window
 {
+    ServiceLocator serviceLocator = new ServiceLocator();
 
 
-    public TagsWindow( final ContainerHost containerHost, LocalPeer localPeer )
+    public TagsWindow( final ContainerHost containerHost )
     {
-        ContainerHost localContainer = null;
+        ContainerHost environmentContainer = null;
         try
         {
-            localContainer = localPeer.getContainerHostById( containerHost.getId() );
+            EnvironmentManager environmentManager = serviceLocator.getService( EnvironmentManager.class );
+            String environmentId = containerHost.getEnvironmentId();
+            if ( UUIDUtil.isStringAUuid( environmentId ) )
+            {
+                Environment environment = environmentManager.findEnvironment( UUID.fromString( environmentId ) );
+                environmentContainer = environment.getContainerHostById( containerHost.getId() );
+            }
         }
-        catch ( HostNotFoundException e )
+        catch ( Exception e )
         {
-            //ignore, this is a remote container
+            //ignore
         }
 
-        final ContainerHost finalLocalContainer = localContainer;
+        final ContainerHost finalEnvironmentContainer = environmentContainer;
 
         setCaption( containerHost.getHostname() );
         setWidth( "300px" );
@@ -48,7 +59,6 @@ public class TagsWindow extends Window
 
         final ListSelect tagsSelect = new ListSelect( "Tags", containerHost.getTags() );
         tagsSelect.setNullSelectionAllowed( false );
-        //        tagsSelect.setRows( 5 );
         tagsSelect.setWidth( "150px" );
         tagsSelect.setMultiSelect( false );
 
@@ -68,9 +78,9 @@ public class TagsWindow extends Window
                     String tag = String.valueOf( tagsSelect.getValue() ).trim();
                     containerHost.removeTag( tag );
                     tagsSelect.setContainerDataSource( new IndexedContainer( containerHost.getTags() ) );
-                    if ( finalLocalContainer != null )
+                    if ( finalEnvironmentContainer != null )
                     {
-                        finalLocalContainer.removeTag( tag );
+                        finalEnvironmentContainer.removeTag( tag );
                     }
                 }
                 else
@@ -102,9 +112,9 @@ public class TagsWindow extends Window
                     String tag = tagTxt.getValue().trim();
                     containerHost.addTag( tag );
                     tagsSelect.setContainerDataSource( new IndexedContainer( containerHost.getTags() ) );
-                    if ( finalLocalContainer != null )
+                    if ( finalEnvironmentContainer != null )
                     {
-                        finalLocalContainer.addTag( tag );
+                        finalEnvironmentContainer.addTag( tag );
                     }
                 }
                 else

@@ -25,6 +25,7 @@ import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
+import org.safehaus.subutai.common.security.utils.RestartCoreServlet;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.identity.api.CustomSslContextFactory;
@@ -45,13 +46,11 @@ public class RestServiceImpl implements RestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
     private PeerManager peerManager;
-    private CustomSslContextFactory sslContextFactory;
 
 
-    public RestServiceImpl( final PeerManager peerManager, final CustomSslContextFactory sslContextFactory )
+    public RestServiceImpl( final PeerManager peerManager )
     {
         this.peerManager = peerManager;
-        this.sslContextFactory = sslContextFactory;
     }
 
 
@@ -180,8 +179,8 @@ public class RestServiceImpl implements RestService
                 keyStoreManager.deleteEntry( keyStore, keyStoreData );
                 //***********************************************************************
 
-                //                new Thread( new RestartCoreServlet() ).start();
-                sslContextFactory.reloadTrustStore();
+                new Thread( new RestartCoreServlet() ).start();
+                //                sslContextFactory.reloadTrustStore();
 
                 return Response.ok( "Successfully unregistered peer: " + peerId ).build();
             }
@@ -265,9 +264,8 @@ public class RestServiceImpl implements RestService
 
         //***********************************************************************
 
-        sslContextFactory.reloadTrustStore();
-        //        new Thread( new RestartCoreServlet() ).start();
-
+        //        sslContextFactory.reloadTrustStore();
+        new Thread( new RestartCoreServlet() ).start();
 
 
         return Response.ok( HEXCert ).build();

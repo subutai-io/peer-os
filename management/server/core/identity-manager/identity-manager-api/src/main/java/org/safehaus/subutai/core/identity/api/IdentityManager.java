@@ -14,7 +14,7 @@ import org.apache.shiro.subject.Subject;
  */
 public interface IdentityManager
 {
-    public static final String[] ROLES = { "admin", "manager", "viewer" };
+
 
     /**
      * Returns shiro SecurityManager
@@ -32,7 +32,7 @@ public interface IdentityManager
      */
     public User getUser();
 
-    //    public User getUser( String username );
+    public User getUser( String username );
 
 
     /**
@@ -45,10 +45,9 @@ public interface IdentityManager
      */
     public Serializable login( String username, String password );
 
-    //    public Subject login( AuthenticationToken token );
+    public Serializable loginWithToken( String tokenId , String ip);
 
 
-    //    boolean isAuthenticated( Serializable sessionId );
 
     /**
      * Get {@code Subject} for target session
@@ -59,6 +58,8 @@ public interface IdentityManager
      */
     public Subject getSubject( Serializable sessionId );
 
+
+    public void touch( Serializable sessionId );
 
     /**
      * Logout user by sessions id
