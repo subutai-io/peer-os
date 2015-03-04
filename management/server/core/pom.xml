@@ -39,7 +39,7 @@
     <module>env-manager</module>
     <module>identity-manager</module>
     <module>template-wizard</module>
-    <module>test</module>
+    <module>channel-manager</module>
     <!--    <module>shiro-manager-parent</module>-->
   </modules>
 
