@@ -368,7 +368,7 @@ public class MainUI extends UI implements ViewChangeListener
                                         username.setValue( user.getUsername() );
                                     }
                                 }
-                                catch ( NamingException e )
+                                catch ( Exception e )
                                 {
                                     LOG.error( e.toString(), e );
                                 }
