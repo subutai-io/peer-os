@@ -40,6 +40,7 @@
     <module>identity-manager</module>
     <module>template-wizard</module>
     <module>test</module>
+    <module>jetty-ssl-fragment</module>
     <!--    <module>shiro-manager-parent</module>-->
   </modules>
 
