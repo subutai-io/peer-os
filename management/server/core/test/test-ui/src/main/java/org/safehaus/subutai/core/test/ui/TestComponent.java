@@ -1,8 +1,6 @@
 package org.safehaus.subutai.core.test.ui;
 
 
-import java.util.UUID;
-
 import org.safehaus.subutai.core.jetty.fragment.TestSslContextFactory;
 import org.safehaus.subutai.core.test.api.Test;
 
@@ -47,7 +45,7 @@ public class TestComponent extends CustomComponent
             @Override
             public void buttonClick( final Button.ClickEvent event )
             {
-                Notification.show( test.loginWithToken( UUID.randomUUID().toString(), "127.0.0.1" ).toString() );
+                Notification.show( test.loginWithToken( "karaf" ).toString() );
             }
         } );
 
