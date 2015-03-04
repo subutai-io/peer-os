@@ -14,6 +14,7 @@ import org.safehaus.subutai.common.security.NullSubutaiLoginContext;
 import org.safehaus.subutai.common.security.SubutaiLoginContext;
 import org.safehaus.subutai.common.security.SubutaiThreadContext;
 import org.safehaus.subutai.common.util.SecurityUtil;
+import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.PermissionGroup;
@@ -30,6 +31,8 @@ import org.safehaus.subutai.core.identity.impl.entity.UserEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.felix.gogo.api.CommandSessionListener;
+import org.apache.felix.service.command.CommandSession;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
@@ -51,7 +54,7 @@ import com.google.common.collect.Lists;
 /**
  * Implementation of Identity Manager
  */
-public class IdentityManagerImpl implements IdentityManager
+public class IdentityManagerImpl implements IdentityManager, CommandSessionListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( IdentityManagerImpl.class );
 
@@ -62,6 +65,7 @@ public class IdentityManagerImpl implements IdentityManager
     private UserDataService userDataService;
     private PermissionDataService permissionDataService;
     private RoleDataService roleDataService;
+    private ServiceLocator serviceLocator = new ServiceLocator();
 
 
     //    public void setSecurityManager( final SecurityManager securityManager )
@@ -304,6 +308,17 @@ public class IdentityManagerImpl implements IdentityManager
     {
         Subject subject = new Subject.Builder( securityManager ).sessionId( sessionId ).buildSubject();
         return subject;
+    }
+
+
+    @Override
+    public void touch( Serializable sessionId )
+    {
+        Subject subject = getSubject( sessionId );
+        if ( subject != null && subject.isAuthenticated() )
+        {
+            subject.getSession().touch();
+        }
     }
 
 
@@ -576,5 +591,30 @@ public class IdentityManagerImpl implements IdentityManager
         Sha256Hash sha256Hash = new Sha256Hash( password, salt );
         String result = sha256Hash.toHex();
         return result;
+    }
+
+
+    @Override
+    public void beforeExecute( final CommandSession commandSession, final CharSequence charSequence )
+    {
+        SubutaiLoginContext loginContext = getSubutaiLoginContext();
+        if ( !( loginContext instanceof NullSubutaiLoginContext ) && isAuthenticated( loginContext.getSessionId() ) )
+        {
+            touch( loginContext.getSessionId() );
+        }
+    }
+
+
+    @Override
+    public void afterExecute( final CommandSession commandSession, final CharSequence charSequence, final Exception e )
+    {
+
+    }
+
+
+    @Override
+    public void afterExecute( final CommandSession commandSession, final CharSequence charSequence, final Object o )
+    {
+
     }
 }

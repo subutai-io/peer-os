@@ -29,6 +29,8 @@
     </jaas:module>
   </jaas:config>
 
+  <service ref="identityManager" interface="org.apache.felix.gogo.api.CommandSessionListener" />
+
   <!--<bean id="sessionMgr"-->
   <!--class="org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO" scope="singleton" activation="eager">-->
   <!--<property name="activeSessionsCacheName"-->
