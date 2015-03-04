@@ -91,6 +91,7 @@ import org.safehaus.subutai.core.peer.impl.entity.ManagementHostEntity;
 import org.safehaus.subutai.core.peer.impl.entity.ResourceHostEntity;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.safehaus.subutai.core.strategy.api.StrategyNotFoundException;
@@ -132,6 +133,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     private HostRegistry hostRegistry;
     private Set<RequestListener> requestListeners;
     private CommandUtil commandUtil = new CommandUtil();
+    private CustomSslContextFactory sslContextFactory;
+
 
     public LocalPeerImpl( PeerManager peerManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
                           StrategyManager strategyManager, Set<RequestListener> requestListeners,
@@ -1522,7 +1525,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
         keyStoreManager.importCertificateHEXString( keyStore, keyStoreData );
         //***********************************************************************
-//        this.sslContextFactory.reloadTrustStore();
+        this.sslContextFactory.reloadTrustStore();
         new Thread( new RestartCoreServlet( 4 ) ).start();
     }
 
@@ -1564,7 +1567,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
         keyStoreManager.saveX509Certificate( keyStore, environmentKeyStoreData, cert, keyPair );
 
-//        sslContextFactory.reloadKeyStore();
+        sslContextFactory.reloadKeyStore();
 
         return keyStoreManager.exportCertificateHEXString( keyStore, environmentKeyStoreData );
     }
@@ -1609,7 +1612,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             }
 
             //***********************************************************************
-            new Thread( new RestartCoreServlet() ).start();
+            //            new Thread( new RestartCoreServlet() ).start();
+            sslContextFactory.reloadTrustStore();
         }
         catch ( KeyStoreException e )
         {
@@ -1653,5 +1657,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     }
 
 
+    public void setSslContextFactory( final CustomSslContextFactory sslContextFactory )
+    {
+        this.sslContextFactory = sslContextFactory;
+    }
+
+
+    public CustomSslContextFactory getSslContextFactory()
+    {
+        return sslContextFactory;
+    }
 }
 

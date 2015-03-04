@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint default-activation="eager"
-           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
 
     >
@@ -33,6 +33,9 @@
   <reference id="identityManager" availability="mandatory"
              interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
 
+  <reference id="sslContextFactory" availability="mandatory"
+             interface="org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory" />
+
   <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
         class="org.safehaus.subutai.core.peer.impl.PeerManagerImpl">
     <property name="templateRegistry" ref="templateRegistry" />
@@ -43,6 +46,7 @@
     <property name="commandExecutor" ref="commandExecutor" />
     <property name="daoManager" ref="daoManagerPeer" />
     <property name="identityManager" ref="identityManager" />
+    <property name="sslContextFactory" ref="sslContextFactory" />
     <argument ref="messenger" />
   </bean>
 

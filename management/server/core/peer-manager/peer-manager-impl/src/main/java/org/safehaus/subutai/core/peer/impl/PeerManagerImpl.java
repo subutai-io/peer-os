@@ -41,6 +41,7 @@ import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequestListener;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,6 +76,13 @@ public class PeerManagerImpl implements PeerManager
     private DaoManager daoManager;
     private KeyManager keyManager;
     private IdentityManager identityManager;
+    private CustomSslContextFactory sslContextFactory;
+
+
+    public void setSslContextFactory( final CustomSslContextFactory sslContextFactory )
+    {
+        this.sslContextFactory = sslContextFactory;
+    }
 
 
     public PeerManagerImpl( final Messenger messenger )
@@ -186,6 +194,7 @@ public class PeerManagerImpl implements PeerManager
         }
         localPeer = new LocalPeerImpl( this, templateRegistry, quotaManager, strategyManager, requestListeners,
                 commandExecutor, hostRegistry, monitor, identityManager );
+        localPeer.setSslContextFactory( sslContextFactory );
         localPeer.init();
 
         //add command request listener
