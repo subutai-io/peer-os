@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.metric.impl;
 
 
 import java.io.PrintStream;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -21,13 +22,17 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.exception.DaoException;
+import org.safehaus.subutai.common.metric.HistoricalMetric;
 import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
+import org.safehaus.subutai.common.metric.MetricType;
+import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.MonitoringSettings;
 import org.safehaus.subutai.common.metric.ResourceHostMetric;
@@ -44,6 +49,7 @@ import com.google.common.collect.Sets;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -112,7 +118,6 @@ public class MonitorImplTest
     @Mock
     EnvironmentManager environmentManager;
 
-
     static class MonitorImplExt extends MonitorImpl
     {
         public MonitorImplExt( final PeerManager peerManager, DaoManager daoManager,
@@ -129,6 +134,12 @@ public class MonitorImplTest
 
 
         public void setMetricListeners( Set<AlertListener> alertListeners ) {this.alertListeners = alertListeners;}
+
+
+        @Override
+        public List<HistoricalMetric> getHistoricalMetric( final Host host, final MetricType metricType ) {
+            return null;
+        }
     }
 
 
@@ -689,5 +700,38 @@ public class MonitorImplTest
         doThrow( exception ).when( containerHost ).getPeer();
 
         monitor.activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings, ENVIRONMENT_ID );
+    }
+
+
+    @Test
+    public void testHistoricalMetrics() {
+        Monitor monitor1 = null;
+        try {
+            monitor1 = new MonitorImpl( peerManager, daoManager, environmentManager );
+        }
+        catch ( MonitorException e ) {
+            e.printStackTrace();
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        CommandResult commandResult = mock( CommandResult.class );
+        stringBuilder.append( "1425289620: 1.2902400000e+06" )
+                     .append( System.getProperty( "line.separator" ) )
+                     .append( "1425289680: 1.2902400000e+06" )
+                     .append( System.getProperty( "line.separator" ) );
+        try {
+            when( commandResult.hasSucceeded() ).thenReturn( true );
+            when( peerManager.getLocalPeer().getResourceHostByContainerId( any( UUID.class ) ) ).thenReturn( resourceHost );
+            when( commandResult.getStdOut() ).thenReturn( stringBuilder.toString() );
+            when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
+        }
+        catch ( CommandException e ) {
+            e.printStackTrace();
+        }
+        catch ( HostNotFoundException e ) {
+            e.printStackTrace();
+        }
+        List<HistoricalMetric> historicalMetric = monitor1.getHistoricalMetric( containerHost, MetricType.CPU );
+        assertNotNull( historicalMetric );
+        assertTrue( historicalMetric.size() == 2 );
     }
 }
