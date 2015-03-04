@@ -32,7 +32,7 @@ public interface IdentityManager
      */
     public User getUser();
 
-    //    public User getUser( String username );
+    public User getUser( String username );
 
 
     /**
@@ -45,10 +45,9 @@ public interface IdentityManager
      */
     public Serializable login( String username, String password );
 
-    //    public Subject login( AuthenticationToken token );
+    public Serializable loginWithToken( String tokenId , String ip);
 
 
-    //    boolean isAuthenticated( Serializable sessionId );
 
     /**
      * Get {@code Subject} for target session
