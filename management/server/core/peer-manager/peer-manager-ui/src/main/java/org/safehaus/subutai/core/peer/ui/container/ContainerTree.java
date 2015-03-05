@@ -220,6 +220,21 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                     }
                 }
             }
+
+            for ( Object itemObj : container.getItemIds() )
+            {
+                UUID itemId = ( UUID ) itemObj;
+                Item item = container.getItem( itemId );
+                Object o = item.getItemProperty( "value" ).getValue();
+                if ( ( o instanceof Host ) && ( ( ( Host ) o ).isConnected() ) )
+                {
+                    item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
+                }
+                else
+                {
+                    item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual_offline.png" ) );
+                }
+            }
         }
 
 
@@ -238,20 +253,6 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
         synchronized ( container )
         {
             getNodeContainer();
-            for ( Object itemObj : container.getItemIds() )
-            {
-                UUID itemId = ( UUID ) itemObj;
-                Item item = container.getItem( itemId );
-                Object o = item.getItemProperty( "value" ).getValue();
-                if ( ( o instanceof Host ) && ( ( ( Host ) o ).isConnected() ) )
-                {
-                    item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
-                }
-                else
-                {
-                    item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual_offline.png" ) );
-                }
-            }
         }
     }
 
@@ -265,13 +266,6 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
     {
-        getUI().access( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                refreshHosts();
-            }
-        } );
+        refreshHosts();
     }
 }
