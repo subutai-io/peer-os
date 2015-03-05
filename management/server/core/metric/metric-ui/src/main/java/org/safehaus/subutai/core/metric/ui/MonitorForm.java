@@ -2,15 +2,12 @@ package org.safehaus.subutai.core.metric.ui;
 
 
 import java.awt.BasicStroke;
-import java.awt.Stroke;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -18,11 +15,8 @@ import javax.naming.NamingException;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.time.Minute;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
@@ -141,7 +135,6 @@ public class MonitorForm extends CustomComponent
 
         content.addComponent( chartsLayout, 0, 10 );
 
-        //        horizontalSplit.setSecondComponent( content );
         horizontalSplit.setSecondComponent( chartsLayout );
 
         horizontalSplit.setSizeFull();
@@ -160,7 +153,6 @@ public class MonitorForm extends CustomComponent
 
     private void loadMetrics()
     {
-
         Map<UUID, List<HistoricalMetric>> historicalCpuMetric = new HashMap<>();
         Map<UUID, List<HistoricalMetric>> historicalRamMetric = new HashMap<>();
         Map<UUID, List<HistoricalMetric>> historicalDiskVarMetric = new HashMap<>();
@@ -286,10 +278,8 @@ public class MonitorForm extends CustomComponent
         String categoryYAxis = "Usage";
         try
         {
-            XYDataset dataset = null;
-            JFreeChart lineChartObject;
-            dataset = createMetricsDataset( hostMetrics ) ;
-            lineChartObject = createChart( chartTitle, categoryXAxis, categoryYAxis, dataset );
+            XYDataset dataset = createMetricsDataset( hostMetrics );
+            JFreeChart lineChartObject = createChart( chartTitle, categoryXAxis, categoryYAxis, dataset );
             JFreeChartWrapper jFreeChartWrapper = new JFreeChartWrapper( lineChartObject );
             chartsLayout.addComponent( jFreeChartWrapper );
         }
@@ -302,7 +292,7 @@ public class MonitorForm extends CustomComponent
 
     private XYDataset createMetricsDataset( final Map<UUID, List<HistoricalMetric>> hostMetrics ) {
 
-        TimeSeries localTimeSeries = null;
+        TimeSeries localTimeSeries;
         TimeSeriesCollection timeSeriesCollection = new TimeSeriesCollection();
         if ( hostMetrics.size() == 0 ) {
             return timeSeriesCollection;
