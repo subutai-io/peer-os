@@ -15,20 +15,29 @@
   </bean>
 
   <!-- ************************************************************************************************** -->
-
+  <reference id="identityManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
 
   <!-- ************************************************************************************************** -->
   <reference-list id="busListener" interface="org.apache.cxf.Bus" availability="optional">
     <reference-listener bind-method="busRegistered">
-      <bean class="org.safehaus.subutai.core.channel.impl.interceptor.CXFBusListener" />
+      <bean class="org.safehaus.subutai.core.channel.impl.interceptor.CXFBusListener">
+        <property name="channelManager" ref="channelManagerImpl"/>
+      </bean>
     </reference-listener>
   </reference-list>
   <!-- ************************************************************************************************** -->
 
 
-  <bean id="channelManager" scope="singleton" init-method="init"
+  <bean id="channelManagerImpl" scope="singleton" init-method="init"
         class="org.safehaus.subutai.core.channel.impl.ChannelManagerImpl">
     <property name="daoManager" ref="daoManagerChannel"/>
+    <property name="identityManager" ref="identityManager"/>
   </bean>
+
+  <service ref="channelManagerImpl"
+           interface="org.safehaus.subutai.core.channel.api.ChannelManager"/>
+
+
 
 </blueprint>

@@ -8,7 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
+import org.safehaus.subutai.core.channel.api.entity.IUserChannelToken;
 
 /**
  * Created by nisakov on 3/3/15.
@@ -19,7 +19,7 @@ import javax.persistence.Table;
 @Table( name = "user_channel_token" )
 @Access( AccessType.FIELD )
 
-public class UserChannelToken
+public class UserChannelToken implements IUserChannelToken
 {
     @Id
     @Column( name = "user_id" )
@@ -32,10 +32,10 @@ public class UserChannelToken
     private short status;
 
     @Column(name = "ip_range_start")
-    private short ipRangeStart;
+    private String ipRangeStart;
 
     @Column(name = "ip_range_end")
-    private short ipRangeEnd;
+    private String ipRangeEnd;
 
     @Column( name = "token")
     private String token;
@@ -99,25 +99,25 @@ public class UserChannelToken
     }
 
 
-    public short getIpRangeStart()
+    public String getIpRangeStart()
     {
         return ipRangeStart;
     }
 
 
-    public void setIpRangeStart( final short ipRangeStart )
+    public void setIpRangeStart( final String ipRangeStart )
     {
         this.ipRangeStart = ipRangeStart;
     }
 
 
-    public short getIpRangeEnd()
+    public String getIpRangeEnd()
     {
         return ipRangeEnd;
     }
 
 
-    public void setIpRangeEnd( final short ipRangeEnd )
+    public void setIpRangeEnd( final String ipRangeEnd )
     {
         this.ipRangeEnd = ipRangeEnd;
     }

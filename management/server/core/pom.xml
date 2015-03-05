@@ -41,6 +41,7 @@
     <module>template-wizard</module>
     <module>channel-manager</module>
     <module>test</module>
+    <!--    <module>shiro-manager-parent</module>-->
   </modules>
 
 </project>

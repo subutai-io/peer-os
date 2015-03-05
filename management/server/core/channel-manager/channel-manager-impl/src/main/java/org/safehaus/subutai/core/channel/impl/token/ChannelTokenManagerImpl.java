@@ -1,15 +1,13 @@
 package org.safehaus.subutai.core.channel.impl.token;
 
 
-import org.safehaus.subutai.common.dao.DaoManager;
+import org.safehaus.subutai.core.channel.api.entity.IUserChannelToken;
 import org.safehaus.subutai.core.channel.api.token.ChannelTokenManager;
 import org.safehaus.subutai.core.channel.impl.entity.UserChannelToken;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
-import java.sql.Timestamp;
-
 
 
 
@@ -17,17 +15,18 @@ import java.sql.Timestamp;
  * Created by nisakov on 3/3/15.
  */
 
-public class ChannelTokenManagerImpl
+public class ChannelTokenManagerImpl implements ChannelTokenManager
 {
-    private static EntityManagerFactory EntityManagerFactory = null;
+    private EntityManagerFactory EntityManagerFactory = null;
 
 
-    public static EntityManagerFactory getEntityManagerFactory()
+
+    public EntityManagerFactory getEntityManagerFactory()
     {
         return EntityManagerFactory;
     }
 
-    public static void setEntityManagerFactory( EntityManagerFactory entityManagerFactory )
+    public void setEntityManagerFactory( EntityManagerFactory entityManagerFactory )
     {
         EntityManagerFactory = entityManagerFactory;
     }
@@ -36,7 +35,7 @@ public class ChannelTokenManagerImpl
     /***********************************************************************************************************
      *
      * */
-    public static long getUserChannelToken(String token)
+    public long getUserChannelToken(String token)
     {
         long user_id = 0;
         EntityManager entityManager = EntityManagerFactory.createEntityManager();
@@ -44,8 +43,8 @@ public class ChannelTokenManagerImpl
         try
         {
             Query query;
-            query = entityManager.createQuery( "select user_id FROM UserChannelToken AS ucht WHERE and ucht.token=:token and ucht.status=1" );
-            query.setParameter( "token", token );
+            query = entityManager.createQuery( "select ucht FROM UserChannelToken AS ucht WHERE ucht.token=:tokenParam and ucht.status=1" );
+            query.setParameter( "tokenParam", token );
             UserChannelToken userChannelToken = (UserChannelToken)query.getSingleResult();
 
             if(userChannelToken!=null)
@@ -73,7 +72,7 @@ public class ChannelTokenManagerImpl
     /***********************************************************************************************************
      *
      * */
-    public static void setTokenValidity()
+    public void setTokenValidity()
     {
         EntityManager entityManager = EntityManagerFactory.createEntityManager();
 
@@ -100,7 +99,7 @@ public class ChannelTokenManagerImpl
     /***********************************************************************************************************
      *
      * */
-    public static void saveUserChannelToken(UserChannelToken userChannelToken)
+    public void saveUserChannelToken(IUserChannelToken userChannelToken)
     {
         EntityManager entityManager = EntityManagerFactory.createEntityManager();
 
@@ -124,7 +123,7 @@ public class ChannelTokenManagerImpl
     /***********************************************************************************************************
      *
      * */
-    public static UserChannelToken getUserChannelTokenData(long userId)
+    public IUserChannelToken getUserChannelTokenData(long userId)
     {
         UserChannelToken userChannelToken = null;
 
@@ -133,12 +132,13 @@ public class ChannelTokenManagerImpl
         try
         {
             Query query;
-            query = entityManager.createQuery( "select * FROM UserChannelToken AS ucht WHERE and ucht.user_id=:user_id" );
+            query = entityManager.createQuery( "select u FROM UserChannelToken AS u WHERE u.userId = :user_id" );
             query.setParameter( "user_id", userId );
             userChannelToken = (UserChannelToken)query.getSingleResult();
         }
         catch ( Exception e )
         {
+            System.out.println(e.toString());
         }
         finally
         {
@@ -148,6 +148,11 @@ public class ChannelTokenManagerImpl
 
         return  userChannelToken;
 
+    }
+
+    public IUserChannelToken createUserChannelToken()
+    {
+        return new UserChannelToken();
     }
 
 }

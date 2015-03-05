@@ -1,4 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
+    <reference id="channelManager" availability="mandatory"
+               interface="org.safehaus.subutai.core.channel.api.ChannelManager" />
+
+    <reference id="identityManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
+
+    <bean id="module" scope="singleton" class="org.safehaus.subutai.core.channel.ui.ChannelManagerPortalModule" init-method="init" destroy-method="destroy">
+      <argument ref="channelManager" />
+      <argument ref="identityManager" />
+    </bean>
+
+    <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />
+
 </blueprint>

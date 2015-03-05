@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.safehaus.subutai.common.settings.ChannelSettings;
+import org.safehaus.subutai.core.channel.impl.ChannelManagerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,10 +21,13 @@ import org.apache.cxf.phase.Phase;
 public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
 {
     private final static Logger LOG = LoggerFactory.getLogger( CXFInterceptor.class );
+    private ChannelManagerImpl channelManagerImpl = null;
 
-    public CXFInterceptor()
+
+    public CXFInterceptor(ChannelManagerImpl channelManagerImpl)
     {
         super( Phase.RECEIVE );
+        this.channelManagerImpl = channelManagerImpl;
     }
 
 
@@ -38,6 +42,7 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
         {
             URL url = new URL( ( String ) message.get( Message.REQUEST_URL ) );
             String basePath = url.getPath();
+
 
             int status = 1;
 
@@ -57,10 +62,30 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
             }
             else if(url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X3))
             {
-
+                //----------------------------------------------------------------------
             }
             else if(url.getPort() == Integer.parseInt( ChannelSettings.SPECIAL_PORT_X1))
             {
+                String query      =  ( String ) message.get( Message.QUERY_STRING ) ;
+                String paramValue = getQueryParameterValue("sptoken",query);
+
+                if(!"".equals(paramValue))
+                {
+                    long userId = channelManagerImpl.getChannelTokenManager().getUserChannelToken(paramValue);
+
+                    if(userId != 0)
+                    {
+                        channelManagerImpl.getIdentityManager().loginWithToken(paramValue , "" );
+                    }
+                    else
+                    {
+                        status = 0;
+                    }
+                }
+                else
+                {
+                    status = 0;
+                }
 
             }
 
@@ -90,5 +115,28 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
     public void handleFault( final Message message )
     {
         super.handleFault( message );
+    }
+
+    private String getQueryParameterValue(String paramName,String query)
+    {
+        String paramValue = "";
+        String parameters[] = query.split( "&" );
+
+        if(parameters!=null)
+        {
+            for(int x=0;x<parameters.length;x++)
+            {
+                String subParameters[] = parameters[x].split( "=" );
+
+                if(subParameters[0].equals(paramName ))
+                {
+                    paramValue = subParameters[1];
+                    break;
+                }
+            }
+
+        }
+
+        return paramValue;
     }
 }
