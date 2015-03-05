@@ -238,14 +238,13 @@ public class QuotaManagerImpl implements QuotaManager
         }
         else
         {
-            //TODO Need to modify regex to be able to parse decimal point values
-            String regex = "(\\d+)(K|M|G|T|P|E)?";
+            String regex = "(\\d+(?:\\.\\d+)?)(K|M|G|T|P|E)?";
             Pattern quotaPattern = Pattern.compile( regex );
             Matcher quotaMatcher = quotaPattern.matcher( result.getStdOut().trim() );
             if ( quotaMatcher.matches() )
             {
                 String quotaValue = quotaMatcher.group( 1 );
-                long value = Long.parseLong( quotaValue );
+                double value = Double.parseDouble( quotaValue );
                 String acronym = quotaMatcher.group( 2 );
                 DiskQuotaUnit diskQuotaUnit = DiskQuotaUnit.parseFromAcronym( acronym );
                 return new DiskQuota( diskPartition, diskQuotaUnit == null ? DiskQuotaUnit.BYTE : diskQuotaUnit,
@@ -322,14 +321,13 @@ public class QuotaManagerImpl implements QuotaManager
         }
         else
         {
-            //TODO Need to modify regex to be able to parse decimal point values
-            String regex = "(\\d+)(K|M|G|T|P|E)?";
+            String regex = "(\\d+(?:\\.\\d+)?)(K|M|G|T|P|E)?";
             Pattern quotaPattern = Pattern.compile( regex );
             Matcher quotaMatcher = quotaPattern.matcher( result.getStdOut().trim() );
             if ( quotaMatcher.matches() )
             {
                 String quotaValue = quotaMatcher.group( 1 );
-                long value = Long.parseLong( quotaValue );
+                double value = Double.parseDouble( quotaValue );
                 String acronym = quotaMatcher.group( 2 );
                 DiskQuotaUnit diskQuotaUnit = DiskQuotaUnit.parseFromAcronym( acronym );
                 return new DiskQuota( diskPartition, diskQuotaUnit == null ? DiskQuotaUnit.BYTE : diskQuotaUnit,
@@ -376,7 +374,7 @@ public class QuotaManagerImpl implements QuotaManager
     {
         try
         {
-            return peerManager.getLocalPeer().getResourceHostByContainerId( containerId);
+            return peerManager.getLocalPeer().getResourceHostByContainerId( containerId );
         }
         catch ( HostNotFoundException e )
         {

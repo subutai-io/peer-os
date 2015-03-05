@@ -13,8 +13,8 @@ import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.peer.PeerStatus;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
-import org.safehaus.subutai.common.security.utils.RestartCoreServlet;
 import org.safehaus.subutai.common.settings.ChannelSettings;
+import org.safehaus.subutai.common.settings.SecuritySettings;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.core.peer.ui.PeerManagerPortalModule;
@@ -323,8 +323,7 @@ public class PeerRegisterForm extends CustomComponent
             String responseString = response.readEntity( String.class );
             LOG.info( response.toString() );
             PeerInfo remotePeerInfo = JsonUtil.from( responseString, new TypeToken<PeerInfo>()
-            {
-            }.getType() );
+            {}.getType() );
             if ( remotePeerInfo != null )
             {
                 remotePeerInfo.setStatus( PeerStatus.REQUEST_SENT );
@@ -341,9 +340,9 @@ public class PeerRegisterForm extends CustomComponent
 
     private void unregisterMeFromRemote( PeerInfo peerToUnregister, PeerInfo remotePeerInfo )
     {
-        //TODO remove peer certificate from trust store
         String baseUrl = String.format( "https://%s:%s/cxf", remotePeerInfo.getIp(), ChannelSettings.SECURE_PORT_X2 );
-        WebClient client = RestUtil.createTrustedWebClientWithAuth( baseUrl );// WebClient.create( baseUrl );
+        WebClient client = RestUtil.createTrustedWebClientWithAuth( baseUrl,
+                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS );// WebClient.create( baseUrl );
         Response response =
                 client.path( "peer/unregister" ).type( MediaType.APPLICATION_JSON ).accept( MediaType.APPLICATION_JSON )
                       .query( "peerId", GSON.toJson( peerToUnregister.getId().toString() ) ).delete();
@@ -365,7 +364,7 @@ public class PeerRegisterForm extends CustomComponent
 
             keyStoreManager.deleteEntry( keyStore, keyStoreData );
             //***********************************************************************
-            new Thread( new RestartCoreServlet() ).start();
+            //            new Thread( new RestartCoreServlet() ).start();
         }
         else
         {
@@ -376,7 +375,6 @@ public class PeerRegisterForm extends CustomComponent
 
     private void removeMeFromRemote( PeerInfo peerToUnregister, PeerInfo remotePeerInfo )
     {
-        //TODO remove peer certificate from trust store
         String baseUrl = String.format( "https://%s:%s/cxf", remotePeerInfo.getIp(), ChannelSettings.SECURE_PORT_X1 );
         WebClient client = RestUtil.createTrustedWebClient( baseUrl );// WebClient.create( baseUrl );
         Response response =
@@ -427,7 +425,7 @@ public class PeerRegisterForm extends CustomComponent
             keyStoreManager.importCertificateHEXString( keyStore, keyStoreData );
             //***********************************************************************
 
-            new Thread( new RestartCoreServlet() ).start();
+            //            new Thread( new RestartCoreServlet() ).start();
             return true;
         }
         else

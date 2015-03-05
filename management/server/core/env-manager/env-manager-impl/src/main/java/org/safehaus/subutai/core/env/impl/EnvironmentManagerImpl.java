@@ -28,14 +28,15 @@ import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentSecurityException;
 import org.safehaus.subutai.core.env.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.env.impl.dao.BlueprintDataService;
 import org.safehaus.subutai.core.env.impl.dao.EnvironmentContainerDataService;
 import org.safehaus.subutai.core.env.impl.dao.EnvironmentDataService;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
-import org.safehaus.subutai.core.env.impl.exception.EnvironmentAccessDeniedException;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
+import org.safehaus.subutai.core.env.impl.exception.EnvironmentTunnelException;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
 import org.safehaus.subutai.core.env.impl.tasks.CreateEnvironmentTask;
 import org.safehaus.subutai.core.env.impl.tasks.DestroyContainerTask;
@@ -45,6 +46,7 @@ import org.safehaus.subutai.core.env.impl.tasks.SetSshKeyTask;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.slf4j.Logger;
@@ -111,7 +113,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     protected boolean isUserAdmin()
     {
-        return identityManager.getUser().isAdmin();
+        return ( identityManager.getUser() != null ) && identityManager.getUser().isAdmin();
     }
 
 
@@ -125,7 +127,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         if ( !( isUserAdmin() || Objects.equals( environment.getUserId(), getUserId() ) ) )
         {
-            throw new EnvironmentAccessDeniedException();
+            throw new EnvironmentSecurityException(
+                    String.format( "Access to environment %s is denied", environment.getName() ) );
         }
     }
 
@@ -245,6 +248,36 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    public void setupEnvironmentTunnel( UUID environmentId, Set<Peer> peers ) throws EnvironmentTunnelException
+    {
+        String envAlias =
+                String.format( "env_%s_%s", peerManager.getLocalPeer().getId().toString(), environmentId.toString() );
+        Set<Peer> remotePeers = Sets.newHashSet( peers );
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        remotePeers.remove( localPeer );
+        if ( !remotePeers.isEmpty() )
+        {
+            try
+            {
+                String localPeerCert = localPeer.exportEnvironmentCertificate( envAlias );
+
+                for ( Peer remotePeer : remotePeers )
+                {
+                    String remotePeerCert = remotePeer.exportEnvironmentCertificate( envAlias );
+                    localPeer.importCertificate( remotePeerCert, envAlias );
+                    remotePeer.importCertificate( localPeerCert, envAlias );
+                }
+            }
+            catch ( Exception e )
+            {
+                //TODO uncomment this exception later when PEKS work
+                //            throw new EnvironmentTunnelException( "Error exchanging environment certificates ",e );
+                LOG.error( "Error exchanging environment certificates ", e );
+            }
+        }
+    }
+
+
     public long findFreeVni( final Set<Peer> peers ) throws EnvironmentManagerException
     {
 
@@ -313,10 +346,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final ResultHolder<EnvironmentDestructionException> resultHolder = new ResultHolder<>();
 
-        final Set<EnvironmentDestructionException> exceptions = Sets.newHashSet();
+        final Set<Throwable> exceptions = Sets.newHashSet();
+
 
         DestroyEnvironmentTask destroyEnvironmentTask =
-                new DestroyEnvironmentTask( this, environment, exceptions, resultHolder, forceMetadataRemoval );
+                new DestroyEnvironmentTask( this, environment, exceptions, resultHolder, forceMetadataRemoval,
+                        peerManager.getLocalPeer() );
 
         executor.submit( destroyEnvironmentTask );
 

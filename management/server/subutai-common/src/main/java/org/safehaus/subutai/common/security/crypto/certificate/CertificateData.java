@@ -8,7 +8,7 @@ public class CertificateData
 	private String organizationName = "Subutai";
 	private String organizationUnit = "Subutai";
 	private String localityName = "";
-	private String country = "";
+	private String country = "KG";
 	private String state = "";
 	private String email = "support@subut.ai";
 	

@@ -8,10 +8,11 @@ public class DiskQuota extends QuotaInfo
 {
     private DiskPartition diskPartition;
     private DiskQuotaUnit diskQuotaUnit;
-    private long diskQuotaValue;
+    private double diskQuotaValue;
 
 
-    public DiskQuota( final DiskPartition diskPartition, final DiskQuotaUnit diskQuotaUnit, final long diskQuotaValue )
+    public DiskQuota( final DiskPartition diskPartition, final DiskQuotaUnit diskQuotaUnit,
+                      final double diskQuotaValue )
     {
         this.diskPartition = diskPartition;
         this.diskQuotaUnit = diskQuotaUnit;
@@ -31,7 +32,7 @@ public class DiskQuota extends QuotaInfo
     }
 
 
-    public long getDiskQuotaValue()
+    public double getDiskQuotaValue()
     {
         return diskQuotaValue;
     }
@@ -49,7 +50,7 @@ public class DiskQuota extends QuotaInfo
         {
             return DiskQuotaUnit.UNLIMITED.getAcronym();
         }
-        return String.format( "%d%s", diskQuotaValue, diskQuotaUnit.getAcronym() );
+        return String.format( "%.2f%s", diskQuotaValue, diskQuotaUnit.getAcronym() );
     }
 
 

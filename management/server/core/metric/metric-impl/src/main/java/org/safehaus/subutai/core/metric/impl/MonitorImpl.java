@@ -1,24 +1,32 @@
 package org.safehaus.subutai.core.metric.impl;
 
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.exception.DaoException;
+import org.safehaus.subutai.common.metric.HistoricalMetric;
 import org.safehaus.subutai.common.metric.OwnerResourceUsage;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.settings.Common;
@@ -28,6 +36,7 @@ import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
+import org.safehaus.subutai.common.metric.MetricType;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.MonitoringSettings;
@@ -776,5 +785,119 @@ public class MonitorImpl implements Monitor
         Preconditions.checkNotNull( alertListener );
 
         alertListeners.remove( alertListener );
+    }
+
+
+    @Override
+    public List<HistoricalMetric> getHistoricalMetric( final Host host, final MetricType metricType ) {
+        Preconditions.checkNotNull( host );
+        Preconditions.checkNotNull( metricType );
+
+        List<HistoricalMetric> metrics = new ArrayList<>();
+
+            //execute metrics command
+        CommandResult result = null;
+        ResourceHost resourceHost = null;
+        try {
+            RequestBuilder historicalMetricCommand = commands.getHistoricalMetricCommand( host, metricType );
+            if ( ! (host instanceof ResourceHost ) ) {
+                resourceHost = peerManager.getLocalPeer().getResourceHostByContainerId( host.getId() );
+            } else {
+                resourceHost = ( ResourceHost ) host;
+            }
+            result = resourceHost.execute( historicalMetricCommand );
+        }
+        catch ( CommandException e ) {
+            LOG.error( "Could not run command successfully! Error: {}", e );
+            return null;
+        }
+        catch ( HostNotFoundException e ) {
+           LOG.error( "Could not find resource host of host {}!", host.getHostname() );
+            return null;
+        }
+        if ( result.hasSucceeded() )
+        {
+            String lines[] = result.getStdOut().split("\\r?\\n");
+            int timestamp;
+            double value;
+            for ( String line : lines ) {
+                int seperatorIndex = line.indexOf( ":" );
+                timestamp = Integer.parseInt( line.substring( 0, seperatorIndex ) );
+                value = Double.parseDouble( line.substring( seperatorIndex+1 ).trim() );
+                switch ( metricType ) {
+                    case RAM:
+                    case DISK_HOME:
+                    case DISK_OPT:
+                    case DISK_ROOTFS:
+                    case DISK_VAR:
+                        // Convert it from byte to megabyte
+                        value = value / ( 1024 * 1024 );
+                        break;
+                    case CPU:
+                        // Convert it from nanoseconds to seconds
+                        value = value / ( 1000000000 );
+                        break;
+                    default:
+                        break;
+                }
+                metrics.add( new HistoricalMetric( host, metricType ,timestamp, value ) );
+            }
+        }
+        else
+        {
+            LOG.error( String.format( "Error getting metrics from %s: %s", host.getHostname(),
+                    result.getStdErr() ) );
+        }
+
+        return metrics;
+    }
+
+
+    @Override
+    public Map<UUID, List<HistoricalMetric>> getHistoricalMetrics( final Collection<Host> hosts,
+                                                                   final MetricType metricType ) {
+        final Map<UUID, List<HistoricalMetric>> historicalMetrics = new ConcurrentHashMap<>();
+
+        for ( Host host : hosts ) {
+            try {
+                List<HistoricalMetric> historicalMetric = getHistoricalMetric( host, metricType );
+                historicalMetrics.put( historicalMetric.get( 0 ).getHost().getId(), historicalMetric );
+            } catch ( Exception e ) {
+                continue;
+            }
+        }
+
+        // TODO enable this block as it executes the commands asynchronously
+        // when agent can read them without problem and returns a response
+
+//        ExecutorService executor = Executors.newFixedThreadPool( hosts.size() );
+//        final Map<UUID, List<HistoricalMetric>> historicalMetrics = new ConcurrentHashMap<>();
+//        for ( final Host host : hosts ) {
+//            executor.execute( new Runnable() {
+//                @Override
+//                public void run() {
+//                    try {
+//                        List<HistoricalMetric> historicalMetric = getHistoricalMetric( host, metricType );
+//                        historicalMetrics.put( historicalMetric.get( 0 ).getHost().getId(), historicalMetric );
+//                    } catch ( Exception e ) {
+//                    }
+//                }
+//            }
+//                            );
+//        }
+//        executor.shutdown();
+//        int timeout = 5;
+//        LOG.info( "Waiting for all threads to retrieve historical data for {} to finish {} seconds maximum."
+//                , metricType, timeout );
+//        // Wait until all threads are finished
+//        try {
+//            executor.awaitTermination( timeout, TimeUnit.SECONDS );
+//        } catch (InterruptedException e) {
+//            LOG.error( e.getMessage() );
+//        }
+//
+//        LOG.info( "All threads finished/timed out for retrieving {} metric. Size: {}", metricType, historicalMetrics.size() );
+
+        return historicalMetrics;
     }
 }

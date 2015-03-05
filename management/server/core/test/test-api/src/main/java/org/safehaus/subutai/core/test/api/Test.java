@@ -11,5 +11,5 @@ public interface Test
 
     public String getUserName();
 
-    public Serializable loginWithToken( String tokenId, String ip );
+    public Serializable loginWithToken( String username );
 }

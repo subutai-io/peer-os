@@ -1,6 +1,8 @@
 package org.safehaus.subutai.common.util;
 
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.KeyStore;
 import java.util.Map;
 
@@ -10,6 +12,8 @@ import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
 import org.safehaus.subutai.common.security.crypto.ssl.SSLManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -23,6 +27,7 @@ import com.google.common.base.Strings;
 
 public class RestUtil
 {
+    private static final Logger LOG = LoggerFactory.getLogger( RestUtil.class );
     private static long defaultReceiveTimeout = 1000 * 60 * 5;
     private static long defaultConnectionTimeout = 1000 * 60;
     private static int defaultMaxRetransmits = 3;
@@ -50,7 +55,7 @@ public class RestUtil
     }
 
 
-    public String request( RequestType requestType, String url, Map<String, String> params,
+    public String request( RequestType requestType, String url, String alias, Map<String, String> params,
                            Map<String, String> headers ) throws HTTPException
     {
 
@@ -61,7 +66,24 @@ public class RestUtil
         Response response = null;
         try
         {
+            URL urlObject = new URL( url );
+            String port = String.valueOf( urlObject.getPort() );
             client = createWebClient( url );
+            //            switch ( port )
+            //            {
+            //                case ChannelSettings.SECURE_PORT_X1:
+            //                    client = createTrustedWebClient( url );
+            //                    break;
+            //                case ChannelSettings.SECURE_PORT_X2:
+            //                    client = createTrustedWebClientWithAuth( url, alias );
+            //                    break;
+            //                case ChannelSettings.SECURE_PORT_X3:
+            //                    client = createTrustedWebClientWithEnvAuth( url, "environment certificate alias" );
+            //                    break;
+            //                default:
+            //                    client = createWebClient( url );
+            //                    break;
+            //            }
             Form form = new Form();
             if ( params != null )
             {
@@ -100,6 +122,10 @@ public class RestUtil
             {
                 return response.readEntity( String.class );
             }
+        }
+        catch ( MalformedURLException e )
+        {
+            LOG.error( "Error in url path.", e );
         }
         finally
         {
@@ -168,7 +194,7 @@ public class RestUtil
     }
 
 
-    public static WebClient createTrustedWebClientWithAuth( String url )
+    public static WebClient createTrustedWebClientWithAuth( String url, String alias )
     {
         WebClient client = WebClient.create( url );
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
@@ -178,12 +204,12 @@ public class RestUtil
         httpClientPolicy.setReceiveTimeout( defaultReceiveTimeout );
         httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
 
-
         httpConduit.setClient( httpClientPolicy );
 
         KeyStoreManager keyStoreManager = new KeyStoreManager();
         KeyStoreData keyStoreData = new KeyStoreData();
         keyStoreData.setupKeyStorePx2();
+        keyStoreData.setAlias( alias );
         KeyStore keyStore = keyStoreManager.load( keyStoreData );
 
         KeyStoreData trustStoreData = new KeyStoreData();
@@ -192,6 +218,39 @@ public class RestUtil
 
         SSLManager sslManager = new SSLManager( keyStore, keyStoreData, trustStore, trustStoreData );
 
+        TLSClientParameters tlsClientParameters = new TLSClientParameters();
+        tlsClientParameters.setDisableCNCheck( true );
+        tlsClientParameters.setTrustManagers( sslManager.getClientTrustManagers() );
+        tlsClientParameters.setKeyManagers( sslManager.getClientKeyManagers() );
+        httpConduit.setTlsClientParameters( tlsClientParameters );
+
+        return client;
+    }
+
+
+    public static WebClient createTrustedWebClientWithEnvAuth( String url, String environmentAlias )
+    {
+        WebClient client = WebClient.create( url );
+        HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
+
+        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+        httpClientPolicy.setConnectionTimeout( defaultConnectionTimeout );
+        httpClientPolicy.setReceiveTimeout( defaultReceiveTimeout );
+        httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
+
+        httpConduit.setClient( httpClientPolicy );
+
+        KeyStoreManager keyStoreManager = new KeyStoreManager();
+        KeyStoreData keyStoreData = new KeyStoreData();
+        keyStoreData.setupKeyStorePx2();
+        keyStoreData.setAlias( environmentAlias );
+        KeyStore keyStore = keyStoreManager.load( keyStoreData );
+
+        KeyStoreData trustStoreData = new KeyStoreData();
+        trustStoreData.setupTrustStorePx2();
+        KeyStore trustStore = keyStoreManager.load( trustStoreData );
+
+        SSLManager sslManager = new SSLManager( keyStore, keyStoreData, trustStore, trustStoreData );
 
         TLSClientParameters tlsClientParameters = new TLSClientParameters();
         tlsClientParameters.setDisableCNCheck( true );

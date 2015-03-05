@@ -16,6 +16,8 @@ import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import com.google.common.collect.Sets;
 
 
@@ -95,7 +97,7 @@ public class CreateEnvironmentTask implements Runnable
 
             resultHolder.setResult(
                     e instanceof EnvironmentCreationException ? ( EnvironmentCreationException ) e.getCause() :
-                    new EnvironmentCreationException( e ) );
+                    new EnvironmentCreationException( ExceptionUtils.getRootCause( e ) ) );
         }
         finally
         {

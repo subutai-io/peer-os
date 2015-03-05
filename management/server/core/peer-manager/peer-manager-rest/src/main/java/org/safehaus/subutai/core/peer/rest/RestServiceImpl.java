@@ -25,7 +25,6 @@ import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
-import org.safehaus.subutai.common.security.utils.RestartCoreServlet;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -77,14 +76,17 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getPeerPolicy( final String peerId ) {
+    public Response getPeerPolicy( final String peerId )
+    {
         Preconditions.checkState( UUIDUtil.isStringAUuid( peerId ) );
         LocalPeer localPeer = peerManager.getLocalPeer();
         PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( UUID.fromString( peerId ) );
-        if ( peerPolicy == null ) {
+        if ( peerPolicy == null )
+        {
             return Response.ok().build();
         }
-        else {
+        else
+        {
             return Response.ok( JsonUtil.toJson( JsonUtil.toJson( peerPolicy ) ) ).build();
         }
     }
@@ -175,7 +177,7 @@ public class RestServiceImpl implements RestService
                 keyStoreManager.deleteEntry( keyStore, keyStoreData );
                 //***********************************************************************
 
-                new Thread( new RestartCoreServlet() ).start();
+                //                new Thread( new RestartCoreServlet() ).start();
 
                 return Response.ok( "Successfully unregistered peer: " + peerId ).build();
             }
@@ -259,7 +261,7 @@ public class RestServiceImpl implements RestService
 
         //***********************************************************************
 
-        new Thread( new RestartCoreServlet() ).start();
+        //        new Thread( new RestartCoreServlet() ).start();
 
         return Response.ok( HEXCert ).build();
     }
@@ -272,8 +274,6 @@ public class RestServiceImpl implements RestService
         p.setIp( getRequestIp() );
         p.setName( String.format( "Peer on %s", p.getIp() ) );
         peerManager.update( p );
-
-        //TODO store pk in trust store.
 
         return Response.ok( JsonUtil.toJson( p ) ).build();
     }
@@ -495,8 +495,7 @@ public class RestServiceImpl implements RestService
                                                           .getAvailableDiskQuota(
                                                                   JsonUtil.<DiskPartition>from( diskPartition,
                                                                           new TypeToken<DiskPartition>()
-                                                                          {
-                                                                          }.getType() ) ) ) ).build();
+                                                                          {}.getType() ) ) ) ).build();
         }
         catch ( Exception e )
         {
@@ -642,8 +641,7 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.getContainerHostById( UUID.fromString( containerId ) )
                      .setCpuSet( JsonUtil.<Set<Integer>>fromJson( cpuSet, new TypeToken<Set<Integer>>()
-                     {
-                     }.getType() ) );
+                     {}.getType() ) );
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -662,8 +660,7 @@ public class RestServiceImpl implements RestService
             return Response.ok( JsonUtil.toJson( localPeer.getContainerHostById( UUID.fromString( containerId ) )
                                                           .getDiskQuota( JsonUtil.<DiskPartition>from( diskPartition,
                                                                   new TypeToken<DiskPartition>()
-                                                                  {
-                                                                  }.getType() ) ) ) ).build();
+                                                                  {}.getType() ) ) ) ).build();
         }
         catch ( Exception e )
         {
@@ -680,8 +677,7 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.getContainerHostById( UUID.fromString( containerId ) )
                      .setDiskQuota( JsonUtil.<DiskQuota>fromJson( diskQuota, new TypeToken<DiskQuota>()
-                     {
-                     }.getType() ) );
+                     {}.getType() ) );
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -734,6 +730,55 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response importEnvironmentCert( final String envCert, final String alias )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            localPeer.importCertificate( envCert, alias );
+            return Response.noContent().build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response exportEnvironmentCert( final String alias )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            String certHEX = localPeer.exportEnvironmentCertificate( alias );
+            return Response.ok( certHEX ).build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response removeEnvironmentCert( final String environmentId )
+    {
+        try
+        {
+            UUID environmentUUID = JsonUtil.fromJson( environmentId, UUID.class );
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            localPeer.removeEnvironmentCertificates( environmentUUID );
+            return Response.noContent().build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.getMessage() ).build();
         }
     }
 }
