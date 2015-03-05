@@ -14,13 +14,6 @@
   <name>Subutai Ssl Context Factory Api</name>
   <description>Subutai Ssl Context Factory Api</description>
 
-  <dependencies>
-    <!--<dependency>-->
-    <!--<groupId>${project.groupId}</groupId>-->
-    <!--<artifactId>jetty-ssl-fragment</artifactId>-->
-    <!--</dependency>-->
-  </dependencies>
-
   <build>
     <plugins>
       <plugin>

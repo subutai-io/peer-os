@@ -14,7 +14,6 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManager;
 
-import org.eclipse.jetty.util.security.Password;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,20 +23,19 @@ public class TestSslContextFactory extends SslContextFactory
 {
     private static Logger LOG = LoggerFactory.getLogger( TestSslContextFactory.class.getName() );
 
-    private static UUID id;
+    private static UUID id = UUID.randomUUID();
 
     private static TestSslContextFactory singleton;
 
     private boolean customStart = false;
 
-    private Password _keyStorePassword;
-    private Password _trustStorePassword;
+    private String _keyStorePassword = "subutai";
+    private String _trustStorePassword = "subutai";
 
 
     public TestSslContextFactory()
     {
         super();
-        id = UUID.randomUUID();
         LOG.error( "CUSTOM SSL FACTORY!!!!! " + id.toString() );
         //        TestSslContextFactory.state = getState();
         //        TestSslContextFactory.secureRandom = getSecureRandomAlgorithm();
@@ -48,7 +46,6 @@ public class TestSslContextFactory extends SslContextFactory
     public TestSslContextFactory( final boolean trustAll )
     {
         super( trustAll );
-        id = UUID.randomUUID();
         LOG.error( "CUSTOM SSL FACTORY!!!!! " + id.toString() );
         TestSslContextFactory.singleton = this;
     }
@@ -57,7 +54,6 @@ public class TestSslContextFactory extends SslContextFactory
     public TestSslContextFactory( final String keyStorePath )
     {
         super( keyStorePath );
-        id = UUID.randomUUID();
         LOG.error( "CUSTOM SSL FACTORY!!!!! " + id.toString() );
         TestSslContextFactory.singleton = this;
     }
@@ -97,12 +93,8 @@ public class TestSslContextFactory extends SslContextFactory
         super.doStart();
         //        if ( !customStart )
         //        {
-        //            super.doStart();
-        //        }
-        //        else
-        //        {
-        //            // verify that keystore and truststore
-        //            // parameters are set up correctly
+        ////            verify that keystore and truststore
+        ////            parameters are set up correctly
         //            checkKeyStore();
         //
         //            KeyStore keyStore = loadKeyStore();
@@ -138,11 +130,10 @@ public class TestSslContextFactory extends SslContextFactory
         //            KeyManager[] keyManagers = getKeyManagers( keyStore );
         //            TrustManager[] trustManagers = getTrustManagers( trustStore, crls );
         //
-        //            SecureRandom secureRandom = ( getSecureRandomAlgorithm() == null ) ? null : SecureRandom
-        // .getInstance(
-        //                    getSecureRandomAlgorithm() );
-        //            setSslContext( ( getProvider() == null ) ? SSLContext.getInstance( getProtocol() ) : SSLContext
-        // .getInstance( getProtocol(), getProvider() ) );
+        //            SecureRandom secureRandom = ( getSecureRandomAlgorithm() == null ) ? null :
+        //                                        SecureRandom.getInstance( getSecureRandomAlgorithm() );
+        //            setSslContext( ( getProvider() == null ) ? SSLContext.getInstance( getProtocol() ) :
+        //                           SSLContext.getInstance( getProtocol(), getProvider() ) );
         //
         //            setCustomStart( true );
         //            getSslContext().init( keyManagers, trustManagers, secureRandom );
@@ -150,13 +141,17 @@ public class TestSslContextFactory extends SslContextFactory
         //
         //            SSLEngine engine = newSslEngine();
         //
-        //            LOG.info( "Enabled Protocols {} of {}", Arrays.asList( engine.getEnabledProtocols() ), Arrays
-        // .asList( engine.getSupportedProtocols() ) );
+        //            LOG.info( "Enabled Protocols {} of {}", Arrays.asList( engine.getEnabledProtocols() ),
+        //                    Arrays.asList( engine.getSupportedProtocols() ) );
         //            if ( LOG.isDebugEnabled() )
         //            {
         //                LOG.debug( "Enabled Ciphers   {} of {}", Arrays.asList( engine.getEnabledCipherSuites() ),
-        // Arrays.asList( engine.getSupportedCipherSuites() ) );
+        //                        Arrays.asList( engine.getSupportedCipherSuites() ) );
         //            }
+        //        }
+        //        else
+        //        {
+        //            super.doStart();
         //        }
     }
 
@@ -164,16 +159,16 @@ public class TestSslContextFactory extends SslContextFactory
     @Override
     protected void doStop() throws Exception
     {
-        super.doStop();
-        //        if ( customStart )
-        //        {
-        //            stop();
-        //            super.doStop();
-        //        }
-        //        else
-        //        {
-        //            super.doStop();
-        //        }
+        //                super.doStop();
+        if ( customStart )
+        {
+            stop();
+            super.doStop();
+        }
+        else
+        {
+            super.doStop();
+        }
     }
 
 
@@ -193,7 +188,19 @@ public class TestSslContextFactory extends SslContextFactory
     {
         try
         {
+            setCustomStart( true );
             doStop();
+            setCustomStart( false );
+
+            setSslContext( null );
+
+            setKeyStore( ( KeyStore ) null );
+
+            setTrustStore( ( KeyStore ) null );
+
+            setKeyStorePassword( _keyStorePassword );
+
+            setTrustStorePassword( _trustStorePassword );
 
             Thread.sleep( 1000 );
 
@@ -292,12 +299,11 @@ public class TestSslContextFactory extends SslContextFactory
     @Override
     protected KeyStore loadKeyStore() throws Exception
     {
-        //        if ( customStart )
-        //        {
-        //            return getKeyStore( getKeyStoreInputStream(), getKeyStorePath(), getKeyStoreType(),
-        // getKeyStoreProvider(),
-        //                    _keyStorePassword == null ? null : _keyStorePassword.toString() );
-        //        }
+        if ( customStart )
+        {
+            return getKeyStore( getKeyStoreInputStream(), getKeyStorePath(), getKeyStoreType(), getKeyStoreProvider(),
+                    _keyStorePassword == null ? null : _keyStorePassword.toString() );
+        }
         return super.loadKeyStore();
     }
 
@@ -305,30 +311,29 @@ public class TestSslContextFactory extends SslContextFactory
     @Override
     protected KeyStore loadTrustStore() throws Exception
     {
-        //        if ( customStart )
-        //        {
-        //            return getKeyStore( getTrustStoreInputStream(), getTrustStore(), getTrustStoreType(),
-        //                    getTrustStoreProvider(), _trustStorePassword == null ? null : _trustStorePassword
-        // .toString() );
-        //        }
+        if ( customStart )
+        {
+            return getKeyStore( getTrustStoreInputStream(), getTrustStore(), getTrustStoreType(),
+                    getTrustStoreProvider(), _trustStorePassword == null ? null : _trustStorePassword.toString() );
+        }
         return super.loadTrustStore();
     }
 
 
-    @Override
-    public void setKeyStorePassword( final String password )
-    {
-        checkNotStarted();
-
-        _keyStorePassword = Password.getPassword( PASSWORD_PROPERTY, password, null );
-    }
-
-
-    @Override
-    public void setTrustStorePassword( final String password )
-    {
-        checkNotStarted();
-
-        _trustStorePassword = Password.getPassword( PASSWORD_PROPERTY, password, null );
-    }
+    //        @Override
+    //        public void setKeyStorePassword( final String password )
+    //        {
+    //            checkNotStarted();
+    //
+    //            _keyStorePassword = password;
+    //        }
+    //
+    //
+    //        @Override
+    //        public void setTrustStorePassword( final String password )
+    //        {
+    //            checkNotStarted();
+    //
+    //            _trustStorePassword = password;
+    //        }
 }

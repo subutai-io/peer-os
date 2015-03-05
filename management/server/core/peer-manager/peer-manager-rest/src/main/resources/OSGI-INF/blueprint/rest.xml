@@ -25,7 +25,7 @@
   <reference id="peerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
-  <reference id="sslContextFactory" availability="optional"
+  <reference id="sslContextFactory" availability="mandatory"
              interface="org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory" />
 
 </blueprint>

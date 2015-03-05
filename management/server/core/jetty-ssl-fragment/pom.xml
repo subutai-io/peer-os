@@ -41,6 +41,12 @@
             <Bundle-Version>${project.version}</Bundle-Version>
             <Fragment-Host>org.ops4j.pax.web.pax-web-jetty</Fragment-Host>
             <Export-Package>
+              javax.net.ssl.SSLContext;
+              javax.net.ssl.SSLEngine;
+              javax.net.ssl.SSLServerSocket;
+              javax.net.ssl.SSLSocket;
+              org.eclipse.jetty.util.security.CertificateValidator;
+              org.eclipse.jetty.util.security.Password;
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
           </instructions>
