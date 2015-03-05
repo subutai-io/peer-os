@@ -22,6 +22,9 @@ import org.safehaus.subutai.core.channel.api.entity.IUserChannelToken;
 public class UserChannelToken implements IUserChannelToken
 {
     @Id
+    @Column( name = "token")
+    private String token;
+
     @Column( name = "user_id" )
     private Long userId;
 
@@ -37,8 +40,9 @@ public class UserChannelToken implements IUserChannelToken
     @Column(name = "ip_range_end")
     private String ipRangeEnd;
 
-    @Column( name = "token")
-    private String token;
+
+    @Column( name = "token_name")
+    private String tokenName;
 
     @Column (name = "date")
     private Timestamp date;
@@ -120,5 +124,17 @@ public class UserChannelToken implements IUserChannelToken
     public void setIpRangeEnd( final String ipRangeEnd )
     {
         this.ipRangeEnd = ipRangeEnd;
+    }
+
+
+    public String getTokenName()
+    {
+        return tokenName;
+    }
+
+
+    public void setTokenName( final String tokenName )
+    {
+        this.tokenName = tokenName;
     }
 }
