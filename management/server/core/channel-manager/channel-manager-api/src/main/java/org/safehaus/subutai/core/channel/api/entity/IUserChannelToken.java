@@ -36,4 +36,8 @@ public interface IUserChannelToken
     public String getIpRangeEnd();
 
     public void setIpRangeEnd( final String ipRangeEnd );
+
+    public String getTokenName();
+
+    public void setTokenName( final String tokenName );
 }
