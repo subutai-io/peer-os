@@ -39,28 +39,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>ssl-context-manager-api</artifactId>
     </dependency>
-
-    <!--BouncyCastle-->
-    <!--<dependency>-->
-    <!--<groupId>org.bouncycastle</groupId>-->
-    <!--<artifactId>bcmail-jdk15on</artifactId>-->
-    <!--<version>${org.bouncycastle.version}</version>-->
-    <!--</dependency>-->
-    <!--<dependency>-->
-    <!--<groupId>org.bouncycastle</groupId>-->
-    <!--<artifactId>bcpg-jdk15on</artifactId>-->
-    <!--<version>${org.bouncycastle.version}</version>-->
-    <!--</dependency>-->
-    <!--<dependency>-->
-    <!--<groupId>org.bouncycastle</groupId>-->
-    <!--<artifactId>bcprov-jdk15on</artifactId>-->
-    <!--<version>${org.bouncycastle.version}</version>-->
-    <!--</dependency>-->
-    <!--<dependency>-->
-    <!--<groupId>org.bouncycastle</groupId>-->
-    <!--<artifactId>bcprov-ext-jdk15on</artifactId>-->
-    <!--<version>${org.bouncycastle.version}</version>-->
-    <!--</dependency>-->
   </dependencies>
 
   <build>

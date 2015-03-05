@@ -22,7 +22,6 @@ public class CustomSslContextFactoryImpl implements CustomSslContextFactory
     @Override
     public void reloadKeyStore()
     {
-        //        TestSslContextFactory.setKeyManager( keyManager );
         TestSslContextFactory.getSingleton().reloadStores();
     }
 
@@ -30,7 +29,6 @@ public class CustomSslContextFactoryImpl implements CustomSslContextFactory
     @Override
     public void reloadTrustStore()
     {
-        //        TestSslContextFactory.setTrustManager( trustManager );
         TestSslContextFactory.getSingleton().reloadStores();
     }
 

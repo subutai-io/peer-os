@@ -3,7 +3,6 @@ package org.safehaus.subutai.core.env.impl;
 
 import java.sql.SQLException;
 import java.util.Iterator;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -213,8 +212,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final ResultHolder<EnvironmentCreationException> resultHolder = new ResultHolder<>();
 
-        setupEnvironmentTunnel( environment, topology.getNodeGroupPlacement().keySet() );
-
         CreateEnvironmentTask createEnvironmentTask =
                 new CreateEnvironmentTask( peerManager.getLocalPeer(), this, environment, topology, resultHolder );
 
@@ -244,35 +241,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         catch ( EnvironmentNotFoundException e )
         {
             throw new EnvironmentCreationException( e );
-        }
-    }
-
-
-    private void setupEnvironmentTunnel( EnvironmentImpl environment, Set<Peer> peers )
-    {
-        String envAlias = String.format( "env_%s_%s", peerManager.getLocalPeer().getId().toString(),
-                environment.getId().toString() );
-        Set<Peer> peersToExchange = new HashSet<>( peers );
-        peersToExchange.add( peerManager.getLocalPeer() );
-        for ( final Peer peer : peersToExchange )
-        {
-            try
-            {
-                //                Thread.sleep( 1000 * 2 );
-                String certHEX = peer.exportEnvironmentCertificate( envAlias );
-                for ( final Peer peer1 : peersToExchange )
-                {
-                    if ( !peer1.equals( peer ) )
-                    {
-                        peer1.importCertificate( certHEX, envAlias );
-                    }
-                }
-                //                new Thread( new RestartCoreServlet( 1 ) ).start();
-            }
-            catch ( PeerException e )
-            {
-                LOG.error( "Error importing/exporting certificates", e );
-            }
         }
     }
 
@@ -347,13 +315,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final Set<EnvironmentDestructionException> exceptions = Sets.newHashSet();
 
-        Set<Peer> peersToRemoveCertFrom = new HashSet<>( environment.getPeers() );
-        peersToRemoveCertFrom.add( peerManager.getLocalPeer() );
-
-
         DestroyEnvironmentTask destroyEnvironmentTask =
-                new DestroyEnvironmentTask( this, environment, exceptions, resultHolder, forceMetadataRemoval,
-                        peersToRemoveCertFrom );
+                new DestroyEnvironmentTask( this, environment, exceptions, resultHolder, forceMetadataRemoval );
 
         executor.submit( destroyEnvironmentTask );
 

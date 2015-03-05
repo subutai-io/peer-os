@@ -14,7 +14,6 @@ import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.ContainersDestructionResult;
 import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
 import org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl;
@@ -45,12 +44,12 @@ public class DestroyEnvironmentTask implements Runnable
     private final ResultHolder<EnvironmentDestructionException> resultHolder;
     private final boolean forceMetadataRemoval;
     private final Semaphore semaphore;
-    private final Set<Peer> peerStoresToUpdate;
+
 
     public DestroyEnvironmentTask( final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
                                    final Set<EnvironmentDestructionException> exceptions,
                                    final ResultHolder<EnvironmentDestructionException> resultHolder,
-                                   final boolean forceMetadataRemoval, final Set<Peer> peersToRemoveCertFrom )
+                                   final boolean forceMetadataRemoval )
     {
         this.environmentManager = environmentManager;
         this.environment = environment;
@@ -58,7 +57,6 @@ public class DestroyEnvironmentTask implements Runnable
         this.resultHolder = resultHolder;
         this.forceMetadataRemoval = forceMetadataRemoval;
         this.semaphore = new Semaphore( 0 );
-        this.peerStoresToUpdate = peersToRemoveCertFrom;
     }
 
 
@@ -144,11 +142,6 @@ public class DestroyEnvironmentTask implements Runnable
                 }
             }
 
-            for ( final Peer peer : peerStoresToUpdate )
-            {
-                peer.removeEnvironmentCertificates( environment.getId() );
-            }
-
             if ( forceMetadataRemoval || environment.getContainerHosts().isEmpty() )
             {
                 environmentManager.removeEnvironment( environment.getId() );
@@ -158,7 +151,7 @@ public class DestroyEnvironmentTask implements Runnable
                 environment.setStatus( EnvironmentStatus.UNHEALTHY );
             }
         }
-        catch ( EnvironmentNotFoundException | PeerException e )
+        catch ( EnvironmentNotFoundException e )
         {
             LOG.error( String.format( "Error destroying environment %s", environment.getId() ), e );
 
