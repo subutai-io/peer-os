@@ -38,7 +38,6 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
     private final Tree tree;
     private HierarchicalContainer container;
     private Set<Host> selectedHosts = new HashSet<>();
-    //    private final ScheduledExecutorService scheduler;
     private Item managementHostItem;
 
 
@@ -111,17 +110,6 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
             }
         } );
         addComponent( tree );
-        //        scheduler = Executors.newScheduledThreadPool( 1 );
-        //
-        //        scheduler.scheduleWithFixedDelay( new Runnable()
-        //        {
-        //            public void run()
-        //            {
-        //                LOG.info( "Refreshing containers state..." );
-        //                refreshHosts();
-        //                LOG.info( "Refreshing done." );
-        //            }
-        //        }, 5, 30, TimeUnit.SECONDS );
 
         final ContainerTree THIS = this;
         addAttachListener( new AttachListener()
@@ -247,22 +235,19 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
 
     public void refreshHosts()
     {
-        synchronized ( container )
+        getNodeContainer();
+        for ( Object itemObj : container.getItemIds() )
         {
-            getNodeContainer();
-            for ( Object itemObj : container.getItemIds() )
+            UUID itemId = ( UUID ) itemObj;
+            Item item = container.getItem( itemId );
+            Object o = item.getItemProperty( "value" ).getValue();
+            if ( ( o instanceof Host ) && ( ( ( Host ) o ).isConnected() ) )
             {
-                UUID itemId = ( UUID ) itemObj;
-                Item item = container.getItem( itemId );
-                Object o = item.getItemProperty( "value" ).getValue();
-                if ( ( o instanceof Host ) && ( ( ( Host ) o ).isConnected() ) )
-                {
-                    item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
-                }
-                else
-                {
-                    item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual_offline.png" ) );
-                }
+                item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
+            }
+            else
+            {
+                item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual_offline.png" ) );
             }
         }
     }
@@ -277,6 +262,13 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
     {
-        refreshHosts();
+        getUI().access( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                refreshHosts();
+            }
+        } );
     }
 }
