@@ -2,7 +2,6 @@ package org.safehaus.subutai.core.env.impl;
 
 
 import java.sql.SQLException;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -29,14 +28,15 @@ import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentSecurityException;
 import org.safehaus.subutai.core.env.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.env.impl.dao.BlueprintDataService;
 import org.safehaus.subutai.core.env.impl.dao.EnvironmentContainerDataService;
 import org.safehaus.subutai.core.env.impl.dao.EnvironmentDataService;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
-import org.safehaus.subutai.core.env.impl.exception.EnvironmentAccessDeniedException;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
+import org.safehaus.subutai.core.env.impl.exception.EnvironmentTunnelException;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
 import org.safehaus.subutai.core.env.impl.tasks.CreateEnvironmentTask;
 import org.safehaus.subutai.core.env.impl.tasks.DestroyContainerTask;
@@ -46,6 +46,7 @@ import org.safehaus.subutai.core.env.impl.tasks.SetSshKeyTask;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.slf4j.Logger;
@@ -126,7 +127,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         if ( !( isUserAdmin() || Objects.equals( environment.getUserId(), getUserId() ) ) )
         {
-            throw new EnvironmentAccessDeniedException();
+            throw new EnvironmentSecurityException(
+                    String.format( "Access to environment %s is denied", environment.getName() ) );
         }
     }
 
@@ -213,8 +215,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final ResultHolder<EnvironmentCreationException> resultHolder = new ResultHolder<>();
 
-        setupEnvironmentTunnel( environment, topology.getNodeGroupPlacement().keySet() );
-
         CreateEnvironmentTask createEnvironmentTask =
                 new CreateEnvironmentTask( peerManager.getLocalPeer(), this, environment, topology, resultHolder );
 
@@ -248,30 +248,31 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    private void setupEnvironmentTunnel( EnvironmentImpl environment, Set<Peer> peers )
+    public void setupEnvironmentTunnel( UUID environmentId, Set<Peer> peers ) throws EnvironmentTunnelException
     {
-        String envAlias = String.format( "env_%s_%s", peerManager.getLocalPeer().getId().toString(),
-                environment.getId().toString() );
-        Set<Peer> peersToExchange = new HashSet<>( peers );
-        peersToExchange.add( peerManager.getLocalPeer() );
-        for ( final Peer peer : peersToExchange )
+        String envAlias =
+                String.format( "env_%s_%s", peerManager.getLocalPeer().getId().toString(), environmentId.toString() );
+        Set<Peer> remotePeers = Sets.newHashSet( peers );
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        remotePeers.remove( localPeer );
+        if ( !remotePeers.isEmpty() )
         {
             try
             {
-                //                Thread.sleep( 1000 * 2 );
-                String certHEX = peer.exportEnvironmentCertificate( envAlias );
-                for ( final Peer peer1 : peersToExchange )
+                String localPeerCert = localPeer.exportEnvironmentCertificate( envAlias );
+
+                for ( Peer remotePeer : remotePeers )
                 {
-                    if ( !peer1.equals( peer ) )
-                    {
-                        peer1.importCertificate( certHEX, envAlias );
-                    }
+                    String remotePeerCert = remotePeer.exportEnvironmentCertificate( envAlias );
+                    localPeer.importCertificate( remotePeerCert, envAlias );
+                    remotePeer.importCertificate( localPeerCert, envAlias );
                 }
-                //                new Thread( new RestartCoreServlet( 1 ) ).start();
             }
-            catch ( PeerException e )
+            catch ( Exception e )
             {
-                LOG.error( "Error importing/exporting certificates", e );
+                //TODO uncomment this exception later when PEKS work
+                //            throw new EnvironmentTunnelException( "Error exchanging environment certificates ",e );
+                LOG.error( "Error exchanging environment certificates ", e );
             }
         }
     }
@@ -345,15 +346,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final ResultHolder<EnvironmentDestructionException> resultHolder = new ResultHolder<>();
 
-        final Set<EnvironmentDestructionException> exceptions = Sets.newHashSet();
-
-        Set<Peer> peersToRemoveCertFrom = new HashSet<>( environment.getPeers() );
-        peersToRemoveCertFrom.add( peerManager.getLocalPeer() );
+        final Set<Throwable> exceptions = Sets.newHashSet();
 
 
         DestroyEnvironmentTask destroyEnvironmentTask =
                 new DestroyEnvironmentTask( this, environment, exceptions, resultHolder, forceMetadataRemoval,
-                        peersToRemoveCertFrom );
+                        peerManager.getLocalPeer() );
 
         executor.submit( destroyEnvironmentTask );
 

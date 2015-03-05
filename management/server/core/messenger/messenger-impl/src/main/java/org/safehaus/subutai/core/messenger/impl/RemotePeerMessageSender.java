@@ -53,7 +53,7 @@ public class RemotePeerMessageSender implements Callable<Boolean>
                 int targetPeerPort = targetPeer.getPeerInfo().getPort();
 
                 restUtil.request( RestUtil.RequestType.POST,
-                        String.format( "https://%s:%d/cxf/messenger/message", targetPeerIP, targetPeerPort ),
+                        String.format( "http://%s:%d/cxf/messenger/message", targetPeerIP, targetPeerPort ),
                         SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params,
                         envelope.getHeaders() );
 
