@@ -12,4 +12,6 @@ public interface Test
     public String getUserName();
 
     public Serializable loginWithToken( String username );
+
+    public void testExecutor();
 }
