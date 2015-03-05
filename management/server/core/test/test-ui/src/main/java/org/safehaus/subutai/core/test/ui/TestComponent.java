@@ -3,6 +3,10 @@ package org.safehaus.subutai.core.test.ui;
 
 import org.safehaus.subutai.core.jetty.fragment.TestSslContextFactory;
 import org.safehaus.subutai.core.test.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.apache.log4j.MDC;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
@@ -12,6 +16,8 @@ import com.vaadin.ui.VerticalLayout;
 
 public class TestComponent extends CustomComponent
 {
+    private static Logger LOG = LoggerFactory.getLogger( TestComponent.class.getName() );
+
 
     public TestComponent( final Test test )
     {
@@ -59,10 +65,25 @@ public class TestComponent extends CustomComponent
             }
         } );
 
+        Button execBtn = new Button( "Exec" );
+        execBtn.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
+            {
+                String username = test.getUserName();
+                LOG.error( "Setting MDC >>> " + username );
+
+                MDC.put( "test", username );
+                test.testExecutor();
+            }
+        } );
+
         layout.addComponent( logBtn );
         layout.addComponent( showBtn );
         layout.addComponent( loginWithTokenBtn );
         layout.addComponent( ssBtn );
+        layout.addComponent( execBtn );
 
 
         setCompositionRoot( layout );
