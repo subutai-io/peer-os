@@ -156,6 +156,24 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
+    @Override
+    public void removeGateway( final int vlan ) throws PeerException
+    {
+        Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
+                String.format( "VLAN must be in the range from %d to %d", Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+
+        try
+        {
+            commandUtil.execute( new RequestBuilder( "subutai management_network" )
+                    .withCmdArgs( Lists.newArrayList( "-D", String.valueOf( vlan ) ) ), this );
+        }
+        catch ( CommandException e )
+        {
+            throw new PeerException( String.format( "Error removing gateway tap device with VLAN %d", vlan ), e );
+        }
+    }
+
+
     protected NetworkManager getNetworkManager() throws PeerException
     {
         try
