@@ -15,11 +15,6 @@ public class CustomSslContextFactoryImpl implements CustomSslContextFactory
 
     private static final Logger LOG = LoggerFactory.getLogger( CustomSslContextFactoryImpl.class );
 
-    private String keyStorePath;
-    private String keyStorePassword;
-    private String trustStorePath;
-    private String trustStorePassword;
-
     private KeyManager keyManager[];
     private TrustManager trustManager[];
 
@@ -30,6 +25,7 @@ public class CustomSslContextFactoryImpl implements CustomSslContextFactory
         trustManager = new TrustManager[] { new CustomTrustManager() };
         TestSslContextFactory.setKeyManager( keyManager );
         TestSslContextFactory.setTrustManager( trustManager );
+        LOG.error( String.format( "Printing singleton: %s", TestSslContextFactory.getSingleton() ) );
     }
 
 
@@ -37,7 +33,8 @@ public class CustomSslContextFactoryImpl implements CustomSslContextFactory
     public void reloadKeyStore()
     {
         keyManager = new KeyManager[] { new CustomKeyManager() };
-        TestSslContextFactory.setKeyManager( keyManager );
+        //        TestSslContextFactory.setKeyManager( keyManager );
+        TestSslContextFactory.getSingleton().reloadStores();
     }
 
 
@@ -45,13 +42,14 @@ public class CustomSslContextFactoryImpl implements CustomSslContextFactory
     public void reloadTrustStore()
     {
         trustManager = new TrustManager[] { new CustomTrustManager() };
-        TestSslContextFactory.setTrustManager( trustManager );
+        //        TestSslContextFactory.setTrustManager( trustManager );
+        TestSslContextFactory.getSingleton().reloadStores();
     }
 
 
     @Override
-    public void setSSLContext()
+    public Object getSSLContext()
     {
-
+        return TestSslContextFactory.getSingleton();
     }
 }

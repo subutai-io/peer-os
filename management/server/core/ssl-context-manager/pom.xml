@@ -15,6 +15,7 @@
   <modules>
     <module>ssl-context-manager-impl</module>
     <module>ssl-context-manager-api</module>
+    <module>ssl-context-manager-cli</module>
   </modules>
 
 </project>

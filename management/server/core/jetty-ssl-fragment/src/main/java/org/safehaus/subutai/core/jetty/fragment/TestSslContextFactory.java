@@ -1,18 +1,20 @@
 package org.safehaus.subutai.core.jetty.fragment;
 
 
-import java.security.KeyManagementException;
+import java.io.IOException;
 import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.cert.CRL;
 import java.util.Collection;
 import java.util.UUID;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManager;
 
+import org.eclipse.jetty.util.security.Password;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,12 +26,12 @@ public class TestSslContextFactory extends SslContextFactory
 
     private static UUID id;
 
-    private static KeyManager keyManager[];
-    private static TrustManager trustManager[];
-    private static SSLContext sslContext;
-    private static String secureRandom;
-    private static String state;
     private static TestSslContextFactory singleton;
+
+    private boolean customStart = false;
+
+    private Password _keyStorePassword;
+    private Password _trustStorePassword;
 
 
     public TestSslContextFactory()
@@ -37,9 +39,33 @@ public class TestSslContextFactory extends SslContextFactory
         super();
         id = UUID.randomUUID();
         LOG.error( "CUSTOM SSL FACTORY!!!!! " + id.toString() );
-        TestSslContextFactory.state = getState();
-        TestSslContextFactory.secureRandom = getSecureRandomAlgorithm();
+        //        TestSslContextFactory.state = getState();
+        //        TestSslContextFactory.secureRandom = getSecureRandomAlgorithm();
         TestSslContextFactory.singleton = this;
+    }
+
+
+    public TestSslContextFactory( final boolean trustAll )
+    {
+        super( trustAll );
+        id = UUID.randomUUID();
+        LOG.error( "CUSTOM SSL FACTORY!!!!! " + id.toString() );
+        TestSslContextFactory.singleton = this;
+    }
+
+
+    public TestSslContextFactory( final String keyStorePath )
+    {
+        super( keyStorePath );
+        id = UUID.randomUUID();
+        LOG.error( "CUSTOM SSL FACTORY!!!!! " + id.toString() );
+        TestSslContextFactory.singleton = this;
+    }
+
+
+    public static TestSslContextFactory getSingleton()
+    {
+        return singleton;
     }
 
 
@@ -53,11 +79,7 @@ public class TestSslContextFactory extends SslContextFactory
     protected KeyManager[] getKeyManagers( final KeyStore keyStore ) throws Exception
     {
         LOG.warn( "getKeyManagers" );
-        if ( keyManager == null )
-        {
-            return super.getKeyManagers( keyStore );
-        }
-        return keyManager;
+        return super.getKeyManagers( keyStore );
     }
 
 
@@ -65,11 +87,7 @@ public class TestSslContextFactory extends SslContextFactory
     protected TrustManager[] getTrustManagers( final KeyStore trustStore, final Collection<? extends CRL> crls )
             throws Exception
     {
-        if ( trustManager == null )
-        {
-            return super.getTrustManagers( trustStore, crls );
-        }
-        return trustManager;
+        return super.getTrustManagers( trustStore, crls );
     }
 
 
@@ -77,100 +95,124 @@ public class TestSslContextFactory extends SslContextFactory
     protected void doStart() throws Exception
     {
         super.doStart();
-        TestSslContextFactory.state = getState();
-        new Thread( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                while ( !getState().equals( "STARTED" ) )
-                {
-                    TestSslContextFactory.secureRandom = getSecureRandomAlgorithm();
-                    TestSslContextFactory.sslContext = getSslContext();
-                    TestSslContextFactory.state = "STARTED";
-                    LOG.warn( "Got SSLContext in STARTED State" );
-                }
-            }
-        } ).start();
+        //        if ( !customStart )
+        //        {
+        //            super.doStart();
+        //        }
+        //        else
+        //        {
+        //            // verify that keystore and truststore
+        //            // parameters are set up correctly
+        //            checkKeyStore();
+        //
+        //            KeyStore keyStore = loadKeyStore();
+        //            KeyStore trustStore = loadTrustStore();
+        //
+        //            Collection<? extends CRL> crls = loadCRL( getCrlPath() );
+        //
+        //            if ( getValidateCerts() && keyStore != null )
+        //            {
+        //                if ( getCertAlias() == null )
+        //                {
+        //                    List<String> aliases = Collections.list( keyStore.aliases() );
+        //                    setCertAlias( aliases.size() == 1 ? aliases.get( 0 ) : null );
+        //                }
+        //
+        //                Certificate cert = getCertAlias() == null ? null : keyStore.getCertificate( getCertAlias() );
+        //                if ( cert == null )
+        //                {
+        //                    throw new Exception( "No certificate found in the keystore" + ( getCertAlias() == null
+        // ? "" :
+        //                                                                                    " for alias " +
+        // getCertAlias() ) );
+        //                }
+        //
+        //                CertificateValidator validator = new CertificateValidator( trustStore, crls );
+        //                validator.setMaxCertPathLength( getMaxCertPathLength() );
+        //                validator.setEnableCRLDP( isEnableCRLDP() );
+        //                validator.setEnableOCSP( isEnableOCSP() );
+        //                validator.setOcspResponderURL( getOcspResponderURL() );
+        //                validator.validate( keyStore, cert );
+        //            }
+        //
+        //            KeyManager[] keyManagers = getKeyManagers( keyStore );
+        //            TrustManager[] trustManagers = getTrustManagers( trustStore, crls );
+        //
+        //            SecureRandom secureRandom = ( getSecureRandomAlgorithm() == null ) ? null : SecureRandom
+        // .getInstance(
+        //                    getSecureRandomAlgorithm() );
+        //            setSslContext( ( getProvider() == null ) ? SSLContext.getInstance( getProtocol() ) : SSLContext
+        // .getInstance( getProtocol(), getProvider() ) );
+        //
+        //            setCustomStart( true );
+        //            getSslContext().init( keyManagers, trustManagers, secureRandom );
+        //            setCustomStart( false );
+        //
+        //            SSLEngine engine = newSslEngine();
+        //
+        //            LOG.info( "Enabled Protocols {} of {}", Arrays.asList( engine.getEnabledProtocols() ), Arrays
+        // .asList( engine.getSupportedProtocols() ) );
+        //            if ( LOG.isDebugEnabled() )
+        //            {
+        //                LOG.debug( "Enabled Ciphers   {} of {}", Arrays.asList( engine.getEnabledCipherSuites() ),
+        // Arrays.asList( engine.getSupportedCipherSuites() ) );
+        //            }
+        //        }
     }
 
 
-    public static void setKeyManager( final KeyManager[] keyManager, boolean setContext )
+    @Override
+    protected void doStop() throws Exception
     {
-        TestSslContextFactory.keyManager = keyManager;
-        if ( setContext )
+        super.doStop();
+        //        if ( customStart )
+        //        {
+        //            stop();
+        //            super.doStop();
+        //        }
+        //        else
+        //        {
+        //            super.doStop();
+        //        }
+    }
+
+
+    public static void setKeyManager( final KeyManager[] keyManager )
+    {
+        //        TestSslContextFactory.keyManager = keyManager;
+    }
+
+
+    public static void setTrustManager( final TrustManager[] trustManager )
+    {
+        //        TestSslContextFactory.trustManager = trustManager;
+    }
+
+
+    public void reloadStores()
+    {
+        try
         {
-            try
-            {
-                SecureRandom secureRandom = ( TestSslContextFactory.secureRandom == null ) ? null :
-                                            SecureRandom.getInstance( TestSslContextFactory.secureRandom );
-                if ( TestSslContextFactory.sslContext == null )
-                {
-                    TestSslContextFactory.sslContext
-                            .init( TestSslContextFactory.keyManager, TestSslContextFactory.trustManager, secureRandom );
-                }
-            }
-            catch ( KeyManagementException | NoSuchAlgorithmException e )
-            {
-                LOG.error( "Error initializing sslContext", e );
-            }
+            doStop();
+
+            Thread.sleep( 1000 );
+
+            doStart();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error restarting ssl context factory", e );
         }
     }
 
 
-    public static void setTrustManager( final TrustManager[] trustManager, boolean setContext )
+    public void setCustomStart( final boolean customStart )
     {
-        TestSslContextFactory.trustManager = trustManager;
-        if ( setContext )
-        {
-            try
-            {
-                SecureRandom secureRandom = ( TestSslContextFactory.secureRandom == null ) ? null :
-                                            SecureRandom.getInstance( TestSslContextFactory.secureRandom );
-                if ( TestSslContextFactory.sslContext == null )
-                {
-                    TestSslContextFactory.sslContext
-                            .init( TestSslContextFactory.keyManager, TestSslContextFactory.trustManager, secureRandom );
-                }
-            }
-            catch ( KeyManagementException | NoSuchAlgorithmException e )
-            {
-                LOG.error( "Error initializing sslContext", e );
-            }
-        }
+        this.customStart = customStart;
     }
 
 
-    @Override
-    public void setKeyStorePath( final String keyStorePath )
-    {
-        LOG.warn( String.format( "KeyStorePath %s", keyStorePath ) );
-        super.setKeyStorePath( keyStorePath );
-    }
-
-
-    @Override
-    public void setTrustStore( final String trustStorePath )
-    {
-        LOG.warn( String.format( "TrustStorePath %s", trustStorePath ) );
-        super.setTrustStore( trustStorePath );
-    }
-
-
-    @Override
-    public void setKeyStorePassword( final String password )
-    {
-        LOG.warn( String.format( "KeyStorePassword: %s", password ) );
-        super.setKeyStorePassword( password );
-    }
-
-
-    @Override
-    public void setTrustStorePassword( final String password )
-    {
-        LOG.warn( String.format( "TrustStore password %s", password ) );
-        super.setTrustStorePassword( password );
-    }
+    //    Parent Methods
 
 
     @Override
@@ -186,5 +228,107 @@ public class TestSslContextFactory extends SslContextFactory
     {
         super.setSslContext( sslContext );
         LOG.warn( "Setting sslContext" );
+    }
+
+
+    //Critically important for reloading keyStores, trustStores
+    @Override
+    public boolean isStarted()
+    {
+        //        if ( customStart )
+        //        {
+        //            return true;
+        //        }
+        return super.isStarted();
+    }
+
+
+    @Override
+    public SSLServerSocket newSslServerSocket( final String host, final int port, final int backlog ) throws IOException
+    {
+        return super.newSslServerSocket( host, port, backlog );
+    }
+
+
+    @Override
+    public SSLSocket newSslSocket() throws IOException
+    {
+        return super.newSslSocket();
+    }
+
+
+    @Override
+    public SSLEngine newSslEngine( final String host, final int port )
+    {
+        //        try
+        //        {
+        //            getSslContext().init( TestSslContextFactory.keyManager, TestSslContextFactory.trustManager,
+        // null );
+        //        }
+        //        catch ( KeyManagementException e )
+        //        {
+        //            LOG.error( "Error initializing ssl engine", e );
+        //        }
+        return super.newSslEngine( host, port );
+    }
+
+
+    @Override
+    public SSLEngine newSslEngine()
+    {
+        //        try
+        //        {
+        //            getSslContext().init( TestSslContextFactory.keyManager, TestSslContextFactory.trustManager,
+        // null );
+        //        }
+        //        catch ( KeyManagementException e )
+        //        {
+        //            LOG.error( "Error initializing ssl engine", e );
+        //        }
+        return super.newSslEngine();
+    }
+
+
+    @Override
+    protected KeyStore loadKeyStore() throws Exception
+    {
+        //        if ( customStart )
+        //        {
+        //            return getKeyStore( getKeyStoreInputStream(), getKeyStorePath(), getKeyStoreType(),
+        // getKeyStoreProvider(),
+        //                    _keyStorePassword == null ? null : _keyStorePassword.toString() );
+        //        }
+        return super.loadKeyStore();
+    }
+
+
+    @Override
+    protected KeyStore loadTrustStore() throws Exception
+    {
+        //        if ( customStart )
+        //        {
+        //            return getKeyStore( getTrustStoreInputStream(), getTrustStore(), getTrustStoreType(),
+        //                    getTrustStoreProvider(), _trustStorePassword == null ? null : _trustStorePassword
+        // .toString() );
+        //        }
+        return super.loadTrustStore();
+    }
+
+
+    @Override
+    public void setKeyStorePassword( final String password )
+    {
+        checkNotStarted();
+
+        _keyStorePassword = Password.getPassword( PASSWORD_PROPERTY, password, null );
+    }
+
+
+    @Override
+    public void setTrustStorePassword( final String password )
+    {
+        checkNotStarted();
+
+        _trustStorePassword = Password.getPassword( PASSWORD_PROPERTY, password, null );
     }
 }
