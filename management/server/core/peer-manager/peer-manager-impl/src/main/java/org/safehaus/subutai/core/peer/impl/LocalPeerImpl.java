@@ -52,7 +52,6 @@ import org.safehaus.subutai.common.security.crypto.key.KeyManager;
 import org.safehaus.subutai.common.security.crypto.key.KeyPairType;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
-import org.safehaus.subutai.common.security.utils.RestartCoreServlet;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.StringUtil;
@@ -1526,7 +1525,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         keyStoreManager.importCertificateHEXString( keyStore, keyStoreData );
         //***********************************************************************
         this.sslContextFactory.reloadTrustStore();
-        new Thread( new RestartCoreServlet( 4 ) ).start();
+//        new Thread( new RestartCoreServlet( 4 ) ).start();
     }
 
 

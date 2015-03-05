@@ -1,12 +1,16 @@
 package org.safehaus.subutai.core.jetty.fragment;
 
 
+import java.security.KeyManagementException;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.cert.CRL;
 import java.util.Collection;
 import java.util.UUID;
 
 import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 
 import org.eclipse.jetty.util.ssl.SslContextFactory;
@@ -22,6 +26,10 @@ public class TestSslContextFactory extends SslContextFactory
 
     private static KeyManager keyManager[];
     private static TrustManager trustManager[];
+    private static SSLContext sslContext;
+    private static String secureRandom;
+    private static String state;
+    private static TestSslContextFactory singleton;
 
 
     public TestSslContextFactory()
@@ -29,6 +37,9 @@ public class TestSslContextFactory extends SslContextFactory
         super();
         id = UUID.randomUUID();
         LOG.error( "CUSTOM SSL FACTORY!!!!! " + id.toString() );
+        TestSslContextFactory.state = getState();
+        TestSslContextFactory.secureRandom = getSecureRandomAlgorithm();
+        TestSslContextFactory.singleton = this;
     }
 
 
@@ -41,6 +52,7 @@ public class TestSslContextFactory extends SslContextFactory
     @Override
     protected KeyManager[] getKeyManagers( final KeyStore keyStore ) throws Exception
     {
+        LOG.warn( "getKeyManagers" );
         if ( keyManager == null )
         {
             return super.getKeyManagers( keyStore );
@@ -61,15 +73,71 @@ public class TestSslContextFactory extends SslContextFactory
     }
 
 
-    public static void setKeyManager( final KeyManager[] keyManager )
+    @Override
+    protected void doStart() throws Exception
     {
-        TestSslContextFactory.keyManager = keyManager;
+        super.doStart();
+        TestSslContextFactory.state = getState();
+        new Thread( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                while ( !getState().equals( "STARTED" ) )
+                {
+                    TestSslContextFactory.secureRandom = getSecureRandomAlgorithm();
+                    TestSslContextFactory.sslContext = getSslContext();
+                    TestSslContextFactory.state = "STARTED";
+                    LOG.warn( "Got SSLContext in STARTED State" );
+                }
+            }
+        } ).start();
     }
 
 
-    public static void setTrustManager( final TrustManager[] trustManager )
+    public static void setKeyManager( final KeyManager[] keyManager, boolean setContext )
+    {
+        TestSslContextFactory.keyManager = keyManager;
+        if ( setContext )
+        {
+            try
+            {
+                SecureRandom secureRandom = ( TestSslContextFactory.secureRandom == null ) ? null :
+                                            SecureRandom.getInstance( TestSslContextFactory.secureRandom );
+                if ( TestSslContextFactory.sslContext == null )
+                {
+                    TestSslContextFactory.sslContext
+                            .init( TestSslContextFactory.keyManager, TestSslContextFactory.trustManager, secureRandom );
+                }
+            }
+            catch ( KeyManagementException | NoSuchAlgorithmException e )
+            {
+                LOG.error( "Error initializing sslContext", e );
+            }
+        }
+    }
+
+
+    public static void setTrustManager( final TrustManager[] trustManager, boolean setContext )
     {
         TestSslContextFactory.trustManager = trustManager;
+        if ( setContext )
+        {
+            try
+            {
+                SecureRandom secureRandom = ( TestSslContextFactory.secureRandom == null ) ? null :
+                                            SecureRandom.getInstance( TestSslContextFactory.secureRandom );
+                if ( TestSslContextFactory.sslContext == null )
+                {
+                    TestSslContextFactory.sslContext
+                            .init( TestSslContextFactory.keyManager, TestSslContextFactory.trustManager, secureRandom );
+                }
+            }
+            catch ( KeyManagementException | NoSuchAlgorithmException e )
+            {
+                LOG.error( "Error initializing sslContext", e );
+            }
+        }
     }
 
 
@@ -102,5 +170,21 @@ public class TestSslContextFactory extends SslContextFactory
     {
         LOG.warn( String.format( "TrustStore password %s", password ) );
         super.setTrustStorePassword( password );
+    }
+
+
+    @Override
+    public SSLContext getSslContext()
+    {
+        LOG.warn( "Getting sslContext." );
+        return super.getSslContext();
+    }
+
+
+    @Override
+    public void setSslContext( final SSLContext sslContext )
+    {
+        super.setSslContext( sslContext );
+        LOG.warn( "Setting sslContext" );
     }
 }

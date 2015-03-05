@@ -33,7 +33,7 @@
   <reference id="identityManager" availability="mandatory"
              interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
 
-  <reference id="sslContextFactory" availability="mandatory"
+  <reference id="sslContextFactory" availability="optional"
              interface="org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory" />
 
   <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"

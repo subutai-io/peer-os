@@ -6,4 +6,6 @@ public interface CustomSslContextFactory
     public void reloadKeyStore();
 
     public void reloadTrustStore();
+
+    public void setSSLContext();
 }

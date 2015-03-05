@@ -47,4 +47,11 @@ public class CustomSslContextFactoryImpl implements CustomSslContextFactory
         trustManager = new TrustManager[] { new CustomTrustManager() };
         TestSslContextFactory.setTrustManager( trustManager );
     }
+
+
+    @Override
+    public void setSSLContext()
+    {
+
+    }
 }
