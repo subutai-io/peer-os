@@ -1480,6 +1480,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                         if ( vni.getEnvironmentId().equals( environmentId ) )
                         {
                             getManagementHost().removeGateway( vni.getVlan() );
+                            //todo remove vnivlan mapping and vni reservation
                             break;
                         }
                     }
