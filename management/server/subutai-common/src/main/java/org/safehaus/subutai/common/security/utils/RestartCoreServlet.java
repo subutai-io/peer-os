@@ -17,6 +17,19 @@ public class RestartCoreServlet implements Runnable
     private final String PAX_WEB_JETTY_BUNDLE_NAME = "org.ops4j.pax.web.pax-web-jetty";
     private static final Logger LOGGER = LoggerFactory.getLogger( RestartCoreServlet.class );
 
+    private int timeout = 5;
+
+
+    public RestartCoreServlet()
+    {
+
+    }
+
+
+    public RestartCoreServlet( int timeout )
+    {
+        this.timeout = timeout;
+    }
 
     /**
      * When an object implementing interface <code>Runnable</code> is used to create a thread, starting the thread
@@ -31,7 +44,7 @@ public class RestartCoreServlet implements Runnable
         LOGGER.error( "########################    Restarting servlet." );
         try
         {
-            Thread.sleep( 5 * 1000 );
+            Thread.sleep( timeout * 1000 );
         }
         catch ( InterruptedException e )
         {

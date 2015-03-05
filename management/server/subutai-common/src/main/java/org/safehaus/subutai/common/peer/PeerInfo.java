@@ -21,7 +21,7 @@ public class PeerInfo
     private String name;
     private UUID id;
     private UUID ownerId;
-    private int port = 8181;
+    private int port = 8544;
 
     private int lastUsedVlanId = 100;
     private String keyId;

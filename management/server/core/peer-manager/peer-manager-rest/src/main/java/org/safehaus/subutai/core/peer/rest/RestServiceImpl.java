@@ -77,14 +77,17 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getPeerPolicy( final String peerId ) {
+    public Response getPeerPolicy( final String peerId )
+    {
         Preconditions.checkState( UUIDUtil.isStringAUuid( peerId ) );
         LocalPeer localPeer = peerManager.getLocalPeer();
         PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( UUID.fromString( peerId ) );
-        if ( peerPolicy == null ) {
+        if ( peerPolicy == null )
+        {
             return Response.ok().build();
         }
-        else {
+        else
+        {
             return Response.ok( JsonUtil.toJson( JsonUtil.toJson( peerPolicy ) ) ).build();
         }
     }
@@ -272,8 +275,6 @@ public class RestServiceImpl implements RestService
         p.setIp( getRequestIp() );
         p.setName( String.format( "Peer on %s", p.getIp() ) );
         peerManager.update( p );
-
-        //TODO store pk in trust store.
 
         return Response.ok( JsonUtil.toJson( p ) ).build();
     }
@@ -734,6 +735,55 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response importEnvironmentCert( final String envCert, final String alias )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            localPeer.importCertificate( envCert, alias );
+            return Response.noContent().build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response exportEnvironmentCert( final String alias )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            String certHEX = localPeer.exportEnvironmentCertificate( alias );
+            return Response.ok( certHEX ).build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response removeEnvironmentCert( final String environmentId )
+    {
+        try
+        {
+            UUID environmentUUID = JsonUtil.fromJson( environmentId, UUID.class );
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            localPeer.removeEnvironmentCertificates( environmentUUID );
+            return Response.noContent().build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.getMessage() ).build();
         }
     }
 }
