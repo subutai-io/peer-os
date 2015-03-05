@@ -111,7 +111,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     protected boolean isUserAdmin()
     {
-        return identityManager.getUser().isAdmin();
+        return ( identityManager.getUser() != null ) && identityManager.getUser().isAdmin();
     }
 
 
