@@ -5,7 +5,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.safehaus.subutai.common.settings.ChannelSettings;
+import org.safehaus.subutai.common.util.UrlUtil;
 import org.safehaus.subutai.core.channel.impl.ChannelManagerImpl;
+import org.safehaus.subutai.core.identity.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,20 +46,20 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
             String basePath = url.getPath();
 
 
-            int status = 1;
+            int status = 0;
 
             if(url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X1))
             {
                 if(ChannelSettings.checkURL(basePath,ChannelSettings.URL_ACCESS_PX1) == 0)
                 {
-                    status = 0;
+                    status = 1;
                 }
             }
             else if(url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2))
             {
                 if(ChannelSettings.checkURL(basePath,ChannelSettings.URL_ACCESS_PX2) == 0)
                 {
-                    status = 0;
+                    status = 1;
                 }
             }
             else if(url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X3))
@@ -67,7 +69,7 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
             else if(url.getPort() == Integer.parseInt( ChannelSettings.SPECIAL_PORT_X1))
             {
                 String query      =  ( String ) message.get( Message.QUERY_STRING ) ;
-                String paramValue = getQueryParameterValue("sptoken",query);
+                String paramValue =  UrlUtil.getQueryParameterValue(  "sptoken", query );
 
                 if(!"".equals(paramValue))
                 {
@@ -75,16 +77,17 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
 
                     if(userId != 0)
                     {
-                        channelManagerImpl.getIdentityManager().loginWithToken(paramValue , "" );
+                        User user = channelManagerImpl.getIdentityManager().getUser(userId);
+                        channelManagerImpl.getIdentityManager().loginWithToken(user.getUsername() );
                     }
                     else
                     {
-                        status = 0;
+                        status = 1;
                     }
                 }
                 else
                 {
-                    status = 0;
+                    status = 1;
                 }
 
             }
@@ -92,9 +95,16 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
 
             //----------------------------------------------------------------------------------------------
             //--------------- Redirect ---------------------------------------------------------------------
-            if(status == 0)
+            if(status == 1)
             {
-                LOG.warn( "*********  Access to" + basePath + "  is blocked **********************" );
+                LOG.warn( "*********  Access to" + basePath + "  is blocked (403) **********************" );
+
+                message.put( Message.RESPONSE_CODE, 403 );
+                message.getInterceptorChain().abort();
+            }
+            else if(status == 2)
+            {
+                LOG.warn( "*********  Access to" + basePath + "  is blocked (404) **********************" );
 
                 message.put( Message.RESPONSE_CODE, 403 );
                 message.getInterceptorChain().abort();
@@ -117,26 +127,5 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
         super.handleFault( message );
     }
 
-    private String getQueryParameterValue(String paramName,String query)
-    {
-        String paramValue = "";
-        String parameters[] = query.split( "&" );
 
-        if(parameters!=null)
-        {
-            for(int x=0;x<parameters.length;x++)
-            {
-                String subParameters[] = parameters[x].split( "=" );
-
-                if(subParameters[0].equals(paramName ))
-                {
-                    paramValue = subParameters[1];
-                    break;
-                }
-            }
-
-        }
-
-        return paramValue;
-    }
 }
