@@ -1469,6 +1469,27 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 }
             }
 
+            //remove gateway
+            if ( containerGroup.getContainerIds().size() == destroyedContainersIds.size() )
+            {
+                try
+                {
+                    Set<Vni> vnis = getManagementHost().getReservedVnis();
+                    for ( Vni vni : vnis )
+                    {
+                        if ( vni.getEnvironmentId().equals( environmentId ) )
+                        {
+                            getManagementHost().removeGateway( vni.getVlan() );
+                            //todo remove vnivlan mapping and vni reservation
+                            break;
+                        }
+                    }
+                }
+                catch ( PeerException e )
+                {
+                    errors.add( ExceptionUtils.getRootCause( e ) );
+                }
+            }
 
             executorService.shutdown();
         }
