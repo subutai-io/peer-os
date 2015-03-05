@@ -30,39 +30,39 @@ public class Commands
     }
 
 
-    public RequestBuilder getDownloadTemplateCommand( String peerIp, int peerPort, String templateName,
-                                                      String templateDownloadToken, String downloadDir )
-    {
-        return new RequestBuilder( "curl" ).withCmdArgs( Lists.newArrayList( "-O", "-J", "-L",
-                String.format( "https://%s:%d/cxf/registry/templates/%s/download/%s", peerIp, peerPort, templateName,
-                        templateDownloadToken ) ) ).withCwd( downloadDir ).withTimeout( 24 * 60 * 60 );
-    }
-
-
-    public RequestBuilder getCopyTemplateFromManagementHostCommand( String downloadDir, String templateFileName )
-    {
-        return new RequestBuilder(
-                String.format( "scp root@gw.intra.lan:%s", Paths.get( downloadDir, templateFileName ) ) )
-                .withTimeout( 180 );
-    }
-
-
-    public RequestBuilder getImportTemplateCommand( String templateName )
-    {
-        return new RequestBuilder( "subutai" ).withCmdArgs( Lists.newArrayList( "import", templateName ) )
-                                              .withTimeout( 3 * 60 );
-    }
-
-
-    public RequestBuilder getCheckTemplateImportedCommand( String templateName )
-    {
-        return new RequestBuilder( "subutai" ).withCmdArgs( Lists.newArrayList( "list", "-t", templateName ) );
-    }
-
-
-    public RequestBuilder getCheckTemplateDownloadedCommand( String downloadDir, String templateFileName )
-    {
-        return new RequestBuilder(
-                String.format( "mkdir -p %s ; ls %s", downloadDir, Paths.get( downloadDir, templateFileName ) ) );
-    }
+//    public RequestBuilder getDownloadTemplateCommand( String peerIp, int peerPort, String templateName,
+//                                                      String templateDownloadToken, String downloadDir )
+//    {
+//        return new RequestBuilder( "curl" ).withCmdArgs( Lists.newArrayList( "-O", "-J", "-L",
+//                String.format( "https://%s:%d/cxf/registry/templates/%s/download/%s", peerIp, peerPort, templateName,
+//                        templateDownloadToken ) ) ).withCwd( downloadDir ).withTimeout( 24 * 60 * 60 );
+//    }
+//
+//
+//    public RequestBuilder getCopyTemplateFromManagementHostCommand( String downloadDir, String templateFileName )
+//    {
+//        return new RequestBuilder(
+//                String.format( "scp root@gw.intra.lan:%s", Paths.get( downloadDir, templateFileName ) ) )
+//                .withTimeout( 180 );
+//    }
+//
+//
+//    public RequestBuilder getImportTemplateCommand( String templateName )
+//    {
+//        return new RequestBuilder( "subutai" ).withCmdArgs( Lists.newArrayList( "import", templateName ) )
+//                                              .withTimeout( 3 * 60 );
+//    }
+//
+//
+//    public RequestBuilder getCheckTemplateImportedCommand( String templateName )
+//    {
+//        return new RequestBuilder( "subutai" ).withCmdArgs( Lists.newArrayList( "list", "-t", templateName ) );
+//    }
+//
+//
+//    public RequestBuilder getCheckTemplateDownloadedCommand( String downloadDir, String templateFileName )
+//    {
+//        return new RequestBuilder(
+//                String.format( "mkdir -p %s ; ls %s", downloadDir, Paths.get( downloadDir, templateFileName ) ) );
+//    }
 }

@@ -92,7 +92,7 @@ public class RemotePeerImpl implements RemotePeer
         this.messenger = messenger;
         this.commandResponseListener = commandResponseListener;
         this.messageResponseListener = messageResponseListener;
-        this.baseUrl = String.format( "https://%s:%s/cxf", peerInfo.getIp(), peerInfo.getPort() );
+        this.baseUrl = String.format( "http://%s:%s/cxf", peerInfo.getIp(), peerInfo.getPort() );
     }
 
 

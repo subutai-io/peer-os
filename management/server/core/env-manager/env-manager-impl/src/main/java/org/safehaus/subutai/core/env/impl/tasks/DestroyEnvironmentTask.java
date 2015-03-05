@@ -20,8 +20,11 @@ import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionExcepti
 import org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -41,24 +44,25 @@ public class DestroyEnvironmentTask implements Runnable
 
     private final EnvironmentManagerImpl environmentManager;
     private final EnvironmentImpl environment;
-    private final Set<EnvironmentDestructionException> exceptions;
+    private final Set<Throwable> exceptions;
     private final ResultHolder<EnvironmentDestructionException> resultHolder;
     private final boolean forceMetadataRemoval;
+    private final LocalPeer localPeer;
     private final Semaphore semaphore;
-    private final Set<Peer> peerStoresToUpdate;
+
 
     public DestroyEnvironmentTask( final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
-                                   final Set<EnvironmentDestructionException> exceptions,
+                                   final Set<Throwable> exceptions,
                                    final ResultHolder<EnvironmentDestructionException> resultHolder,
-                                   final boolean forceMetadataRemoval, final Set<Peer> peersToRemoveCertFrom )
+                                   final boolean forceMetadataRemoval, final LocalPeer localPeer )
     {
         this.environmentManager = environmentManager;
         this.environment = environment;
         this.exceptions = exceptions;
         this.resultHolder = resultHolder;
         this.forceMetadataRemoval = forceMetadataRemoval;
+        this.localPeer = localPeer;
         this.semaphore = new Semaphore( 0 );
-        this.peerStoresToUpdate = peersToRemoveCertFrom;
     }
 
 
@@ -103,7 +107,7 @@ public class DestroyEnvironmentTask implements Runnable
                 }
                 catch ( ExecutionException | InterruptedException e )
                 {
-                    exceptions.add( new EnvironmentDestructionException( e ) );
+                    exceptions.add( ExceptionUtils.getRootCause( e ) );
                 }
             }
 
@@ -114,11 +118,14 @@ public class DestroyEnvironmentTask implements Runnable
                 boolean deleteAllPeerContainers = false;
                 if ( !Strings.isNullOrEmpty( result.getException() ) )
                 {
-                    exceptions.add( new EnvironmentDestructionException( result.getException() ) );
 
                     if ( result.getException().equals( "Container group not found" ) )
                     {
                         deleteAllPeerContainers = true;
+                    }
+                    else
+                    {
+                        exceptions.add( new EnvironmentDestructionException( result.getException() ) );
                     }
                 }
                 if ( deleteAllPeerContainers )
@@ -144,13 +151,36 @@ public class DestroyEnvironmentTask implements Runnable
                 }
             }
 
-            for ( final Peer peer : peerStoresToUpdate )
+            //remove certificates
+            if ( !forceMetadataRemoval )
             {
-                peer.removeEnvironmentCertificates( environment.getId() );
+                environmentPeers.removeAll( environment.getPeers() );
+            }
+            for ( Peer peer : environmentPeers )
+            {
+                if ( !peer.isLocal() )
+                {
+                    try
+                    {
+                        peer.removeEnvironmentCertificates( environment.getId() );
+                    }
+                    catch ( PeerException e )
+                    {
+                        exceptions.add( ExceptionUtils.getRootCause( e ) );
+                    }
+                }
             }
 
             if ( forceMetadataRemoval || environment.getContainerHosts().isEmpty() )
             {
+                try
+                {
+                    localPeer.removeEnvironmentCertificates( environment.getId() );
+                }
+                catch ( PeerException e )
+                {
+                    LOG.error( "Error removing environment certificate from local peer", e );
+                }
                 environmentManager.removeEnvironment( environment.getId() );
             }
             else
@@ -158,7 +188,7 @@ public class DestroyEnvironmentTask implements Runnable
                 environment.setStatus( EnvironmentStatus.UNHEALTHY );
             }
         }
-        catch ( EnvironmentNotFoundException | PeerException e )
+        catch ( EnvironmentNotFoundException e )
         {
             LOG.error( String.format( "Error destroying environment %s", environment.getId() ), e );
 
