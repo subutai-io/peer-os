@@ -44,6 +44,7 @@ generate_truststore_certificate() {
     $(keytool -export -alias $alias -file $client_cert -keystore $keystore -storepass subutai)
 
     $(keytool -import -trustcacerts -alias "" -file $client_cert -keystore $file_path -storepass subutai -noprompt)
+
 	rm $client_cert
 }
 
