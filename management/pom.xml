@@ -93,6 +93,11 @@
 
       <dependency>
         <groupId>${project.groupId}</groupId>
+        <artifactId>jetty-ssl-fragment</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
         <artifactId>test-api</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -104,6 +109,11 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>test-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>test-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 

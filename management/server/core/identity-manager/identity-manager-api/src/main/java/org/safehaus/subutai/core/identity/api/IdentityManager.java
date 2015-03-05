@@ -45,8 +45,7 @@ public interface IdentityManager
      */
     public Serializable login( String username, String password );
 
-    public Serializable loginWithToken( String tokenId , String ip);
-
+    public Serializable loginWithToken( String username );
 
 
     /**

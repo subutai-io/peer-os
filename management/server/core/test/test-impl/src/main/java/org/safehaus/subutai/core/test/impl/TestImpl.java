@@ -39,8 +39,8 @@ public class TestImpl implements Test
 
 
     @Override
-    public Serializable loginWithToken( String tokenId, String ip )
+    public Serializable loginWithToken( String username )
     {
-        return identityManager.loginWithToken( tokenId, ip );
+        return identityManager.loginWithToken( username );
     }
 }
