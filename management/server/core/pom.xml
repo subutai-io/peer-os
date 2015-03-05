@@ -42,6 +42,7 @@
     <module>channel-manager</module>
     <module>test</module>
     <module>jetty-ssl-fragment</module>
+    <module>ssl-context-manager</module>
     <!--    <module>shiro-manager-parent</module>-->
   </modules>
 

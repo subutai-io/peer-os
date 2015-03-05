@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.jetty.fragment;
 
 
+import java.security.KeyStore;
 import java.util.UUID;
 
 import org.eclipse.jetty.util.ssl.SslContextFactory;
@@ -12,14 +13,43 @@ public class TestSslContextFactory extends SslContextFactory
 {
     private static Logger LOG = LoggerFactory.getLogger( TestSslContextFactory.class.getName() );
 
-    private static UUID id;
+    private static UUID id = UUID.randomUUID();
+
+    private static TestSslContextFactory singleton;
+
+    private boolean customStart = false;
+
+    private String _keyStorePassword = "subutai";
+    private String _trustStorePassword = "subutai";
 
 
     public TestSslContextFactory()
     {
         super();
-        id = UUID.randomUUID();
         LOG.error( "CUSTOM SSL FACTORY!!!!! " + id.toString() );
+        TestSslContextFactory.singleton = this;
+    }
+
+
+    public TestSslContextFactory( final boolean trustAll )
+    {
+        super( trustAll );
+        LOG.error( "CUSTOM SSL FACTORY!!!!! " + id.toString() );
+        TestSslContextFactory.singleton = this;
+    }
+
+
+    public TestSslContextFactory( final String keyStorePath )
+    {
+        super( keyStorePath );
+        LOG.error( "CUSTOM SSL FACTORY!!!!! " + id.toString() );
+        TestSslContextFactory.singleton = this;
+    }
+
+
+    public static TestSslContextFactory getSingleton()
+    {
+        return singleton;
     }
 
 
@@ -30,10 +60,49 @@ public class TestSslContextFactory extends SslContextFactory
 
 
     @Override
-    public void setTrustStore( final String trustStorePath )
+    protected void doStop() throws Exception
     {
-        super.setTrustStore( trustStorePath );
+        if ( customStart )
+        {
+            stop();
+            super.doStop();
+        }
+        else
+        {
+            super.doStop();
+        }
+    }
 
-        LOG.error( "TURST STORE PATH >>>" + trustStorePath );
+
+    public void reloadStores()
+    {
+        try
+        {
+            setCustomStart( true );
+            doStop();
+            setCustomStart( false );
+
+            setSslContext( null );
+
+            setKeyStore( ( KeyStore ) null );
+
+            setTrustStore( ( KeyStore ) null );
+
+            setKeyStorePassword( _keyStorePassword );
+
+            setTrustStorePassword( _trustStorePassword );
+
+            doStart();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error restarting ssl context factory", e );
+        }
+    }
+
+
+    public void setCustomStart( final boolean customStart )
+    {
+        this.customStart = customStart;
     }
 }
