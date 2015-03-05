@@ -235,19 +235,22 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
 
     public void refreshHosts()
     {
-        getNodeContainer();
-        for ( Object itemObj : container.getItemIds() )
+        synchronized ( container )
         {
-            UUID itemId = ( UUID ) itemObj;
-            Item item = container.getItem( itemId );
-            Object o = item.getItemProperty( "value" ).getValue();
-            if ( ( o instanceof Host ) && ( ( ( Host ) o ).isConnected() ) )
+            getNodeContainer();
+            for ( Object itemObj : container.getItemIds() )
             {
-                item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
-            }
-            else
-            {
-                item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual_offline.png" ) );
+                UUID itemId = ( UUID ) itemObj;
+                Item item = container.getItem( itemId );
+                Object o = item.getItemProperty( "value" ).getValue();
+                if ( ( o instanceof Host ) && ( ( ( Host ) o ).isConnected() ) )
+                {
+                    item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
+                }
+                else
+                {
+                    item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual_offline.png" ) );
+                }
             }
         }
     }
