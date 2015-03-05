@@ -63,7 +63,7 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
         <Set name="lowResourcesConnections">20000</Set>
         <Set name="lowResourcesMaxIdleTime">5000</Set>
       </New>
-    </Arg>
+    </Arg>yes
   </Call>
   <Call name="addConnector">
     <Arg>

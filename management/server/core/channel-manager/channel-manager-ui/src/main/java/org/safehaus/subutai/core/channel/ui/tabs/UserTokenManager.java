@@ -13,6 +13,7 @@ import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vaadin.data.Item;
 import com.vaadin.server.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
@@ -311,8 +312,9 @@ public class UserTokenManager extends Panel
                 userChannelToken.setValidPeriod( Short.valueOf( editValidityPeriodTxtFld.getValue() ) );
                 channelManager.getChannelTokenManager().saveUserChannelToken( userChannelToken );
 
+
+                //setUserChannelList();
                 subWindow.close();
-                setUserChannelList();
             }
         } );
 
@@ -396,7 +398,7 @@ public class UserTokenManager extends Panel
                         Short.toString( userChannelToken.getValidPeriod() ), userChannelToken.getDate().toString(),
                         ( userChannelToken.getValidPeriod() > 0 ) ? "Valid" : "Expired", userChannelToken.getToken(),
                         editBtn, removeBtn
-                }, null );
+                }, null);
             }
         }
     }
