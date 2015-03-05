@@ -92,8 +92,6 @@ public class TestSslContextFactory extends SslContextFactory
 
             setTrustStorePassword( _trustStorePassword );
 
-            Thread.sleep( 1000 );
-
             doStart();
         }
         catch ( Exception e )
