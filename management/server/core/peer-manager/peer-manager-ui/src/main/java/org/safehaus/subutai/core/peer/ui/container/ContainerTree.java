@@ -216,17 +216,20 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                 }
 
                 // removing destroyed containers
-                Collection children = container.getChildren( rh.getId() );
-                if ( children != null )
+                synchronized ( container )
                 {
-                    for ( final Object id : children )
+                    Collection children = container.getChildren( rh.getId() );
+                    if ( children != null )
                     {
-                        Item item = container.getItem( id );
-                        ContainerHost containerHost = ( ContainerHost ) item.getItemProperty( "value" ).getValue();
-                        if ( !rh.getContainerHosts().contains( containerHost ) )
+                        for ( final Object id : children )
                         {
-                            container.removeItem( item );
-                            tree.removeItem( id );
+                            Item item = container.getItem( id );
+                            ContainerHost containerHost = ( ContainerHost ) item.getItemProperty( "value" ).getValue();
+                            if ( !rh.getContainerHosts().contains( containerHost ) )
+                            {
+                                container.removeItem( item );
+                                tree.removeItem( id );
+                            }
                         }
                     }
                 }
