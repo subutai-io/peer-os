@@ -216,20 +216,18 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                 }
 
                 // removing destroyed containers
-                synchronized ( container )
+
+                Collection children = container.getChildren( rh.getId() );
+                if ( children != null )
                 {
-                    Collection children = container.getChildren( rh.getId() );
-                    if ( children != null )
+                    for ( final Object id : children )
                     {
-                        for ( final Object id : children )
+                        Item item = container.getItem( id );
+                        ContainerHost containerHost = ( ContainerHost ) item.getItemProperty( "value" ).getValue();
+                        if ( !rh.getContainerHosts().contains( containerHost ) )
                         {
-                            Item item = container.getItem( id );
-                            ContainerHost containerHost = ( ContainerHost ) item.getItemProperty( "value" ).getValue();
-                            if ( !rh.getContainerHosts().contains( containerHost ) )
-                            {
-                                container.removeItem( item );
-                                tree.removeItem( id );
-                            }
+                            container.removeItem( item );
+                            tree.removeItem( id );
                         }
                     }
                 }
@@ -249,19 +247,22 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
 
     public void refreshHosts()
     {
-        getNodeContainer();
-        for ( Object itemObj : container.getItemIds() )
+        synchronized ( container )
         {
-            UUID itemId = ( UUID ) itemObj;
-            Item item = container.getItem( itemId );
-            Object o = item.getItemProperty( "value" ).getValue();
-            if ( ( o instanceof Host ) && ( ( ( Host ) o ).isConnected() ) )
+            getNodeContainer();
+            for ( Object itemObj : container.getItemIds() )
             {
-                item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
-            }
-            else
-            {
-                item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual_offline.png" ) );
+                UUID itemId = ( UUID ) itemObj;
+                Item item = container.getItem( itemId );
+                Object o = item.getItemProperty( "value" ).getValue();
+                if ( ( o instanceof Host ) && ( ( ( Host ) o ).isConnected() ) )
+                {
+                    item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
+                }
+                else
+                {
+                    item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual_offline.png" ) );
+                }
             }
         }
     }
