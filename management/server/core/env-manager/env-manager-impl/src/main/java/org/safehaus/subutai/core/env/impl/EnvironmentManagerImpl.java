@@ -215,6 +215,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final ResultHolder<EnvironmentCreationException> resultHolder = new ResultHolder<>();
 
+        try
+        {
+            setupEnvironmentTunnel( environment.getId(), topology.getNodeGroupPlacement().keySet() );
+        }
+        catch ( EnvironmentTunnelException e )
+        {
+            LOG.error( "Setting up secure tunnel", e );
+        }
+
         CreateEnvironmentTask createEnvironmentTask =
                 new CreateEnvironmentTask( peerManager.getLocalPeer(), this, environment, topology, resultHolder );
 
@@ -250,7 +259,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     public void setupEnvironmentTunnel( UUID environmentId, Set<Peer> peers ) throws EnvironmentTunnelException
     {
-        String envAlias =
+        String localEnvAlias =
                 String.format( "env_%s_%s", peerManager.getLocalPeer().getId().toString(), environmentId.toString() );
         Set<Peer> remotePeers = Sets.newHashSet( peers );
         LocalPeer localPeer = peerManager.getLocalPeer();
@@ -259,13 +268,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             try
             {
-                String localPeerCert = localPeer.exportEnvironmentCertificate( envAlias );
+                String localPeerCert = localPeer.exportEnvironmentCertificate( environmentId );
 
                 for ( Peer remotePeer : remotePeers )
                 {
-                    String remotePeerCert = remotePeer.exportEnvironmentCertificate( envAlias );
-                    localPeer.importCertificate( remotePeerCert, envAlias );
-                    remotePeer.importCertificate( localPeerCert, envAlias );
+                    String remotePeerCert = remotePeer.exportEnvironmentCertificate( environmentId );
+                    String remoteEnvAlias =
+                            String.format( "env_%s_%s", remotePeer.getId().toString(), environmentId.toString() );
+                    localPeer.importCertificate( remotePeerCert, remoteEnvAlias );
+                    remotePeer.importCertificate( localPeerCert, localEnvAlias );
                 }
             }
             catch ( Exception e )

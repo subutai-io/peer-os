@@ -258,7 +258,7 @@ public interface RestService
     @POST
     @Path( "cert/export" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response exportEnvironmentCert( @FormParam( "alias" ) String alias );
+    Response exportEnvironmentCert( @FormParam( "environmentId" ) String environmentId );
 
 
     @DELETE

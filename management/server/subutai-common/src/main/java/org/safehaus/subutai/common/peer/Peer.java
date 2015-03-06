@@ -247,7 +247,7 @@ public interface Peer
     public Set<Vni> getReservedVnis() throws PeerException;
 
     /**
-     * Imports certificate to trustStore. Important note here is to restart servlet after trustStore update.
+     * Imports certificate to trustStore. Important note here is not to miss with alias
      *
      * @param cert - cert in HEX representation
      * @param alias - cert alias
@@ -259,11 +259,11 @@ public interface Peer
      * Exports certificate with alias passed and returns cert in HEX String format. And stores new certificate in
      * keyStore.
      *
-     * @param alias - certificate alias
+     * @param environmentId - environmentId to generate cert for
      *
      * @return - certificate in HEX format
      */
-    public String exportEnvironmentCertificate( String alias ) throws PeerException;
+    public String exportEnvironmentCertificate( UUID environmentId ) throws PeerException;
 
 
     /**
