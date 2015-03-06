@@ -23,6 +23,7 @@ import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.common.quota.RamQuota;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
 import org.safehaus.subutai.common.util.JsonUtil;
@@ -661,6 +662,24 @@ public class RestServiceImpl implements RestService
                                                           .getDiskQuota( JsonUtil.<DiskPartition>from( diskPartition,
                                                                   new TypeToken<DiskPartition>()
                                                                   {}.getType() ) ) ) ).build();
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response setRamQuota( final String containerId, final String ramQuota )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            localPeer.getContainerHostById( UUID.fromString( containerId ) )
+                     .setRamQuota( JsonUtil.<RamQuota>fromJson( ramQuota, new TypeToken<RamQuota>()
+                     {}.getType() ) );
+            return Response.ok().build();
         }
         catch ( Exception e )
         {

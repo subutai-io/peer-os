@@ -45,6 +45,7 @@ import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.common.quota.RamQuota;
 import org.safehaus.subutai.common.security.SecurityProvider;
 import org.safehaus.subutai.common.security.crypto.certificate.CertificateData;
 import org.safehaus.subutai.common.security.crypto.certificate.CertificateManager;
@@ -1356,6 +1357,23 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         try
         {
             quotaManager.setDiskQuota( host.getId(), diskQuota );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
+    public void setRamQuota( final ContainerHost host, final RamQuota ramQuota ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( ramQuota, "Invalid ram quota" );
+
+        try
+        {
+            quotaManager.setRamQuota( host.getId(), ramQuota );
         }
         catch ( QuotaException e )
         {

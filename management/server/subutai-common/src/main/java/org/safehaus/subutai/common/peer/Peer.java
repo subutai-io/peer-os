@@ -21,6 +21,7 @@ import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.common.quota.RamQuota;
 
 
 /**
@@ -218,6 +219,14 @@ public interface Peer
      */
     public void setDiskQuota( ContainerHost host, DiskQuota diskQuota ) throws PeerException;
 
+
+    /**
+     * Sets ram quota
+     *
+     * @param host - container
+     * @param ramQuota - quota to set
+     */
+    public void setRamQuota( ContainerHost host, RamQuota ramQuota ) throws PeerException;
 
     /**
      * Destroys hosted part of environment

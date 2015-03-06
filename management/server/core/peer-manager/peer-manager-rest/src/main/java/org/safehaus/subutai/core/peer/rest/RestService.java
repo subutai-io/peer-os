@@ -190,6 +190,10 @@ public interface RestService
     @Path( "container/quota/ram" )
     Response setRamQuota( @FormParam( "containerId" ) String containerId, @FormParam( "ram" ) int ram );
 
+    @POST
+    @Path( "container/quota/ram2" )
+    Response setRamQuota( @FormParam( "containerId" ) String containerId, @FormParam( "ramQuota" ) String ramQuota );
+
     @GET
     @Path( "container/quota/cpu" )
     @Produces( { MediaType.APPLICATION_JSON } )
