@@ -39,7 +39,7 @@ public class ChannelSettings
 
             "/cxf/identity/key/{username}",
 
-            "/cxf/messenger/message",
+            "/cxf/messenger/message", "/cxf/peer/gateways",
 
             "/cxf/monitor/metrics/resource-hosts",
             //"/cxf/monitor/metrics/containers-hosts/{environmentId}",
