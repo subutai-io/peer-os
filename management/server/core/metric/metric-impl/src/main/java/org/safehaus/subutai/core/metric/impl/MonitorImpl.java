@@ -4,7 +4,6 @@ package org.safehaus.subutai.core.metric.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +12,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
@@ -22,6 +20,7 @@ import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.metric.HistoricalMetric;
+import org.safehaus.subutai.common.metric.MetricType;
 import org.safehaus.subutai.common.metric.OwnerResourceUsage;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.metric.ResourceHostMetric;
@@ -33,10 +32,8 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.StringUtil;
-import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
-import org.safehaus.subutai.common.metric.MetricType;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.MonitoringSettings;
@@ -73,25 +70,21 @@ public class MonitorImpl implements Monitor
             Collections.newSetFromMap( new ConcurrentHashMap<AlertListener, Boolean>() );
     private final Commands commands = new Commands();
     private final PeerManager peerManager;
-    private EnvironmentManager environmentManager;
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     protected MonitorDao monitorDao;
     protected DaoManager daoManager;
 
 
-    public MonitorImpl( PeerManager peerManager, DaoManager daoManager, EnvironmentManager environmentManager )
-            throws MonitorException
+    public MonitorImpl( PeerManager peerManager, DaoManager daoManager ) throws MonitorException
     {
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( daoManager );
-        Preconditions.checkNotNull( environmentManager );
 
         try
         {
             this.daoManager = daoManager;
             this.monitorDao = new MonitorDao( daoManager.getEntityManagerFactory() );
             this.peerManager = peerManager;
-            this.environmentManager = environmentManager;
             peerManager.addRequestListener( new RemoteAlertListener( this ) );
             peerManager.addRequestListener( new RemoteMetricRequestListener( this ) );
             peerManager.addRequestListener( new MonitoringActivationListener( this, peerManager ) );
@@ -675,6 +668,10 @@ public class MonitorImpl implements Monitor
             ContainerGroup containerGroup = localPeer.findContainerGroupByContainerId( containerHost.getId() );
 
 
+            //set environment id
+            containerHostMetric.setEnvironmentId( containerGroup.getEnvironmentId() );
+
+
             Peer creatorPeer = peerManager.getPeer( containerGroup.getInitiatorPeerId() );
 
             //if container is "created" by local peer, notifyOnAlert local peer
@@ -709,35 +706,8 @@ public class MonitorImpl implements Monitor
     {
         try
         {
-            //find container's environment
-            Set<Environment> environments = environmentManager.getEnvironments();
-            ContainerHost containerHost = null;
-            outer:
-            for ( Environment environment : environments )
-            {
-                for ( ContainerHost container : environment.getContainerHosts() )
-                {
-                    if ( container.getId().equals( metric.getHostId() ) )
-                    {
-                        containerHost = container;
-                        break outer;
-                    }
-                }
-            }
-
-            if ( containerHost == null )
-            {
-                throw new MonitorException(
-                        String.format( "Could not find alert container within existing environments by id %s",
-                                metric.getHostId() ) );
-            }
-
-            metric.setEnvironmentId( UUID.fromString( containerHost.getEnvironmentId() ) );
-
-
-            //search for environment, if not found then no-op
-            Set<String> subscribersIds = monitorDao.getEnvironmentSubscribersIds( metric.getEnvironmentId() );
             //search for subscriber if not found then no-op
+            Set<String> subscribersIds = monitorDao.getEnvironmentSubscribersIds( metric.getEnvironmentId() );
             for ( String subscriberId : subscribersIds )
             {
                 //notify subscriber on alert
@@ -789,42 +759,51 @@ public class MonitorImpl implements Monitor
 
 
     @Override
-    public List<HistoricalMetric> getHistoricalMetric( final Host host, final MetricType metricType ) {
+    public List<HistoricalMetric> getHistoricalMetric( final Host host, final MetricType metricType )
+    {
         Preconditions.checkNotNull( host );
         Preconditions.checkNotNull( metricType );
 
         List<HistoricalMetric> metrics = new ArrayList<>();
 
-            //execute metrics command
-        CommandResult result = null;
-        ResourceHost resourceHost = null;
-        try {
+        //execute metrics command
+        CommandResult result;
+        ResourceHost resourceHost;
+        try
+        {
             RequestBuilder historicalMetricCommand = commands.getHistoricalMetricCommand( host, metricType );
-            if ( ! (host instanceof ResourceHost ) ) {
+            if ( !( host instanceof ResourceHost ) )
+            {
                 resourceHost = peerManager.getLocalPeer().getResourceHostByContainerId( host.getId() );
-            } else {
+            }
+            else
+            {
                 resourceHost = ( ResourceHost ) host;
             }
             result = resourceHost.execute( historicalMetricCommand );
         }
-        catch ( CommandException e ) {
+        catch ( CommandException e )
+        {
             LOG.error( "Could not run command successfully! Error: {}", e );
             return null;
         }
-        catch ( HostNotFoundException e ) {
-           LOG.error( "Could not find resource host of host {}!", host.getHostname() );
+        catch ( HostNotFoundException e )
+        {
+            LOG.error( "Could not find resource host of host {}!", host.getHostname() );
             return null;
         }
         if ( result.hasSucceeded() )
         {
-            String lines[] = result.getStdOut().split("\\r?\\n");
+            String lines[] = result.getStdOut().split( "\\r?\\n" );
             int timestamp;
             double value;
-            for ( String line : lines ) {
+            for ( String line : lines )
+            {
                 int seperatorIndex = line.indexOf( ":" );
                 timestamp = Integer.parseInt( line.substring( 0, seperatorIndex ) );
-                value = Double.parseDouble( line.substring( seperatorIndex+1 ).trim() );
-                switch ( metricType ) {
+                value = Double.parseDouble( line.substring( seperatorIndex + 1 ).trim() );
+                switch ( metricType )
+                {
                     case RAM:
                     case DISK_HOME:
                     case DISK_OPT:
@@ -840,13 +819,12 @@ public class MonitorImpl implements Monitor
                     default:
                         break;
                 }
-                metrics.add( new HistoricalMetric( host, metricType ,timestamp, value ) );
+                metrics.add( new HistoricalMetric( host, metricType, timestamp, value ) );
             }
         }
         else
         {
-            LOG.error( String.format( "Error getting metrics from %s: %s", host.getHostname(),
-                    result.getStdErr() ) );
+            LOG.error( String.format( "Error getting metrics from %s: %s", host.getHostname(), result.getStdErr() ) );
         }
 
         return metrics;
@@ -855,14 +833,19 @@ public class MonitorImpl implements Monitor
 
     @Override
     public Map<UUID, List<HistoricalMetric>> getHistoricalMetrics( final Collection<Host> hosts,
-                                                                   final MetricType metricType ) {
+                                                                   final MetricType metricType )
+    {
         final Map<UUID, List<HistoricalMetric>> historicalMetrics = new ConcurrentHashMap<>();
 
-        for ( Host host : hosts ) {
-            try {
+        for ( Host host : hosts )
+        {
+            try
+            {
                 List<HistoricalMetric> historicalMetric = getHistoricalMetric( host, metricType );
                 historicalMetrics.put( historicalMetric.get( 0 ).getHost().getId(), historicalMetric );
-            } catch ( Exception e ) {
+            }
+            catch ( Exception e )
+            {
                 continue;
             }
         }
@@ -870,33 +853,35 @@ public class MonitorImpl implements Monitor
         // TODO enable this block as it executes the commands asynchronously
         // when agent can read them without problem and returns a response
 
-//        ExecutorService executor = Executors.newFixedThreadPool( hosts.size() );
-//        final Map<UUID, List<HistoricalMetric>> historicalMetrics = new ConcurrentHashMap<>();
-//        for ( final Host host : hosts ) {
-//            executor.execute( new Runnable() {
-//                @Override
-//                public void run() {
-//                    try {
-//                        List<HistoricalMetric> historicalMetric = getHistoricalMetric( host, metricType );
-//                        historicalMetrics.put( historicalMetric.get( 0 ).getHost().getId(), historicalMetric );
-//                    } catch ( Exception e ) {
-//                    }
-//                }
-//            }
-//                            );
-//        }
-//        executor.shutdown();
-//        int timeout = 5;
-//        LOG.info( "Waiting for all threads to retrieve historical data for {} to finish {} seconds maximum."
-//                , metricType, timeout );
-//        // Wait until all threads are finished
-//        try {
-//            executor.awaitTermination( timeout, TimeUnit.SECONDS );
-//        } catch (InterruptedException e) {
-//            LOG.error( e.getMessage() );
-//        }
-//
-//        LOG.info( "All threads finished/timed out for retrieving {} metric. Size: {}", metricType, historicalMetrics.size() );
+        //        ExecutorService executor = Executors.newFixedThreadPool( hosts.size() );
+        //        final Map<UUID, List<HistoricalMetric>> historicalMetrics = new ConcurrentHashMap<>();
+        //        for ( final Host host : hosts ) {
+        //            executor.execute( new Runnable() {
+        //                @Override
+        //                public void run() {
+        //                    try {
+        //                        List<HistoricalMetric> historicalMetric = getHistoricalMetric( host, metricType );
+        //                        historicalMetrics.put( historicalMetric.get( 0 ).getHost().getId(),
+        // historicalMetric );
+        //                    } catch ( Exception e ) {
+        //                    }
+        //                }
+        //            }
+        //                            );
+        //        }
+        //        executor.shutdown();
+        //        int timeout = 5;
+        //        LOG.info( "Waiting for all threads to retrieve historical data for {} to finish {} seconds maximum."
+        //                , metricType, timeout );
+        //        // Wait until all threads are finished
+        //        try {
+        //            executor.awaitTermination( timeout, TimeUnit.SECONDS );
+        //        } catch (InterruptedException e) {
+        //            LOG.error( e.getMessage() );
+        //        }
+        //
+        //        LOG.info( "All threads finished/timed out for retrieving {} metric. Size: {}", metricType,
+        // historicalMetrics.size() );
 
         return historicalMetrics;
     }

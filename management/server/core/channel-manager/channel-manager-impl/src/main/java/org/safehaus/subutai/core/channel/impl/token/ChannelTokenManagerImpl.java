@@ -37,7 +37,7 @@ public class ChannelTokenManagerImpl implements ChannelTokenManager
     /***********************************************************************************************************
      *
      * */
-    public long getUserChannelToken(String token)
+    public long getUserChannelTokenId(String token)
     {
         long user_id = 0;
         EntityManager entityManager = EntityManagerFactory.createEntityManager();
@@ -70,6 +70,33 @@ public class ChannelTokenManagerImpl implements ChannelTokenManager
         return  user_id;
 
     }
+    /***********************************************************************************************************
+     *
+     * */
+    public IUserChannelToken getUserChannelToken(String token)
+    {
+        IUserChannelToken userChannelToken = null;
+        EntityManager entityManager = EntityManagerFactory.createEntityManager();
+
+        try
+        {
+            Query query;
+            query = entityManager.createQuery( "select ucht FROM UserChannelToken AS ucht WHERE ucht.token=:tokenParam and ucht.validPeriod>0" );
+            query.setParameter( "tokenParam", token );
+            userChannelToken = (UserChannelToken)query.getSingleResult();
+        }
+        catch ( Exception e )
+        {
+        }
+        finally
+        {
+            if(entityManager.isOpen())
+                entityManager.close();
+        }
+
+        return  userChannelToken;
+
+    }
 
     /***********************************************************************************************************
      *
@@ -84,9 +111,10 @@ public class ChannelTokenManagerImpl implements ChannelTokenManager
 
             //-------- Update Validity Period ------------------------------------------------------------------------------
             Query query;
+
             query = entityManager.createNativeQuery(" update user_channel_token set valid_period  = "
-                    + " case when (valid_period - datediff(hour,user_channel_token.date,CURRENT_TIMESTAMP))<=0 then  0"
-                    + " else  valid_period - datediff(hour,user_channel_token.date,CURRENT_TIMESTAMP)"
+                    + " case when (valid_period-1)<0 then  0"
+                    + " else valid_period-1"
                     + " end" );
 
             query.executeUpdate();

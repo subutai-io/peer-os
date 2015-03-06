@@ -41,7 +41,7 @@ public class UserEntity implements User
             "user_id" ), inverseJoinColumns = @JoinColumn( name = "role_name", referencedColumnName = "name" ) )
     Set<Role> roles = new HashSet<>();
 
-    @Column( name = "user_name" )
+    @Column( name = "user_name" ,unique=true )
     private String username;
 
     @Column( name = "full_name" )
@@ -140,6 +140,11 @@ public class UserEntity implements User
     public void removeRole( final Role roleEntity )
     {
         roles.remove( roleEntity );
+    }
+    @Override
+    public void removeAllRoles( )
+    {
+        roles.clear();
     }
 
 

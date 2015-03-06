@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.PeerException;
@@ -28,7 +29,11 @@ public interface ManagementHost extends Host
 
     public void reserveVni( Vni vni ) throws PeerException;
 
+    public Set<Gateway> getGateways() throws PeerException;
+
     public void createGateway( String gatewayIp, int vlan ) throws PeerException;
 
     public void removeGateway( int vlan ) throws PeerException;
+
+    public void cleanupEnvironmentNetworkSettings( final UUID environmentId ) throws PeerException;
 }
