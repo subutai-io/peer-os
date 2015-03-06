@@ -312,8 +312,17 @@ public class UserTokenManager extends Panel
                 userChannelToken.setValidPeriod( Short.valueOf( editValidityPeriodTxtFld.getValue() ) );
                 channelManager.getChannelTokenManager().saveUserChannelToken( userChannelToken );
 
+                Item rowItem = tokenTable.getItem( userChannelToken );
+                Property property1 = rowItem.getItemProperty( "Token Name" );
+                Property property2 = rowItem.getItemProperty("Ip range");
+                Property property3 = rowItem.getItemProperty("TTL");
+                Property property4 = rowItem.getItemProperty("Create date");
 
-                //setUserChannelList();
+                property1.setValue(userChannelToken.getTokenName());
+                property2.setValue(userChannelToken.getIpRangeStart()+"-"+userChannelToken.getIpRangeEnd());
+                property3.setValue(Short.toString( userChannelToken.getValidPeriod()));
+                property4.setValue(userChannelToken.getDate().toString());
+
                 subWindow.close();
             }
         } );
@@ -398,7 +407,7 @@ public class UserTokenManager extends Panel
                         Short.toString( userChannelToken.getValidPeriod() ), userChannelToken.getDate().toString(),
                         ( userChannelToken.getValidPeriod() > 0 ) ? "Valid" : "Expired", userChannelToken.getToken(),
                         editBtn, removeBtn
-                }, null);
+                }, userChannelToken);
             }
         }
     }
