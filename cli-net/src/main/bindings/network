@@ -77,7 +77,7 @@ function network {
        echo "#vlan_id = $vlanID"  >> $config
        # get macaddress_of_container to initialize ovs bridges' name
        macaddress_of_container=`cat $config | grep lxc.network.hwaddr | cut -d "=" -f 2 | tr -d ' '`
-       local gateway="`echo $ipAddress | awk -F"/" '{print $1}' | sed '$s/.$/1/'`"
+       local gateway="`getgw $ipAddress`"
        echo "route add default gw $gateway" >> $gwup
        #Remove ':' characters from macaddress to initialize ovs_bridges
        ovs_port_name=`echo $macaddress_of_container | tr -d ':'`
