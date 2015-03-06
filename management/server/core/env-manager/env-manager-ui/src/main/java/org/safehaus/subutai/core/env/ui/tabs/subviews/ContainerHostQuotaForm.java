@@ -177,6 +177,8 @@ public class ContainerHostQuotaForm extends VerticalLayout
             }
             catch ( Exception e )
             {
+                updateChanges.setEnabled( true );
+                parent.setEnabled( true );
                 Notification.show( String.format( "Error setting quota: %s", e.getMessage() ),
                         Notification.Type.ERROR_MESSAGE );
             }
