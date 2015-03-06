@@ -198,10 +198,10 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     @Override
     public User getUser()
     {
-        logActiveSessions();
+//        logActiveSessions();
 
         SubutaiLoginContext loginContext = getSubutaiLoginContext();
-        LOG.debug( String.format( "Login context: [%s] ", loginContext ) );
+//        LOG.debug( String.format( "Login context: [%s] ", loginContext ) );
 
         if ( loginContext instanceof NullSubutaiLoginContext )
         {

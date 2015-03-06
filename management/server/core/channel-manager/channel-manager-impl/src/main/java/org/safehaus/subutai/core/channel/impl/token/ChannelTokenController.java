@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.channel.impl.token;
 
 
+import org.safehaus.subutai.core.channel.api.token.ChannelTokenManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,25 +12,29 @@ import org.slf4j.LoggerFactory;
 public class ChannelTokenController implements Runnable
 {
     private final static Logger LOG = LoggerFactory.getLogger( ChannelTokenController.class );
+    private ChannelTokenManager channelTokenManager = null;
+
+    public ChannelTokenController(ChannelTokenManager channelTokenManager)
+    {
+        this.channelTokenManager = channelTokenManager;
+    }
 
     @Override
     public void run()
     {
-        while (true)
+        try
         {
-            try
+            while (true)
             {
-                //ChannelTokenManagerImpl.setTokenValidity();
-
                 LOG.info( "******** Channel Token Controller invoked *********" );
+                channelTokenManager.setTokenValidity();
 
-
-                Thread.sleep( 60 * 1000 );
+                Thread.sleep( 60 * 60 * 1000 );
             }
-            catch (InterruptedException e)
-            {
-                e.printStackTrace();
-            }
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
         }
     }
 }

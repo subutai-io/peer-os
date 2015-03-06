@@ -238,13 +238,13 @@ public class QuotaManagerImpl implements QuotaManager
         }
         else
         {
-            String regex = "(\\d+(?:\\.\\d+)?)(K|M|G|T|P|E)?";
+            String regex = "(\\d+(?:[\\.,]\\d+)?)(K|M|G|T|P|E)?";
             Pattern quotaPattern = Pattern.compile( regex );
             Matcher quotaMatcher = quotaPattern.matcher( result.getStdOut().trim() );
             if ( quotaMatcher.matches() )
             {
                 String quotaValue = quotaMatcher.group( 1 );
-                double value = Double.parseDouble( quotaValue );
+                double value = Double.parseDouble( quotaValue.replace(",", ".") );
                 String acronym = quotaMatcher.group( 2 );
                 DiskQuotaUnit diskQuotaUnit = DiskQuotaUnit.parseFromAcronym( acronym );
                 return new DiskQuota( diskPartition, diskQuotaUnit == null ? DiskQuotaUnit.BYTE : diskQuotaUnit,
@@ -321,13 +321,13 @@ public class QuotaManagerImpl implements QuotaManager
         }
         else
         {
-            String regex = "(\\d+(?:\\.\\d+)?)(K|M|G|T|P|E)?";
+            String regex = "(\\d+(?:[\\.,]\\d+)?)(K|M|G|T|P|E)?";
             Pattern quotaPattern = Pattern.compile( regex );
             Matcher quotaMatcher = quotaPattern.matcher( result.getStdOut().trim() );
             if ( quotaMatcher.matches() )
             {
                 String quotaValue = quotaMatcher.group( 1 );
-                double value = Double.parseDouble( quotaValue );
+                double value = Double.parseDouble( quotaValue.replace(",", ".") );
                 String acronym = quotaMatcher.group( 2 );
                 DiskQuotaUnit diskQuotaUnit = DiskQuotaUnit.parseFromAcronym( acronym );
                 return new DiskQuota( diskPartition, diskQuotaUnit == null ? DiskQuotaUnit.BYTE : diskQuotaUnit,

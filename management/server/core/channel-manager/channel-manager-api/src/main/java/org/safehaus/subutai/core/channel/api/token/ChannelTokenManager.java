@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.channel.api.token;
 
 
+import java.util.List;
+
 import javax.persistence.EntityManagerFactory;
 
 import org.safehaus.subutai.core.channel.api.entity.IUserChannelToken;
@@ -32,7 +34,10 @@ public interface ChannelTokenManager
      * */
     public void setTokenValidity();
 
-
+    /***********************************************************************************************************
+     *
+     * */
+    public void removeUserChannelToken(String token);
     /***********************************************************************************************************
      *
      * */
@@ -41,7 +46,13 @@ public interface ChannelTokenManager
     /***********************************************************************************************************
      *
      * */
-    public  IUserChannelToken getUserChannelTokenData(long userId);
+    public List<IUserChannelToken> getUserChannelTokenData(long userId);
+
+
+    /***********************************************************************************************************
+     *
+     * */
+    List<IUserChannelToken> getAllUserChannelTokenData();
 
 
     /***********************************************************************************************************

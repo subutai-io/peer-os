@@ -100,7 +100,7 @@ public class ContainerHostQuotaForm extends VerticalLayout
                     Double diskHome = Double.parseDouble(
                             diskHomeTextField.getValue().substring( 0, diskHomeTextField.getValue().length() - 1 ) );
                     containerHost
-                            .setDiskQuota( new DiskQuota( DiskPartition.HOME, DiskQuotaUnit.MB, diskHome.intValue() ) );
+                            .setDiskQuota( new DiskQuota( DiskPartition.HOME, DiskQuotaUnit.MB, diskHome) );
                 }
 
 
@@ -113,7 +113,7 @@ public class ContainerHostQuotaForm extends VerticalLayout
                     Double diskRootfs = Double.parseDouble( diskRootfsTextField.getValue().substring( 0,
                             diskRootfsTextField.getValue().length() - 1 ) );
                     containerHost.setDiskQuota(
-                            new DiskQuota( DiskPartition.ROOT_FS, DiskQuotaUnit.MB, diskRootfs.intValue() ) );
+                            new DiskQuota( DiskPartition.ROOT_FS, DiskQuotaUnit.MB, diskRootfs ) );
                 }
 
                 if ( diskOptTextField.getValue().equals( "none" ) )
@@ -125,7 +125,7 @@ public class ContainerHostQuotaForm extends VerticalLayout
                     Double diskOpt = Double.parseDouble(
                             diskOptTextField.getValue().substring( 0, diskOptTextField.getValue().length() - 1 ) );
                     containerHost
-                            .setDiskQuota( new DiskQuota( DiskPartition.OPT, DiskQuotaUnit.MB, diskOpt.intValue() ) );
+                            .setDiskQuota( new DiskQuota( DiskPartition.OPT, DiskQuotaUnit.MB, diskOpt ) );
                 }
 
                 if ( diskVarTextField.getValue().equals( "none" ) )
@@ -137,7 +137,7 @@ public class ContainerHostQuotaForm extends VerticalLayout
                     Double diskVar = Double.parseDouble(
                             diskVarTextField.getValue().substring( 0, diskVarTextField.getValue().length() - 1 ) );
                     containerHost
-                            .setDiskQuota( new DiskQuota( DiskPartition.VAR, DiskQuotaUnit.MB, diskVar.intValue() ) );
+                            .setDiskQuota( new DiskQuota( DiskPartition.VAR, DiskQuotaUnit.MB, diskVar ) );
                 }
             }
             catch ( PeerException e )

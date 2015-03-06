@@ -20,6 +20,7 @@ import org.safehaus.subutai.server.ui.component.ConcurrentComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
@@ -38,7 +39,6 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
     private final Tree tree;
     private HierarchicalContainer container;
     private Set<Host> selectedHosts = new HashSet<>();
-    //    private final ScheduledExecutorService scheduler;
     private Item managementHostItem;
 
 
@@ -111,17 +111,6 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
             }
         } );
         addComponent( tree );
-        //        scheduler = Executors.newScheduledThreadPool( 1 );
-        //
-        //        scheduler.scheduleWithFixedDelay( new Runnable()
-        //        {
-        //            public void run()
-        //            {
-        //                LOG.info( "Refreshing containers state..." );
-        //                refreshHosts();
-        //                LOG.info( "Refreshing done." );
-        //            }
-        //        }, 5, 30, TimeUnit.SECONDS );
 
         final ContainerTree THIS = this;
         addAttachListener( new AttachListener()
@@ -216,10 +205,12 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                 }
 
                 // removing destroyed containers
+
                 Collection children = container.getChildren( rh.getId() );
                 if ( children != null )
                 {
-                    for ( final Object id : children )
+                    Set<Object> ids = Sets.newConcurrentHashSet( children );
+                    for ( final Object id : ids )
                     {
                         Item item = container.getItem( id );
                         ContainerHost containerHost = ( ContainerHost ) item.getItemProperty( "value" ).getValue();
@@ -229,6 +220,21 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                             tree.removeItem( id );
                         }
                     }
+                }
+            }
+
+            for ( Object itemObj : container.getItemIds() )
+            {
+                UUID itemId = ( UUID ) itemObj;
+                Item item = container.getItem( itemId );
+                Object o = item.getItemProperty( "value" ).getValue();
+                if ( ( o instanceof Host ) && ( ( ( Host ) o ).isConnected() ) )
+                {
+                    item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
+                }
+                else
+                {
+                    item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual_offline.png" ) );
                 }
             }
         }
@@ -246,20 +252,9 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
 
     public void refreshHosts()
     {
-        getNodeContainer();
-        for ( Object itemObj : container.getItemIds() )
+        synchronized ( container )
         {
-            UUID itemId = ( UUID ) itemObj;
-            Item item = container.getItem( itemId );
-            Object o = item.getItemProperty( "value" ).getValue();
-            if ( ( o instanceof Host ) && ( ( ( Host ) o ).isConnected() ) )
-            {
-                item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
-            }
-            else
-            {
-                item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual_offline.png" ) );
-            }
+            getNodeContainer();
         }
     }
 
