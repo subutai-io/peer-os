@@ -4,6 +4,6 @@ Section: devel
 Installed-Size: 42681
 Maintainer: subutai 
 Architecture: amd64 
-Version: 1.0.3
+Version: 1.0.4
 Depends: subutai-hadoop, subutai-zookeeper, expect
 Description: This is a accumulo package of subutai distribution.
