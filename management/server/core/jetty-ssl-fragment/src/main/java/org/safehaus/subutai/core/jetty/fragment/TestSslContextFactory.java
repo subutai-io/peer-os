@@ -78,6 +78,7 @@ public class TestSslContextFactory extends SslContextFactory
     {
         try
         {
+            LOG.debug( String.format( "Reloading ssl context factory" ) );
             setCustomStart( true );
             doStop();
             setCustomStart( false );

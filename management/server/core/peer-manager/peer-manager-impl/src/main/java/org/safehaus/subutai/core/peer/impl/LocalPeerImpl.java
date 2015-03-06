@@ -1530,24 +1530,34 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     public void importCertificate( final String cert, final String alias ) throws PeerException
     {
         //************ Save Trust SSL Cert **************************************
-        KeyStore keyStore;
-        KeyStoreData keyStoreData;
-        KeyStoreManager keyStoreManager;
+        try
+        {
+            KeyStoreData keyStoreData = new KeyStoreData();
 
-        keyStoreData = new KeyStoreData();
-        keyStoreData.setupTrustStorePx2();
-        keyStoreData.setHEXCert( cert );
-        keyStoreData.setAlias( alias );
+            keyStoreData.setupTrustStorePx2();
+            keyStoreData.setHEXCert( cert );
+            keyStoreData.setAlias( alias );
 
-        keyStoreManager = new KeyStoreManager();
-        keyStore = keyStoreManager.load( keyStoreData );
-        keyStoreData.setAlias( alias );
+            KeyStoreManager keyStoreManager = new KeyStoreManager();
+            KeyStore keyStore = keyStoreManager.load( keyStoreData );
+            List<String> aliasList = Collections.list( keyStore.aliases() );
+            if ( !aliasList.contains( alias ) )
+            {
+                keyStoreData.setAlias( alias );
 
-        keyStoreManager.importCertificateHEXString( keyStore, keyStoreData );
-        //***********************************************************************
-        LOG.warn( String.format( "Importing new certificate to trustStore with alias: %s", alias ) );
-        this.sslContextFactory.reloadTrustStore();
-        //        new Thread( new RestartCoreServlet( 4 ) ).start();
+                //        keyStoreManager.getEntries(  )
+
+                keyStoreManager.importCertificateHEXString( keyStore, keyStoreData );
+                //***********************************************************************
+                LOG.debug( String.format( "Importing new certificate to trustStore with alias: %s", alias ) );
+                this.sslContextFactory.reloadTrustStore();
+                //        new Thread( new RestartCoreServlet( 4 ) ).start();
+            }
+        }
+        catch ( KeyStoreException e )
+        {
+            LOG.error( "Error getting aliases", e );
+        }
     }
 
 
@@ -1555,42 +1565,53 @@ public class LocalPeerImpl implements LocalPeer, HostListener
      * Exports certificate with alias passed and returns cert in HEX String format. And stores new certificate in
      * keyStore.
      *
-     * @param alias - certificate alias
+     * @param environmentId - environmentId to generate cert for
      *
      * @return - certificate in HEX format
      */
     @Override
-    public String exportEnvironmentCertificate( final String alias ) throws PeerException
+    public String exportEnvironmentCertificate( final UUID environmentId ) throws PeerException
     {
+        String alias = String.format( "env_%s_%s", peerManager.getLocalPeer().getPeerInfo().getId().toString(),
+                environmentId.toString() );
+
         KeyStoreData environmentKeyStoreData = new KeyStoreData();
         environmentKeyStoreData.setupKeyStorePx2();
         environmentKeyStoreData.setAlias( alias );
 
-        CertificateData certData = new CertificateData();
-        //TODO Instead of envId CN Will be gpg fingerprint.
-        certData.setCommonName( alias );
-
-
-        CertificateManager certManager = new CertificateManager();
-        certManager.setDateParamaters();
-
         KeyStoreManager keyStoreManager = new KeyStoreManager();
         KeyStore keyStore = keyStoreManager.load( environmentKeyStoreData );
 
+        try
+        {
+            List<String> aliasList = Collections.list( keyStore.aliases() );
+            if ( !aliasList.contains( alias ) )
+            {
+                KeyManager keyManager = new KeyManager();
+                KeyPairGenerator keyPairGenerator = keyManager.prepareKeyPairGeneration( KeyPairType.RSA, 1024 );
+                KeyPair keyPair = keyManager.generateKeyPair( keyPairGenerator );
 
-        KeyManager keyManager = new KeyManager();
-        KeyPairGenerator keyPairGenerator = keyManager.prepareKeyPairGeneration( KeyPairType.RSA, 1024 );
-        KeyPair keyPair = keyManager.generateKeyPair( keyPairGenerator );
+                CertificateData certData = new CertificateData();
+                //TODO Instead of envId CN Will be gpg fingerprint.
+                certData.setCommonName( alias );
 
+                CertificateManager certManager = new CertificateManager();
+                certManager.setDateParamaters();
 
-        X509Certificate cert = certManager
-                .generateSelfSignedCertificate( keyStore, keyPair, SecurityProvider.BOUNCY_CASTLE, certData );
+                X509Certificate cert = certManager
+                        .generateSelfSignedCertificate( keyStore, keyPair, SecurityProvider.BOUNCY_CASTLE, certData );
 
-        keyStoreManager.saveX509Certificate( keyStore, environmentKeyStoreData, cert, keyPair );
+                keyStoreManager.saveX509Certificate( keyStore, environmentKeyStoreData, cert, keyPair );
 
-        sslContextFactory.reloadKeyStore();
-        LOG.warn( String.format( "Saving new certificate to keyStore with alias: %s", alias ) );
-
+                sslContextFactory.reloadKeyStore();
+                LOG.debug( String.format( "Saving new certificate to keyStore with alias: %s", alias ) );
+            }
+        }
+        catch ( KeyStoreException e )
+        {
+            LOG.error( "Error getting environment", e );
+        }
+        LOG.debug( String.format( "Returning certificate for alias %s", alias ) );
         return keyStoreManager.exportCertificateHEXString( keyStore, environmentKeyStoreData );
     }
 
@@ -1603,20 +1624,32 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     @Override
     public void removeEnvironmentCertificates( final UUID environmentId ) throws PeerException
     {
+        KeyStoreData storeData = new KeyStoreData();
+
+        storeData.setupTrustStorePx2();
+        removeEnvironmentCertificateFromStore( environmentId, storeData );
+        LOG.debug( "clearing up trustStore" );
+
+
+        storeData.setupKeyStorePx2();
+        removeEnvironmentCertificateFromStore( environmentId, storeData );
+        LOG.debug( "clearing up keyStore" );
+    }
+
+
+    private void removeEnvironmentCertificateFromStore( UUID environmentId, KeyStoreData storeData )
+    {
         try
         {
             //************ Delete Trust SSL Cert **************************************
-            KeyStore keyStore;
-            KeyStoreData keyStoreData;
-            KeyStoreManager keyStoreManager;
+            KeyStore trustStore;
+            KeyStoreManager trustStoreManager;
 
-            keyStoreData = new KeyStoreData();
-            keyStoreData.setupTrustStorePx2();
-            keyStoreManager = new KeyStoreManager();
+            trustStoreManager = new KeyStoreManager();
 
-            keyStore = keyStoreManager.load( keyStoreData );
+            trustStore = trustStoreManager.load( storeData );
 
-            List<String> aliasList = Collections.list( keyStore.aliases() );
+            List<String> aliasList = Collections.list( trustStore.aliases() );
             for ( final String alias : aliasList )
             {
                 String parseId[] = alias.split( "_" );
@@ -1626,10 +1659,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                     UUID envIdFromAlias = UUID.fromString( parseId[2] );
                     if ( envIdFromAlias.equals( environmentId ) )
                     {
-                        LOG.warn( String.format( "Removing environment certificate with alias: %s", alias ) );
-                        keyStoreData.setAlias( alias );
-                        KeyStore keyStoreToRemove = keyStoreManager.load( keyStoreData );
-                        keyStoreManager.deleteEntry( keyStoreToRemove, keyStoreData );
+                        LOG.debug( String.format( "Removing environment certificate with alias: %s", alias ) );
+                        storeData.setAlias( alias );
+                        KeyStore keyStoreToRemove = trustStoreManager.load( storeData );
+                        trustStoreManager.deleteEntry( keyStoreToRemove, storeData );
                     }
                 }
             }
@@ -1643,6 +1676,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             LOG.error( "Error removing environment certificate.", e );
         }
     }
+
+
+    ;
 
 
     @Override

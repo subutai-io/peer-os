@@ -763,12 +763,12 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response exportEnvironmentCert( final String alias )
+    public Response exportEnvironmentCert( final String environmentId )
     {
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            String certHEX = localPeer.exportEnvironmentCertificate( alias );
+            String certHEX = localPeer.exportEnvironmentCertificate( UUID.fromString( environmentId ) );
             return Response.ok( certHEX ).build();
         }
         catch ( PeerException e )

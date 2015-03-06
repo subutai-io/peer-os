@@ -75,6 +75,7 @@ public class RestUtil
                     client = createTrustedWebClient( url );
                     break;
                 case ChannelSettings.SECURE_PORT_X2:
+                    LOG.debug( String.format( "Request type: %s, %s", requestType, url ) );
                     client = createTrustedWebClientWithAuth( url, alias );
                     break;
                 case ChannelSettings.SECURE_PORT_X3:
@@ -227,7 +228,8 @@ public class RestUtil
         keyStoreData.setAlias( alias );
         KeyStore keyStore = keyStoreManager.load( keyStoreData );
 
-        LOG.warn( String.format( "Getting keyStore with alias: %s", alias ) );
+        LOG.debug( String.format( "Getting keyStore with alias: %s for url: %s", alias, url ) );
+        LOG.debug( String.format( "KeyStore: %s", keyStore.toString() ) );
 
         KeyStoreData trustStoreData = new KeyStoreData();
         trustStoreData.setupTrustStorePx2();
@@ -239,6 +241,7 @@ public class RestUtil
         tlsClientParameters.setDisableCNCheck( true );
         tlsClientParameters.setTrustManagers( sslManager.getClientTrustManagers() );
         tlsClientParameters.setKeyManagers( sslManager.getClientKeyManagers() );
+        tlsClientParameters.setCertAlias( alias );
         httpConduit.setTlsClientParameters( tlsClientParameters );
 
         return client;

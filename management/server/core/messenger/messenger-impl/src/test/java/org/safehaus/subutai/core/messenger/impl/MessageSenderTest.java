@@ -15,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -57,6 +58,8 @@ public class MessageSenderTest
     LocalPeer localPeer;
     @Mock
     Logger logger;
+    @Mock
+    PeerInfo peerInfo;
     @Mock
     CompletionService completer;
     @Mock
@@ -116,7 +119,10 @@ public class MessageSenderTest
         when( peerManager.getPeer( TARGET_PEER_ID ) ).thenReturn( peer );
         when( peer.getId() ).thenReturn( TARGET_PEER_ID );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
+        when( peerManager.getLocalPeerInfo() ).thenReturn( peerInfo );
+        when( peerInfo.getId() ).thenReturn( UUID.randomUUID() );
         when( localPeer.isLocal() ).thenReturn( false );
+        when( localPeer.getId() ).thenReturn( UUID.randomUUID() );
         when( completer.take() ).thenReturn( future );
 
         messageSender.deliverMessages();
