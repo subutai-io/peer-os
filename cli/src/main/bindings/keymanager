@@ -11,7 +11,7 @@ function key_manager_usage {
   echo "  "subutai keymanager list key_id
   echo "  "subutai keymanager revoke_subkey subkey_id
   echo "  "subutai keymanager del_subkey subkey_id
-  echo "  "subutai keymanager sign_key \<signer key id\> key_id_to_be_signed
+  echo "  "subutai keymanager sign_key \<-l\> signer_key_id key_id_to_be_signed
   echo -----------------------------------------------------------------------
 }
 
@@ -262,43 +262,138 @@ sign(){
 
 
 # signs the key
+# There are four type of verification level that can be 
+# specified while signing keys: 
+#   (0) I will not answer. (default)
+#   (1) I have not checked at all.
+#   (2) I have done casual checking.
+#   (3) I have done very careful checking.
+# 
+# And sing_key function has an optional <-l> switch to 
+# specify these levels.
+#   e.g.: subutai keymanager sign_key -l 2 <signer_key> <key_id_to_be_signed>
 # parameters:
-#  1) signer key (optional)
-#  2) key to be signed (mandatory)
+#  1) signer key
+#  2) key to be signed
 sign_key(){
-  if [[ $# < 1 ]]; then
+  params=`getopt -o l:  --long level: -n '$0' -- "$@"`
+  eval set -- "$params"
+  sing_level=0
+  # extract options and their arguments into variables.
+  while true ; do
+    case "$1" in
+      -l | --level)
+        case "$2" in
+          0 | 1 | 2 | 3 )
+	    sign_level="$2"
+	    ;;
+ 	  *)
+            msg_error "invalid switch arguments!"
+            echo " Available arguments that can be used with \"-l\""
+            echo "  (0) I will not answer. (default)"
+	    echo "  (1) I have not checked at all."
+	    echo "  (2) I have done casual checking."
+	    echo "  (3) I have done very careful checking."
+	    exit 1
+            ;;
+        esac 
+        shift 3
+        break
+        ;;
+      --)
+        shift;
+        break
+        ;;
+      *)
+        echo "Invalid switch!" 
+        exit 1
+        ;;
+    esac
+  done
+
+  if [[ $# < 2 ]]; then
     msg_error "missing arguments"
     key_manager_usage
     exit 1
   fi
 
-  if [ $# == 1 ]; then
-    signer=`get_default_signer_key`
-    key_to_be_signed=$1
-    assert_key_exists $key_to_be_signed
-  elif [ $# == 2 ]; then
-    signer=$1
-    assert_key_exists_private_key_ring $signer
-    key_to_be_signed=$2
-    assert_key_exists $key_to_be_signed
-  fi
-
+  signer=$1
+  assert_key_exists_private_key_ring $signer
+  key_to_be_signed=$2
+  assert_key_exists $key_to_be_signed
+ 
   if [[ "true" == `is_signed $signer $key_to_be_signed` ]]; then
     msg_info "key $key_to_be_signed is already signed by $signer"
   else
-    gpg2 -u $signer --yes --batch --sign-key $key_to_be_signed >> /dev/null 2>&1
     msg_ok "signing key $key_to_be_signed with key $signer"
+    echo -e "$sign_level\ny\n" | gpg2 -u $signer --yes --sign-key \
+                            --no-tty --command-fd 0  \
+                            --ask-cert-level $key_to_be_signed >> /dev/null 2>&1
   fi
 }
 
 
-# sends the key to hub after sign operation
+# sends the key to keyserver
 # parameters:
 #   1) key id
-#   2) key_server url (probably hub default)
+#   2) key_server -optional ( default management keyserver )
 send(){
-  msg_info "send"
-  pulic_key_id=$1
+  params=`getopt -o s:  --long server: -n '$0' -- "$@"`
+  eval set -- "$params"
+  local keyserver="$SUBUTAI_REST_IP"
+  # extract options and their arguments into variables.
+  while true ; do
+    case "$1" in
+      -s | --server)
+         keyserver="$2"
+         shift 3
+         break
+         ;;
+      --)
+        shift;
+        break
+        ;;
+      *)
+        echo "Invalid switch!" 
+        exit 1
+        ;;
+    esac
+  done
+  key_id=$1
+  assert_key_exists $key_id
+  gpg2 --keyserver $keyserver --send-keys $key_id # > /dev/null 2>&1
+}
+
+
+# receives the key from keyserver 
+# parameters:
+#   1) key id
+#   2) key_server -optional ( default management key server )
+receive(){
+  params=`getopt -o s:  --long server: -n '$0' -- "$@"`
+  eval set -- "$params"
+  local keyserver="$SUBUTAI_REST_IP"
+  # extract options and their arguments into variables.
+  while true ; do
+    case "$1" in
+      -s | --server)
+         keyserver="$2"
+         shift 3
+         break
+         ;;
+      --)
+        shift;
+        break
+        ;;
+      *)
+        echo "Invalid switch!" 
+        exit 1
+        ;;
+    esac
+  done
+  key_id=$1
+  msg_info "receiving key from $keyserver"
+  gpg2 --keyserver gw.intra.lan --recv-keys $key_id # > /dev/null 2&1
 }
 
 
