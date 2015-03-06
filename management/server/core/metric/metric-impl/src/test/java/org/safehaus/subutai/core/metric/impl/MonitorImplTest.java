@@ -228,7 +228,7 @@ public class MonitorImplTest
 
         monitor.notifyOnAlert( containerHostMetric );
 
-        verify( containerHostMetric ).getHostId();
+        verify( containerHostMetric ).getEnvironmentId();
     }
 
 
@@ -247,6 +247,7 @@ public class MonitorImplTest
         //set owner id as local peer
         ContainerGroup containerGroup = mock( ContainerGroup.class );
         when( containerGroup.getInitiatorPeerId() ).thenReturn( LOCAL_PEER_ID );
+        when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
         when( localPeer.findContainerGroupByContainerId( HOST_ID ) ).thenReturn( containerGroup );
         when( localPeer.getContainerHostByName( HOST ) ).thenReturn( containerHost );
         Peer ownerPeer = mock( Peer.class );
