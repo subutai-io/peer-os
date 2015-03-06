@@ -93,4 +93,48 @@ public class DiskQuota extends QuotaInfo
             throw new IllegalArgumentException( String.format( "Unparseable result: %s", quotaString ) );
         }
     }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof DiskQuota ) )
+        {
+            return false;
+        }
+
+        final DiskQuota diskQuota = ( DiskQuota ) o;
+
+        if ( Double.compare( diskQuota.diskQuotaValue, diskQuotaValue ) != 0 )
+        {
+            return false;
+        }
+        if ( diskPartition != diskQuota.diskPartition )
+        {
+            return false;
+        }
+        if ( diskQuotaUnit != diskQuota.diskQuotaUnit )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        int result;
+        long temp;
+        result = diskPartition != null ? diskPartition.hashCode() : 0;
+        result = 31 * result + ( diskQuotaUnit != null ? diskQuotaUnit.hashCode() : 0 );
+        temp = Double.doubleToLongBits( diskQuotaValue );
+        result = 31 * result + ( int ) ( temp ^ ( temp >>> 32 ) );
+        return result;
+    }
 }

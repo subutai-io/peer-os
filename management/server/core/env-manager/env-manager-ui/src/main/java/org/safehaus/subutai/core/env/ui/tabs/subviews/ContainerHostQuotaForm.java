@@ -1,15 +1,15 @@
 package org.safehaus.subutai.core.env.ui.tabs.subviews;
 
 
+import java.util.concurrent.ExecutorService;
+
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.vaadin.data.util.BeanItem;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
@@ -19,7 +19,6 @@ import com.vaadin.ui.VerticalLayout;
 public class ContainerHostQuotaForm extends VerticalLayout
 {
 
-    private Logger LOGGER = LoggerFactory.getLogger( ContainerHostQuotaForm.class );
 
     private TextField ramQuotaTextField = new TextField( "RAM Quota" );
 
@@ -37,35 +36,56 @@ public class ContainerHostQuotaForm extends VerticalLayout
 
     private ContainerHost containerHost;
 
+    private int prevRamQuota;
+    private int prevCpuQuota;
+    private DiskQuota prevHomeDiskQuota;
+    private DiskQuota prevVarDiskQuota;
+    private DiskQuota prevOptDiskQuota;
+    private DiskQuota prevRootFsDiskQuota;
 
-    public ContainerHostQuotaForm()
+    private ExecutorService executorService;
+    private Component parent;
+
+
+    public ContainerHostQuotaForm( ExecutorService executorService, Component parent )
     {
+        this.executorService = executorService;
+        this.parent = parent;
         init();
     }
 
 
     private void init()
     {
+        setSpacing( true );
         FormLayout form = new FormLayout();
         form.addComponents( ramQuotaTextField, cpuQuotaTextField, diskHomeTextField, diskVarTextField,
                 diskRootfsTextField, diskOptTextField, updateChanges );
         addComponent( form );
         updateChanges.addClickListener( updateChangesListener );
-        setSpacing( true );
     }
 
 
-    public void setContainerHostBeanItem( BeanItem<ContainerHost> containerHostBeanItem )
+    public void setContainerHost( final ContainerHost containerHost )
     {
+
         try
         {
-            containerHost = containerHostBeanItem.getBean();
-            ramQuotaTextField.setValue( String.valueOf( containerHost.getRamQuota() ) );
-            cpuQuotaTextField.setValue( String.valueOf( containerHost.getCpuQuota() ) );
-            diskHomeTextField.setValue( containerHost.getDiskQuota( DiskPartition.HOME ).getQuotaValue() );
-            diskVarTextField.setValue( containerHost.getDiskQuota( DiskPartition.VAR ).getQuotaValue() );
-            diskOptTextField.setValue( containerHost.getDiskQuota( DiskPartition.OPT ).getQuotaValue() );
-            diskRootfsTextField.setValue( containerHost.getDiskQuota( DiskPartition.ROOT_FS ).getQuotaValue() );
+            this.containerHost = containerHost;
+
+            prevRamQuota = containerHost.getRamQuota();
+            prevCpuQuota = containerHost.getCpuQuota();
+            prevHomeDiskQuota = containerHost.getDiskQuota( DiskPartition.HOME );
+            prevOptDiskQuota = containerHost.getDiskQuota( DiskPartition.OPT );
+            prevRootFsDiskQuota = containerHost.getDiskQuota( DiskPartition.ROOT_FS );
+            prevVarDiskQuota = containerHost.getDiskQuota( DiskPartition.VAR );
+
+            ramQuotaTextField.setValue( String.valueOf( prevRamQuota ) );
+            cpuQuotaTextField.setValue( String.valueOf( prevCpuQuota ) );
+            diskHomeTextField.setValue( prevHomeDiskQuota.getQuotaValue() );
+            diskVarTextField.setValue( prevVarDiskQuota.getQuotaValue() );
+            diskOptTextField.setValue( prevOptDiskQuota.getQuotaValue() );
+            diskRootfsTextField.setValue( prevRootFsDiskQuota.getQuotaValue() );
         }
         catch ( PeerException e )
         {
@@ -80,29 +100,79 @@ public class ContainerHostQuotaForm extends VerticalLayout
         @Override
         public void buttonClick( final Button.ClickEvent event )
         {
-            try
+            updateChanges.setEnabled( false );
+            parent.setEnabled( false );
+
+            Notification.show( "Please, wait..." );
+            final int newRamQuota = Integer.parseInt( ramQuotaTextField.getValue() );
+
+            final int newCpuQuota = Integer.parseInt( cpuQuotaTextField.getValue() );
+
+            final DiskQuota newHomeDiskQuota =
+                    DiskQuota.parse( DiskPartition.HOME, diskHomeTextField.getValue() );
+            final DiskQuota newRootFsDiskQuota =
+                    DiskQuota.parse( DiskPartition.ROOT_FS, diskRootfsTextField.getValue() );
+            final DiskQuota newOptDiskQuota = DiskQuota.parse( DiskPartition.OPT, diskOptTextField.getValue() );
+            final DiskQuota newVarDiskQuota = DiskQuota.parse( DiskPartition.VAR, diskVarTextField.getValue() );
+
+            executorService.submit( new Runnable()
             {
-                Notification.show( "Please, wait..." );
+                @Override
+                public void run()
+                {
+                    try
+                    {
 
-                containerHost.setRamQuota( Integer.parseInt( ramQuotaTextField.getValue() ) );
+                        if ( newRamQuota != prevRamQuota )
+                        {
+                            containerHost.setRamQuota( newRamQuota );
+                            prevRamQuota = newRamQuota;
+                        }
 
-                containerHost.setCpuQuota( Integer.parseInt( cpuQuotaTextField.getValue() ) );
+                        if ( newCpuQuota != prevCpuQuota )
+                        {
+                            containerHost.setCpuQuota( newCpuQuota );
+                            prevCpuQuota = newCpuQuota;
+                        }
 
-                containerHost.setDiskQuota( DiskQuota.parse( DiskPartition.HOME, diskHomeTextField.getValue() ) );
+                        if ( !newHomeDiskQuota.equals( prevHomeDiskQuota ) )
+                        {
+                            containerHost.setDiskQuota( newHomeDiskQuota );
+                            prevHomeDiskQuota = newHomeDiskQuota;
+                        }
 
-                containerHost.setDiskQuota( DiskQuota.parse( DiskPartition.ROOT_FS, diskRootfsTextField.getValue() ) );
+                        if ( !newRootFsDiskQuota.equals( prevRootFsDiskQuota ) )
+                        {
+                            containerHost.setDiskQuota( newRootFsDiskQuota );
+                            prevRootFsDiskQuota = newRootFsDiskQuota;
+                        }
 
-                containerHost.setDiskQuota( DiskQuota.parse( DiskPartition.OPT, diskOptTextField.getValue() ) );
+                        if ( !newOptDiskQuota.equals( prevOptDiskQuota ) )
+                        {
+                            containerHost.setDiskQuota( newOptDiskQuota );
+                            prevOptDiskQuota = newOptDiskQuota;
+                        }
 
-                containerHost.setDiskQuota( DiskQuota.parse( DiskPartition.VAR, diskVarTextField.getValue() ) );
+                        if ( !newVarDiskQuota.equals( prevVarDiskQuota ) )
+                        {
+                            containerHost.setDiskQuota( newVarDiskQuota );
+                            prevVarDiskQuota = newVarDiskQuota;
+                        }
 
-                Notification.show( "Quotas are updated" );
-            }
-            catch ( Exception e )
-            {
-                Notification.show( String.format( "Error setting quota: %s", e.getMessage() ),
-                        Notification.Type.ERROR_MESSAGE );
-            }
+                        Notification.show( "Quotas are updated" );
+                    }
+                    catch ( Exception e )
+                    {
+                        Notification.show( String.format( "Error setting quota: %s", e.getMessage() ),
+                                Notification.Type.ERROR_MESSAGE );
+                    }
+                    finally
+                    {
+                        parent.setEnabled( true );
+                        updateChanges.setEnabled( true );
+                    }
+                }
+            } );
         }
     };
 }
