@@ -232,29 +232,7 @@ public class QuotaManagerImpl implements QuotaManager
         CommandResult result = executeOnContainersResourceHost( containerId,
                 commands.getReadDiskQuotaCommand( containerHost.getHostname(), diskPartition.getPartitionName() ) );
 
-        if ( result.getStdOut().contains( DiskQuotaUnit.UNLIMITED.getAcronym() ) )
-        {
-            return new DiskQuota( diskPartition, DiskQuotaUnit.UNLIMITED, -1 );
-        }
-        else
-        {
-            String regex = "(\\d+(?:[\\.,]\\d+)?)(K|M|G|T|P|E)?";
-            Pattern quotaPattern = Pattern.compile( regex );
-            Matcher quotaMatcher = quotaPattern.matcher( result.getStdOut().trim() );
-            if ( quotaMatcher.matches() )
-            {
-                String quotaValue = quotaMatcher.group( 1 );
-                double value = Double.parseDouble( quotaValue.replace(",", ".") );
-                String acronym = quotaMatcher.group( 2 );
-                DiskQuotaUnit diskQuotaUnit = DiskQuotaUnit.parseFromAcronym( acronym );
-                return new DiskQuota( diskPartition, diskQuotaUnit == null ? DiskQuotaUnit.BYTE : diskQuotaUnit,
-                        value );
-            }
-            else
-            {
-                throw new QuotaException( String.format( "Unparseable result: %s", result.getStdOut() ) );
-            }
-        }
+        return DiskQuota.parse( diskPartition, result.getStdOut() );
     }
 
 
@@ -315,29 +293,7 @@ public class QuotaManagerImpl implements QuotaManager
                 commands.getReadAvailableDiskQuotaCommand( containerHost.getHostname(),
                         diskPartition.getPartitionName() ) );
 
-        if ( result.getStdOut().contains( DiskQuotaUnit.UNLIMITED.getAcronym() ) )
-        {
-            return new DiskQuota( diskPartition, DiskQuotaUnit.UNLIMITED, -1 );
-        }
-        else
-        {
-            String regex = "(\\d+(?:[\\.,]\\d+)?)(K|M|G|T|P|E)?";
-            Pattern quotaPattern = Pattern.compile( regex );
-            Matcher quotaMatcher = quotaPattern.matcher( result.getStdOut().trim() );
-            if ( quotaMatcher.matches() )
-            {
-                String quotaValue = quotaMatcher.group( 1 );
-                double value = Double.parseDouble( quotaValue.replace(",", ".") );
-                String acronym = quotaMatcher.group( 2 );
-                DiskQuotaUnit diskQuotaUnit = DiskQuotaUnit.parseFromAcronym( acronym );
-                return new DiskQuota( diskPartition, diskQuotaUnit == null ? DiskQuotaUnit.BYTE : diskQuotaUnit,
-                        value );
-            }
-            else
-            {
-                throw new QuotaException( String.format( "Unparseable result: %s", result.getStdOut() ) );
-            }
-        }
+        return DiskQuota.parse( diskPartition, result.getStdOut() );
     }
 
 
