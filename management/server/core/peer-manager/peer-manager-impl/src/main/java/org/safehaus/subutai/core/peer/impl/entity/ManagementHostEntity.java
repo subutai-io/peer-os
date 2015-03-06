@@ -264,6 +264,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     {
         Preconditions.checkNotNull( vni, "Invalid vni" );
 
+        //todo exec via queueSequentialTask
         //check if vni is already reserved
         if ( findVniByEnvironmentId( vni.getEnvironmentId() ) != null )
         {
