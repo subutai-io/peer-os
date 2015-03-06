@@ -186,6 +186,8 @@ public class UserForm extends VerticalLayout
                 {
                     Collection<String> selectedRoleNames = ( Collection<String> ) rolesSelector.getValue();
                     User user = userFieldGroup.getItemDataSource().getBean();
+                    user.removeAllRoles();
+
                     for ( final String roleName : selectedRoleNames )
                     {
                         BeanItem beanItem = ( BeanItem ) rolesSelector.getItem( roleName );
