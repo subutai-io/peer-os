@@ -18,6 +18,7 @@ import org.safehaus.subutai.common.environment.EnvironmentModificationException;
 import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
+import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Peer;
@@ -275,6 +276,27 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 LOG.error( "Error exchanging environment certificates ", e );
             }
         }
+    }
+
+
+    public Map<Peer, Set<Gateway>> getUsedGateways( Set<Peer> peers ) throws EnvironmentManagerException
+    {
+        Map<Peer, Set<Gateway>> usedGateways = Maps.newHashMap();
+
+        for ( Peer peer : peers )
+        {
+            try
+            {
+                usedGateways.put( peer, peer.getGateways() );
+            }
+            catch ( PeerException e )
+            {
+                throw new EnvironmentManagerException(
+                        String.format( "Error obtaining gateways from peer %s", peer.getName() ), e );
+            }
+        }
+
+        return usedGateways;
     }
 
 
