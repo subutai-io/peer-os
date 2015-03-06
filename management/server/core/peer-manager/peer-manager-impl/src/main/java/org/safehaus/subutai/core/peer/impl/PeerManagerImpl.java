@@ -163,6 +163,7 @@ public class PeerManagerImpl implements PeerManager
         {
             peerInfo = new PeerInfo();
             //TODO generate peer id based on owner/system information
+            //OR get it from fs, generate if not found
             peerInfo.setId( UUID.randomUUID() );
             peerInfo.setName( "Local Subutai server" );
             //TODO get ownerId from persistent storage
