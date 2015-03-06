@@ -20,6 +20,7 @@ import org.safehaus.subutai.server.ui.component.ConcurrentComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
@@ -208,7 +209,8 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                 Collection children = container.getChildren( rh.getId() );
                 if ( children != null )
                 {
-                    for ( final Object id : children )
+                    Set<Object> ids = Sets.newConcurrentHashSet( children );
+                    for ( final Object id : ids )
                     {
                         Item item = container.getItem( id );
                         ContainerHost containerHost = ( ContainerHost ) item.getItemProperty( "value" ).getValue();

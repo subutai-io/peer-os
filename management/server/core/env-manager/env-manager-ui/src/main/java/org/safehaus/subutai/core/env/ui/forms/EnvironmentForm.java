@@ -133,7 +133,8 @@ public class EnvironmentForm
                 @Override
                 public void buttonClick( final Button.ClickEvent event )
                 {
-                    contentRoot.getUI().addWindow( new ContainersWindow( environmentManager, environment, peerManager ) );
+                    contentRoot.getUI()
+                               .addWindow( new ContainersWindow( environmentManager, environment, peerManager ) );
                 }
             } );
 
@@ -143,10 +144,23 @@ public class EnvironmentForm
                 @Override
                 public void buttonClick( final Button.ClickEvent clickEvent )
                 {
-                    destroyBtn.setEnabled( false );
-                    containersBtn.setEnabled( false );
-                    sshKeyBtn.setEnabled( false );
-                    destroyEnvironment( environment );
+
+                    ConfirmationDialog alert =
+                            new ConfirmationDialog( "Do you really want to destroy this environment?",
+                                    "Yes", "No" );
+                    alert.getOk().addClickListener( new Button.ClickListener()
+                    {
+                        @Override
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
+                            destroyBtn.setEnabled( false );
+                            containersBtn.setEnabled( false );
+                            sshKeyBtn.setEnabled( false );
+                            destroyEnvironment( environment );
+                        }
+                    } );
+
+                    contentRoot.getUI().addWindow( alert.getAlert() );
                 }
             } );
 
@@ -167,7 +181,7 @@ public class EnvironmentForm
                 public void buttonClick( final Button.ClickEvent event )
                 {
                     ConfirmationDialog alert =
-                            new ConfirmationDialog( "Do you really want to remove environment without destroying it?",
+                            new ConfirmationDialog( "Do you really want to remove this environment without destroying it?",
                                     "Yes", "No" );
                     alert.getOk().addClickListener( new Button.ClickListener()
                     {
