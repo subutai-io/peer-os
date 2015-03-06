@@ -80,13 +80,13 @@ public class UserTokenManager extends Panel
         ipRangeStartTxtFld.setId( "IpRangeStart" );
         ipRangeStartTxtFld.setInputPrompt( "IP range start" );
         ipRangeStartTxtFld.setRequired( true );
-
+        ipRangeStartTxtFld.setValue( "*" );
 
         ipRangeEndTxtFld = new TextField( "Enter IP range end" );
         ipRangeEndTxtFld.setId( "IpRangeEnd" );
         ipRangeEndTxtFld.setInputPrompt( "IP range end" );
         ipRangeEndTxtFld.setRequired( true );
-
+        ipRangeEndTxtFld.setValue( "*" );
 
         validityPeriodTxtFld = new TextField( "Enter validity period (hours)" );
         validityPeriodTxtFld.setId( "ValidityPeriod" );

@@ -5,7 +5,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.safehaus.subutai.common.settings.ChannelSettings;
+import org.safehaus.subutai.common.util.IPUtil;
 import org.safehaus.subutai.common.util.UrlUtil;
+import org.safehaus.subutai.core.channel.api.entity.IUserChannelToken;
 import org.safehaus.subutai.core.channel.impl.ChannelManagerImpl;
 import org.safehaus.subutai.core.identity.api.User;
 import org.slf4j.Logger;
@@ -73,12 +75,21 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
 
                 if(!"".equals(paramValue))
                 {
-                    long userId = channelManagerImpl.getChannelTokenManager().getUserChannelToken(paramValue);
+                    IUserChannelToken userChannelToken= channelManagerImpl.getChannelTokenManager().getUserChannelToken(paramValue);
 
-                    if(userId != 0)
+                    if(userChannelToken != null)
                     {
-                        User user = channelManagerImpl.getIdentityManager().getUser(userId);
-                        channelManagerImpl.getIdentityManager().loginWithToken(user.getUsername() );
+                        if( IPUtil.isValidIPRange(userChannelToken.getIpRangeStart(),
+                                                  userChannelToken.getIpRangeStart(),
+                                                  url.getHost()))
+                        {
+                            User user = channelManagerImpl.getIdentityManager().getUser(userChannelToken.getUserId());
+                            channelManagerImpl.getIdentityManager().loginWithToken(user.getUsername() );
+                        }
+                        else
+                        {
+                            status = 1;
+                        }
                     }
                     else
                     {
