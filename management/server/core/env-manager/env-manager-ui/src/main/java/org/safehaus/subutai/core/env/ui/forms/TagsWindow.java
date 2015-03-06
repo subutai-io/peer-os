@@ -35,7 +35,7 @@ public class TagsWindow extends Window
         final ContainerHost finalLocalContainer = localContainer;
 
         setCaption( containerHost.getHostname() );
-        setWidth( "300px" );
+        setWidth( "350px" );
         setHeight( "300px" );
         setModal( true );
         setClosable( true );
