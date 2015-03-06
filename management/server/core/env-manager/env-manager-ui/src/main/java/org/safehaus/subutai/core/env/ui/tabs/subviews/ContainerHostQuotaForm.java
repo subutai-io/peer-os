@@ -7,6 +7,7 @@ import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
+import org.safehaus.subutai.common.quota.RamQuota;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -36,7 +37,7 @@ public class ContainerHostQuotaForm extends VerticalLayout
 
     private ContainerHost containerHost;
 
-    private int prevRamQuota;
+    private RamQuota prevRamQuota;
     private int prevCpuQuota;
     private DiskQuota prevHomeDiskQuota;
     private DiskQuota prevVarDiskQuota;
@@ -73,14 +74,14 @@ public class ContainerHostQuotaForm extends VerticalLayout
         {
             this.containerHost = containerHost;
 
-            prevRamQuota = containerHost.getRamQuota();
+            prevRamQuota = RamQuota.parse( String.valueOf( containerHost.getRamQuota() ) );
             prevCpuQuota = containerHost.getCpuQuota();
             prevHomeDiskQuota = containerHost.getDiskQuota( DiskPartition.HOME );
             prevOptDiskQuota = containerHost.getDiskQuota( DiskPartition.OPT );
             prevRootFsDiskQuota = containerHost.getDiskQuota( DiskPartition.ROOT_FS );
             prevVarDiskQuota = containerHost.getDiskQuota( DiskPartition.VAR );
 
-            ramQuotaTextField.setValue( String.valueOf( prevRamQuota ) );
+            ramQuotaTextField.setValue( prevRamQuota.getQuotaValue() );
             cpuQuotaTextField.setValue( String.valueOf( prevCpuQuota ) );
             diskHomeTextField.setValue( prevHomeDiskQuota.getQuotaValue() );
             diskVarTextField.setValue( prevVarDiskQuota.getQuotaValue() );
@@ -106,7 +107,7 @@ public class ContainerHostQuotaForm extends VerticalLayout
                 parent.setEnabled( false );
 
                 Notification.show( "Please, wait..." );
-                final int newRamQuota = Integer.parseInt( ramQuotaTextField.getValue() );
+                final RamQuota newRamQuota = RamQuota.parse( ramQuotaTextField.getValue() );
 
                 final int newCpuQuota = Integer.parseInt( cpuQuotaTextField.getValue() );
 

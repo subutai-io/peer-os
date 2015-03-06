@@ -45,6 +45,7 @@ import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.common.quota.RamQuota;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 
 import com.google.common.base.Objects;
@@ -473,6 +474,13 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public void setDiskQuota( final DiskQuota diskQuota ) throws PeerException
     {
         getPeer().setDiskQuota( this, diskQuota );
+    }
+
+
+    @Override
+    public void setRamQuota( final RamQuota ramQuota ) throws PeerException
+    {
+        getPeer().setRamQuota( this, ramQuota );
     }
 
 

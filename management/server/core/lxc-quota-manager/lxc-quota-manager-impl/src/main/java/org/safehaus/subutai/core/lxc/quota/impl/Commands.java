@@ -27,6 +27,13 @@ public class Commands
     }
 
 
+    public RequestBuilder getWriteRamQuotaCommand2( String containerHostname, String ramQuota )
+    {
+        return new RequestBuilder( QUOTA_BINDING )
+                .withCmdArgs( Lists.newArrayList( containerHostname, "ram", "-s", ramQuota ) );
+    }
+
+
     public RequestBuilder getReadCpuQuotaCommand( String containerHostname )
     {
         return new RequestBuilder( QUOTA_BINDING ).withCmdArgs( Lists.newArrayList( containerHostname, "cpu" ) );
