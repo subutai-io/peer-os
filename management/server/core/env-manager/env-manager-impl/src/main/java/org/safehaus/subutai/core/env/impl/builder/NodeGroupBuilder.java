@@ -8,6 +8,7 @@ import java.util.concurrent.Callable;
 
 import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.environment.NodeGroup;
+import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.common.peer.Peer;
@@ -22,6 +23,7 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -122,7 +124,6 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
         Set<NodeGroupBuildResult> results = Sets.newHashSet();
         LocalPeer localPeer = peerManager.getLocalPeer();
 
-
         //check if environment has reserved VNI
         Set<Vni> reservedVnis;
         try
@@ -133,6 +134,57 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
         {
             throw new NodeGroupBuildException(
                     String.format( "Error obtaining reserved vnis on peer %s", peer.getName() ), e );
+        }
+
+        //check availability of subnet
+        Set<Gateway> gateways;
+        try
+        {
+            gateways = peer.getGateways();
+        }
+        catch ( PeerException e )
+        {
+            throw new NodeGroupBuildException( String.format( "Error obtaining gateways on peer %s", peer.getName() ),
+                    e );
+        }
+
+        SubnetUtils subnetUtils = new SubnetUtils( environment.getSubnetCidr() );
+        String environmentGatewayIp = subnetUtils.getInfo().getLowAddress();
+
+        Gateway usedGateway = null;
+
+        for ( Gateway gateway : gateways )
+        {
+            if ( gateway.getIp().equals( environmentGatewayIp ) )
+            {
+                usedGateway = gateway;
+                break;
+            }
+        }
+
+        if ( usedGateway != null )
+        {
+            boolean subnetIsUsed = true;
+
+            //check if subnet is used for this environment
+            for ( Vni reservedVni : reservedVnis )
+            {
+                if ( reservedVni.getEnvironmentId().equals( environment.getId() ) )
+                {
+                    if ( reservedVni.getVlan() == usedGateway.getVlan() )
+                    {
+                        //this subnet is used for this environment, all is ok
+                        subnetIsUsed = false;
+                    }
+                    break;
+                }
+            }
+
+            if ( subnetIsUsed )
+            {
+                throw new NodeGroupBuildException(
+                        String.format( "Subnet is already in use on peer %s", peer.getName() ), null );
+            }
         }
 
         Vni environmentVni = null;

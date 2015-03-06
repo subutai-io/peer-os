@@ -24,4 +24,40 @@ public class Gateway
     {
         return ip;
     }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof Gateway ) )
+        {
+            return false;
+        }
+
+        final Gateway gateway = ( Gateway ) o;
+
+        if ( vlan != gateway.vlan )
+        {
+            return false;
+        }
+        if ( ip != null ? !ip.equals( gateway.ip ) : gateway.ip != null )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        int result = vlan;
+        result = 31 * result + ( ip != null ? ip.hashCode() : 0 );
+        return result;
+    }
 }
