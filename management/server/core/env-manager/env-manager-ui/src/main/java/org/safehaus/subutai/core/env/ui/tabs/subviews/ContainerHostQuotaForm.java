@@ -5,20 +5,17 @@ import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
-import org.safehaus.subutai.common.quota.DiskQuotaUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 
-/**
- * Created by talas on 2/13/15.
- */
 public class ContainerHostQuotaForm extends VerticalLayout
 {
 
@@ -72,7 +69,8 @@ public class ContainerHostQuotaForm extends VerticalLayout
         }
         catch ( PeerException e )
         {
-            LOGGER.error( "Error getting quota", e );
+            Notification.show( String.format( "Error getting quota: %s", e.getMessage() ),
+                    Notification.Type.ERROR_MESSAGE );
         }
     }
 
@@ -84,65 +82,26 @@ public class ContainerHostQuotaForm extends VerticalLayout
         {
             try
             {
-                Double ram = Double.parseDouble( ramQuotaTextField.getValue() );
-                containerHost.setRamQuota( ram.intValue() );
+                Notification.show( "Please, wait..." );
 
-                Double cpu = Double.parseDouble( cpuQuotaTextField.getValue() );
-                containerHost.setCpuQuota( cpu.intValue() );
+                containerHost.setRamQuota( Integer.parseInt( ramQuotaTextField.getValue() ) );
 
+                containerHost.setCpuQuota( Integer.parseInt( cpuQuotaTextField.getValue() ) );
 
-                if ( diskHomeTextField.getValue().equals( "none" ) )
-                {
-                    containerHost.setDiskQuota( new DiskQuota( DiskPartition.HOME, DiskQuotaUnit.UNLIMITED, -1 ) );
-                }
-                else
-                {
-                    Double diskHome = Double.parseDouble(
-                            diskHomeTextField.getValue().substring( 0, diskHomeTextField.getValue().length() - 1 ) );
-                    containerHost
-                            .setDiskQuota( new DiskQuota( DiskPartition.HOME, DiskQuotaUnit.MB, diskHome) );
-                }
+                containerHost.setDiskQuota( DiskQuota.parse( DiskPartition.HOME, diskHomeTextField.getValue() ) );
 
+                containerHost.setDiskQuota( DiskQuota.parse( DiskPartition.ROOT_FS, diskRootfsTextField.getValue() ) );
 
-                if ( diskRootfsTextField.getValue().equals( "none" ) )
-                {
-                    containerHost.setDiskQuota( new DiskQuota( DiskPartition.ROOT_FS, DiskQuotaUnit.UNLIMITED, -1 ) );
-                }
-                else
-                {
-                    Double diskRootfs = Double.parseDouble( diskRootfsTextField.getValue().substring( 0,
-                            diskRootfsTextField.getValue().length() - 1 ) );
-                    containerHost.setDiskQuota(
-                            new DiskQuota( DiskPartition.ROOT_FS, DiskQuotaUnit.MB, diskRootfs ) );
-                }
+                containerHost.setDiskQuota( DiskQuota.parse( DiskPartition.OPT, diskOptTextField.getValue() ) );
 
-                if ( diskOptTextField.getValue().equals( "none" ) )
-                {
-                    containerHost.setDiskQuota( new DiskQuota( DiskPartition.OPT, DiskQuotaUnit.UNLIMITED, -1 ) );
-                }
-                else
-                {
-                    Double diskOpt = Double.parseDouble(
-                            diskOptTextField.getValue().substring( 0, diskOptTextField.getValue().length() - 1 ) );
-                    containerHost
-                            .setDiskQuota( new DiskQuota( DiskPartition.OPT, DiskQuotaUnit.MB, diskOpt ) );
-                }
+                containerHost.setDiskQuota( DiskQuota.parse( DiskPartition.VAR, diskVarTextField.getValue() ) );
 
-                if ( diskVarTextField.getValue().equals( "none" ) )
-                {
-                    containerHost.setDiskQuota( new DiskQuota( DiskPartition.VAR, DiskQuotaUnit.UNLIMITED, -1 ) );
-                }
-                else
-                {
-                    Double diskVar = Double.parseDouble(
-                            diskVarTextField.getValue().substring( 0, diskVarTextField.getValue().length() - 1 ) );
-                    containerHost
-                            .setDiskQuota( new DiskQuota( DiskPartition.VAR, DiskQuotaUnit.MB, diskVar ) );
-                }
+                Notification.show( "Quotas are updated" );
             }
-            catch ( PeerException e )
+            catch ( Exception e )
             {
-                LOGGER.error( "Error updating quota", e );
+                Notification.show( String.format( "Error setting quota: %s", e.getMessage() ),
+                        Notification.Type.ERROR_MESSAGE );
             }
         }
     };

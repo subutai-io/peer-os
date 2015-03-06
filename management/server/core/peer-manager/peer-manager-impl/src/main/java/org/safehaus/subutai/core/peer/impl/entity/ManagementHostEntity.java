@@ -174,6 +174,33 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
+    public void cleanupEnvironmentNetworkSettings( final UUID environmentId ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        Set<Vni> reservedVnis = getReservedVnis();
+
+        for ( Vni vni : reservedVnis )
+        {
+            if ( vni.getEnvironmentId().equals( environmentId ) )
+            {
+                try
+                {
+                    commandUtil.execute( new RequestBuilder( "subutai management_network" )
+                            .withCmdArgs( Lists.newArrayList( "-Z", "deleteall", String.valueOf( vni.getVlan() ) ) ),
+                            this );
+                }
+                catch ( CommandException e )
+                {
+                    throw new PeerException(
+                            String.format( "Error cleaning up environment %s network settings", environmentId ), e );
+                }
+                break;
+            }
+        }
+    }
+
+
     protected NetworkManager getNetworkManager() throws PeerException
     {
         try
