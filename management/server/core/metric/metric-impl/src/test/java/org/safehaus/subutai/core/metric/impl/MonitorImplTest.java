@@ -23,19 +23,18 @@ import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.metric.HistoricalMetric;
+import org.safehaus.subutai.common.metric.MetricType;
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
-import org.safehaus.subutai.common.metric.MetricType;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.MonitoringSettings;
-import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.core.peer.api.ContainerGroup;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -115,15 +114,12 @@ public class MonitorImplTest
     @Mock
     MonitoringSettings monitoringSettings;
 
-    @Mock
-    EnvironmentManager environmentManager;
 
     static class MonitorImplExt extends MonitorImpl
     {
-        public MonitorImplExt( final PeerManager peerManager, DaoManager daoManager,
-                               EnvironmentManager environmentManager ) throws MonitorException
+        public MonitorImplExt( final PeerManager peerManager, DaoManager daoManager ) throws MonitorException
         {
-            super( peerManager, daoManager, environmentManager );
+            super( peerManager, daoManager );
         }
 
 
@@ -137,7 +133,8 @@ public class MonitorImplTest
 
 
         @Override
-        public List<HistoricalMetric> getHistoricalMetric( final Host host, final MetricType metricType ) {
+        public List<HistoricalMetric> getHistoricalMetric( final Host host, final MetricType metricType )
+        {
             return null;
         }
     }
@@ -154,7 +151,7 @@ public class MonitorImplTest
         when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
 
 
-        monitor = new MonitorImplExt( peerManager, daoManager, environmentManager );
+        monitor = new MonitorImplExt( peerManager, daoManager );
         monitor.setMonitorDao( monitorDao );
 
 
@@ -177,7 +174,6 @@ public class MonitorImplTest
         when( containerHost.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID.toString() );
         when( containerHost.getId() ).thenReturn( HOST_ID );
         when( localPeer.getResourceHosts() ).thenReturn( Sets.newHashSet( resourceHost ) );
-        when( environmentManager.getEnvironments() ).thenReturn( Sets.newHashSet( environment ) );
     }
 
 
@@ -232,7 +228,7 @@ public class MonitorImplTest
 
         monitor.notifyOnAlert( containerHostMetric );
 
-        verify( containerHostMetric ).getHostId();
+        verify( containerHostMetric ).getEnvironmentId();
     }
 
 
@@ -251,6 +247,7 @@ public class MonitorImplTest
         //set owner id as local peer
         ContainerGroup containerGroup = mock( ContainerGroup.class );
         when( containerGroup.getInitiatorPeerId() ).thenReturn( LOCAL_PEER_ID );
+        when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
         when( localPeer.findContainerGroupByContainerId( HOST_ID ) ).thenReturn( containerGroup );
         when( localPeer.getContainerHostByName( HOST ) ).thenReturn( containerHost );
         Peer ownerPeer = mock( Peer.class );
@@ -426,7 +423,7 @@ public class MonitorImplTest
         ContainerHostMetricResponse response = mock( ContainerHostMetricResponse.class );
         when( remotePeer
                 .sendRequest( anyObject(), anyString(), anyInt(), eq( ContainerHostMetricResponse.class ), anyInt(),
-                        anyMap()) ).thenReturn( response );
+                        anyMap() ) ).thenReturn( response );
         ContainerHostMetricImpl metric = JsonUtil.fromJson( METRIC_JSON, ContainerHostMetricImpl.class );
         when( response.getMetrics() ).thenReturn( Sets.newHashSet( metric ) );
 
@@ -488,7 +485,7 @@ public class MonitorImplTest
         when( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) ).thenReturn( containerGroup );
         when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( HOST_ID ) );
         HostNotFoundException exception = mock( HostNotFoundException.class );
-        doThrow( exception ).when( localPeer ).getResourceHostByContainerId( any(UUID.class) );
+        doThrow( exception ).when( localPeer ).getResourceHostByContainerId( any( UUID.class ) );
 
 
         monitor.getLocalContainerHostsMetrics( ENVIRONMENT_ID );
@@ -617,14 +614,12 @@ public class MonitorImplTest
         monitor.activateMonitoringAtRemoteContainers( remotePeer, Sets.newHashSet( containerHost ), monitoringSettings,
                 ENVIRONMENT_ID );
 
-        verify( remotePeer )
-                .sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt(), anyMap() );
+        verify( remotePeer ).sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt(), anyMap() );
 
 
         PeerException exception = mock( PeerException.class );
         doThrow( exception ).when( remotePeer )
-                            .sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt(),
-                                    anyMap() );
+                            .sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt(), anyMap() );
 
         monitor.activateMonitoringAtRemoteContainers( remotePeer, Sets.newHashSet( containerHost ), monitoringSettings,
                 ENVIRONMENT_ID );
@@ -681,8 +676,7 @@ public class MonitorImplTest
 
         monitor.activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings, ENVIRONMENT_ID );
 
-        verify( remotePeer )
-                .sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt(), anyMap() );
+        verify( remotePeer ).sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt(), anyMap() );
 
 
         monitor.activateMonitoring( containerHost, monitoringSettings );
@@ -704,30 +698,35 @@ public class MonitorImplTest
 
 
     @Test
-    public void testHistoricalMetrics() {
+    public void testHistoricalMetrics()
+    {
         Monitor monitor1 = null;
-        try {
-            monitor1 = new MonitorImpl( peerManager, daoManager, environmentManager );
+        try
+        {
+            monitor1 = new MonitorImpl( peerManager, daoManager );
         }
-        catch ( MonitorException e ) {
+        catch ( MonitorException e )
+        {
             e.printStackTrace();
         }
         StringBuilder stringBuilder = new StringBuilder();
         CommandResult commandResult = mock( CommandResult.class );
-        stringBuilder.append( "1425289620: 1.2902400000e+06" )
-                     .append( System.getProperty( "line.separator" ) )
-                     .append( "1425289680: 1.2902400000e+06" )
-                     .append( System.getProperty( "line.separator" ) );
-        try {
+        stringBuilder.append( "1425289620: 1.2902400000e+06" ).append( System.getProperty( "line.separator" ) )
+                     .append( "1425289680: 1.2902400000e+06" ).append( System.getProperty( "line.separator" ) );
+        try
+        {
             when( commandResult.hasSucceeded() ).thenReturn( true );
-            when( peerManager.getLocalPeer().getResourceHostByContainerId( any( UUID.class ) ) ).thenReturn( resourceHost );
+            when( peerManager.getLocalPeer().getResourceHostByContainerId( any( UUID.class ) ) )
+                    .thenReturn( resourceHost );
             when( commandResult.getStdOut() ).thenReturn( stringBuilder.toString() );
             when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
         }
-        catch ( CommandException e ) {
+        catch ( CommandException e )
+        {
             e.printStackTrace();
         }
-        catch ( HostNotFoundException e ) {
+        catch ( HostNotFoundException e )
+        {
             e.printStackTrace();
         }
         List<HistoricalMetric> historicalMetric = monitor1.getHistoricalMetric( containerHost, MetricType.CPU );

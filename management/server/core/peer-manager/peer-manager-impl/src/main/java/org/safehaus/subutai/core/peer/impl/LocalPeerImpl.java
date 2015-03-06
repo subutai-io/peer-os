@@ -29,6 +29,7 @@ import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.metric.ResourceHostMetric;
+import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.ContainersDestructionResult;
@@ -1515,6 +1516,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     //networking
+
+
+    public Set<Gateway> getGateways() throws PeerException
+    {
+        return getManagementHost().getGateways();
+    }
 
 
     @Override

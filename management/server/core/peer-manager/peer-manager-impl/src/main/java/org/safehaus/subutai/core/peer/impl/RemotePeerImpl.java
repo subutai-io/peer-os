@@ -17,6 +17,7 @@ import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.ContainersDestructionResult;
@@ -367,8 +368,7 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, alias, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<ProcessResourceUsage>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         catch ( Exception e )
         {
@@ -591,8 +591,7 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, alias, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<Set<Integer>>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         catch ( Exception e )
         {
@@ -651,8 +650,7 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, alias, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<DiskQuota>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         catch ( Exception e )
         {
@@ -712,7 +710,6 @@ public class RemotePeerImpl implements RemotePeer
         {
             throw new PeerException( "Error setting ram quota", e );
         }
-
     }
 
 
@@ -795,8 +792,7 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, alias, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<DiskQuota>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         catch ( Exception e )
         {
@@ -827,8 +823,7 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, alias, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<PeerQuotaInfo>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         catch ( Exception e )
         {
@@ -859,8 +854,7 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, alias, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<QuotaInfo>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         catch ( Exception e )
         {
@@ -1282,6 +1276,24 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public Set<Gateway> getGateways() throws PeerException
+    {
+        String path = "peer/gateways";
+        try
+        {
+            String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, null );
+
+            return JsonUtil.fromJson( response, new TypeToken<Set<Gateway>>()
+            {}.getType() );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( String.format( "Error obtaining gateways from peer %s", getName() ), e );
+        }
+    }
+
+
+    @Override
     public Set<Vni> getReservedVnis() throws PeerException
     {
         String path = "peer/vni";
@@ -1291,8 +1303,7 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, null );
 
             return JsonUtil.fromJson( response, new TypeToken<Set<Vni>>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         catch ( Exception e )
         {

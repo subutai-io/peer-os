@@ -738,6 +738,21 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response getGateways()
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            return Response.ok( JsonUtil.toJson( localPeer.getGateways() ) ).build();
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
     public Response reserveVni( final String vni )
     {
         try
