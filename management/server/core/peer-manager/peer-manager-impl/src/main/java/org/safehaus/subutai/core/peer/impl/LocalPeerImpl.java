@@ -1150,7 +1150,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             else
             {
                 //update network interfaces
-                ( ( AbstractSubutaiHost ) containerHost ).setNetInterfaces( containerHost.getNetInterfaces() );
+                ( ( AbstractSubutaiHost ) containerHost ).setNetInterfaces( containerHostInfo.getInterfaces() );
                 containerHostDataService.update( ( ContainerHostEntity ) containerHost );
             }
             ( ( AbstractSubutaiHost ) containerHost ).updateHostInfo( containerHostInfo );

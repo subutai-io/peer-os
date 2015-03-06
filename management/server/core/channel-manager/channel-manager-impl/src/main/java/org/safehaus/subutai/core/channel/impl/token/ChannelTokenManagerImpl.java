@@ -82,11 +82,15 @@ public class ChannelTokenManagerImpl implements ChannelTokenManager
         {
             entityManager.getTransaction().begin();
 
+            //-------- Update Validity Period ------------------------------------------------------------------------------
             Query query;
             query = entityManager.createNativeQuery(" update user_channel_token set valid_period  = "
                     + " case when (valid_period - datediff(hour,user_channel_token.date,CURRENT_TIMESTAMP))<=0 then  0"
                     + " else  valid_period - datediff(hour,user_channel_token.date,CURRENT_TIMESTAMP)"
                     + " end" );
+
+            query.executeUpdate();
+            //--------------------------------------------------------------------------------------
 
             entityManager.getTransaction().commit();
         }
@@ -193,7 +197,7 @@ public class ChannelTokenManagerImpl implements ChannelTokenManager
         try
         {
             Query query;
-            query = entityManager.createQuery( "select u FROM UserChannelToken AS u" );
+            query = entityManager.createQuery( "select u FROM UserChannelToken AS u order by u.userId" );
             userChannelTokenList = query.getResultList();
         }
         catch ( Exception e )
