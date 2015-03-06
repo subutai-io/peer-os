@@ -11,6 +11,8 @@
 
   <artifactId>ssl-context-manager</artifactId>
   <packaging>pom</packaging>
+  <name>Subutai Ssl Manager Parent</name>
+  <description>Subutai Ssl Manager Parent</description>
 
   <modules>
     <module>ssl-context-manager-impl</module>

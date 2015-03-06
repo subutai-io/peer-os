@@ -7,7 +7,8 @@ import java.util.concurrent.Callable;
 
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.settings.SecuritySettings;
+import org.safehaus.subutai.common.settings.ChannelSettings;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
 import org.slf4j.Logger;
@@ -51,11 +52,26 @@ public class RemotePeerMessageSender implements Callable<Boolean>
 
                 String targetPeerIP = targetPeer.getPeerInfo().getIp();
                 int targetPeerPort = targetPeer.getPeerInfo().getPort();
+                String port = String.valueOf( targetPeerPort );
 
-                restUtil.request( RestUtil.RequestType.POST,
-                        String.format( "http://%s:%d/cxf/messenger/message", targetPeerIP, targetPeerPort ),
-                        SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params,
-                        envelope.getHeaders() );
+                String url = "";
+                String alias = String.format( "env_%s_%s", targetPeer.getPeerInfo().getId(),
+                        envelope.getHeaders().get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
+
+                switch ( port )
+                {
+                    case ChannelSettings.OPEN_PORT:
+                    case ChannelSettings.SPECIAL_PORT_X1:
+                        url = String.format( "http://%s:%d/cxf/messenger/message", targetPeerIP, targetPeerPort );
+                        break;
+                    case ChannelSettings.SECURE_PORT_X1:
+                    case ChannelSettings.SECURE_PORT_X2:
+                    case ChannelSettings.SECURE_PORT_X3:
+                        url = String.format( "https://%s:%d/cxf/messenger/message", targetPeerIP, targetPeerPort );
+                        break;
+                }
+
+                restUtil.request( RestUtil.RequestType.POST, url, alias, params, envelope.getHeaders() );
 
                 messengerDao.markAsSent( envelope );
             }

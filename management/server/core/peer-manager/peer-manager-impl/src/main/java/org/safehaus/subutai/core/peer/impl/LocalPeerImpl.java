@@ -8,7 +8,7 @@ import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -1545,8 +1545,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
         keyStoreManager.importCertificateHEXString( keyStore, keyStoreData );
         //***********************************************************************
+        LOG.warn( String.format( "Importing new certificate to trustStore with alias: %s", alias ) );
         this.sslContextFactory.reloadTrustStore();
-//        new Thread( new RestartCoreServlet( 4 ) ).start();
+        //        new Thread( new RestartCoreServlet( 4 ) ).start();
     }
 
 
@@ -1588,6 +1589,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         keyStoreManager.saveX509Certificate( keyStore, environmentKeyStoreData, cert, keyPair );
 
         sslContextFactory.reloadKeyStore();
+        LOG.warn( String.format( "Saving new certificate to keyStore with alias: %s", alias ) );
 
         return keyStoreManager.exportCertificateHEXString( keyStore, environmentKeyStoreData );
     }
@@ -1614,16 +1616,17 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
             keyStore = keyStoreManager.load( keyStoreData );
 
-            Enumeration<String> aliases = keyStore.aliases();
-            while ( aliases.hasMoreElements() )
+            List<String> aliasList = Collections.list( keyStore.aliases() );
+            for ( final String alias : aliasList )
             {
-                String alias = aliases.nextElement();
                 String parseId[] = alias.split( "_" );
+                LOG.info( String.format( "Parsing alias: %s", alias ) );
                 if ( parseId.length == 2 )
                 {
                     UUID envIdFromAlias = UUID.fromString( parseId[2] );
                     if ( envIdFromAlias.equals( environmentId ) )
                     {
+                        LOG.warn( String.format( "Removing environment certificate with alias: %s", alias ) );
                         keyStoreData.setAlias( alias );
                         KeyStore keyStoreToRemove = keyStoreManager.load( keyStoreData );
                         keyStoreManager.deleteEntry( keyStoreToRemove, keyStoreData );

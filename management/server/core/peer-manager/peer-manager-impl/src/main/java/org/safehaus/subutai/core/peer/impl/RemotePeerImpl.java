@@ -92,7 +92,22 @@ public class RemotePeerImpl implements RemotePeer
         this.messenger = messenger;
         this.commandResponseListener = commandResponseListener;
         this.messageResponseListener = messageResponseListener;
-        this.baseUrl = String.format( "http://%s:%s/cxf", peerInfo.getIp(), peerInfo.getPort() );
+        String url = "";
+
+        String port = String.valueOf( peerInfo.getPort() );
+        switch ( port )
+        {
+            case ChannelSettings.OPEN_PORT:
+            case ChannelSettings.SPECIAL_PORT_X1:
+                url = String.format( "http://%s:%s/cxf", peerInfo.getIp(), peerInfo.getPort() );
+                break;
+            case ChannelSettings.SECURE_PORT_X1:
+            case ChannelSettings.SECURE_PORT_X2:
+            case ChannelSettings.SECURE_PORT_X3:
+                url = String.format( "https://%s:%s/cxf", peerInfo.getIp(), peerInfo.getPort() );
+                break;
+        }
+        this.baseUrl = url;
     }
 
 
@@ -1089,8 +1104,7 @@ public class RemotePeerImpl implements RemotePeer
 
             params.put( "vni", JsonUtil.to( vni ) );
 
-            String alias =
-                    String.format( "env_%s_%s", peerInfo.getId(), headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
+            String alias = String.format( "%s", peerInfo.getId() );
             post( path, alias, params, headers );
         }
         catch ( Exception e )

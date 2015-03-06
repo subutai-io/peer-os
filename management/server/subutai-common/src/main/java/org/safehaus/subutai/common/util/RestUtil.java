@@ -12,6 +12,7 @@ import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
 import org.safehaus.subutai.common.security.crypto.ssl.SSLManager;
+import org.safehaus.subutai.common.settings.ChannelSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +69,21 @@ public class RestUtil
         {
             URL urlObject = new URL( url );
             String port = String.valueOf( urlObject.getPort() );
-            client = createWebClient( url );
+            switch ( port )
+            {
+                case ChannelSettings.SECURE_PORT_X1:
+                    client = createTrustedWebClient( url );
+                    break;
+                case ChannelSettings.SECURE_PORT_X2:
+                    client = createTrustedWebClientWithAuth( url, alias );
+                    break;
+                case ChannelSettings.SECURE_PORT_X3:
+                    client = createTrustedWebClientWithEnvAuth( url, "environment certificate alias" );
+                    break;
+                default:
+                    client = createWebClient( url );
+                    break;
+            }
             //            switch ( port )
             //            {
             //                case ChannelSettings.SECURE_PORT_X1:
@@ -211,6 +226,8 @@ public class RestUtil
         keyStoreData.setupKeyStorePx2();
         keyStoreData.setAlias( alias );
         KeyStore keyStore = keyStoreManager.load( keyStoreData );
+
+        LOG.warn( String.format( "Getting keyStore with alias: %s", alias ) );
 
         KeyStoreData trustStoreData = new KeyStoreData();
         trustStoreData.setupTrustStorePx2();
