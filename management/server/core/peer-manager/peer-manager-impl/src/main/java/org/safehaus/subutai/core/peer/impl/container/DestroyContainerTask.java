@@ -14,8 +14,6 @@ import com.google.common.collect.Lists;
 
 public class DestroyContainerTask implements Callable
 {
-    //    private static final String CONTAINER_DOES_NOT_EXIST = "Container \"%s\" does NOT exist";
-    //    private static final String CONTAINER_DESTROYED = "Destruction of \"%s\" completed successfully";
     private static final int DESTROY_TIMEOUT = 180;
 
     private final ResourceHost resourceHost;
@@ -36,38 +34,12 @@ public class DestroyContainerTask implements Callable
     @Override
     public Object call() throws Exception
     {
-        //        final Semaphore semaphore = new Semaphore( 0 );
-
-//        final StringBuilder out = new StringBuilder();
 
         RequestBuilder destroyCommand =
                 new RequestBuilder( "subutai destroy" ).withCmdArgs( Lists.newArrayList( hostname ) )
                                                        .withTimeout( DESTROY_TIMEOUT );
 
         commandUtil.execute( destroyCommand, resourceHost );
-
-        //        commandUtil.executeAsync( destroyCommand, resourceHost, new CommandUtil.StoppableCallback()
-        //        {
-        //            @Override
-        //            public void onResponse( final Response response, final CommandResult commandResult )
-        //            {
-        //                out.append( commandResult.getStdOut() );
-        //                if ( commandResult.getStdOut().contains( String.format( CONTAINER_DESTROYED, hostname ) )
-        //                        || commandResult.getStdOut().contains( String.format( CONTAINER_DOES_NOT_EXIST,
-        // hostname ) ) )
-        //                {
-        //                    semaphore.release();
-        //                    stop();
-        //                }
-        //            }
-        //        } );
-
-
-        //        if ( !semaphore.tryAcquire( DESTROY_TIMEOUT + 3, TimeUnit.SECONDS ) )
-        //        {
-        //            throw new ContainerDestructionException(
-        //                    String.format( "Unexpected command result while destroying container: %s", out ) );
-        //        }
 
         return null;
     }
