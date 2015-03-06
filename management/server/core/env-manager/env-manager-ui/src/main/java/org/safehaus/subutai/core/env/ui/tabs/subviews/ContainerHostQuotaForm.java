@@ -100,79 +100,86 @@ public class ContainerHostQuotaForm extends VerticalLayout
         @Override
         public void buttonClick( final Button.ClickEvent event )
         {
-            updateChanges.setEnabled( false );
-            parent.setEnabled( false );
-
-            Notification.show( "Please, wait..." );
-            final int newRamQuota = Integer.parseInt( ramQuotaTextField.getValue() );
-
-            final int newCpuQuota = Integer.parseInt( cpuQuotaTextField.getValue() );
-
-            final DiskQuota newHomeDiskQuota =
-                    DiskQuota.parse( DiskPartition.HOME, diskHomeTextField.getValue() );
-            final DiskQuota newRootFsDiskQuota =
-                    DiskQuota.parse( DiskPartition.ROOT_FS, diskRootfsTextField.getValue() );
-            final DiskQuota newOptDiskQuota = DiskQuota.parse( DiskPartition.OPT, diskOptTextField.getValue() );
-            final DiskQuota newVarDiskQuota = DiskQuota.parse( DiskPartition.VAR, diskVarTextField.getValue() );
-
-            executorService.submit( new Runnable()
+            try
             {
-                @Override
-                public void run()
+                updateChanges.setEnabled( false );
+                parent.setEnabled( false );
+
+                Notification.show( "Please, wait..." );
+                final int newRamQuota = Integer.parseInt( ramQuotaTextField.getValue() );
+
+                final int newCpuQuota = Integer.parseInt( cpuQuotaTextField.getValue() );
+
+                final DiskQuota newHomeDiskQuota = DiskQuota.parse( DiskPartition.HOME, diskHomeTextField.getValue() );
+                final DiskQuota newRootFsDiskQuota =
+                        DiskQuota.parse( DiskPartition.ROOT_FS, diskRootfsTextField.getValue() );
+                final DiskQuota newOptDiskQuota = DiskQuota.parse( DiskPartition.OPT, diskOptTextField.getValue() );
+                final DiskQuota newVarDiskQuota = DiskQuota.parse( DiskPartition.VAR, diskVarTextField.getValue() );
+
+                executorService.submit( new Runnable()
                 {
-                    try
+                    @Override
+                    public void run()
                     {
-
-                        if ( newRamQuota != prevRamQuota )
+                        try
                         {
-                            containerHost.setRamQuota( newRamQuota );
-                            prevRamQuota = newRamQuota;
-                        }
 
-                        if ( newCpuQuota != prevCpuQuota )
+                            if ( newRamQuota != prevRamQuota )
+                            {
+                                containerHost.setRamQuota( newRamQuota );
+                                prevRamQuota = newRamQuota;
+                            }
+
+                            if ( newCpuQuota != prevCpuQuota )
+                            {
+                                containerHost.setCpuQuota( newCpuQuota );
+                                prevCpuQuota = newCpuQuota;
+                            }
+
+                            if ( !newHomeDiskQuota.equals( prevHomeDiskQuota ) )
+                            {
+                                containerHost.setDiskQuota( newHomeDiskQuota );
+                                prevHomeDiskQuota = newHomeDiskQuota;
+                            }
+
+                            if ( !newRootFsDiskQuota.equals( prevRootFsDiskQuota ) )
+                            {
+                                containerHost.setDiskQuota( newRootFsDiskQuota );
+                                prevRootFsDiskQuota = newRootFsDiskQuota;
+                            }
+
+                            if ( !newOptDiskQuota.equals( prevOptDiskQuota ) )
+                            {
+                                containerHost.setDiskQuota( newOptDiskQuota );
+                                prevOptDiskQuota = newOptDiskQuota;
+                            }
+
+                            if ( !newVarDiskQuota.equals( prevVarDiskQuota ) )
+                            {
+                                containerHost.setDiskQuota( newVarDiskQuota );
+                                prevVarDiskQuota = newVarDiskQuota;
+                            }
+
+                            Notification.show( "Quotas are updated" );
+                        }
+                        catch ( Exception e )
                         {
-                            containerHost.setCpuQuota( newCpuQuota );
-                            prevCpuQuota = newCpuQuota;
+                            Notification.show( String.format( "Error setting quota: %s", e.getMessage() ),
+                                    Notification.Type.ERROR_MESSAGE );
                         }
-
-                        if ( !newHomeDiskQuota.equals( prevHomeDiskQuota ) )
+                        finally
                         {
-                            containerHost.setDiskQuota( newHomeDiskQuota );
-                            prevHomeDiskQuota = newHomeDiskQuota;
+                            parent.setEnabled( true );
+                            updateChanges.setEnabled( true );
                         }
-
-                        if ( !newRootFsDiskQuota.equals( prevRootFsDiskQuota ) )
-                        {
-                            containerHost.setDiskQuota( newRootFsDiskQuota );
-                            prevRootFsDiskQuota = newRootFsDiskQuota;
-                        }
-
-                        if ( !newOptDiskQuota.equals( prevOptDiskQuota ) )
-                        {
-                            containerHost.setDiskQuota( newOptDiskQuota );
-                            prevOptDiskQuota = newOptDiskQuota;
-                        }
-
-                        if ( !newVarDiskQuota.equals( prevVarDiskQuota ) )
-                        {
-                            containerHost.setDiskQuota( newVarDiskQuota );
-                            prevVarDiskQuota = newVarDiskQuota;
-                        }
-
-                        Notification.show( "Quotas are updated" );
                     }
-                    catch ( Exception e )
-                    {
-                        Notification.show( String.format( "Error setting quota: %s", e.getMessage() ),
-                                Notification.Type.ERROR_MESSAGE );
-                    }
-                    finally
-                    {
-                        parent.setEnabled( true );
-                        updateChanges.setEnabled( true );
-                    }
-                }
-            } );
+                } );
+            }
+            catch ( Exception e )
+            {
+                Notification.show( String.format( "Error setting quota: %s", e.getMessage() ),
+                        Notification.Type.ERROR_MESSAGE );
+            }
         }
     };
 }

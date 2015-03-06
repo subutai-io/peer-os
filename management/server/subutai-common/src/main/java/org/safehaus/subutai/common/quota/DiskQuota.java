@@ -74,7 +74,7 @@ public class DiskQuota extends QuotaInfo
         Preconditions.checkNotNull( diskPartition, "Invalid disk partition" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( quotaString ), "Invalid quota string" );
 
-        if ( quotaString.contains( DiskQuotaUnit.UNLIMITED.getAcronym() ) )
+        if ( quotaString.trim().equalsIgnoreCase( DiskQuotaUnit.UNLIMITED.getAcronym() ) )
         {
             return new DiskQuota( diskPartition, DiskQuotaUnit.UNLIMITED, -1 );
         }
