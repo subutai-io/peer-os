@@ -51,6 +51,16 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getTemplate( @FormParam( "templateName" ) String templateName );
 
+    @GET
+    @Path( "vni" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getReservedVnis();
+
+    @GET
+    @Path( "gateways" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getGateways();
+
     //*************** Peer Registration Handshake REST - BEGIN ***************************
 
     @POST
@@ -190,6 +200,10 @@ public interface RestService
     @Path( "container/quota/ram" )
     Response setRamQuota( @FormParam( "containerId" ) String containerId, @FormParam( "ram" ) int ram );
 
+    @POST
+    @Path( "container/quota/ram2" )
+    Response setRamQuota( @FormParam( "containerId" ) String containerId, @FormParam( "ramQuota" ) String ramQuota );
+
     @GET
     @Path( "container/quota/cpu" )
     @Produces( { MediaType.APPLICATION_JSON } )
@@ -253,9 +267,4 @@ public interface RestService
     Response removeEnvironmentCert( @QueryParam( "environmentId" ) String environmentId );
 
     //*********** Environment Specific REST - END ***************
-
-    @GET
-    @Path( "vni" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response getReservedVnis();
 }

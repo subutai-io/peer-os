@@ -29,6 +29,7 @@ import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.metric.ResourceHostMetric;
+import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.ContainersDestructionResult;
@@ -45,6 +46,7 @@ import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.common.quota.RamQuota;
 import org.safehaus.subutai.common.security.SecurityProvider;
 import org.safehaus.subutai.common.security.crypto.certificate.CertificateData;
 import org.safehaus.subutai.common.security.crypto.certificate.CertificateManager;
@@ -1365,6 +1367,23 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
+    public void setRamQuota( final ContainerHost host, final RamQuota ramQuota ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( ramQuota, "Invalid ram quota" );
+
+        try
+        {
+            quotaManager.setRamQuota( host.getId(), ramQuota );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
     public int getAvailableRamQuota( final ContainerHost host ) throws PeerException
     {
         Preconditions.checkNotNull( host, "Invalid container host" );
@@ -1497,6 +1516,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     //networking
+
+
+    public Set<Gateway> getGateways() throws PeerException
+    {
+        return getManagementHost().getGateways();
+    }
 
 
     @Override

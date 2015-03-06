@@ -12,6 +12,7 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.CpuQuotaInfo;
@@ -21,6 +22,7 @@ import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.common.quota.RamQuota;
 
 
 /**
@@ -220,6 +222,14 @@ public interface Peer
 
 
     /**
+     * Sets ram quota
+     *
+     * @param host - container
+     * @param ramQuota - quota to set
+     */
+    public void setRamQuota( ContainerHost host, RamQuota ramQuota ) throws PeerException;
+
+    /**
      * Destroys hosted part of environment
      *
      * @param environmentId - id fo environment
@@ -229,6 +239,8 @@ public interface Peer
     public ContainersDestructionResult destroyEnvironmentContainers( UUID environmentId ) throws PeerException;
 
     //networking
+
+    public Set<Gateway> getGateways() throws PeerException;
 
     public void reserveVni( Vni vni ) throws PeerException;
 

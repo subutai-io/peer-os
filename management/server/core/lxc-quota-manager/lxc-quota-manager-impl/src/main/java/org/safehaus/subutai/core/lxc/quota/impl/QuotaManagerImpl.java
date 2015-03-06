@@ -21,6 +21,7 @@ import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.common.quota.RamQuota;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
@@ -248,6 +249,18 @@ public class QuotaManagerImpl implements QuotaManager
                 diskQuota.getDiskPartition().getPartitionName(), String.format( "%s%s",
                         diskQuota.getDiskQuotaUnit() == DiskQuotaUnit.UNLIMITED ? "" : diskQuota.getDiskQuotaValue(),
                         diskQuota.getDiskQuotaUnit().getAcronym() ) ) );
+    }
+
+
+    public void setRamQuota( final UUID containerId, final RamQuota ramQuota ) throws QuotaException
+    {
+        Preconditions.checkNotNull( containerId );
+        Preconditions.checkNotNull( ramQuota );
+
+        ContainerHost containerHost = getContainerHostById( containerId );
+
+        executeOnContainersResourceHost( containerId, commands.getWriteRamQuotaCommand2( containerHost.getHostname(),
+                String.format( "%s%s", ramQuota.getRamQuotaValue(), ramQuota.getRamQuotaUnit().getAcronym() ) ) );
     }
 
 
