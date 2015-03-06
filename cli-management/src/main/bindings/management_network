@@ -64,9 +64,12 @@ Usage:   Reserve VNI
 Usage:   LIST Reserved VNI                 
          "subutai \[-qh\] management_network -Z list
          Example: subutai management_network -Z list
-Usage:   Selete Reserved VNI                 
+Usage:   Delete Reserved VNI                 
          "subutai \[-qh\] management_network -Z delete VNI VLAN_ID ENV_ID
          Example: subutai management_network -Z delete 4300 234 A12E567H78
+Usage:   Delete Reserved VNI Delete tunnell mapping Delete Gateway                 
+         "subutai \[-qh\] management_network -Z deleteall VLAN_ID
+         Example: subutai management_network -Z deleteall 234
 
 -------------------------------------------------------------------------------
 EOF
@@ -546,7 +549,30 @@ function management_network {
             exit 0
         fi
       local status=$1
-      if   [ "$status" == "list"  ]; then
+
+if   [ "$status" == "deleteall" ]; then
+             VLAN=$2
+             if [ -z "$VLAN" ];then
+              msg_error "Provide VLAN" >&2
+              msg_info "Usage: subutai management_network -Z delete_all VLAN" >&2
+               exit 1
+             fi
+            get_res=$(subutai management_network -Z list | awk -F "," -v var="$VLAN" '{ if ( $2 == var ){ print $1 " " $2 " " $3 }  }')
+            echo "$get_res"
+            if [ -z "$get_res" ];then
+               msg_error "Not found VLAN=$VLAN" >&2
+               exit 0
+            fi
+            subutai management_network -D $VLAN
+            get_res2=$(subutai management_network -v | awk -F "," -v var="$VLAN" '{ if ( $3 == var ){ print $1 " " $2 " " $3 " " $4}  }')
+            if [ "$get_res2" ]; then
+                subutai management_network -M $get_res2
+            fi
+            subutai management_network -Z delete $get_res
+
+           exit 0
+
+      elif   [ "$status" == "list"  ]; then
          cat $file_name | awk -F " " '{print $1 "," $2 "," $3}'
          exit 0              
       elif [ "$status" == "delete" ]; then 
