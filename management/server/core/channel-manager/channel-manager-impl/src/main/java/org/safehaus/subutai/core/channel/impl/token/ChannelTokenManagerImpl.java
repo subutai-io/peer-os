@@ -111,9 +111,10 @@ public class ChannelTokenManagerImpl implements ChannelTokenManager
 
             //-------- Update Validity Period ------------------------------------------------------------------------------
             Query query;
+
             query = entityManager.createNativeQuery(" update user_channel_token set valid_period  = "
-                    + " case when (valid_period - datediff(hour,user_channel_token.date,CURRENT_TIMESTAMP))<=0 then  0"
-                    + " else  valid_period - datediff(hour,user_channel_token.date,CURRENT_TIMESTAMP)"
+                    + " case when (valid_period-1)<0 then  0"
+                    + " else valid_period-1"
                     + " end" );
 
             query.executeUpdate();
