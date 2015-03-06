@@ -12,6 +12,7 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.CpuQuotaInfo;
@@ -238,6 +239,8 @@ public interface Peer
     public ContainersDestructionResult destroyEnvironmentContainers( UUID environmentId ) throws PeerException;
 
     //networking
+
+    public Set<Gateway> getGateways() throws PeerException;
 
     public void reserveVni( Vni vni ) throws PeerException;
 
