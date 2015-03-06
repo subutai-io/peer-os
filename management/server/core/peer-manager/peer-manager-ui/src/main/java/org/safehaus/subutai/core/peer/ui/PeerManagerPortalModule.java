@@ -7,6 +7,7 @@ import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
@@ -20,6 +21,19 @@ public class PeerManagerPortalModule implements PortalModule
     private PeerManager peerManager;
     private TemplateRegistry registry;
     private HostRegistry hostRegistry;
+    private CustomSslContextFactory sslContextFactory;
+
+
+    public void setSslContextFactory( final CustomSslContextFactory sslContextFactory )
+    {
+        this.sslContextFactory = sslContextFactory;
+    }
+
+
+    public CustomSslContextFactory getSslContextFactory()
+    {
+        return sslContextFactory;
+    }
 
 
     public PeerManager getPeerManager()

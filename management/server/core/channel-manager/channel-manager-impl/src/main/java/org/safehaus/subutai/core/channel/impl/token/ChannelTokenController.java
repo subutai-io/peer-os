@@ -26,10 +26,10 @@ public class ChannelTokenController implements Runnable
         {
             while (true)
             {
+                Thread.sleep(60 * 60 * 1000 );
+
                 LOG.info( "******** Channel Token Controller invoked *********" );
                 channelTokenManager.setTokenValidity();
-
-                Thread.sleep( 60 * 60 * 1000 );
             }
         }
         catch (InterruptedException e)

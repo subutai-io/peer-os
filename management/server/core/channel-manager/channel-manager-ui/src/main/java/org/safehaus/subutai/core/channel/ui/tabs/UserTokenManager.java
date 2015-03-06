@@ -59,6 +59,7 @@ public class UserTokenManager extends Panel
     private ComboBox userCombo;
     private Button generateTokenBtn;
     private Button editSubBtn;
+    private Window subWindow;
     private User user;
     String userName = "";
     long userId = 0;
@@ -169,9 +170,6 @@ public class UserTokenManager extends Panel
         }
         //----------------------------------------------------------------------------------------------
 
-        editSubBtn = new Button( "Save" );
-        editSubBtn.setId( "EditSubBtn" );
-        editSubBtn.addStyleName( "default" );
 
 
         editIpRangeStartTxtFld = new TextField( "Enter IP range start" );
@@ -283,7 +281,13 @@ public class UserTokenManager extends Panel
     {
         final IUserChannelToken userChannelToken = ( IUserChannelToken ) clickEvent.getButton().getData();
 
-        final Window subWindow = new Window();
+        subWindow = new Window();
+
+        editSubBtn = new Button( "Save" );
+        editSubBtn.setId( "EditSubBtn" );
+        editSubBtn.addStyleName( "default" );
+
+
         VerticalLayout content = new VerticalLayout();
         content.setMargin( true );
 
@@ -301,7 +305,7 @@ public class UserTokenManager extends Panel
         editSubBtn.addClickListener( new Button.ClickListener()
         {
             @Override
-            public void buttonClick( final Button.ClickEvent clickEvent )
+            public void buttonClick( final Button.ClickEvent clickEvent)
             {
                 Timestamp datetime = new Timestamp( System.currentTimeMillis() );
 

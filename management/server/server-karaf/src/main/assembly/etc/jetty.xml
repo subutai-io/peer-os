@@ -69,7 +69,7 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
     <Arg>
       <New class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
         <Arg>
-          <New class="org.eclipse.jetty.util.ssl.SslContextFactory">
+          <New class="org.eclipse.jetty.http.ssl.SslContextFactory">
             <!--<Set name="KeyStore">etc/keystores/keystore_server_px1.jks</Set>-->
             <Set name="KeyStore">/var/lib/subutai/keystores/keystore_server_px1.jks</Set>
             <Set name="certAlias">root_server_px1</Set>

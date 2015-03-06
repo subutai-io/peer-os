@@ -94,7 +94,22 @@ public class RemotePeerImpl implements RemotePeer
         this.messenger = messenger;
         this.commandResponseListener = commandResponseListener;
         this.messageResponseListener = messageResponseListener;
-        this.baseUrl = String.format( "http://%s:%s/cxf", peerInfo.getIp(), peerInfo.getPort() );
+        String url = "";
+
+        String port = String.valueOf( peerInfo.getPort() );
+        switch ( port )
+        {
+            case ChannelSettings.OPEN_PORT:
+            case ChannelSettings.SPECIAL_PORT_X1:
+                url = String.format( "http://%s:%s/cxf", peerInfo.getIp(), peerInfo.getPort() );
+                break;
+            case ChannelSettings.SECURE_PORT_X1:
+            case ChannelSettings.SECURE_PORT_X2:
+            case ChannelSettings.SECURE_PORT_X3:
+                url = String.format( "https://%s:%s/cxf", peerInfo.getIp(), peerInfo.getPort() );
+                break;
+        }
+        this.baseUrl = url;
     }
 
 
@@ -229,7 +244,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", peerInfo.getId(), host.getEnvironmentId() );
+            String alias = String.format( "env_%s_%s", localPeer.getId(), host.getEnvironmentId() );
             post( path, alias, params, headers );
         }
         catch ( Exception e )
@@ -254,7 +269,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", peerInfo.getId(), host.getEnvironmentId() );
+            String alias = String.format( "env_%s_%s", localPeer.getId(), host.getEnvironmentId() );
             post( path, alias, params, headers );
         }
         catch ( Exception e )
@@ -279,7 +294,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", peerInfo.getId(), host.getEnvironmentId() );
+            String alias = String.format( "env_%s_%s", localPeer.getId(), host.getEnvironmentId() );
             post( path, alias, params, headers );
         }
         catch ( Exception e )
@@ -307,7 +322,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", peerInfo.getId(), host.getEnvironmentId() );
+            String alias = String.format( "env_%s_%s", localPeer.getId(), host.getEnvironmentId() );
             post( path, alias, params, headers );
         }
         catch ( Exception e )
@@ -334,7 +349,7 @@ public class RemotePeerImpl implements RemotePeer
         try
         {
             String alias =
-                    String.format( "env_%s_%s", peerInfo.getId(), headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
+                    String.format( "env_%s_%s", localPeer.getId(), headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             return JsonUtil.fromJson( post( path, alias, params, headers ), Boolean.class );
         }
         catch ( Exception e )
@@ -364,7 +379,7 @@ public class RemotePeerImpl implements RemotePeer
         try
         {
             String alias =
-                    String.format( "env_%s_%s", peerInfo.getId(), headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
+                    String.format( "env_%s_%s", localPeer.getId(), headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<ProcessResourceUsage>()
@@ -392,7 +407,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", peerInfo.getId().toString(),
+            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
@@ -420,7 +435,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", peerInfo.getId().toString(),
+            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
@@ -448,7 +463,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", peerInfo.getId().toString(),
+            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
@@ -478,7 +493,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", peerInfo.getId(), host.getEnvironmentId() );
+            String alias = String.format( "env_%s_%s", localPeer.getId(), host.getEnvironmentId() );
             post( path, alias, params, headers );
         }
         catch ( Exception e )
@@ -503,7 +518,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", peerInfo.getId().toString(),
+            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
@@ -531,7 +546,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", peerInfo.getId().toString(),
+            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
@@ -561,7 +576,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", peerInfo.getId(), host.getEnvironmentId() );
+            String alias = String.format( "env_%s_%s", localPeer.getId(), host.getEnvironmentId() );
             post( path, alias, params, headers );
         }
         catch ( Exception e )
@@ -586,7 +601,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", peerInfo.getId().toString(),
+            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
@@ -617,7 +632,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", peerInfo.getId(), host.getEnvironmentId() );
+            String alias = String.format( "env_%s_%s", localPeer.getId(), host.getEnvironmentId() );
             post( path, alias, params, headers );
         }
         catch ( Exception e )
@@ -645,7 +660,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", peerInfo.getId().toString(),
+            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
@@ -676,7 +691,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", peerInfo.getId(), host.getEnvironmentId() );
+            String alias = String.format( "env_%s_%s", localPeer.getId(), host.getEnvironmentId() );
             post( path, alias, params, headers );
         }
         catch ( Exception e )
@@ -728,7 +743,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", peerInfo.getId().toString(),
+            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
@@ -756,7 +771,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", peerInfo.getId().toString(),
+            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
@@ -787,7 +802,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", peerInfo.getId().toString(),
+            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
@@ -818,7 +833,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", peerInfo.getId().toString(),
+            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
@@ -849,7 +864,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", peerInfo.getId().toString(),
+            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
@@ -881,7 +896,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", peerInfo.getId(), host.getEnvironmentId() );
+            String alias = String.format( "env_%s_%s", localPeer.getId(), host.getEnvironmentId() );
             post( path, alias, params, headers );
         }
         catch ( Exception e )
@@ -1112,9 +1127,8 @@ public class RemotePeerImpl implements RemotePeer
 
             params.put( "vni", JsonUtil.to( vni ) );
 
-            String alias =
-                    String.format( "env_%s_%s", peerInfo.getId(), headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
-            post( path, alias, params, headers );
+            //            String alias = String.format( "%s", peerInfo.getId() );
+            post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
         }
         catch ( Exception e )
         {
@@ -1162,17 +1176,17 @@ public class RemotePeerImpl implements RemotePeer
      * Exports certificate with alias passed and returns cert in HEX String format. And stores new certificate in
      * keyStore.
      *
-     * @param alias - certificate alias
+     * @param environmentId - environmentId to generate cert for
      *
      * @return - certificate in HEX format
      */
     @Override
-    public String exportEnvironmentCertificate( final String alias ) throws PeerException
+    public String exportEnvironmentCertificate( final UUID environmentId ) throws PeerException
     {
-        Preconditions.checkNotNull( alias, "Invalid parameter alias" );
+        Preconditions.checkNotNull( environmentId, "Invalid parameter environmentId" );
 
         String path = "peer/cert/export";
-        String envId = alias.split( "_" )[2];
+        String envId = environmentId.toString();
 
         try
         {
@@ -1181,7 +1195,7 @@ public class RemotePeerImpl implements RemotePeer
             client.path( path );
 
             Form form = new Form();
-            form.set( "alias", alias );
+            form.set( "environmentId", envId );
 
             client.header( Common.ENVIRONMENT_ID_HEADER_NAME, envId );
 
@@ -1198,7 +1212,7 @@ public class RemotePeerImpl implements RemotePeer
         catch ( Exception e )
         {
             throw new PeerException(
-                    String.format( "Error importing environment certificate %s on peer %s", alias, getName() ), e );
+                    String.format( "Error importing environment certificate %s on peer %s", envId, getName() ), e );
         }
     }
 
@@ -1220,7 +1234,7 @@ public class RemotePeerImpl implements RemotePeer
         {
 
             String url = String.format( "https://%s:%s/cxf", peerInfo.getIp(), ChannelSettings.SECURE_PORT_X2 );
-            String environmentRequestAlias = String.format( "env_%s_%s", peerInfo.getId().toString(), envId );
+            String environmentRequestAlias = String.format( "env_%s_%s", localPeer.getId().toString(), envId );
 
             WebClient client = RestUtil.createTrustedWebClientWithEnvAuth( url, environmentRequestAlias );
             client.path( path );
