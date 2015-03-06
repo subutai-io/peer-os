@@ -100,6 +100,21 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/get-reserved-vni">
+      <action class="org.safehaus.subutai.core.peer.cli.GetReservedVnisCommand">
+        <property name="peerManager" ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/jetty">
+      <action class="org.safehaus.subutai.core.peer.cli.JettyCommand">
+      </action>
+    </command>
+  </command-bundle>
+
   <reference id="peerManager" availability="mandatory" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
   <reference id="identityManager" availability="mandatory"
              interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
@@ -108,8 +123,5 @@
              interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
   <reference id="environmentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.env.api.EnvironmentManager" />
-
-  <reference id="securityManager" availability="mandatory"
-             interface="org.apache.shiro.mgt.SecurityManager" />
 
 </blueprint>

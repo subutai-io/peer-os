@@ -24,9 +24,6 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 
-/**
- * Created by talas on 2/12/15.
- */
 public class EnvironmentContainersQuotaTab extends CustomComponent
 {
     private EnvironmentManagerComponent environmentComponent;

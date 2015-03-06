@@ -5,14 +5,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import javax.management.Notification;
 
 import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.pluginmanager.api.OperationType;
 import org.safehaus.subutai.pluginmanager.api.PluginInfo;
 import org.safehaus.subutai.pluginmanager.api.PluginManager;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 
+import com.vaadin.server.ClientConnector;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Button;
@@ -26,12 +33,13 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
 
 
-public class PluginManagerComponent extends CustomComponent implements Disposable
+public class PluginManagerComponent extends CustomComponent
 {
     protected static final String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
     protected static final String MARKET_PLACE_BUTTON_CAPTION = "Market Place";
     protected static final String LIST_INSTALLED_PLUGINS_BUTTON_CAPTION = "List Installed Plugins";
     protected static final String LIST_AVAILABLE_PLUGINS_BUTTON_CAPTION = "List Available Plugins";
+    protected static final String LIST_PLUGINS_BUTTON_CAPTION = "List Plugins";
     protected static final String SEARCH_BUTTON_CAPTION = "Search";
     protected static final String INSTALL_BUTTON_CAPTION = "Install";
     protected static final String REMOVE_BUTTON_CAPTION = "Remove";
@@ -47,6 +55,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
     private final ExecutorService executorService;
     private Tracker tracker;
     private boolean isTableRemoved = false;
+    private ScheduledExecutorService updater;
 
 
     public PluginManagerComponent( final ExecutorService executorService, PluginManagerPortalModule managerUI,
@@ -66,17 +75,39 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
         pluginsTable = createTableTemplate( "Plugins" );
         pluginsTable.setId( "PluginsTable" );
 
-        HorizontalLayout controlsContent = new HorizontalLayout();
+        final HorizontalLayout controlsContent = new HorizontalLayout();
         controlsContent.setSpacing( true );
 
-        getListInstalledPluginsButton( controlsContent );
-        getListAvailablePluginsButton( controlsContent );
-        getMarketPlaceButton( controlsContent );
+        getListPluginsButton( controlsContent );
+        //getListInstalledPluginsButton( controlsContent );
+        //getListAvailablePluginsButton( controlsContent );
+        //getMarketPlaceButton( controlsContent );
 
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( pluginsTable, 0, 1, 0, 9 );
 
         setCompositionRoot( contentRoot );
+    }
+
+    private void startTableUpdateThread( final HorizontalLayout controlsContent )
+    {
+        updater = Executors.newSingleThreadScheduledExecutor();
+        updater.scheduleWithFixedDelay( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+
+                pluginsTable.getUI().access( new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        listPluginsClickHandler( );
+                    }
+                } );
+            }
+        }, 3, 5, TimeUnit.SECONDS );
     }
 
 
@@ -85,6 +116,23 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
         contentRoot.addComponent( pluginsTable, 0, 1, 0, 9 );
     }
 
+
+    private void getListPluginsButton( final HorizontalLayout controlsContent )
+    {
+        Button listPluginsBtn = new Button( LIST_PLUGINS_BUTTON_CAPTION );
+        listPluginsBtn.setId( "listPluginsBtn" );
+        listPluginsBtn.addStyleName( STYLE_NAME );
+        listPluginsBtn.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
+                listPluginsClickHandler( );
+            }
+        } );
+
+        controlsContent.addComponent( listPluginsBtn );
+    }
 
     private void getListInstalledPluginsButton( final HorizontalLayout controlsContent )
     {
@@ -150,6 +198,11 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
         controlsContent.addComponent( browser );
     }
 
+    private void refreshUI()
+    {
+        listPluginsClickHandler();
+    }
+
 
     private void listInstalledPluginsClickHandler( HorizontalLayout controlsContent )
     {
@@ -190,9 +243,50 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
             int count = itemIds.size();
             Object itemId = itemIds.get( count - 1 );
 
-            addClickListenerToRemoveButton( removeButton, p.getPluginName(), itemId );
-            addClickListenetToUpgradeButton( upgradeButton, p.getPluginName() );
+            //addClickListenerToRemoveButton( removeButton, p.getPluginName(), itemId, availableOperations );
+            //addClickListenetToUpgradeButton( upgradeButton, p.getPluginName() );
             isTableRemoved = false;
+        }
+    }
+
+
+    private void listPluginsClickHandler( )
+    {
+        pluginsTable.removeAllItems();
+        boolean isInstalled = false;
+        for ( String p : pluginManager.getAvailablePluginNames() )
+        {
+            final Button installButton = new Button( INSTALL_BUTTON_CAPTION );
+            final Button removeButton = new Button( REMOVE_BUTTON_CAPTION );
+            isInstalled = pluginManager.isInstalled( p );
+            final HorizontalLayout availableOperations = new HorizontalLayout();
+            addStyleName( installButton, removeButton, availableOperations );
+
+            if ( isInstalled )
+            {
+                addGivenComponents( availableOperations, removeButton );
+            }
+            else
+            {
+                addGivenComponents( availableOperations, installButton );
+            }
+
+
+            pluginsTable.addItem( new Object[] { p, availableOperations }, null);
+
+            List<Object> itemIds = new ArrayList<>( pluginsTable.getItemIds() );
+            if( itemIds.size() == 0 )
+            {
+                com.vaadin.ui.Notification.show( "There is no available plugins in repo to be installed" );
+                return;
+            }
+            else{
+                int count = itemIds.size();
+                Object itemId = itemIds.get( count - 1 );
+                addClickListenerToRemoveButton( removeButton, p, itemId, availableOperations, installButton );
+                addClickListenerToInstallButton( installButton, p, itemId, availableOperations, removeButton );
+            }
+
         }
     }
 
@@ -226,24 +320,36 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
             }, null );
 
             List<Object> itemIds = new ArrayList<>( pluginsTable.getItemIds() );
-            int count = itemIds.size();
-            Object itemId = itemIds.get( count - 1 );
+            if( itemIds.size() == 0 )
+            {
+                com.vaadin.ui.Notification.show( "There is no available plugins in repo to be installed" );
+                return;
+            }
+            else{
+                int count = itemIds.size();
+                Object itemId = itemIds.get( count - 1 );
+                //addClickListenerToInstallButton( installButton, p.getPluginName(), itemId );
+            }
 
-            addClickListenerToInstallButton( installButton, p.getPluginName(), itemId );
+
+
             isTableRemoved = false;
         }
     }
 
 
-    private void addClickListenerToInstallButton( Button installButton, final String pluginName, final Object itemId )
+    private void addClickListenerToInstallButton( final Button installButton, final String pluginName, final Object itemId,
+                                                  final HorizontalLayout availableOperations, final Button removeButton )
     {
         installButton.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
+                pluginsTable.setEnabled( false );
+
                 ConfirmationDialog alert =
-                        new ConfirmationDialog( String.format( "Do you want to remove the %s plugin?", pluginName ),
+                        new ConfirmationDialog( String.format( "Do you want to install the %s plugin?", pluginName ),
                                 "Yes", "No" );
                 alert.getOk().addClickListener( new Button.ClickListener()
                 {
@@ -260,20 +366,32 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
                             @Override
                             public void windowClose( Window.CloseEvent closeEvent )
                             {
-                                pluginsTable.removeItem( itemId );
+                                if( pluginManager.operationSuccessful( OperationType.INSTALL ))
+                                {
+                                    availableOperations.removeComponent( installButton );
+                                    availableOperations.addComponent( removeButton );
+                                }
+                                pluginsTable.setEnabled( true );
                             }
                         } );
                         contentRoot.getUI().addWindow( window.getWindow() );
                     }
                 } );
-
+                alert.getCancel().addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent clickEvent )
+                    {
+                        pluginsTable.setEnabled( true );
+                    }
+                } );
                 contentRoot.getUI().addWindow( alert.getAlert() );
             }
         } );
     }
 
 
-    private void addClickListenetToUpgradeButton( final Button upgradeButton, final String pluginName )
+    private void addClickListenerToUpgradeButton( final Button upgradeButton, final String pluginName )
     {
         upgradeButton.addClickListener( new Button.ClickListener()
         {
@@ -311,13 +429,16 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
     }
 
 
-    private void addClickListenerToRemoveButton( Button removeButton, final String pluginName, final Object itemId )
+    private void addClickListenerToRemoveButton( final Button removeButton, final String pluginName, final Object itemId,
+                                                 final HorizontalLayout availableOperations, final Button installButton )
     {
         removeButton.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
+                pluginsTable.setEnabled( false );
+
                 ConfirmationDialog alert =
                         new ConfirmationDialog( String.format( "Do you want to remove the %s plugin?", pluginName ),
                                 "Yes", "No" );
@@ -336,14 +457,27 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
                             @Override
                             public void windowClose( Window.CloseEvent closeEvent )
                             {
-                                pluginsTable.removeItem( itemId );
+                                if( pluginManager.operationSuccessful( OperationType.REMOVE ))
+                                {
+                                    availableOperations.removeComponent( removeButton );
+                                    availableOperations.addComponent( installButton );
+                                }
+                                pluginsTable.setEnabled( true );
                             }
                         } );
                         contentRoot.getUI().addWindow( window.getWindow() );
                     }
                 } );
-
+                alert.getCancel().addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent clickEvent )
+                    {
+                        pluginsTable.setEnabled( true );
+                    }
+                } );
                 contentRoot.getUI().addWindow( alert.getAlert() );
+
             }
         } );
     }
@@ -372,7 +506,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
         final Table table = new Table( caption );
         table.setStyleName( "Reindeer.TABLE_STRONG" );
         table.addContainerProperty( PLUGIN_COLUMN_CAPTION, String.class, null );
-        table.addContainerProperty( VERSION_COLUMN_CAPTION, Label.class, null );
+        //table.addContainerProperty( VERSION_COLUMN_CAPTION, Label.class, null );
         table.addContainerProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION, HorizontalLayout.class, null );
         table.setSizeFull();
         table.setPageLength( 20 );
@@ -382,9 +516,9 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
     }
 
 
-    @Override
-    public void dispose()
-    {
-        this.pluginManager = null;
-    }
+//    @Override
+//    public void dispose()
+//    {
+//        this.pluginManager = null;
+//    }
 }

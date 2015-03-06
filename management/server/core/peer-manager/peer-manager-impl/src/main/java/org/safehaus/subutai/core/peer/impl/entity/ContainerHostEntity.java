@@ -108,7 +108,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         }
         catch ( ContainerGroupNotFoundException e )
         {
-            throw new UnsupportedOperationException( "This operation is not allowed for non environment containers" );
+            return null;
         }
     }
 
@@ -141,6 +141,13 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public Set<String> getTags()
     {
         return this.tags;
+    }
+
+
+    @Override
+    public void setDefaultGateway( final String gatewayIp ) throws PeerException
+    {
+        getPeer().setDefaultGateway( this, gatewayIp );
     }
 
 

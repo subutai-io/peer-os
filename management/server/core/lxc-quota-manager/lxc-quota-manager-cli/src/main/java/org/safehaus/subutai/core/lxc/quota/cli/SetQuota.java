@@ -57,19 +57,19 @@ public class SetQuota extends OsgiCommandSupport
                 break;
             case QUOTA_TYPE_DISK_ROOTFS:
                 quotaManager.setDiskQuota( targetContainer.getId(),
-                        new DiskQuota( DiskPartition.ROOT_FS, DiskQuotaUnit.MB, Integer.valueOf( quotaValue ) ) );
+                        new DiskQuota( DiskPartition.ROOT_FS, DiskQuotaUnit.MB, Double.valueOf( quotaValue ) ) );
                 break;
             case QUOTA_TYPE_DISK_HOME:
                 quotaManager.setDiskQuota( targetContainer.getId(),
-                        new DiskQuota( DiskPartition.HOME, DiskQuotaUnit.MB, Integer.valueOf( quotaValue ) ) );
+                        new DiskQuota( DiskPartition.HOME, DiskQuotaUnit.MB, Double.valueOf( quotaValue ) ) );
                 break;
             case QUOTA_TYPE_DISK_OPT:
                 quotaManager.setDiskQuota( targetContainer.getId(),
-                        new DiskQuota( DiskPartition.OPT, DiskQuotaUnit.MB, Integer.valueOf( quotaValue ) ) );
+                        new DiskQuota( DiskPartition.OPT, DiskQuotaUnit.MB, Double.valueOf( quotaValue ) ) );
                 break;
             case QUOTA_TYPE_DISK_VAR:
                 quotaManager.setDiskQuota( targetContainer.getId(),
-                        new DiskQuota( DiskPartition.VAR, DiskQuotaUnit.MB, Integer.valueOf( quotaValue ) ) );
+                        new DiskQuota( DiskPartition.VAR, DiskQuotaUnit.MB, Double.valueOf( quotaValue ) ) );
                 break;
             case QUOTA_TYPE_CPU:
                 quotaManager.setCpuQuota( targetContainer.getId(), Integer.valueOf( quotaValue ) );

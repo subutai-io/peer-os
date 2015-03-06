@@ -134,8 +134,8 @@ public class MessengerImpl implements Messenger, MessageProcessor
                     return MessageStatus.SENT;
                 }
                 //give 10 extra seconds in case background sender is in process of transmitting this message
-                else if ( ( envelope.getCreateDate().getTime() + envelope.getTimeToLive() * 1000 )
-                        < System.currentTimeMillis() + 10000 )
+                else if ( ( envelope.getCreateDate().getTime() + ( envelope.getTimeToLive() + 10 ) * 1000 ) > System
+                        .currentTimeMillis() )
                 {
                     return MessageStatus.IN_PROCESS;
                 }

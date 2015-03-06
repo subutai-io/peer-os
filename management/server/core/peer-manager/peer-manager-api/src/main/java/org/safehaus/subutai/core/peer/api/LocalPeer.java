@@ -74,8 +74,6 @@ public interface LocalPeer extends Peer
                                           final String containerName ) throws PeerException;
 
 
-    public String getFreeHostName( String prefix );
-
     /**
      * Returns container group by container id
      *
@@ -107,4 +105,8 @@ public interface LocalPeer extends Peer
      * @return - set of {@code ContainerGroup}
      */
     public Set<ContainerGroup> findContainerGroupsByOwnerId( UUID ownerId );
+
+    //networking
+
+    public int setupTunnels( Set<String> peerIps, UUID environmentId ) throws PeerException;
 }

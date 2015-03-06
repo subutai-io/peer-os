@@ -232,30 +232,7 @@ public class QuotaManagerImpl implements QuotaManager
         CommandResult result = executeOnContainersResourceHost( containerId,
                 commands.getReadDiskQuotaCommand( containerHost.getHostname(), diskPartition.getPartitionName() ) );
 
-        if ( result.getStdOut().contains( DiskQuotaUnit.UNLIMITED.getAcronym() ) )
-        {
-            return new DiskQuota( diskPartition, DiskQuotaUnit.UNLIMITED, -1 );
-        }
-        else
-        {
-            //TODO Need to modify regex to be able to parse decimal point values
-            String regex = "(\\d+)(K|M|G|T|P|E)?";
-            Pattern quotaPattern = Pattern.compile( regex );
-            Matcher quotaMatcher = quotaPattern.matcher( result.getStdOut().trim() );
-            if ( quotaMatcher.matches() )
-            {
-                String quotaValue = quotaMatcher.group( 1 );
-                long value = Long.parseLong( quotaValue );
-                String acronym = quotaMatcher.group( 2 );
-                DiskQuotaUnit diskQuotaUnit = DiskQuotaUnit.parseFromAcronym( acronym );
-                return new DiskQuota( diskPartition, diskQuotaUnit == null ? DiskQuotaUnit.BYTE : diskQuotaUnit,
-                        value );
-            }
-            else
-            {
-                throw new QuotaException( String.format( "Unparseable result: %s", result.getStdOut() ) );
-            }
-        }
+        return DiskQuota.parse( diskPartition, result.getStdOut() );
     }
 
 
@@ -316,30 +293,7 @@ public class QuotaManagerImpl implements QuotaManager
                 commands.getReadAvailableDiskQuotaCommand( containerHost.getHostname(),
                         diskPartition.getPartitionName() ) );
 
-        if ( result.getStdOut().contains( DiskQuotaUnit.UNLIMITED.getAcronym() ) )
-        {
-            return new DiskQuota( diskPartition, DiskQuotaUnit.UNLIMITED, -1 );
-        }
-        else
-        {
-            //TODO Need to modify regex to be able to parse decimal point values
-            String regex = "(\\d+)(K|M|G|T|P|E)?";
-            Pattern quotaPattern = Pattern.compile( regex );
-            Matcher quotaMatcher = quotaPattern.matcher( result.getStdOut().trim() );
-            if ( quotaMatcher.matches() )
-            {
-                String quotaValue = quotaMatcher.group( 1 );
-                long value = Long.parseLong( quotaValue );
-                String acronym = quotaMatcher.group( 2 );
-                DiskQuotaUnit diskQuotaUnit = DiskQuotaUnit.parseFromAcronym( acronym );
-                return new DiskQuota( diskPartition, diskQuotaUnit == null ? DiskQuotaUnit.BYTE : diskQuotaUnit,
-                        value );
-            }
-            else
-            {
-                throw new QuotaException( String.format( "Unparseable result: %s", result.getStdOut() ) );
-            }
-        }
+        return DiskQuota.parse( diskPartition, result.getStdOut() );
     }
 
 
@@ -376,7 +330,7 @@ public class QuotaManagerImpl implements QuotaManager
     {
         try
         {
-            return peerManager.getLocalPeer().getResourceHostByContainerId( containerId);
+            return peerManager.getLocalPeer().getResourceHostByContainerId( containerId );
         }
         catch ( HostNotFoundException e )
         {

@@ -157,14 +157,14 @@ public class MessengerImplTest
 
         status = messenger.getMessageStatus( MESSAGE_ID );
 
-        assertEquals( MessageStatus.IN_PROCESS, status );
+        assertEquals( MessageStatus.EXPIRED, status );
 
         //test EXPIRED
         when( createDate.getTime() ).thenReturn( System.currentTimeMillis() + 1000000 );
 
         status = messenger.getMessageStatus( MESSAGE_ID );
 
-        assertEquals( MessageStatus.EXPIRED, status );
+        assertEquals( MessageStatus.IN_PROCESS, status );
 
 
         //test SENT

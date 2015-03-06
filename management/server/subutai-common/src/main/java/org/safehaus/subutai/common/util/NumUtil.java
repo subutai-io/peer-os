@@ -16,4 +16,10 @@ public class NumUtil
     {
         return num >= from && num <= to;
     }
+
+
+    public static boolean isLongBetween( long num, long from, long to )
+    {
+        return num >= from && num <= to;
+    }
 }

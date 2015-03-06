@@ -60,17 +60,7 @@ public class ResourceHostInfoImpl implements ResourceHostInfo
 
         if ( !CollectionUtil.isCollectionEmpty( containers ) )
         {
-            //TODO remove this temp workaround when agent is fixed
-            for ( ContainerHostInfoImpl containerHostInfo : containers )
-            {
-                if ( !CollectionUtil.isCollectionEmpty( containerHostInfo.getInterfaces() ) )
-                {
-                    result.add( containerHostInfo );
-                }
-            }
-            //TODO
-
-            //            result.addAll( containers );
+            result.addAll( containers );
         }
 
         return result;

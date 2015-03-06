@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 
@@ -55,10 +56,10 @@ import com.google.common.collect.Sets;
 @Access( AccessType.FIELD )
 public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceHost
 {
-    private static final int DESTROY_TIMEOUT = 180;
+    private static final int CONNECT_TIMEOUT = 300;
+
     protected static final Logger LOG = LoggerFactory.getLogger( ResourceHostEntity.class );
     private static final Pattern LXC_STATE_PATTERN = Pattern.compile( "State:(\\s*)(.*)" );
-    private static final Pattern LOAD_AVERAGE_PATTERN = Pattern.compile( "load average: (.*)" );
 
     @OneToMany( mappedBy = "parent", fetch = FetchType.EAGER,
             targetEntity = ContainerHostEntity.class )
@@ -175,14 +176,28 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         RequestBuilder requestBuilder =
                 new RequestBuilder( String.format( "/usr/bin/lxc-start -n %s -d", containerHost.getHostname() ) )
-                        .withTimeout( 60 ).daemon();
+                        .withTimeout( 1 ).daemon();
         try
         {
-            execute( requestBuilder );
+            commandUtil.execute( requestBuilder, this );
         }
         catch ( CommandException e )
         {
             throw new ResourceHostException( "Error on starting container", e );
+        }
+
+        //wait container connection
+        long ts = System.currentTimeMillis();
+        while ( System.currentTimeMillis() - ts < CONNECT_TIMEOUT * 1000 && !containerHost.isConnected() )
+        {
+            try
+            {
+                Thread.sleep( 100 );
+            }
+            catch ( InterruptedException e )
+            {
+                throw new ResourceHostException( e );
+            }
         }
 
         if ( !ContainerState.RUNNING.equals( getContainerHostState( containerHost ) ) )
@@ -209,7 +224,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         RequestBuilder requestBuilder =
                 new RequestBuilder( String.format( "/usr/bin/lxc-stop -n %s", containerHost.getHostname() ) )
-                        .withTimeout( 60 );
+                        .withTimeout( 120 );
         try
         {
             commandUtil.execute( requestBuilder, this );
@@ -300,7 +315,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public ContainerHost createContainer( final String templateName, final String hostname, final int timeout )
+    public ContainerHost createContainer( final String templateName, final String hostname, final String ip,
+                                          final int vlan, final String gateway, final int timeout )
             throws ResourceHostException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
@@ -322,8 +338,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             //ignore
         }
 
-        Future<ContainerHost> containerHostFuture =
-                queueSequentialTask( new CreateContainerTask( this, templateName, hostname, timeout ) );
+        Future<ContainerHost> containerHostFuture = queueSequentialTask(
+                new CreateContainerTask( this, templateName, hostname, ip, vlan, gateway, timeout ) );
 
         try
         {
@@ -333,6 +349,14 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         {
             throw new ResourceHostException( "Error creating container", e );
         }
+    }
+
+
+    @Override
+    public ContainerHost createContainer( final String templateName, final String hostname, final int timeout )
+            throws ResourceHostException
+    {
+        return createContainer( templateName, hostname, null, 0, null, timeout );
     }
 
 
@@ -384,7 +408,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         try
         {
-            CommandResult commandresult = run( Command.LIST_TEMPLATES, template.getTemplateName() );
+            CommandResult commandresult = execute( new RequestBuilder( "subutai list -t" )
+                    .withCmdArgs( Lists.newArrayList( template.getTemplateName() ) ) );
             if ( commandresult.hasSucceeded() )
             {
                 LOG.debug( String.format( "Template %s exists on %s.", template.getTemplateName(), hostname ) );
@@ -409,19 +434,15 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         Preconditions.checkNotNull( template, "Invalid template" );
 
-        LOG.debug( String.format( "Trying to import template %s to %s.", template.getTemplateName(), hostname ) );
         try
         {
-            CommandResult commandResult = run( Command.IMPORT, template.getTemplateName() );
-            if ( !commandResult.hasSucceeded() )
-            {
-                LOG.warn( "Template import failed. ", commandResult );
-            }
+            commandUtil.execute( new RequestBuilder( "subutai import" )
+                    .withCmdArgs( Lists.newArrayList( template.getTemplateName() ) ), this );
         }
         catch ( CommandException ce )
         {
-            LOG.error( "Command exception.", ce );
-            throw new ResourceHostException( "General command exception on checking container existence.", ce );
+            LOG.error( "Template import failed", ce );
+            throw new ResourceHostException( "Template import failed", ce );
         }
     }
 
@@ -436,14 +457,16 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             try
             {
                 LOG.debug( String.format( "Adding remote repository %s to %s...", template.getPeerId(), hostname ) );
-                CommandResult commandResult = run( Command.ADD_SOURCE, template.getPeerId().toString() );
+                CommandResult commandResult = execute( new RequestBuilder( String.format(
+                        "echo \"deb http://gw.intra.lan:9999/%1$s trusty main\" > /etc/apt/sources.list.d/%1$s.list ",
+                        template.getPeerId().toString() ) ) );
                 if ( !commandResult.hasSucceeded() )
                 {
                     LOG.warn( String.format( "Could not add repository %s to %s.", template.getPeerId(), hostname ),
                             commandResult );
                 }
                 LOG.debug( String.format( "Updating repository index on %s...", hostname ) );
-                commandResult = run( Command.APT_GET_UPDATE );
+                commandResult = execute( new RequestBuilder( "apt-get update" ).withTimeout( 300 ) );
                 if ( !commandResult.hasSucceeded() )
                 {
                     LOG.warn( String.format( "Could not update repository %s on %s.", template.getPeerId(), hostname ),
@@ -477,12 +500,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    protected CommandResult run( Command command, String... args ) throws CommandException
-    {
-        return execute( command.build( args ) );
-    }
-
-
     public void addContainerHost( ContainerHost host )
     {
         Preconditions.checkNotNull( host, "Invalid container host" );
@@ -491,64 +508,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         synchronized ( containersHosts )
         {
+            //replace host
+            containersHosts.remove( host );
             containersHosts.add( host );
-        }
-    }
-
-
-    enum Command
-    {
-        LIST_TEMPLATES( "subutai list -t %s" ),
-        CLONE( "subutai clone %s %s", 1, true ),
-        DESTROY( "subutai destroy %s", DESTROY_TIMEOUT, true ),
-        IMPORT( "subutai import %s" ),
-        PROMOTE( "promote %s" ),
-        EXPORT( "subutai export %s" ),
-        SUBUTAI_TMPDIR( "echo $SUBUTAI_TMPDIR" ),
-        GET_PACKAGE_NAME( ". /usr/share/subutai-cli/subutai/lib/deb_ops && get_package_name  %s" ),
-        GET_DEB_PACKAGE_NAME(
-                ". /etc/subutai/config && . /usr/share/subutai-cli/subutai/lib/deb_ops && get_debian_package_name  "
-                        + "%s" ),
-        ADD_SOURCE( "echo \"deb http://gw.intra.lan:9999/%1$s trusty main\" > /etc/apt/sources.list.d/%1$s.list " ),
-        REMOVE_SOURCE( "rm /etc/apt/sources.list.d/%1$s.list " ),
-        APT_GET_UPDATE( "apt-get update", 240 );
-
-        String script;
-        boolean daemon = false;
-        int timeout = 120;
-
-
-        Command( String script )
-        {
-            this.script = script;
-        }
-
-
-        Command( String script, int timeout )
-        {
-            this.script = script;
-            this.timeout = timeout;
-        }
-
-
-        Command( String script, int timeout, boolean daemon )
-        {
-            this.script = script;
-            this.timeout = timeout;
-            this.daemon = daemon;
-        }
-
-
-        public RequestBuilder build( String... args )
-        {
-            String s = String.format( this.script, args );
-            RequestBuilder rb = new RequestBuilder( s );
-            rb.withTimeout( timeout );
-            if ( daemon )
-            {
-                rb.daemon();
-            }
-            return rb;
         }
     }
 }

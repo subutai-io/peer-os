@@ -44,6 +44,7 @@ public interface EnvironmentManager
      *
      * @param name - environment name
      * @param topology - {@code Topology}
+     * @param subnetCidr - subnet in CIDR-notation string, e.g. "192.168.0.1/16"
      * @param sshKey - optional ssh key content
      * @param async - indicates whether environment is created synchronously or asynchronously to the calling party
      *
@@ -51,19 +52,9 @@ public interface EnvironmentManager
      *
      * @throws EnvironmentCreationException - thrown if error occurs during environment creation
      */
-    public Environment createEnvironment( String name, Topology topology, String sshKey, boolean async )
-            throws EnvironmentCreationException;
+    public Environment createEnvironment( String name, Topology topology, String subnetCidr, String sshKey,
+                                          boolean async ) throws EnvironmentCreationException;
 
-
-    /**
-     * Creates empty environment
-     *
-     * @param name - environment name
-     * @param sshKey - ssh key content
-     *
-     * @return - id of created environment
-     */
-    public UUID createEmptyEnvironment( String name, String sshKey );
 
     /**
      * Destroys environment by id.
@@ -137,30 +128,31 @@ public interface EnvironmentManager
 
     /**
      * Save environment blueprint
+     *
      * @param blueprint - blueprint to save
-     * @throws EnvironmentManagerException
      */
     public void saveBlueprint( Blueprint blueprint ) throws EnvironmentManagerException;
 
 
     /**
      * Remove blueprint from database
+     *
      * @param blueprintId - blueprint id to remove
-     * @throws EnvironmentManagerException
      */
     public void removeBlueprint( UUID blueprintId ) throws EnvironmentManagerException;
 
 
     /**
      * Get All blueprints
+     *
      * @return - set of blueprints
-     * @throws EnvironmentManagerException
      */
     public Set<Blueprint> getBlueprints() throws EnvironmentManagerException;
 
 
     /**
      * Get default domain name defaultDomainName: intra.lan
+     *
      * @return - default domain name
      */
     public String getDefaultDomainName();

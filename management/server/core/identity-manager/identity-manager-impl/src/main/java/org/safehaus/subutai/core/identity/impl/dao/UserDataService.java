@@ -2,11 +2,12 @@ package org.safehaus.subutai.core.identity.impl.dao;
 
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
 
+import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.identity.impl.entity.UserEntity;
@@ -19,26 +20,27 @@ import com.google.common.collect.Lists;
 public class UserDataService implements DataService<Long, User>
 {
     private static final Logger LOG = LoggerFactory.getLogger( UserDataService.class );
-    EntityManagerFactory emf;
+    DaoManager daoManager;
 
 
-    public UserDataService( EntityManagerFactory entityManagerFactory )
+    public UserDataService( DaoManager daoManager )
     {
-        this.emf = entityManagerFactory;
+        this.daoManager = daoManager;
     }
 
 
-    public void setEntityManagerFactory( final EntityManagerFactory emf )
-    {
-        this.emf = emf;
-    }
+    //    public void setEntityManagerFactory( final EntityManagerFactory emf )
+    //    {
+    //        this.emf = emf;
+    //    }
 
 
     @Override
     public UserEntity find( final Long id )
     {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+
         UserEntity result = null;
-        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
@@ -64,12 +66,13 @@ public class UserDataService implements DataService<Long, User>
     @Override
     public Collection<User> getAll()
     {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+
         Collection<User> result = Lists.newArrayList();
-        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
-            result = em.createQuery( "select h from UserEntity h" ).getResultList();
+            result = em.createQuery( "select h from UserEntity h", User.class ).getResultList();
             em.getTransaction().commit();
         }
         catch ( Exception e )
@@ -91,7 +94,7 @@ public class UserDataService implements DataService<Long, User>
     @Override
     public void persist( final User item )
     {
-        EntityManager em = emf.createEntityManager();
+        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             em.getTransaction().begin();
@@ -117,7 +120,7 @@ public class UserDataService implements DataService<Long, User>
     @Override
     public void remove( final Long id )
     {
-        EntityManager em = emf.createEntityManager();
+        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             em.getTransaction().begin();
@@ -143,7 +146,7 @@ public class UserDataService implements DataService<Long, User>
     @Override
     public void update( final User item )
     {
-        EntityManager em = emf.createEntityManager();
+        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             em.getTransaction().begin();
@@ -167,8 +170,8 @@ public class UserDataService implements DataService<Long, User>
 
     public User findByUsername( final String username )
     {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
         User result = null;
-        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
@@ -176,7 +179,11 @@ public class UserDataService implements DataService<Long, User>
                     em.createQuery( "select u from UserEntity u where u.username = :username", UserEntity.class );
             query.setParameter( "username", username );
 
-            result = query.getSingleResult();
+            List<UserEntity> users = query.getResultList();
+            if ( users.size() > 0 )
+            {
+                result = users.iterator().next();
+            }
             em.getTransaction().commit();
         }
         catch ( Exception e )

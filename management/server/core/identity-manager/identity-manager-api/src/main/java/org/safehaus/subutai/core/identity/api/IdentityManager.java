@@ -3,8 +3,8 @@ package org.safehaus.subutai.core.identity.api;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
-import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
 
@@ -14,6 +14,8 @@ import org.apache.shiro.subject.Subject;
  */
 public interface IdentityManager
 {
+
+
     /**
      * Returns shiro SecurityManager
      *
@@ -26,21 +28,24 @@ public interface IdentityManager
     /**
      * Return user entity
      *
-     * @param username - user name
-     *
      * @return user entity
      */
+    public User getUser();
+
     public User getUser( String username );
+
 
     /**
      * Logs in user with token passed
      *
-     * @param token - consolidation of an account's principals and supporting credentials submitted by user
+     * @param username - username
+     * @param password - password
      *
      * @return - {@code Subject} represents state and security operations for a <em>single</em> application user.
      */
+    public Serializable login( String username, String password );
 
-    public Subject login( AuthenticationToken token );
+    public Serializable loginWithToken( String username );
 
 
     /**
@@ -52,6 +57,8 @@ public interface IdentityManager
      */
     public Subject getSubject( Serializable sessionId );
 
+
+    public void touch( Serializable sessionId );
 
     /**
      * Logout user by sessions id
@@ -240,5 +247,9 @@ public interface IdentityManager
      * @return - result for erase operation
      */
     public boolean deleteRole( Role role );
+
+    public boolean isAuthenticated();
+
+    public Set<String> getRoles( Serializable shiroSessionId );
 }
 

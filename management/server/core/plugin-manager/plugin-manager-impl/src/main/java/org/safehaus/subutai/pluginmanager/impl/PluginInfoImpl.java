@@ -11,16 +11,6 @@ public class PluginInfoImpl implements PluginInfo
     private String version;
     private String rating;
 
-
-
-    /*public PluginInfoImpl ( String pluginName, String packageName, String packageVersion )
-    {
-        this.pluginName = pluginName;
-        this.packageName = packageName;
-        this.packageVersion = packageVersion;
-    }*/
-
-
     @Override
     public String getVersion()
     {

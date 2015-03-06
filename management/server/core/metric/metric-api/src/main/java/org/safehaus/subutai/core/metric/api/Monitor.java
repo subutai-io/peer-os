@@ -1,14 +1,20 @@
 package org.safehaus.subutai.core.metric.api;
 
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.environment.Environment;
+import org.safehaus.subutai.common.metric.HistoricalMetric;
+import org.safehaus.subutai.common.metric.MetricType;
 import org.safehaus.subutai.common.metric.OwnerResourceUsage;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 
 
@@ -28,6 +34,8 @@ public interface Monitor
 
     public Set<ContainerHostMetric> getLocalContainerHostsMetrics( Set<ContainerHost> containerHosts );
 
+
+    public ContainerHostMetric getLocalContainerHostMetric( ContainerHost containerHost ) throws MonitorException;
 
     /**
      * Returns current metrics of local resource hosts
@@ -136,4 +144,22 @@ public interface Monitor
      * @param listener - listener
      */
     public void removeAlertListener( AlertListener listener );
+
+
+    /**
+     *
+     * @param host physical or container host to be monitored
+     * @param metricType to be retrieved for historical data
+     * @return
+     */
+    public List<HistoricalMetric> getHistoricalMetric( Host host, MetricType metricType );
+
+
+    /**
+     *
+     * @param hosts physical or container hosts to be monitored
+     * @param metricType to be retrieved for historical data
+     * @return
+     */
+    public Map<UUID, List<HistoricalMetric>> getHistoricalMetrics( Collection<Host> hosts, MetricType metricType );
 }

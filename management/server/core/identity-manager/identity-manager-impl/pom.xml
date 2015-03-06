@@ -67,10 +67,15 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.safehaus.subutai</groupId>
-      <artifactId>peer-manager-api</artifactId>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-ehcache</artifactId>
+      <version>${org.apache.shiro.version}</version>
+      <scope>provided</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.apache.karaf.shell</groupId>
+      <artifactId>org.apache.karaf.shell.console</artifactId>
+    </dependency>
     <!--Tests-->
     <dependency>
       <groupId>junit</groupId>

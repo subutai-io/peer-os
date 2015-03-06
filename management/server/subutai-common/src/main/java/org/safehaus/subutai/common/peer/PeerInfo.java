@@ -1,7 +1,9 @@
 package org.safehaus.subutai.common.peer;
 
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -14,6 +16,7 @@ public class PeerInfo
     private String gatewayIp;
 
     private PeerStatus status;
+    private Set<PeerPolicy> peerPolicies = new HashSet<>();
 
     private String name;
     private UUID id;
@@ -22,6 +25,7 @@ public class PeerInfo
 
     private int lastUsedVlanId = 100;
     private String keyId;
+
 
 
     public UUID getId()
@@ -132,6 +136,25 @@ public class PeerInfo
     }
 
 
+    public Set<PeerPolicy> getPeerPolicies() {
+        return peerPolicies;
+    }
+
+
+    public void setPeerPolicies( final Set<PeerPolicy> peerPolicies ) {
+        this.peerPolicies = peerPolicies;
+    }
+
+
+    public void setPeerPolicy( final PeerPolicy peerPolicy ) {
+        PeerPolicy oldPeerPolicy = getPeerPolicy( peerPolicy.getRemotePeerId() );
+        if ( oldPeerPolicy != null ) {
+            peerPolicies.remove( oldPeerPolicy );
+        }
+        peerPolicies.add( peerPolicy );
+    }
+
+
     @Override
     public int hashCode()
     {
@@ -150,6 +173,19 @@ public class PeerInfo
             return Objects.equals( this.id, other.id );
         }
         return false;
+    }
+
+
+    public PeerPolicy getPeerPolicy( final UUID remotePeerId ) {
+        if ( peerPolicies == null ) {
+            return null;
+        }
+        for ( PeerPolicy peerPolicy : peerPolicies ) {
+            if ( peerPolicy.getRemotePeerId().compareTo( remotePeerId ) == 0 ) {
+                return peerPolicy;
+            }
+        }
+        return null;
     }
 }
 

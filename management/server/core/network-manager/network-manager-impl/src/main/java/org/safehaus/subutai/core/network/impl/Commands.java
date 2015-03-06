@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.network.impl;
 
 
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.peer.ContainerHost;
@@ -18,12 +19,41 @@ public class Commands
     private static final String RESOURCE_HOST_NETWORK_BINDING = "subutai network";
 
 
+    //container commands
+
+
+    public RequestBuilder getSetContainerIpCommand( String containerName, String ip, int netMask, int vLanId )
+    {
+        return new RequestBuilder( RESOURCE_HOST_NETWORK_BINDING ).withCmdArgs(
+                Lists.newArrayList( containerName, "-s", String.format( "%s/%s", ip, netMask ),
+                        String.valueOf( vLanId ) ) );
+    }
+
+
+    public RequestBuilder getShowContainerIpCommand( String containerName )
+    {
+        return new RequestBuilder( RESOURCE_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( containerName, "-l" ) );
+    }
+
+
+    public RequestBuilder getRemoveContainerIpCommand( String containerName )
+    {
+        return new RequestBuilder( RESOURCE_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( containerName, "-r" ) );
+    }
+
+
+    //management host commands
+
+
     public RequestBuilder getSetupN2NConnectionCommand( String superNodeIp, int superNodePort, String interfaceName,
-                                                        String communityName, String localIp, String pathToKeyFile )
+                                                        String communityName, String localIp, String keyType,
+                                                        String pathToKeyFile )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
                 Lists.newArrayList( "-N", superNodeIp, String.valueOf( superNodePort ), interfaceName, communityName,
-                        localIp, "file", pathToKeyFile ) );
+                        localIp, "file", keyType, pathToKeyFile ) );
     }
 
 
@@ -60,28 +90,6 @@ public class Commands
     }
 
 
-    public RequestBuilder getSetContainerIpCommand( String containerName, String ip, int netMask, int vLanId )
-    {
-        return new RequestBuilder( RESOURCE_HOST_NETWORK_BINDING ).withCmdArgs(
-                Lists.newArrayList( containerName, "-s", String.format( "%s/%s", ip, netMask ),
-                        String.valueOf( vLanId ) ) );
-    }
-
-
-    public RequestBuilder getShowContainerIpCommand( String containerName )
-    {
-        return new RequestBuilder( RESOURCE_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( containerName, "-l" ) );
-    }
-
-
-    public RequestBuilder getRemoveContainerIpCommand( String containerName )
-    {
-        return new RequestBuilder( RESOURCE_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( containerName, "-r" ) );
-    }
-
-
     public RequestBuilder getSetupGatewayCommand( String gatewayIp, int vLanId )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
@@ -109,17 +117,37 @@ public class Commands
     }
 
 
-    public RequestBuilder getSetupVniVlanMappingCommand( String tunnelName, int vni, int vLanId )
+    public RequestBuilder getSetupVniVlanMappingCommand( String tunnelName, long vni, int vLanId, UUID environmentId )
     {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-m", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ) ) );
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
+                Lists.newArrayList( "-m", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ),
+                        environmentId.toString() ) );
     }
 
 
-    public RequestBuilder getRemoveVniVlanMappingCommand( String tunnelName, int vni, int vLanId )
+    public RequestBuilder getRemoveVniVlanMappingCommand( String tunnelName, long vni, int vLanId )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
                 .withCmdArgs( Lists.newArrayList( "-M", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ) ) );
+    }
+
+
+    public RequestBuilder getListVniVlanMappingsCommand()
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-v" ) );
+    }
+
+
+    public RequestBuilder getReserveVniCommand( long vni, int vlan, UUID environmentId )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
+                Lists.newArrayList( "-E", String.valueOf( vni ), String.valueOf( vlan ), environmentId.toString() ) );
+    }
+
+
+    public RequestBuilder getListReservedVnisCommand()
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-Z", "list" ) );
     }
 
     // ssh and hosts

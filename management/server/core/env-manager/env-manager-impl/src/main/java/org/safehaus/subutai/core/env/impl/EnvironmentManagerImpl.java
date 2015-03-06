@@ -2,7 +2,9 @@ package org.safehaus.subutai.core.env.impl;
 
 
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -16,26 +18,35 @@ import org.safehaus.subutai.common.environment.EnvironmentModificationException;
 import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
+import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.env.api.EnvironmentEventListener;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
-import org.safehaus.subutai.core.env.impl.builder.TopologyBuilder;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentSecurityException;
+import org.safehaus.subutai.core.env.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.env.impl.dao.BlueprintDataService;
 import org.safehaus.subutai.core.env.impl.dao.EnvironmentContainerDataService;
 import org.safehaus.subutai.core.env.impl.dao.EnvironmentDataService;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
+import org.safehaus.subutai.core.env.impl.exception.EnvironmentTunnelException;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
+import org.safehaus.subutai.core.env.impl.tasks.CreateEnvironmentTask;
 import org.safehaus.subutai.core.env.impl.tasks.DestroyContainerTask;
 import org.safehaus.subutai.core.env.impl.tasks.DestroyEnvironmentTask;
 import org.safehaus.subutai.core.env.impl.tasks.GrowEnvironmentTask;
 import org.safehaus.subutai.core.env.impl.tasks.SetSshKeyTask;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.slf4j.Logger;
@@ -56,9 +67,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     private final PeerManager peerManager;
     private final NetworkManager networkManager;
-    private final TopologyBuilder topologyBuilder;
+    private final EnvironmentBuilder environmentBuilder;
     private final ExecutorService executor = Executors.newCachedThreadPool();
     private final String defaultDomain;
+    private final IdentityManager identityManager;
 
     private final Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
 
@@ -73,19 +85,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager,
                                    final NetworkManager networkManager, final DaoManager daoManager,
-                                   final String defaultDomain )
+                                   final String defaultDomain, final IdentityManager identityManager )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( networkManager );
         Preconditions.checkNotNull( daoManager );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( defaultDomain ) );
+        Preconditions.checkNotNull( identityManager );
 
         this.peerManager = peerManager;
         this.networkManager = networkManager;
         this.daoManager = daoManager;
         this.defaultDomain = defaultDomain;
-        this.topologyBuilder = new TopologyBuilder( templateRegistry, peerManager, defaultDomain );
+        this.environmentBuilder = new EnvironmentBuilder( templateRegistry, peerManager, defaultDomain );
+        this.identityManager = identityManager;
     }
 
 
@@ -94,6 +108,28 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         this.blueprintDataService = new BlueprintDataService( daoManager );
         this.environmentDataService = new EnvironmentDataService( daoManager );
         this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager );
+    }
+
+
+    protected boolean isUserAdmin()
+    {
+        return ( identityManager.getUser() != null ) && identityManager.getUser().isAdmin();
+    }
+
+
+    protected Long getUserId()
+    {
+        return identityManager.getUser().getId();
+    }
+
+
+    protected void checkAccess( Environment environment )
+    {
+        if ( !( isUserAdmin() || Objects.equals( environment.getUserId(), getUserId() ) ) )
+        {
+            throw new EnvironmentSecurityException(
+                    String.format( "Access to environment %s is denied", environment.getName() ) );
+        }
     }
 
 
@@ -109,6 +145,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             setContainersTransientFields( environment.getContainerHosts() );
         }
 
+        if ( !isUserAdmin() )
+        {
+            Long userId = getUserId();
+            for ( Iterator<Environment> iterator = environments.iterator(); iterator.hasNext(); )
+            {
+                final Environment environment = iterator.next();
+                if ( !Objects.equals( environment.getUserId(), userId ) )
+                {
+                    iterator.remove();
+                }
+            }
+        }
+
         return environments;
     }
 
@@ -119,10 +168,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         EnvironmentImpl environment = environmentDataService.find( environmentId.toString() );
+
         if ( environment == null )
         {
             throw new EnvironmentNotFoundException();
         }
+
+        //check user access
+        checkAccess( environment );
 
         //set environment's transient fields
         setEnvironmentTransientFields( environment );
@@ -134,12 +187,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    @Override
-    public UUID createEmptyEnvironment( final String name, final String sshKey )
+    protected EnvironmentImpl createEmptyEnvironment( final String name, final String subnetCidr, final String sshKey )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
 
-        final EnvironmentImpl environment = new EnvironmentImpl( name, sshKey );
+        final EnvironmentImpl environment = new EnvironmentImpl( name, subnetCidr, sshKey, getUserId() );
 
         saveEnvironment( environment );
 
@@ -147,30 +198,123 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         notifyOnEnvironmentCreated( environment );
 
-        return environment.getId();
+        return environment;
     }
 
 
     @Override
-    public Environment createEnvironment( final String name, final Topology topology, final String sshKey,
-                                          boolean async ) throws EnvironmentCreationException
+    public Environment createEnvironment( final String name, final Topology topology, final String subnetCidr,
+                                          final String sshKey, boolean async ) throws EnvironmentCreationException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
         Preconditions.checkNotNull( topology, "Invalid topology" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( subnetCidr ), "Invalid subnet CIDR" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
-        final UUID environmentId = createEmptyEnvironment( name, sshKey );
+        final EnvironmentImpl environment = createEmptyEnvironment( name, subnetCidr, sshKey );
+
+        final ResultHolder<EnvironmentCreationException> resultHolder = new ResultHolder<>();
+
+        CreateEnvironmentTask createEnvironmentTask =
+                new CreateEnvironmentTask( peerManager.getLocalPeer(), this, environment, topology, resultHolder );
+
+        executor.submit( createEnvironmentTask );
+
+        if ( !async )
+        {
+            try
+            {
+                createEnvironmentTask.waitCompletion();
+
+                if ( resultHolder.getResult() != null )
+                {
+                    throw resultHolder.getResult();
+                }
+            }
+            catch ( InterruptedException e )
+            {
+                throw new EnvironmentCreationException( e );
+            }
+        }
 
         try
         {
-            growEnvironment( environmentId, topology, async );
-
-            return findEnvironment( environmentId );
+            return findEnvironment( environment.getId() );
         }
-        catch ( EnvironmentModificationException | EnvironmentNotFoundException e )
+        catch ( EnvironmentNotFoundException e )
         {
             throw new EnvironmentCreationException( e );
         }
+    }
+
+
+    public void setupEnvironmentTunnel( UUID environmentId, Set<Peer> peers ) throws EnvironmentTunnelException
+    {
+        String envAlias =
+                String.format( "env_%s_%s", peerManager.getLocalPeer().getId().toString(), environmentId.toString() );
+        Set<Peer> remotePeers = Sets.newHashSet( peers );
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        remotePeers.remove( localPeer );
+        if ( !remotePeers.isEmpty() )
+        {
+            try
+            {
+                String localPeerCert = localPeer.exportEnvironmentCertificate( envAlias );
+
+                for ( Peer remotePeer : remotePeers )
+                {
+                    String remotePeerCert = remotePeer.exportEnvironmentCertificate( envAlias );
+                    localPeer.importCertificate( remotePeerCert, envAlias );
+                    remotePeer.importCertificate( localPeerCert, envAlias );
+                }
+            }
+            catch ( Exception e )
+            {
+                //TODO uncomment this exception later when PEKS work
+                //            throw new EnvironmentTunnelException( "Error exchanging environment certificates ",e );
+                LOG.error( "Error exchanging environment certificates ", e );
+            }
+        }
+    }
+
+
+    public long findFreeVni( final Set<Peer> peers ) throws EnvironmentManagerException
+    {
+
+        Set<Long> reservedVnis = Sets.newHashSet();
+        for ( Peer peer : peers )
+        {
+            try
+            {
+                for ( Vni vni : peer.getReservedVnis() )
+                {
+                    reservedVnis.add( vni.getVni() );
+                }
+            }
+            catch ( PeerException e )
+            {
+                throw new EnvironmentManagerException(
+                        String.format( "Error obtaining reserved vnis from peer %s", peer.getName() ), e );
+            }
+        }
+
+        int maxIterations = 10000;
+        int currentIteration = 0;
+        long vni;
+
+        do
+        {
+            vni = ( long ) ( Math.random() * ( Common.MAX_VNI_ID - Common.MIN_VNI_ID ) ) + Common.MIN_VNI_ID;
+            currentIteration++;
+        }
+        while ( reservedVnis.contains( vni ) && currentIteration < maxIterations );
+
+        if ( reservedVnis.contains( vni ) )
+        {
+            throw new EnvironmentManagerException( "No free Vni found", null );
+        }
+
+        return vni;
     }
 
 
@@ -182,7 +326,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     public void build( EnvironmentImpl environment, Topology topology ) throws EnvironmentBuildException
     {
-        topologyBuilder.build( environment, topology );
+        environmentBuilder.build( environment, topology );
     }
 
 
@@ -202,10 +346,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final ResultHolder<EnvironmentDestructionException> resultHolder = new ResultHolder<>();
 
-        final Set<EnvironmentDestructionException> exceptions = Sets.newHashSet();
+        final Set<Throwable> exceptions = Sets.newHashSet();
+
 
         DestroyEnvironmentTask destroyEnvironmentTask =
-                new DestroyEnvironmentTask( this, environment, exceptions, resultHolder, forceMetadataRemoval );
+                new DestroyEnvironmentTask( this, environment, exceptions, resultHolder, forceMetadataRemoval,
+                        peerManager.getLocalPeer() );
 
         executor.submit( destroyEnvironmentTask );
 

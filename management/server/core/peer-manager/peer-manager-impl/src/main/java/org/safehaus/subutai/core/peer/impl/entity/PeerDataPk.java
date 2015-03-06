@@ -4,21 +4,18 @@ package org.safehaus.subutai.core.peer.impl.entity;
 import java.io.Serializable;
 
 
-/**
- * Created by nisakov on 1/12/15.
- */
-
-//*************** Primary Key ************************************
-
-class PeerDataPk  implements Serializable
+class PeerDataPk implements Serializable
 {
     private String id;
     private String source;
+
 
     public PeerDataPk()
     {
 
     }
+
+
     public String getId()
     {
         return id;
@@ -41,17 +38,22 @@ class PeerDataPk  implements Serializable
     {
         this.source = source;
     }
-    @Override
-    public boolean equals(Object obj)
-    {
-        if(obj instanceof PeerDataPk ){
-            PeerDataPk ppk = (PeerDataPk ) obj;
 
-            if(!ppk.getId().equals( this.id )){
+
+    @Override
+    public boolean equals( Object obj )
+    {
+        if ( obj instanceof PeerDataPk )
+        {
+            PeerDataPk ppk = ( PeerDataPk ) obj;
+
+            if ( !ppk.getId().equals( this.id ) )
+            {
                 return false;
             }
 
-            if(!ppk.getSource().equals( this.source )){
+            if ( !ppk.getSource().equals( this.source ) )
+            {
                 return false;
             }
 
@@ -60,10 +62,11 @@ class PeerDataPk  implements Serializable
 
         return false;
     }
+
+
     @Override
     public int hashCode()
     {
         return id.hashCode() + source.hashCode();
     }
-
 }

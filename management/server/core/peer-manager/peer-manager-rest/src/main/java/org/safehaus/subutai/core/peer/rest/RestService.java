@@ -15,6 +15,10 @@ import javax.ws.rs.core.Response;
 
 public interface RestService
 {
+    @GET
+    @Path( "me" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getSelfPeerInfo();
 
 
     @GET
@@ -26,6 +30,17 @@ public interface RestService
     @Path( "registered_peers" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getRegisteredPeers();
+
+
+    @GET
+    @Path( "peer_policy" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getPeerPolicy( @QueryParam( "peerId" ) String peerId );
+
+
+    @Path( "/" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getRegisteredPeerInfo( @QueryParam( "peerId" ) String peerId );
 
     @GET
     @Path( "ping" )
@@ -39,19 +54,55 @@ public interface RestService
     //*************** Peer Registration Handshake REST - BEGIN ***************************
 
     @POST
+    @Path( "trust_request" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response processTrustRequest( @FormParam( "peer" ) String peer,
+                                         @FormParam( "root_cert_px2" ) String root_cert_px2 );
+
+    @POST
+    @Path( "trust_response" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response processTrustResponse( @FormParam( "peer" ) String peer,
+                                          @FormParam( "root_cert_px2" ) String root_cert_px2,
+                                          @FormParam( "status" ) short status );
+
+    @POST
     @Path( "register" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response processRegisterRequest( @QueryParam( "peer" ) String peer );
+    //    public Response processRegisterRequest( @FormParam( "peer" ) String peer,
+    //                                            @FormParam( "root_cert_px2" ) String root_cert_px2 );
+    public Response processRegisterRequest( @FormParam( "peer" ) String peer );
+
 
     @DELETE
     @Path( "unregister" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response unregisterPeer( @QueryParam( "peerId" ) String peerId );
 
+
+    @PUT
+    @Path( "reject" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response rejectForRegistrationRequest( @FormParam( "rejectedPeerId" ) String rejectedPeerId );
+
+
+    @DELETE
+    @Path( "remove" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response removeRegistrationRequest( @QueryParam( "rejectedPeerId" ) String rejectedPeerId );
+
+
+    @PUT
+    @Path( "approve" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response approveForRegistrationRequest( @FormParam( "approvedPeer" ) String approvedPeer,
+                                                   @FormParam( "root_cert_px2" ) String root_cert_px2 );
+
+
     @PUT
     @Path( "update" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response updatePeer( @QueryParam( "peer" ) String peer );
+    public Response updatePeer( @FormParam( "peer" ) String peer, @FormParam( "root_cert_px2" ) String root_cert_px2 );
 
     //*************** Peer Registration Handshake REST - END ***************************
 
@@ -174,5 +225,37 @@ public interface RestService
     @Path( "container/quota/disk" )
     Response setDiskQuota( @FormParam( "containerId" ) String containerId, @FormParam( "diskQuota" ) String diskQuota );
 
+    @POST
+    @Path( "container/gateway" )
+    Response setDefaultGateway( @FormParam( "containerId" ) String containerId,
+                                @FormParam( "gatewayIp" ) String gatewayIp );
+
+    @POST
+    @Path( "vni" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response reserveVni( @FormParam( "vni" ) String vni );
+
+
+    @POST
+    @Path( "cert/import" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response importEnvironmentCert( @FormParam( "cert" ) String envCert, @FormParam( "alias" ) String alias );
+
+    @POST
+    @Path( "cert/export" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response exportEnvironmentCert( @FormParam( "alias" ) String alias );
+
+
+    @DELETE
+    @Path( "cert/remove" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response removeEnvironmentCert( @QueryParam( "environmentId" ) String environmentId );
+
     //*********** Environment Specific REST - END ***************
+
+    @GET
+    @Path( "vni" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getReservedVnis();
 }

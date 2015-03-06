@@ -61,7 +61,7 @@ public class TerminalForm extends CustomComponent implements Disposable
 
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
         horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
-        hostTree = new HostTree( hostRegistry );
+        hostTree = new HostTree( hostRegistry, false );
         horizontalSplit.setFirstComponent( hostTree );
 
         GridLayout grid = new GridLayout( 20, 11 );
@@ -228,13 +228,20 @@ public class TerminalForm extends CustomComponent implements Disposable
     }
 
 
-    public void addOutput( String output )
+    public void addOutput( final String output )
     {
-        if ( !Strings.isNullOrEmpty( output ) )
+        commandOutputTxtArea.getUI().access( new Runnable()
         {
-            commandOutputTxtArea.setValue( String.format( "%s%s", commandOutputTxtArea.getValue(), output ) );
-            commandOutputTxtArea.setCursorPosition( commandOutputTxtArea.getValue().length() - 1 );
-        }
+            @Override
+            public void run()
+            {
+                if ( !Strings.isNullOrEmpty( output ) )
+                {
+                    commandOutputTxtArea.setValue( String.format( "%s%s", commandOutputTxtArea.getValue(), output ) );
+                    commandOutputTxtArea.setCursorPosition( commandOutputTxtArea.getValue().length() - 1 );
+                }
+            }
+        } );
     }
 
 

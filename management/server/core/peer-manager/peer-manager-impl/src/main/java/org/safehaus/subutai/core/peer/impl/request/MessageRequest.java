@@ -13,6 +13,7 @@ public class MessageRequest
     private Payload payload;
     private String recipient;
     private Map<String, String> headers;
+    private UUID messageId;
 
 
     public MessageRequest( final Payload payload, final String recipient, final Map<String, String> headers )
@@ -21,6 +22,18 @@ public class MessageRequest
         this.payload = payload;
         this.recipient = recipient;
         this.headers = headers;
+    }
+
+
+    public UUID getMessageId()
+    {
+        return messageId;
+    }
+
+
+    public void setMessageId( final UUID messageId )
+    {
+        this.messageId = messageId;
     }
 
 

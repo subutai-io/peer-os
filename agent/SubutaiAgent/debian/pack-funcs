@@ -176,7 +176,7 @@ generateRepoPackage() {
 generateTemplateRepo() {
   pushd $BASE
   templateName="temp"
-
+  archType="amd64"
   #check temp folder does exist or not
   if [ -d "$templateName" ]; then
     rm -rf "$BASE/$templateName"

@@ -9,6 +9,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.safehaus.subutai.common.environment.Environment;
+import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
@@ -30,6 +31,7 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.UI;
 
@@ -51,32 +53,22 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
     private HierarchicalContainer container;
     private Set<ContainerHost> selectedContainers = new HashSet<>();
     private Environment environment;
-    private final ScheduledExecutorService scheduler;
+    private ScheduledExecutorService scheduler;
+    private final EnvironmentManager environmentManager;
+    private final ComboBox env;
 
 
     public EnvironmentTree( final EnvironmentManager environmentManager )
     {
 
-        scheduler = Executors.newScheduledThreadPool( 1 );
+        this.environmentManager = environmentManager;
 
-        scheduler.scheduleWithFixedDelay( new Runnable()
-        {
-            public void run()
-            {
-                LOG.info( "Refreshing containers state..." );
-                if ( environment != null )
-                {
-                    refreshContainers();
-                }
-                LOG.info( "Refreshing done." );
-            }
-        }, 5, 60, TimeUnit.SECONDS );
         setSizeFull();
         setMargin( true );
 
         BeanItemContainer<Environment> environments = new BeanItemContainer<>( Environment.class );
         environments.addAll( environmentManager.getEnvironments() );
-        final ComboBox env = new ComboBox( null, environments );
+        env = new ComboBox( null, environments );
         env.setItemCaptionPropertyId( "name" );
         env.setImmediate( true );
         env.setTextInputAllowed( false );
@@ -133,7 +125,8 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
 
                     for ( Object o : ( Iterable<?> ) t.getValue() )
                     {
-                        if ( tree.getItem( o ).getItemProperty( VALUE_PROPERTY ).getValue() != null )
+                        if ( tree.getItem( o ) != null && tree.getItem( o ).getItemProperty( VALUE_PROPERTY ) != null
+                                && tree.getItem( o ).getItemProperty( VALUE_PROPERTY ).getValue() != null )
                         {
                             ContainerHost containerHost =
                                     ( ContainerHost ) tree.getItem( o ).getItemProperty( VALUE_PROPERTY ).getValue();
@@ -152,6 +145,52 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         grid.addComponent( tree, 0, 2 );
 
         addComponent( grid );
+
+        addDetachListener( new DetachListener()
+        {
+            @Override
+            public void detach( final DetachEvent event )
+            {
+                scheduler.shutdown();
+            }
+        } );
+
+        addAttachListener( new AttachListener()
+        {
+            @Override
+            public void attach( final AttachEvent event )
+            {
+                startTreeUpdate();
+            }
+        } );
+    }
+
+
+    private void startTreeUpdate()
+    {
+        scheduler = Executors.newScheduledThreadPool( 1 );
+
+        scheduler.scheduleWithFixedDelay( new Runnable()
+        {
+            public void run()
+            {
+                LOG.info( "Refreshing containers state..." );
+                if ( environment != null )
+                {
+                    try
+                    {
+                        environment = environmentManager.findEnvironment( environment.getId() );
+                    }
+                    catch ( EnvironmentNotFoundException e )
+                    {
+                        environment = null;
+                        env.setValue( null );
+                    }
+                    refreshContainers();
+                }
+                LOG.info( "Refreshing done." );
+            }
+        }, 3, 30, TimeUnit.SECONDS );
     }
 
 
@@ -236,33 +275,40 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
     public void filterContainerHostsByTag( String tag )
     {
 
-        container.removeAllContainerFilters();
-
-        if ( !Strings.isNullOrEmpty( tag ) )
+        if ( environment != null )
         {
+            container.removeAllContainerFilters();
 
-            Set<String> matchedContainerNames = Sets.newHashSet();
-
-            for ( ContainerHost ec : environment.getContainerHosts() )
+            if ( !Strings.isNullOrEmpty( tag ) )
             {
 
-                if ( ec.getTags().contains( tag ) )
+                Set<String> matchedContainerNames = Sets.newHashSet();
+
+                for ( ContainerHost ec : environment.getContainerHosts() )
                 {
-                    matchedContainerNames.add( ec.getHostname() );
+
+                    if ( ec.getTags().contains( tag ) )
+                    {
+                        matchedContainerNames.add( ec.getHostname() );
+                    }
+                }
+
+                container.addContainerFilter( new MyCustomFilter( VALUE_PROPERTY, matchedContainerNames ) );
+
+                for ( ContainerHost ec : environment.getContainerHosts() )
+                {
+                    if ( !matchedContainerNames.contains( ec.getHostname() ) )
+                    {
+                        String peerId = ec.getPeerId().toString();
+                        String itemId = peerId + ":" + ec.getId();
+                        tree.unselect( itemId );
+                    }
                 }
             }
-
-            container.addContainerFilter( new MyCustomFilter( VALUE_PROPERTY, matchedContainerNames ) );
-
-            for ( ContainerHost ec : environment.getContainerHosts() )
-            {
-                if ( !matchedContainerNames.contains( ec.getHostname() ) )
-                {
-                    String peerId = ec.getPeerId().toString();
-                    String itemId = peerId + ":" + ec.getId();
-                    tree.unselect( itemId );
-                }
-            }
+        }
+        else
+        {
+            Notification.show( "Select environment" );
         }
     }
 

@@ -1,11 +1,11 @@
 package org.safehaus.subutai.common.environment;
 
 
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Peer;
 
 
 /**
@@ -13,6 +13,9 @@ import org.safehaus.subutai.common.peer.ContainerHost;
  */
 public interface Environment
 {
+
+    public Long getUserId();
+
     public UUID getId();
 
     public String getName();
@@ -25,6 +28,7 @@ public interface Environment
 
     public Set<ContainerHost> getContainerHosts();
 
+
     public void destroyContainer( ContainerHost containerHost, boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException;
 
@@ -35,6 +39,7 @@ public interface Environment
 
     public void setSshKey( String sshKey, boolean async ) throws EnvironmentModificationException;
 
+    public Set<Peer> getPeers();
 
     /**
      * Network subnet of the environment in CIDR format notation.
@@ -45,17 +50,9 @@ public interface Environment
 
 
     /**
-     * VLAN ids of each participating peer.
-     *
-     * @return map of peer ids to VLAN ids
-     */
-    public Map<UUID, Integer> getPeerVlanInfo();
-
-
-    /**
      * VNI of the environment.
      */
-    public int getVni();
+    public Long getVni();
 
 
     public ContainerHost getContainerHostById( UUID id ) throws ContainerHostNotFoundException;
@@ -63,6 +60,6 @@ public interface Environment
 
     public ContainerHost getContainerHostByHostname( String hostname ) throws ContainerHostNotFoundException;
 
-
+    @Deprecated
     public Set<ContainerHost> getContainerHostsByIds( Set<UUID> ids ) throws ContainerHostNotFoundException;
 }

@@ -45,6 +45,7 @@ public class Manager extends VerticalLayout
 
     private static final AtomicInteger processPending = new AtomicInteger( 0 );
 
+    private static final Action TAG_CONTAINER = new Action( "Tags" );
     private static final Action START_CONTAINER = new Action( "Start" );
     private static final Action STOP_CONTAINER = new Action( "Stop" );
     private static final Action DESTROY_CONTAINER = new Action( "Destroy" );
@@ -54,6 +55,8 @@ public class Manager extends VerticalLayout
     private static final Action DESTROY_ALL = new Action( "Destroy All" );
 
     private static final Logger LOG = LoggerFactory.getLogger( Manager.class );
+
+    private Action.Handler contextMenu;
 
 
     public Manager( final ExecutorService executorService, final PeerManager peerManager )
@@ -105,18 +108,61 @@ public class Manager extends VerticalLayout
         grid.setComponentAlignment( indicator, Alignment.MIDDLE_CENTER );
         addComponent( grid );
 
-        final Action.Handler actionHandler = new Action.Handler()
+        addComponent( lxcTable );
+
+        binContextMenu();
+    }
+
+
+    private void binContextMenu()
+    {
+        if ( contextMenu != null )
+        {
+            lxcTable.removeActionHandler( contextMenu );
+        }
+        contextMenu = new Action.Handler()
         {
             @Override
             public Action[] getActions( final Object target, final Object sender )
             {
                 if ( target != null )
                 {
+
                     if ( !lxcTable.areChildrenAllowed( target ) )
                     {
-                        return new Action[] { START_CONTAINER, STOP_CONTAINER, DESTROY_CONTAINER };
+                        Item row = lxcTable.getItem( target );
+                        final String lxcHostname = ( String ) row.getItemProperty( HOST_NAME ).getValue();
+                        LocalPeer localPeer = peerManager.getLocalPeer();
+                        try
+                        {
+                            final ContainerHost containerHost = localPeer.getContainerHostByName( lxcHostname );
+                            if ( containerHost.getState() == ContainerHostState.RUNNING )
+                            {
+                                return new Action[] { STOP_CONTAINER, DESTROY_CONTAINER, TAG_CONTAINER };
+                            }
+                            else if ( containerHost.getState() == ContainerHostState.STOPPED )
+                            {
+                                return new Action[] { START_CONTAINER, DESTROY_CONTAINER, TAG_CONTAINER };
+                            }
+                            else
+                            {
+                                return new Action[] { DESTROY_CONTAINER, TAG_CONTAINER };
+                            }
+                        }
+                        catch ( final PeerException e )
+                        {
+                            getUI().access( new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+
+                                    Notification.show( e.getMessage() );
+                                }
+                            } );
+                        }
                     }
-                    else
+                    else if ( lxcTable.hasChildren( target ) )
                     {
                         return new Action[] { START_ALL, STOP_ALL, DESTROY_ALL };
                     }
@@ -131,23 +177,29 @@ public class Manager extends VerticalLayout
                 Item row = lxcTable.getItem( target );
                 try
                 {
-                    if ( !lxcTable.hasChildren( target ) )
+                    if ( !lxcTable.areChildrenAllowed( target ) )
                     {
                         final String lxcHostname = ( String ) row.getItemProperty( HOST_NAME ).getValue();
                         LocalPeer localPeer = peerManager.getLocalPeer();
                         final ContainerHost containerHost = localPeer.getContainerHostByName( lxcHostname );
                         if ( action == START_CONTAINER )
                         {
-                            startContainer( containerHost );
+                            if ( containerHost.getState() == ContainerHostState.STOPPED )
+                            {
+                                startContainer( containerHost );
+                            }
                         }
                         else if ( action == STOP_CONTAINER )
                         {
-                            stopContainer( containerHost );
+                            if ( containerHost.getState() == ContainerHostState.RUNNING )
+                            {
+                                stopContainer( containerHost );
+                            }
                         }
                         else if ( action == DESTROY_CONTAINER )
                         {
                             ConfirmationDialog alert =
-                                    new ConfirmationDialog( "Do you want to destroy this lxc node?", "Yes", "No" );
+                                    new ConfirmationDialog( "Do you want to destroy this container?", "Yes", "No" );
                             alert.getOk().addClickListener( new Button.ClickListener()
                             {
                                 @Override
@@ -158,8 +210,12 @@ public class Manager extends VerticalLayout
                             } );
                             getUI().addWindow( alert.getAlert() );
                         }
+                        else if ( action == TAG_CONTAINER )
+                        {
+                            getUI().addWindow( new TagsWindow( containerHost ) );
+                        }
                     }
-                    else
+                    else if ( lxcTable.hasChildren( target ) )
                     {
                         final String physicalHostname = ( String ) row.getItemProperty( HOST_NAME ).getValue();
                         final ResourceHost resourceHost =
@@ -172,20 +228,26 @@ public class Manager extends VerticalLayout
                         {
                             for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
                             {
-                                startContainer( containerHost );
+                                if ( containerHost.getState() == ContainerHostState.STOPPED )
+                                {
+                                    startContainer( containerHost );
+                                }
                             }
                         }
                         else if ( action == STOP_ALL )
                         {
                             for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
                             {
-                                stopContainer( containerHost );
+                                if ( containerHost.getState() == ContainerHostState.RUNNING )
+                                {
+                                    stopContainer( containerHost );
+                                }
                             }
                         }
                         else if ( action == DESTROY_ALL )
                         {
-                            ConfirmationDialog alert =
-                                    new ConfirmationDialog( "Do you want to destroy this lxc node?", "Yes", "No" );
+                            ConfirmationDialog alert = new ConfirmationDialog(
+                                    "Do you want to destroy all containers of this resource host?", "Yes", "No" );
                             alert.getOk().addClickListener( new Button.ClickListener()
                             {
                                 @Override
@@ -203,13 +265,11 @@ public class Manager extends VerticalLayout
                 }
                 catch ( PeerException pe )
                 {
-                    pe.printStackTrace();
+                    Notification.show( pe.getMessage() );
                 }
             }
         };
-        lxcTable.addActionHandler( actionHandler );
-
-        addComponent( lxcTable );
+        lxcTable.addActionHandler( contextMenu );
     }
 
 
@@ -286,6 +346,7 @@ public class Manager extends VerticalLayout
                             @Override
                             public void run()
                             {
+                                binContextMenu();
                                 Property lxcStatus =
                                         lxcTable.getItem( containerHost.getHostname() ).getItemProperty( LXC_STATUS );
                                 Label lbl = ( Label ) lxcStatus.getValue();
@@ -323,6 +384,7 @@ public class Manager extends VerticalLayout
                             @Override
                             public void run()
                             {
+                                binContextMenu();
                                 Property lxcStatus =
                                         lxcTable.getItem( containerHost.getHostname() ).getItemProperty( LXC_STATUS );
                                 Label lbl = ( Label ) lxcStatus.getValue();

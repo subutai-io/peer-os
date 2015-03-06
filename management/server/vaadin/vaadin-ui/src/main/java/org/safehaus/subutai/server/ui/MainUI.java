@@ -23,17 +23,23 @@ package org.safehaus.subutai.server.ui;
 import java.util.HashMap;
 import java.util.Locale;
 
+import javax.naming.NamingException;
+import javax.servlet.http.Cookie;
+
+import org.safehaus.subutai.common.security.NullSubutaiLoginContext;
+import org.safehaus.subutai.common.security.SubutaiLoginContext;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
+import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.server.ui.util.HelpManager;
 import org.safehaus.subutai.server.ui.util.HelpOverlay;
+import org.safehaus.subutai.server.ui.util.SubutaiVaadinUtils;
 import org.safehaus.subutai.server.ui.views.CoreModulesView;
 import org.safehaus.subutai.server.ui.views.LoginView;
 import org.safehaus.subutai.server.ui.views.ModulesView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
@@ -44,6 +50,7 @@ import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
@@ -248,17 +255,32 @@ public class MainUI extends UI implements ViewChangeListener
     public boolean beforeViewChange( final ViewChangeListener.ViewChangeEvent event )
     {
         helpManager.closeAll();
-        Subject currentUser = SecurityUtils.getSubject();
-        LOG.debug( String.format( "Current user: %s", currentUser.isAuthenticated() ) );
+        SubutaiLoginContext loginContext = SubutaiVaadinUtils.getSubutaiLoginContext();
+        LOG.debug( String.format( "Current subutai login context: %s", loginContext ) );
         LOG.debug( String.format( "View: %s", event.getViewName() ) );
 
-        if ( currentUser.isAuthenticated() && event.getViewName().equals( "" ) )
+        boolean isAuthenticated = false;
+
+        if ( !( loginContext instanceof NullSubutaiLoginContext ) )
+        {
+            try
+            {
+                IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+                isAuthenticated = identityManager.isAuthenticated();
+            }
+            catch ( NamingException e )
+            {
+                LOG.error( e.toString(), e );
+            }
+        }
+
+        if ( isAuthenticated && event.getViewName().equals( "" ) )
         {
             event.getNavigator().navigateTo( "/core" );
             return false;
         }
 
-        if ( !currentUser.isAuthenticated() && !event.getViewName().equals( "/login" ) )
+        if ( !isAuthenticated && !event.getViewName().equals( "/login" ) )
         {
             HelpOverlay w = helpManager.addOverlay( "Welcome to the Subutai",
                     "<p>No username or password is required, just click the ‘Sign In’ button to continue.</p>",
@@ -334,6 +356,26 @@ public class MainUI extends UI implements ViewChangeListener
                                 username.setSizeUndefined();
                                 addComponent( username );
 
+                                try
+                                {
+                                    IdentityManager identityManager =
+                                            ServiceLocator.getServiceNoCache( IdentityManager.class );
+
+                                    if ( identityManager != null )
+                                    {
+                                        User user = identityManager.getUser();
+
+                                        if ( user != null )
+                                        {
+                                            username.setValue( user.getUsername() );
+                                        }
+                                    }
+                                }
+                                catch ( Exception e )
+                                {
+                                    LOG.error( e.toString(), e );
+                                }
+
                                 MenuBar.Command cmd = new MenuBar.Command()
                                 {
                                     @Override
@@ -360,7 +402,27 @@ public class MainUI extends UI implements ViewChangeListener
                                     @Override
                                     public void buttonClick( Button.ClickEvent event )
                                     {
-                                        SecurityUtils.getSubject().logout();
+
+                                        try
+                                        {
+                                            IdentityManager identityManager =
+                                                    ServiceLocator.getServiceNoCache( IdentityManager.class );
+                                            identityManager.logout(
+                                                    SubutaiVaadinUtils.getSubutaiLoginContext().getSessionId() );
+
+                                            VaadinService.getCurrentRequest().getWrappedSession().removeAttribute(
+                                                    SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME );
+                                            Cookie removeCookie =
+                                                    new Cookie( SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME, null );
+                                            removeCookie.setMaxAge( 0 );
+                                            VaadinService.getCurrentResponse().addCookie( removeCookie );
+                                            VaadinSession.getCurrent().close();
+                                        }
+                                        catch ( NamingException e )
+                                        {
+                                            LOG.error( e.toString(), e );
+                                        }
+
                                         String contextPath = VaadinService.getCurrentRequest().getContextPath();
                                         getUI().getPage().setLocation( contextPath );
                                         LOG.trace( "VaadinSession.close() called" );

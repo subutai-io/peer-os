@@ -12,6 +12,8 @@ import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
@@ -23,15 +25,18 @@ import com.vaadin.ui.Window;
 public class ContainersWindow extends Window
 {
     private final EnvironmentManager environmentManager;
+    private final PeerManager peerManager;
     private Environment environment;
     private Table containersTable;
     private ScheduledExecutorService updater;
     private ExecutorService taskExecutor;
 
 
-    public ContainersWindow( final EnvironmentManager environmentManager, final Environment environment )
+    public ContainersWindow( final EnvironmentManager environmentManager, final Environment environment,
+                             final PeerManager peerManager )
     {
         this.environmentManager = environmentManager;
+        this.peerManager = peerManager;
         this.environment = environment;
 
         setCaption( "Containers" );
@@ -93,7 +98,7 @@ public class ContainersWindow extends Window
                     }
                 } );
             }
-        }, 3, 5, TimeUnit.SECONDS );
+        }, 3, 30, TimeUnit.SECONDS );
     }
 
 
@@ -105,8 +110,18 @@ public class ContainersWindow extends Window
         for ( final ContainerHost containerHost : environment.getContainerHosts() )
         {
             final Button startBtn = new Button( "Start" );
+            final Button tagsBtn = new Button( "Tags" );
             final Button stopBtn = new Button( "Stop" );
             final Button destroyBtn = new Button( "Destroy" );
+
+            tagsBtn.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( final Button.ClickEvent event )
+                {
+                    getUI().addWindow( new TagsWindow( containerHost, peerManager.getLocalPeer() ) );
+                }
+            } );
 
             startBtn.addClickListener( new Button.ClickListener()
             {
@@ -128,8 +143,9 @@ public class ContainersWindow extends Window
                             }
                             catch ( PeerException e )
                             {
-                                Notification.show( String.format( "Error starting container %s: %s",
-                                                containerHost.getHostname(), e ), Notification.Type.ERROR_MESSAGE );
+                                Notification.show( String
+                                        .format( "Error starting container %s: %s", containerHost.getHostname(), e ),
+                                        Notification.Type.ERROR_MESSAGE );
                             }
                             finally
                             {
@@ -178,45 +194,55 @@ public class ContainersWindow extends Window
                 @Override
                 public void buttonClick( final Button.ClickEvent event )
                 {
-
-                    disableTable();
-
-                    taskExecutor.submit( new Runnable()
+                    ConfirmationDialog alert =
+                            new ConfirmationDialog( "Do you really want to destroy this container?", "Yes", "No" );
+                    alert.getOk().addClickListener( new Button.ClickListener()
                     {
                         @Override
-                        public void run()
+                        public void buttonClick( Button.ClickEvent clickEvent )
                         {
+                            disableTable();
 
-                            try
+                            taskExecutor.submit( new Runnable()
                             {
-                                containerHost.dispose();
+                                @Override
+                                public void run()
+                                {
 
-                                try
-                                {
-                                    environment = environmentManager.findEnvironment( environment.getId() );
-                                }
-                                catch ( EnvironmentNotFoundException e )
-                                {
-                                    close();
-                                }
-                            }
-                            catch ( PeerException e )
-                            {
-                                Notification.show( String.format( "Error destroying container %s: %s",
+                                    try
+                                    {
+                                        containerHost.dispose();
+
+                                        try
+                                        {
+                                            environment = environmentManager.findEnvironment( environment.getId() );
+                                        }
+                                        catch ( EnvironmentNotFoundException e )
+                                        {
+                                            close();
+                                        }
+                                    }
+                                    catch ( PeerException e )
+                                    {
+                                        Notification.show( String.format( "Error destroying container %s: %s",
                                                 containerHost.getHostname(), e ), Notification.Type.ERROR_MESSAGE );
-                            }
-                            finally
-                            {
-                                enableTable();
-                            }
+                                    }
+                                    finally
+                                    {
+                                        enableTable();
+                                    }
+                                }
+                            } );
                         }
                     } );
+
+                    getUI().addWindow( alert.getAlert() );
                 }
             } );
 
             containersTable.addItem( new Object[] {
                     containerHost.getId().toString(), containerHost.getTemplateName(), containerHost.getHostname(),
-                    containerHost.getIpByInterfaceName( "eth0" ), startBtn, stopBtn, destroyBtn
+                    containerHost.getIpByInterfaceName( "eth0" ), tagsBtn, startBtn, stopBtn, destroyBtn
             }, null );
 
             boolean isContainerConnected = containerHost.isConnected();
@@ -232,6 +258,7 @@ public class ContainersWindow extends Window
     {
         if ( environment.getStatus() != EnvironmentStatus.UNDER_MODIFICATION )
         {
+            updateContainersTable();
             containersTable.setEnabled( true );
         }
     }
@@ -252,6 +279,7 @@ public class ContainersWindow extends Window
         table.addContainerProperty( "Template", String.class, null );
         table.addContainerProperty( "Hostname", String.class, null );
         table.addContainerProperty( "IP", String.class, null );
+        table.addContainerProperty( "Tags", Button.class, null );
         table.addContainerProperty( "Start", Button.class, null );
         table.addContainerProperty( "Stop", Button.class, null );
         table.addContainerProperty( "Destroy", Button.class, null );

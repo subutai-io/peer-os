@@ -19,6 +19,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import org.safehaus.subutai.core.identity.api.Role;
+import org.safehaus.subutai.core.identity.api.Roles;
 import org.safehaus.subutai.core.identity.api.User;
 
 
@@ -40,7 +41,7 @@ public class UserEntity implements User
             "user_id" ), inverseJoinColumns = @JoinColumn( name = "role_name", referencedColumnName = "name" ) )
     Set<Role> roles = new HashSet<>();
 
-    @Column( name = "user_name" )
+    @Column( name = "user_name" ,unique=true )
     private String username;
 
     @Column( name = "full_name" )
@@ -140,6 +141,11 @@ public class UserEntity implements User
     {
         roles.remove( roleEntity );
     }
+    @Override
+    public void removeAllRoles( )
+    {
+        roles.clear();
+    }
 
 
     public void setFullname( final String fullname )
@@ -186,5 +192,20 @@ public class UserEntity implements User
     public Set<Role> getRoles()
     {
         return roles;
+    }
+
+
+    @Override
+    public boolean isAdmin()
+    {
+        for ( Role role : roles )
+        {
+            if ( role.getName().equalsIgnoreCase( Roles.ADMIN.getRoleName() ) )
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

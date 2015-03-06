@@ -2,7 +2,7 @@
 
 . $subutai_lib_base/net_ops
 
-function network_usage {
+function network_usage { 
 echo --------------------------------------------------------------------------
 echo
 echo Usage:   Assign or Modify -due to state of container- Environment IP and VLAN ID of Container

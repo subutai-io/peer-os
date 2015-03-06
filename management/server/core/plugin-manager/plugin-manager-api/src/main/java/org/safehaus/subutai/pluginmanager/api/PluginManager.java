@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 
+
 public interface PluginManager
 {
     public UUID installPlugin( String pluginName );
@@ -18,17 +19,21 @@ public interface PluginManager
 
     public Set<PluginInfo> getAvailablePlugins();
 
-    public List<String> getAvailablePluginNames();
+    public Set<String> getAvailablePluginNames();
 
     public List<String> getAvaileblePluginVersions();
 
     public List<String> getInstalledPluginVersions();
 
-    public List<String> getInstalledPluginNames();
+    public Set<String> getInstalledPluginNames();
 
     public String getPluginVersion( String pluginName );
 
     public boolean isUpgradeAvailable( String pluginName );
 
     public String getProductKey();
+
+    public boolean isInstalled( String p );
+
+    public boolean operationSuccessful( OperationType operationType);
 }

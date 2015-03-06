@@ -19,6 +19,8 @@ public interface User
     public void setPassword( String password );
 
 
+    public boolean isAdmin();
+
     public List<String> getPermissions();
 
     public void setSalt( String salt );
@@ -30,6 +32,8 @@ public interface User
     public String getEmail();
 
     public void removeRole( Role roleEntity );
+
+    public void removeAllRoles( );
 
     public void setFullname( String fullname );
 

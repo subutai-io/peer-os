@@ -5,17 +5,17 @@ import java.util.Set;
 import java.util.concurrent.Semaphore;
 
 import org.safehaus.subutai.common.environment.EnvironmentModificationException;
-import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
-import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
-import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -62,10 +62,16 @@ public class GrowEnvironmentTask implements Runnable
         {
             environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
+
             final Set<ContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
 
             try
             {
+                Set<Peer> newRemotePeers = Sets.newHashSet( topology.getNodeGroupPlacement().keySet() );
+                newRemotePeers.removeAll( environment.getPeers() );
+
+                environmentManager.setupEnvironmentTunnel( environment.getId(), newRemotePeers );
+
                 environmentManager.build( environment, topology );
 
                 newContainers.addAll( environment.getContainerHosts() );
@@ -85,12 +91,11 @@ public class GrowEnvironmentTask implements Runnable
 
                 environment.setStatus( EnvironmentStatus.HEALTHY );
             }
-            catch ( EnvironmentBuildException | NetworkManagerException | EnvironmentNotFoundException |
-                    EnvironmentModificationException e )
+            catch ( Exception e )
             {
                 environment.setStatus( EnvironmentStatus.UNHEALTHY );
 
-                throw new EnvironmentModificationException( e );
+                throw new EnvironmentModificationException( ExceptionUtils.getRootCause( e ) );
             }
             finally
             {
