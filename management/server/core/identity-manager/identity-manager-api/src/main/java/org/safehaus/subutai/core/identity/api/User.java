@@ -33,6 +33,8 @@ public interface User
 
     public void removeRole( Role roleEntity );
 
+    public void removeAllRoles( );
+
     public void setFullname( String fullname );
 
     public void setEmail( String email );

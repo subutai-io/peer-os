@@ -37,7 +37,7 @@ public class ChannelTokenManagerImpl implements ChannelTokenManager
     /***********************************************************************************************************
      *
      * */
-    public long getUserChannelToken(String token)
+    public long getUserChannelTokenId(String token)
     {
         long user_id = 0;
         EntityManager entityManager = EntityManagerFactory.createEntityManager();
@@ -68,6 +68,33 @@ public class ChannelTokenManagerImpl implements ChannelTokenManager
         }
 
         return  user_id;
+
+    }
+    /***********************************************************************************************************
+     *
+     * */
+    public IUserChannelToken getUserChannelToken(String token)
+    {
+        IUserChannelToken userChannelToken = null;
+        EntityManager entityManager = EntityManagerFactory.createEntityManager();
+
+        try
+        {
+            Query query;
+            query = entityManager.createQuery( "select ucht FROM UserChannelToken AS ucht WHERE ucht.token=:tokenParam and ucht.validPeriod>0" );
+            query.setParameter( "tokenParam", token );
+            userChannelToken = (UserChannelToken)query.getSingleResult();
+        }
+        catch ( Exception e )
+        {
+        }
+        finally
+        {
+            if(entityManager.isOpen())
+                entityManager.close();
+        }
+
+        return  userChannelToken;
 
     }
 

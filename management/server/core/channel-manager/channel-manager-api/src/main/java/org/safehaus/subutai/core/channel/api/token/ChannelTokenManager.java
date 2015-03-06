@@ -27,8 +27,12 @@ public interface ChannelTokenManager
     /***********************************************************************************************************
      *
      * */
-    public long getUserChannelToken(String token);
+    public long getUserChannelTokenId(String token);
 
+    /***********************************************************************************************************
+     *
+     * */
+    public IUserChannelToken getUserChannelToken(String token);
     /***********************************************************************************************************
      *
      * */
