@@ -9,7 +9,7 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
-import org.safehaus.subutai.core.identity.api.Role;
+import org.safehaus.subutai.core.identity.api.UserPortalModule;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.server.ui.api.PortalModuleListener;
 import org.safehaus.subutai.server.ui.api.PortalModuleService;
@@ -40,25 +40,19 @@ public class PortalModuleServiceImpl implements PortalModuleService
             try
             {
                 IdentityManager identityManager = serviceLocator.getService( IdentityManager.class );
-                identityManager.updateUserPortalModule(
-                        identityManager.createMockUserPortalModule( module.getId(), module.getName() ) );
-
-                for ( final Role role : identityManager.getUser().getRoles() )
-                {
-                    if ( role.canAccessModule( module.getId() ) )
-                    {
-                        LOG.info( String.format( "Registering module: %s ", module.getId() ) );
-                        modules.add( module );
-                        for ( PortalModuleListener listener : listeners )
-                        {
-                            listener.moduleRegistered( module );
-                        }
-                    }
-                }
+                UserPortalModule portalModule =
+                        identityManager.createMockUserPortalModule( module.getId(), module.getName() );
+                identityManager.updateUserPortalModule( portalModule );
             }
             catch ( NamingException e )
             {
                 LOG.error( "Error accessing identityManager via serviceLocator", e );
+            }
+            LOG.info( String.format( "Registering module: %s ", module.getId() ) );
+            modules.add( module );
+            for ( PortalModuleListener listener : listeners )
+            {
+                listener.moduleRegistered( module );
             }
         }
         else

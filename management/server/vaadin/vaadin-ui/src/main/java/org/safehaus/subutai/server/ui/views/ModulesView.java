@@ -59,7 +59,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
     @Override
     public void enter( ViewChangeEvent event )
     {
-
+        LOG.debug( "User entered ModulesView" );
     }
 
 

@@ -51,7 +51,7 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
     @Override
     public void enter( ViewChangeListener.ViewChangeEvent event )
     {
-
+        LOG.debug( "User entered CoreModulesView" );
     }
 
 

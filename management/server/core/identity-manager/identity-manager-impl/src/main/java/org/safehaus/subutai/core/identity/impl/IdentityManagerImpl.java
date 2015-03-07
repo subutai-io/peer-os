@@ -346,6 +346,13 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
             return false;
         }
         portalModuleDataService.update( ( UserPortalModuleEntity ) userPortalModule );
+        for ( final RoleEntity roleEntity : roleDataService.getAll() )
+        {
+            if ( roleEntity.getName().equalsIgnoreCase( Roles.ADMIN.getRoleName() ) )
+            {
+                roleEntity.addPortalModule( userPortalModule );
+            }
+        }
         return true;
     }
 
