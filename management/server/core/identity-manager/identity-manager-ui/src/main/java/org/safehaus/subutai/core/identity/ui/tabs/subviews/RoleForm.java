@@ -58,6 +58,19 @@ public class RoleForm extends VerticalLayout
     };
 
 
+    private TwinColSelect modulesSelector = new TwinColSelect( "Accessible modules" )
+    {
+        {
+            setItemCaptionMode( ItemCaptionMode.PROPERTY );
+            setItemCaptionPropertyId( "moduleName" );
+            setImmediate( true );
+            setSpacing( true );
+            setRequired( false );
+            setNullSelectionAllowed( true );
+        }
+    };
+
+
     public RoleForm( TabCallback<BeanItem<Role>> callback, Set<Permission> permissions )
     {
         init();

@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.server.ui.api.PortalModuleListener;
 import org.safehaus.subutai.server.ui.api.PortalModuleService;
@@ -23,11 +27,26 @@ public class PortalModuleServiceImpl implements PortalModuleService
     private List<PortalModuleListener> listeners =
             Collections.synchronizedList( new ArrayList<PortalModuleListener>() );
 
+    private ServiceLocator serviceLocator = new ServiceLocator();
+
 
     public synchronized void registerModule( PortalModule module )
     {
         if ( module != null )
         {
+            //TODO place to filter out modules
+
+            try
+            {
+                IdentityManager identityManager = serviceLocator.getService( IdentityManager.class );
+                identityManager.updateUserPortalModule(
+                        identityManager.createMockUserPortalModule( module.getId(), module.getName() ) );
+            }
+            catch ( NamingException e )
+            {
+                LOG.error( "Error accessing identityManager via serviceLocator", e );
+            }
+
             LOG.info( String.format( "Registering module: %s ", module.getId() ) );
             modules.add( module );
             for ( PortalModuleListener listener : listeners )

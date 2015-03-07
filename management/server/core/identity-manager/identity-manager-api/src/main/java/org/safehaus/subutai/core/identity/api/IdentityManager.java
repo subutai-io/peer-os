@@ -142,7 +142,12 @@ public interface IdentityManager
     public boolean deleteUser( User user );
 
 
-    //Permissions
+    //-------------------------- UserPortalModule ---------------------
+
+    public Set<UserPortalModule> getAllPortalModules();
+
+
+    //<-------------------------- Permissions -------------------------
 
     /**
      * Get all Permissions
@@ -197,7 +202,7 @@ public interface IdentityManager
     public boolean deletePermission( Permission permission );
 
 
-    //Roles
+    //-------------------------- Roles -------------------------
 
     /**
      * Get list of {@code Role} existing in database
@@ -251,5 +256,9 @@ public interface IdentityManager
     public boolean isAuthenticated();
 
     public Set<String> getRoles( Serializable shiroSessionId );
+
+    public UserPortalModule createMockUserPortalModule( String moduleKey, String moduleName );
+
+    public boolean updateUserPortalModule( UserPortalModule userPortalModule );
 }
 

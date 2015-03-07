@@ -31,6 +31,14 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>identity-manager-api</artifactId>
+    </dependency>
     <!--<dependency>-->
     <!--<groupId>javax.servlet</groupId>-->
     <!--<artifactId>javax.servlet-api</artifactId>-->

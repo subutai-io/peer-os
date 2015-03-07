@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.api.User;
+import org.safehaus.subutai.core.identity.api.UserPortalModule;
 import org.safehaus.subutai.core.identity.ui.tabs.TabCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,14 +101,36 @@ public class UserForm extends VerticalLayout
     };
 
 
-    public UserForm( TabCallback<BeanItem<User>> callback, List<Role> roles )
+    private TwinColSelect modulesSelector = new TwinColSelect( "Accessible modules" )
+    {
+        {
+            setItemCaptionMode( ItemCaptionMode.PROPERTY );
+            setItemCaptionPropertyId( "moduleName" );
+            setImmediate( true );
+            setSpacing( true );
+            setRequired( false );
+            setNullSelectionAllowed( true );
+        }
+    };
+
+
+    public UserForm( TabCallback<BeanItem<User>> callback, List<Role> roles,
+                     final Set<UserPortalModule> allPortalModules )
     {
         init();
+
         BeanContainer<String, Role> permissionsContainer = new BeanContainer<>( Role.class );
         permissionsContainer.setBeanIdProperty( "name" );
         permissionsContainer.addAll( roles );
         rolesSelector.setContainerDataSource( permissionsContainer );
         rolesSelector.setItemCaptionPropertyId( "name" );
+
+        BeanContainer<String, UserPortalModule> modulesContainer = new BeanContainer<>( UserPortalModule.class );
+        modulesContainer.setBeanIdProperty( "moduleKey" );
+        modulesContainer.addAll( allPortalModules );
+        modulesSelector.setContainerDataSource( modulesContainer );
+        modulesSelector.setItemCaptionPropertyId( "moduleName" );
+
         this.callback = callback;
     }
 
@@ -123,7 +146,7 @@ public class UserForm extends VerticalLayout
         buttons.setSpacing( true );
 
         final FormLayout form = new FormLayout();
-        form.addComponents( username, email, fullName, password, confirmPassword, rolesSelector );
+        form.addComponents( username, email, fullName, password, confirmPassword, rolesSelector, modulesSelector );
 
         addComponents( form, buttons );
 
@@ -152,6 +175,13 @@ public class UserForm extends VerticalLayout
                 roleNames.add( role.getName() );
             }
             rolesSelector.setValue( roleNames );
+
+            Set<String> modules = new HashSet<>();
+            for ( final UserPortalModule userPortalModule : userBean.getAccessibleModules() )
+            {
+                modules.add( userPortalModule.getModuleName() );
+            }
+            modulesSelector.setValue( modules );
 
             if ( !newValue )
             {
@@ -184,15 +214,23 @@ public class UserForm extends VerticalLayout
 
                 if ( callback != null )
                 {
-                    Collection<String> selectedRoleNames = ( Collection<String> ) rolesSelector.getValue();
                     User user = userFieldGroup.getItemDataSource().getBean();
                     user.removeAllRoles();
-
+                    Collection<String> selectedRoleNames = ( Collection<String> ) rolesSelector.getValue();
                     for ( final String roleName : selectedRoleNames )
                     {
                         BeanItem beanItem = ( BeanItem ) rolesSelector.getItem( roleName );
                         user.addRole( ( Role ) beanItem.getBean() );
                     }
+
+                    user.clearPortalModules();
+                    Collection<String> selectedModuleNames = ( Collection<String> ) modulesSelector.getValue();
+                    for ( final String moduleName : selectedModuleNames )
+                    {
+                        BeanItem beanItem = ( BeanItem ) modulesSelector.getItem( moduleName );
+                        user.addPortalModule( ( UserPortalModule ) beanItem.getBean() );
+                    }
+
                     callback.saveOperation( userFieldGroup.getItemDataSource(), newValue );
                 }
             }

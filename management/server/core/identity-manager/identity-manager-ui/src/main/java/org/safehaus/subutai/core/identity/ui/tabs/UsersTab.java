@@ -68,7 +68,7 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
 
         // Create a form for editing a selected or new item.
         // It is invisible until actually used.
-        form = new UserForm( this, identityManager.getAllRoles() );
+        form = new UserForm( this, identityManager.getAllRoles(), identityManager.getAllPortalModules() );
         form.setVisible( false );
 
         // When the user selects an item, show it in the form

@@ -20,13 +20,16 @@ import org.safehaus.subutai.core.identity.api.PermissionGroup;
 import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.api.Roles;
 import org.safehaus.subutai.core.identity.api.User;
+import org.safehaus.subutai.core.identity.api.UserPortalModule;
 import org.safehaus.subutai.core.identity.impl.dao.PermissionDataService;
 import org.safehaus.subutai.core.identity.impl.dao.RoleDataService;
 import org.safehaus.subutai.core.identity.impl.dao.UserDataService;
+import org.safehaus.subutai.core.identity.impl.dao.UserPortalModuleDataService;
 import org.safehaus.subutai.core.identity.impl.entity.PermissionEntity;
 import org.safehaus.subutai.core.identity.impl.entity.PermissionPK;
 import org.safehaus.subutai.core.identity.impl.entity.RoleEntity;
 import org.safehaus.subutai.core.identity.impl.entity.UserEntity;
+import org.safehaus.subutai.core.identity.impl.entity.UserPortalModuleEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +69,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     private UserDataService userDataService;
     private PermissionDataService permissionDataService;
     private RoleDataService roleDataService;
+    private UserPortalModuleDataService portalModuleDataService;
 
 
     private String getSimpleSalt( String username )
@@ -88,6 +92,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         userDataService = new UserDataService( daoManager );
         permissionDataService = new PermissionDataService( daoManager.getEntityManagerFactory() );
         roleDataService = new RoleDataService( daoManager.getEntityManagerFactory() );
+        portalModuleDataService = new UserPortalModuleDataService( daoManager.getEntityManagerFactory() );
 
 
         securityManager = new DefaultSecurityManager();
@@ -198,10 +203,10 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     @Override
     public User getUser()
     {
-//        logActiveSessions();
+        //        logActiveSessions();
 
         SubutaiLoginContext loginContext = getSubutaiLoginContext();
-//        LOG.debug( String.format( "Login context: [%s] ", loginContext ) );
+        //        LOG.debug( String.format( "Login context: [%s] ", loginContext ) );
 
         if ( loginContext instanceof NullSubutaiLoginContext )
         {
@@ -322,6 +327,25 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
             }
         }
         return result;
+    }
+
+
+    @Override
+    public UserPortalModule createMockUserPortalModule( final String moduleKey, final String moduleName )
+    {
+        return new UserPortalModuleEntity( moduleKey, moduleName );
+    }
+
+
+    @Override
+    public boolean updateUserPortalModule( final UserPortalModule userPortalModule )
+    {
+        if ( !( userPortalModule instanceof UserPortalModuleEntity ) )
+        {
+            return false;
+        }
+        portalModuleDataService.update( ( UserPortalModuleEntity ) userPortalModule );
+        return true;
     }
 
 
@@ -519,6 +543,15 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         }
         userDataService.remove( user.getId() );
         return true;
+    }
+
+
+    @Override
+    public Set<UserPortalModule> getAllPortalModules()
+    {
+        Set<UserPortalModule> portalModules = Sets.newHashSet();
+        portalModules.addAll( portalModuleDataService.getAll() );
+        return portalModules;
     }
 
 
