@@ -11,9 +11,9 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
+import org.safehaus.subutai.core.identity.api.PortalModuleScope;
 import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.api.User;
-import org.safehaus.subutai.core.identity.api.UserPortalModule;
 import org.safehaus.subutai.server.ui.MainUI;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.server.ui.api.PortalModuleListener;
@@ -72,7 +72,7 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
             User user = identityManager.getUser();
             for ( final Role role : user.getRoles() )
             {
-                for ( final UserPortalModule module : role.getAccessibleModules() )
+                for ( final PortalModuleScope module : role.getAccessibleModules() )
                 {
                     moduleViews.get( module.getModuleKey() ).setVisible( true );
                 }

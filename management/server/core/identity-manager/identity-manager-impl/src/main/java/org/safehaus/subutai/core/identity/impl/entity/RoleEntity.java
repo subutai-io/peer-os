@@ -19,9 +19,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.safehaus.subutai.core.identity.api.Permission;
+import org.safehaus.subutai.core.identity.api.PortalModuleScope;
 import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.api.User;
-import org.safehaus.subutai.core.identity.api.UserPortalModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +53,7 @@ public class RoleEntity implements Role, Serializable
             CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH
     } )
     @Column( name = "accessible_modules" )
-    Set<UserPortalModuleEntity> accessibleModules = new HashSet<>();
+    Set<PortalModuleScopeEntity> accessibleModules = new HashSet<>();
 
 
     public RoleEntity()
@@ -125,27 +125,27 @@ public class RoleEntity implements Role, Serializable
 
 
     @Override
-    public Set<UserPortalModule> getAccessibleModules()
+    public Set<PortalModuleScope> getAccessibleModules()
     {
-        Set<UserPortalModule> portalModules = new HashSet<>();
+        Set<PortalModuleScope> portalModules = new HashSet<>();
         portalModules.addAll( accessibleModules );
         return portalModules;
     }
 
 
     @Override
-    public void addPortalModule( final UserPortalModule module )
+    public void addPortalModule( final PortalModuleScope module )
     {
         if ( module == null )
         {
             throw new IllegalArgumentException( "Module could not be null." );
         }
-        if ( !( module instanceof UserPortalModuleEntity ) )
+        if ( !( module instanceof PortalModuleScopeEntity ) )
         {
             throw new IllegalArgumentException( "Module is not instance of UserPortalModuleEntity" );
         }
         LOG.debug( "Adding accessible module to role", module.getModuleName() );
-        accessibleModules.add( ( UserPortalModuleEntity ) module );
+        accessibleModules.add( ( PortalModuleScopeEntity ) module );
     }
 
 
@@ -159,7 +159,7 @@ public class RoleEntity implements Role, Serializable
     @Override
     public boolean canAccessModule( final String moduleKey )
     {
-        for ( final UserPortalModuleEntity accessibleModule : accessibleModules )
+        for ( final PortalModuleScopeEntity accessibleModule : accessibleModules )
         {
             if ( moduleKey != null && moduleKey.equalsIgnoreCase( accessibleModule.getModuleKey() ) )
             {

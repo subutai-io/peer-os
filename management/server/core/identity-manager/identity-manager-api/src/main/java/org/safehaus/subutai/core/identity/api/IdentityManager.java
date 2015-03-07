@@ -144,7 +144,7 @@ public interface IdentityManager
 
     //-------------------------- UserPortalModule ---------------------
 
-    public Set<UserPortalModule> getAllPortalModules();
+    public Set<PortalModuleScope> getAllPortalModules();
 
 
     //<-------------------------- Permissions -------------------------
@@ -257,8 +257,8 @@ public interface IdentityManager
 
     public Set<String> getRoles( Serializable shiroSessionId );
 
-    public UserPortalModule createMockUserPortalModule( String moduleKey, String moduleName );
+    public PortalModuleScope createMockUserPortalModule( String moduleKey, String moduleName );
 
-    public boolean updateUserPortalModule( UserPortalModule userPortalModule );
+    public boolean updateUserPortalModule( PortalModuleScope portalModuleScope );
 }
 

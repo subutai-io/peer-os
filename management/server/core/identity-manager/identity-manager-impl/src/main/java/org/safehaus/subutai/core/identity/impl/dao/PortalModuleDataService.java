@@ -9,7 +9,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.safehaus.subutai.common.protocol.api.DataService;
-import org.safehaus.subutai.core.identity.impl.entity.UserPortalModuleEntity;
+import org.safehaus.subutai.core.identity.impl.entity.PortalModuleScopeEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,13 +20,13 @@ import com.google.common.collect.Lists;
 /**
  * Created by talas on 2/5/15.
  */
-public class UserPortalModuleDataService implements DataService<String, UserPortalModuleEntity>
+public class PortalModuleDataService implements DataService<String, PortalModuleScopeEntity>
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( UserPortalModuleDataService.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( PortalModuleDataService.class );
     private EntityManagerFactory emf;
 
 
-    public UserPortalModuleDataService( final EntityManagerFactory emf )
+    public PortalModuleDataService( final EntityManagerFactory emf )
     {
         Preconditions.checkNotNull( emf, "Please provide valid entity manager factory for Permissions data service" );
         this.emf = emf;
@@ -34,15 +34,15 @@ public class UserPortalModuleDataService implements DataService<String, UserPort
 
 
     @Override
-    public List<UserPortalModuleEntity> getAll()
+    public List<PortalModuleScopeEntity> getAll()
     {
-        List<UserPortalModuleEntity> result = Lists.newArrayList();
+        List<PortalModuleScopeEntity> result = Lists.newArrayList();
         EntityManager em = emf.createEntityManager();
 
         try
         {
             em.getTransaction().begin();
-            result = em.createQuery( "SELECT p FROM UserPortalModuleEntity p", UserPortalModuleEntity.class )
+            result = em.createQuery( "SELECT p FROM UserPortalModuleEntity p", PortalModuleScopeEntity.class )
                        .getResultList();
             em.getTransaction().commit();
         }
@@ -64,20 +64,20 @@ public class UserPortalModuleDataService implements DataService<String, UserPort
 
 
     @Override
-    public UserPortalModuleEntity find( final String id )
+    public PortalModuleScopeEntity find( final String id )
     {
-        UserPortalModuleEntity result = null;
+        PortalModuleScopeEntity result = null;
         EntityManager em = emf.createEntityManager();
 
         try
         {
             em.getTransaction().begin();
-            TypedQuery<UserPortalModuleEntity> query = em.createQuery(
+            TypedQuery<PortalModuleScopeEntity> query = em.createQuery(
                     "SELECT p FROM UserPortalModuleEntity p WHERE p.moduleKey = :moduleKey AND p.moduleName = "
-                            + ":moduleName", UserPortalModuleEntity.class );
+                            + ":moduleName", PortalModuleScopeEntity.class );
             query.setParameter( "moduleKey", id );
 
-            List<UserPortalModuleEntity> permissions = query.getResultList();
+            List<PortalModuleScopeEntity> permissions = query.getResultList();
             if ( permissions.size() > 0 )
             {
                 result = permissions.iterator().next();
@@ -102,7 +102,7 @@ public class UserPortalModuleDataService implements DataService<String, UserPort
 
 
     @Override
-    public void persist( final UserPortalModuleEntity item )
+    public void persist( final PortalModuleScopeEntity item )
     {
         EntityManager em = emf.createEntityManager();
         try
@@ -160,7 +160,7 @@ public class UserPortalModuleDataService implements DataService<String, UserPort
 
 
     @Override
-    public void update( final UserPortalModuleEntity item )
+    public void update( final PortalModuleScopeEntity item )
     {
         EntityManager em = emf.createEntityManager();
         try

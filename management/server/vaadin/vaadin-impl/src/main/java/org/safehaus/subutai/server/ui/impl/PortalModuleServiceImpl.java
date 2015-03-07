@@ -9,7 +9,7 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
-import org.safehaus.subutai.core.identity.api.UserPortalModule;
+import org.safehaus.subutai.core.identity.api.PortalModuleScope;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.server.ui.api.PortalModuleListener;
 import org.safehaus.subutai.server.ui.api.PortalModuleService;
@@ -40,7 +40,7 @@ public class PortalModuleServiceImpl implements PortalModuleService
             try
             {
                 IdentityManager identityManager = serviceLocator.getService( IdentityManager.class );
-                UserPortalModule portalModule =
+                PortalModuleScope portalModule =
                         identityManager.createMockUserPortalModule( module.getId(), module.getName() );
                 identityManager.updateUserPortalModule( portalModule );
             }

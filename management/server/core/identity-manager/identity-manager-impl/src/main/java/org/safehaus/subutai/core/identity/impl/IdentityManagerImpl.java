@@ -17,19 +17,19 @@ import org.safehaus.subutai.common.util.SecurityUtil;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.PermissionGroup;
+import org.safehaus.subutai.core.identity.api.PortalModuleScope;
 import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.api.Roles;
 import org.safehaus.subutai.core.identity.api.User;
-import org.safehaus.subutai.core.identity.api.UserPortalModule;
 import org.safehaus.subutai.core.identity.impl.dao.PermissionDataService;
+import org.safehaus.subutai.core.identity.impl.dao.PortalModuleDataService;
 import org.safehaus.subutai.core.identity.impl.dao.RoleDataService;
 import org.safehaus.subutai.core.identity.impl.dao.UserDataService;
-import org.safehaus.subutai.core.identity.impl.dao.UserPortalModuleDataService;
 import org.safehaus.subutai.core.identity.impl.entity.PermissionEntity;
 import org.safehaus.subutai.core.identity.impl.entity.PermissionPK;
+import org.safehaus.subutai.core.identity.impl.entity.PortalModuleScopeEntity;
 import org.safehaus.subutai.core.identity.impl.entity.RoleEntity;
 import org.safehaus.subutai.core.identity.impl.entity.UserEntity;
-import org.safehaus.subutai.core.identity.impl.entity.UserPortalModuleEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +69,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     private UserDataService userDataService;
     private PermissionDataService permissionDataService;
     private RoleDataService roleDataService;
-    private UserPortalModuleDataService portalModuleDataService;
+    private PortalModuleDataService portalModuleDataService;
 
 
     private String getSimpleSalt( String username )
@@ -92,7 +92,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         userDataService = new UserDataService( daoManager );
         permissionDataService = new PermissionDataService( daoManager.getEntityManagerFactory() );
         roleDataService = new RoleDataService( daoManager.getEntityManagerFactory() );
-        portalModuleDataService = new UserPortalModuleDataService( daoManager.getEntityManagerFactory() );
+        portalModuleDataService = new PortalModuleDataService( daoManager.getEntityManagerFactory() );
 
 
         securityManager = new DefaultSecurityManager();
@@ -152,7 +152,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
             adminRole = new RoleEntity();
             adminRole.setName( "admin" );
 
-            for ( final UserPortalModuleEntity moduleEntity : portalModuleDataService.getAll() )
+            for ( final PortalModuleScopeEntity moduleEntity : portalModuleDataService.getAll() )
             {
                 adminRole.addPortalModule( moduleEntity );
             }
@@ -337,21 +337,30 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
 
 
     @Override
-    public UserPortalModule createMockUserPortalModule( final String moduleKey, final String moduleName )
+    public PortalModuleScope createMockUserPortalModule( final String moduleKey, final String moduleName )
     {
-        return new UserPortalModuleEntity( moduleKey, moduleName );
+        return new PortalModuleScopeEntity( moduleKey, moduleName );
     }
 
 
     @Override
-    public boolean updateUserPortalModule( final UserPortalModule userPortalModule )
+    public boolean updateUserPortalModule( final PortalModuleScope portalModuleScope )
     {
-        LOG.debug( "Saving new portal module: ", userPortalModule.toString() );
-        if ( !( userPortalModule instanceof UserPortalModuleEntity ) )
+        LOG.debug( "Saving new portal module: ", portalModuleScope.toString() );
+        if ( !( portalModuleScope instanceof PortalModuleScopeEntity ) )
         {
             return false;
         }
-        portalModuleDataService.update( ( UserPortalModuleEntity ) userPortalModule );
+        portalModuleDataService.update( ( PortalModuleScopeEntity ) portalModuleScope );
+        List<RoleEntity> roles = roleDataService.getAll();
+        for ( RoleEntity roleEntity : roles )
+        {
+            if ( roleEntity.getName().equalsIgnoreCase( Roles.ADMIN.getRoleName() ) )
+            {
+                roleEntity.addPortalModule( portalModuleScope );
+                roleDataService.update( roleEntity );
+            }
+        }
         return true;
     }
 
@@ -554,9 +563,9 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
 
 
     @Override
-    public Set<UserPortalModule> getAllPortalModules()
+    public Set<PortalModuleScope> getAllPortalModules()
     {
-        Set<UserPortalModule> portalModules = Sets.newHashSet();
+        Set<PortalModuleScope> portalModules = Sets.newHashSet();
         portalModules.addAll( portalModuleDataService.getAll() );
         return portalModules;
     }

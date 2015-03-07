@@ -17,11 +17,11 @@ public interface Role
 
     public void removePermission( Permission permission );
 
-    public Set<UserPortalModule> getAccessibleModules();
+    public Set<PortalModuleScope> getAccessibleModules();
 
     public void clearPortalModules();
 
-    public void addPortalModule( UserPortalModule portalModule );
+    public void addPortalModule( PortalModuleScope portalModule );
 
     public boolean canAccessModule( String moduleKey );
 }

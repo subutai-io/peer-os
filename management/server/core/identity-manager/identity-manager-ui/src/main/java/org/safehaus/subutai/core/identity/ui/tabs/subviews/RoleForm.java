@@ -6,8 +6,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.safehaus.subutai.core.identity.api.Permission;
+import org.safehaus.subutai.core.identity.api.PortalModuleScope;
 import org.safehaus.subutai.core.identity.api.Role;
-import org.safehaus.subutai.core.identity.api.UserPortalModule;
 import org.safehaus.subutai.core.identity.ui.tabs.TabCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +73,7 @@ public class RoleForm extends VerticalLayout
 
 
     public RoleForm( TabCallback<BeanItem<Role>> callback, Set<Permission> permissions,
-                     final Set<UserPortalModule> allPortalModules )
+                     final Set<PortalModuleScope> allPortalModules )
     {
         init();
         BeanContainer<String, Permission> permissionsContainer = new BeanContainer<>( Permission.class );
@@ -82,7 +82,7 @@ public class RoleForm extends VerticalLayout
         permissionsSelector.setContainerDataSource( permissionsContainer );
         permissionsSelector.setItemCaptionPropertyId( "name" );
 
-        BeanContainer<String, UserPortalModule> modulesContainer = new BeanContainer<>( UserPortalModule.class );
+        BeanContainer<String, PortalModuleScope> modulesContainer = new BeanContainer<>( PortalModuleScope.class );
         modulesContainer.setBeanIdProperty( "moduleKey" );
         modulesContainer.addAll( allPortalModules );
         modulesSelector.setContainerDataSource( modulesContainer );
@@ -131,9 +131,9 @@ public class RoleForm extends VerticalLayout
             permissionsSelector.setValue( permissionNames );
 
             Set<String> modules = new HashSet<>();
-            for ( final UserPortalModule userPortalModule : roleBean.getAccessibleModules() )
+            for ( final PortalModuleScope portalModuleScope : roleBean.getAccessibleModules() )
             {
-                modules.add( userPortalModule.getModuleName() );
+                modules.add( portalModuleScope.getModuleName() );
             }
             modulesSelector.setValue( modules );
 
@@ -176,7 +176,7 @@ public class RoleForm extends VerticalLayout
                     for ( final String moduleName : selectedModuleNames )
                     {
                         BeanItem beanItem = ( BeanItem ) modulesSelector.getItem( moduleName );
-                        role.addPortalModule( ( UserPortalModule ) beanItem.getBean() );
+                        role.addPortalModule( ( PortalModuleScope ) beanItem.getBean() );
                     }
 
                     callback.saveOperation( permissionFieldGroup.getItemDataSource(), newValue );
