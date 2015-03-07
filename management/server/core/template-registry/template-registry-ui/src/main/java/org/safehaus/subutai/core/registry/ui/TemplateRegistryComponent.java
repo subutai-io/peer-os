@@ -117,6 +117,19 @@ public class TemplateRegistryComponent extends CustomComponent
                     return template.getSubutaiConfigPath();
                 }
             } );
+            put( "Used on resource hosts", new TemplateValue()
+            {
+                @Override
+                public String getTemplateProperty( final Template template )
+                {
+                    String rsHosts = "";
+                    for ( final String rh : template.getFaisUsingThisTemplate() )
+                    {
+                        rsHosts += rh + "; ";
+                    }
+                    return rsHosts;
+                }
+            } );
             //            put( "App Data Path", new TemplateValue()
             //            {
             //                @Override
