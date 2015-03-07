@@ -28,7 +28,8 @@ public class PortalModuleDataService implements DataService<String, PortalModule
 
     public PortalModuleDataService( final EntityManagerFactory emf )
     {
-        Preconditions.checkNotNull( emf, "Please provide valid entity manager factory for Permissions data service" );
+        Preconditions.checkNotNull( emf,
+                "Please provide valid entity manager factory for PortalModuleScopeEntity data service" );
         this.emf = emf;
     }
 
@@ -42,13 +43,13 @@ public class PortalModuleDataService implements DataService<String, PortalModule
         try
         {
             em.getTransaction().begin();
-            result = em.createQuery( "SELECT p FROM UserPortalModuleEntity p", PortalModuleScopeEntity.class )
+            result = em.createQuery( "SELECT p FROM PortalModuleScopeEntity p", PortalModuleScopeEntity.class )
                        .getResultList();
             em.getTransaction().commit();
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error retrieving all userPortalModule entity", e );
+            LOGGER.error( "Error retrieving all PortalModuleScopeEntity entity", e );
             if ( em.getTransaction().isActive() )
             {
                 em.getTransaction().rollback();
@@ -73,7 +74,7 @@ public class PortalModuleDataService implements DataService<String, PortalModule
         {
             em.getTransaction().begin();
             TypedQuery<PortalModuleScopeEntity> query = em.createQuery(
-                    "SELECT p FROM UserPortalModuleEntity p WHERE p.moduleKey = :moduleKey AND p.moduleName = "
+                    "SELECT p FROM PortalModuleScopeEntity p WHERE p.moduleKey = :moduleKey AND p.moduleName = "
                             + ":moduleName", PortalModuleScopeEntity.class );
             query.setParameter( "moduleKey", id );
 
@@ -86,7 +87,7 @@ public class PortalModuleDataService implements DataService<String, PortalModule
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error looking for userPortalModule entity", e );
+            LOGGER.error( "Error looking for PortalModuleScopeEntity entity", e );
             if ( em.getTransaction().isActive() )
             {
                 em.getTransaction().rollback();
@@ -115,7 +116,7 @@ public class PortalModuleDataService implements DataService<String, PortalModule
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error while persisting userPortalModule entity.", e );
+            LOGGER.error( "Error while persisting PortalModuleScopeEntity entity.", e );
             if ( em.getTransaction().isActive() )
             {
                 em.getTransaction().rollback();
@@ -137,7 +138,7 @@ public class PortalModuleDataService implements DataService<String, PortalModule
             em.getTransaction().begin();
 
             Query query = em.createQuery(
-                    "DELETE FROM UserPortalModuleEntity p WHERE p.moduleKey = :moduleKey AND p.moduleName = "
+                    "DELETE FROM PortalModuleScopeEntity p WHERE p.moduleKey = :moduleKey AND p.moduleName = "
                             + ":moduleName" );
             query.setParameter( "moduleKey", id );
             query.executeUpdate();
@@ -146,7 +147,7 @@ public class PortalModuleDataService implements DataService<String, PortalModule
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error while removing userPortalModule entity.", e );
+            LOGGER.error( "Error while removing PortalModuleScopeEntity entity.", e );
             if ( em.getTransaction().isActive() )
             {
                 em.getTransaction().rollback();
@@ -171,7 +172,7 @@ public class PortalModuleDataService implements DataService<String, PortalModule
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error while merging userPortalModule entity.", e );
+            LOGGER.error( "Error while merging PortalModuleScopeEntity entity.", e );
             if ( em.getTransaction().isActive() )
             {
                 em.getTransaction().rollback();
