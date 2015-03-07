@@ -65,7 +65,10 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
             for ( final Map.Entry<String, AbstractLayout> entry : moduleViews.entrySet() )
             {
                 AbstractLayout layout = moduleViews.get( entry.getKey() );
-                layout.setVisible( false );
+                if ( layout != null )
+                {
+                    layout.setVisible( false );
+                }
             }
 
             IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
@@ -74,7 +77,11 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
             {
                 for ( final PortalModuleScope module : role.getAccessibleModules() )
                 {
-                    moduleViews.get( module.getModuleKey() ).setVisible( true );
+                    AbstractLayout layout = moduleViews.get( module.getModuleKey() );
+                    if ( layout != null )
+                    {
+                        layout.setVisible( true );
+                    }
                 }
             }
         }
