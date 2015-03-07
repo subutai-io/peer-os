@@ -47,9 +47,4 @@ public interface User
 
     Set<Role> getRoles();
 
-    public Set<UserPortalModule> getAccessibleModules();
-
-    public void addPortalModule( UserPortalModule module );
-
-    public void clearPortalModules();
 }

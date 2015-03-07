@@ -340,6 +340,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     @Override
     public boolean updateUserPortalModule( final UserPortalModule userPortalModule )
     {
+        LOG.debug( "Saving new portal module: ", userPortalModule.toString() );
         if ( !( userPortalModule instanceof UserPortalModuleEntity ) )
         {
             return false;

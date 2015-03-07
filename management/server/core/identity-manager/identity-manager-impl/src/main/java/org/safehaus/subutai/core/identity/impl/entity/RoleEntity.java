@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -20,6 +21,7 @@ import javax.persistence.Table;
 import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.api.User;
+import org.safehaus.subutai.core.identity.api.UserPortalModule;
 
 
 /**
@@ -42,6 +44,13 @@ public class RoleEntity implements Role, Serializable
     @JoinTable( name = "subutai_user_role", joinColumns = @JoinColumn( name = "role_name", referencedColumnName =
             "name" ), inverseJoinColumns = @JoinColumn( name = "user_id", referencedColumnName = "user_id" ) )
     Set<User> users = new HashSet<>();
+
+
+    @OneToMany( fetch = FetchType.EAGER, cascade = {
+            CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH
+    } )
+    @Column( name = "accessible_modules" )
+    Set<UserPortalModuleEntity> accessibleModules = new HashSet<>();
 
 
     public RoleEntity()
@@ -109,5 +118,50 @@ public class RoleEntity implements Role, Serializable
 
         PermissionEntity permissionEntity = ( PermissionEntity ) permission;
         permissions.remove( permissionEntity );
+    }
+
+
+    @Override
+    public Set<UserPortalModule> getAccessibleModules()
+    {
+        Set<UserPortalModule> portalModules = new HashSet<>();
+        portalModules.addAll( accessibleModules );
+        return portalModules;
+    }
+
+
+    @Override
+    public void addPortalModule( final UserPortalModule module )
+    {
+        if ( module == null )
+        {
+            throw new IllegalArgumentException( "Module could not be null." );
+        }
+        if ( !( module instanceof UserPortalModuleEntity ) )
+        {
+            throw new IllegalArgumentException( "Module is not instance of UserPortalModuleEntity" );
+        }
+        accessibleModules.add( ( UserPortalModuleEntity ) module );
+    }
+
+
+    @Override
+    public void clearPortalModules()
+    {
+        accessibleModules.clear();
+    }
+
+
+    @Override
+    public boolean canAccessModule( final String moduleKey )
+    {
+        for ( final UserPortalModuleEntity accessibleModule : accessibleModules )
+        {
+            if ( moduleKey != null && moduleKey.equalsIgnoreCase( accessibleModule.getModuleKey() ) )
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

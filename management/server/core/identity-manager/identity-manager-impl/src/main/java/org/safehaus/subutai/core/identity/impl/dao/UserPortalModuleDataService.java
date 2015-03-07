@@ -10,7 +10,6 @@ import javax.persistence.TypedQuery;
 
 import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.core.identity.impl.entity.UserPortalModuleEntity;
-import org.safehaus.subutai.core.identity.impl.entity.UserPortalModulePK;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +20,7 @@ import com.google.common.collect.Lists;
 /**
  * Created by talas on 2/5/15.
  */
-public class UserPortalModuleDataService implements DataService<UserPortalModulePK, UserPortalModuleEntity>
+public class UserPortalModuleDataService implements DataService<String, UserPortalModuleEntity>
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( UserPortalModuleDataService.class );
     private EntityManagerFactory emf;
@@ -65,7 +64,7 @@ public class UserPortalModuleDataService implements DataService<UserPortalModule
 
 
     @Override
-    public UserPortalModuleEntity find( final UserPortalModulePK id )
+    public UserPortalModuleEntity find( final String id )
     {
         UserPortalModuleEntity result = null;
         EntityManager em = emf.createEntityManager();
@@ -76,8 +75,7 @@ public class UserPortalModuleDataService implements DataService<UserPortalModule
             TypedQuery<UserPortalModuleEntity> query = em.createQuery(
                     "SELECT p FROM UserPortalModuleEntity p WHERE p.moduleKey = :moduleKey AND p.moduleName = "
                             + ":moduleName", UserPortalModuleEntity.class );
-            query.setParameter( "moduleKey", id.getModuleKey() );
-            query.setParameter( "moduleName", id.getModuleName() );
+            query.setParameter( "moduleKey", id );
 
             List<UserPortalModuleEntity> permissions = query.getResultList();
             if ( permissions.size() > 0 )
@@ -131,19 +129,17 @@ public class UserPortalModuleDataService implements DataService<UserPortalModule
 
 
     @Override
-    public void remove( final UserPortalModulePK id )
+    public void remove( final String id )
     {
         EntityManager em = emf.createEntityManager();
         try
         {
-            UserPortalModuleEntity permission = find( id );
             em.getTransaction().begin();
 
             Query query = em.createQuery(
                     "DELETE FROM UserPortalModuleEntity p WHERE p.moduleKey = :moduleKey AND p.moduleName = "
                             + ":moduleName" );
-            query.setParameter( "moduleKey", id.getModuleKey() );
-            query.setParameter( "moduleName", id.getModuleName() );
+            query.setParameter( "moduleKey", id );
             query.executeUpdate();
 
             em.getTransaction().commit();

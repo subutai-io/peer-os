@@ -13,7 +13,15 @@ public interface Role
 
     public Set<Permission> getPermissions();
 
-    public void addPermission(Permission permission);
+    public void addPermission( Permission permission );
 
-    public void removePermission(Permission permission);
+    public void removePermission( Permission permission );
+
+    public Set<UserPortalModule> getAccessibleModules();
+
+    public void clearPortalModules();
+
+    public void addPortalModule( UserPortalModule portalModule );
+
+    public boolean canAccessModule( String moduleKey );
 }

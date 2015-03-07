@@ -8,7 +8,6 @@ import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 import org.safehaus.subutai.core.identity.api.UserPortalModule;
@@ -22,14 +21,12 @@ import com.google.common.base.Preconditions;
 @Entity
 @Access( AccessType.FIELD )
 @Table( name = "user_portal_module" )
-@IdClass( UserPortalModulePK.class )
 public class UserPortalModuleEntity implements UserPortalModule, Serializable
 {
     @Id
     @Column( name = "module_key" )
     private String moduleKey;
 
-    @Id
     @Column( name = "module_name" )
     private String moduleName;
 
@@ -81,5 +78,15 @@ public class UserPortalModuleEntity implements UserPortalModule, Serializable
         int result = moduleKey.hashCode();
         result = 31 * result + moduleName.hashCode();
         return result;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "UserPortalModuleEntity{" +
+                "moduleKey='" + moduleKey + '\'' +
+                ", moduleName='" + moduleName + '\'' +
+                '}';
     }
 }
