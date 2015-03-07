@@ -151,6 +151,12 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         {
             adminRole = new RoleEntity();
             adminRole.setName( "admin" );
+
+            for ( final UserPortalModuleEntity moduleEntity : portalModuleDataService.getAll() )
+            {
+                adminRole.addPortalModule( moduleEntity );
+            }
+
             roleDataService.persist( adminRole );
         }
 
@@ -346,13 +352,6 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
             return false;
         }
         portalModuleDataService.update( ( UserPortalModuleEntity ) userPortalModule );
-        for ( final RoleEntity roleEntity : roleDataService.getAll() )
-        {
-            if ( roleEntity.getName().equalsIgnoreCase( Roles.ADMIN.getRoleName() ) )
-            {
-                roleEntity.addPortalModule( userPortalModule );
-            }
-        }
         return true;
     }
 
@@ -631,6 +630,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     @Override
     public boolean updateRole( final Role role )
     {
+        LOG.debug( String.format( "Updating role: %s", role.getName() ) );
         if ( !( role instanceof RoleEntity ) )
         {
             return false;
