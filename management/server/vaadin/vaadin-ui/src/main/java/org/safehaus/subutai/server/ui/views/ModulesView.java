@@ -12,10 +12,18 @@ package org.safehaus.subutai.server.ui.views;
 
 
 import java.util.HashMap;
+import java.util.Map;
+
+import javax.naming.NamingException;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
+import org.safehaus.subutai.core.identity.api.Role;
+import org.safehaus.subutai.core.identity.api.User;
+import org.safehaus.subutai.core.identity.api.UserPortalModule;
 import org.safehaus.subutai.server.ui.MainUI;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.server.ui.api.PortalModuleListener;
@@ -60,6 +68,28 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
     public void enter( ViewChangeEvent event )
     {
         LOG.debug( "User entered ModulesView" );
+        try
+        {
+            for ( final Map.Entry<String, AbstractLayout> entry : moduleViews.entrySet() )
+            {
+                AbstractLayout layout = moduleViews.get( entry.getKey() );
+                layout.setVisible( false );
+            }
+
+            IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+            User user = identityManager.getUser();
+            for ( final Role role : user.getRoles() )
+            {
+                for ( final UserPortalModule module : role.getAccessibleModules() )
+                {
+                    moduleViews.get( module.getModuleKey() ).setVisible( true );
+                }
+            }
+        }
+        catch ( NamingException e )
+        {
+            LOG.error( "Error getting identityManager service", e );
+        }
     }
 
 

@@ -22,6 +22,8 @@ import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.identity.api.UserPortalModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -32,6 +34,7 @@ import org.safehaus.subutai.core.identity.api.UserPortalModule;
 @Access( AccessType.FIELD )
 public class RoleEntity implements Role, Serializable
 {
+    private static final Logger LOG = LoggerFactory.getLogger( RoleEntity.class );
     @Id
     private String name;
 
@@ -141,6 +144,7 @@ public class RoleEntity implements Role, Serializable
         {
             throw new IllegalArgumentException( "Module is not instance of UserPortalModuleEntity" );
         }
+        LOG.debug( "Adding accessible module to role", module.getModuleName() );
         accessibleModules.add( ( UserPortalModuleEntity ) module );
     }
 
