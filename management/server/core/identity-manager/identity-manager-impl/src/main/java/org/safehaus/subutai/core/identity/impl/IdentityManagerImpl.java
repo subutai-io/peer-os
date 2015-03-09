@@ -242,7 +242,6 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     private SubutaiLoginContext getSubutaiLoginContext()
     {
         return SubutaiThreadContext.get();
-//        return loginContext instanceof NullSubutaiLoginContext ? SecurityUtil.getSubutaiLoginContext() : loginContext;
     }
 
 

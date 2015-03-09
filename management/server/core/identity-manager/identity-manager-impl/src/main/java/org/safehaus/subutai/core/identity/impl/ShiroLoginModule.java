@@ -18,7 +18,6 @@ import javax.security.auth.login.LoginException;
 
 import org.safehaus.subutai.common.security.ShiroPrincipal;
 import org.safehaus.subutai.common.security.SubutaiLoginContext;
-import org.safehaus.subutai.common.security.SubutaiThreadContext;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.slf4j.Logger;
@@ -30,9 +29,6 @@ import org.apache.karaf.jaas.config.JaasRealm;
 import org.apache.karaf.jaas.modules.AbstractKarafLoginModule;
 
 
-/**
- * Created by timur on 1/22/15.
- */
 public class ShiroLoginModule extends AbstractKarafLoginModule
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( ShiroLoginModule.class.getName() );
