@@ -241,8 +241,8 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
 
     private SubutaiLoginContext getSubutaiLoginContext()
     {
-        SubutaiLoginContext loginContext = SubutaiThreadContext.get();
-        return loginContext instanceof NullSubutaiLoginContext ? SecurityUtil.getSubutaiLoginContext() : loginContext;
+        return SubutaiThreadContext.get();
+//        return loginContext instanceof NullSubutaiLoginContext ? SecurityUtil.getSubutaiLoginContext() : loginContext;
     }
 
 
@@ -685,10 +685,10 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     @Override
     public void beforeExecute( final CommandSession commandSession, final CharSequence charSequence )
     {
-        SubutaiLoginContext loginContext = getSubutaiLoginContext();
+        SubutaiLoginContext loginContext = SecurityUtil.getSubutaiLoginContext();
         if ( !( loginContext instanceof NullSubutaiLoginContext ) && isAuthenticated( loginContext.getSessionId() ) )
         {
-            SubutaiThreadContext.set( SecurityUtil.getSubutaiLoginContext() );
+            SubutaiThreadContext.set( loginContext );
             touch( loginContext.getSessionId() );
         }
     }
