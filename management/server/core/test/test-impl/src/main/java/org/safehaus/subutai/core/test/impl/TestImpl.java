@@ -20,7 +20,7 @@ public class TestImpl implements Test
     private static Logger LOG = LoggerFactory.getLogger( TestImpl.class.getName() );
 
     private final IdentityManager identityManager;
-    ExecutorService executorService = SubutaiExecutors.newFixedThreadPool( 10 );
+    ExecutorService executorService = SubutaiExecutors.newCachedThreadPool();
 
 
     public TestImpl( final IdentityManager identityManager )
@@ -44,7 +44,7 @@ public class TestImpl implements Test
             @Override
             public void run()
             {
-                LOG.error( "MDC >>>>>> " + MDC.get( "test" ) );
+                LOG.error( "User >>>>>> " + identityManager.getUser().getUsername() );
             }
         } );
     }

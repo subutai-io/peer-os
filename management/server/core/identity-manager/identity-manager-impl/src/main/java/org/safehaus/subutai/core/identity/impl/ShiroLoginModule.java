@@ -18,6 +18,7 @@ import javax.security.auth.login.LoginException;
 
 import org.safehaus.subutai.common.security.ShiroPrincipal;
 import org.safehaus.subutai.common.security.SubutaiLoginContext;
+import org.safehaus.subutai.common.security.SubutaiThreadContext;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.slf4j.Logger;
