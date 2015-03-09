@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.PortalModuleScope;
+import org.safehaus.subutai.core.identity.api.RestEndpointScope;
 import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.ui.tabs.TabCallback;
 import org.slf4j.Logger;
@@ -46,6 +47,19 @@ public class RoleForm extends VerticalLayout
     };
 
 
+    private TwinColSelect restEndpointsSelector = new TwinColSelect()
+    {
+        {
+            setItemCaptionMode( ItemCaptionMode.PROPERTY );
+            setItemCaptionPropertyId( "restEndpoint" );
+            setImmediate( true );
+            setSpacing( true );
+            setRequired( true );
+            setNullSelectionAllowed( false );
+        }
+    };
+
+
     private TwinColSelect permissionsSelector = new TwinColSelect()
     {
         {
@@ -73,7 +87,7 @@ public class RoleForm extends VerticalLayout
 
 
     public RoleForm( TabCallback<BeanItem<Role>> callback, Set<Permission> permissions,
-                     final Set<PortalModuleScope> allPortalModules )
+                     final Set<PortalModuleScope> allPortalModules, final Set<RestEndpointScope> allRestEndpoints )
     {
         init();
         BeanContainer<String, Permission> permissionsContainer = new BeanContainer<>( Permission.class );
@@ -87,6 +101,13 @@ public class RoleForm extends VerticalLayout
         modulesContainer.addAll( allPortalModules );
         modulesSelector.setContainerDataSource( modulesContainer );
         modulesSelector.setItemCaptionPropertyId( "moduleName" );
+
+        BeanContainer<String, RestEndpointScope> restEndpointsContainer =
+                new BeanContainer<>( RestEndpointScope.class );
+        restEndpointsContainer.setBeanIdProperty( "restEndpoint" );
+        restEndpointsContainer.addAll( allRestEndpoints );
+        restEndpointsSelector.setContainerDataSource( modulesContainer );
+        restEndpointsSelector.setItemCaptionPropertyId( "restEndpoint" );
 
         this.callback = callback;
     }
@@ -103,7 +124,7 @@ public class RoleForm extends VerticalLayout
         buttons.setSpacing( true );
 
         final FormLayout form = new FormLayout();
-        form.addComponents( name, permissionsSelector, modulesSelector );
+        form.addComponents( name, permissionsSelector, modulesSelector, restEndpointsSelector );
 
         addComponents( form, buttons );
 
@@ -136,6 +157,14 @@ public class RoleForm extends VerticalLayout
                 modules.add( portalModuleScope.getModuleName() );
             }
             modulesSelector.setValue( modules );
+
+
+            Set<String> endpoints = new HashSet<>();
+            for ( final RestEndpointScope endpointScope : roleBean.getAccessibleRestEndpoints() )
+            {
+                endpoints.add( endpointScope.getRestEndpoint() );
+            }
+            restEndpointsSelector.setValue( endpoints );
 
             if ( !newValue )
             {
@@ -177,6 +206,15 @@ public class RoleForm extends VerticalLayout
                     {
                         BeanItem beanItem = ( BeanItem ) modulesSelector.getItem( moduleName );
                         role.addPortalModule( ( PortalModuleScope ) beanItem.getBean() );
+                    }
+
+
+                    role.clearRestEndpointScopes();
+                    Collection<String> selectedRestEndpoints = ( Collection<String> ) restEndpointsSelector.getValue();
+                    for ( final String moduleName : selectedRestEndpoints )
+                    {
+                        BeanItem beanItem = ( BeanItem ) restEndpointsSelector.getItem( moduleName );
+                        role.addRestEndpointScope( ( RestEndpointScope ) beanItem.getBean() );
                     }
 
                     callback.saveOperation( permissionFieldGroup.getItemDataSource(), newValue );

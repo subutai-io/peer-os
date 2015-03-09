@@ -13,21 +13,25 @@ import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.security.NullSubutaiLoginContext;
 import org.safehaus.subutai.common.security.SubutaiLoginContext;
 import org.safehaus.subutai.common.security.SubutaiThreadContext;
+import org.safehaus.subutai.common.settings.ChannelSettings;
 import org.safehaus.subutai.common.util.SecurityUtil;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.PermissionGroup;
 import org.safehaus.subutai.core.identity.api.PortalModuleScope;
+import org.safehaus.subutai.core.identity.api.RestEndpointScope;
 import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.api.Roles;
 import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.identity.impl.dao.PermissionDataService;
 import org.safehaus.subutai.core.identity.impl.dao.PortalModuleDataService;
+import org.safehaus.subutai.core.identity.impl.dao.RestEndpointDataService;
 import org.safehaus.subutai.core.identity.impl.dao.RoleDataService;
 import org.safehaus.subutai.core.identity.impl.dao.UserDataService;
 import org.safehaus.subutai.core.identity.impl.entity.PermissionEntity;
 import org.safehaus.subutai.core.identity.impl.entity.PermissionPK;
 import org.safehaus.subutai.core.identity.impl.entity.PortalModuleScopeEntity;
+import org.safehaus.subutai.core.identity.impl.entity.RestEndpointScopeEntity;
 import org.safehaus.subutai.core.identity.impl.entity.RoleEntity;
 import org.safehaus.subutai.core.identity.impl.entity.UserEntity;
 import org.slf4j.Logger;
@@ -70,6 +74,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     private PermissionDataService permissionDataService;
     private RoleDataService roleDataService;
     private PortalModuleDataService portalModuleDataService;
+    private RestEndpointDataService restEndpointDataService;
 
 
     private String getSimpleSalt( String username )
@@ -93,6 +98,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         permissionDataService = new PermissionDataService( daoManager.getEntityManagerFactory() );
         roleDataService = new RoleDataService( daoManager.getEntityManagerFactory() );
         portalModuleDataService = new PortalModuleDataService( daoManager.getEntityManagerFactory() );
+        restEndpointDataService = new RestEndpointDataService( daoManager.getEntityManagerFactory() );
 
 
         securityManager = new DefaultSecurityManager();
@@ -155,6 +161,39 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
             for ( final PortalModuleScopeEntity moduleEntity : portalModuleDataService.getAll() )
             {
                 adminRole.addPortalModule( moduleEntity );
+            }
+
+            for ( final String uri : ChannelSettings.URL_ACCESS_PX1 )
+            {
+                if ( uri.length() == 0 )
+                {
+                    continue;
+                }
+                RestEndpointScopeEntity restEndpointScopeEntity = new RestEndpointScopeEntity( uri );
+                restEndpointDataService.update( restEndpointScopeEntity );
+                adminRole.addRestEndpointScope( restEndpointScopeEntity );
+            }
+
+            for ( final String uri : ChannelSettings.URL_ACCESS_PX3 )
+            {
+                if ( uri.length() == 0 )
+                {
+                    continue;
+                }
+                RestEndpointScopeEntity restEndpointScopeEntity = new RestEndpointScopeEntity( uri );
+                restEndpointDataService.update( restEndpointScopeEntity );
+                adminRole.addRestEndpointScope( restEndpointScopeEntity );
+            }
+
+            for ( final String uri : ChannelSettings.URL_ACCESS_PX2 )
+            {
+                if ( uri.length() == 0 )
+                {
+                    continue;
+                }
+                RestEndpointScopeEntity restEndpointScopeEntity = new RestEndpointScopeEntity( uri );
+                restEndpointDataService.update( restEndpointScopeEntity );
+                adminRole.addRestEndpointScope( restEndpointScopeEntity );
             }
 
             roleDataService.persist( adminRole );
@@ -559,6 +598,34 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         }
         userDataService.remove( user.getId() );
         return true;
+    }
+
+
+    @Override
+    public Set<RestEndpointScope> getAllRestEndpoints()
+    {
+        Set<RestEndpointScope> restEndpointScopes = Sets.newHashSet();
+        restEndpointScopes.addAll( restEndpointDataService.getAll() );
+        return restEndpointScopes;
+    }
+
+
+    @Override
+    public RestEndpointScope createMockRestEndpoint( final String endpoint, final String port )
+    {
+        return new RestEndpointScopeEntity( endpoint );
+    }
+
+
+    @Override
+    public boolean updateRestEndpoint( final RestEndpointScope endpointScope )
+    {
+        if ( !( endpointScope instanceof RestEndpointScopeEntity ) )
+        {
+            return false;
+        }
+        restEndpointDataService.update( ( RestEndpointScopeEntity ) endpointScope );
+        return false;
     }
 
 

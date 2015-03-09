@@ -141,10 +141,21 @@ public interface IdentityManager
      */
     public boolean deleteUser( User user );
 
+    //-------------------------- RestEndpointScope --------------------
 
-    //-------------------------- UserPortalModule ---------------------
+    public Set<RestEndpointScope> getAllRestEndpoints();
+
+    public RestEndpointScope createMockRestEndpoint(String endpoint, String port);
+
+    public boolean updateRestEndpoint(RestEndpointScope endpointScope);
+
+    //-------------------------- PortalModuleScope --------------------
 
     public Set<PortalModuleScope> getAllPortalModules();
+
+    public PortalModuleScope createMockUserPortalModule( String moduleKey, String moduleName );
+
+    public boolean updateUserPortalModule( PortalModuleScope portalModuleScope );
 
 
     //<-------------------------- Permissions -------------------------
@@ -257,8 +268,5 @@ public interface IdentityManager
 
     public Set<String> getRoles( Serializable shiroSessionId );
 
-    public PortalModuleScope createMockUserPortalModule( String moduleKey, String moduleName );
-
-    public boolean updateUserPortalModule( PortalModuleScope portalModuleScope );
 }
 
