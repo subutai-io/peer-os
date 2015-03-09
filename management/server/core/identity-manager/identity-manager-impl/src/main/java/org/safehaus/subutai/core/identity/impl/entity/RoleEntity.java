@@ -56,7 +56,7 @@ public class RoleEntity implements Role
     Set<PortalModuleScopeEntity> accessibleModules = new HashSet<>();
 
 
-    @OneToMany( fetch = FetchType.EAGER, cascade = { CascadeType.ALL } )
+    @OneToMany( fetch = FetchType.EAGER, cascade = CascadeType.ALL )
     @Column( name = "accessible_rest_endpoints" )
     Set<RestEndpointScopeEntity> accessibleRestEndpoints = new HashSet<>();
 

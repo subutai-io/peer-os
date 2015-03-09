@@ -151,17 +151,11 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
             return;
         }
         LOG.info( String.format( "User not found. Adding new user: [%s] ", username ) );
-        RoleDataService roleDataService = new RoleDataService( daoManager.getEntityManagerFactory() );
         RoleEntity adminRole = roleDataService.find( "admin" );
         if ( adminRole == null )
         {
             adminRole = new RoleEntity();
             adminRole.setName( "admin" );
-
-            for ( final PortalModuleScopeEntity moduleEntity : portalModuleDataService.getAll() )
-            {
-                adminRole.addPortalModule( moduleEntity );
-            }
 
             for ( final String uri : ChannelSettings.URL_ACCESS_PX1 )
             {
@@ -196,7 +190,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
                 adminRole.addRestEndpointScope( restEndpointScopeEntity );
             }
 
-            roleDataService.persist( adminRole );
+            roleDataService.update( adminRole );
         }
 
         RoleEntity managerRole = roleDataService.find( "manager" );
@@ -204,7 +198,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         {
             managerRole = new RoleEntity();
             managerRole.setName( "manager" );
-            roleDataService.persist( managerRole );
+            roleDataService.update( managerRole );
         }
 
 
@@ -218,7 +212,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         user.setSalt( salt );
         user.addRole( adminRole );
         user.addRole( managerRole );
-        userDataService.persist( user );
+        userDataService.update( user );
         LOG.debug( String.format( "User: %s", user.getId() ) );
     }
 

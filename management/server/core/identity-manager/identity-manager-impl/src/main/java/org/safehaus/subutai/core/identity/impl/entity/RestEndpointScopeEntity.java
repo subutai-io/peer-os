@@ -25,7 +25,7 @@ public class RestEndpointScopeEntity implements Serializable, RestEndpointScope
 {
     @Id
     @Column(name = "rest_endpoint")
-    private String restEndpoint;
+    private String restEndpoint = "rest_endpoint";
 
     @Column(name = "rest_port")
     private Long port;

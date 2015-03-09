@@ -106,7 +106,7 @@ public class RoleForm extends VerticalLayout
                 new BeanContainer<>( RestEndpointScope.class );
         restEndpointsContainer.setBeanIdProperty( "restEndpoint" );
         restEndpointsContainer.addAll( allRestEndpoints );
-        restEndpointsSelector.setContainerDataSource( modulesContainer );
+        restEndpointsSelector.setContainerDataSource( restEndpointsContainer );
         restEndpointsSelector.setItemCaptionPropertyId( "restEndpoint" );
 
         this.callback = callback;
