@@ -45,6 +45,6 @@ public interface User
 
     public void addRole( Role role );
 
-
     Set<Role> getRoles();
+
 }

@@ -20,11 +20,12 @@
 <blueprint default-activation="eager"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <reference-list id="portalModule"
-                  interface="org.safehaus.subutai.server.ui.api.PortalModule"
-                  availability="optional">
+  <reference-list id="portalModule" availability="optional"
+                  interface="org.safehaus.subutai.server.ui.api.PortalModule">
+
     <reference-listener ref="portalModuleService"
                         bind-method="registerModule" unbind-method="unregisterModule" />
+
   </reference-list>
 
   <bean id="portalModuleService"

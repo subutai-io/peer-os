@@ -2,10 +2,18 @@ package org.safehaus.subutai.server.ui.views;
 
 
 import java.util.HashMap;
+import java.util.Map;
+
+import javax.naming.NamingException;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
+import org.safehaus.subutai.core.identity.api.PortalModuleScope;
+import org.safehaus.subutai.core.identity.api.Role;
+import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.server.ui.MainUI;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.server.ui.api.PortalModuleListener;
@@ -36,6 +44,7 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
     private HashMap<String, PortalModule> modules = new HashMap<>();
     private HashMap<String, AbstractLayout> moduleViews = new HashMap<>();
     private static PortalModuleService portalModuleService = null;
+    private static final ServiceLocator serviceLocator = new ServiceLocator();
 
 
     public CoreModulesView()
@@ -51,7 +60,37 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
     @Override
     public void enter( ViewChangeListener.ViewChangeEvent event )
     {
+        try
+        {
+            for ( final Map.Entry<String, AbstractLayout> entry : moduleViews.entrySet() )
+            {
+                AbstractLayout layout = moduleViews.get( entry.getKey() );
+                if ( layout != null )
+                {
+                    layout.setVisible( false );
+                }
+            }
 
+            IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+            User user = identityManager.getUser();
+            for ( final Role role : user.getRoles() )
+            {
+                for ( final PortalModuleScope module : role.getAccessibleModules() )
+                {
+                    AbstractLayout layout = moduleViews.get( module.getModuleKey() );
+                    if ( layout != null )
+                    {
+                        layout.setVisible( true );
+                    }
+                }
+            }
+        }
+        catch ( NamingException e )
+        {
+            LOG.error( "Error getting identityManager service", e );
+        }
+
+        LOG.debug( "User entered CoreModulesView" );
     }
 
 

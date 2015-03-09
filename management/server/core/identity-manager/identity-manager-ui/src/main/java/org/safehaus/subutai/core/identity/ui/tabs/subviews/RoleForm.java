@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.safehaus.subutai.core.identity.api.Permission;
+import org.safehaus.subutai.core.identity.api.PortalModuleScope;
 import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.ui.tabs.TabCallback;
 import org.slf4j.Logger;
@@ -58,7 +59,21 @@ public class RoleForm extends VerticalLayout
     };
 
 
-    public RoleForm( TabCallback<BeanItem<Role>> callback, Set<Permission> permissions )
+    private TwinColSelect modulesSelector = new TwinColSelect( "Accessible modules" )
+    {
+        {
+            setItemCaptionMode( ItemCaptionMode.PROPERTY );
+            setItemCaptionPropertyId( "moduleName" );
+            setImmediate( true );
+            setSpacing( true );
+            setRequired( false );
+            setNullSelectionAllowed( true );
+        }
+    };
+
+
+    public RoleForm( TabCallback<BeanItem<Role>> callback, Set<Permission> permissions,
+                     final Set<PortalModuleScope> allPortalModules )
     {
         init();
         BeanContainer<String, Permission> permissionsContainer = new BeanContainer<>( Permission.class );
@@ -66,6 +81,13 @@ public class RoleForm extends VerticalLayout
         permissionsContainer.addAll( permissions );
         permissionsSelector.setContainerDataSource( permissionsContainer );
         permissionsSelector.setItemCaptionPropertyId( "name" );
+
+        BeanContainer<String, PortalModuleScope> modulesContainer = new BeanContainer<>( PortalModuleScope.class );
+        modulesContainer.setBeanIdProperty( "moduleKey" );
+        modulesContainer.addAll( allPortalModules );
+        modulesSelector.setContainerDataSource( modulesContainer );
+        modulesSelector.setItemCaptionPropertyId( "moduleName" );
+
         this.callback = callback;
     }
 
@@ -81,7 +103,7 @@ public class RoleForm extends VerticalLayout
         buttons.setSpacing( true );
 
         final FormLayout form = new FormLayout();
-        form.addComponents( name, permissionsSelector );
+        form.addComponents( name, permissionsSelector, modulesSelector );
 
         addComponents( form, buttons );
 
@@ -107,6 +129,14 @@ public class RoleForm extends VerticalLayout
                 permissionNames.add( permission.getName() );
             }
             permissionsSelector.setValue( permissionNames );
+
+            Set<String> modules = new HashSet<>();
+            for ( final PortalModuleScope portalModuleScope : roleBean.getAccessibleModules() )
+            {
+                modules.add( portalModuleScope.getModuleName() );
+            }
+            modulesSelector.setValue( modules );
+
             if ( !newValue )
             {
                 permissionFieldGroup.setReadOnly( true );
@@ -140,6 +170,15 @@ public class RoleForm extends VerticalLayout
                         BeanItem beanItem = ( BeanItem ) permissionsSelector.getItem( permissionId );
                         role.addPermission( ( Permission ) beanItem.getBean() );
                     }
+
+                    role.clearPortalModules();
+                    Collection<String> selectedModuleNames = ( Collection<String> ) modulesSelector.getValue();
+                    for ( final String moduleName : selectedModuleNames )
+                    {
+                        BeanItem beanItem = ( BeanItem ) modulesSelector.getItem( moduleName );
+                        role.addPortalModule( ( PortalModuleScope ) beanItem.getBean() );
+                    }
+
                     callback.saveOperation( permissionFieldGroup.getItemDataSource(), newValue );
                 }
             }

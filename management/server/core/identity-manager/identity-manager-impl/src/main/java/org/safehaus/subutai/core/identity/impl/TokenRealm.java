@@ -6,6 +6,8 @@ import java.util.Set;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.api.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -22,7 +24,7 @@ import com.google.common.collect.Sets;
 
 public class TokenRealm extends AuthorizingRealm
 {
-
+    private static final Logger LOG = LoggerFactory.getLogger( TokenRealm.class );
     private final IdentityManager identityManager;
 
 
@@ -43,6 +45,7 @@ public class TokenRealm extends AuthorizingRealm
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo( final PrincipalCollection principals )
     {
+        LOG.debug( "Getting authorization info by principal {}", principals.asList() );
         String username = ( String ) principals.getPrimaryPrincipal();
         User user = identityManager.getUser( username );
         Set<String> roles = Sets.newHashSet();
@@ -64,6 +67,7 @@ public class TokenRealm extends AuthorizingRealm
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo( AuthenticationToken token ) throws AuthenticationException
     {
+        LOG.debug( "Getting authorization info by token {}", token.getCredentials() );
         UserToken userToken = ( UserToken ) token;
 
         String username = ( String ) userToken.getPrincipal();
