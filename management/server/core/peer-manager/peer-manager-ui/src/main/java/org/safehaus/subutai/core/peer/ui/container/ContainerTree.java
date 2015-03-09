@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
@@ -73,7 +74,7 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                         String intfName = "br-int";
                         if ( host instanceof ContainerHost )
                         {
-                            intfName = "eth0";
+                            intfName = Common.DEFAULT_CONTAINER_INTERFACE;
                         }
                         description = "Hostname: " + host.getHostname() + "<br>" + "MAC: " + host
                                 .getMacByInterfaceName( intfName ) + "<br>" + "UUID: " + host.getHostId() + "<br>"

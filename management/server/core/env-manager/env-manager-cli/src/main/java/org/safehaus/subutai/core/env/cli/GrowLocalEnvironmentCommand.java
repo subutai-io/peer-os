@@ -8,6 +8,7 @@ import org.safehaus.subutai.common.environment.NodeGroup;
 import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -96,7 +97,8 @@ public class GrowLocalEnvironmentCommand extends OsgiCommandSupport
             System.out.println( String.format( "Environment id %s", containerHost.getEnvironmentId() ) );
             System.out.println( String.format( "NodeGroup name %s", containerHost.getNodeGroupName() ) );
             System.out.println( String.format( "Template name %s", containerHost.getTemplateName() ) );
-            System.out.println( String.format( "IP %s", containerHost.getIpByInterfaceName( "eth0" ) ) );
+            System.out.println( String.format( "IP %s",
+                    containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ) ) );
             System.out.println( String.format( "Is connected %s", containerHost.isConnected() ) );
         }
 

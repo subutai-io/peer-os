@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 
@@ -27,8 +28,7 @@ public class ViewEnvironmentCommand extends OsgiCommandSupport
     /**
      * {@value environmentId} environment id to view info about
      * <p>{@code required = true}</p>
-     */
-    private String environmentId;
+     */ private String environmentId;
 
     private final EnvironmentManager environmentManager;
 
@@ -59,7 +59,8 @@ public class ViewEnvironmentCommand extends OsgiCommandSupport
             System.out.println( String.format( "Environment id %s", containerHost.getEnvironmentId() ) );
             System.out.println( String.format( "NodeGroup name %s", containerHost.getNodeGroupName() ) );
             System.out.println( String.format( "Template name %s", containerHost.getTemplateName() ) );
-            System.out.println( String.format( "IP %s", containerHost.getIpByInterfaceName( "eth0" ) ) );
+            System.out.println( String.format( "IP %s",
+                    containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ) ) );
             System.out.println( String.format( "Is connected %s", containerHost.isConnected() ) );
         }
 
