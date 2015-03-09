@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.identity.impl.entity;
 
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -57,9 +56,7 @@ public class RoleEntity implements Role
     Set<PortalModuleScopeEntity> accessibleModules = new HashSet<>();
 
 
-    @OneToMany( fetch = FetchType.EAGER, cascade = {
-            CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH
-    } )
+    @OneToMany( fetch = FetchType.EAGER, cascade = { CascadeType.ALL } )
     @Column( name = "accessible_rest_endpoints" )
     Set<RestEndpointScopeEntity> accessibleRestEndpoints = new HashSet<>();
 
