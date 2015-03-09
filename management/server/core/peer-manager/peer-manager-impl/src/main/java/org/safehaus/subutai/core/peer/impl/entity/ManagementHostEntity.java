@@ -197,8 +197,9 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
             {
                 try
                 {
-                    commandUtil.execute( new RequestBuilder( "subutai management_network" ).withCmdArgs(
-                                    Lists.newArrayList( "-Z", "deleteall", String.valueOf( vni.getVlan() ) ) ), this );
+                    commandUtil.execute( new RequestBuilder( "subutai management_network" )
+                            .withCmdArgs( Lists.newArrayList( "-Z", "deleteall", String.valueOf( vni.getVlan() ) ) ),
+                            this );
                 }
                 catch ( CommandException e )
                 {
@@ -315,7 +316,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
                 Set<Tunnel> tunnels = networkManager.listTunnels();
 
                 //remove local IP, just in case
-                peerIps.remove( getIpByInterfaceName( "eth1" ) );
+                peerIps.remove( getIpByInterfaceName( Common.MANAGEMENT_HOST_EXTERNAL_IP_INTERFACE ) );
 
                 for ( String peerIp : peerIps )
                 {

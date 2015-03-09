@@ -59,7 +59,7 @@ public class Commands
 
         for ( ContainerHost host : containerHosts )
         {
-            String ip = host.getIpByInterfaceName( "eth0" );
+            String ip = host.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE );
             String hostname = host.getHostname();
             cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
             appendHosts.append( "/bin/echo '" ).
