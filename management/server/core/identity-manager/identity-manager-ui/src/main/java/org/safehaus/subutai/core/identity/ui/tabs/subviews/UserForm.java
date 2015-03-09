@@ -103,11 +103,13 @@ public class UserForm extends VerticalLayout
     public UserForm( TabCallback<BeanItem<User>> callback, List<Role> roles )
     {
         init();
+
         BeanContainer<String, Role> permissionsContainer = new BeanContainer<>( Role.class );
         permissionsContainer.setBeanIdProperty( "name" );
         permissionsContainer.addAll( roles );
         rolesSelector.setContainerDataSource( permissionsContainer );
         rolesSelector.setItemCaptionPropertyId( "name" );
+
         this.callback = callback;
     }
 
@@ -184,15 +186,15 @@ public class UserForm extends VerticalLayout
 
                 if ( callback != null )
                 {
-                    Collection<String> selectedRoleNames = ( Collection<String> ) rolesSelector.getValue();
                     User user = userFieldGroup.getItemDataSource().getBean();
                     user.removeAllRoles();
-
+                    Collection<String> selectedRoleNames = ( Collection<String> ) rolesSelector.getValue();
                     for ( final String roleName : selectedRoleNames )
                     {
                         BeanItem beanItem = ( BeanItem ) rolesSelector.getItem( roleName );
                         user.addRole( ( Role ) beanItem.getBean() );
                     }
+
                     callback.saveOperation( userFieldGroup.getItemDataSource(), newValue );
                 }
             }

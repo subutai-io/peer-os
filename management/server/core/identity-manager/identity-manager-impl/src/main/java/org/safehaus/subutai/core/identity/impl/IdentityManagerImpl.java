@@ -17,14 +17,17 @@ import org.safehaus.subutai.common.util.SecurityUtil;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.PermissionGroup;
+import org.safehaus.subutai.core.identity.api.PortalModuleScope;
 import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.api.Roles;
 import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.identity.impl.dao.PermissionDataService;
+import org.safehaus.subutai.core.identity.impl.dao.PortalModuleDataService;
 import org.safehaus.subutai.core.identity.impl.dao.RoleDataService;
 import org.safehaus.subutai.core.identity.impl.dao.UserDataService;
 import org.safehaus.subutai.core.identity.impl.entity.PermissionEntity;
 import org.safehaus.subutai.core.identity.impl.entity.PermissionPK;
+import org.safehaus.subutai.core.identity.impl.entity.PortalModuleScopeEntity;
 import org.safehaus.subutai.core.identity.impl.entity.RoleEntity;
 import org.safehaus.subutai.core.identity.impl.entity.UserEntity;
 import org.slf4j.Logger;
@@ -66,6 +69,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     private UserDataService userDataService;
     private PermissionDataService permissionDataService;
     private RoleDataService roleDataService;
+    private PortalModuleDataService portalModuleDataService;
 
 
     private String getSimpleSalt( String username )
@@ -88,6 +92,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         userDataService = new UserDataService( daoManager );
         permissionDataService = new PermissionDataService( daoManager.getEntityManagerFactory() );
         roleDataService = new RoleDataService( daoManager.getEntityManagerFactory() );
+        portalModuleDataService = new PortalModuleDataService( daoManager.getEntityManagerFactory() );
 
 
         securityManager = new DefaultSecurityManager();
@@ -146,6 +151,12 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         {
             adminRole = new RoleEntity();
             adminRole.setName( "admin" );
+
+            for ( final PortalModuleScopeEntity moduleEntity : portalModuleDataService.getAll() )
+            {
+                adminRole.addPortalModule( moduleEntity );
+            }
+
             roleDataService.persist( adminRole );
         }
 
@@ -198,10 +209,10 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     @Override
     public User getUser()
     {
-//        logActiveSessions();
+        //        logActiveSessions();
 
         SubutaiLoginContext loginContext = getSubutaiLoginContext();
-//        LOG.debug( String.format( "Login context: [%s] ", loginContext ) );
+        //        LOG.debug( String.format( "Login context: [%s] ", loginContext ) );
 
         if ( loginContext instanceof NullSubutaiLoginContext )
         {
@@ -322,6 +333,35 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
             }
         }
         return result;
+    }
+
+
+    @Override
+    public PortalModuleScope createMockUserPortalModule( final String moduleKey, final String moduleName )
+    {
+        return new PortalModuleScopeEntity( moduleKey, moduleName );
+    }
+
+
+    @Override
+    public boolean updateUserPortalModule( final PortalModuleScope portalModuleScope )
+    {
+        LOG.debug( "Saving new portal module: ", portalModuleScope.toString() );
+        if ( !( portalModuleScope instanceof PortalModuleScopeEntity ) )
+        {
+            return false;
+        }
+        portalModuleDataService.update( ( PortalModuleScopeEntity ) portalModuleScope );
+        List<RoleEntity> roles = roleDataService.getAll();
+        for ( RoleEntity roleEntity : roles )
+        {
+            if ( roleEntity.getName().equalsIgnoreCase( Roles.ADMIN.getRoleName() ) )
+            {
+                roleEntity.addPortalModule( portalModuleScope );
+                roleDataService.update( roleEntity );
+            }
+        }
+        return true;
     }
 
 
@@ -523,6 +563,15 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
 
 
     @Override
+    public Set<PortalModuleScope> getAllPortalModules()
+    {
+        Set<PortalModuleScope> portalModules = Sets.newHashSet();
+        portalModules.addAll( portalModuleDataService.getAll() );
+        return portalModules;
+    }
+
+
+    @Override
     public List<Permission> getAllPermissions()
     {
         List<Permission> permissions = Lists.newArrayList();
@@ -590,6 +639,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     @Override
     public boolean updateRole( final Role role )
     {
+        LOG.debug( String.format( "Updating role: %s", role.getName() ) );
         if ( !( role instanceof RoleEntity ) )
         {
             return false;
