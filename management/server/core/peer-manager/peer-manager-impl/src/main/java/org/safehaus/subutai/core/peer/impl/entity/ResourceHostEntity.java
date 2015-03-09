@@ -60,6 +60,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     protected static final Logger LOG = LoggerFactory.getLogger( ResourceHostEntity.class );
     private static final Pattern LXC_STATE_PATTERN = Pattern.compile( "State:(\\s*)(.*)" );
+    private static final int TEMPLATE_IMPORT_TIMEOUT_SEC = 10 * 60 * 60;
 
     @OneToMany( mappedBy = "parent", fetch = FetchType.EAGER,
             targetEntity = ContainerHostEntity.class )
@@ -436,8 +437,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         try
         {
-            commandUtil.execute( new RequestBuilder( "subutai import" )
-                    .withCmdArgs( Lists.newArrayList( template.getTemplateName() ) ), this );
+            commandUtil.execute( new RequestBuilder( "subutai import" ).withTimeout( TEMPLATE_IMPORT_TIMEOUT_SEC )
+                                                                       .withCmdArgs( Lists.newArrayList(
+                                                                               template.getTemplateName() ) ), this );
         }
         catch ( CommandException ce )
         {
