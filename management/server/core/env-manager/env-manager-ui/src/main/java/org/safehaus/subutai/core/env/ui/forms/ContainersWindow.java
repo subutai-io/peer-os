@@ -11,6 +11,7 @@ import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
@@ -143,9 +144,8 @@ public class ContainersWindow extends Window
                             }
                             catch ( PeerException e )
                             {
-                                Notification.show( String
-                                        .format( "Error starting container %s: %s", containerHost.getHostname(), e ),
-                                        Notification.Type.ERROR_MESSAGE );
+                                Notification.show( String.format( "Error starting container %s: %s",
+                                                containerHost.getHostname(), e ), Notification.Type.ERROR_MESSAGE );
                             }
                             finally
                             {
@@ -242,7 +242,8 @@ public class ContainersWindow extends Window
 
             containersTable.addItem( new Object[] {
                     containerHost.getId().toString(), containerHost.getTemplateName(), containerHost.getHostname(),
-                    containerHost.getIpByInterfaceName( "eth0" ), tagsBtn, startBtn, stopBtn, destroyBtn
+                    containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ), tagsBtn, startBtn,
+                    stopBtn, destroyBtn
             }, null );
 
             boolean isContainerConnected = containerHost.isConnected();

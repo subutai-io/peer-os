@@ -18,6 +18,7 @@ import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.peer.PeerPolicy;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
@@ -163,6 +164,7 @@ public class PeerManagerImpl implements PeerManager
         {
             peerInfo = new PeerInfo();
             //TODO generate peer id based on owner/system information
+            //OR get it from fs, generate if not found
             peerInfo.setId( UUID.randomUUID() );
             peerInfo.setName( "Local Subutai server" );
             //TODO get ownerId from persistent storage
@@ -170,7 +172,8 @@ public class PeerManagerImpl implements PeerManager
 
             try
             {
-                Enumeration<InetAddress> addressEnumeration = NetworkInterface.getByName( "eth1" ).getInetAddresses();
+                Enumeration<InetAddress> addressEnumeration =
+                        NetworkInterface.getByName( Common.MANAGEMENT_HOST_EXTERNAL_IP_INTERFACE ).getInetAddresses();
                 while ( addressEnumeration.hasMoreElements() )
                 {
                     InetAddress address = addressEnumeration.nextElement();

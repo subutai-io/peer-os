@@ -14,6 +14,7 @@ import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
@@ -227,7 +228,8 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
                 Set<String> peerIps = Sets.newHashSet();
 
                 //add initiator peer mandatorily
-                peerIps.add( localPeer.getManagementHost().getIpByInterfaceName( "eth1" ) );
+                peerIps.add( localPeer.getManagementHost().getIpByInterfaceName(
+                        Common.MANAGEMENT_HOST_EXTERNAL_IP_INTERFACE) );
 
 
                 for ( Peer aPeer : allPeers )

@@ -52,6 +52,7 @@ function ovs_revert_configuration {
   fi
 
   config="/var/lib/lxc/$lxc/config"
+  gwup="/var/lib/lxc/$container/rootfs/etc/network/if-up.d/upstart"
 
   # Remove configuration entries for network.(type,flags,link,veth.pair,script.up)
   sed -i '/lxc.network.type.*/d' $config
@@ -62,7 +63,7 @@ function ovs_revert_configuration {
   sed -i '/lxc.network.mtu.*/d' $config
   sed -i '/lxc.network.ipv4.*/d' $config
   sed -i '/#vlan_id.*/d' $config
-
+  sed -i '/route add default gw/d' $gwup
   # Insert default network configurations
   add_before_line="lxc.network.hwaddr"
   sed -i "/$add_before_line/i \lxc.network.type = veth" $config

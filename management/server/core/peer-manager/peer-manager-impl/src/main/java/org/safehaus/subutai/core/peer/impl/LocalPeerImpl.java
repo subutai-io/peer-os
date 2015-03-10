@@ -781,7 +781,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s eth1", gatewayIp ) ),
+            commandUtil.execute( new RequestBuilder(
+                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
                     bindHost( host.getId() ) );
         }
         catch ( CommandException e )
