@@ -216,14 +216,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final ResultHolder<EnvironmentCreationException> resultHolder = new ResultHolder<>();
 
-        try
-        {
-            setupEnvironmentTunnel( environment.getId(), topology.getNodeGroupPlacement().keySet() );
-        }
-        catch ( EnvironmentTunnelException e )
-        {
-            LOG.error( "Setting up secure tunnel", e );
-        }
 
         CreateEnvironmentTask createEnvironmentTask =
                 new CreateEnvironmentTask( peerManager.getLocalPeer(), this, environment, topology, resultHolder );
@@ -282,9 +274,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
             catch ( Exception e )
             {
-                //TODO uncomment this exception later when PEKS work
-                //            throw new EnvironmentTunnelException( "Error exchanging environment certificates ",e );
-                LOG.error( "Error exchanging environment certificates ", e );
+                throw new EnvironmentTunnelException( "Error exchanging environment certificates ", e );
             }
         }
     }

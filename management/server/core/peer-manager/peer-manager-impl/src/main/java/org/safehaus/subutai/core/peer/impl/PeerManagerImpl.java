@@ -1,10 +1,13 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
+import java.io.File;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.List;
@@ -47,6 +50,8 @@ import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.io.FileUtils;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -60,7 +65,8 @@ public class PeerManagerImpl implements PeerManager
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class.getName() );
     private static final String SOURCE_REMOTE_PEER = "PEER_REMOTE";
     private static final String SOURCE_LOCAL_PEER = "PEER_LOCAL";
-    private static final String PEER_GROUP = "PEER_GROUP";
+    private static final String PEER_ID_PATH = "/var/lib/subutai/id";
+    private static final String PEER_ID_FILE = "peer_id";
     private PeerDAO peerDAO;
     private QuotaManager quotaManager;
     private Monitor monitor;
@@ -162,10 +168,39 @@ public class PeerManagerImpl implements PeerManager
         List<PeerInfo> result = peerDAO.getInfo( SOURCE_LOCAL_PEER, PeerInfo.class );
         if ( result.isEmpty() )
         {
+
+            //obtain id from fs
+            File scriptsDirectory = new File( PEER_ID_PATH );
+            scriptsDirectory.mkdirs();
+
+            Path peerIdFilePath = Paths.get( PEER_ID_PATH, PEER_ID_FILE );
+
+            File peerIdFile = peerIdFilePath.toFile();
+
+            UUID peerId = null;
+
+            try
+            {
+                if ( !peerIdFile.exists() )
+                {
+                    //generate new id and save to fs
+                    peerId = UUID.randomUUID();
+                    FileUtils.writeStringToFile( peerIdFile, peerId.toString() );
+                }
+                else
+                {
+                    //read id from file
+                    peerId = UUID.fromString( FileUtils.readFileToString( peerIdFile ) );
+                }
+            }
+            catch ( Exception e )
+            {
+                throw new PeerInitializationError( "Failed to obtain peer id file", e );
+            }
+
+
             peerInfo = new PeerInfo();
-            //TODO generate peer id based on owner/system information
-            //OR get it from fs, generate if not found
-            peerInfo.setId( UUID.randomUUID() );
+            peerInfo.setId( peerId );
             peerInfo.setName( "Local Subutai server" );
             //TODO get ownerId from persistent storage
             peerInfo.setOwnerId( UUID.randomUUID() );
