@@ -243,13 +243,13 @@ void SubutaiResponse::serialize(string& output)
     if(this->getType()!= "INOTIFY_EVENT")
     {
 		for(unsigned int index = 0; index < this->containers.size(); index++) {
-			root["response"]["containers"][index]["hostname"]	= this->containers[index].getContainerHostnameValue();
-			root["response"]["containers"][index]["id"]		= this->containers[index].getContainerIdValue();
-			root["response"]["containers"][index]["status"]		= this->containers[index].getContainerStatus();
-            if (this->containers[index].getContainerArch() != "") {
-                root["response"]["containers"][index]["arch"] = this->containers[index].getContainerArch();
+			root["response"]["containers"][index]["hostname"]	= this->containers[index]->getContainerHostnameValue();
+			root["response"]["containers"][index]["id"]		= this->containers[index]->getContainerIdValue();
+			root["response"]["containers"][index]["status"]		= this->containers[index]->getContainerStatus();
+            if (this->containers[index]->getContainerArch() != "") {
+                root["response"]["containers"][index]["arch"] = this->containers[index]->getContainerArch();
             }
-			vector<Interface> interfaceValues	=	this->containers[index].getContainerInterfaceValues();
+			vector<Interface> interfaceValues	=	this->containers[index]->getContainerInterfaceValues();
 			for(unsigned int i=0; i < interfaceValues.size(); i++) {
 				root["response"]["containers"][index]["interfaces"][i]["interfaceName"]=interfaceValues[i].name;
 				root["response"]["containers"][index]["interfaces"][i]["ip"]=interfaceValues[i].ip;
@@ -386,7 +386,7 @@ vector<Interface> SubutaiResponse::getInterfaces()
 /**
  *   \details Add a new container set for response.
  */
-void SubutaiResponse::setContainerSet(vector<SubutaiContainer> contSet)
+void SubutaiResponse::setContainerSet(vector<SubutaiContainer*> contSet)
 {
     this->containers.clear();
     this->containers = contSet;
@@ -670,7 +670,7 @@ vector<string>& SubutaiResponse::getConfPoints()
 /**
  *  \details   getting "containers" private vector variable of SubutaiResponse instance.
  */
-vector<SubutaiContainer>& SubutaiResponse::getContainerSet()
+vector<SubutaiContainer*>& SubutaiResponse::getContainerSet()
 {
 	return this->containers;
 }

@@ -59,8 +59,8 @@ public:
 	string& getDateTime();
 	string& getChangeType();
 	vector<string>& getConfPoints();
-	vector<SubutaiContainer>& getContainerSet();
-	void setContainerSet(vector<SubutaiContainer>);
+	vector<SubutaiContainer*>& getContainerSet();
+	void setContainerSet(vector<SubutaiContainer*>);
 	void setHostname(const string&);
 	void setParentHostname(const string&);
 	void setCommandId(const string&);
@@ -101,6 +101,6 @@ private:
     string              topic;
     string              arch;
 	vector<string>  confPoints;
-	vector<SubutaiContainer>  containers;
+	vector<SubutaiContainer*>  containers;
 };
 #endif /* SUBUTAIRESPONSE_H_ */

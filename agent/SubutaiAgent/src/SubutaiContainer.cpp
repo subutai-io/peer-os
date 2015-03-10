@@ -43,6 +43,7 @@ SubutaiContainer::SubutaiContainer(SubutaiLogger* logger, lxc_container* cont) :
 SubutaiContainer::~SubutaiContainer()
 {
     // TODO Auto-generated destructor stub
+	containerLogger->writeLog(6, containerLogger->setLogData(_logEntry, "Destroying " + this->getContainerHostnameValue()));
 }
 
 /**
@@ -355,7 +356,7 @@ vector<Interface> SubutaiContainer::getContainerInterfaceValues()
  */
 void SubutaiContainer::getContainerAllFields()
 {
-    containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "get all container fields"));
+    containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "Updating all information of container " + this->getContainerHostnameValue()));
     clear();
     getContainerId();
     getContainerInterfaces();

@@ -70,8 +70,6 @@ struct ExecutionResult {
     pid_t pid;
 };
 
-
-
 enum containerStatus { RUNNING, STOPPED, FROZEN };
 
 class SubutaiContainer

@@ -41,15 +41,15 @@
 
 using namespace std;
 
-typedef std::vector<SubutaiContainer>::iterator ContainerIterator;
+typedef std::vector<SubutaiContainer*>::iterator ContainerIterator;
 
 class SubutaiContainerManager {
     public:
         SubutaiContainerManager(string , SubutaiLogger*);
         ~SubutaiContainerManager();
-        vector<SubutaiContainer> findAllContainers();
+        vector<SubutaiContainer*> findAllContainers();
         SubutaiContainer* findContainerById(string );
-        vector<SubutaiContainer> getAllContainers();
+        vector<SubutaiContainer*> getAllContainers();
         vector<string> getContainers();
         bool checkIfTemplate(string, vector<string>, bool );
         void updateContainerIdListOnStart();
@@ -60,10 +60,7 @@ class SubutaiContainerManager {
     private:
         string                          _lxc_path;
         SubutaiLogger*                  _logger;
-        vector<SubutaiContainer>        _containers;
-        vector<SubutaiContainer>        _frozenContainers;
-        vector<SubutaiContainer>        _stoppedContainers;
-        vector<SubutaiContainer>        _runningContainers;
+        vector<SubutaiContainer*>        _containers;
         SubutaiHelper					_helper;
 };
 
