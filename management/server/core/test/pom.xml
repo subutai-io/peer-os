@@ -17,6 +17,7 @@
     <module>test-impl</module>
     <module>test-ui</module>
     <module>test-rest</module>
+    <module>test-cli</module>
   </modules>
 
 </project>

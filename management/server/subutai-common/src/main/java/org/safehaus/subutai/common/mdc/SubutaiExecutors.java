@@ -71,8 +71,11 @@ public class SubutaiExecutors
             @Override
             protected void beforeExecute( final Thread t, final Runnable r )
             {
-                currentContext = MDC.getCopyOfContextMap();
-                MDC.setContextMap( parentContext );
+                if ( parentContext != null )
+                {
+                    currentContext = MDC.getCopyOfContextMap();
+                    MDC.setContextMap( parentContext );
+                }
                 super.beforeExecute( t, r );
             }
 
@@ -80,7 +83,10 @@ public class SubutaiExecutors
             @Override
             protected void afterExecute( final Runnable r, final Throwable t )
             {
-                MDC.setContextMap( currentContext );
+                if ( parentContext != null )
+                {
+                    MDC.setContextMap( currentContext );
+                }
                 super.afterExecute( r, t );
             }
         };
@@ -130,8 +136,11 @@ public class SubutaiExecutors
             @Override
             protected void beforeExecute( final Thread t, final Runnable r )
             {
-                currentContext = MDC.getCopyOfContextMap();
-                MDC.setContextMap( parentContext );
+                if ( parentContext != null )
+                {
+                    currentContext = MDC.getCopyOfContextMap();
+                    MDC.setContextMap( parentContext );
+                }
                 super.beforeExecute( t, r );
             }
 
@@ -139,7 +148,10 @@ public class SubutaiExecutors
             @Override
             protected void afterExecute( final Runnable r, final Throwable t )
             {
-                MDC.setContextMap( currentContext );
+                if ( parentContext != null )
+                {
+                    MDC.setContextMap( currentContext );
+                }
                 super.afterExecute( r, t );
             }
         };
@@ -189,8 +201,11 @@ public class SubutaiExecutors
             @Override
             protected void beforeExecute( final Thread t, final Runnable r )
             {
-                currentContext = MDC.getCopyOfContextMap();
-                MDC.setContextMap( parentContext );
+                if ( parentContext != null )
+                {
+                    currentContext = MDC.getCopyOfContextMap();
+                    MDC.setContextMap( parentContext );
+                }
                 super.beforeExecute( t, r );
             }
 
@@ -198,7 +213,10 @@ public class SubutaiExecutors
             @Override
             protected void afterExecute( final Runnable r, final Throwable t )
             {
-                MDC.setContextMap( currentContext );
+                if ( parentContext != null )
+                {
+                    MDC.setContextMap( currentContext );
+                }
                 super.afterExecute( r, t );
             }
         } );
@@ -249,8 +267,11 @@ public class SubutaiExecutors
                     @Override
                     protected void beforeExecute( final Thread t, final Runnable r )
                     {
-                        currentContext = MDC.getCopyOfContextMap();
-                        MDC.setContextMap( parentContext );
+                        if ( parentContext != null )
+                        {
+                            currentContext = MDC.getCopyOfContextMap();
+                            MDC.setContextMap( parentContext );
+                        }
                         super.beforeExecute( t, r );
                     }
 
@@ -258,7 +279,10 @@ public class SubutaiExecutors
                     @Override
                     protected void afterExecute( final Runnable r, final Throwable t )
                     {
-                        MDC.setContextMap( currentContext );
+                        if ( parentContext != null )
+                        {
+                            MDC.setContextMap( currentContext );
+                        }
                         super.afterExecute( r, t );
                     }
                 } );

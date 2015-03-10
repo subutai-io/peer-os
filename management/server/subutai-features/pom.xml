@@ -54,6 +54,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>test-rest</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>test-cli</artifactId>
+    </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- channel manager -->
@@ -74,7 +78,7 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>channel-manager-ui</artifactId>
     </dependency>
-    
+
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- messenger -->
     <dependency>

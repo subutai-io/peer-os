@@ -241,8 +241,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
 
     private SubutaiLoginContext getSubutaiLoginContext()
     {
-        SubutaiLoginContext loginContext = SubutaiThreadContext.get();
-        return loginContext instanceof NullSubutaiLoginContext ? SecurityUtil.getSubutaiLoginContext() : loginContext;
+        return SubutaiThreadContext.get();
     }
 
 
@@ -254,16 +253,28 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         SecurityUtils.setSecurityManager( securityManager );
         Subject subject = SecurityUtils.getSubject();
 
+        Session session = null;
         try
         {
             subject.login( usernamePasswordToken );
-            return subject.getSession().getId();
+            session = subject.getSession();
+            return session.getId();
         }
         catch ( UnknownSessionException e )
         {
             subject = new Subject.Builder().buildSubject();
             subject.login( usernamePasswordToken );
-            return subject.getSession( true ).getId();
+            session = subject.getSession( true );
+            return session.getId();
+        }
+        finally
+        {
+            if ( session != null )
+            {
+                SubutaiLoginContext loginContext =
+                        new SubutaiLoginContext( session.getId().toString(), subject.getPrincipal().toString(), null );
+                SubutaiThreadContext.set( loginContext );
+            }
         }
     }
 
@@ -673,9 +684,10 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     @Override
     public void beforeExecute( final CommandSession commandSession, final CharSequence charSequence )
     {
-        SubutaiLoginContext loginContext = getSubutaiLoginContext();
+        SubutaiLoginContext loginContext = SecurityUtil.getSubutaiLoginContext();
         if ( !( loginContext instanceof NullSubutaiLoginContext ) && isAuthenticated( loginContext.getSessionId() ) )
         {
+            SubutaiThreadContext.set( loginContext );
             touch( loginContext.getSessionId() );
         }
     }
