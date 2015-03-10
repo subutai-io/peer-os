@@ -243,7 +243,6 @@ int main(int argc,char *argv[],char *envp[])
      */
     timer.sendHeartBeat();
     logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Sending first heartbeat.."));
-    //cman.getRunningContainers()[0].tryLongCommand();
     while(true)
     {
         try
@@ -365,26 +364,10 @@ int main(int argc,char *argv[],char *envp[])
 
                         if (command.getPid() > 0)
                         {
-                            /*if( isLocal)
-                              {*/
                             logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID on resource host: " + command.getPid()));
                             retstatus = kill(command.getPid(),SIGKILL);
                             resp = response.createTerminateMessage(environment.getAgentUuidValue(),
                                     command.getCommandId(), command.getPid(), retstatus);
-                            /*}
-                              else
-                              {
-                              logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID on container node: " + command.getPid()));
-
-                              command.setCommand("/bin/kill -9 " + helper.toString(command.getPid()) );
-                              ExecutionResult execResult = target_container->RunCommand(&command);
-                              retstatus  = execResult.exit_code;
-
-
-                              resp = response.createTerminateMessage(target_container->getContainerIdValue(),
-                              command.getCommandId(), command.getPid(), retstatus);
-
-                              }*/
 
                             connection->sendMessage(resp);
                             logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Terminate response: " + resp));

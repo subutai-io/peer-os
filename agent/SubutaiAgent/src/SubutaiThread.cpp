@@ -377,28 +377,36 @@ bool SubutaiThread::checkExecutionTimeout(unsigned int* startsec,bool* overflag,
  *  		   It also gets the process id of the execution.
  *  		   It manages the lifecycle of the threads and handles capturing and sending execution responses using these threads.
  */
-int SubutaiThread::optionReadSend(message_queue* messageQueue, SubutaiCommand* command, int newpid, int* ret)
+int SubutaiThread::optionReadSend(message_queue* messageQueue, SubutaiCommand* command, int newpid, int* ret, int* sub_pid)
 {
     /*
      *	Getting system pid of child process
      *	For example, after this block, processpid should be pid of running command (e.g. tail)
      */
+
     int status;
     this->setPpid(newpid);
     pid_t result = waitpid(newpid, &status, WNOHANG);
     this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Find pid start","current pid:",helper.toString(newpid)));
-    while ((result = waitpid(newpid, &status, WNOHANG)) == 0) {
-        string cmd;
-        cmd = "pgrep -P " + helper.toString(newpid);
-        cmd = this->getProcessPid(cmd.c_str());
-        cmd = "pgrep -P " + cmd;
-        cmd = this->getProcessPid(cmd.c_str());
-        this->setPpid(atoi(cmd.c_str()));
-        if (this->getPpid()) {
-            break;
-        }
-        this->setPpid(newpid);
+    this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> ", "*** Pid on start","current pid:",
+    		helper.toString(*sub_pid)));
+    if (!_container)
+    {
+		while ((result = waitpid(newpid, &status, WNOHANG)) == 0)
+		{
+			string cmd;
+			cmd = "pgrep -P " + helper.toString(newpid);
+			cmd = this->getProcessPid(cmd.c_str());
+			cmd = "pgrep -P " + cmd;
+			cmd = this->getProcessPid(cmd.c_str());
+			this->setPpid(atoi(cmd.c_str()));
+			if (this->getPpid()) {
+				break;
+			}
+			this->setPpid(newpid);
+		}
     }
+
     if (result > 0) {
         this->setPpid(newpid);
     }
@@ -433,7 +441,7 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue, SubutaiCommand* c
     unsigned int count = 0;
 
     /*
-     * Starting Hertbeat Timeout
+     * Starting Heartbeat Timeout
      */
     boost::posix_time::ptime startheart = boost::posix_time::second_clock::local_time();
     unsigned int startheartsec  =  startheart.time_of_day().seconds();
@@ -485,6 +493,7 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue, SubutaiCommand* c
                      * sending I'm alive message with no output and errror buffers
                      *
                      *         	"type":"EXECUTE_RESPONSE",
+
 
                      "id":"56b0ac88-5140-4a32-8691-916d75d62f1c"
 
@@ -625,7 +634,26 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue, SubutaiCommand* c
         }
         while (!messageQueue->try_send(message.data(), message.size(), 0));
         this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Process Last Message",message));
-        if (this->getPpid())
+
+
+        if(_container)
+        {
+			if(!command->getIsDaemon() && (0 == kill(*sub_pid, 0)))
+			{
+				this->getLogger().writeLog(7, logger.setLogData("<SubutaiThread::optionReadSend> ", "--------- *** Process will be killed on container .",
+						"pid:",helper.toString(*sub_pid)));
+				if (*sub_pid > 1000)
+				{
+					this->getLogger().writeLog(7, logger.setLogData("<SubutaiThread::optionReadSend> ", "Killing process with id: ",
+										helper.toString(*sub_pid), " running in container."));
+					kill(*sub_pid, SIGKILL);
+				}
+				else this->getLogger().writeLog(7, logger.setLogData("<SubutaiThread::optionReadSend> ", "Agent will not kill process with id: ",
+						helper.toString(*sub_pid), " which seems to belong to a command running in container. But it may belong to system since the pid < 1000. "));
+
+        	}
+        }
+        else if (this->getPpid())
         {
             this->getLogger().writeLog(7, logger.setLogData("<SubutaiThread::optionReadSend> " "Process will be killed.","pid:",helper.toString(this->getPpid())));
             kill(this->getPpid(),SIGKILL); //killing the process after timeout
@@ -682,6 +710,10 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
     {
         _container = container; // Keep container for future use
     }
+    else
+    {
+    	_container = NULL;
+    }
     pid = fork();		// creating a child process
     if (pid == 0)		// child process is starting
     {
@@ -710,6 +742,7 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
         int val = 0; //for system return value
         pipe(ret);
         signal(SIGCHLD, SIG_DFL);
+        int *sub_pid = (int*) mmap(NULL, sizeof(int), PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, -1, 0);
         int newpid = fork();
         if (newpid == 0)
         {	// Child execute the command
@@ -747,7 +780,10 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
                     if (command->getIsDaemon()) {
                         container->RunDaemon(command);
                     } else {
-                        container->RunCommand(command);
+                        container->RunCommandAsDaemon(command, sub_pid);
+                        this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> "
+                        		"********* Pid after command start","current pid:", helper.toString(*sub_pid)));
+
                     }
                 } catch (SubutaiException e) {
                     logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Exception", e.displayText()));
@@ -775,7 +811,7 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
                 this->getErrorStream().closePipe(1);
                 this->getOutputStream().closePipe(1);
                 logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "optionReadSend is starting!!","pid",helper.toString(getpid())));
-                optionReadSend(messageQueue, command, newpid, ret);
+                optionReadSend(messageQueue, command, newpid, ret, sub_pid);
                 logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "optionReadSend has finished!!","pid",helper.toString(getpid())));
                 this->getErrorStream().closePipe(0);
                 this->getOutputStream().closePipe(0);

@@ -54,11 +54,12 @@ void SubutaiContainer::clear()
     interfaces.clear();
 }
 
+
 /**
  * Run program given as parameter 'program' with arguments 'params'
  * Return stdout if success or stderr if fails
  */
-string SubutaiContainer::RunProgram(string program, vector<string> params) 
+string SubutaiContainer::RunProgram(string program, vector<string> params)
 {
     ExecutionResult result = RunProgram(program, params, true, LXC_ATTACH_OPTIONS_DEFAULT);
     if (result.exit_code == 0) {
@@ -95,7 +96,6 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
         pipe(outfd);
         opts.stdout_fd = outfd[1];
     }
-    pid_t pid;
     try {
         result.exit_code = this->container->attach_run_wait(this->container, &opts, _params[0], _params);
     } catch (std::exception e) {
@@ -313,14 +313,6 @@ string SubutaiContainer::getContainerStatus()
     return this->container->state(this->container);
 }
 
-/**
- *  \details   set the status of Subutai Container.
- */
-void SubutaiContainer::setContainerStatus(containerStatus status)
-{
-    this->status = status;
-}
-
 void SubutaiContainer::write()
 {
     cout << hostname << " " << id << endl;
@@ -367,7 +359,7 @@ void SubutaiContainer::getContainerAllFields()
     clear();
     getContainerId();
     getContainerInterfaces();
-    UpdateUsersList();
+    //UpdateUsersList();
 }
 
 /*
@@ -432,6 +424,23 @@ ExecutionResult SubutaiContainer::RunCommand(SubutaiCommand* command)
     return res;
 }
 
+
+/*
+ * \details Executes a command received from server.
+ *          Method prepares received command from server: collects arguments and env. variables
+ *
+ */
+ExecutionResult SubutaiContainer::RunCommandAsDaemon(SubutaiCommand* command, int* sub_pid)
+{
+	SubutaiHelper h;
+	ExecutionResult res = RunDaemon(command) ;
+	*sub_pid = res.pid;
+	containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "--------- Pid from lxc: " + h.toString(res.pid) + "Command pid: " + h.toString(*sub_pid)));
+	return res;
+}
+
+
+
 /*
  * \details Runs a daemon within a container
  *          Methods prepares command to be executed, parses it and executes lxc api function
@@ -441,8 +450,6 @@ ExecutionResult SubutaiContainer::RunDaemon(SubutaiCommand* command) {
     if (getState() != "RUNNING") throw new SubutaiException("Trying to run daemon on a non running container", 100);
 
     string programName;
-    int outFd[2];
-    int errFd[2];
     pid_t pid;
     lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT;
     containerLogger->writeLog(6, containerLogger->setLogData(_logEntry, "Running daemon. "));
@@ -573,26 +580,6 @@ void SubutaiContainer::PutToFile(string filename, string text) {
     args.push_back("'");
     containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "Echo "+ text + "in " + filename));
     RunProgram("/bin/bash", args);
-}
-
-/**
- * \details		Get the full path for a given program
- */
-string SubutaiContainer::findFullProgramPath(string program_name) 
-{
-    vector<string> args;
-    args.push_back(program_name);
-    string locations = RunProgram("whereis", args);
-    return _helper.splitResult(program_name, "\n")[1];
-}
-
-/**
- * \details 	run ps command on LXC.
- */
-string SubutaiContainer::RunPsCommand() {
-    vector<string> args;
-    containerLogger->writeLog(6, containerLogger->setLogData(_logEntry, "Running ps command.."));
-    return RunProgram("/opt/psrun", args);
 }
 
 /**

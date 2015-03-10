@@ -48,21 +48,13 @@ class SubutaiContainerManager {
         SubutaiContainerManager(string , SubutaiLogger*);
         ~SubutaiContainerManager();
         vector<SubutaiContainer> findAllContainers();
-        SubutaiContainer* findContainerByName(string );
         SubutaiContainer* findContainerById(string );
         vector<SubutaiContainer> getAllContainers();
-        vector<SubutaiContainer> getRunningContainers();
-        vector<SubutaiContainer> getStoppedContainers();
-        vector<SubutaiContainer> getFrozenContainers();
         vector<string> getContainers();
         bool checkIfTemplate(string, vector<string>, bool );
         void updateContainerIdListOnStart();
         void deleteContainerInfo(string);
-        bool isContainerRunning(string );
-        bool isContainerStopped(string );
-        bool isContainerFrozen(string );
         void updateContainerLists();
-        void write();
     protected:
 
     private:

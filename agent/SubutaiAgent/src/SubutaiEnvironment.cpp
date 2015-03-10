@@ -168,55 +168,6 @@ string SubutaiEnvironment::getAgentArch() {
     }
 }
 
-/**
- *  \details   Checking the machine is lxc or not
- */
-/*
-bool SubutaiEnvironment::isAgentLxc()
-{
-    try
-    {
-        string firstline;
-        ifstream file("/proc/1/cpuset");	//opening root cgroup file
-        getline(file,firstline);
-        file.close();
-        int ret = firstline.find("lxc");
-        if(ret==-1)		//if cgroup is null or not reading successfully
-        {
-            islxc = 0;
-            environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","This machine is not a Lxc Container.."));
-            environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","Subutai Agent IsLxc:",toString(islxc)));
-            getAgentHostname(); //its physical there is no parenthost.
-            parentHostname="";
-            environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","Subutai Agent Hostname:",hostname));
-            return false;
-        }
-        else
-        {
-            islxc = 1;
-            environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","This machine is a Lxc Container.."));
-            environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","Subutai Agent IsLxc:",toString(islxc)));
-            if(getAgentParentHostname())	//trying to get parentHostname
-            {
-                getAgentHostname();
-                environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","Subutai Agent Hostname:",hostname));
-            }
-            else
-            {
-                environmentLogger->writeLog(3,environmentLogger->setLogData("<SubutaiAgent>","ParentHostname cannot be read !!"));
-                getAgentHostname();
-                parentHostname="";
-                environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","Subutai Agent Hostname:",hostname));
-            }
-            return true;
-        }
-    }
-    catch(const std::exception& error)
-    {
-        cout << error.what()<< endl;
-    }
-    return false;
-}*/
 
 /**
  *  \details   IpAddress of the KiskisAgent machine is fetched from statically.

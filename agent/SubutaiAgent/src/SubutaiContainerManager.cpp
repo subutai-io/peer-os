@@ -89,50 +89,6 @@ void SubutaiContainerManager::updateContainerIdListOnStart()
 	    rename("temp.txt",uuidFile.c_str());
 }
 
-/**
- * \details 	Check if container with the name given is running
- */
-bool SubutaiContainerManager::isContainerRunning(string container_name) 
-{
-    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Check if container running"));
-    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
-        if ((*it).getContainerHostnameValue().compare(container_name) == 0 && (*it).getState() == "RUNNING") {
-            return true;
-        }
-    }
-    _logger->writeLog(1, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_name));
-    return false;
-}
-
-/**
- * \details 	Check if container with the name given is stopped
- */
-bool SubutaiContainerManager::isContainerStopped(string container_name)
-{
-    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Check if container stopped"));
-    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
-        if ((*it).getContainerHostnameValue().compare(container_name) == 0 && (*it).getState() == "STOPPED") {
-            return true;
-        }
-    }
-    _logger->writeLog(1, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_name));
-    return false;
-}
-
-/**
- * \details 	Check if container with the name given is frozen
- */
-bool SubutaiContainerManager::isContainerFrozen(string container_name)
-{
-    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Check if container frozen"));
-    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
-        if ((*it).getContainerHostnameValue().compare(container_name) == 0 && (*it).getState() == "FROZEN") {
-            return true;
-        }
-    }
-    _logger->writeLog(1, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_name));
-    return false;
-}
 
 /**
  * Delete related container info from containerIdList file when a container is destroyed.
@@ -265,22 +221,6 @@ vector<SubutaiContainer> SubutaiContainerManager::findAllContainers()
 }
 
 /*
- * \details find container using hostname
- *
- */
-SubutaiContainer* SubutaiContainerManager::findContainerByName(string container_name)
-{
-    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Get container by name: " + container_name));
-    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
-        if ((*it).getContainerHostnameValue().compare(container_name) == 0) {
-            return &(*it);
-        }
-    }
-    _logger->writeLog(1, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_name));
-    return NULL;
-}
-
-/*
  * \details find container using id
  *
  */
@@ -347,8 +287,11 @@ void SubutaiContainerManager::updateContainerLists()
         	/*if this container is destroyed, clean both containerIdList and containers array on containerManager*/
         	if(!destroy_container_check[i])
         	{
+        		cout << "before delete container info" << endl;
         		deleteContainerInfo((_containers.at(i)).getContainerHostnameValue());
+        		cout << "after delete container info" << endl;
         		_containers.erase (_containers.begin()+i);
+        		cout << "after container erase" << endl;
         	}
         }
     } catch (SubutaiException e) {
@@ -363,48 +306,6 @@ void SubutaiContainerManager::updateContainerLists()
 }
 
 /**
- * \details 	get running containers of resource host
- */
-vector<SubutaiContainer> SubutaiContainerManager::getRunningContainers()
-{
-    vector<SubutaiContainer> cont;
-    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
-        if ((*it).getState() == "RUNNING") {
-            cont.push_back((*it));
-        }
-    }
-    return cont;
-}
-
-/**
- * \details 	get stopped containers of resource host
- */
-vector<SubutaiContainer> SubutaiContainerManager::getStoppedContainers()
-{
-    vector<SubutaiContainer> cont;
-    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
-        if ((*it).getState() == "STOPPED") {
-            cont.push_back((*it));
-        }
-    }
-    return cont;
-}
-
-/**
- * \details 	get frozen containers of resource host
- */
-vector<SubutaiContainer> SubutaiContainerManager::getFrozenContainers()
-{
-    vector<SubutaiContainer> cont;
-    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
-        if ((*it).getState() == "FROZEN") {
-            cont.push_back((*it));
-        }
-    }
-    return cont;
-}
-
-/**
  * \details 	get all containers of resource host
  */
 vector<SubutaiContainer> SubutaiContainerManager::getAllContainers()
@@ -413,27 +314,3 @@ vector<SubutaiContainer> SubutaiContainerManager::getAllContainers()
 }
 
 
-/**
- * \details 	for testing
- */
-void SubutaiContainerManager::write()
-{
-    cout << "active: \n";
-    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
-        if ((*it).getState() == "RUNNING") {
-            (*it).write();
-        }
-    }
-    cout << "stopped: \n";
-    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
-        if ((*it).getState() == "STOPPED") {
-            (*it).write();
-        }
-    }
-    cout << "frozen: \n";
-    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
-        if ((*it).getState() == "FROZEN") {
-            (*it).write();
-        }
-    }
-}
