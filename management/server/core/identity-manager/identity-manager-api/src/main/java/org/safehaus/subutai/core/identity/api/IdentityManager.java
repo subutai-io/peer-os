@@ -49,6 +49,16 @@ public interface IdentityManager
 
 
     /**
+     * Check User Rest URL
+     *
+     *
+     *
+     *
+     *
+     */
+    public short checkRestPermissions(  User user , String restURL );
+
+    /**
      * Get {@code Subject} for target session
      *
      * @param sessionId - session id

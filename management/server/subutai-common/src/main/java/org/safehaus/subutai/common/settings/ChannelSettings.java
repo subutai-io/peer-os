@@ -91,41 +91,52 @@ public class ChannelSettings
     };
 
 
-    public static short checkURL( String uri, String[] URL_ACCESS )
+    public static short checkURLArray( String uri, String[] URL_ACCESS_ARRAY )
     {
-        String subURI[] = uri.split( "/" );
-        int subURIsize = subURI.length;
-
         short status = 0;
 
-        for ( int x = 0; x < URL_ACCESS.length; x++ )
+        for ( int x = 0; x < URL_ACCESS_ARRAY.length; x++ )
         {
-            String subURL_ACCESS[] = URL_ACCESS[x].split( "/" );
-
-            if ( subURIsize == subURL_ACCESS.length )
+            if(checkURL( uri, URL_ACCESS_ARRAY[x] ) == 1)
             {
-                int st = 0;
+                status = 1;
+                break;
+            }
+        }
 
-                for ( int i = 0; i < subURIsize; i++ )
+        return status;
+    }
+
+
+    public static short checkURL( String uri, String URL_ACCESS )
+    {
+        short status = 0;
+        String subURI[] = uri.split( "/" );
+        int subURIsize  = subURI.length;
+        String subURL_ACCESS[] = URL_ACCESS.split( "/" );
+
+        if ( subURIsize == subURL_ACCESS.length )
+        {
+            int st = 0;
+
+            for ( int i = 0; i < subURIsize; i++ )
+            {
+                if ( subURL_ACCESS[i].equals( "{$}" ) )
                 {
-                    if ( subURL_ACCESS[i].equals( "{$}" ) )
+                    st++;
+                }
+                else
+                {
+                    if ( subURI[i].equals( subURL_ACCESS[i] ) )
                     {
                         st++;
                     }
-                    else
-                    {
-                        if ( subURI[i].equals( subURL_ACCESS[i] ) )
-                        {
-                            st++;
-                        }
-                    }
                 }
+            }
 
-                if ( st == subURIsize )
-                {
-                    status = 1;
-                    break;
-                }
+            if ( st == subURIsize )
+            {
+                status = 1;
             }
         }
 
