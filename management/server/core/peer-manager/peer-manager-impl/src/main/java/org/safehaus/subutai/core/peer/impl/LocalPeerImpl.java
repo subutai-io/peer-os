@@ -750,6 +750,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             if ( containerIds.isEmpty() )
             {
                 containerGroupDataService.remove( containerGroup.getEnvironmentId().toString() );
+
+                //todo cleanup networking settings
             }
             else
             {
