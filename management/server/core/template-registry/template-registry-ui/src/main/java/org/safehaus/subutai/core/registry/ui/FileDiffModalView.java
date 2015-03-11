@@ -136,36 +136,68 @@ public class FileDiffModalView extends Window
                 //                    }
                 //                }
 
-                String lineFormat = "<div style=\"background-color: ";
+
                 if ( str.startsWith( "-" ) )
                 {
-                    if ( i + 1 < parsedString.length && parsedString[i + 1].startsWith( "+" ) )
+
+                    boolean aDeleted = true;
+                    int j = i;
+                    for (; j < parsedString.length && parsedString[j].startsWith( "-" ); j++ )
                     {
-                        String nextLine = parsedString[i + 1];
-                        if ( nextLine.startsWith( "+" ) )
+                    }
+                    if ( j < parsedString.length && parsedString[j].startsWith( "+" ) )
+                    {
+                        aDeleted = false;
+                    }
+                    if ( aDeleted )
+                    {
+                        for (; i < parsedString.length && parsedString[i].startsWith( "-" ); i++ )
                         {
-                            //Changed line representation
-                            lineFormat += "#dfd;";
-                            i++;
-                        }
-                        else
-                        {
-                            //Removed line representation
-                            lineFormat += "#ffb6ba;";
+                            String lineFormat = "<div style=\"background-color: #ffb6ba;\">";
+                            str = parsedString[i];
+                            str = str.length() > 0 ? " " + str.substring( 1 ) : str;
+                            lineFormat += "<pre>" + str + "</pre>";
+                            lineFormat += "</div>";
+                            result += lineFormat;
                         }
                     }
-                    str = str.length() > 0 ? " " + str.substring( 1 ) : str;
+                    else
+                    {
+                        for ( i = j; i < parsedString.length && parsedString[i].startsWith( "+" ); i++ )
+                        {
+                            String lineFormat = "<div style=\"background-color: #dfd;\">";
+                            str = parsedString[i];
+                            str = str.length() > 0 ? " " + str.substring( 1 ) : str;
+                            lineFormat += "<pre>" + str + "</pre>";
+                            lineFormat += "</div>";
+                            result += lineFormat;
+                        }
+                        if ( !( i == parsedString.length - 1 ) )
+                        {
+                            i--;
+                        }
+                    }
                 }
                 else if ( str.startsWith( "+" ) )
                 {
+                    String lineFormat = "<div style=\"background-color: ";
                     //New line added representation
                     lineFormat += "#97f295;";
                     str = str.length() > 0 ? " " + str.substring( 1 ) : str;
+
+                    lineFormat += "\">";
+                    lineFormat += "<pre>" + str + "</pre>";
+                    lineFormat += "</div>";
+                    result += lineFormat;
                 }
-                lineFormat += "\">";
-                lineFormat += "<pre>" + str + "</pre>";
-                lineFormat += "</div>";
-                result += lineFormat;
+                else
+                {
+                    String lineFormat = "<div style=\"background-color: ";
+                    lineFormat += "\">";
+                    lineFormat += "<pre>" + str + "</pre>";
+                    lineFormat += "</div>";
+                    result += lineFormat;
+                }
             }
         }
         return result;
