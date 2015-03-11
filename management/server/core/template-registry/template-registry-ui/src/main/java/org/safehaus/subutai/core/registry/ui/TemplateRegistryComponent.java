@@ -19,8 +19,6 @@ import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
@@ -33,7 +31,6 @@ import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
@@ -57,11 +54,8 @@ public class TemplateRegistryComponent extends CustomComponent
     private HierarchicalContainer container;
     private Tree templateTree;
 
-    private GridLayout grid;
     private Table templateInfoTable;
     private Table changedFilesTable;
-    //    private TextArea packagesInstalled;
-    //    private TextArea packagesChanged;
 
     private static final String TEMPLATE_PROPERTY = "Template Property";
     private static final String TEMPLATE_VALUE = "Value";
@@ -71,6 +65,12 @@ public class TemplateRegistryComponent extends CustomComponent
     private interface TemplateValue
     {
         public String getTemplateProperty( Template template );
+    }
+
+
+    private interface CustomListener extends Property.ValueChangeListener
+    {
+
     }
 
 
@@ -130,14 +130,6 @@ public class TemplateRegistryComponent extends CustomComponent
                     return rsHosts;
                 }
             } );
-            //            put( "App Data Path", new TemplateValue()
-            //            {
-            //                @Override
-            //                public String getTemplateProperty( final Template template )
-            //                {
-            //                    return template.getPat;
-            //                }
-            //            } );
         }
     };
 
@@ -155,6 +147,58 @@ public class TemplateRegistryComponent extends CustomComponent
         container = new HierarchicalContainer();
         container.addContainerProperty( VALUE_PROPERTY, Template.class, null );
         container.addContainerProperty( ICON, Resource.class, new ThemeResource( PHYSICAL_IMG ) );
+
+        final BeanContainer<String, GitChangedFile> dataContainer = new BeanContainer<>( GitChangedFile.class );
+        dataContainer.setBeanIdProperty( "gitFilePath" );
+        dataContainer.addAll( new ArrayList<GitChangedFile>() );
+
+        changedFilesTable = new Table( "Changed Files." );
+        changedFilesTable.setWidth( "40%" );
+        changedFilesTable.setImmediate( true );
+        changedFilesTable.setContainerDataSource( dataContainer );
+        changedFilesTable.addItemClickListener( new ItemClickEvent.ItemClickListener()
+        {
+            @Override
+            public void itemClick( final ItemClickEvent event )
+            {
+                BeanItem<GitChangedFile> file = dataContainer.getItem( event.getItemId() );
+
+                if ( file == null )
+                {
+                    return;
+                }
+
+                Item item = templateTree.getItem( templateTree.getValue() );
+
+                if ( item != null )
+                {
+                    final Template template = ( Template ) item.getItemProperty( VALUE_PROPERTY ).getValue();
+                    if ( template != null )
+                    {
+
+                        GitChangedFile gitFile = file.getBean();
+                        String fileDiff = registryManager
+                                .getChangedFileVersions( template.getParentTemplateName(), template.getTemplateName(),
+                                        gitFile );
+                        FileDiffModalView modalView =
+                                new FileDiffModalView( gitFile.getGitFilePath(), new HorizontalLayout(), fileDiff );
+
+                        getUI().addWindow( modalView );
+                    }
+                }
+            }
+        } );
+
+        templateInfoTable = new Table( "Template Info" );
+        templateInfoTable.setWidth( "25%" );
+        templateInfoTable.setImmediate( true );
+        templateInfoTable.addContainerProperty( TEMPLATE_PROPERTY, String.class, null );
+        templateInfoTable.addContainerProperty( TEMPLATE_VALUE, String.class, null );
+
+        for ( String key : templatePropertiesMap.keySet() )
+        {
+            templateInfoTable.addItem( new Object[] { key, "" }, key );
+        }
 
         templateTree = new Tree( "Templates" );
         templateTree.setContainerDataSource( container );
@@ -203,50 +247,16 @@ public class TemplateRegistryComponent extends CustomComponent
 
                         showSelectedTemplateInfo( template );
 
+                        dataContainer.removeAllItems();
                         try
                         {
-                            final BeanContainer<String, GitChangedFile> dataContainer =
-                                    new BeanContainer<>( GitChangedFile.class );
-                            dataContainer.setBeanIdProperty( "gitFilePath" );
-
-
                             List<GitChangedFile> changedFiles = registryManager.getChangedFiles( template );
 
                             dataContainer.addAll( changedFiles );
-
-
-                            changedFilesTable.setContainerDataSource( dataContainer );
-                            changedFilesTable.addItemClickListener( new ItemClickEvent.ItemClickListener()
-                            {
-                                @Override
-                                public void itemClick( final ItemClickEvent event )
-                                {
-                                    BeanItem<GitChangedFile> file = dataContainer.getItem( event.getItemId() );
-
-                                    if ( file == null )
-                                    {
-                                        return;
-                                    }
-
-                                    GitChangedFile gitFile = file.getBean();
-                                    Pair<String, String> fileVersions = registryManager
-                                            .getChangedFileVersions( template.getParentTemplateName(),
-                                                    template.getTemplateName(), gitFile );
-                                    FileDiffModalView modalView =
-                                            new FileDiffModalView( gitFile.getGitFilePath(), new HorizontalLayout(),
-                                                    fileVersions.getLeft(), fileVersions.getRight() );
-
-                                    getUI().addWindow( modalView );
-                                }
-                            } );
-                            //TODO instead of listing all changed files in TextArea list all of them in Table
-                            //where all files will be shown with appropriate columns and implement user
-                            //table row click listener, after that need to implement functionality to show diffs
-                            //of changed files by different colouring stuff
                         }
                         catch ( RegistryException e )
                         {
-                            LOGGER.error( "Error getting changed files from repo.", e );
+                            e.printStackTrace();
                         }
                     }
                     else
@@ -265,38 +275,10 @@ public class TemplateRegistryComponent extends CustomComponent
         verticalLayout.setSpacing( true );
         verticalLayout.setSizeFull();
 
-        changedFilesTable = new Table( "Changed Files." );
-        changedFilesTable.setWidth( "40%" );
-        changedFilesTable.setImmediate( true );
 
-        templateInfoTable = new Table( "Template Info" );
-        templateInfoTable.setWidth( "25%" );
-        templateInfoTable.setImmediate( true );
-        templateInfoTable.addContainerProperty( TEMPLATE_PROPERTY, String.class, null );
-        templateInfoTable.addContainerProperty( TEMPLATE_VALUE, String.class, null );
-
-        for ( String key : templatePropertiesMap.keySet() )
-        {
-            templateInfoTable.addItem( new Object[] { key, "" }, key );
-        }
 
         verticalLayout.addComponent( templateInfoTable );
         verticalLayout.addComponent( changedFilesTable );
-
-        //        packagesInstalled = new TextArea( "Packages Installed" );
-        //        packagesInstalled.setValue( "" );
-        //        packagesInstalled.setReadOnly( true );
-
-        //        packagesChanged = new TextArea( "Packages Changed" );
-        //        packagesChanged.setValue( "" );
-        //        packagesChanged.setReadOnly( true );
-
-        //        HorizontalLayout packagesLayout = new HorizontalLayout();
-        //        packagesLayout.addComponent( packagesInstalled );
-        //        packagesLayout.addComponent( packagesChanged );
-
-        //        verticalLayout.addComponent( packagesLayout );
-
 
         Label confirmationLbl = new Label( "<font style='color:red'>some lines which were deleted</font><br/>"
                 + "<font style='color:green'>some lines which were added</font><br/>" );
@@ -324,9 +306,6 @@ public class TemplateRegistryComponent extends CustomComponent
             product = product + "\n";
             products.append( product );
         }
-        //        packagesInstalled.setReadOnly( false );
-        //        packagesInstalled.setValue( products.toString() );
-        //        packagesInstalled.setReadOnly( true );
 
         StringBuilder packages = new StringBuilder();
         Set<String> diff = registryManager.getPackagesDiff( template );
@@ -334,9 +313,6 @@ public class TemplateRegistryComponent extends CustomComponent
         {
             packages.append( templatePackage ).append( "\n" );
         }
-        //        packagesChanged.setReadOnly( false );
-        //        packagesChanged.setValue( packages.toString() );
-        //        packagesChanged.setReadOnly( true );
     }
 
 

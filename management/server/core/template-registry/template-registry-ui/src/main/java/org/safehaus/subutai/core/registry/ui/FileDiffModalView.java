@@ -19,8 +19,7 @@ public class FileDiffModalView extends Window
      *
      * @param caption the title of the window.
      */
-    public FileDiffModalView( final String caption, final HorizontalLayout content, final String aVersion,
-                              final String bVersion )
+    public FileDiffModalView( final String caption, final HorizontalLayout content, final String aVersion )
     {
 
         super( caption, content );
@@ -28,24 +27,13 @@ public class FileDiffModalView extends Window
         content.setSpacing( true );
         content.setSizeFull();
 
-
-        String customStyle =
-                "<div style=\"text-align:center;color:blue;font-weight:bold; word-wrap: break-word; /* " + "IE  */\n"
-                        + "   white-space: -moz-pre-wrap;/* Firefox */\">";
-
-        final Label aText = new Label( customStyle + aVersion + "</div>" );
+        final Label aText = new Label( formattedStringWithStyles( aVersion ) );
         aText.setImmediate( true );
         aText.setContentMode( ContentMode.HTML );
 
-        final Label bText = new Label( customStyle + bVersion + "</div>" );
-        bText.setImmediate( true );
-        bText.setContentMode( ContentMode.HTML );
-
         content.addComponent( aText );
-        content.addComponent( bText );
 
         content.setExpandRatio( aText, 0.5f );
-        content.setExpandRatio( bText, 0.5f );
 
         setImmediate( true );
         setModal( true );
@@ -53,5 +41,50 @@ public class FileDiffModalView extends Window
         center();
         setWidth( 65, Unit.PERCENTAGE );
         setHeight( "40%" );
+    }
+
+
+    private String formattedStringWithStyles( String input )
+    {
+        String result = "";
+        String parsedString[] = input.split( "\n" );
+        boolean append = false;
+        for ( int i = 0; i < parsedString.length; i++ )
+        {
+            String str = parsedString[i];
+            if ( str.startsWith( "@@" ) )
+            {
+                append = true;
+                continue;
+            }
+            if ( append )
+            {
+                String temp = "<div style=\"background-color: ";
+                if ( str.startsWith( "-" ) )
+                {
+                    if ( i + 1 < parsedString.length )
+                    {
+                        String nextLine = parsedString[i + 1];
+                        if ( nextLine.startsWith( "+" ) )
+                        {
+                            temp += "rgba(73, 60, 186, 0.53);";
+                        }
+                        else
+                        {
+                            temp += "rgba(189, 67, 51, 0.62);";
+                        }
+                    }
+                }
+                else if ( str.startsWith( "+" ) )
+                {
+                    temp += "rgba(34, 134, 58, 0.54);";
+                }
+                temp += "\">";
+                temp += str;
+                temp += "</div>";
+                result += temp;
+            }
+        }
+        return result;
     }
 }
