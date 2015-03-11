@@ -59,30 +59,113 @@ public class FileDiffModalView extends Window
             }
             if ( append )
             {
-                String temp = "<div style=\"background-color: ";
+                //TODO correctly format output git diff string for showing precise changes
+                //do not delete these comments
+                //                List<String> aChanges = new ArrayList<>();
+                //                List<String> aChangesDuplicate = new ArrayList<>();
+                //                for (; i < parsedString.length && parsedString[i].startsWith( "-" ); i++ )
+                //                {
+                //                    str = parsedString[i];
+                //                    String temp = str.replace( ".", "\\." );
+                //                    temp = temp.replace( "?", "\\?" );
+                //                    temp = temp.replace( "+", "\\+" );
+                //                    temp = temp.replace( "*", "\\*" );
+                //                    temp = temp.replace( "^", "\\^" );
+                //                    temp = temp.replace( "$", "\\$" );
+                //                    temp = temp.replace( "\\", "\\\\" );
+                //                    temp = temp.replace( "(", "\\(" );
+                //                    temp = temp.replace( ")", "\\)" );
+                //                    temp = temp.replace( "[", "\\[" );
+                //                    temp = temp.replace( "]", "\\]" );
+                //                    temp = temp.replace( "{", "\\{" );
+                //                    temp = temp.replace( "}", "\\}" );
+                //                    temp = temp.replace( "|", "\\|" );
+                //
+                //                    String tokens [] = temp.split( "[(\\s|\t)]" );
+                //                    temp = "(";
+                //                    for ( int j = 0; j < tokens.length; j++ )
+                //                    {
+                //                        String token = tokens[j];
+                //                        if ( j == tokens.length - 1 )
+                //                        {
+                //                            temp += token;
+                //                        }
+                //                        else
+                //                        {
+                //                            temp += token + " | ";
+                //                        }
+                //                    }
+                //                    temp += ")";
+                //
+                //                    aChanges.add( temp.length() > 0 ? " " + temp.substring( 1 ) : temp );
+                //                    aChangesDuplicate.add( str.length() > 0 ? " " + str.substring( 1 ) : str );
+                //                }
+                //                List<String> bChanges = new ArrayList<>();
+                //                for (; i < parsedString.length && parsedString[i].startsWith( "+" ); i++ )
+                //                {
+                //                    str = parsedString[i];
+                //                    //                    String temp = str.replace( ".", "\\." );
+                //                    //                    temp = temp.replace( "?", "\\?" );
+                //                    //                    temp = temp.replace( "+", "\\+" );
+                //                    //                    temp = temp.replace( "*", "\\*" );
+                //                    //                    temp = temp.replace( "^", "\\^" );
+                //                    //                    temp = temp.replace( "$", "\\$" );
+                //                    //                    temp = temp.replace( "\\", "\\\\" );
+                //                    //                    temp = temp.replace( "(", "\\(" );
+                //                    //                    temp = temp.replace( ")", "\\)" );
+                //                    //                    temp = temp.replace( "[", "\\[" );
+                //                    //                    temp = temp.replace( "]", "\\]" );
+                //                    //                    temp = temp.replace( "{", "\\{" );
+                //                    //                    temp = temp.replace( "}", "\\}" );
+                //                    //                    temp = temp.replace( "|", "\\|" );
+                //                    bChanges.add( str.length() > 0 ? " " + str.substring( 1 ) : str );
+                //                }
+                //
+                //                for ( int j = 0; j < aChanges.size(); j++ )
+                //                {
+                //                    String aChange = aChanges.get( j );
+                //                    Pattern p = Pattern.compile( "[" + aChange + "]" );
+                //                    for ( final String bChange : bChanges )
+                //                    {
+                //                        String lineFormat = "<div style=\"background-color: ";
+                //                        Matcher matcher = p.matcher( bChange );
+                //                        if ( matcher.find() )
+                //                        {
+                //                            lineFormat += "#dfd;";
+                //                        }
+                //                    }
+                //                }
+
+                String lineFormat = "<div style=\"background-color: ";
                 if ( str.startsWith( "-" ) )
                 {
-                    if ( i + 1 < parsedString.length )
+                    if ( i + 1 < parsedString.length && parsedString[i + 1].startsWith( "+" ) )
                     {
                         String nextLine = parsedString[i + 1];
                         if ( nextLine.startsWith( "+" ) )
                         {
-                            temp += "rgba(73, 60, 186, 0.53);";
+                            //Changed line representation
+                            lineFormat += "#dfd;";
+                            i++;
                         }
                         else
                         {
-                            temp += "rgba(189, 67, 51, 0.62);";
+                            //Removed line representation
+                            lineFormat += "#ffb6ba;";
                         }
                     }
+                    str = str.length() > 0 ? " " + str.substring( 1 ) : str;
                 }
                 else if ( str.startsWith( "+" ) )
                 {
-                    temp += "rgba(34, 134, 58, 0.54);";
+                    //New line added representation
+                    lineFormat += "#97f295;";
+                    str = str.length() > 0 ? " " + str.substring( 1 ) : str;
                 }
-                temp += "\">";
-                temp += str;
-                temp += "</div>";
-                result += temp;
+                lineFormat += "\">";
+                lineFormat += "<pre>" + str + "</pre>";
+                lineFormat += "</div>";
+                result += lineFormat;
             }
         }
         return result;

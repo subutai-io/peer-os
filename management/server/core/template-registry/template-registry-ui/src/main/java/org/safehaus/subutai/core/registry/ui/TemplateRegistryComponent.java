@@ -178,7 +178,7 @@ public class TemplateRegistryComponent extends CustomComponent
 
                         GitChangedFile gitFile = file.getBean();
                         String fileDiff = registryManager
-                                .getChangedFileVersions( template.getParentTemplateName(), template.getTemplateName(),
+                                .getChangedFileVersions( template.getTemplateName(), template.getParentTemplateName(),
                                         gitFile );
                         FileDiffModalView modalView =
                                 new FileDiffModalView( gitFile.getGitFilePath(), new HorizontalLayout(), fileDiff );
@@ -274,7 +274,6 @@ public class TemplateRegistryComponent extends CustomComponent
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing( true );
         verticalLayout.setSizeFull();
-
 
 
         verticalLayout.addComponent( templateInfoTable );
