@@ -13,8 +13,6 @@ import org.safehaus.subutai.common.datatypes.TemplateVersion;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.git.api.GitChangedFile;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 
 /**
  * Class to work with templates registry, templates metadata
@@ -325,7 +323,7 @@ public interface TemplateRegistry
      */
     public boolean checkTemplateDownloadToken( String token );
 
-    public Pair<String, String> getChangedFileVersions( String branchA, String branchB, GitChangedFile file );
+    public String getChangedFileVersions( String branchA, String branchB, GitChangedFile file );
 
 
     public List<Template> getTemplateTree();

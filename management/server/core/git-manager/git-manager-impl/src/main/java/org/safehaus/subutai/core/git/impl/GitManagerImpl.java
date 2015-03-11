@@ -147,8 +147,8 @@ public class GitManagerImpl implements GitManager
         Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName2 ), "Branch name 2 is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( filePath ), "File path is null or empty" );
 
-        CommandResult result = execute(
-                new RequestBuilder( String.format( "git diff %s %s -- %s", branchName1, branchName2, filePath ) )
+        CommandResult result = execute( new RequestBuilder(
+                        String.format( "git diff -U10000 %s %s -- %s", branchName1, branchName2, filePath ) )
                         .withCwd( repositoryRoot ), false );
 
         return result.getStdOut();
