@@ -750,6 +750,17 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             if ( containerIds.isEmpty() )
             {
                 containerGroupDataService.remove( containerGroup.getEnvironmentId().toString() );
+
+                //cleanup environment network settings
+                try
+                {
+                    getManagementHost().cleanupEnvironmentNetworkSettings( containerGroup.getEnvironmentId() );
+                }
+                catch ( PeerException e )
+                {
+                    LOG.error( "Error cleaning up environment network configuration",
+                            ExceptionUtils.getRootCause( e ) );
+                }
             }
             else
             {
@@ -781,9 +792,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
         try
         {
-            commandUtil.execute( new RequestBuilder(
-                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
-                    bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
+                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {

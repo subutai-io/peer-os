@@ -8,15 +8,18 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.environment.Blueprint;
 import org.safehaus.subutai.common.environment.Environment;
-import org.safehaus.subutai.common.environment.EnvironmentModificationException;
-import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.NodeGroup;
 import org.safehaus.subutai.common.environment.Topology;
+import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
@@ -121,21 +124,44 @@ public class TopologyWindow extends Window
                         }
                         else
                         {
+                            //check availability of subnet
+                            Map<Peer, Set<Gateway>> usedGateways =
+                                    getUsedGateways( topology.getNodeGroupPlacement().keySet() );
+
+                            SubnetUtils subnetUtils = new SubnetUtils( subnetTxt.getValue() );
+                            String environmentGatewayIp = subnetUtils.getInfo().getLowAddress();
+
+                            for ( Map.Entry<Peer, Set<Gateway>> peerGateways : usedGateways.entrySet() )
+                            {
+                                Peer peer = peerGateways.getKey();
+                                Set<Gateway> gateways = peerGateways.getValue();
+                                for ( Gateway gateway : gateways )
+                                {
+                                    if ( gateway.getIp().equals( environmentGatewayIp ) )
+                                    {
+                                        throw new EnvironmentManagerException(
+                                                String.format( "Subnet %s is already used on peer %s",
+                                                        environmentGatewayIp, peer.getName() ), null );
+                                    }
+                                }
+                            }
+
                             environmentManager.createEnvironment(
                                     String.format( "%s-%s", blueprint.getName(), UUID.randomUUID() ), topology,
                                     subnetTxt.getValue(), null, true );
                             Notification.show( "Environment creation started" );
                         }
+
+                        close();
                     }
-                    catch ( EnvironmentModificationException | EnvironmentNotFoundException |
-                            EnvironmentCreationException e )
+                    catch ( Exception e )
                     {
-                        Notification.show( String.format( "Failed to %s environment: %s", grow ? "grow" : "create", e ),
-                                Notification.Type.ERROR_MESSAGE );
+                        Notification.show( String.format( "Failed to %s environment: %s", grow ? "grow" : "create",
+                                        ExceptionUtils.getRootCauseMessage( e ) ), Notification.Type.ERROR_MESSAGE );
                     }
 
 
-                    close();
+
                 }
             }
         } );
@@ -167,6 +193,19 @@ public class TopologyWindow extends Window
         content.setComponentAlignment( buildBtn, Alignment.TOP_RIGHT );
 
         setContent( content );
+    }
+
+
+    private Map<Peer, Set<Gateway>> getUsedGateways( Set<Peer> peers ) throws PeerException
+    {
+        Map<Peer, Set<Gateway>> usedGateways = Maps.newHashMap();
+
+        for ( Peer peer : peers )
+        {
+            usedGateways.put( peer, peer.getGateways() );
+        }
+
+        return usedGateways;
     }
 
 
