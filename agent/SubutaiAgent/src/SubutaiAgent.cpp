@@ -107,6 +107,7 @@ int main(int argc,char *argv[],char *envp[])
     string input = "";
     string sendout;
     deque<string> commandIdsList;
+    bool heartbeatInterruptFlag = false;
 
     if (!thread.getUserID().checkRootUser()) {
         //user is not root SubutaiAgent Will be closed
@@ -241,7 +242,7 @@ int main(int argc,char *argv[],char *envp[])
     /*
      * Send initial heartbeat for registration of resource host and container nodes attached to this host.
      */
-    timer.sendHeartBeat();
+    timer.sendHeartBeat(false, &heartbeatInterruptFlag);
     logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Sending first heartbeat.."));
     while(true)
     {
@@ -250,7 +251,7 @@ int main(int argc,char *argv[],char *envp[])
             /*
              * In 30 second periods send heartbeat and in_queue responses.
              */
-            timer.checkHeartBeatTimer(command);
+            timer.checkHeartBeatTimer(command, pidList, &heartbeatInterruptFlag);
             timer.checkCommandQueueInfoTimer(command);
             command.clear();
             for (list<int>::iterator iter = pidList.begin(); iter != pidList.end(); iter++) {
@@ -277,8 +278,10 @@ int main(int argc,char *argv[],char *envp[])
                 connection->resetMessageStatus(); //reseting message status
                 input = connection->getMessage(); //fetching message..
                 logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Fetched Message:",input));
+                cout << "Message fetched from activemq" << endl;
 
                 if (command.deserialize(input))	{  //deserialize the message
+                	cout << "Deserializing msg" << endl;
                     logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>","New Message is received"));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","New Message:", input));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request type:", command.getType()));
@@ -301,17 +304,19 @@ int main(int argc,char *argv[],char *envp[])
                     }
 
                     if (!isCommandNew) {
+                    	cout << "command is not new" << endl;
                         continue;
                     } else {
+                    	cout << "new command!!! Adding.." << endl;
                         commandIdsList.push_back(command.getCommandId());
                         // Remove first command if amount of commands has exceeded maximum size
                         if (commandIdsList.size() > COMMAND_ID_MAX) {
+                        	cout << "command line is full." << endl;
                             commandIdsList.pop_front();
                         }
                     }
 
                     // Check if this uuid belongs the resource host or one of child containers
-                    bool isLocal = true;
                     SubutaiContainer* target_container;
                     if (hasLxc) {
                         target_container = cman.findContainerById(command.getUuid());
@@ -319,7 +324,6 @@ int main(int argc,char *argv[],char *envp[])
 
                     if (hasLxc && target_container) {
                         logMain.writeLog(3, logMain.setLogData("<SubutaiAgent>", "Container received a command to execute"));
-                        isLocal = false;
                     } else {
                         logMain.writeLog(3, logMain.setLogData("<SubutaiAgent>", "Resource host received command to execute"));
                     }
@@ -332,12 +336,14 @@ int main(int argc,char *argv[],char *envp[])
 
                     if (command.getType() == "EXECUTE_REQUEST")	//execution request will be executed in other process.
                     {
+                    	cout << "it is execute, write to file: " << command.getCommand() << endl;
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Received Message to internal currentProcess!"));
                         fstream file;	//opening commandQueue.txt
                         file.open("/etc/subutai-agent/commandQueue.txt",fstream::in | fstream::out | fstream::app);
                         file << input;
                         file.close();
                     } else if (command.getType()=="PS_REQUEST") {
+                    	cout << "it is ps req" << endl;
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","PS execution operation is starting.."));
                         SubutaiThread* subprocess = new SubutaiThread;
                         subprocess->getLogger().setLogLevel(logMain.getLogLevel());
@@ -359,6 +365,7 @@ int main(int argc,char *argv[],char *envp[])
                     }
                     else if (command.getType() == "TERMINATE_REQUEST")
                     {
+                    	cout << "it is terminate" << endl;
                         int retstatus; string resp;
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Termination request ID:",helper.toString(command.getPid())));
 
@@ -380,6 +387,7 @@ int main(int argc,char *argv[],char *envp[])
                     }
                     else if (command.getType()=="SET_INOTIFY_REQUEST")
                     {
+                    	cout << "it is set_inotify" << endl;
                         string preArg = "";
                         if(target_container) preArg = "/var/lib/lxc/" + target_container->getContainerHostnameValue() + "/rootfs";
 
@@ -397,6 +405,7 @@ int main(int argc,char *argv[],char *envp[])
                     }
                     else if (command.getType() == "UNSET_INOTIFY_REQUEST")
                     {
+                    	cout << "it is unset_inotify" << endl;
                         string preArg = "";
                         if(target_container) preArg = "/var/lib/lxc/" + target_container->getContainerHostnameValue() + "/rootfs";
 
@@ -413,6 +422,7 @@ int main(int argc,char *argv[],char *envp[])
                         Watcher.stats();
                     }
                     else if (command.getType() == "LIST_INOTIFY_REQUEST") {
+                    	cout << "it is list_inotify" << endl;
                         logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "executing INOTIFY_SHOW_REQUEST.."));
                         Watcher.stats();
                         sendout = response.createInotifyShowMessage(environment.getAgentUuidValue(), command.getCommandId(), response.getConfPoints());
@@ -420,10 +430,15 @@ int main(int argc,char *argv[],char *envp[])
                         Watcher.stats();
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Sending Inotify Show Message: ", sendout));
                     }
+                    else{
+                    	cout << "Unknown command type...... " << command.getType() << endl;
+                    }
                 }
                 else {
+                	cout << "couldnt deserialize" << endl;
                     logMain.writeLog(3, logMain.setLogData("<SubutaiAgent>","Failed to parsing JSON String: ", input));
                     if (input.size() >= 10000) {
+                    	cout << "Request Size is greater than Maximum Size" << endl;
                         connection->sendMessage(response.createResponseMessage(environment.getAgentUuidValue(), 9999999,
                                     command.getRequestSequenceNumber(), 1,
                                     "Request Size is greater than Maximum Size", "", command.getCommandId()));
@@ -431,6 +446,7 @@ int main(int argc,char *argv[],char *envp[])
                                     command.getRequestSequenceNumber(), 2,
                                     command.getCommandId(), 1));
                     } else {
+                    	cout << "Request is not a valid JSON string" << endl;
                         connection->sendMessage(response.createResponseMessage(environment.getAgentUuidValue(),9999999,
                                     command.getRequestSequenceNumber(),1,
                                     "Request is not a valid JSON string","",command.getCommandId()));
@@ -440,7 +456,11 @@ int main(int argc,char *argv[],char *envp[])
                     }
                 }
             } else {
-                if (currentProcess < ncores) {
+            	if(heartbeatInterruptFlag)
+            	{
+            		cout<< "*******************Heartbeat is waiting to update list. Don't run any more commands until it sends heartbeat.*******************" << endl;
+            	}
+            	else if (currentProcess < ncores) {
                     ifstream file2("/etc/subutai-agent/commandQueue.txt");
                     if (file2.peek() != ifstream::traits_type::eof()) {
                         ofstream file3("/etc/subutai-agent/commandQueue2.txt");
@@ -458,6 +478,7 @@ int main(int argc,char *argv[],char *envp[])
                             SubutaiThread* subprocess = new SubutaiThread;
                             subprocess->getLogger().setLogLevel(logMain.getLogLevel());
                             SubutaiContainer* target_container = cman.findContainerById(command.getUuid());
+                            cout << command.getCommand() << endl;
                             pidList.push_back(subprocess->threadFunction(&messageQueue, &command, argv, target_container));
                             currentProcess++;
                             delete subprocess;

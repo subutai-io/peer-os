@@ -30,21 +30,21 @@ using namespace std;
  */
 SubutaiTimer::SubutaiTimer(SubutaiLogger log, SubutaiEnvironment* env, SubutaiContainerManager* cont, SubutaiConnection* conn)
 {
-    start 			=  	boost::posix_time::second_clock::local_time();
+    start 				=  	boost::posix_time::second_clock::local_time();
     startQueue			=  	boost::posix_time::second_clock::local_time();
-    exectimeout 		=  	30;
-    queuetimeout 		=  	30;
+    exectimeout 		=  	10;
+    queuetimeout 		=  	10;
     startsec  			=  	start.time_of_day().seconds();
     startsecQueue		=  	start.time_of_day().seconds();
     overflag 			=  	false;
     overflagQueue		=  	false;
-    count 			=  	1;
+    count 				=  	1;
     countQueue			=  	1;
-    logMain		 	=	log;
+    logMain		 		=	log;
     response 			= 	new SubutaiResponsePack();
     connection			= 	conn;
     environment 		=	env;
-    containerManager 	        = 	cont;
+    containerManager 	= 	cont;
 }
 
 /**
@@ -102,7 +102,7 @@ bool SubutaiTimer::checkExecutionTimeout(unsigned int* startsec,bool* overflag,u
 }
 
 
-void SubutaiTimer::sendHeartBeat()
+void SubutaiTimer::sendHeartBeat(bool lxcCommandInProgress,  bool* heartbeatIntFlag)
 {
     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Starting collecting of HEARTBEAT data"));
     response->clear();
@@ -113,7 +113,18 @@ void SubutaiTimer::sendHeartBeat()
     /*
      * Update each field of container nodes and set for each heartbeat message
      */
-    containerManager->updateContainerLists();
+    if(!lxcCommandInProgress)
+    {
+    	*heartbeatIntFlag = true;
+    	cout << "No lxc command, update container list." << endl;
+    	containerManager->updateContainerLists();
+    	*heartbeatIntFlag = false;
+    }
+    else
+    {
+    	cout << "**************************Lxc command found, don't update container list for heartbeat*************************" << endl;
+    	*heartbeatIntFlag = true;
+    }
 
     response->setInterfaces(environment->getAgentInterfaceValues());
     response->setHostname(environment->getAgentHostnameValue());
@@ -122,18 +133,39 @@ void SubutaiTimer::sendHeartBeat()
     string resp = response->createHeartBeatMessage(environment->getAgentUuidValue(), environment->getAgentHostnameValue());
     connection->sendMessage(resp, "HEARTBEAT_TOPIC");
 
-    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "HeartBeat:", resp));
+   // logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "HeartBeat:", resp));
 }
 
-bool SubutaiTimer::checkHeartBeatTimer(SubutaiCommand command)
+/*
+ * This method checks the running commands if there is a lxc command running or not.
+ * If Lxc command is in progress send latest Heartbeat.
+ * We cannot tr to get lxc information when some operation on lxc is in progress.
+ *
+ */
+bool SubutaiTimer::checkIfLxcCommandInProgress(list<int> pidList)
+{
+	FILE* file = popen("ps aux | grep destroy | grep -v grep", "r");
+	char buffer[1000];
+	while ( fgets( buffer, 1000, file))
+	{
+		cout << "entry found: " << buffer << endl;
+		return true;
+	}
+	pclose(file);
+
+	return false;
+}
+
+bool SubutaiTimer::checkHeartBeatTimer(SubutaiCommand command, list<int> pidList, bool* heartbeatIntFlag)
 {
     if (checkExecutionTimeout(&startsec, &overflag, &exectimeout, &count)) //checking Default Timeout
     {
-        sendHeartBeat();
+
+        sendHeartBeat(checkIfLxcCommandInProgress(pidList), heartbeatIntFlag);
         start =         boost::posix_time::second_clock::local_time();	//Reset Default Timeout value
         startsec =      start.time_of_day().seconds();
         overflag =      false;
-        exectimeout =   30;
+        exectimeout =   10;
         count =         1;
 
         return true;
@@ -170,7 +202,7 @@ bool SubutaiTimer::checkCommandQueueInfoTimer(SubutaiCommand command)
         startQueue =            boost::posix_time::second_clock::local_time();	//Reset Default Timeout values
         startsecQueue  =        startQueue.time_of_day().seconds();
         overflagQueue =         false;
-        queuetimeout =          30;
+        queuetimeout =          10;
         countQueue =            1;
 
 

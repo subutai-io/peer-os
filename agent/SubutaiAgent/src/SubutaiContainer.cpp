@@ -114,8 +114,8 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
     }
     containerLogger->writeLog(6, containerLogger->setLogData(
                 _logEntry,
-                program + " executed. Exit code: " + _helper.toString(result.exit_code)
-                + ", out stream: " + result.out + ", err stream: " + result.err));
+                program + " executed. Exit code: " + _helper.toString(result.exit_code)));
+    //            + ", out stream: " + result.out + ", err stream: " + result.err));
     return result;
 }
 
