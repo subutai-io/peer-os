@@ -163,20 +163,18 @@ string SubutaiEnvironment::getAgentArch() {
     } else {
         std::string arch(info.machine);
         std::transform(arch.begin(), arch.end(), arch.begin(), ::toupper);
-        environmentLogger->writeLog(7, environmentLogger->setLogData("<SubutaiAgent>", "Machine architecture:", arch));
+        //environmentLogger->writeLog(7, environmentLogger->setLogData("<SubutaiAgent>", "Machine architecture:", arch));
         return arch;
     }
 }
 
 
 /**
- *  \details   IpAddress of the KiskisAgent machine is fetched from statically.
+ *  \details   IpAddress of the SubutaiAgent machine is fetched from statically.
  */
 bool SubutaiEnvironment::getAgentInterfaces()
 {
 	interfaces.clear();
-
-	environmentLogger->writeLog(1, environmentLogger->setLogData("<SubutaiContainer>", "Run ifconfig on resource host"));
 	FILE * fp = popen("ifconfig", "r");
 	if (fp)
 	{
@@ -219,7 +217,7 @@ bool SubutaiEnvironment::getAgentInterfaces()
 	    			struct Interface interface_n;
 	    			interface_n.name = nic; interface_n.mac = address; interface_n.ip = ip;
 	    			interfaces.push_back(interface_n);
-	    			environmentLogger->writeLog(1, environmentLogger->setLogData("<SubutaiContainer>", "Adding interface: " + nic + " " + address + " " + ip));
+	    			//environmentLogger->writeLog(7, environmentLogger->setLogData("<SubutaiContainer>", "Adding interface: " + nic + " " + address + " " + ip));
 				    found_mac = false; found_ip = false; found_name = false; nic = ""; address = ""; ip = "";
 	    		}
 	    	}

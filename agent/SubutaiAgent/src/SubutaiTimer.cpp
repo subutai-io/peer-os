@@ -104,25 +104,36 @@ bool SubutaiTimer::checkExecutionTimeout(unsigned int* startsec,bool* overflag,u
 
 void SubutaiTimer::sendHeartBeat(bool lxcCommandInProgress,  bool* heartbeatIntFlag)
 {
-    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Starting collecting of HEARTBEAT data"));
     response->clear();
     /*
-     * Refresh new agent ip address set for each heartbeat message
+     * Refresh new agent ip address set for each heart beat message
      */
     environment->getAgentInterfaces();
     /*
-     * Update each field of container nodes and set for each heartbeat message
+     * Update each field of container nodes and set for each heart beat message
+     * If lxc destruction command is in progress, wait until it finishes.
+     * If they run at the same time, list_all containers method will try to access
+     * 			the fields of a container, which is destroyed -> Causes segmentation fault.
      */
     if(!lxcCommandInProgress)
     {
+    	//When update container list starts, it blocks execution of system requests.
     	*heartbeatIntFlag = true;
-    	cout << "No lxc command, update container list." << endl;
     	containerManager->updateContainerLists();
+    	//When update container list finishes, it unlocks the execution of system requests.
     	*heartbeatIntFlag = false;
     }
     else
     {
-    	cout << "**************************Lxc command found, don't update container list for heartbeat*************************" << endl;
+    	/*
+    	 * If an lxc destruction command is in progress, don't try to get any information about the containers.
+    	 * Send the existing information.
+    	 *
+    	 * Update list when the current execution finishes.
+    	 *
+    	 */
+    	logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Lxc destruction command is in progress, ",
+    			"wait until it is finished to update container list for heartbeat"));
     	*heartbeatIntFlag = true;
     }
 
@@ -133,7 +144,8 @@ void SubutaiTimer::sendHeartBeat(bool lxcCommandInProgress,  bool* heartbeatIntF
     string resp = response->createHeartBeatMessage(environment->getAgentUuidValue(), environment->getAgentHostnameValue());
     connection->sendMessage(resp, "HEARTBEAT_TOPIC");
 
-   // logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "HeartBeat:", resp));
+    logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "HEARTBEAT is sent."));
+    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", resp));
 }
 
 /*
@@ -189,12 +201,12 @@ bool SubutaiTimer::checkCommandQueueInfoTimer(SubutaiCommand command)
                 {
                     string resp = response->createInQueueMessage(environment->getAgentUuidValue(), command.getCommandId());
                     connection->sendMessage(resp);
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "IN_QUEUE Response:", resp));
+                    logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "IN_QUEUE Response:", command.getCommandId()));
+                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", resp));
                 }
                 else
                 {
-                    cout << "error!!" <<endl;
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Fetched Element:",queueElement));
+                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Cannot deserialize: ",queueElement));
                 }
             }
         }
