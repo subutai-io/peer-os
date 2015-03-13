@@ -5,15 +5,15 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 @Command( scope = "peer", name = "get-reserved-vni" )
-public class GetReservedVnisCommand extends OsgiCommandSupport
+public class GetReservedVnisCommand extends SubutaiShellCommandSupport
 {
     @Argument( index = 0, name = "peerId", multiValued = false, required = true, description = "Peer ID" )
     private String peerId;

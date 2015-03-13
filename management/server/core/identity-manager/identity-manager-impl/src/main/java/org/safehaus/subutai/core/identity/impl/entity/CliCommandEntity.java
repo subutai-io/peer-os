@@ -72,4 +72,31 @@ public class CliCommandEntity implements CliCommand
     {
         return String.format( "%s:%s", scope, name );
     }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof CliCommandEntity ) )
+        {
+            return false;
+        }
+
+        final CliCommandEntity that = ( CliCommandEntity ) o;
+
+        return name.equals( that.name ) && scope.equals( that.scope );
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        int result = scope.hashCode();
+        result = 31 * result + name.hashCode();
+        return result;
+    }
 }

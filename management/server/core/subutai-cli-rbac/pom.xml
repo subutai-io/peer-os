@@ -9,7 +9,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>karaf-cli-fragment</artifactId>
+  <artifactId>subutai-cli-rbac</artifactId>
 
   <dependencies>
     <dependency>
@@ -26,11 +26,7 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.ops4j.pax.runner</groupId>
-      <artifactId>pax-runner-no-jcl</artifactId>
-      <version>1.7.4</version>
-    </dependency>
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
@@ -44,7 +40,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.core.karaf.fragment</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.identity.rbac.cli</Bundle-SymbolicName>
             <Bundle-Version>${project.version}</Bundle-Version>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true

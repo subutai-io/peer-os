@@ -56,6 +56,7 @@ public class RoleForm extends VerticalLayout
         {
             setItemCaptionMode( ItemCaptionMode.PROPERTY );
             setItemCaptionPropertyId( "restEndpoint" );
+            setWidth( 600, Unit.PIXELS );
             setImmediate( true );
             setSpacing( true );
             setRequired( true );
@@ -69,6 +70,7 @@ public class RoleForm extends VerticalLayout
         {
             setItemCaptionMode( ItemCaptionMode.PROPERTY );
             setItemCaptionPropertyId( "name" );
+            setWidth( 400, Unit.PIXELS );
             setImmediate( true );
             setSpacing( true );
             setRequired( true );
@@ -82,6 +84,7 @@ public class RoleForm extends VerticalLayout
         {
             setItemCaptionMode( ItemCaptionMode.PROPERTY );
             setItemCaptionPropertyId( "moduleName" );
+            setWidth( 400, Unit.PIXELS );
             setImmediate( true );
             setSpacing( true );
             setRequired( false );
@@ -95,6 +98,7 @@ public class RoleForm extends VerticalLayout
         {
             setItemCaptionMode( ItemCaptionMode.PROPERTY );
             setItemCaptionPropertyId( "command" );
+            setWidth( 500, Unit.PIXELS );
             setImmediate( true );
             setSpacing( true );
             setRequired( false );
@@ -147,8 +151,14 @@ public class RoleForm extends VerticalLayout
         HorizontalLayout buttons = new HorizontalLayout( saveButton, cancelButton, removeButton );
         buttons.setSpacing( true );
 
+        HorizontalLayout selectorsGroupA = new HorizontalLayout( permissionsSelector, modulesSelector );
+        selectorsGroupA.setSpacing( true );
+
+        HorizontalLayout selectorsGroupB = new HorizontalLayout( restEndpointsSelector, commandsSelector );
+        selectorsGroupB.setSpacing( true );
+
         final FormLayout form = new FormLayout();
-        form.addComponents( name, permissionsSelector, modulesSelector, restEndpointsSelector, commandsSelector );
+        form.addComponents( name, selectorsGroupA, selectorsGroupB );
 
         addComponents( form, buttons );
 

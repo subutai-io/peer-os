@@ -98,7 +98,7 @@
 
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>karaf-cli-fragment</artifactId>
+        <artifactId>subutai-cli-rbac</artifactId>
         <version>${project.version}</version>
       </dependency>
 

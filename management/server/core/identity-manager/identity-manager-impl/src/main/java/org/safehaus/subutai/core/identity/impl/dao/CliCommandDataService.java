@@ -29,7 +29,7 @@ public class CliCommandDataService implements DataService<CliCommandPK, CliComma
 
     public CliCommandDataService( final EntityManagerFactory emf )
     {
-        Preconditions.checkNotNull( emf, "Please provide valid entity manager factory for Permissions data service" );
+        Preconditions.checkNotNull( emf, "Please provide valid entity manager factory for CliCommands data service" );
         this.emf = emf;
     }
 
@@ -49,7 +49,7 @@ public class CliCommandDataService implements DataService<CliCommandPK, CliComma
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error retrieving all permissions", e );
+            LOGGER.error( "Error retrieving all cli commands", e );
             if ( em.getTransaction().isActive() )
             {
                 em.getTransaction().rollback();
@@ -88,7 +88,7 @@ public class CliCommandDataService implements DataService<CliCommandPK, CliComma
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error looking for Permission", e );
+            LOGGER.error( "Error looking for CliCommands", e );
             if ( em.getTransaction().isActive() )
             {
                 em.getTransaction().rollback();
@@ -117,7 +117,7 @@ public class CliCommandDataService implements DataService<CliCommandPK, CliComma
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error while persisting permission.", e );
+            LOGGER.error( "Error while persisting cli command.", e );
             if ( em.getTransaction().isActive() )
             {
                 em.getTransaction().rollback();
@@ -147,7 +147,7 @@ public class CliCommandDataService implements DataService<CliCommandPK, CliComma
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error while removing permission.", e );
+            LOGGER.error( "Error while removing cli command.", e );
             if ( em.getTransaction().isActive() )
             {
                 em.getTransaction().rollback();
@@ -172,7 +172,7 @@ public class CliCommandDataService implements DataService<CliCommandPK, CliComma
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error while merging permission.", e );
+            LOGGER.error( "Error while merging cli command.", e );
             if ( em.getTransaction().isActive() )
             {
                 em.getTransaction().rollback();

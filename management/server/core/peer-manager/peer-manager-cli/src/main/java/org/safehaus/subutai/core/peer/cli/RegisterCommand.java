@@ -3,17 +3,17 @@ package org.safehaus.subutai.core.peer.cli;
 
 import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.util.UUIDUtil;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
  * Created by bahadyr on 8/28/14.
  */
 @Command( scope = "peer", name = "register" )
-public class RegisterCommand extends OsgiCommandSupport
+public class RegisterCommand extends SubutaiShellCommandSupport
 {
 
     private PeerManager peerManager;

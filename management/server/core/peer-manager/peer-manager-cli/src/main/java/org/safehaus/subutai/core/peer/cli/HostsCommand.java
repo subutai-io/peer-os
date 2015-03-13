@@ -9,6 +9,7 @@ import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.User;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -17,11 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 @Command( scope = "peer", name = "hosts" )
-public class HostsCommand extends OsgiCommandSupport
+public class HostsCommand extends SubutaiShellCommandSupport
 {
     private static Logger log = LoggerFactory.getLogger( HostsCommand.class );
     DateFormat fmt = new SimpleDateFormat( "dd.MM.yy HH:mm:ss.SS" );

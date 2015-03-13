@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.karaf.fragment;
+package org.safehaus.subutai.core.identity.rbac.cli;
 
 
 import java.util.Set;
@@ -19,9 +19,15 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Created by talas on 3/12/15.
  */
-public abstract class SubutaiCommandSupport extends OsgiCommandSupport
+
+
+/**
+ * Filters out karaf user shell command accessibility according to his/her role permission Check is made upon existence
+ * of a command pattern in identity registry
+ */
+public abstract class SubutaiShellCommandSupport extends OsgiCommandSupport
 {
-    private static final Logger LOG = LoggerFactory.getLogger( SubutaiCommandSupport.class );
+    private static final Logger LOG = LoggerFactory.getLogger( SubutaiShellCommandSupport.class );
 
 
     @Override
@@ -30,7 +36,7 @@ public abstract class SubutaiCommandSupport extends OsgiCommandSupport
         try
         {
             Command command = this.getClass().getAnnotation( Command.class );
-            LOG.warn( String.format( "Executing command: %s:%s", command.scope(), command.name() ) );
+            LOG.debug( String.format( "Executing command: %s:%s", command.scope(), command.name() ) );
 
             this.session = session;
             IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
@@ -50,6 +56,7 @@ public abstract class SubutaiCommandSupport extends OsgiCommandSupport
                     }
                 }
             }
+            LOG.warn( "Access denied." );
             return null;
         }
         finally
