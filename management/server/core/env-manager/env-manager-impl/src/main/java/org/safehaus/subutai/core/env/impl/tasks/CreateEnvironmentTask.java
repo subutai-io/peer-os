@@ -56,6 +56,9 @@ public class CreateEnvironmentTask implements Runnable
         {
             Set<Peer> allPeers = Sets.newHashSet( topology.getNodeGroupPlacement().keySet() );
 
+            //exchange environment certificates
+            environmentManager.setupEnvironmentTunnel( environment.getId(), allPeers );
+
             //check availability of subnet
             Map<Peer, Set<Gateway>> usedGateways = environmentManager.getUsedGateways( allPeers );
 

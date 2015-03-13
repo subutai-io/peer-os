@@ -25,7 +25,7 @@ _subutai()
                 clone | demote | destroy | publish | export | unregister)
                     COMPREPLY=($(compgen -W "${template_list}" ${cur}))
                     ;;
-                promote)
+                promote | start | stop)
                     COMPREPLY=($(compgen -W "${container_list}" ${cur}))
                     ;;
                 list)
@@ -50,7 +50,7 @@ _subutai()
                 clone | demote | destroy | publish | export | unregister)
                     COMPREPLY=($(compgen -W "${template_list}" ${cur}))
                     ;;
-                promote)
+                promote | start | stop)
                     COMPREPLY=($(compgen -W "${container_list}" ${cur}))
                     ;;
                 list)
