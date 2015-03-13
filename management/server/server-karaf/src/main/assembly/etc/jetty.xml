@@ -65,6 +65,8 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
       </New>
     </Arg>
   </Call>
+  <!-- =========================================================== -->
+  <!-- One way SSL for peer Handshake -->
   <Call name="addConnector">
     <Arg>
       <New class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
@@ -83,6 +85,8 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
     </Arg>
   </Call>
 
+  <!-- =========================================================== -->
+  <!-- Mutual SSL  Peer and Environment Management -->
   <Call name="addConnector">
     <Arg>
       <New class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
@@ -99,6 +103,25 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
           </New>
         </Arg>
         <Set name="port">8544</Set>
+        <Set name="maxIdleTime">30000</Set>
+      </New>
+    </Arg>
+  </Call>
+
+  <!-- =========================================================== -->
+  <!-- One way SSL for user tokens channel -->
+  <Call name="addConnector">
+    <Arg>
+      <New class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
+        <Arg>
+          <New class="org.eclipse.jetty.http.ssl.SslContextFactory">
+            <Set name="KeyStore">/var/lib/subutai/keystores/keystore_special_px1.jks</Set>
+            <Set name="certAlias">root_special_px1</Set>
+            <Set name="KeyStorePassword">subutai</Set>
+            <Set name="needClientAuth">false</Set>
+          </New>
+        </Arg>
+        <Set name="port">8552</Set>
         <Set name="maxIdleTime">30000</Set>
       </New>
     </Arg>
