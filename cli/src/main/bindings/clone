@@ -110,9 +110,17 @@ function clone {
 
   #cloning operation is starting..
   lxc_clone $parent $child $environmentId "`clone_usage`"
-
   ovs_configure_lxc $child
+
+  if [ "$network_interface_enabled" == "true" ]; then
+     subutai network $child -s ${interfaceProperties//\"} #"192.168.3.2/24 100" varible should be like this
+  fi
+ 
+  #starting lxc in this method 
   git_child_branch $child
+
+  #restarting ssh service in upstart
+  (lxc-attach -n $child -- service ssh restart) > /dev/null 2>&1
 
   if [ "x$postScriptsEnabled" == "xtrue" ]; then
     if [ "x$postScripts" == "xall" ]; then
@@ -143,12 +151,6 @@ function clone {
 
   if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
 
-  if [ "$network_interface_enabled" == "true" ]; then
-     subutai network $child -s ${interfaceProperties//\"} #"192.168.3.2/24 100" varible should be like this
-     #restart the container to get container ip online
-     lxc-stop -n $child
-     lxc-start -n $child -d
-  fi
 }
 
 function clone_description {

@@ -1,0 +1,76 @@
+#!/bin/bash
+
+
+function start_usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Start a Container
+  echo
+  echo "        "subutai start container
+  echo
+  echo -----------------------------------------------------------------------
+}
+
+
+function start {
+  if [ "`is_system_locked`" == "true" ]
+  then
+     msg_error "System locked by a subutai process"
+     exit 1
+  fi
+
+  OPTIND=0
+  if [ "$1" == "start" ]; then
+    shift
+  fi
+
+  local lxc="$1"
+
+  if [ "`are_containers_readable $lxc`" == "true" ]
+  then
+     msg_error "Container(s) locked by a subutai process"
+     exit 1
+  fi
+
+  lock_container_read $lxc
+  if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
+
+  # The master is already a template
+  if [ "$lxc" == "master" ]; then
+    msg_error "The master is a template. Aborting ..."
+    unlock_container_read $lxc
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+    exit 1
+  fi
+
+  # ---------------------------------------------------------------------------
+  # (1) perform some sanity checks
+  # ---------------------------------------------------------------------------
+  lxc_assert $lxc
+
+  # check to make sure the container is NOT already a template
+  if [ "`fs_is_template $lxc`" == "true" ]; then
+    msg_error "Container \"$lxc\" is a template. Aborting ..."
+    unlock_container_read $lxc
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+    exit 1
+  else
+    msg_info "    - check passed: \"$lxc\" is NOT a template"
+  fi
+
+  # start container if it is stopped
+  if [ -z "`lxc-ls --running | grep $lxc`" ]; then
+    lxc-start -n $lxc -d
+    lxc-wait -n $lxc -s RUNNING
+    #Delay for system initialization
+    sleep 1
+    #Restart ssh service
+    (lxc-attach -n $lxc -- service ssh start) > /dev/null 2>&1
+  fi
+
+  unlock_container_read $lxc
+  if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+}
+
+function start_description {
+  echo starts a container with network configuration
+}
