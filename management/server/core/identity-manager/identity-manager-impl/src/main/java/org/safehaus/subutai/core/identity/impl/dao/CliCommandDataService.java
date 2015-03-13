@@ -43,7 +43,8 @@ public class CliCommandDataService implements DataService<CliCommandPK, CliComma
         try
         {
             em.getTransaction().begin();
-            result = em.createQuery( "SELECT p FROM CliCommandEntity p", CliCommandEntity.class ).getResultList();
+            result = em.createQuery( "SELECT p FROM CliCommandEntity p ORDER BY p.scope, p.name",
+                    CliCommandEntity.class ).getResultList();
             em.getTransaction().commit();
         }
         catch ( Exception e )

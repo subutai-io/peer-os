@@ -1,13 +1,12 @@
 package org.safehaus.subutai.core.identity.ui.tabs;
 
 
-import java.util.HashSet;
-
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.PermissionGroup;
 import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.ui.tabs.subviews.RoleForm;
 
+import com.google.common.collect.Sets;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
@@ -71,7 +70,7 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
 
         // Create a form for editing a selected or new item.
         // It is invisible until actually used.
-        form = new RoleForm( this, new HashSet<>( identityManager.getAllPermissions() ),
+        form = new RoleForm( this, Sets.newHashSet( identityManager.getAllPermissions() ),
                 identityManager.getAllPortalModules(), identityManager.getAllRestEndpoints(),
                 identityManager.getAllCliCommands() );
         form.setVisible( false );

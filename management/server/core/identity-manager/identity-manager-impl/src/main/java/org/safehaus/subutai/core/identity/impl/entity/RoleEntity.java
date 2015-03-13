@@ -1,7 +1,9 @@
 package org.safehaus.subutai.core.identity.impl.entity;
 
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Access;
@@ -64,7 +66,7 @@ public class RoleEntity implements Role
 
     @OneToMany( fetch = FetchType.EAGER, cascade = CascadeType.ALL )
     @Column( name = "accessible_cli_commands" )
-    Set<CliCommandEntity> cliCommands = new HashSet<>();
+    List<CliCommandEntity> cliCommands = new ArrayList<>();
 
 
     public RoleEntity()
@@ -136,9 +138,9 @@ public class RoleEntity implements Role
 
 
     @Override
-    public Set<CliCommand> getCliCommands()
+    public List<CliCommand> getCliCommands()
     {
-        Set<CliCommand> cliCommandSet = new HashSet<>();
+        List<CliCommand> cliCommandSet = new ArrayList<>();
         cliCommandSet.addAll( cliCommands );
         return cliCommandSet;
     }
@@ -155,7 +157,7 @@ public class RoleEntity implements Role
 
 
     @Override
-    public void setCliCommands( final Set<CliCommand> cliCommands )
+    public void setCliCommands( final List<CliCommand> cliCommands )
     {
         this.cliCommands.clear();
         for ( final CliCommand cliCommand : cliCommands )

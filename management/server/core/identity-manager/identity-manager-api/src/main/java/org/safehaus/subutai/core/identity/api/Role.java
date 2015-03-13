@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.identity.api;
 
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 
@@ -18,11 +19,11 @@ public interface Role extends Serializable
 
     public void removePermission( Permission permission );
 
-    public Set<CliCommand> getCliCommands();
+    public List<CliCommand> getCliCommands();
 
     public void addCliCommand( CliCommand cliCommand );
 
-    public void setCliCommands( Set<CliCommand> cliCommands );
+    public void setCliCommands( List<CliCommand> cliCommands );
 
     public void addPortalModule( PortalModuleScope portalModule );
 

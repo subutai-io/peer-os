@@ -660,9 +660,9 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
 
 
     @Override
-    public Set<CliCommand> getAllCliCommands()
+    public List<CliCommand> getAllCliCommands()
     {
-        Set<CliCommand> cliCommands = new HashSet<>();
+        List<CliCommand> cliCommands = new ArrayList<>();
         cliCommands.addAll( cliCommandDataService.getAll() );
         return cliCommands;
     }

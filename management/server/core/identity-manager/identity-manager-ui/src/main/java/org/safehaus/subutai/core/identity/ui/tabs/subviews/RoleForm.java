@@ -1,8 +1,11 @@
 package org.safehaus.subutai.core.identity.ui.tabs.subviews;
 
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.safehaus.subutai.core.identity.api.CliCommand;
@@ -48,7 +51,7 @@ public class RoleForm extends VerticalLayout
     };
 
 
-    private TwinColSelect restEndpointsSelector = new TwinColSelect()
+    private TwinColSelect restEndpointsSelector = new TwinColSelect( "Accessible rest endpoints" )
     {
         {
             setItemCaptionMode( ItemCaptionMode.PROPERTY );
@@ -61,7 +64,7 @@ public class RoleForm extends VerticalLayout
     };
 
 
-    private TwinColSelect permissionsSelector = new TwinColSelect()
+    private TwinColSelect permissionsSelector = new TwinColSelect( "System Permissions" )
     {
         {
             setItemCaptionMode( ItemCaptionMode.PROPERTY );
@@ -91,7 +94,7 @@ public class RoleForm extends VerticalLayout
     {
         {
             setItemCaptionMode( ItemCaptionMode.PROPERTY );
-            setItemCaptionPropertyId( "toString" );
+            setItemCaptionPropertyId( "command" );
             setImmediate( true );
             setSpacing( true );
             setRequired( false );
@@ -102,7 +105,7 @@ public class RoleForm extends VerticalLayout
 
     public RoleForm( TabCallback<BeanItem<Role>> callback, Set<Permission> permissions,
                      final Set<PortalModuleScope> allPortalModules, final Set<RestEndpointScope> allRestEndpoints,
-                     final Set<CliCommand> allCliCommands )
+                     final List<CliCommand> allCliCommands )
     {
         init();
         BeanContainer<String, Permission> permissionsContainer = new BeanContainer<>( Permission.class );
@@ -125,10 +128,10 @@ public class RoleForm extends VerticalLayout
         restEndpointsSelector.setItemCaptionPropertyId( "restEndpoint" );
 
         BeanContainer<String, CliCommand> cliCommandBeanContainer = new BeanContainer<>( CliCommand.class );
-        cliCommandBeanContainer.setBeanIdProperty( "toString" );
+        cliCommandBeanContainer.setBeanIdProperty( "command" );
         cliCommandBeanContainer.addAll( allCliCommands );
-        commandsSelector.setContainerDataSource( restEndpointsContainer );
-        commandsSelector.setItemCaptionPropertyId( "toString" );
+        commandsSelector.setContainerDataSource( cliCommandBeanContainer );
+        commandsSelector.setItemCaptionPropertyId( "command" );
 
         this.callback = callback;
     }
@@ -180,12 +183,19 @@ public class RoleForm extends VerticalLayout
             modulesSelector.setValue( modules );
 
 
-            Set<String> endpoints = new HashSet<>();
+            List<String> endpoints = new ArrayList<>();
             for ( final RestEndpointScope endpointScope : roleBean.getAccessibleRestEndpoints() )
             {
                 endpoints.add( endpointScope.getRestEndpoint() );
             }
             restEndpointsSelector.setValue( endpoints );
+
+            Set<String> cliCommands = new HashSet<>();
+            for ( final CliCommand cliCommand : roleBean.getCliCommands() )
+            {
+                cliCommands.add( cliCommand.getCommand() );
+            }
+            commandsSelector.setValue( cliCommands );
 
             if ( !newValue )
             {
@@ -236,6 +246,14 @@ public class RoleForm extends VerticalLayout
                     {
                         BeanItem beanItem = ( BeanItem ) restEndpointsSelector.getItem( moduleName );
                         role.addRestEndpointScope( ( RestEndpointScope ) beanItem.getBean() );
+                    }
+
+                    role.setCliCommands( Collections.<CliCommand>emptyList() );
+                    Collection<String> selectedCommands = ( Collection<String> ) commandsSelector.getValue();
+                    for ( final String command : selectedCommands )
+                    {
+                        BeanItem beanItem = ( BeanItem ) commandsSelector.getItem( command );
+                        role.addCliCommand( ( CliCommand ) beanItem.getBean() );
                     }
 
                     callback.saveOperation( permissionFieldGroup.getItemDataSource(), newValue );

@@ -146,9 +146,9 @@ public interface IdentityManager
     /**
      * Get all available cli commands registered in system
      *
-     * @return - set of {@code CliCommand} interface objects
+     * @return - list of {@code CliCommand} interface objects
      */
-    public Set<CliCommand> getAllCliCommands();
+    public List<CliCommand> getAllCliCommands();
 
     /**
      * Create sample {@code CliCommand} instance of CliCommandEntity with intention of usability for further db CRUD

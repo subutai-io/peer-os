@@ -12,4 +12,6 @@ public interface CliCommand extends Serializable
     public String getScope();
 
     public String getName();
+
+    public String getCommand();
 }
