@@ -120,7 +120,6 @@ function clone {
   git_child_branch $child
 
   #restarting ssh service in upstart
-  sleep 3
   (lxc-attach -n $child -- service ssh restart) > /dev/null 2>&1
 
   if [ "x$postScriptsEnabled" == "xtrue" ]; then

@@ -61,7 +61,9 @@ function start {
   if [ -z "`lxc-ls --running | grep $lxc`" ]; then
     lxc-start -n $lxc -d
     lxc-wait -n $lxc -s RUNNING
-    sleep 3
+    #Delay for system initialization
+    sleep 1
+    #Restart ssh service
     (lxc-attach -n $lxc -- service ssh start) > /dev/null 2>&1
   fi
 
