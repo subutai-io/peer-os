@@ -45,6 +45,7 @@ SubutaiTimer::SubutaiTimer(SubutaiLogger log, SubutaiEnvironment* env, SubutaiCo
     connection			= 	conn;
     environment 		=	env;
     containerManager 	= 	cont;
+    numHeartbeatmod5	= 	0;
 }
 
 /**
@@ -104,6 +105,7 @@ bool SubutaiTimer::checkExecutionTimeout(unsigned int* startsec,bool* overflag,u
 
 void SubutaiTimer::sendHeartBeat(bool lxcCommandInProgress,  bool* heartbeatIntFlag)
 {
+
     response->clear();
     /*
      * Refresh new agent ip address set for each heart beat message
@@ -145,7 +147,12 @@ void SubutaiTimer::sendHeartBeat(bool lxcCommandInProgress,  bool* heartbeatIntF
     connection->sendMessage(resp, "HEARTBEAT_TOPIC");
 
     logMain.writeLog(6, logMain.setLogData("<SubutaiTimer>", "HEARTBEAT is sent."));
-    logMain.writeLog(7, logMain.setLogData("<SubutaiTimer>", resp));
+    if( numHeartbeatmod5 == 0 )
+    {
+    	logMain.writeLog(7, logMain.setLogData("<SubutaiTimer>", resp));
+    }
+
+    numHeartbeatmod5 = (numHeartbeatmod5 +1 ) % 5;
 }
 
 /*

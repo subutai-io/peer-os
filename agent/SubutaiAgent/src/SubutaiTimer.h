@@ -84,6 +84,7 @@ private:
 	bool overflagQueue;
 	unsigned int count;
 	unsigned int countQueue;
+	unsigned int numHeartbeatmod5;
 
 	SubutaiLogger logMain;
 	SubutaiHelper helper;

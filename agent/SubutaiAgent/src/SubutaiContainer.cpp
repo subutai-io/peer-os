@@ -353,7 +353,7 @@ vector<Interface> SubutaiContainer::getContainerInterfaceValues()
  */
 void SubutaiContainer::getContainerAllFields()
 {
-    containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "Updating all information of container " + this->getContainerHostnameValue()));
+    //containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "Updating all information of container " + this->getContainerHostnameValue()));
     clear();
     getContainerId();
     getContainerInterfaces();

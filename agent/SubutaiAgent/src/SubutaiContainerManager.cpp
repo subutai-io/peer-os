@@ -308,6 +308,7 @@ void SubutaiContainerManager::updateContainerLists()
     } catch (std::exception e) {
         _logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", string(e.what())));
     }
+    _logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", "Updating all container informations.."));
     for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
     	/*If new container is added, containerIdList is updated in getContainerId() method*/
         (*it)->getContainerAllFields();
