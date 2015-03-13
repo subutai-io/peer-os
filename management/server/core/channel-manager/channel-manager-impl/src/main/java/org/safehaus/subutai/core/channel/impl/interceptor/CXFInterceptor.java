@@ -86,7 +86,8 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
             {
                 //----------------------------------------------------------------------
             }
-            else if(url.getPort() == Integer.parseInt( ChannelSettings.SPECIAL_PORT_X1))
+            else if(   url.getPort() == Integer.parseInt( ChannelSettings.SPECIAL_PORT_X1)
+                    || url.getPort() == Integer.parseInt( ChannelSettings.SPECIAL_SECURE_PORT_X1))
             {
                 String query      =  ( String ) message.get( Message.QUERY_STRING ) ;
                 String paramValue =  UrlUtil.getQueryParameterValue(  "sptoken", query );
