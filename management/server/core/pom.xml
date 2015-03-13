@@ -43,6 +43,7 @@
     <module>test</module>
     <module>jetty-ssl-fragment</module>
     <module>ssl-context-manager</module>
+    <module>karaf-cli-fragment</module>
     <!--    <module>shiro-manager-parent</module>-->
   </modules>
 

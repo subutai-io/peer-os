@@ -88,14 +88,23 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- core -->
-
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- fragments -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>jetty-ssl-fragment</artifactId>
         <version>${project.version}</version>
       </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>karaf-cli-fragment</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- core -->
+
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>test-api</artifactId>
