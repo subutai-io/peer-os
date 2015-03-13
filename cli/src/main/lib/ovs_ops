@@ -34,7 +34,6 @@ function ovs_configure_lxc {
   sed -i "/$add_before_line/i \lxc.network.veth.pair = $ovs_port_name-2" $config
   sed -i "/$add_before_line/i \lxc.network.mtu = 1340" $config
   sed -i "/$add_before_line/a \lxc.network.script.up = $subutai_script_base/create_ovs_interface" $config
-  sed -i 's/^lxc.network.hwaddr/lxc.network.hwaddr/' $config
   msg_info "    - configured $lxc's network with openvswitch"
 }
 
