@@ -226,21 +226,21 @@ int main(int argc,char *argv[],char *envp[])
     ncores =                                    sysconf(_SC_NPROCESSORS_CONF);
     int currentProcess =                        0;
     string str, str2; 
-    //logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Number of cpu core:", helper.toString(ncores)));
-    //logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Client Address:", clientAddress));
+    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Number of cpu core:", helper.toString(ncores)));
+    logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Client Address:", clientAddress));
 
     /*
      * initializing inotify handler
      */
     SubutaiWatch Watcher(connection, &response, &logMain);
     Watcher.initialize(20000);
-    //logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Watcher is initializing.."));
+    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Watcher is initializing.."));
 
     /*
      * initializing timer for periodical operations
      */
     SubutaiTimer timer(logMain, &environment, &cman, connection);
-    //logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Timer is initializing.."));
+    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Timer is initializing.."));
 
     /*
      * Send initial heartbeat for registration of resource host and container nodes attached to this host.

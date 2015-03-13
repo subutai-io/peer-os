@@ -132,7 +132,7 @@ void SubutaiTimer::sendHeartBeat(bool lxcCommandInProgress,  bool* heartbeatIntF
     	 * Update list when the current execution finishes.
     	 *
     	 */
-    	logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Lxc destruction command is in progress, ",
+    	logMain.writeLog(7, logMain.setLogData("<SubutaiTimer>","Lxc destruction command is in progress, ",
     			"wait until it is finished to update container list for heartbeat"));
     	*heartbeatIntFlag = true;
     }
@@ -144,8 +144,8 @@ void SubutaiTimer::sendHeartBeat(bool lxcCommandInProgress,  bool* heartbeatIntF
     string resp = response->createHeartBeatMessage(environment->getAgentUuidValue(), environment->getAgentHostnameValue());
     connection->sendMessage(resp, "HEARTBEAT_TOPIC");
 
-    logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "HEARTBEAT is sent."));
-    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", resp));
+    logMain.writeLog(6, logMain.setLogData("<SubutaiTimer>", "HEARTBEAT is sent."));
+    logMain.writeLog(7, logMain.setLogData("<SubutaiTimer>", resp));
 }
 
 /*
@@ -201,12 +201,12 @@ bool SubutaiTimer::checkCommandQueueInfoTimer(SubutaiCommand command)
                 {
                     string resp = response->createInQueueMessage(environment->getAgentUuidValue(), command.getCommandId());
                     connection->sendMessage(resp);
-                    logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "IN_QUEUE Response:", command.getCommandId()));
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", resp));
+                    logMain.writeLog(6, logMain.setLogData("<SubutaiTimer>", "IN_QUEUE Response:", command.getCommandId()));
+                    logMain.writeLog(7, logMain.setLogData("<SubutaiTimer>", resp));
                 }
                 else
                 {
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Cannot deserialize: ",queueElement));
+                    logMain.writeLog(7, logMain.setLogData("<SubutaiTimer>", "Cannot deserialize: ",queueElement));
                 }
             }
         }
