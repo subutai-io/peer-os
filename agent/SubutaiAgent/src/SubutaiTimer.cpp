@@ -152,7 +152,7 @@ void SubutaiTimer::sendHeartBeat(bool lxcCommandInProgress,  bool* heartbeatIntF
     	logMain.writeLog(7, logMain.setLogData("<SubutaiTimer>", resp));
     }
 
-    numHeartbeatmod5 = (numHeartbeatmod5 +1 ) % 5;
+    numHeartbeatmod5 = (numHeartbeatmod5 +1 ) % LOG_HEARTBEAT_PERIOD;
 }
 
 /*
