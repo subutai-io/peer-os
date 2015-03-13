@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.sql.DataSource;
@@ -13,8 +14,10 @@ import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.security.NullSubutaiLoginContext;
 import org.safehaus.subutai.common.security.SubutaiLoginContext;
 import org.safehaus.subutai.common.security.SubutaiThreadContext;
+import org.safehaus.subutai.common.settings.CLISettings;
 import org.safehaus.subutai.common.settings.ChannelSettings;
 import org.safehaus.subutai.common.util.SecurityUtil;
+import org.safehaus.subutai.core.identity.api.CliCommand;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.PermissionGroup;
@@ -23,11 +26,13 @@ import org.safehaus.subutai.core.identity.api.RestEndpointScope;
 import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.api.Roles;
 import org.safehaus.subutai.core.identity.api.User;
+import org.safehaus.subutai.core.identity.impl.dao.CliCommandDataService;
 import org.safehaus.subutai.core.identity.impl.dao.PermissionDataService;
 import org.safehaus.subutai.core.identity.impl.dao.PortalModuleDataService;
 import org.safehaus.subutai.core.identity.impl.dao.RestEndpointDataService;
 import org.safehaus.subutai.core.identity.impl.dao.RoleDataService;
 import org.safehaus.subutai.core.identity.impl.dao.UserDataService;
+import org.safehaus.subutai.core.identity.impl.entity.CliCommandEntity;
 import org.safehaus.subutai.core.identity.impl.entity.PermissionEntity;
 import org.safehaus.subutai.core.identity.impl.entity.PermissionPK;
 import org.safehaus.subutai.core.identity.impl.entity.PortalModuleScopeEntity;
@@ -73,6 +78,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     private UserDataService userDataService;
     private PermissionDataService permissionDataService;
     private RoleDataService roleDataService;
+    private CliCommandDataService cliCommandDataService;
     private PortalModuleDataService portalModuleDataService;
     private RestEndpointDataService restEndpointDataService;
 
@@ -97,6 +103,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         userDataService = new UserDataService( daoManager );
         permissionDataService = new PermissionDataService( daoManager.getEntityManagerFactory() );
         roleDataService = new RoleDataService( daoManager.getEntityManagerFactory() );
+        cliCommandDataService = new CliCommandDataService( daoManager.getEntityManagerFactory() );
         portalModuleDataService = new PortalModuleDataService( daoManager.getEntityManagerFactory() );
         restEndpointDataService = new RestEndpointDataService( daoManager.getEntityManagerFactory() );
 
@@ -141,7 +148,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     }
 
 
-    public short checkRestPermissions(  User user , String restURL )
+    public short checkRestPermissions( User user, String restURL )
     {
         short status = 0;
 
@@ -149,34 +156,32 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         {
             Set<Role> roles = user.getRoles();
 
-            for(Role role : roles)
+            for ( Role role : roles )
             {
                 Set<RestEndpointScope> restEndpointScopeList = role.getAccessibleRestEndpoints();
 
-                if(restEndpointScopeList !=null)
+                if ( restEndpointScopeList != null )
                 {
-                    for(RestEndpointScope restEndpointScope : restEndpointScopeList )
+                    for ( RestEndpointScope restEndpointScope : restEndpointScopeList )
                     {
-                        if(ChannelSettings.checkURL(restURL,restEndpointScope.getRestEndpoint()) == 1)
+                        if ( ChannelSettings.checkURL( restURL, restEndpointScope.getRestEndpoint() ) == 1 )
                         {
                             status = 1;
                             break;
                         }
                     }
-
                 }
-                if(status == 1)
+                if ( status == 1 )
                 {
                     break;
                 }
             }
-
         }
 
 
         return status;
-
     }
+
 
     private void checkDefaultUser( String username )
     {
@@ -225,6 +230,17 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
                 RestEndpointScopeEntity restEndpointScopeEntity = new RestEndpointScopeEntity( uri );
                 restEndpointDataService.update( restEndpointScopeEntity );
                 adminRole.addRestEndpointScope( restEndpointScopeEntity );
+            }
+
+            for ( final Map.Entry<String, Set<String>> scopes : CLISettings.CLI_CMD_MAP.entrySet() )
+            {
+                Set<String> names = scopes.getValue();
+                for ( final String name : names )
+                {
+                    CliCommandEntity cliCommandEntity = new CliCommandEntity( scopes.getKey(), name );
+                    cliCommandDataService.update( cliCommandEntity );
+                    adminRole.addCliCommand( cliCommandEntity );
+                }
             }
 
             roleDataService.update( adminRole );
@@ -640,6 +656,34 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         }
         userDataService.remove( user.getId() );
         return true;
+    }
+
+
+    @Override
+    public Set<CliCommand> getAllCliCommands()
+    {
+        Set<CliCommand> cliCommands = new HashSet<>();
+        cliCommands.addAll( cliCommandDataService.getAll() );
+        return cliCommands;
+    }
+
+
+    @Override
+    public CliCommand createMockCliCommand( final String scope, final String name )
+    {
+        return new CliCommandEntity( scope, name );
+    }
+
+
+    @Override
+    public boolean updateCliCommand( final CliCommand cliCommand )
+    {
+        if ( cliCommand instanceof CliCommandEntity )
+        {
+            cliCommandDataService.update( ( CliCommandEntity ) cliCommand );
+            return true;
+        }
+        return false;
     }
 
 

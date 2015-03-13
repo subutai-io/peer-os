@@ -18,6 +18,12 @@ public interface Role extends Serializable
 
     public void removePermission( Permission permission );
 
+    public Set<CliCommand> getCliCommands();
+
+    public void addCliCommand( CliCommand cliCommand );
+
+    public void setCliCommands( Set<CliCommand> cliCommands );
+
     public void addPortalModule( PortalModuleScope portalModule );
 
     public Set<PortalModuleScope> getAccessibleModules();

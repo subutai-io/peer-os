@@ -17,6 +17,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.safehaus.subutai.core.identity.api.CliCommand;
 import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.PortalModuleScope;
 import org.safehaus.subutai.core.identity.api.RestEndpointScope;
@@ -59,6 +60,11 @@ public class RoleEntity implements Role
     @OneToMany( fetch = FetchType.EAGER, cascade = CascadeType.ALL )
     @Column( name = "accessible_rest_endpoints" )
     Set<RestEndpointScopeEntity> accessibleRestEndpoints = new HashSet<>();
+
+
+    @OneToMany( fetch = FetchType.EAGER, cascade = CascadeType.ALL )
+    @Column( name = "accessible_cli_commands" )
+    Set<CliCommandEntity> cliCommands = new HashSet<>();
 
 
     public RoleEntity()
@@ -126,6 +132,36 @@ public class RoleEntity implements Role
 
         PermissionEntity permissionEntity = ( PermissionEntity ) permission;
         permissions.remove( permissionEntity );
+    }
+
+
+    @Override
+    public Set<CliCommand> getCliCommands()
+    {
+        Set<CliCommand> cliCommandSet = new HashSet<>();
+        cliCommandSet.addAll( cliCommands );
+        return cliCommandSet;
+    }
+
+
+    @Override
+    public void addCliCommand( final CliCommand cliCommand )
+    {
+        if ( cliCommand instanceof CliCommandEntity )
+        {
+            cliCommands.add( ( CliCommandEntity ) cliCommand );
+        }
+    }
+
+
+    @Override
+    public void setCliCommands( final Set<CliCommand> cliCommands )
+    {
+        this.cliCommands.clear();
+        for ( final CliCommand cliCommand : cliCommands )
+        {
+            this.cliCommands.add( ( CliCommandEntity ) cliCommand );
+        }
     }
 
 

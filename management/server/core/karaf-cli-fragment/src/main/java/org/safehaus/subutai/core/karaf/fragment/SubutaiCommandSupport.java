@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.karaf.fragment;
 import java.util.Set;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.identity.api.CliCommand;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.api.User;
@@ -26,35 +27,30 @@ public abstract class SubutaiCommandSupport extends OsgiCommandSupport
     @Override
     public Object execute( final CommandSession session ) throws Exception
     {
-        LOG.warn( "Executing command", session.toString() );
         try
         {
             Command command = this.getClass().getAnnotation( Command.class );
-            command.scope();
-            command.name();
-
+            LOG.warn( String.format( "Executing command: %s:%s", command.scope(), command.name() ) );
 
             this.session = session;
             IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
             if ( identityManager != null )
             {
                 User user = identityManager.getUser();
+                CliCommand temp = identityManager.createMockCliCommand( command.scope(), command.name() );
                 if ( user != null )
                 {
                     Set<Role> roles = user.getRoles();
                     for ( final Role role : roles )
                     {
+                        if ( role.getCliCommands().contains( temp ) )
+                        {
+                            return doExecute();
+                        }
                     }
                 }
             }
-            if ( identityManager.getUser().isAdmin() )
-            {
-                return doExecute();
-            }
-            else
-            {
-                return null;
-            }
+            return null;
         }
         finally
         {

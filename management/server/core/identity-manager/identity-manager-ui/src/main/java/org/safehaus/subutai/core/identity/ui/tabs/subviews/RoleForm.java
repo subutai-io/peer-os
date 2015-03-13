@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.safehaus.subutai.core.identity.api.CliCommand;
 import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.PortalModuleScope;
 import org.safehaus.subutai.core.identity.api.RestEndpointScope;
@@ -86,8 +87,22 @@ public class RoleForm extends VerticalLayout
     };
 
 
+    private TwinColSelect commandsSelector = new TwinColSelect( "Accessible cli commands" )
+    {
+        {
+            setItemCaptionMode( ItemCaptionMode.PROPERTY );
+            setItemCaptionPropertyId( "toString" );
+            setImmediate( true );
+            setSpacing( true );
+            setRequired( false );
+            setNullSelectionAllowed( true );
+        }
+    };
+
+
     public RoleForm( TabCallback<BeanItem<Role>> callback, Set<Permission> permissions,
-                     final Set<PortalModuleScope> allPortalModules, final Set<RestEndpointScope> allRestEndpoints )
+                     final Set<PortalModuleScope> allPortalModules, final Set<RestEndpointScope> allRestEndpoints,
+                     final Set<CliCommand> allCliCommands )
     {
         init();
         BeanContainer<String, Permission> permissionsContainer = new BeanContainer<>( Permission.class );
@@ -109,6 +124,12 @@ public class RoleForm extends VerticalLayout
         restEndpointsSelector.setContainerDataSource( restEndpointsContainer );
         restEndpointsSelector.setItemCaptionPropertyId( "restEndpoint" );
 
+        BeanContainer<String, CliCommand> cliCommandBeanContainer = new BeanContainer<>( CliCommand.class );
+        cliCommandBeanContainer.setBeanIdProperty( "toString" );
+        cliCommandBeanContainer.addAll( allCliCommands );
+        commandsSelector.setContainerDataSource( restEndpointsContainer );
+        commandsSelector.setItemCaptionPropertyId( "toString" );
+
         this.callback = callback;
     }
 
@@ -124,7 +145,7 @@ public class RoleForm extends VerticalLayout
         buttons.setSpacing( true );
 
         final FormLayout form = new FormLayout();
-        form.addComponents( name, permissionsSelector, modulesSelector, restEndpointsSelector );
+        form.addComponents( name, permissionsSelector, modulesSelector, restEndpointsSelector, commandsSelector );
 
         addComponents( form, buttons );
 
