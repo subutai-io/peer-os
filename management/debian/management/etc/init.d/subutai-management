@@ -16,10 +16,9 @@ getPid() {
 do_start() {
         if [ -z "$SUBUTAI_PID" ];
         then
-                sudo rm -rf $SUBUTAI_DATA/*
                 sudo $SUBUTAI_BIN/start
                 echo "Subutai-Management is starting.."
-                sleep 2
+                sleep 3
                 getPid
                 echo "Subutai-Management is started..($SUBUTAI_PID)"
         else
@@ -57,7 +56,6 @@ stop)
 restart)
 	echo "Subutai-Management is restarting now.."
         sudo pkill -f karaf
-        sudo rm -rf $SUBUTAI_DATA/*
         sudo $SUBUTAI_BIN/start
 	sleep 3
         getPid
