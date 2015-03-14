@@ -197,11 +197,6 @@ public interface IdentityManager
      */
     public boolean updateRestEndpoint( RestEndpointScope endpointScope );
 
-    /**
-     * Check User Rest URL
-     */
-    public short checkRestPermissions( User user, String restURL );
-
     //-------------------------- PortalModuleScope --------------------
 
     public Set<PortalModuleScope> getAllPortalModules();
