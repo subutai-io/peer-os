@@ -92,52 +92,41 @@ public class ChannelSettings
     };
 
 
-    public static short checkURLArray( String uri, String[] URL_ACCESS_ARRAY )
+    public static short checkURL( String uri, String[] URL_ACCESS )
     {
-        short status = 0;
-
-        for ( int x = 0; x < URL_ACCESS_ARRAY.length; x++ )
-        {
-            if(checkURL( uri, URL_ACCESS_ARRAY[x] ) == 1)
-            {
-                status = 1;
-                break;
-            }
-        }
-
-        return status;
-    }
-
-
-    public static short checkURL( String uri, String URL_ACCESS )
-    {
-        short status = 0;
         String subURI[] = uri.split( "/" );
-        int subURIsize  = subURI.length;
-        String subURL_ACCESS[] = URL_ACCESS.split( "/" );
+        int subURIsize = subURI.length;
 
-        if ( subURIsize == subURL_ACCESS.length )
+        short status = 0;
+
+        for ( int x = 0; x < URL_ACCESS.length; x++ )
         {
-            int st = 0;
+            String subURL_ACCESS[] = URL_ACCESS[x].split( "/" );
 
-            for ( int i = 0; i < subURIsize; i++ )
+            if ( subURIsize == subURL_ACCESS.length )
             {
-                if ( subURL_ACCESS[i].equals( "{$}" ) )
+                int st = 0;
+
+                for ( int i = 0; i < subURIsize; i++ )
                 {
-                    st++;
-                }
-                else
-                {
-                    if ( subURI[i].equals( subURL_ACCESS[i] ) )
+                    if ( subURL_ACCESS[i].equals( "{$}" ) )
                     {
                         st++;
                     }
+                    else
+                    {
+                        if ( subURI[i].equals( subURL_ACCESS[i] ) )
+                        {
+                            st++;
+                        }
+                    }
                 }
-            }
 
-            if ( st == subURIsize )
-            {
-                status = 1;
+                if ( st == subURIsize )
+                {
+                    status = 1;
+                    break;
+                }
             }
         }
 

@@ -52,34 +52,16 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
 
             if(url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X1))
             {
-                if(ChannelSettings.checkURLArray(basePath,ChannelSettings.URL_ACCESS_PX1) == 0)
+                if ( ChannelSettings.checkURL( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
                 {
                     status = 1;
-                }
-                else
-                {
-                    User user  = channelManagerImpl.getIdentityManager().getUser();
-
-                    if(channelManagerImpl.getIdentityManager().checkRestPermissions( user,basePath ) != 1)
-                    {
-                        status = 1;
-                    }
                 }
             }
             else if(url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2))
             {
-                if(ChannelSettings.checkURLArray( basePath, ChannelSettings.URL_ACCESS_PX2) == 0)
+                if ( ChannelSettings.checkURL( basePath, ChannelSettings.URL_ACCESS_PX2 ) == 0 )
                 {
                     status = 1;
-                }
-                else
-                {
-                    User user  = channelManagerImpl.getIdentityManager().getUser();
-
-                    if(channelManagerImpl.getIdentityManager().checkRestPermissions( user,basePath ) != 1)
-                    {
-                        status = 1;
-                    }
                 }
             }
             else if(url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X3))
@@ -103,15 +85,7 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
                                                   url.getHost()))
                         {
                             User user = channelManagerImpl.getIdentityManager().getUser(userChannelToken.getUserId());
-
-                            if(channelManagerImpl.getIdentityManager().checkRestPermissions( user,basePath ) != 1)
-                            {
-                                status = 1;
-                            }
-                            else
-                            {
-                                channelManagerImpl.getIdentityManager().loginWithToken(user.getUsername() );
-                            }
+                            channelManagerImpl.getIdentityManager().loginWithToken( user.getUsername() );
                         }
                         else
                         {
