@@ -54,6 +54,19 @@ public class PermissionForm extends VerticalLayout
         }
     };
 
+    Button removeButton = new Button( "Remove permission", new Button.ClickListener()
+    {
+        @Override
+        public void buttonClick( final Button.ClickEvent event )
+        {
+            permissionFieldGroup.discard();
+            if ( callback != null )
+            {
+                callback.removeOperation( permissionFieldGroup.getItemDataSource(), newValue );
+            }
+        }
+    } );
+
     private ComboBox permissionGroup =
             new ComboBox( "", new BeanItemContainer<>( PermissionGroup.class, EnumSet.allOf( PermissionGroup.class ) ) )
             {
@@ -82,7 +95,6 @@ public class PermissionForm extends VerticalLayout
     {
         final Button saveButton = new Button( "Save permission", saveListener );
         final Button cancelButton = new Button( "Cancel", cancelListener );
-        final Button removeButton = new Button( "Remove permission", resetListener );
         saveButton.setStyleName( Reindeer.BUTTON_DEFAULT );
 
         HorizontalLayout buttons = new HorizontalLayout( saveButton, cancelButton, removeButton );
@@ -117,6 +129,7 @@ public class PermissionForm extends VerticalLayout
             else
             {
                 permissionFieldGroup.setReadOnly( false );
+                removeButton.setVisible( false );
             }
         }
     }
@@ -142,19 +155,6 @@ public class PermissionForm extends VerticalLayout
             {
                 LOGGER.error( "Error commit permission fieldGroup changes", e );
                 Notification.show( e.getMessage(), Notification.Type.WARNING_MESSAGE );
-            }
-        }
-    };
-
-    private Button.ClickListener resetListener = new Button.ClickListener()
-    {
-        @Override
-        public void buttonClick( final Button.ClickEvent event )
-        {
-            permissionFieldGroup.discard();
-            if ( callback != null )
-            {
-                callback.removeOperation( permissionFieldGroup.getItemDataSource(), newValue );
             }
         }
     };

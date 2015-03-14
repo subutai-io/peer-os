@@ -50,6 +50,19 @@ public class RoleForm extends VerticalLayout
         }
     };
 
+    Button removeButton = new Button( "Remove role", new Button.ClickListener()
+    {
+        @Override
+        public void buttonClick( final Button.ClickEvent event )
+        {
+            permissionFieldGroup.discard();
+            if ( callback != null )
+            {
+                callback.removeOperation( permissionFieldGroup.getItemDataSource(), newValue );
+            }
+        }
+    } );
+
 
     private TwinColSelect restEndpointsSelector = new TwinColSelect( "Accessible rest endpoints" )
     {
@@ -74,6 +87,7 @@ public class RoleForm extends VerticalLayout
             setImmediate( true );
             setSpacing( true );
             setRequired( true );
+            setVisible( false );
             setNullSelectionAllowed( false );
         }
     };
@@ -145,7 +159,6 @@ public class RoleForm extends VerticalLayout
     {
         final Button saveButton = new Button( "Save role", saveListener );
         final Button cancelButton = new Button( "Cancel", cancelListener );
-        final Button removeButton = new Button( "Remove role", resetListener );
         saveButton.setStyleName( Reindeer.BUTTON_DEFAULT );
 
         HorizontalLayout buttons = new HorizontalLayout( saveButton, cancelButton, removeButton );
@@ -214,6 +227,7 @@ public class RoleForm extends VerticalLayout
             else
             {
                 permissionFieldGroup.setReadOnly( false );
+                removeButton.setVisible( false );
             }
         }
     }
@@ -277,18 +291,6 @@ public class RoleForm extends VerticalLayout
         }
     };
 
-    private Button.ClickListener resetListener = new Button.ClickListener()
-    {
-        @Override
-        public void buttonClick( final Button.ClickEvent event )
-        {
-            permissionFieldGroup.discard();
-            if ( callback != null )
-            {
-                callback.removeOperation( permissionFieldGroup.getItemDataSource(), newValue );
-            }
-        }
-    };
 
     private Button.ClickListener cancelListener = new Button.ClickListener()
     {
