@@ -28,13 +28,13 @@ public class ChannelTokenController implements Runnable
             {
                 Thread.sleep(60 * 60 * 1000 );
 
-                LOG.info( "******** Channel Token Controller invoked *********" );
+                LOG.info( "******** Channel Token controller invoked *********" );
                 channelTokenManager.setTokenValidity();
             }
         }
         catch (InterruptedException e)
         {
-            e.printStackTrace();
+            LOG.error( "Error in ChannelToken controller" , e );
         }
     }
 }
