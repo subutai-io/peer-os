@@ -199,31 +199,6 @@ public class TemplateRegistryComponent extends CustomComponent
         changedFilesTable.setContainerDataSource( changedFilesBeanContainer );
         changedFilesTable.setColumnHeaders( "File Path", "Status" );
 
-        // Templates basic info tables
-
-        final Table templateBInfoTable = new Table( "Template Info" );
-        templateBInfoTable.setWidth( "50%" );
-        templateBInfoTable.setImmediate( true );
-        templateBInfoTable.addContainerProperty( TEMPLATE_PROPERTY, String.class, null );
-        templateBInfoTable.addContainerProperty( TEMPLATE_VALUE, String.class, null );
-
-        //adding rows
-        for ( String key : templatePropertiesMap.keySet() )
-        {
-            templateBInfoTable.addItem( new Object[] { key, "" }, key );
-        }
-
-        final Table templateAInfoTable = new Table( "Template Info" );
-        templateAInfoTable.setWidth( "50%" );
-        templateAInfoTable.setImmediate( true );
-        templateAInfoTable.addContainerProperty( TEMPLATE_PROPERTY, String.class, null );
-        templateAInfoTable.addContainerProperty( TEMPLATE_VALUE, String.class, null );
-
-        //adding rows
-        for ( String key : templatePropertiesMap.keySet() )
-        {
-            templateAInfoTable.addItem( new Object[] { key, "" }, key );
-        }
 
         // Tree View
 
@@ -237,6 +212,87 @@ public class TemplateRegistryComponent extends CustomComponent
         {
             templateTree.expandItem( id );
         }
+
+
+        // Build templates layout
+
+        // Templates basic info tables
+
+        final Table templateBInfoTable = new Table( "Template Info" );
+        templateBInfoTable.setWidth( "80%" );
+        templateBInfoTable.setImmediate( true );
+        templateBInfoTable.addContainerProperty( TEMPLATE_PROPERTY, String.class, null );
+        templateBInfoTable.addContainerProperty( TEMPLATE_VALUE, String.class, null );
+
+        //adding rows
+        for ( String key : templatePropertiesMap.keySet() )
+        {
+            templateBInfoTable.addItem( new Object[] { key, "" }, key );
+        }
+
+        final Table templateAInfoTable = new Table( "Template Info" );
+        templateAInfoTable.setWidth( "80%" );
+        templateAInfoTable.setImmediate( true );
+        templateAInfoTable.addContainerProperty( TEMPLATE_PROPERTY, String.class, null );
+        templateAInfoTable.addContainerProperty( TEMPLATE_VALUE, String.class, null );
+
+        //adding rows
+        for ( String key : templatePropertiesMap.keySet() )
+        {
+            templateAInfoTable.addItem( new Object[] { key, "" }, key );
+        }
+
+        VerticalLayout firstTemplateComponents = new VerticalLayout();
+        firstTemplateComponents.setSpacing( true );
+        firstTemplateComponents.addComponent( templateA );
+        firstTemplateComponents.addComponent( templateAInfoTable );
+        firstTemplateComponents.setId( "firstTemplateComponentsId" );
+
+        VerticalLayout secondTemplateComponents = new VerticalLayout();
+        secondTemplateComponents.setSpacing( true );
+        secondTemplateComponents.addComponent( templateB );
+        secondTemplateComponents.addComponent( templateBInfoTable );
+        secondTemplateComponents.setId( "secondTemplateComponentsId" );
+
+        Button swapTemplates = new Button( "Swap Templates" );
+        swapTemplates.setId( "swapTemplatesId" );
+        swapTemplates.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
+            {
+                Object firstSelected = templateA.getValue();
+                templateA.select( templateB.getValue() );
+                templateB.select( firstSelected );
+            }
+        } );
+
+        HorizontalLayout generalInfoHorizontalLayout = new HorizontalLayout();
+        generalInfoHorizontalLayout.setSpacing( true );
+        generalInfoHorizontalLayout.setSizeFull();
+        generalInfoHorizontalLayout.setId( "generalInfoHorizontalLayoutId" );
+        generalInfoHorizontalLayout.addComponent( secondTemplateComponents );
+        generalInfoHorizontalLayout.setExpandRatio( secondTemplateComponents, 2.0f );
+        generalInfoHorizontalLayout.addComponent( swapTemplates );
+        generalInfoHorizontalLayout.setExpandRatio( swapTemplates, 1.0f );
+        generalInfoHorizontalLayout.setComponentAlignment( swapTemplates, Alignment.MIDDLE_CENTER );
+        generalInfoHorizontalLayout.addComponent( firstTemplateComponents );
+        generalInfoHorizontalLayout.setExpandRatio( firstTemplateComponents, 2.0f );
+        generalInfoHorizontalLayout.setId( "generalInfoHorizontalLayoutId" );
+
+        VerticalLayout baseLayout = new VerticalLayout();
+        baseLayout.setSpacing( true );
+        baseLayout.setId( "baseLayoutId" );
+        baseLayout.setSizeFull();
+        baseLayout.addComponent( generalInfoHorizontalLayout );
+        baseLayout.addComponent( changedFilesTable );
+
+        HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
+        horizontalSplit.setStyleName( Runo.SPLITPANEL_SMALL );
+        horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
+        horizontalSplit.setFirstComponent( templateTree );
+        horizontalSplit.setSecondComponent( baseLayout );
+        setCompositionRoot( horizontalSplit );
 
         //Listeners
         Property.ValueChangeListener templateComboBoxListener = new Property.ValueChangeListener()
@@ -327,57 +383,6 @@ public class TemplateRegistryComponent extends CustomComponent
         templateA.addValueChangeListener( templateComboBoxListener );
         templateB.addValueChangeListener( templateComboBoxListener );
         changedFilesTable.addItemClickListener( changedFileRowClickListener );
-
-
-        // Build templates layout
-        VerticalLayout firstTemplateComponents = new VerticalLayout();
-        firstTemplateComponents.setSpacing( true );
-        firstTemplateComponents.addComponent( templateA );
-        firstTemplateComponents.addComponent( templateAInfoTable );
-        firstTemplateComponents.setId( "firstTemplateComponentsId" );
-
-        VerticalLayout secondTemplateComponents = new VerticalLayout();
-        secondTemplateComponents.setSpacing( true );
-        secondTemplateComponents.addComponent( templateB );
-        secondTemplateComponents.addComponent( templateBInfoTable );
-        secondTemplateComponents.setId( "secondTemplateComponentsId" );
-
-        Button swapTemplates = new Button( "Swap Templates" );
-        swapTemplates.setId( "swapTemplatesId" );
-        swapTemplates.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( final Button.ClickEvent event )
-            {
-                Object firstSelected = templateA.getValue();
-                templateA.select( templateB.getValue() );
-                templateB.select( firstSelected );
-            }
-        } );
-
-        HorizontalLayout generalInfoHorizontalLayout = new HorizontalLayout();
-        generalInfoHorizontalLayout.setSpacing( true );
-        generalInfoHorizontalLayout.setSizeFull();
-        generalInfoHorizontalLayout.setId( "generalInfoHorizontalLayoutId" );
-        generalInfoHorizontalLayout.addComponent( firstTemplateComponents );
-        generalInfoHorizontalLayout.addComponent( swapTemplates );
-        generalInfoHorizontalLayout.setComponentAlignment( swapTemplates, Alignment.MIDDLE_LEFT );
-        generalInfoHorizontalLayout.addComponent( secondTemplateComponents );
-        generalInfoHorizontalLayout.setId( "generalInfoHorizontalLayoutId" );
-
-        VerticalLayout baseLayout = new VerticalLayout();
-        baseLayout.setSpacing( true );
-        baseLayout.setId( "baseLayoutId" );
-        baseLayout.setSizeFull();
-        baseLayout.addComponent( generalInfoHorizontalLayout );
-        baseLayout.addComponent( changedFilesTable );
-
-        HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
-        horizontalSplit.setStyleName( Runo.SPLITPANEL_SMALL );
-        horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
-        horizontalSplit.setFirstComponent( templateTree );
-        horizontalSplit.setSecondComponent( baseLayout );
-        setCompositionRoot( horizontalSplit );
     }
 
 
