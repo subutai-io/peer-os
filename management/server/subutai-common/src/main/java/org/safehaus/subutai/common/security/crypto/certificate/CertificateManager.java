@@ -87,7 +87,6 @@ public class CertificateManager
         }
         catch ( Throwable t )
         {
-            t.printStackTrace();
             throw new RuntimeException( "Failed to generate self-signed certificate!", t );
         }
 
