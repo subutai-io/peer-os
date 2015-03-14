@@ -27,6 +27,8 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
@@ -327,22 +329,7 @@ public class TemplateRegistryComponent extends CustomComponent
         changedFilesTable.addItemClickListener( changedFileRowClickListener );
 
 
-        HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
-        horizontalSplit.setStyleName( Runo.SPLITPANEL_SMALL );
-        horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
-        horizontalSplit.setFirstComponent( templateTree );
-
-        VerticalLayout baseLayout = new VerticalLayout();
-        baseLayout.setSpacing( true );
-        baseLayout.setId( "baseLayoutId" );
-        baseLayout.setSizeFull();
-
-
-        HorizontalLayout generalInfoHorizontalLayout = new HorizontalLayout();
-        generalInfoHorizontalLayout.setSpacing( true );
-        generalInfoHorizontalLayout.setSizeFull();
-        generalInfoHorizontalLayout.setId( "generalInfoHorizontalLayoutId" );
-
+        // Build templates layout
         VerticalLayout firstTemplateComponents = new VerticalLayout();
         firstTemplateComponents.setSpacing( true );
         firstTemplateComponents.addComponent( templateA );
@@ -355,14 +342,40 @@ public class TemplateRegistryComponent extends CustomComponent
         secondTemplateComponents.addComponent( templateBInfoTable );
         secondTemplateComponents.setId( "secondTemplateComponentsId" );
 
+        Button swapTemplates = new Button( "Swap Templates" );
+        swapTemplates.setId( "swapTemplatesId" );
+        swapTemplates.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
+            {
+                Object firstSelected = templateA.getValue();
+                templateA.select( templateB.getValue() );
+                templateB.select( firstSelected );
+            }
+        } );
+
+        HorizontalLayout generalInfoHorizontalLayout = new HorizontalLayout();
+        generalInfoHorizontalLayout.setSpacing( true );
+        generalInfoHorizontalLayout.setSizeFull();
+        generalInfoHorizontalLayout.setId( "generalInfoHorizontalLayoutId" );
         generalInfoHorizontalLayout.addComponent( firstTemplateComponents );
+        generalInfoHorizontalLayout.addComponent( swapTemplates );
+        generalInfoHorizontalLayout.setComponentAlignment( swapTemplates, Alignment.MIDDLE_LEFT );
         generalInfoHorizontalLayout.addComponent( secondTemplateComponents );
         generalInfoHorizontalLayout.setId( "generalInfoHorizontalLayoutId" );
 
-
+        VerticalLayout baseLayout = new VerticalLayout();
+        baseLayout.setSpacing( true );
+        baseLayout.setId( "baseLayoutId" );
+        baseLayout.setSizeFull();
         baseLayout.addComponent( generalInfoHorizontalLayout );
         baseLayout.addComponent( changedFilesTable );
 
+        HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
+        horizontalSplit.setStyleName( Runo.SPLITPANEL_SMALL );
+        horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
+        horizontalSplit.setFirstComponent( templateTree );
         horizontalSplit.setSecondComponent( baseLayout );
         setCompositionRoot( horizontalSplit );
     }
