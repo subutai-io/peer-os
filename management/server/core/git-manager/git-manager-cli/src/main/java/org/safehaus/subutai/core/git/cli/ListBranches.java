@@ -6,12 +6,12 @@ import java.util.List;
 import org.safehaus.subutai.core.git.api.GitBranch;
 import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitManager;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
 
@@ -20,7 +20,7 @@ import com.google.common.base.Preconditions;
  * Displays branches
  */
 @Command( scope = "git", name = "list-branches", description = "List local/remote branches" )
-public class ListBranches extends OsgiCommandSupport
+public class ListBranches extends SubutaiShellCommandSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( ListBranches.class.getName() );

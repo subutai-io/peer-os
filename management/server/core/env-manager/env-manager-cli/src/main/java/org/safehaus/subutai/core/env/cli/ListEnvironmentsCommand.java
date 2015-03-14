@@ -5,9 +5,9 @@ import java.util.Date;
 
 import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
 
@@ -16,7 +16,7 @@ import com.google.common.base.Preconditions;
  * List all existing environments
  */
 @Command( scope = "env", name = "list", description = "Command to view environment" )
-public class ListEnvironmentsCommand extends OsgiCommandSupport
+public class ListEnvironmentsCommand extends SubutaiShellCommandSupport
 {
 
     private final EnvironmentManager environmentManager;

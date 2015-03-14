@@ -8,10 +8,10 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
 
@@ -25,7 +25,7 @@ import com.google.common.base.Preconditions;
  * daemon: trigger command execution process as daemon or not
  */
 @Command( scope = "command", name = "exec-sync", description = "Executes command synchronously" )
-public class ExecSyncCommand extends OsgiCommandSupport
+public class ExecSyncCommand extends SubutaiShellCommandSupport
 {
     private final CommandExecutor executor;
 

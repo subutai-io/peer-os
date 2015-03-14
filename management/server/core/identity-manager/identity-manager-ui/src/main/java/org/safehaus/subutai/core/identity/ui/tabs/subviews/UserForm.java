@@ -42,6 +42,19 @@ public class UserForm extends VerticalLayout
 
     private boolean newValue;
 
+    Button removeButton = new Button( "Delete user", new Button.ClickListener()
+    {
+        @Override
+        public void buttonClick( final Button.ClickEvent event )
+        {
+            userFieldGroup.discard();
+            if ( callback != null )
+            {
+                callback.removeOperation( userFieldGroup.getItemDataSource(), newValue );
+            }
+        }
+    } );
+
     private TextField username = new TextField( "Username" )
     {
         {
@@ -118,7 +131,6 @@ public class UserForm extends VerticalLayout
     {
         final Button saveButton = new Button( "Save user", saveListener );
         final Button cancelButton = new Button( "Cancel", cancelListener );
-        final Button removeButton = new Button( "Delete user", resetListener );
         saveButton.setStyleName( Reindeer.BUTTON_DEFAULT );
 
         HorizontalLayout buttons = new HorizontalLayout( saveButton, cancelButton, removeButton );
@@ -167,6 +179,7 @@ public class UserForm extends VerticalLayout
             else
             {
                 userFieldGroup.setReadOnly( false );
+                removeButton.setVisible( false );
             }
         }
     }
@@ -206,18 +219,6 @@ public class UserForm extends VerticalLayout
         }
     };
 
-    private Button.ClickListener resetListener = new Button.ClickListener()
-    {
-        @Override
-        public void buttonClick( final Button.ClickEvent event )
-        {
-            userFieldGroup.discard();
-            if ( callback != null )
-            {
-                callback.removeOperation( userFieldGroup.getItemDataSource(), newValue );
-            }
-        }
-    };
 
     private Button.ClickListener cancelListener = new Button.ClickListener()
     {

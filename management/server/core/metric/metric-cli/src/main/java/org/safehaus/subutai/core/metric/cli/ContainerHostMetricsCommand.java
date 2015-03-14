@@ -7,12 +7,12 @@ import java.util.UUID;
 import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
 
@@ -21,7 +21,7 @@ import com.google.common.base.Preconditions;
  * ResourceHostMetricsCommand
  */
 @Command( scope = "metric", name = "container-host-metrics", description = "Lists container host metrics" )
-public class ContainerHostMetricsCommand extends OsgiCommandSupport
+public class ContainerHostMetricsCommand extends SubutaiShellCommandSupport
 {
     @Argument( index = 0, name = "environment id", required = true, multiValued = false,
             description = "environment id (uuid)" )

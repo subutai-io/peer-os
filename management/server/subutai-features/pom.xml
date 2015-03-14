@@ -31,12 +31,19 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- core -->
-
+    <!-- fragments -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>jetty-ssl-fragment</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-cli-rbac</artifactId>
+    </dependency>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- core -->
 
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -453,6 +460,12 @@
       <classifier>classes</classifier>
     </dependency>
 
+    <!--JMX-HTTP manager-->
+    <dependency>
+      <groupId>org.jolokia</groupId>
+      <artifactId>jolokia-osgi</artifactId>
+      <version>1.1.5</version>
+    </dependency>
   </dependencies>
 
   <build>
