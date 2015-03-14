@@ -301,7 +301,7 @@ public interface TemplateRegistry
     /**
      * Returns list of GitChangedFile between two templates
      */
-    public List<GitChangedFile> getChangedFiles( Template template ) throws RegistryException;
+    public List<GitChangedFile> getChangedFiles( Template templateA, Template templateB ) throws RegistryException;
 
 
     /**
