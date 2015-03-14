@@ -223,6 +223,7 @@ public class RoleForm extends VerticalLayout
             if ( !newValue )
             {
                 permissionFieldGroup.setReadOnly( true );
+                removeButton.setVisible( true );
             }
             else
             {
