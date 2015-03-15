@@ -101,7 +101,7 @@ int main(int argc, char *argv[], char *envp[]) {
 	SubutaiHelper helper;
 	SubutaiThread thread;
 	SubutaiLogger logMain;
-	SubutaiCommand* command;
+	SubutaiCommand* command = new SubutaiCommand();
 	SubutaiResponsePack response;
 	SubutaiEnvironment environment(&logMain);
 	string input = "";
@@ -278,6 +278,7 @@ int main(int argc, char *argv[], char *envp[]) {
 			/*
 			 * In 30 second periods send heartbeat and in_queue responses.
 			 */
+
 			timer.checkHeartBeatTimer(pidList, &heartbeatInterruptFlag);
 			timer.checkCommandQueueInfoTimer(command);
 			command->clear();
@@ -297,7 +298,6 @@ int main(int argc, char *argv[], char *envp[]) {
 			}
 
 			Watcher.checkNotification(&cman); //checking the watch event status
-
 			rc = connection->loop(1); // checking the status of the new message
 			if (rc) {
 				logMain.writeLog(6,
@@ -309,7 +309,6 @@ int main(int argc, char *argv[], char *envp[]) {
 			//checking new message arrived
 			if (connection->checkMessageStatus()) {
 
-				connection->resetMessageStatus(); //reseting message status
 				command = connection->getMessage(); //fetching message..
 
 				logMain.writeLog(6,

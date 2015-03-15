@@ -17,8 +17,10 @@
 /**
  *  \details   Default constructor of SubutaiCommand class.
  */
-SubutaiCommand::SubutaiCommand() {			//Setting default values..
-	// TODO Auto-generated constructor stub
+SubutaiCommand::SubutaiCommand() :
+	_isDaemon(false), requestSequenceNumber(-1), pid(-1), timeout(5)
+{
+	//Setting default values..
 	this->setType("");
 	this->setCommand("");
 	this->setWorkingDirectory("");

@@ -47,15 +47,17 @@ class SubutaiConnection: public mosqpp::mosquittopp {
 public:
 	SubutaiConnection(const char*, const char*, const char*, const char*,
 			const char*, int, SubutaiEnvironment*, SubutaiLogger*);
-	virtual ~SubutaiConnection();bool openSession();bool sendMessage(string,
-			string topic = "");bool checkMessageStatus();bool addMessageToQueue(
-			SubutaiCommand*);bool addMessageToExecQueue(SubutaiCommand*,
-			string&);
-	void resetMessageStatus();
-	void setMessage(string);
-	SubutaiCommand* getMessage();bool reConnect();
+	virtual ~SubutaiConnection();
+	bool openSession();
+	bool sendMessage(string,string topic = "");
+	bool checkMessageStatus();
+	bool addMessageToQueue(	SubutaiCommand*);
+	bool addMessageToExecQueue(SubutaiCommand*,	string&);
+	SubutaiCommand* getMessage();
+	bool reConnect();
 	string getID();
-	SubutaiCommand* getExecutionMessage();bool checkExecutionMessageStatus();
+	SubutaiCommand* getExecutionMessage();
+	bool checkExecutionMessageStatus();
 	void initializeQueue();
 
 private:

@@ -54,7 +54,7 @@ public:
 	string GenerateUUID();
 	string& readFromFile(string&);
 	void writeToFile(string&, string&);
-	void removeFromFile(string&, string&);
+	void removeFromFile(string&, string);
 };
 
 #endif /* SUBUTAIHELPER_H_ */

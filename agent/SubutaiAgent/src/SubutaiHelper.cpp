@@ -105,7 +105,7 @@ string& SubutaiHelper::readFromFile(string& path) {
 	return input;
 }
 
-void SubutaiHelper::removeFromFile(string& path, string& sub_string) {
+void SubutaiHelper::removeFromFile(string& path, string sub_string) {
 	string input, str;
 	ifstream file(path.c_str());
 	if (file.peek() != ifstream::traits_type::eof()) {

@@ -36,6 +36,7 @@ SubutaiConnection::SubutaiConnection(const char * id,
 	this->certpath = "/etc/subutai-agent/";
 	this->environment = env;
 	initializeQueue();
+
 }
 ;
 
@@ -162,19 +163,20 @@ void SubutaiConnection::on_subscribe(int mid) {
  */
 void SubutaiConnection::on_message(const struct mosquitto_message *message) {
 	char buf[this->bufferSize + 1];
-	SubutaiCommand new_command;
+	SubutaiCommand* new_command = new SubutaiCommand();
 	if (!strcmp(message->topic, this->subscribedTopic)
 			|| !strcmp(message->topic, this->broadcastTopic)) {
 		memset(buf, 0, (this->bufferSize + 1) * sizeof(char));
 		/* Copy N-1 bytes to ensure always 0 terminated. */
 		memcpy(buf, message->payload, this->bufferSize * sizeof(char));
 
-		string& input = (string&) buf;
-		if (new_command.deserialize(input)) {
-			if (new_command.getType() == "EXECUTION_REQUEST") {
-				addMessageToExecQueue(&new_command, input);
+		string input(buf);
+		if (new_command->deserialize(input)) {
+			cout << new_command->getType() << endl;
+			if (new_command->getType() == "EXECUTE_REQUEST") {
+				addMessageToExecQueue(new_command, input);
 			} else {
-				addMessageToQueue(&new_command);
+				addMessageToQueue(new_command);
 			}
 		} else {
 			logger->writeLog(3,
@@ -184,26 +186,26 @@ void SubutaiConnection::on_message(const struct mosquitto_message *message) {
 				this->sendMessage(
 						response.createResponseMessage(
 								environment->getAgentUuidValue(), 9999999,
-								new_command.getRequestSequenceNumber(), 1,
+								new_command->getRequestSequenceNumber(), 1,
 								"Request Size is greater than Maximum Size", "",
-								new_command.getCommandId()));
+								new_command->getCommandId()));
 				this->sendMessage(
 						response.createExitMessage(
 								environment->getAgentUuidValue(), 9999999,
-								new_command.getRequestSequenceNumber(), 2,
-								new_command.getCommandId(), 1));
+								new_command->getRequestSequenceNumber(), 2,
+								new_command->getCommandId(), 1));
 			} else {
 				this->sendMessage(
 						response.createResponseMessage(
 								environment->getAgentUuidValue(), 9999999,
-								new_command.getRequestSequenceNumber(), 1,
+								new_command->getRequestSequenceNumber(), 1,
 								"Request is not a valid JSON string", "",
-								new_command.getCommandId()));
+								new_command->getCommandId()));
 				this->sendMessage(
 						response.createExitMessage(
 								environment->getAgentUuidValue(), 9999999,
-								new_command.getRequestSequenceNumber(), 2,
-								new_command.getCommandId(), 1));
+								new_command->getRequestSequenceNumber(), 2,
+								new_command->getCommandId(), 1));
 			}
 		}
 	}
@@ -252,7 +254,6 @@ bool SubutaiConnection::checkMessageStatus() {
 	} else {
 		return true;
 	}
-	//return receivedMessage;
 }
 
 /**
@@ -264,14 +265,6 @@ bool SubutaiConnection::checkExecutionMessageStatus() {
 	} else {
 		return true;
 	}
-	//return receivedMessage;
-}
-
-/**
- *  \details   This method resets the status of the new message flag.
- */
-void SubutaiConnection::resetMessageStatus() {
-	this->receivedMessage = false;
 }
 
 /**
@@ -295,13 +288,6 @@ SubutaiCommand* SubutaiConnection::getExecutionMessage() {
 	return tmp;
 }
 
-/**
- *  \details   setting "message" private variable of the SubutaiConnection class.
- *
- */
-void SubutaiConnection::setMessage(string message) {
-	this->message = message;
-}
 
 /**
  *  \details   setting "id" private variable of the SubutaiConnection class.
@@ -317,9 +303,9 @@ void SubutaiConnection::initializeQueue() {
 	ifstream file(commandQueuePath.c_str());
 	if (file.peek() != ifstream::traits_type::eof()) {
 		while (getline(file, str)) {
-			SubutaiCommand cmd;
-			cmd.deserialize(str);
-			execution_queue.push(&cmd);
+			SubutaiCommand* cmd = new SubutaiCommand();
+			cmd->deserialize(str);
+			execution_queue.push(cmd);
 		}
 	}
 }
