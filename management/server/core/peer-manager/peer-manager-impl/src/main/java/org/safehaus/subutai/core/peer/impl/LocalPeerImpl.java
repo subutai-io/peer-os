@@ -1094,20 +1094,26 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     {
         if ( resourceHostInfo.getHostname().equals( "management" ) )
         {
-            if ( managementHost == null )
+            boolean initRequired = managementHost == null;
+            managementHost = new ManagementHostEntity( getId().toString(), resourceHostInfo );
+
+            if ( initRequired )
             {
-                managementHost = new ManagementHostEntity( getId().toString(), resourceHostInfo );
                 try
                 {
                     managementHost.init();
                 }
                 catch ( Exception e )
                 {
-                    LOG.error( e.toString() );
+                    LOG.error( "Error initializing management host", e );
                 }
                 managementHostDataService.persist( ( ManagementHostEntity ) managementHost );
-                ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
             }
+            else
+            {
+                managementHostDataService.update( ( ManagementHostEntity ) managementHost );
+            }
+            ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
             ( ( AbstractSubutaiHost ) managementHost ).updateHostInfo( resourceHostInfo );
         }
         else

@@ -79,15 +79,16 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     public ManagementHostEntity( final String peerId, final ResourceHostInfo resourceHostInfo )
     {
         super( peerId, resourceHostInfo );
+        this.commands = new Commands();
+        this.commandUtil = new CommandUtil();
+        this.singleThreadExecutorService = Executors.newSingleThreadExecutor();
+        this.serviceLocator = new ServiceLocator();
     }
 
 
     public void init()
     {
-        this.commands = new Commands();
-        this.commandUtil = new CommandUtil();
-        this.singleThreadExecutorService = Executors.newSingleThreadExecutor();
-        this.serviceLocator = new ServiceLocator();
+        //for future use
     }
 
 
