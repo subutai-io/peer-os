@@ -10,6 +10,7 @@ import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.util.ExceptionUtil;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
@@ -18,7 +19,6 @@ import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Sets;
@@ -34,6 +34,7 @@ public class CreateEnvironmentTask implements Runnable
     private final Topology topology;
     private final ResultHolder<EnvironmentCreationException> resultHolder;
     private final Semaphore semaphore;
+    private ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
     public CreateEnvironmentTask( final LocalPeer localPeer, final EnvironmentManagerImpl environmentManager,
@@ -134,7 +135,7 @@ public class CreateEnvironmentTask implements Runnable
 
             resultHolder.setResult(
                     e instanceof EnvironmentCreationException ? ( EnvironmentCreationException ) e.getCause() :
-                    new EnvironmentCreationException( ExceptionUtils.getRootCause( e ) ) );
+                    new EnvironmentCreationException( exceptionUtil.getRootCause( e ) ) );
         }
         finally
         {

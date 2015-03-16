@@ -56,6 +56,7 @@ import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.util.ExceptionUtil;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
@@ -99,7 +100,6 @@ import org.safehaus.subutai.core.strategy.api.StrategyNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
@@ -134,6 +134,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     private HostRegistry hostRegistry;
     private Set<RequestListener> requestListeners;
     private CommandUtil commandUtil = new CommandUtil();
+    private ExceptionUtil exceptionUtil = new ExceptionUtil();
+
     private CustomSslContextFactory sslContextFactory;
 
 
@@ -758,8 +760,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 }
                 catch ( PeerException e )
                 {
-                    LOG.error( "Error cleaning up environment network configuration",
-                            ExceptionUtils.getRootCause( e ) );
+                    LOG.error( "Error cleaning up environment network configuration", exceptionUtil.getRootCause( e ) );
                 }
             }
             else
@@ -1497,7 +1498,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 }
                 catch ( ExecutionException | InterruptedException e )
                 {
-                    errors.add( ExceptionUtils.getRootCause( e ) );
+                    errors.add( exceptionUtil.getRootCause( e ) );
                 }
             }
 
@@ -1510,7 +1511,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 }
                 catch ( PeerException e )
                 {
-                    errors.add( ExceptionUtils.getRootCause( e ) );
+                    errors.add( exceptionUtil.getRootCause( e ) );
                 }
             }
 

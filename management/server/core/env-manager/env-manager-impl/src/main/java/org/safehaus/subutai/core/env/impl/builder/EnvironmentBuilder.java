@@ -15,6 +15,7 @@ import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.util.ExceptionUtil;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -38,6 +39,7 @@ public class EnvironmentBuilder
     private final TemplateRegistry templateRegistry;
     private final PeerManager peerManager;
     private final String defaultDomain;
+    private ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
     public EnvironmentBuilder( final TemplateRegistry templateRegistry, final PeerManager peerManager,
@@ -167,7 +169,7 @@ public class EnvironmentBuilder
             }
             catch ( ExecutionException | InterruptedException e )
             {
-                errors.add( ExceptionUtils.getRootCause( e ) );
+                errors.add( exceptionUtil.getRootCause( e ) );
             }
         }
 

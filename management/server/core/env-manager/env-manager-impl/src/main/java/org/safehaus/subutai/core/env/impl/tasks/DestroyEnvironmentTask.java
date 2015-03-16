@@ -16,6 +16,7 @@ import org.safehaus.subutai.common.peer.ContainersDestructionResult;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.util.ExceptionUtil;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
 import org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
@@ -23,8 +24,6 @@ import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -49,6 +48,7 @@ public class DestroyEnvironmentTask implements Runnable
     private final boolean forceMetadataRemoval;
     private final LocalPeer localPeer;
     private final Semaphore semaphore;
+    private ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
     public DestroyEnvironmentTask( final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
@@ -107,7 +107,7 @@ public class DestroyEnvironmentTask implements Runnable
                 }
                 catch ( ExecutionException | InterruptedException e )
                 {
-                    exceptions.add( ExceptionUtils.getRootCause( e ) );
+                    exceptions.add( exceptionUtil.getRootCause( e ) );
                 }
             }
 
@@ -166,7 +166,7 @@ public class DestroyEnvironmentTask implements Runnable
                     }
                     catch ( PeerException e )
                     {
-                        exceptions.add( ExceptionUtils.getRootCause( e ) );
+                        exceptions.add( exceptionUtil.getRootCause( e ) );
                     }
                 }
             }
