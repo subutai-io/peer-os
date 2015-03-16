@@ -471,17 +471,24 @@ function management_network {
 
       ovs-vsctl add-br br-$vlanID
       ifconfig  br-$vlanID $ipAdd
+      sed -i "/Re-init OVS flows/i \ifconfig br-$vlanID $ipAdd" /etc/init.d/service-interface
       ovs-vsctl add-port br-$vlanID "$vlanID"toint
       ovs-vsctl set interface "$vlanID"toint type=patch
       ovs-vsctl set interface "$vlanID"toint options:peer=intto"$vlanID"
       ovs-vsctl add-port br-int intto"$vlanID"
       ovs-vsctl set interface intto"$vlanID" type=patch
       ovs-vsctl set interface intto"$vlanID" options:peer="$vlanID"toint
-      ovs-vsctl set port br-$vlanID tag=$vlanID 
+      ovs-vsctl set port br-$vlanID tag=$vlanID
       ovs-ofctl add-flow br-$vlanID "priority=2500,ip,nw_src=10.10.10.0/24 actions=drop"
+      sed -i '/Re-init OVS flows/i \ovs-ofctl add-flow br-'$vlanID' "priority=2500,ip,nw_src=10.10.10.0/24 actions=drop"' /etc/init.d/service-interface
       ovs-ofctl add-flow br-int "priority=2500,ip,nw_src=10.10.10.0/24,nw_dst=$ipAdd actions=drop"
+      sed -i '/Re-init OVS flows/i \ovs-ofctl add-flow br-int "priority=2500,ip,nw_src=10.10.10.0/24,nw_dst='$ipAdd' actions=drop"' /etc/init.d/service-interface
       ovs-ofctl add-flow br-$vlanID "priority=2600,ip,nw_src=10.10.10.1 actions=normal"
+sed -i '/Re-init OVS flows/i \ovs-ofctl add-flow br-'$vlanID' "priority=2600,ip,nw_src=10.10.10.1 actions=normal"' /etc/init.d/service-interface
+
       ovs-ofctl add-flow br-int "priority=2600,ip,nw_src=10.10.10.1,nw_dst=$ipAdd actions=normal"
+sed -i '/Re-init OVS flows/i \ovs-ofctl add-flow br-int "priority=2600,ip,nw_src=10.10.10.1,nw_dst='$ipAdd' actions=normal"' /etc/init.d/service-interface
+ 
       msg_info "Gateway created for $vlanID"
    fi
 
@@ -511,8 +518,12 @@ function management_network {
          msg_error "VLAN ID has not provided. Aborting ..."
          show_usage "`management_network_usage`"
       fi
+      ipAdd=`ifconfig | grep -A1 br-$vlanID | grep addr: | awk -F":" '{print $2}' | awk '{print $1}'`
       ovs-vsctl del-br br-$vlanID
       ovs-vsctl del-port br-int intto$vlanID
+      sed -i '/reinit_flows () {/,/Re-init OVS flows/{/'$ipAdd'/d}' /etc/init.d/service-interface
+      sed -i '/reinit_flows () {/,/Re-init OVS flows/{/br-'$vlanID'/d}' /etc/init.d/service-interface
+
       msg_info "Gateway removed for $vlanID"
    fi
 
