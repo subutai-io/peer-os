@@ -9,13 +9,12 @@ import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.util.ExceptionUtil;
 import org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -39,6 +38,7 @@ public class GrowEnvironmentTask implements Runnable
     private final ResultHolder<EnvironmentModificationException> resultHolder;
     private final Set<ContainerHost> newContainers;
     private final Semaphore semaphore;
+    private ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
     public GrowEnvironmentTask( final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
@@ -95,7 +95,7 @@ public class GrowEnvironmentTask implements Runnable
             {
                 environment.setStatus( EnvironmentStatus.UNHEALTHY );
 
-                throw new EnvironmentModificationException( ExceptionUtils.getRootCause( e ) );
+                throw new EnvironmentModificationException( exceptionUtil.getRootCause( e ) );
             }
             finally
             {
