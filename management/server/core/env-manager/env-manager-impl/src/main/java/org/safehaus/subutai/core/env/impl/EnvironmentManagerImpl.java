@@ -180,18 +180,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public Environment findEnvironment( final UUID environmentId ) throws EnvironmentNotFoundException
     {
-        EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironmentInsecure( environmentId );
-
-        //check user access
-        checkAccess( environment );
-
-        return environment;
-    }
-
-
-    @Override
-    public Environment findEnvironmentInsecure( final UUID environmentId ) throws EnvironmentNotFoundException
-    {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         EnvironmentImpl environment = environmentDataService.find( environmentId.toString() );
@@ -200,6 +188,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             throw new EnvironmentNotFoundException();
         }
+
+        //check access to environment
+        checkAccess( environment );
 
         //set environment's transient fields
         setEnvironmentTransientFields( environment );
