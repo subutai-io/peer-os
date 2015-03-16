@@ -45,6 +45,7 @@ import org.safehaus.subutai.core.env.impl.tasks.DestroyEnvironmentTask;
 import org.safehaus.subutai.core.env.impl.tasks.GrowEnvironmentTask;
 import org.safehaus.subutai.core.env.impl.tasks.SetSshKeyTask;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
+import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -112,15 +113,28 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    protected User getUser()
+    {
+        User user = identityManager.getUser();
+
+        if ( user == null )
+        {
+            throw new EnvironmentSecurityException( "User not authenticated" );
+        }
+
+        return user;
+    }
+
+
     protected boolean isUserAdmin()
     {
-        return ( identityManager.getUser() != null ) && identityManager.getUser().isAdmin();
+        return getUser().isAdmin();
     }
 
 
     protected Long getUserId()
     {
-        return identityManager.getUser().getId();
+        return getUser().getId();
     }
 
 
@@ -166,6 +180,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public Environment findEnvironment( final UUID environmentId ) throws EnvironmentNotFoundException
     {
+        EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironmentInsecure( environmentId );
+
+        //check user access
+        checkAccess( environment );
+
+        return environment;
+    }
+
+
+    @Override
+    public Environment findEnvironmentInsecure( final UUID environmentId ) throws EnvironmentNotFoundException
+    {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         EnvironmentImpl environment = environmentDataService.find( environmentId.toString() );
@@ -174,9 +200,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             throw new EnvironmentNotFoundException();
         }
-
-        //check user access
-        checkAccess( environment );
 
         //set environment's transient fields
         setEnvironmentTransientFields( environment );

@@ -40,6 +40,17 @@ public interface EnvironmentManager
     public Environment findEnvironment( UUID environmentId ) throws EnvironmentNotFoundException;
 
     /**
+     * Returns environment by id without checking access rights
+     *
+     * @param environmentId - environment id
+     *
+     * @return - {@code Environment}
+     *
+     * @throws EnvironmentNotFoundException - thrown if environment not found
+     */
+    public Environment findEnvironmentInsecure( UUID environmentId ) throws EnvironmentNotFoundException;
+
+    /**
      * Creates environment based on a passed topology
      *
      * @param name - environment name
