@@ -197,9 +197,8 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
             {
                 try
                 {
-                    commandUtil.execute( new RequestBuilder( "subutai management_network" )
-                            .withCmdArgs( Lists.newArrayList( "-Z", "deleteall", String.valueOf( vni.getVlan() ) ) ),
-                            this );
+                    commandUtil.execute( new RequestBuilder( "subutai management_network" ).withCmdArgs(
+                                    Lists.newArrayList( "-Z", "deleteall", String.valueOf( vni.getVlan() ) ) ), this );
                 }
                 catch ( CommandException e )
                 {
@@ -282,7 +281,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         }
         catch ( NetworkManagerException e )
         {
-            throw new PeerException( e );
+            throw new PeerException( "Error reserving VNI", e );
         }
     }
 

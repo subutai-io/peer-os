@@ -9,7 +9,6 @@ import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.ExceptionUtil;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl;
@@ -74,11 +73,9 @@ public class CreateEnvironmentTask implements Runnable
                 {
                     if ( gateway.getIp().equals( environmentGatewayIp ) )
                     {
-                        LOG.error( String.format( "Subnet %s is already used on peer %s. Peer excluded",
-                                environment.getSubnetCidr(), peer.getName() ) );
-                        //exclude peer from environment in case subnet is not available
-                        topology.excludePeer( peer );
-                        break;
+                        throw new EnvironmentCreationException(
+                                String.format( "Subnet %s is already used on peer %s", environment.getSubnetCidr(),
+                                        peer.getName() ) );
                     }
                 }
             }
@@ -104,19 +101,8 @@ public class CreateEnvironmentTask implements Runnable
 
             for ( Peer peer : allPeers )
             {
-                try
-                {
-                    peer.reserveVni( newVni );
-                }
-                catch ( PeerException e )
-                {
-                    LOG.error( String.format( "Failed to reserve VNI %d on peer %s. Peer excluded", vni,
-                            peer.getName() ) );
-                    //exclude peer from environment in case VNI reservation failed
-                    topology.excludePeer( peer );
-                }
+                peer.reserveVni( newVni );
             }
-
 
             if ( topology.getNodeGroupPlacement().isEmpty() )
             {
