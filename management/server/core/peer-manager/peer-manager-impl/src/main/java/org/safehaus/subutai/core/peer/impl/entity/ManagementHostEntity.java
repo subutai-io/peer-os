@@ -258,15 +258,16 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
-    public void reserveVni( final Vni vni ) throws PeerException
+    public int reserveVni( final Vni vni ) throws PeerException
     {
         Preconditions.checkNotNull( vni, "Invalid vni" );
 
         //todo exec via queueSequentialTask
         //check if vni is already reserved
-        if ( findVniByEnvironmentId( vni.getEnvironmentId() ) != null )
+        Vni existingVni = findVniByEnvironmentId( vni.getEnvironmentId() );
+        if ( existingVni != null )
         {
-            return;
+            return existingVni.getVlan();
         }
 
         //figure out available vlan
@@ -276,6 +277,8 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         try
         {
             getNetworkManager().reserveVni( new Vni( vni.getVni(), vlan, vni.getEnvironmentId() ) );
+
+            return vlan;
         }
         catch ( NetworkManagerException e )
         {

@@ -80,21 +80,16 @@ public class CreateEnvironmentTask implements Runnable
                 }
             }
 
-            if ( topology.getNodeGroupPlacement().isEmpty() )
-            {
-                throw new EnvironmentCreationException( "Subnet is already used on all peers" );
-            }
-
-            allPeers = Sets.newHashSet( topology.getNodeGroupPlacement().keySet() );
-
             //figure out free VNI
             long vni = environmentManager.findFreeVni( allPeers );
-
 
             //reserve VNI on local peer
             Vni newVni = new Vni( vni, environment.getId() );
 
-            localPeer.reserveVni( newVni );
+            int vlan = localPeer.reserveVni( newVni );
+
+            //setup gateway on mgmt host
+            localPeer.getManagementHost().createGateway( environmentGatewayIp, vlan );
 
             //reserve VNI on remote peers
             allPeers.remove( localPeer );
@@ -102,11 +97,6 @@ public class CreateEnvironmentTask implements Runnable
             for ( Peer peer : allPeers )
             {
                 peer.reserveVni( newVni );
-            }
-
-            if ( topology.getNodeGroupPlacement().isEmpty() )
-            {
-                throw new EnvironmentCreationException( "Failed to reserve VNI on all remote peers" );
             }
 
             //save environment VNI
