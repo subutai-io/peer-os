@@ -519,6 +519,7 @@ sed -i '/Re-init OVS flows/i \ovs-ofctl add-flow br-int "priority=2600,ip,nw_src
          show_usage "`management_network_usage`"
       fi
       ipAdd=`ifconfig | grep -A1 br-$vlanID | grep addr: | awk -F":" '{print $2}' | awk '{print $1}'`
+      ovs-ofctl del-flows br-int ip,nw_src=10.10.10.0/24,nw_dst=$ipAdd
       ovs-vsctl del-br br-$vlanID
       ovs-vsctl del-port br-int intto$vlanID
       sed -i '/reinit_flows () {/,/Re-init OVS flows/{/'$ipAdd'/d}' /etc/init.d/service-interface
