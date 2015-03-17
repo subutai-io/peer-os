@@ -246,7 +246,7 @@ public interface RestService
 
     @POST
     @Path( "vni" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( { MediaType.TEXT_PLAIN } )
     Response reserveVni( @FormParam( "vni" ) String vni );
 
 
