@@ -229,9 +229,7 @@ SubutaiContainer* SubutaiContainerManager::findContainerById(
 			return (*it);
 		}
 	}
-	_logger->writeLog(1,
-			_logger->setLogData("<SubutaiContainerManager>",
-					"Container not found: " + container_id));
+
 	return NULL;
 }
 
