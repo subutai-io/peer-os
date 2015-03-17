@@ -202,8 +202,7 @@ public class HexUtil
             // Not a control character and defined in Unicode
             if ( ( !Character.isISOControl( ( char ) i ) ) && ( Character.isDefined( ( char ) i ) ) )
             {
-                Character clr = Character.valueOf( ( char ) i );
-                c = clr.charValue();
+                c = ( char ) i;
             }
 
             sbClr.append( c );
