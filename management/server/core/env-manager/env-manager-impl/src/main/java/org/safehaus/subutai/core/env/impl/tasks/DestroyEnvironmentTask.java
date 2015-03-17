@@ -11,6 +11,7 @@ import java.util.concurrent.Semaphore;
 
 import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
+import org.safehaus.subutai.common.mdc.SubutaiExecutors;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.ContainersDestructionResult;
 import org.safehaus.subutai.common.peer.Peer;
@@ -87,7 +88,7 @@ public class DestroyEnvironmentTask implements Runnable
                 environmentPeers.add( container.getPeer() );
             }
 
-            ExecutorService executorService = Executors.newFixedThreadPool( environmentPeers.size() );
+            ExecutorService executorService = SubutaiExecutors.newFixedThreadPool( environmentPeers.size() );
 
             Set<Future<ContainersDestructionResult>> futures = Sets.newHashSet();
 
