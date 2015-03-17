@@ -43,8 +43,8 @@ public class PortalModuleDataService implements DataService<String, PortalModule
         try
         {
             em.getTransaction().begin();
-            result = em.createQuery( "SELECT p FROM PortalModuleScopeEntity p", PortalModuleScopeEntity.class )
-                       .getResultList();
+            result = em.createQuery( "SELECT p FROM PortalModuleScopeEntity p ORDER BY p.moduleKey, p.moduleName",
+                    PortalModuleScopeEntity.class ).getResultList();
             em.getTransaction().commit();
         }
         catch ( Exception e )
@@ -73,9 +73,9 @@ public class PortalModuleDataService implements DataService<String, PortalModule
         try
         {
             em.getTransaction().begin();
-            TypedQuery<PortalModuleScopeEntity> query = em.createQuery(
-                    "SELECT p FROM PortalModuleScopeEntity p WHERE p.moduleKey = :moduleKey AND p.moduleName = "
-                            + ":moduleName", PortalModuleScopeEntity.class );
+            TypedQuery<PortalModuleScopeEntity> query =
+                    em.createQuery( "SELECT p FROM PortalModuleScopeEntity p WHERE p.moduleKey = :moduleKey",
+                            PortalModuleScopeEntity.class );
             query.setParameter( "moduleKey", id );
 
             List<PortalModuleScopeEntity> permissions = query.getResultList();
@@ -137,9 +137,7 @@ public class PortalModuleDataService implements DataService<String, PortalModule
         {
             em.getTransaction().begin();
 
-            Query query = em.createQuery(
-                    "DELETE FROM PortalModuleScopeEntity p WHERE p.moduleKey = :moduleKey AND p.moduleName = "
-                            + ":moduleName" );
+            Query query = em.createQuery( "DELETE FROM PortalModuleScopeEntity p WHERE p.moduleKey = :moduleKey" );
             query.setParameter( "moduleKey", id );
             query.executeUpdate();
 

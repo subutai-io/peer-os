@@ -16,6 +16,7 @@ import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.util.ExceptionUtil;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.NodeGroupBuildException;
@@ -23,7 +24,6 @@ import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
@@ -46,6 +46,7 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
     private final String defaultDomain;
     private final Set<Peer> allPeers;
     private final int ipAddressOffset;
+    private ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
     public NodeGroupBuilder( final EnvironmentImpl environment, final TemplateRegistry templateRegistry,
@@ -228,8 +229,8 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
                 Set<String> peerIps = Sets.newHashSet();
 
                 //add initiator peer mandatorily
-                peerIps.add( localPeer.getManagementHost().getIpByInterfaceName(
-                        Common.MANAGEMENT_HOST_EXTERNAL_IP_INTERFACE) );
+                peerIps.add( localPeer.getManagementHost()
+                                      .getIpByInterfaceName( Common.MANAGEMENT_HOST_EXTERNAL_IP_INTERFACE ) );
 
 
                 for ( Peer aPeer : allPeers )
@@ -271,7 +272,7 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
             {
                 exception = new NodeGroupBuildException(
                         String.format( "Error creating node group %s on peer %s", nodeGroup, peer.getName() ),
-                        ExceptionUtils.getRootCause( e ) );
+                        exceptionUtil.getRootCause( e ) );
             }
 
             results.add( new NodeGroupBuildResult( containers, exception ) );

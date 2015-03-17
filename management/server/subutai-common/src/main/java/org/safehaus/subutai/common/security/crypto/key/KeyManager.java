@@ -12,10 +12,15 @@ import java.security.Signature;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class KeyManager
 {
-	
+
+	private static final Logger LOG = LoggerFactory.getLogger( KeyManager.class.getName() );
+
 	private KeyPairGenerator keyPairGen;
 	private KeyPair keyPair;
 	private PrivateKey privateKey;
@@ -38,7 +43,7 @@ public class KeyManager
 		}
         catch ( Exception e )
         {
-	        e.printStackTrace();
+			LOG.error( "Error preparing KeyPair generator", e );
         }
         
         return keyPairGen;
@@ -59,7 +64,7 @@ public class KeyManager
 		}
         catch ( Exception e )
         {
-	        e.printStackTrace();
+			LOG.error( "Error generating KeyPair", e );
         }
         
         return keyPair;
@@ -76,7 +81,7 @@ public class KeyManager
 		}
         catch ( Exception e )
         {
-	        e.printStackTrace();
+			LOG.error( "Error generating Private Key", e );
         }
         
         return privateKey;
@@ -94,7 +99,7 @@ public class KeyManager
 		}
         catch ( Exception e )
         {
-	        e.printStackTrace();
+			LOG.error( "Error Public Key", e );
         }
         
         return publicKey;
@@ -114,7 +119,7 @@ public class KeyManager
 		}
         catch ( Exception e )
         {
-	        e.printStackTrace();
+			LOG.error( "Error converting private Key to bytes", e );
         }
         
         return privateKeyBytes;
@@ -135,7 +140,7 @@ public class KeyManager
 		}
         catch ( Exception e )
         {
-	        e.printStackTrace();
+			LOG.error( "Error converting public Key to bytes", e );
         }
         
         return publicKeyBytes;
@@ -154,7 +159,7 @@ public class KeyManager
         }
         catch ( NoSuchAlgorithmException e )
         {
-	        e.printStackTrace();
+			LOG.error( "Error preparing Secret Key generator", e );
         }
 	}
 	/**
@@ -170,7 +175,7 @@ public class KeyManager
         }
         catch ( Exception e )
         {
-	        e.printStackTrace();
+			LOG.error( "Error generating Secret Key", e );
         }
 		
 		return secretKey;
@@ -211,7 +216,7 @@ public class KeyManager
         }
         catch ( Exception e )
         {
-	        e.printStackTrace();
+			LOG.error( "Error signing data", e );
         }
 		
 		return  signedData; 
@@ -222,7 +227,7 @@ public class KeyManager
 	 * *************************************************************************
 	 * **********************************
 	 */
-	public boolean verfifySignedData(SignatureType signatureType,KeyPair keyPair,String fileName,byte[] sign)
+	public boolean verifySignedData(SignatureType signatureType,KeyPair keyPair,String fileName,byte[] sign)
 	{
 		boolean verified = false;
 		
@@ -253,7 +258,7 @@ public class KeyManager
         }
         catch ( Exception e )
         {
-	        e.printStackTrace();
+			LOG.error( "Error verifying signed data", e );
         }
 		
 		return  verified; 

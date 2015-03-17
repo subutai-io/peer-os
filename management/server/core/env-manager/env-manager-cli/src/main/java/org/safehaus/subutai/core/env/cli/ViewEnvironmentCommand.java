@@ -8,10 +8,10 @@ import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
 
@@ -20,7 +20,7 @@ import com.google.common.base.Preconditions;
  * View target environment brief info
  */
 @Command( scope = "env", name = "view", description = "Command to view environment" )
-public class ViewEnvironmentCommand extends OsgiCommandSupport
+public class ViewEnvironmentCommand extends SubutaiShellCommandSupport
 {
 
     @Argument( name = "envId", description = "Environment id",

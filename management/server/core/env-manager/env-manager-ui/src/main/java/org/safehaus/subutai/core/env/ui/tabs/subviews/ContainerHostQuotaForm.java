@@ -21,17 +21,47 @@ public class ContainerHostQuotaForm extends VerticalLayout
 {
 
 
-    private TextField ramQuotaTextField = new TextField( "RAM Quota" );
+    private TextField ramQuotaTextField = new TextField( "RAM Quota" )
+    {
+        {
+            setBuffered( true );
+        }
+    };
 
-    private TextField cpuQuotaTextField = new TextField( "CPU Quota" );
+    private TextField cpuQuotaTextField = new TextField( "CPU Quota" )
+    {
+        {
+            setBuffered( true );
+        }
+    };
 
-    private TextField diskHomeTextField = new TextField( "Home directory quota" );
+    private TextField diskHomeTextField = new TextField( "Home directory quota" )
+    {
+        {
+            setBuffered( true );
+        }
+    };
 
-    private TextField diskRootfsTextField = new TextField( "Rootfs directory quota" );
+    private TextField diskRootfsTextField = new TextField( "Rootfs directory quota" )
+    {
+        {
+            setBuffered( true );
+        }
+    };
 
-    private TextField diskVarTextField = new TextField( "Var directory quota" );
+    private TextField diskVarTextField = new TextField( "Var directory quota" )
+    {
+        {
+            setBuffered( true );
+        }
+    };
 
-    private TextField diskOptTextField = new TextField( "Opt directory quota" );
+    private TextField diskOptTextField = new TextField( "Opt directory quota" )
+    {
+        {
+            setBuffered( true );
+        }
+    };
 
     private Button updateChanges = new Button( "Update changes" );
 

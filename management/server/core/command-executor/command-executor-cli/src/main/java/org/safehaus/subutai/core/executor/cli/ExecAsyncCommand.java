@@ -10,12 +10,12 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.command.Response;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
 
@@ -29,7 +29,7 @@ import com.google.common.base.Preconditions;
  * daemon: specify command execution as a daemon or not
  */
 @Command( scope = "command", name = "exec-async", description = "Executes command asynchronously" )
-public class ExecAsyncCommand extends OsgiCommandSupport
+public class ExecAsyncCommand extends SubutaiShellCommandSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( ExecAsyncCommand.class.getName() );

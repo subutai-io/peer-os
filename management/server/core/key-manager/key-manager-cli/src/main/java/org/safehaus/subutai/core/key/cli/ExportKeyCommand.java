@@ -2,16 +2,16 @@ package org.safehaus.subutai.core.key.cli;
 
 
 import org.safehaus.subutai.common.peer.Host;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.key.api.KeyManager;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 @Command( scope = "km", name = "export-key" )
-public class ExportKeyCommand extends OsgiCommandSupport
+public class ExportKeyCommand extends SubutaiShellCommandSupport
 {
     private KeyManager keyManager;
     private PeerManager peerManager;

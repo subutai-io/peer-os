@@ -200,6 +200,11 @@ public class FileDiffModalView extends Window
                 }
             }
         }
+        if ( !append )
+        {
+            int inx = input.indexOf( "Binary" );
+            result += "<pre>" + input.substring( inx > 0 ? inx : 0 ) + "</pre>";
+        }
         return result;
     }
 }

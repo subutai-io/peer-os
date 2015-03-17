@@ -20,6 +20,10 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-cli-rbac</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>metric-api</artifactId>
     </dependency>
     <dependency>

@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 public class KeyStoreManager
 {
+
     private static final Logger LOGGER = LoggerFactory.getLogger( KeyStoreManager.class );
     private FileInputStream finStream = null;
     private FileOutputStream foutStream = null;
@@ -58,7 +59,7 @@ public class KeyStoreManager
         {
             if ( !keyStoreData.getKeyStoreType().isFileBased() )
             {
-                System.out.println( "NoCreateKeyStoreNotFile.exception.message" );
+                LOGGER.error( "NoCreateKeyStoreNotFile.exception.message" );
             }
             else
             {
@@ -121,7 +122,7 @@ public class KeyStoreManager
         {
             if ( !keyStoreData.getKeyStoreType().isFileBased() )
             {
-                System.out.println( "NoCreateKeyStoreNotFile.exception.message" );
+                LOGGER.error( "NoCreateKeyStoreNotFile.exception.message" );
             }
             else
             {

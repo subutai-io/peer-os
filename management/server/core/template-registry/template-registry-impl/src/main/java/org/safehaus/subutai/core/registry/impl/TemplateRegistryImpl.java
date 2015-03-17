@@ -794,13 +794,25 @@ public class TemplateRegistryImpl implements TemplateRegistry
     }
 
 
-    public List<GitChangedFile> getChangedFiles( Template template ) throws RegistryException
+    public List<GitChangedFile> getChangedFiles( Template templateA, Template templateB ) throws RegistryException
     {
-        String aBranch = template.getParentTemplateName();
-        String bBranch = template.getTemplateName();
-        if ( aBranch == null || "".equals( aBranch ) )
+        String aBranch;
+        String bBranch;
+        if ( templateB == null )
+        {
+            throw new RegistryException( "Base branch name is null aborting." );
+        }
+        else
+        {
+            bBranch = templateB.getTemplateName();
+        }
+        if ( templateA == null )
         {
             aBranch = bBranch;
+        }
+        else
+        {
+            aBranch = templateA.getTemplateName();
         }
         return getChangedFiles( aBranch, bBranch );
     }
