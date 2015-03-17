@@ -112,7 +112,7 @@ public class CreateEnvironmentTask implements Runnable
             //save environment VNI
             environment.setVni( vni );
 
-            environmentManager.growEnvironment( environment.getId(), topology, false );
+            environmentManager.growEnvironment( environment.getId(), topology, false, false );
         }
         catch ( Exception e )
         {

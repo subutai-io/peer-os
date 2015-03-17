@@ -106,7 +106,7 @@ public class DestroyContainerTask implements Runnable
             {
                 try
                 {
-                    environmentManager.removeEnvironment( environment.getId() );
+                    environmentManager.removeEnvironment( environment.getId(), false );
                 }
                 catch ( EnvironmentNotFoundException e )
                 {
