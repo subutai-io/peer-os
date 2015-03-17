@@ -5,6 +5,7 @@ import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -13,14 +14,13 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
  * Created by talas on 12/8/14.
  */
 @Command( scope = "quota", name = "get-quota", description = "Gets quota for specified container" )
-public class GetQuota extends OsgiCommandSupport
+public class GetQuota extends SubutaiShellCommandSupport
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( GetQuota.class );
     @Argument( index = 0, name = "container name", required = true, multiValued = false,

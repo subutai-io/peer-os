@@ -129,4 +129,16 @@ public class TemplatePK implements Serializable
         result = 31 * result + md5sum.hashCode();
         return result;
     }
+
+
+    @Override
+    public String toString()
+    {
+        return "TemplatePK{" +
+                "templateName='" + templateName + '\'' +
+                ", lxcArch='" + lxcArch + '\'' +
+                ", templateVersion='" + templateVersion + '\'' +
+                ", md5sum='" + md5sum + '\'' +
+                '}';
+    }
 }

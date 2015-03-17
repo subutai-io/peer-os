@@ -18,6 +18,7 @@ import org.safehaus.subutai.common.environment.EnvironmentModificationException;
 import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
+import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Peer;
@@ -215,6 +216,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final ResultHolder<EnvironmentCreationException> resultHolder = new ResultHolder<>();
 
+
         CreateEnvironmentTask createEnvironmentTask =
                 new CreateEnvironmentTask( peerManager.getLocalPeer(), this, environment, topology, resultHolder );
 
@@ -250,7 +252,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     public void setupEnvironmentTunnel( UUID environmentId, Set<Peer> peers ) throws EnvironmentTunnelException
     {
-        String envAlias =
+        String localEnvAlias =
                 String.format( "env_%s_%s", peerManager.getLocalPeer().getId().toString(), environmentId.toString() );
         Set<Peer> remotePeers = Sets.newHashSet( peers );
         LocalPeer localPeer = peerManager.getLocalPeer();
@@ -259,22 +261,43 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             try
             {
-                String localPeerCert = localPeer.exportEnvironmentCertificate( envAlias );
+                String localPeerCert = localPeer.exportEnvironmentCertificate( environmentId );
 
                 for ( Peer remotePeer : remotePeers )
                 {
-                    String remotePeerCert = remotePeer.exportEnvironmentCertificate( envAlias );
-                    localPeer.importCertificate( remotePeerCert, envAlias );
-                    remotePeer.importCertificate( localPeerCert, envAlias );
+                    String remotePeerCert = remotePeer.exportEnvironmentCertificate( environmentId );
+                    String remoteEnvAlias =
+                            String.format( "env_%s_%s", remotePeer.getId().toString(), environmentId.toString() );
+                    localPeer.importCertificate( remotePeerCert, remoteEnvAlias );
+                    remotePeer.importCertificate( localPeerCert, localEnvAlias );
                 }
             }
             catch ( Exception e )
             {
-                //TODO uncomment this exception later when PEKS work
-                //            throw new EnvironmentTunnelException( "Error exchanging environment certificates ",e );
-                LOG.error( "Error exchanging environment certificates ", e );
+                throw new EnvironmentTunnelException( "Error exchanging environment certificates ", e );
             }
         }
+    }
+
+
+    public Map<Peer, Set<Gateway>> getUsedGateways( Set<Peer> peers ) throws EnvironmentManagerException
+    {
+        Map<Peer, Set<Gateway>> usedGateways = Maps.newHashMap();
+
+        for ( Peer peer : peers )
+        {
+            try
+            {
+                usedGateways.put( peer, peer.getGateways() );
+            }
+            catch ( PeerException e )
+            {
+                throw new EnvironmentManagerException(
+                        String.format( "Error obtaining gateways from peer %s", peer.getName() ), e );
+            }
+        }
+
+        return usedGateways;
     }
 
 

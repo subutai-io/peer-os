@@ -12,6 +12,7 @@ import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.common.quota.RamQuota;
 
 
 public interface QuotaManager
@@ -133,6 +134,14 @@ public interface QuotaManager
      * @param diskQuota - disk quota to set
      */
     public void setDiskQuota( UUID containerId, DiskQuota diskQuota ) throws QuotaException;
+
+    /**
+     * Sets ram quota on container
+     *
+     * @param containerId - id of container
+     * @param ramQuota - ram quota to set
+     */
+    public void setRamQuota( final UUID containerId, final RamQuota ramQuota ) throws QuotaException;
 
     /**
      * Returns max available RAM quota in MB on container

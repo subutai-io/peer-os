@@ -34,7 +34,14 @@ public class ChannelManagerComponent extends CustomComponent implements Disposab
         PortManager portManager = new PortManager( channelManager );
 
         sheet.addTab( userTokenManager, "User Token Manager" ).setId( "UserTokenManagerTab" );
-        sheet.addTab( portManager, "Port Manager" ).setId( "PortManager" );
+
+
+        //--------------------------------------------------------------------------------------------
+        if(identityManager.getUser().isAdmin())
+        {
+            sheet.addTab( portManager, "Port Manager" ).setId( "PortManager" );
+        }
+        //--------------------------------------------------------------------------------------------
 
         verticalLayout.addComponent( sheet );
 

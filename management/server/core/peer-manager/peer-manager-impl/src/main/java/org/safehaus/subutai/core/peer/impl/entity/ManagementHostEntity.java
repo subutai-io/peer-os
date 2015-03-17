@@ -13,6 +13,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.naming.NamingException;
 import javax.persistence.Access;
@@ -25,6 +27,8 @@ import javax.persistence.Transient;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandUtil;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.host.Interface;
+import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.network.VniVlanMapping;
 import org.safehaus.subutai.common.peer.PeerException;
@@ -50,6 +54,10 @@ import com.google.common.collect.Sets;
 @Access( AccessType.FIELD )
 public class ManagementHostEntity extends AbstractSubutaiHost implements ManagementHost
 {
+    private static final String GATEWAY_INTERFACE_NAME_REGEX = "^br-(\\d+)$";
+    private static final Pattern GATEWAY_INTERFACE_NAME_PATTERN = Pattern.compile( GATEWAY_INTERFACE_NAME_REGEX );
+
+
     @Column
     String name = "Subutai Management Host";
 
@@ -71,15 +79,16 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     public ManagementHostEntity( final String peerId, final ResourceHostInfo resourceHostInfo )
     {
         super( peerId, resourceHostInfo );
+        this.commands = new Commands();
+        this.commandUtil = new CommandUtil();
+        this.singleThreadExecutorService = Executors.newSingleThreadExecutor();
+        this.serviceLocator = new ServiceLocator();
     }
 
 
     public void init()
     {
-        this.commands = new Commands();
-        this.commandUtil = new CommandUtil();
-        this.singleThreadExecutorService = Executors.newSingleThreadExecutor();
-        this.serviceLocator = new ServiceLocator();
+        //for future use
     }
 
 
@@ -143,6 +152,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
                 String.format( "VLAN must be in the range from %d to %d", Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
 
+        //TODO use network manager
         try
         {
             commandUtil.execute( new RequestBuilder( "subutai management_network" )
@@ -152,6 +162,52 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         {
             throw new PeerException(
                     String.format( "Error creating gateway tap device with IP %s and VLAN %d", gatewayIp, vlan ), e );
+        }
+    }
+
+
+    @Override
+    public void removeGateway( final int vlan ) throws PeerException
+    {
+        Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
+                String.format( "VLAN must be in the range from %d to %d", Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+
+        //TODO use network manager
+        try
+        {
+            commandUtil.execute( new RequestBuilder( "subutai management_network" )
+                    .withCmdArgs( Lists.newArrayList( "-D", String.valueOf( vlan ) ) ), this );
+        }
+        catch ( CommandException e )
+        {
+            throw new PeerException( String.format( "Error removing gateway tap device with VLAN %d", vlan ), e );
+        }
+    }
+
+
+    public void cleanupEnvironmentNetworkSettings( final UUID environmentId ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        Set<Vni> reservedVnis = getReservedVnis();
+
+        //TODO use network manager
+        for ( Vni vni : reservedVnis )
+        {
+            if ( vni.getEnvironmentId().equals( environmentId ) )
+            {
+                try
+                {
+                    commandUtil.execute( new RequestBuilder( "subutai management_network" ).withCmdArgs(
+                                    Lists.newArrayList( "-Z", "deleteall", String.valueOf( vni.getVlan() ) ) ), this );
+                }
+                catch ( CommandException e )
+                {
+                    throw new PeerException(
+                            String.format( "Error cleaning up environment %s network settings", environmentId ), e );
+                }
+                break;
+            }
         }
     }
 
@@ -184,10 +240,32 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
+    public Set<Gateway> getGateways() throws PeerException
+    {
+        Set<Gateway> gateways = Sets.newHashSet();
+
+        for ( Interface iface : interfaces )
+        {
+            Matcher matcher = GATEWAY_INTERFACE_NAME_PATTERN.matcher( iface.getInterfaceName().trim() );
+            if ( matcher.find() )
+            {
+                int vlan = Integer.parseInt( matcher.group( 1 ) );
+                String ip = iface.getIp();
+
+                gateways.add( new Gateway( vlan, ip ) );
+            }
+        }
+
+        return gateways;
+    }
+
+
+    @Override
     public void reserveVni( final Vni vni ) throws PeerException
     {
         Preconditions.checkNotNull( vni, "Invalid vni" );
 
+        //todo exec via queueSequentialTask
         //check if vni is already reserved
         if ( findVniByEnvironmentId( vni.getEnvironmentId() ) != null )
         {
@@ -204,7 +282,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         }
         catch ( NetworkManagerException e )
         {
-            throw new PeerException( e );
+            throw new PeerException( "Error reserving VNI", e );
         }
     }
 
@@ -238,7 +316,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
                 Set<Tunnel> tunnels = networkManager.listTunnels();
 
                 //remove local IP, just in case
-                peerIps.remove( getIpByInterfaceName( "eth1" ) );
+                peerIps.remove( getIpByInterfaceName( Common.MANAGEMENT_HOST_EXTERNAL_IP_INTERFACE ) );
 
                 for ( String peerIp : peerIps )
                 {

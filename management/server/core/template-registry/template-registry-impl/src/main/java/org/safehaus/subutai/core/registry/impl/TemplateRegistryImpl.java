@@ -37,8 +37,6 @@ import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -796,15 +794,27 @@ public class TemplateRegistryImpl implements TemplateRegistry
     }
 
 
-    public List<GitChangedFile> getChangedFiles( Template template ) throws RegistryException
+    public List<GitChangedFile> getChangedFiles( Template templateA, Template templateB ) throws RegistryException
     {
-        String parentBranch = template.getParentTemplateName();
-        String templateBranch = template.getTemplateName();
-        if ( parentBranch == null || "".equals( parentBranch ) )
+        String aBranch;
+        String bBranch;
+        if ( templateB == null )
         {
-            parentBranch = templateBranch;
+            throw new RegistryException( "Base branch name is null aborting." );
         }
-        return getChangedFiles( parentBranch, templateBranch );
+        else
+        {
+            bBranch = templateB.getTemplateName();
+        }
+        if ( templateA == null )
+        {
+            aBranch = bBranch;
+        }
+        else
+        {
+            aBranch = templateA.getTemplateName();
+        }
+        return getChangedFiles( aBranch, bBranch );
     }
 
 
@@ -878,34 +888,11 @@ public class TemplateRegistryImpl implements TemplateRegistry
 
 
     @Override
-    public Pair<String, String> getChangedFileVersions( String branchA, String branchB, GitChangedFile file )
+    public String getChangedFileVersions( String branchA, String branchB, GitChangedFile file )
     {
         try
         {
-            final String aBranchVersion = gitManager.showFile( REPO_ROOT_PATH, branchA, file.getGitFilePath() );
-            final String bBranchVersion = gitManager.showFile( REPO_ROOT_PATH, branchB, file.getGitFilePath() );
-            return new Pair<String, String>()
-            {
-                @Override
-                public String getLeft()
-                {
-                    return aBranchVersion;
-                }
-
-
-                @Override
-                public String getRight()
-                {
-                    return bBranchVersion;
-                }
-
-
-                @Override
-                public String setValue( final String value )
-                {
-                    throw new UnsupportedOperationException( "Cannot set value for object." );
-                }
-            };
+            return gitManager.diffFile( REPO_ROOT_PATH, branchA, branchB, file.getGitFilePath() );
         }
         catch ( GitException e )
         {

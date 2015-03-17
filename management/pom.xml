@@ -88,14 +88,23 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- core -->
-
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- fragments -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>jetty-ssl-fragment</artifactId>
         <version>${project.version}</version>
       </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>subutai-cli-rbac</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- core -->
+
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>test-api</artifactId>
@@ -114,6 +123,11 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>test-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>test-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -523,6 +537,24 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- ssl-context-manager -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>ssl-context-manager-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>ssl-context-manager-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>ssl-context-manager-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- identity -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -544,6 +576,7 @@
         <artifactId>identity-manager-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
+
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- Vaadin -->
       <dependency>
@@ -793,6 +826,27 @@
         <groupId>commons-validator</groupId>
         <artifactId>commons-validator</artifactId>
         <version>1.4.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcmail-jdk15on</artifactId>
+        <version>${org.bouncycastle.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcpg-jdk15on</artifactId>
+        <version>${org.bouncycastle.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk15on</artifactId>
+        <version>${org.bouncycastle.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-ext-jdk15on</artifactId>
+        <version>${org.bouncycastle.version}</version>
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

@@ -29,9 +29,6 @@ import org.apache.karaf.jaas.config.JaasRealm;
 import org.apache.karaf.jaas.modules.AbstractKarafLoginModule;
 
 
-/**
- * Created by timur on 1/22/15.
- */
 public class ShiroLoginModule extends AbstractKarafLoginModule
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( ShiroLoginModule.class.getName() );

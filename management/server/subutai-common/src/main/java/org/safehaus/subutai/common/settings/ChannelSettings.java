@@ -8,23 +8,18 @@ public class ChannelSettings
 {
     public static final String OPEN_PORT = "8181";
     public static final String SPECIAL_PORT_X1 = "8542";
-    public static final String SECURE_PORT_X1  = "8543";
-    public static final String SECURE_PORT_X2  = "8544";
-    public static final String SECURE_PORT_X3  = "8545";
+    public static final String SPECIAL_SECURE_PORT_X1 = "8552";
+    public static final String SECURE_PORT_X1 = "8543";
+    public static final String SECURE_PORT_X2 = "8544";
+    public static final String SECURE_PORT_X3 = "8545";
 
 
-    public static String[] URL_ACCESS_PX1 =
-    {
-            "/cxf/peer/register",
-            "/cxf/peer/reject",
-            "/cxf/peer/approve",
-            "/cxf/peer/remove",
-            "/cxf/peer/trust_request",
-            "/cxf/peer/trust_response",
+    public static String[] URL_ACCESS_PX1 = {
+            "/cxf/peer/register", "/cxf/peer/reject", "/cxf/peer/approve", "/cxf/peer/remove",
+            "/cxf/peer/trust_request", "/cxf/peer/trust_response",
     };
 
-    public static String[] URL_ACCESS_PX2 =
-    {
+    public static String[] URL_ACCESS_PX2 = {
             "/cxf/peer/", "/cxf/peer/getlist", "/cxf/peer/me", "/cxf/peer/id", "/cxf/peer/update",
             "/cxf/peer/registered_peers", "/cxf/peer/ping", "/cxf/peer/template/get", "/cxf/peer/unregister",
 
@@ -45,7 +40,7 @@ public class ChannelSettings
 
             "/cxf/identity/key/{username}",
 
-            "/cxf/messenger/message",
+            "/cxf/messenger/message", "/cxf/peer/gateways",
 
             "/cxf/monitor/metrics/resource-hosts",
             //"/cxf/monitor/metrics/containers-hosts/{environmentId}",
@@ -85,54 +80,49 @@ public class ChannelSettings
             "/cxf/tracker/operations/{$}/{$}",
             //"/cxf/tracker/operations/{source}/{dateFrom}/{dateTo}/{limit}",
             "/cxf/tracker/operations/{$}/{$}/{$}/{$}", "/cxf/tracker/operations/sources"
-
     };
 
-    public static String[] URL_ACCESS_PX3 =
-    {
+    public static String[] URL_ACCESS_PX3 = {
             ""
     };
 
 
-
-    public static String[] URL_ACCESS_SPECIAL_PORT_PX1 =
-    {
+    public static String[] URL_ACCESS_SPECIAL_PORT_PX1 = {
             ""
     };
 
 
-
-    public static short checkURL(String uri, String[] URL_ACCESS)
+    public static short checkURL( String uri, String[] URL_ACCESS )
     {
-        String subURI[]  = uri.split( "/" );
-        int subURIsize   = subURI.length;
+        String subURI[] = uri.split( "/" );
+        int subURIsize = subURI.length;
 
         short status = 0;
 
-        for(int x = 0; x<URL_ACCESS.length;x++)
+        for ( int x = 0; x < URL_ACCESS.length; x++ )
         {
             String subURL_ACCESS[] = URL_ACCESS[x].split( "/" );
 
-            if(subURIsize == subURL_ACCESS.length)
+            if ( subURIsize == subURL_ACCESS.length )
             {
                 int st = 0;
 
-                for(int i=0;i<subURIsize;i++)
+                for ( int i = 0; i < subURIsize; i++ )
                 {
-                    if(subURL_ACCESS[i].equals( "{$}" ))
+                    if ( subURL_ACCESS[i].equals( "{$}" ) )
                     {
                         st++;
                     }
                     else
                     {
-                        if(subURI[i].equals( subURL_ACCESS[i] ))
+                        if ( subURI[i].equals( subURL_ACCESS[i] ) )
                         {
                             st++;
                         }
                     }
                 }
 
-                if(st == subURIsize)
+                if ( st == subURIsize )
                 {
                     status = 1;
                     break;
@@ -142,5 +132,4 @@ public class ChannelSettings
 
         return status;
     }
-
 }

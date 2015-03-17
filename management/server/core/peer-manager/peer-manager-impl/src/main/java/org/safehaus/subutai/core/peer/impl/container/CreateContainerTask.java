@@ -67,7 +67,7 @@ public class CreateContainerTask implements Callable<ContainerHost>
 
         ContainerHost containerHost = null;
         while ( System.currentTimeMillis() - start < timeoutSec * 1000 && ( containerHost == null || Strings
-                .isNullOrEmpty( containerHost.getIpByInterfaceName( Common.DEFAULT_NET_INTERFACE ) ) ) )
+                .isNullOrEmpty( containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ) ) ) )
         {
             Thread.sleep( 100 );
             try

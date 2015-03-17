@@ -42,6 +42,19 @@ public class UserForm extends VerticalLayout
 
     private boolean newValue;
 
+    Button removeButton = new Button( "Delete user", new Button.ClickListener()
+    {
+        @Override
+        public void buttonClick( final Button.ClickEvent event )
+        {
+            userFieldGroup.discard();
+            if ( callback != null )
+            {
+                callback.removeOperation( userFieldGroup.getItemDataSource(), newValue );
+            }
+        }
+    } );
+
     private TextField username = new TextField( "Username" )
     {
         {
@@ -103,11 +116,13 @@ public class UserForm extends VerticalLayout
     public UserForm( TabCallback<BeanItem<User>> callback, List<Role> roles )
     {
         init();
+
         BeanContainer<String, Role> permissionsContainer = new BeanContainer<>( Role.class );
         permissionsContainer.setBeanIdProperty( "name" );
         permissionsContainer.addAll( roles );
         rolesSelector.setContainerDataSource( permissionsContainer );
         rolesSelector.setItemCaptionPropertyId( "name" );
+
         this.callback = callback;
     }
 
@@ -116,7 +131,6 @@ public class UserForm extends VerticalLayout
     {
         final Button saveButton = new Button( "Save user", saveListener );
         final Button cancelButton = new Button( "Cancel", cancelListener );
-        final Button removeButton = new Button( "Delete user", resetListener );
         saveButton.setStyleName( Reindeer.BUTTON_DEFAULT );
 
         HorizontalLayout buttons = new HorizontalLayout( saveButton, cancelButton, removeButton );
@@ -165,6 +179,7 @@ public class UserForm extends VerticalLayout
             else
             {
                 userFieldGroup.setReadOnly( false );
+                removeButton.setVisible( false );
             }
         }
     }
@@ -184,13 +199,15 @@ public class UserForm extends VerticalLayout
 
                 if ( callback != null )
                 {
-                    Collection<String> selectedRoleNames = ( Collection<String> ) rolesSelector.getValue();
                     User user = userFieldGroup.getItemDataSource().getBean();
+                    user.removeAllRoles();
+                    Collection<String> selectedRoleNames = ( Collection<String> ) rolesSelector.getValue();
                     for ( final String roleName : selectedRoleNames )
                     {
                         BeanItem beanItem = ( BeanItem ) rolesSelector.getItem( roleName );
                         user.addRole( ( Role ) beanItem.getBean() );
                     }
+
                     callback.saveOperation( userFieldGroup.getItemDataSource(), newValue );
                 }
             }
@@ -202,18 +219,6 @@ public class UserForm extends VerticalLayout
         }
     };
 
-    private Button.ClickListener resetListener = new Button.ClickListener()
-    {
-        @Override
-        public void buttonClick( final Button.ClickEvent event )
-        {
-            userFieldGroup.discard();
-            if ( callback != null )
-            {
-                callback.removeOperation( userFieldGroup.getItemDataSource(), newValue );
-            }
-        }
-    };
 
     private Button.ClickListener cancelListener = new Button.ClickListener()
     {

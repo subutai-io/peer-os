@@ -4,6 +4,8 @@ package org.safehaus.subutai.core.identity.ui.tabs;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.identity.ui.tabs.subviews.UserForm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItem;
@@ -36,6 +38,8 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
     private BeanItemContainer<User> beans;
     private Button newBean;
     private UserForm form;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger( UsersTab.class );
 
 
     public UsersTab( final IdentityManager identityManager )

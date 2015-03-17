@@ -8,7 +8,7 @@ import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +29,7 @@ import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.metric.ResourceHostMetric;
+import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.ContainersDestructionResult;
@@ -45,6 +46,7 @@ import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.common.quota.RamQuota;
 import org.safehaus.subutai.common.security.SecurityProvider;
 import org.safehaus.subutai.common.security.crypto.certificate.CertificateData;
 import org.safehaus.subutai.common.security.crypto.certificate.CertificateManager;
@@ -54,6 +56,7 @@ import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.util.ExceptionUtil;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
@@ -90,13 +93,13 @@ import org.safehaus.subutai.core.peer.impl.entity.ManagementHostEntity;
 import org.safehaus.subutai.core.peer.impl.entity.ResourceHostEntity;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.safehaus.subutai.core.strategy.api.StrategyNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
@@ -131,6 +134,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     private HostRegistry hostRegistry;
     private Set<RequestListener> requestListeners;
     private CommandUtil commandUtil = new CommandUtil();
+    private ExceptionUtil exceptionUtil = new ExceptionUtil();
+
+    private CustomSslContextFactory sslContextFactory;
 
 
     public LocalPeerImpl( PeerManager peerManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
@@ -746,6 +752,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             if ( containerIds.isEmpty() )
             {
                 containerGroupDataService.remove( containerGroup.getEnvironmentId().toString() );
+
+                //cleanup environment network settings
+                try
+                {
+                    getManagementHost().cleanupEnvironmentNetworkSettings( containerGroup.getEnvironmentId() );
+                }
+                catch ( PeerException e )
+                {
+                    LOG.error( "Error cleaning up environment network configuration", exceptionUtil.getRootCause( e ) );
+                }
             }
             else
             {
@@ -777,8 +793,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s eth1", gatewayIp ) ),
-                    bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
+                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1078,20 +1094,26 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     {
         if ( resourceHostInfo.getHostname().equals( "management" ) )
         {
-            if ( managementHost == null )
+            boolean initRequired = managementHost == null;
+            managementHost = new ManagementHostEntity( getId().toString(), resourceHostInfo );
+
+            if ( initRequired )
             {
-                managementHost = new ManagementHostEntity( getId().toString(), resourceHostInfo );
                 try
                 {
                     managementHost.init();
                 }
                 catch ( Exception e )
                 {
-                    LOG.error( e.toString() );
+                    LOG.error( "Error initializing management host", e );
                 }
                 managementHostDataService.persist( ( ManagementHostEntity ) managementHost );
-                ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
             }
+            else
+            {
+                managementHostDataService.update( ( ManagementHostEntity ) managementHost );
+            }
+            ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
             ( ( AbstractSubutaiHost ) managementHost ).updateHostInfo( resourceHostInfo );
         }
         else
@@ -1148,7 +1170,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             else
             {
                 //update network interfaces
-                ( ( AbstractSubutaiHost ) containerHost ).setNetInterfaces( containerHost.getNetInterfaces() );
+                ( ( AbstractSubutaiHost ) containerHost ).setNetInterfaces( containerHostInfo.getInterfaces() );
                 containerHostDataService.update( ( ContainerHostEntity ) containerHost );
             }
             ( ( AbstractSubutaiHost ) containerHost ).updateHostInfo( containerHostInfo );
@@ -1365,6 +1387,23 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
+    public void setRamQuota( final ContainerHost host, final RamQuota ramQuota ) throws PeerException
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( ramQuota, "Invalid ram quota" );
+
+        try
+        {
+            quotaManager.setRamQuota( host.getId(), ramQuota );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
     public int getAvailableRamQuota( final ContainerHost host ) throws PeerException
     {
         Preconditions.checkNotNull( host, "Invalid container host" );
@@ -1465,10 +1504,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 }
                 catch ( ExecutionException | InterruptedException e )
                 {
-                    errors.add( ExceptionUtils.getRootCause( e ) );
+                    errors.add( exceptionUtil.getRootCause( e ) );
                 }
             }
 
+            //cleanup environment network settings
+            if ( containerGroup.getContainerIds().size() == destroyedContainersIds.size() )
+            {
+                try
+                {
+                    getManagementHost().cleanupEnvironmentNetworkSettings( environmentId );
+                }
+                catch ( PeerException e )
+                {
+                    errors.add( exceptionUtil.getRootCause( e ) );
+                }
+            }
 
             executorService.shutdown();
         }
@@ -1485,6 +1536,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     //networking
+
+
+    public Set<Gateway> getGateways() throws PeerException
+    {
+        return getManagementHost().getGateways();
+    }
 
 
     @Override
@@ -1507,21 +1564,34 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     public void importCertificate( final String cert, final String alias ) throws PeerException
     {
         //************ Save Trust SSL Cert **************************************
-        KeyStore keyStore;
-        KeyStoreData keyStoreData;
-        KeyStoreManager keyStoreManager;
+        try
+        {
+            KeyStoreData keyStoreData = new KeyStoreData();
 
-        keyStoreData = new KeyStoreData();
-        keyStoreData.setupTrustStorePx2();
-        keyStoreData.setHEXCert( cert );
-        keyStoreData.setAlias( alias );
+            keyStoreData.setupTrustStorePx2();
+            keyStoreData.setHEXCert( cert );
+            keyStoreData.setAlias( alias );
 
-        keyStoreManager = new KeyStoreManager();
-        keyStore = keyStoreManager.load( keyStoreData );
-        keyStoreData.setAlias( alias );
+            KeyStoreManager keyStoreManager = new KeyStoreManager();
+            KeyStore keyStore = keyStoreManager.load( keyStoreData );
+            List<String> aliasList = Collections.list( keyStore.aliases() );
+            if ( !aliasList.contains( alias ) )
+            {
+                keyStoreData.setAlias( alias );
 
-        keyStoreManager.importCertificateHEXString( keyStore, keyStoreData );
-        //***********************************************************************
+                //        keyStoreManager.getEntries(  )
+
+                keyStoreManager.importCertificateHEXString( keyStore, keyStoreData );
+                //***********************************************************************
+                LOG.debug( String.format( "Importing new certificate to trustStore with alias: %s", alias ) );
+                this.sslContextFactory.reloadTrustStore();
+                //        new Thread( new RestartCoreServlet( 4 ) ).start();
+            }
+        }
+        catch ( KeyStoreException e )
+        {
+            LOG.error( "Error getting aliases", e );
+        }
     }
 
 
@@ -1529,39 +1599,53 @@ public class LocalPeerImpl implements LocalPeer, HostListener
      * Exports certificate with alias passed and returns cert in HEX String format. And stores new certificate in
      * keyStore.
      *
-     * @param alias - certificate alias
+     * @param environmentId - environmentId to generate cert for
      *
      * @return - certificate in HEX format
      */
     @Override
-    public String exportEnvironmentCertificate( final String alias ) throws PeerException
+    public String exportEnvironmentCertificate( final UUID environmentId ) throws PeerException
     {
+        String alias = String.format( "env_%s_%s", peerManager.getLocalPeer().getPeerInfo().getId().toString(),
+                environmentId.toString() );
+
         KeyStoreData environmentKeyStoreData = new KeyStoreData();
         environmentKeyStoreData.setupKeyStorePx2();
         environmentKeyStoreData.setAlias( alias );
 
-        CertificateData certData = new CertificateData();
-        //TODO Instead of envId CN Will be gpg fingerprint.
-        certData.setCommonName( alias );
-
-
-        CertificateManager certManager = new CertificateManager();
-        certManager.setDateParamaters();
-
         KeyStoreManager keyStoreManager = new KeyStoreManager();
         KeyStore keyStore = keyStoreManager.load( environmentKeyStoreData );
 
+        try
+        {
+            List<String> aliasList = Collections.list( keyStore.aliases() );
+            if ( !aliasList.contains( alias ) )
+            {
+                KeyManager keyManager = new KeyManager();
+                KeyPairGenerator keyPairGenerator = keyManager.prepareKeyPairGeneration( KeyPairType.RSA, 1024 );
+                KeyPair keyPair = keyManager.generateKeyPair( keyPairGenerator );
 
-        KeyManager keyManager = new KeyManager();
-        KeyPairGenerator keyPairGenerator = keyManager.prepareKeyPairGeneration( KeyPairType.RSA, 1024 );
-        KeyPair keyPair = keyManager.generateKeyPair( keyPairGenerator );
+                CertificateData certData = new CertificateData();
+                //TODO Instead of envId CN Will be gpg fingerprint.
+                certData.setCommonName( alias );
 
+                CertificateManager certManager = new CertificateManager();
+                certManager.setDateParamaters();
 
-        X509Certificate cert = certManager
-                .generateSelfSignedCertificate( keyStore, keyPair, SecurityProvider.BOUNCY_CASTLE, certData );
+                X509Certificate cert = certManager
+                        .generateSelfSignedCertificate( keyStore, keyPair, SecurityProvider.BOUNCY_CASTLE, certData );
 
-        keyStoreManager.saveX509Certificate( keyStore, environmentKeyStoreData, cert, keyPair );
+                keyStoreManager.saveX509Certificate( keyStore, environmentKeyStoreData, cert, keyPair );
 
+                sslContextFactory.reloadKeyStore();
+                LOG.debug( String.format( "Saving new certificate to keyStore with alias: %s", alias ) );
+            }
+        }
+        catch ( KeyStoreException e )
+        {
+            LOG.error( "Error getting environment", e );
+        }
+        LOG.debug( String.format( "Returning certificate for alias %s", alias ) );
         return keyStoreManager.exportCertificateHEXString( keyStore, environmentKeyStoreData );
     }
 
@@ -1574,44 +1658,61 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     @Override
     public void removeEnvironmentCertificates( final UUID environmentId ) throws PeerException
     {
+        KeyStoreData storeData = new KeyStoreData();
+
+        storeData.setupTrustStorePx2();
+        removeEnvironmentCertificateFromStore( environmentId, storeData );
+        LOG.debug( "clearing up trustStore" );
+
+
+        storeData.setupKeyStorePx2();
+        removeEnvironmentCertificateFromStore( environmentId, storeData );
+        LOG.debug( "clearing up keyStore" );
+    }
+
+
+    private void removeEnvironmentCertificateFromStore( UUID environmentId, KeyStoreData storeData )
+    {
         try
         {
             //************ Delete Trust SSL Cert **************************************
-            KeyStore keyStore;
-            KeyStoreData keyStoreData;
-            KeyStoreManager keyStoreManager;
+            KeyStore trustStore;
+            KeyStoreManager trustStoreManager;
 
-            keyStoreData = new KeyStoreData();
-            keyStoreData.setupTrustStorePx2();
-            keyStoreManager = new KeyStoreManager();
+            trustStoreManager = new KeyStoreManager();
 
-            keyStore = keyStoreManager.load( keyStoreData );
+            trustStore = trustStoreManager.load( storeData );
 
-            Enumeration<String> aliases = keyStore.aliases();
-            while ( aliases.hasMoreElements() )
+            List<String> aliasList = Collections.list( trustStore.aliases() );
+            for ( final String alias : aliasList )
             {
-                String alias = aliases.nextElement();
                 String parseId[] = alias.split( "_" );
+                LOG.info( String.format( "Parsing alias: %s", alias ) );
                 if ( parseId.length == 2 )
                 {
                     UUID envIdFromAlias = UUID.fromString( parseId[2] );
                     if ( envIdFromAlias.equals( environmentId ) )
                     {
-                        keyStoreData.setAlias( alias );
-                        KeyStore keyStoreToRemove = keyStoreManager.load( keyStoreData );
-                        keyStoreManager.deleteEntry( keyStoreToRemove, keyStoreData );
+                        LOG.debug( String.format( "Removing environment certificate with alias: %s", alias ) );
+                        storeData.setAlias( alias );
+                        KeyStore keyStoreToRemove = trustStoreManager.load( storeData );
+                        trustStoreManager.deleteEntry( keyStoreToRemove, storeData );
                     }
                 }
             }
 
             //***********************************************************************
             //            new Thread( new RestartCoreServlet() ).start();
+            sslContextFactory.reloadTrustStore();
         }
         catch ( KeyStoreException e )
         {
             LOG.error( "Error removing environment certificate.", e );
         }
     }
+
+
+    ;
 
 
     @Override
@@ -1646,6 +1747,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     public int hashCode()
     {
         return getId().hashCode();
+    }
+
+
+    public void setSslContextFactory( final CustomSslContextFactory sslContextFactory )
+    {
+        this.sslContextFactory = sslContextFactory;
+    }
+
+
+    public CustomSslContextFactory getSslContextFactory()
+    {
+        return sslContextFactory;
     }
 }
 

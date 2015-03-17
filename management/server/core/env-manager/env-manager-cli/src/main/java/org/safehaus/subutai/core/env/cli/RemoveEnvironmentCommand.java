@@ -5,10 +5,10 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
 
@@ -17,7 +17,7 @@ import com.google.common.base.Preconditions;
  * Remove environment metadata from database and notify trigger environment destroyed event
  */
 @Command( scope = "env", name = "remove", description = "Command to remove environment from database" )
-public class RemoveEnvironmentCommand extends OsgiCommandSupport
+public class RemoveEnvironmentCommand extends SubutaiShellCommandSupport
 {
     @Argument( name = "envId", description = "Environment id",
             index = 0, multiValued = false, required = true )

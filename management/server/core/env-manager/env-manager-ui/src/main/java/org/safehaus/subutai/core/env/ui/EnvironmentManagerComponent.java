@@ -53,14 +53,6 @@ public class EnvironmentManagerComponent extends CustomComponent
 
         EnvironmentContainersQuotaTab envContainersTab = new EnvironmentContainersQuotaTab( this );
         formSheet.addTab( envContainersTab, "Environment Container Quota" ).setId( "EnvironmentContainersTab" );
-        formSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
-        {
-            @Override
-            public void selectedTabChange( final TabSheet.SelectedTabChangeEvent event )
-            {
-
-            }
-        } );
 
         verticalLayout.addComponent( formSheet );
 
@@ -74,14 +66,4 @@ public class EnvironmentManagerComponent extends CustomComponent
     }
 
 
-    public PeerManager getPeerManager()
-    {
-        return peerManager;
-    }
-
-
-    public TemplateRegistry getTemplateRegistry()
-    {
-        return templateRegistry;
-    }
 }

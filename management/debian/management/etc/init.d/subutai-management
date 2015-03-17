@@ -18,8 +18,8 @@ do_start() {
         then
                 sudo $SUBUTAI_BIN/start
                 echo "Subutai-Management is starting.."
-                sleep 1
-                subutaiGetPid
+                sleep 3
+                getPid
                 echo "Subutai-Management is started..($SUBUTAI_PID)"
         else
                 echo "Subutai-Management is already running..($SUBUTAI_PID)"
@@ -56,7 +56,6 @@ stop)
 restart)
 	echo "Subutai-Management is restarting now.."
         sudo pkill -f karaf
-        sudo rm -rf $SUBUTAI_DATA/*
         sudo $SUBUTAI_BIN/start
 	sleep 3
         getPid

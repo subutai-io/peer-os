@@ -17,6 +17,7 @@ import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
@@ -470,7 +471,8 @@ public class RestServiceImpl implements RestService
             }
 
             jsonSet.add( new ContainerJson( containerHost.getId(), UUID.fromString( containerHost.getEnvironmentId() ),
-                    containerHost.getHostname(), state, containerHost.getIpByInterfaceName( "eth0" ),
+                    containerHost.getHostname(), state,
+                    containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ),
                     containerHost.getTemplateName() ) );
         }
         return jsonSet;

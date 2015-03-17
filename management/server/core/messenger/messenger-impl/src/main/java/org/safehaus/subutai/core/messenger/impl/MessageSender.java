@@ -131,7 +131,8 @@ public class MessageSender
             else
             {
                 completer.submit(
-                        new RemotePeerMessageSender( restUtil, messengerDao, targetPeer, envelopsPerPeer.getValue() ) );
+                        new RemotePeerMessageSender( restUtil, messengerDao, targetPeer, envelopsPerPeer.getValue(),
+                                peerManager.getLocalPeerInfo().getId() ) );
             }
         }
 

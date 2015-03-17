@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -36,12 +37,13 @@ public class UserEntity implements User
     @Column( name = "user_id" )
     private Long id;
 
-    @ManyToMany( targetEntity = RoleEntity.class, fetch = FetchType.EAGER )
+    @ManyToMany( targetEntity = RoleEntity.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL )
     @JoinTable( name = "subutai_user_role", joinColumns = @JoinColumn( name = "user_id", referencedColumnName =
             "user_id" ), inverseJoinColumns = @JoinColumn( name = "role_name", referencedColumnName = "name" ) )
     Set<Role> roles = new HashSet<>();
 
-    @Column( name = "user_name" )
+
+    @Column( name = "user_name", unique = true )
     private String username;
 
     @Column( name = "full_name" )
@@ -140,6 +142,13 @@ public class UserEntity implements User
     public void removeRole( final Role roleEntity )
     {
         roles.remove( roleEntity );
+    }
+
+
+    @Override
+    public void removeAllRoles()
+    {
+        roles.clear();
     }
 
 
