@@ -1,10 +1,13 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
+import java.io.File;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.List;
@@ -18,6 +21,7 @@ import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.peer.PeerPolicy;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
@@ -41,9 +45,12 @@ import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequestListener;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.commons.io.FileUtils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -58,7 +65,8 @@ public class PeerManagerImpl implements PeerManager
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class.getName() );
     private static final String SOURCE_REMOTE_PEER = "PEER_REMOTE";
     private static final String SOURCE_LOCAL_PEER = "PEER_LOCAL";
-    private static final String PEER_GROUP = "PEER_GROUP";
+    private static final String PEER_ID_PATH = "/var/lib/subutai/id";
+    private static final String PEER_ID_FILE = "peer_id";
     private PeerDAO peerDAO;
     private QuotaManager quotaManager;
     private Monitor monitor;
@@ -75,6 +83,13 @@ public class PeerManagerImpl implements PeerManager
     private DaoManager daoManager;
     private KeyManager keyManager;
     private IdentityManager identityManager;
+    private CustomSslContextFactory sslContextFactory;
+
+
+    public void setSslContextFactory( final CustomSslContextFactory sslContextFactory )
+    {
+        this.sslContextFactory = sslContextFactory;
+    }
 
 
     public PeerManagerImpl( final Messenger messenger )
@@ -153,16 +168,47 @@ public class PeerManagerImpl implements PeerManager
         List<PeerInfo> result = peerDAO.getInfo( SOURCE_LOCAL_PEER, PeerInfo.class );
         if ( result.isEmpty() )
         {
+
+            //obtain id from fs
+            File scriptsDirectory = new File( PEER_ID_PATH );
+            scriptsDirectory.mkdirs();
+
+            Path peerIdFilePath = Paths.get( PEER_ID_PATH, PEER_ID_FILE );
+
+            File peerIdFile = peerIdFilePath.toFile();
+
+            UUID peerId = null;
+
+            try
+            {
+                if ( !peerIdFile.exists() )
+                {
+                    //generate new id and save to fs
+                    peerId = UUID.randomUUID();
+                    FileUtils.writeStringToFile( peerIdFile, peerId.toString() );
+                }
+                else
+                {
+                    //read id from file
+                    peerId = UUID.fromString( FileUtils.readFileToString( peerIdFile ) );
+                }
+            }
+            catch ( Exception e )
+            {
+                throw new PeerInitializationError( "Failed to obtain peer id file", e );
+            }
+
+
             peerInfo = new PeerInfo();
-            //TODO generate peer id based on owner/system information
-            peerInfo.setId( UUID.randomUUID() );
+            peerInfo.setId( peerId );
             peerInfo.setName( "Local Subutai server" );
             //TODO get ownerId from persistent storage
             peerInfo.setOwnerId( UUID.randomUUID() );
 
             try
             {
-                Enumeration<InetAddress> addressEnumeration = NetworkInterface.getByName( "eth1" ).getInetAddresses();
+                Enumeration<InetAddress> addressEnumeration =
+                        NetworkInterface.getByName( Common.MANAGEMENT_HOST_EXTERNAL_IP_INTERFACE ).getInetAddresses();
                 while ( addressEnumeration.hasMoreElements() )
                 {
                     InetAddress address = addressEnumeration.nextElement();
@@ -186,6 +232,7 @@ public class PeerManagerImpl implements PeerManager
         }
         localPeer = new LocalPeerImpl( this, templateRegistry, quotaManager, strategyManager, requestListeners,
                 commandExecutor, hostRegistry, monitor, identityManager );
+        localPeer.setSslContextFactory( sslContextFactory );
         localPeer.init();
 
         //add command request listener
@@ -196,7 +243,7 @@ public class PeerManagerImpl implements PeerManager
         //subscribe to peer message requests
         messenger.addMessageListener( new MessageRequestListener( this, messenger, requestListeners ) );
         //subscribe to peer message responses
-        messageResponseListener = new MessageResponseListener(messenger);
+        messageResponseListener = new MessageResponseListener( messenger );
         messenger.addMessageListener( messageResponseListener );
         //add create container requests listener
         addRequestListener( new CreateContainerGroupRequestListener( localPeer ) );
@@ -277,7 +324,8 @@ public class PeerManagerImpl implements PeerManager
         managementHost.removeAptSource( p.getId().toString(), p.getIp() );
         PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( remotePeerId );
         // Remove peer policy of the target remote peer from the local peer
-        if ( peerPolicy != null ) {
+        if ( peerPolicy != null )
+        {
             localPeer.getPeerInfo().getPeerPolicies().remove( peerPolicy );
             peerDAO.saveInfo( SOURCE_LOCAL_PEER, localPeer.getId().toString(), localPeer );
         }
@@ -289,10 +337,12 @@ public class PeerManagerImpl implements PeerManager
     public boolean update( final PeerInfo peerInfo )
     {
         String source;
-        if ( peerInfo.getId().compareTo( localPeer.getId() ) == 0 ) {
+        if ( peerInfo.getId().compareTo( localPeer.getId() ) == 0 )
+        {
             source = SOURCE_LOCAL_PEER;
         }
-        else {
+        else
+        {
             source = SOURCE_REMOTE_PEER;
         }
         return peerDAO.saveInfo( source, peerInfo.getId().toString(), peerInfo );
@@ -325,10 +375,12 @@ public class PeerManagerImpl implements PeerManager
     public PeerInfo getPeerInfo( UUID uuid )
     {
         String source;
-        if ( uuid.compareTo( localPeer.getId() ) == 0 ) {
+        if ( uuid.compareTo( localPeer.getId() ) == 0 )
+        {
             source = SOURCE_LOCAL_PEER;
         }
-        else {
+        else
+        {
             source = SOURCE_REMOTE_PEER;
         }
         return peerDAO.getInfo( source, uuid.toString(), PeerInfo.class );

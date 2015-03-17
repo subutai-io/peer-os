@@ -2,8 +2,10 @@ package org.safehaus.subutai.core.env.ui.tabs;
 
 
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.environment.Environment;
+import org.safehaus.subutai.common.mdc.SubutaiExecutors;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.core.env.ui.EnvironmentManagerComponent;
 import org.safehaus.subutai.core.env.ui.tabs.subviews.ContainerHostQuotaForm;
@@ -14,71 +16,74 @@ import com.vaadin.data.util.BeanItem;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 
 
-/**
- * Created by talas on 2/12/15.
- */
 public class EnvironmentContainersQuotaTab extends CustomComponent
 {
     private EnvironmentManagerComponent environmentComponent;
 
-    private BeanContainer<String, Environment> environmentContainer;
+    private ExecutorService executorService = SubutaiExecutors.newCachedThreadPool();
+    private ContainerHostQuotaForm form = new ContainerHostQuotaForm( executorService, this );
 
-    private ContainerHostQuotaForm form = new ContainerHostQuotaForm();
-
-    private static final String LOAD_ICON_SOURCE = "img/spinner.gif";
+    private Label indicator;
 
     private BeanContainer<String, ContainerHost> envContainerHostContainer =
             new BeanContainer<String, ContainerHost>( ContainerHost.class )
             {
                 {
                     setBeanIdProperty( "id" );
-                    addNestedContainerProperty( "ramQuota" );
-                    addNestedContainerProperty( "cpuQuota" );
                 }
             };
 
     private Table containerHosts = new Table( "Environment container hosts", envContainerHostContainer )
     {
         {
-            setVisibleColumns( new Object[] { "hostname", "templateName", "ramQuota", "cpuQuota" } );
+            setVisibleColumns( "hostname", "templateName" );
             setColumnHeader( "hostname", "Container name" );
             setColumnHeader( "templateName", "Template" );
-            setColumnHeader( "ramQuota", "Ram Quota (MB)" );
-            setColumnHeader( "cpuQuota", "CPU Quota (%)" );
-            setBuffered( false );
+            setBuffered( true );
             setSelectable( true );
             addValueChangeListener( new ValueChangeListener()
             {
                 @Override
                 public void valueChange( final Property.ValueChangeEvent event )
                 {
-                    form.setVisible( false );
-                    new Thread( new Runnable()
+                    if ( event.getProperty().getValue() != null )
                     {
-                        @Override
-                        public void run()
-                        {
-                            if ( event.getProperty().getValue() == null )
-                            {
-                                form.setVisible( false );
-                                return;
-                            }
-                            BeanItem<ContainerHost> permission =
-                                    envContainerHostContainer.getItem( containerHosts.getValue() );
-                            form.setContainerHostBeanItem( permission );
-                            form.setVisible( true );
-                        }
-                    } ).start();
+                        containerHosts.setEnabled( false );
+                        envListComboBox.setEnabled( false );
+                        executorService.submit( new Runnable()
+                                                {
+                                                    @Override
+                                                    public void run()
+                                                    {
+                                                        try
+                                                        {
+                                                            showHideIndicator( true );
+                                                            form.setVisible( false );
+                                                            ContainerHost containerHost = envContainerHostContainer
+                                                                    .getItem( containerHosts.getValue() ).getBean();
+                                                            form.setContainerHost( containerHost );
+                                                        }
+                                                        finally
+                                                        {
+                                                            containerHosts.setEnabled( true );
+                                                            envListComboBox.setEnabled( true );
+                                                            form.setVisible( true );
+                                                            showHideIndicator( false );
+                                                        }
+                                                    }
+                                                }
+
+
+                                              );
+                    }
                 }
             } );
         }
@@ -97,9 +102,6 @@ public class EnvironmentContainersQuotaTab extends CustomComponent
     };
 
 
-    private Window showProgress;
-
-
     public EnvironmentContainersQuotaTab( final EnvironmentManagerComponent environmentComponent )
     {
         this.environmentComponent = environmentComponent;
@@ -111,73 +113,89 @@ public class EnvironmentContainersQuotaTab extends CustomComponent
     {
         VerticalLayout verticalLayout = new VerticalLayout();
 
-        environmentContainer = new BeanContainer<>( Environment.class );
+        final BeanContainer<String, Environment> environmentContainer = new BeanContainer<>( Environment.class );
         environmentContainer.setBeanIdProperty( "id" );
         environmentContainer.addAll( environmentComponent.getEnvironmentManager().getEnvironments() );
 
         envListComboBox.setContainerDataSource( environmentContainer );
+        envListComboBox.addFocusListener( new FieldEvents.FocusListener()
+        {
+            @Override
+            public void focus( final FieldEvents.FocusEvent event )
+            {
+                environmentContainer.addAll( environmentComponent.getEnvironmentManager().getEnvironments() );
+            }
+        } );
         envListComboBox.addValueChangeListener( new Property.ValueChangeListener()
         {
             @Override
             public void valueChange( final Property.ValueChangeEvent event )
             {
-                getUI().addWindow( showProgress );
-                showProgress.focus();
+                updateContainersTable();
             }
         } );
 
         form.setVisible( false );
+
+
+        indicator = new Label();
+        indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
+        indicator.setContentMode( ContentMode.HTML );
+        indicator.setHeight( 11, Unit.PIXELS );
+        indicator.setWidth( 50, Unit.PIXELS );
+        indicator.setVisible( false );
+
+        HorizontalLayout topRow = new HorizontalLayout();
+        topRow.addComponents( envListComboBox, indicator );
+
         HorizontalLayout hLayout = new HorizontalLayout();
         hLayout.addComponents( containerHosts, form );
 
-        verticalLayout.addComponents( envListComboBox, hLayout );
+        verticalLayout.addComponents( topRow, hLayout );
 
         setCompositionRoot( verticalLayout );
+    }
 
-        // Notify user about ongoing progress
-        Label icon = new Label();
-        icon.setId( "indicator" );
-        icon.setIcon( new ThemeResource( LOAD_ICON_SOURCE ) );
-        icon.setContentMode( ContentMode.HTML );
-        //        icon.setHeight( 11, Sizeable.Unit.PIXELS );
-        //        icon.setWidth( 50, Sizeable.Unit.PIXELS );
 
-        HorizontalLayout indicatorLayout = new HorizontalLayout();
-        indicatorLayout.addComponent( icon );
-        indicatorLayout.setComponentAlignment( icon, Alignment.TOP_LEFT );
-
-        showProgress = new Window( "", indicatorLayout );
-        showProgress.setModal( true );
-        showProgress.setClosable( false );
-        showProgress.setResizable( false );
-        showProgress.center();
-        showProgress.addFocusListener( new FieldEvents.FocusListener()
+    private void showHideIndicator( boolean showHide )
+    {
+        if ( showHide )
         {
-            @Override
-            public void focus( final FieldEvents.FocusEvent event )
+            getUI().access( new Runnable()
             {
-                updateContainersTable();
-            }
-        } );
+                @Override
+                public void run()
+                {
+                    indicator.setVisible( true );
+                }
+            } );
+        }
+        else
+        {
+            getUI().access( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    indicator.setVisible( false );
+                }
+            } );
+        }
     }
 
 
     private void updateContainersTable()
     {
-        form.setVisible( false );
         UUID envId = ( UUID ) envListComboBox.getValue();
-
-        if ( envId == null )
+        if ( envId != null )
         {
-            return;
+            form.setVisible( false );
+
+            BeanItem beanItem = ( BeanItem ) envListComboBox.getItem( envId );
+            Environment selectedEnvironment = ( Environment ) beanItem.getBean();
+
+            envContainerHostContainer.removeAllItems();
+            envContainerHostContainer.addAll( selectedEnvironment.getContainerHosts() );
         }
-
-        BeanItem beanItem = ( BeanItem ) envListComboBox.getItem( envId );
-        Environment selectedEnvironment = ( Environment ) beanItem.getBean();
-
-        envContainerHostContainer.removeAllItems();
-        envContainerHostContainer.addAll( selectedEnvironment.getContainerHosts() );
-
-        showProgress.close();
     }
 }

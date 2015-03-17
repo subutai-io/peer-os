@@ -31,12 +31,19 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- core -->
-
+    <!-- fragments -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>jetty-ssl-fragment</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-cli-rbac</artifactId>
+    </dependency>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- core -->
 
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -53,6 +60,10 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>test-rest</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>test-cli</artifactId>
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -74,7 +85,7 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>channel-manager-ui</artifactId>
     </dependency>
-    
+
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- messenger -->
     <dependency>
@@ -354,6 +365,21 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- ssl-context-manager -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ssl-context-manager-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ssl-context-manager-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ssl-context-manager-cli</artifactId>
+    </dependency>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- template-registry -->
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -434,6 +460,12 @@
       <classifier>classes</classifier>
     </dependency>
 
+    <!--JMX-HTTP manager-->
+    <dependency>
+      <groupId>org.jolokia</groupId>
+      <artifactId>jolokia-osgi</artifactId>
+      <version>1.1.5</version>
+    </dependency>
   </dependencies>
 
   <build>

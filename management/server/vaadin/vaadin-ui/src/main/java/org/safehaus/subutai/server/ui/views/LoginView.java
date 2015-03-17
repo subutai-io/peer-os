@@ -6,7 +6,6 @@ import java.io.Serializable;
 import javax.servlet.http.Cookie;
 
 import org.safehaus.subutai.common.security.SubutaiLoginContext;
-import org.safehaus.subutai.common.security.SubutaiThreadContext;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
@@ -129,16 +128,16 @@ public class LoginView extends VerticalLayout implements View
                     Serializable sessionId = identityManager.login( username.getValue(), password.getValue() );
 
                     VaadinRequest request = VaadinService.getCurrentRequest();
+
+                    //has to save login context because karaf has own thread context
                     SubutaiLoginContext loginContext =
                             new SubutaiLoginContext( sessionId.toString(), username.getValue(),
                                     request.getRemoteAddr() );
-
                     request.getWrappedSession()
                            .setAttribute( SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME, loginContext );
                     VaadinResponse response = VaadinService.getCurrentResponse();
                     response.addCookie( new Cookie( SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME,
                             JsonUtil.toJson( loginContext ) ) );
-                    SubutaiThreadContext.set( loginContext );
 
                     mainUI.getUsername().setValue( username.getValue() );
                     VaadinService.reinitializeSession( request );

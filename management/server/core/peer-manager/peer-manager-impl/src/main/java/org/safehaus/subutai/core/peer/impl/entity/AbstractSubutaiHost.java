@@ -247,10 +247,7 @@ public abstract class AbstractSubutaiHost implements Host
 
     public void addInterface( HostInterface hostInterface )
     {
-        if ( hostInterface == null )
-        {
-            throw new IllegalArgumentException( "HostInterface could not be null." );
-        }
+        Preconditions.checkNotNull( hostInterface, "HostInterface could not be null." );
 
         hostInterface.setHost( this );
         interfaces.add( hostInterface );
@@ -259,7 +256,7 @@ public abstract class AbstractSubutaiHost implements Host
 
     public void setNetInterfaces( Set<Interface> interfaces )
     {
-        interfaces.clear();
+        this.interfaces.clear();
         for ( Interface iface : interfaces )
         {
             addInterface( new HostInterface( iface ) );

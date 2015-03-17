@@ -12,6 +12,7 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.CpuQuotaInfo;
@@ -21,6 +22,7 @@ import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.common.quota.RamQuota;
 
 
 /**
@@ -220,6 +222,14 @@ public interface Peer
 
 
     /**
+     * Sets ram quota
+     *
+     * @param host - container
+     * @param ramQuota - quota to set
+     */
+    public void setRamQuota( ContainerHost host, RamQuota ramQuota ) throws PeerException;
+
+    /**
      * Destroys hosted part of environment
      *
      * @param environmentId - id fo environment
@@ -230,12 +240,14 @@ public interface Peer
 
     //networking
 
+    public Set<Gateway> getGateways() throws PeerException;
+
     public void reserveVni( Vni vni ) throws PeerException;
 
     public Set<Vni> getReservedVnis() throws PeerException;
 
     /**
-     * Imports certificate to trustStore. Important note here is to restart servlet after trustStore update.
+     * Imports certificate to trustStore. Important note here is not to miss with alias
      *
      * @param cert - cert in HEX representation
      * @param alias - cert alias
@@ -247,11 +259,11 @@ public interface Peer
      * Exports certificate with alias passed and returns cert in HEX String format. And stores new certificate in
      * keyStore.
      *
-     * @param alias - certificate alias
+     * @param environmentId - environmentId to generate cert for
      *
      * @return - certificate in HEX format
      */
-    public String exportEnvironmentCertificate( String alias ) throws PeerException;
+    public String exportEnvironmentCertificate( UUID environmentId ) throws PeerException;
 
 
     /**

@@ -2,17 +2,17 @@ package org.safehaus.subutai.core.key.cli;
 
 
 import org.safehaus.subutai.common.peer.Host;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.key.api.KeyInfo;
 import org.safehaus.subutai.core.key.api.KeyManager;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 @Command( scope = "km", name = "gen-subkey" )
-public class GenerateSubKeyCommand extends OsgiCommandSupport
+public class GenerateSubKeyCommand extends SubutaiShellCommandSupport
 {
     private KeyManager keyManager;
     private PeerManager peerManager;

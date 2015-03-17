@@ -33,6 +33,8 @@ public interface User
 
     public void removeRole( Role roleEntity );
 
+    public void removeAllRoles( );
+
     public void setFullname( String fullname );
 
     public void setEmail( String email );
@@ -43,6 +45,6 @@ public interface User
 
     public void addRole( Role role );
 
-
     Set<Role> getRoles();
+
 }

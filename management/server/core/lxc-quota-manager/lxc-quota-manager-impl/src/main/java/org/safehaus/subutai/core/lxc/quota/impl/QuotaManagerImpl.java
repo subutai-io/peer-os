@@ -21,6 +21,7 @@ import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.common.quota.RamQuota;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
@@ -232,30 +233,7 @@ public class QuotaManagerImpl implements QuotaManager
         CommandResult result = executeOnContainersResourceHost( containerId,
                 commands.getReadDiskQuotaCommand( containerHost.getHostname(), diskPartition.getPartitionName() ) );
 
-        if ( result.getStdOut().contains( DiskQuotaUnit.UNLIMITED.getAcronym() ) )
-        {
-            return new DiskQuota( diskPartition, DiskQuotaUnit.UNLIMITED, -1 );
-        }
-        else
-        {
-            //TODO Need to modify regex to be able to parse decimal point values
-            String regex = "(\\d+)(K|M|G|T|P|E)?";
-            Pattern quotaPattern = Pattern.compile( regex );
-            Matcher quotaMatcher = quotaPattern.matcher( result.getStdOut().trim() );
-            if ( quotaMatcher.matches() )
-            {
-                String quotaValue = quotaMatcher.group( 1 );
-                long value = Long.parseLong( quotaValue );
-                String acronym = quotaMatcher.group( 2 );
-                DiskQuotaUnit diskQuotaUnit = DiskQuotaUnit.parseFromAcronym( acronym );
-                return new DiskQuota( diskPartition, diskQuotaUnit == null ? DiskQuotaUnit.BYTE : diskQuotaUnit,
-                        value );
-            }
-            else
-            {
-                throw new QuotaException( String.format( "Unparseable result: %s", result.getStdOut() ) );
-            }
-        }
+        return DiskQuota.parse( diskPartition, result.getStdOut() );
     }
 
 
@@ -271,6 +249,18 @@ public class QuotaManagerImpl implements QuotaManager
                 diskQuota.getDiskPartition().getPartitionName(), String.format( "%s%s",
                         diskQuota.getDiskQuotaUnit() == DiskQuotaUnit.UNLIMITED ? "" : diskQuota.getDiskQuotaValue(),
                         diskQuota.getDiskQuotaUnit().getAcronym() ) ) );
+    }
+
+
+    public void setRamQuota( final UUID containerId, final RamQuota ramQuota ) throws QuotaException
+    {
+        Preconditions.checkNotNull( containerId );
+        Preconditions.checkNotNull( ramQuota );
+
+        ContainerHost containerHost = getContainerHostById( containerId );
+
+        executeOnContainersResourceHost( containerId, commands.getWriteRamQuotaCommand2( containerHost.getHostname(),
+                String.format( "%s%s", ramQuota.getRamQuotaValue(), ramQuota.getRamQuotaUnit().getAcronym() ) ) );
     }
 
 
@@ -316,30 +306,7 @@ public class QuotaManagerImpl implements QuotaManager
                 commands.getReadAvailableDiskQuotaCommand( containerHost.getHostname(),
                         diskPartition.getPartitionName() ) );
 
-        if ( result.getStdOut().contains( DiskQuotaUnit.UNLIMITED.getAcronym() ) )
-        {
-            return new DiskQuota( diskPartition, DiskQuotaUnit.UNLIMITED, -1 );
-        }
-        else
-        {
-            //TODO Need to modify regex to be able to parse decimal point values
-            String regex = "(\\d+)(K|M|G|T|P|E)?";
-            Pattern quotaPattern = Pattern.compile( regex );
-            Matcher quotaMatcher = quotaPattern.matcher( result.getStdOut().trim() );
-            if ( quotaMatcher.matches() )
-            {
-                String quotaValue = quotaMatcher.group( 1 );
-                long value = Long.parseLong( quotaValue );
-                String acronym = quotaMatcher.group( 2 );
-                DiskQuotaUnit diskQuotaUnit = DiskQuotaUnit.parseFromAcronym( acronym );
-                return new DiskQuota( diskPartition, diskQuotaUnit == null ? DiskQuotaUnit.BYTE : diskQuotaUnit,
-                        value );
-            }
-            else
-            {
-                throw new QuotaException( String.format( "Unparseable result: %s", result.getStdOut() ) );
-            }
-        }
+        return DiskQuota.parse( diskPartition, result.getStdOut() );
     }
 
 
@@ -376,7 +343,7 @@ public class QuotaManagerImpl implements QuotaManager
     {
         try
         {
-            return peerManager.getLocalPeer().getResourceHostByContainerId( containerId);
+            return peerManager.getLocalPeer().getResourceHostByContainerId( containerId );
         }
         catch ( HostNotFoundException e )
         {

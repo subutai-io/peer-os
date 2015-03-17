@@ -23,6 +23,7 @@ public class PortManager extends Panel
 
     private GridLayout installationControls;
     private TextField specialPortTxtFld;
+    private TextField specialSecurePortTxtFld;
     private TextField securePort1TxtFld;
     private TextField securePort2TxtFld;
     private TextField securePort3TxtFld;
@@ -43,12 +44,15 @@ public class PortManager extends Panel
         specialPortTxtFld.setInputPrompt( ChannelSettings.SPECIAL_PORT_X1 );
         specialPortTxtFld.setRequired( true );
 
+        specialSecurePortTxtFld = new TextField( "Enter special secure port" );
+        specialSecurePortTxtFld.setId( "IpRangeStart" );
+        specialSecurePortTxtFld.setInputPrompt( ChannelSettings.SPECIAL_SECURE_PORT_X1 );
+        specialSecurePortTxtFld.setRequired( true );
 
         securePort1TxtFld = new TextField( "Enter secure port 1" );
         securePort1TxtFld.setId( "IpRangeEnd" );
         securePort1TxtFld.setInputPrompt( ChannelSettings.SECURE_PORT_X1 );
         securePort1TxtFld.setRequired( true );
-
 
         securePort2TxtFld = new TextField( "Enter secure port 2" );
         securePort2TxtFld.setId( "ValidityPeriod" );
@@ -72,6 +76,7 @@ public class PortManager extends Panel
     private void init()
     {
         installationControls.addComponent( specialPortTxtFld );
+        installationControls.addComponent( specialSecurePortTxtFld );
         installationControls.addComponent( securePort1TxtFld );
         installationControls.addComponent( securePort2TxtFld );
         installationControls.addComponent( securePort3TxtFld );

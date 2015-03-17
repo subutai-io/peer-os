@@ -8,18 +8,18 @@ import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
  * Created by talas on 12/12/14.
  */
 @Command( scope = "peer", name = "get-quota", description = "gets quota information from peer for container" )
-public class GetContainerQuotaCommand extends OsgiCommandSupport
+public class GetContainerQuotaCommand extends SubutaiShellCommandSupport
 {
     @Argument( index = 0, name = "peer id", multiValued = false, required = true, description = "Id of target peer" )
     private String peerId;

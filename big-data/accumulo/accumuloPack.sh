@@ -30,7 +30,7 @@ downloadFileAndMakeChanges() {
 	mv accumulo-$accumuloVersion/conf/* $confDirectory
 
 	# copy sample configuration files
-	cp -a $confDirectory/examples/3GB/native-standalone/* $confDirectory/
+	cp -a $confDirectory/examples/3GB/standalone/* $confDirectory/
 	popd
 }
 

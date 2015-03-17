@@ -51,16 +51,18 @@ public class RemotePeerMessageSenderTest
 
     RemotePeerMessageSender remotePeerMessageSender;
     Envelope envelope;
+    UUID uuid = UUID.randomUUID();
 
 
     @Before
     public void setUp() throws Exception
     {
         MessageImpl message = new MessageImpl( SOURCE_PEER_ID, PAYLOAD );
+        when( peerInfo.getId() ).thenReturn( uuid );
 
         envelope = new Envelope( message, TARGET_PEER_ID, RECIPIENT, TIME_TO_LIVE, HEADERS );
         remotePeerMessageSender =
-                new RemotePeerMessageSender( restUtil, messengerDao, peer, Sets.newHashSet( envelope ) );
+                new RemotePeerMessageSender( restUtil, messengerDao, peer, Sets.newHashSet( envelope ), uuid );
 
         when( peer.getPeerInfo() ).thenReturn( peerInfo );
         when( peerInfo.getIp() ).thenReturn( IP );

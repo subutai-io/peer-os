@@ -6,6 +6,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.settings.ChannelSettings;
+
 
 /**
  * Holds info about peer
@@ -21,11 +23,10 @@ public class PeerInfo
     private String name;
     private UUID id;
     private UUID ownerId;
-    private int port = 8181;
+    private int port = Integer.valueOf( ChannelSettings.SECURE_PORT_X2 );
 
     private int lastUsedVlanId = 100;
     private String keyId;
-
 
 
     public UUID getId()
@@ -136,19 +137,23 @@ public class PeerInfo
     }
 
 
-    public Set<PeerPolicy> getPeerPolicies() {
+    public Set<PeerPolicy> getPeerPolicies()
+    {
         return peerPolicies;
     }
 
 
-    public void setPeerPolicies( final Set<PeerPolicy> peerPolicies ) {
+    public void setPeerPolicies( final Set<PeerPolicy> peerPolicies )
+    {
         this.peerPolicies = peerPolicies;
     }
 
 
-    public void setPeerPolicy( final PeerPolicy peerPolicy ) {
+    public void setPeerPolicy( final PeerPolicy peerPolicy )
+    {
         PeerPolicy oldPeerPolicy = getPeerPolicy( peerPolicy.getRemotePeerId() );
-        if ( oldPeerPolicy != null ) {
+        if ( oldPeerPolicy != null )
+        {
             peerPolicies.remove( oldPeerPolicy );
         }
         peerPolicies.add( peerPolicy );
@@ -176,12 +181,16 @@ public class PeerInfo
     }
 
 
-    public PeerPolicy getPeerPolicy( final UUID remotePeerId ) {
-        if ( peerPolicies == null ) {
+    public PeerPolicy getPeerPolicy( final UUID remotePeerId )
+    {
+        if ( peerPolicies == null )
+        {
             return null;
         }
-        for ( PeerPolicy peerPolicy : peerPolicies ) {
-            if ( peerPolicy.getRemotePeerId().compareTo( remotePeerId ) == 0 ) {
+        for ( PeerPolicy peerPolicy : peerPolicies )
+        {
+            if ( peerPolicy.getRemotePeerId().compareTo( remotePeerId ) == 0 )
+            {
                 return peerPolicy;
             }
         }

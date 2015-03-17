@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.sql.DataSource;
@@ -13,18 +14,29 @@ import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.security.NullSubutaiLoginContext;
 import org.safehaus.subutai.common.security.SubutaiLoginContext;
 import org.safehaus.subutai.common.security.SubutaiThreadContext;
+import org.safehaus.subutai.common.settings.CLISettings;
+import org.safehaus.subutai.common.settings.ChannelSettings;
 import org.safehaus.subutai.common.util.SecurityUtil;
+import org.safehaus.subutai.core.identity.api.CliCommand;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.PermissionGroup;
+import org.safehaus.subutai.core.identity.api.PortalModuleScope;
+import org.safehaus.subutai.core.identity.api.RestEndpointScope;
 import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.api.Roles;
 import org.safehaus.subutai.core.identity.api.User;
+import org.safehaus.subutai.core.identity.impl.dao.CliCommandDataService;
 import org.safehaus.subutai.core.identity.impl.dao.PermissionDataService;
+import org.safehaus.subutai.core.identity.impl.dao.PortalModuleDataService;
+import org.safehaus.subutai.core.identity.impl.dao.RestEndpointDataService;
 import org.safehaus.subutai.core.identity.impl.dao.RoleDataService;
 import org.safehaus.subutai.core.identity.impl.dao.UserDataService;
+import org.safehaus.subutai.core.identity.impl.entity.CliCommandEntity;
 import org.safehaus.subutai.core.identity.impl.entity.PermissionEntity;
 import org.safehaus.subutai.core.identity.impl.entity.PermissionPK;
+import org.safehaus.subutai.core.identity.impl.entity.PortalModuleScopeEntity;
+import org.safehaus.subutai.core.identity.impl.entity.RestEndpointScopeEntity;
 import org.safehaus.subutai.core.identity.impl.entity.RoleEntity;
 import org.safehaus.subutai.core.identity.impl.entity.UserEntity;
 import org.slf4j.Logger;
@@ -66,6 +78,9 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     private UserDataService userDataService;
     private PermissionDataService permissionDataService;
     private RoleDataService roleDataService;
+    private CliCommandDataService cliCommandDataService;
+    private PortalModuleDataService portalModuleDataService;
+    private RestEndpointDataService restEndpointDataService;
 
 
     private String getSimpleSalt( String username )
@@ -88,6 +103,9 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         userDataService = new UserDataService( daoManager );
         permissionDataService = new PermissionDataService( daoManager.getEntityManagerFactory() );
         roleDataService = new RoleDataService( daoManager.getEntityManagerFactory() );
+        cliCommandDataService = new CliCommandDataService( daoManager.getEntityManagerFactory() );
+        portalModuleDataService = new PortalModuleDataService( daoManager.getEntityManagerFactory() );
+        restEndpointDataService = new RestEndpointDataService( daoManager.getEntityManagerFactory() );
 
 
         securityManager = new DefaultSecurityManager();
@@ -140,13 +158,57 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
             return;
         }
         LOG.info( String.format( "User not found. Adding new user: [%s] ", username ) );
-        RoleDataService roleDataService = new RoleDataService( daoManager.getEntityManagerFactory() );
         RoleEntity adminRole = roleDataService.find( "admin" );
         if ( adminRole == null )
         {
             adminRole = new RoleEntity();
             adminRole.setName( "admin" );
-            roleDataService.persist( adminRole );
+
+            for ( final String uri : ChannelSettings.URL_ACCESS_PX1 )
+            {
+                if ( uri.length() == 0 )
+                {
+                    continue;
+                }
+                RestEndpointScopeEntity restEndpointScopeEntity = new RestEndpointScopeEntity( uri );
+                restEndpointDataService.update( restEndpointScopeEntity );
+                adminRole.addRestEndpointScope( restEndpointScopeEntity );
+            }
+
+            for ( final String uri : ChannelSettings.URL_ACCESS_PX3 )
+            {
+                if ( uri.length() == 0 )
+                {
+                    continue;
+                }
+                RestEndpointScopeEntity restEndpointScopeEntity = new RestEndpointScopeEntity( uri );
+                restEndpointDataService.update( restEndpointScopeEntity );
+                adminRole.addRestEndpointScope( restEndpointScopeEntity );
+            }
+
+            for ( final String uri : ChannelSettings.URL_ACCESS_PX2 )
+            {
+                if ( uri.length() == 0 )
+                {
+                    continue;
+                }
+                RestEndpointScopeEntity restEndpointScopeEntity = new RestEndpointScopeEntity( uri );
+                restEndpointDataService.update( restEndpointScopeEntity );
+                adminRole.addRestEndpointScope( restEndpointScopeEntity );
+            }
+
+            for ( final Map.Entry<String, Set<String>> scopes : CLISettings.CLI_CMD_MAP.entrySet() )
+            {
+                Set<String> names = scopes.getValue();
+                for ( final String name : names )
+                {
+                    CliCommandEntity cliCommandEntity = new CliCommandEntity( scopes.getKey(), name );
+                    cliCommandDataService.update( cliCommandEntity );
+                    adminRole.addCliCommand( cliCommandEntity );
+                }
+            }
+
+            roleDataService.update( adminRole );
         }
 
         RoleEntity managerRole = roleDataService.find( "manager" );
@@ -154,7 +216,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         {
             managerRole = new RoleEntity();
             managerRole.setName( "manager" );
-            roleDataService.persist( managerRole );
+            roleDataService.update( managerRole );
         }
 
 
@@ -168,7 +230,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         user.setSalt( salt );
         user.addRole( adminRole );
         user.addRole( managerRole );
-        userDataService.persist( user );
+        userDataService.update( user );
         LOG.debug( String.format( "User: %s", user.getId() ) );
     }
 
@@ -198,10 +260,10 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     @Override
     public User getUser()
     {
-        logActiveSessions();
+        //        logActiveSessions();
 
         SubutaiLoginContext loginContext = getSubutaiLoginContext();
-        LOG.debug( String.format( "Login context: [%s] ", loginContext ) );
+        //        LOG.debug( String.format( "Login context: [%s] ", loginContext ) );
 
         if ( loginContext instanceof NullSubutaiLoginContext )
         {
@@ -230,8 +292,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
 
     private SubutaiLoginContext getSubutaiLoginContext()
     {
-        SubutaiLoginContext loginContext = SubutaiThreadContext.get();
-        return loginContext instanceof NullSubutaiLoginContext ? SecurityUtil.getSubutaiLoginContext() : loginContext;
+        return SubutaiThreadContext.get();
     }
 
 
@@ -243,16 +304,28 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         SecurityUtils.setSecurityManager( securityManager );
         Subject subject = SecurityUtils.getSubject();
 
+        Session session = null;
         try
         {
             subject.login( usernamePasswordToken );
-            return subject.getSession().getId();
+            session = subject.getSession();
+            return session.getId();
         }
         catch ( UnknownSessionException e )
         {
             subject = new Subject.Builder().buildSubject();
             subject.login( usernamePasswordToken );
-            return subject.getSession( true ).getId();
+            session = subject.getSession( true );
+            return session.getId();
+        }
+        finally
+        {
+            if ( session != null )
+            {
+                SubutaiLoginContext loginContext =
+                        new SubutaiLoginContext( session.getId().toString(), subject.getPrincipal().toString(), null );
+                SubutaiThreadContext.set( loginContext );
+            }
         }
     }
 
@@ -322,6 +395,35 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
             }
         }
         return result;
+    }
+
+
+    @Override
+    public PortalModuleScope createMockUserPortalModule( final String moduleKey, final String moduleName )
+    {
+        return new PortalModuleScopeEntity( moduleKey, moduleName );
+    }
+
+
+    @Override
+    public boolean updateUserPortalModule( final PortalModuleScope portalModuleScope )
+    {
+        LOG.debug( "Saving new portal module: ", portalModuleScope.toString() );
+        if ( !( portalModuleScope instanceof PortalModuleScopeEntity ) )
+        {
+            return false;
+        }
+        portalModuleDataService.update( ( PortalModuleScopeEntity ) portalModuleScope );
+        List<RoleEntity> roles = roleDataService.getAll();
+        for ( RoleEntity roleEntity : roles )
+        {
+            if ( roleEntity.getName().equalsIgnoreCase( Roles.ADMIN.getRoleName() ) )
+            {
+                roleEntity.addPortalModule( portalModuleScope );
+                roleDataService.update( roleEntity );
+            }
+        }
+        return true;
     }
 
 
@@ -523,6 +625,71 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
 
 
     @Override
+    public List<CliCommand> getAllCliCommands()
+    {
+        List<CliCommand> cliCommands = new ArrayList<>();
+        cliCommands.addAll( cliCommandDataService.getAll() );
+        return cliCommands;
+    }
+
+
+    @Override
+    public CliCommand createMockCliCommand( final String scope, final String name )
+    {
+        return new CliCommandEntity( scope, name );
+    }
+
+
+    @Override
+    public boolean updateCliCommand( final CliCommand cliCommand )
+    {
+        if ( cliCommand instanceof CliCommandEntity )
+        {
+            cliCommandDataService.update( ( CliCommandEntity ) cliCommand );
+            return true;
+        }
+        return false;
+    }
+
+
+    @Override
+    public Set<RestEndpointScope> getAllRestEndpoints()
+    {
+        Set<RestEndpointScope> restEndpointScopes = Sets.newHashSet();
+        restEndpointScopes.addAll( restEndpointDataService.getAll() );
+        return restEndpointScopes;
+    }
+
+
+    @Override
+    public RestEndpointScope createMockRestEndpoint( final String endpoint, final String port )
+    {
+        return new RestEndpointScopeEntity( endpoint );
+    }
+
+
+    @Override
+    public boolean updateRestEndpoint( final RestEndpointScope endpointScope )
+    {
+        if ( !( endpointScope instanceof RestEndpointScopeEntity ) )
+        {
+            return false;
+        }
+        restEndpointDataService.update( ( RestEndpointScopeEntity ) endpointScope );
+        return false;
+    }
+
+
+    @Override
+    public Set<PortalModuleScope> getAllPortalModules()
+    {
+        Set<PortalModuleScope> portalModules = Sets.newHashSet();
+        portalModules.addAll( portalModuleDataService.getAll() );
+        return portalModules;
+    }
+
+
+    @Override
     public List<Permission> getAllPermissions()
     {
         List<Permission> permissions = Lists.newArrayList();
@@ -590,6 +757,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     @Override
     public boolean updateRole( final Role role )
     {
+        LOG.debug( String.format( "Updating role: %s", role.getName() ) );
         if ( !( role instanceof RoleEntity ) )
         {
             return false;
@@ -623,9 +791,10 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     @Override
     public void beforeExecute( final CommandSession commandSession, final CharSequence charSequence )
     {
-        SubutaiLoginContext loginContext = getSubutaiLoginContext();
+        SubutaiLoginContext loginContext = SecurityUtil.getSubutaiLoginContext();
         if ( !( loginContext instanceof NullSubutaiLoginContext ) && isAuthenticated( loginContext.getSessionId() ) )
         {
+            SubutaiThreadContext.set( loginContext );
             touch( loginContext.getSessionId() );
         }
     }

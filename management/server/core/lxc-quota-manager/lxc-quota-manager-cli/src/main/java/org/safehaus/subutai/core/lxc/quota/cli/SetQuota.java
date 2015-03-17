@@ -6,6 +6,7 @@ import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.DiskQuotaUnit;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
@@ -13,14 +14,13 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
  * Created by talas on 12/8/14.
  */
 @Command( scope = "quota", name = "set-quota", description = "Sets specified quota to container" )
-public class SetQuota extends OsgiCommandSupport
+public class SetQuota extends SubutaiShellCommandSupport
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( SetQuota.class );
     private QuotaManager quotaManager;
@@ -57,19 +57,19 @@ public class SetQuota extends OsgiCommandSupport
                 break;
             case QUOTA_TYPE_DISK_ROOTFS:
                 quotaManager.setDiskQuota( targetContainer.getId(),
-                        new DiskQuota( DiskPartition.ROOT_FS, DiskQuotaUnit.MB, Integer.valueOf( quotaValue ) ) );
+                        new DiskQuota( DiskPartition.ROOT_FS, DiskQuotaUnit.MB, Double.valueOf( quotaValue ) ) );
                 break;
             case QUOTA_TYPE_DISK_HOME:
                 quotaManager.setDiskQuota( targetContainer.getId(),
-                        new DiskQuota( DiskPartition.HOME, DiskQuotaUnit.MB, Integer.valueOf( quotaValue ) ) );
+                        new DiskQuota( DiskPartition.HOME, DiskQuotaUnit.MB, Double.valueOf( quotaValue ) ) );
                 break;
             case QUOTA_TYPE_DISK_OPT:
                 quotaManager.setDiskQuota( targetContainer.getId(),
-                        new DiskQuota( DiskPartition.OPT, DiskQuotaUnit.MB, Integer.valueOf( quotaValue ) ) );
+                        new DiskQuota( DiskPartition.OPT, DiskQuotaUnit.MB, Double.valueOf( quotaValue ) ) );
                 break;
             case QUOTA_TYPE_DISK_VAR:
                 quotaManager.setDiskQuota( targetContainer.getId(),
-                        new DiskQuota( DiskPartition.VAR, DiskQuotaUnit.MB, Integer.valueOf( quotaValue ) ) );
+                        new DiskQuota( DiskPartition.VAR, DiskQuotaUnit.MB, Double.valueOf( quotaValue ) ) );
                 break;
             case QUOTA_TYPE_CPU:
                 quotaManager.setCpuQuota( targetContainer.getId(), Integer.valueOf( quotaValue ) );

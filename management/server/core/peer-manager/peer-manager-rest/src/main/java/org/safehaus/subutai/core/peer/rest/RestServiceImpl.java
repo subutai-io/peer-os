@@ -23,12 +23,14 @@ import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.common.quota.RamQuota;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,10 +47,18 @@ public class RestServiceImpl implements RestService
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
     private PeerManager peerManager;
 
+    private CustomSslContextFactory sslContextFactory;
+
 
     public RestServiceImpl( final PeerManager peerManager )
     {
         this.peerManager = peerManager;
+    }
+
+
+    public void setSslContextFactory( final CustomSslContextFactory sslContextFactory )
+    {
+        this.sslContextFactory = sslContextFactory;
     }
 
 
@@ -178,6 +188,7 @@ public class RestServiceImpl implements RestService
                 //***********************************************************************
 
                 //                new Thread( new RestartCoreServlet() ).start();
+                sslContextFactory.reloadTrustStore();
 
                 return Response.ok( "Successfully unregistered peer: " + peerId ).build();
             }
@@ -261,7 +272,9 @@ public class RestServiceImpl implements RestService
 
         //***********************************************************************
 
+        sslContextFactory.reloadTrustStore();
         //        new Thread( new RestartCoreServlet() ).start();
+
 
         return Response.ok( HEXCert ).build();
     }
@@ -670,6 +683,24 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response setRamQuota( final String containerId, final String ramQuota )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            localPeer.getContainerHostById( UUID.fromString( containerId ) )
+                     .setRamQuota( JsonUtil.<RamQuota>fromJson( ramQuota, new TypeToken<RamQuota>()
+                     {}.getType() ) );
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
     public Response setDiskQuota( final String containerId, final String diskQuota )
     {
         try
@@ -719,6 +750,21 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response getGateways()
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            return Response.ok( JsonUtil.toJson( localPeer.getGateways() ) ).build();
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
     public Response reserveVni( final String vni )
     {
         try
@@ -751,12 +797,12 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response exportEnvironmentCert( final String alias )
+    public Response exportEnvironmentCert( final String environmentId )
     {
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            String certHEX = localPeer.exportEnvironmentCertificate( alias );
+            String certHEX = localPeer.exportEnvironmentCertificate( UUID.fromString( environmentId ) );
             return Response.ok( certHEX ).build();
         }
         catch ( PeerException e )

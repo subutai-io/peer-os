@@ -13,6 +13,7 @@ import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.common.quota.RamQuota;
 
 
 /**
@@ -170,4 +171,11 @@ public interface ContainerHost extends Host
      * @return - disk partition quota
      */
     public DiskQuota getAvailableDiskQuota( DiskPartition diskPartition ) throws PeerException;
+
+    /**
+     * Sets ram quota
+     *
+     * @param ramQuota - quota to set
+     */
+    public void setRamQuota( RamQuota ramQuota ) throws PeerException;
 }

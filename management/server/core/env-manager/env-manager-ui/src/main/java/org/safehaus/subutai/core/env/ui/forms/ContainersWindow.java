@@ -11,8 +11,10 @@ import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
@@ -192,45 +194,56 @@ public class ContainersWindow extends Window
                 @Override
                 public void buttonClick( final Button.ClickEvent event )
                 {
-
-                    disableTable();
-
-                    taskExecutor.submit( new Runnable()
+                    ConfirmationDialog alert =
+                            new ConfirmationDialog( "Do you really want to destroy this container?", "Yes", "No" );
+                    alert.getOk().addClickListener( new Button.ClickListener()
                     {
                         @Override
-                        public void run()
+                        public void buttonClick( Button.ClickEvent clickEvent )
                         {
+                            disableTable();
 
-                            try
+                            taskExecutor.submit( new Runnable()
                             {
-                                containerHost.dispose();
+                                @Override
+                                public void run()
+                                {
 
-                                try
-                                {
-                                    environment = environmentManager.findEnvironment( environment.getId() );
-                                }
-                                catch ( EnvironmentNotFoundException e )
-                                {
-                                    close();
-                                }
-                            }
-                            catch ( PeerException e )
-                            {
-                                Notification.show( String.format( "Error destroying container %s: %s",
+                                    try
+                                    {
+                                        containerHost.dispose();
+
+                                        try
+                                        {
+                                            environment = environmentManager.findEnvironment( environment.getId() );
+                                        }
+                                        catch ( EnvironmentNotFoundException e )
+                                        {
+                                            close();
+                                        }
+                                    }
+                                    catch ( PeerException e )
+                                    {
+                                        Notification.show( String.format( "Error destroying container %s: %s",
                                                 containerHost.getHostname(), e ), Notification.Type.ERROR_MESSAGE );
-                            }
-                            finally
-                            {
-                                enableTable();
-                            }
+                                    }
+                                    finally
+                                    {
+                                        enableTable();
+                                    }
+                                }
+                            } );
                         }
                     } );
+
+                    getUI().addWindow( alert.getAlert() );
                 }
             } );
 
             containersTable.addItem( new Object[] {
                     containerHost.getId().toString(), containerHost.getTemplateName(), containerHost.getHostname(),
-                    containerHost.getIpByInterfaceName( "eth0" ), tagsBtn, startBtn, stopBtn, destroyBtn
+                    containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ), tagsBtn, startBtn,
+                    stopBtn, destroyBtn
             }, null );
 
             boolean isContainerConnected = containerHost.isConnected();
