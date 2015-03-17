@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.tracker.impl.dao;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -208,7 +209,7 @@ public class TrackerOperationDataService
 
     public List<String> getTrackerOperationSources() throws SQLException
     {
-        List<String> result = new ArrayList<>();
+        List<String> result = Collections.emptyList();
         EntityManager em = emf.createEntityManager();
         try
         {
@@ -216,7 +217,7 @@ public class TrackerOperationDataService
 
             TypedQuery<String> query =
                     em.createQuery( "select distinct to.source from TrackerOperationEntity to", String.class );
-            result = query.getResultList();
+            result.addAll( query.getResultList() );
 
             em.getTransaction().commit();
         }
