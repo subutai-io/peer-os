@@ -122,12 +122,12 @@ public class TemplateRegistryComponent extends CustomComponent
                 @Override
                 public String getTemplateProperty( final Template template )
                 {
-                    String rsHosts = "";
+                    StringBuilder buf = new StringBuilder();
                     for ( final String rh : template.getFaisUsingThisTemplate() )
                     {
-                        rsHosts += rh + "; ";
+                        buf.append( rh ).append( "; " );
                     }
-                    return rsHosts;
+                    return buf.toString();
                 }
             } );
         }
