@@ -15,7 +15,7 @@ public class TestSslContextFactory extends SslContextFactory
 
     private static UUID id = UUID.randomUUID();
 
-    private static TestSslContextFactory singleton;
+    private static volatile TestSslContextFactory singleton;
 
     private boolean customStart = false;
 
