@@ -11,7 +11,6 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,6 +27,7 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandUtil;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.host.Interface;
+import org.safehaus.subutai.common.mdc.SubutaiExecutors;
 import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.network.VniVlanMapping;
@@ -62,13 +62,13 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     String name = "Subutai Management Host";
 
     @Transient
-    private Commands commands;
+    private Commands commands = new Commands();
     @Transient
-    private CommandUtil commandUtil;
+    private CommandUtil commandUtil = new CommandUtil();
     @Transient
-    private ExecutorService singleThreadExecutorService;
+    private ExecutorService singleThreadExecutorService = SubutaiExecutors.newSingleThreadExecutor();
     @Transient
-    ServiceLocator serviceLocator;
+    private ServiceLocator serviceLocator = new ServiceLocator();
 
 
     protected ManagementHostEntity()
@@ -79,10 +79,6 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     public ManagementHostEntity( final String peerId, final ResourceHostInfo resourceHostInfo )
     {
         super( peerId, resourceHostInfo );
-        this.commands = new Commands();
-        this.commandUtil = new CommandUtil();
-        this.singleThreadExecutorService = Executors.newSingleThreadExecutor();
-        this.serviceLocator = new ServiceLocator();
     }
 
 
@@ -198,8 +194,9 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
             {
                 try
                 {
-                    commandUtil.execute( new RequestBuilder( "subutai management_network" ).withCmdArgs(
-                                    Lists.newArrayList( "-Z", "deleteall", String.valueOf( vni.getVlan() ) ) ), this );
+                    commandUtil.execute( new RequestBuilder( "subutai management_network" )
+                            .withCmdArgs( Lists.newArrayList( "-Z", "deleteall", String.valueOf( vni.getVlan() ) ) ),
+                            this );
                 }
                 catch ( CommandException e )
                 {
