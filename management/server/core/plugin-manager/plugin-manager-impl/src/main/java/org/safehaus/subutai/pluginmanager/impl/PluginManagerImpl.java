@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 
 public class PluginManagerImpl implements PluginManager
@@ -96,8 +97,7 @@ public class PluginManagerImpl implements PluginManager
         }
         catch ( PluginManagerException e )
         {
-            LOG.error( e.getMessage() );
-            e.printStackTrace();
+            LOG.error( "Error executing plugin installed status", e );
         }
 
         return managerHelper.parsePluginNamesAndVersions( result );
@@ -118,14 +118,13 @@ public class PluginManagerImpl implements PluginManager
         try
         {
             result = managerHelper.execute( commands.makeListLocalPluginsCommand() );
+            return managerHelper.parseAvailablePluginsNames( result );
         }
         catch ( PluginManagerException e )
         {
-            LOG.error( e.getMessage() );
-            e.printStackTrace();
+            LOG.error( "Error executing command to list installed plugins", e );
+            return Sets.newHashSet();
         }
-
-        return managerHelper.parseAvailablePluginsNames( result );
     }
 
 
@@ -170,8 +169,7 @@ public class PluginManagerImpl implements PluginManager
         }
         catch ( PluginManagerException e )
         {
-            LOG.error( e.getMessage() );
-            e.printStackTrace();
+            LOG.error( "Error executing package status.", e );
         }
 
         return managerHelper.parsePluginNames( result );
