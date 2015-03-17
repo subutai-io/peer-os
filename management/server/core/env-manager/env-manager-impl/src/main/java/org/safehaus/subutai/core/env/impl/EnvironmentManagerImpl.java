@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.environment.Blueprint;
@@ -18,6 +17,7 @@ import org.safehaus.subutai.common.environment.EnvironmentModificationException;
 import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
+import org.safehaus.subutai.common.mdc.SubutaiExecutors;
 import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.ContainerHost;
@@ -70,7 +70,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private final PeerManager peerManager;
     private final NetworkManager networkManager;
     private final EnvironmentBuilder environmentBuilder;
-    private final ExecutorService executor = Executors.newCachedThreadPool();
+    private final ExecutorService executor = SubutaiExecutors.newCachedThreadPool();
     private final String defaultDomain;
     private final IdentityManager identityManager;
 
