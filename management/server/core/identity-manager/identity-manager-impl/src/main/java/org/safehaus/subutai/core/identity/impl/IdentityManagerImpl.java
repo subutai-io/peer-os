@@ -408,20 +408,33 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     @Override
     public boolean updateUserPortalModule( final PortalModuleScope portalModuleScope )
     {
-        LOG.debug( "Saving new portal module: ", portalModuleScope.toString() );
-        if ( !( portalModuleScope instanceof PortalModuleScopeEntity ) )
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader( this.getClass().getClassLoader() );
+        try
         {
-            return false;
-        }
-        portalModuleDataService.update( ( PortalModuleScopeEntity ) portalModuleScope );
-        List<RoleEntity> roles = roleDataService.getAll();
-        for ( RoleEntity roleEntity : roles )
-        {
-            if ( roleEntity.getName().equalsIgnoreCase( Roles.ADMIN.getRoleName() ) )
+            LOG.debug( "Saving new portal module: ", portalModuleScope.toString() );
+            if ( !( portalModuleScope instanceof PortalModuleScopeEntity ) )
             {
-                roleEntity.addPortalModule( portalModuleScope );
-                roleDataService.update( roleEntity );
+                return false;
             }
+            portalModuleDataService.update( ( PortalModuleScopeEntity ) portalModuleScope );
+            List<RoleEntity> roles = roleDataService.getAll();
+            for ( RoleEntity roleEntity : roles )
+            {
+                if ( roleEntity.getName().equalsIgnoreCase( Roles.ADMIN.getRoleName() ) )
+                {
+                    roleEntity.addPortalModule( portalModuleScope );
+                    roleDataService.update( roleEntity );
+                }
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error updating portalModule for role", e );
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader( cl );
         }
         return true;
     }
