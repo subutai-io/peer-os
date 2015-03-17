@@ -29,7 +29,7 @@
  */
 SubutaiContainerManager::SubutaiContainerManager(string lxc_path,
 		SubutaiLogger* logger) :
-		_lxc_path(lxc_path), _logger(logger) {
+		_lxc_path(lxc_path), _logger(logger), managerLocked(false) {
 	// Check for running containers in case we just started an app
 	// after crash
 	try {
@@ -126,6 +126,11 @@ void get_word_from_line(char * line, int size) {
 	}
 }
 
+bool SubutaiContainerManager::isManagerLocked() const {
+	return managerLocked;
+}
+
+
 /*
  * \details This method gets the list of containers using subutai methodology.
  */
@@ -184,6 +189,7 @@ bool SubutaiContainerManager::checkIfTemplate(string container_name,
  *
  */
 vector<SubutaiContainer*> SubutaiContainerManager::findAllContainers() {
+
 	//_logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Get all containers."));
 	vector<SubutaiContainer*> containers;
 	vector<string> subutai_containers;
@@ -191,6 +197,8 @@ vector<SubutaiContainer*> SubutaiContainerManager::findAllContainers() {
 	lxc_container** cont;
 	int num;
 	bool isSubutaiAvailable = system("which subutai") == 0;
+	if (checkBrokenLxc())
+			return containers;
 	try {
 		if (isSubutaiAvailable)
 			subutai_containers = getContainers();
@@ -229,17 +237,38 @@ SubutaiContainer* SubutaiContainerManager::findContainerById(
 			return (*it);
 		}
 	}
-	_logger->writeLog(1,
-			_logger->setLogData("<SubutaiContainerManager>",
-					"Container not found: " + container_id));
+
 	return NULL;
+}
+
+bool SubutaiContainerManager::checkBrokenLxc() {
+	FILE * fp = popen("lxc-ls -f 2>&1", "r");
+	if (fp) {
+		char *line = NULL;
+		size_t n;
+		while ((getline(&line, &n, fp) > 0) ) {
+			string str(line);
+			std::size_t found = str.find("lxc_container: Failed to parse config:");
+			if (found!=std::string::npos)
+			{
+				_logger->writeLog(3, _logger->setLogData("!!!!!!!!!!!! ERROR: lxc_container: Failed to parse config is occured !!!!!!!!!!!!!!!!!!"));
+				managerLocked = true;
+				return true;
+			}
+		}
+	}
+	managerLocked = false;
+	return false;
 }
 
 /*
  * \details     Update active stopped and frozen lists
  */
 void SubutaiContainerManager::updateContainerLists() {
-	//_logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Update container list and their fields.."));
+	//if there is an error on lxc-ls, don't update container list. (It causes abort)
+	if (checkBrokenLxc())
+		return;
+
 	char** names;
 	lxc_container** cont;
 	vector<string> subutai_containers;

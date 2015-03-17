@@ -291,9 +291,9 @@ int main(int argc, char *argv[], char *envp[]) {
 						iter = pidList.erase(iter);
 						currentProcess--;
 						/*
-						string resp = response.createInQueueMessage(
-								environment.getAgentUuidValue(),
-								command->getCommandId());*/
+						 string resp = response.createInQueueMessage(
+						 environment.getAgentUuidValue(),
+						 command->getCommandId());*/
 					}
 				}
 			}
@@ -343,7 +343,11 @@ int main(int argc, char *argv[], char *envp[]) {
 					}
 				}
 
-				if (command->getType() == "PS_REQUEST") {
+				if (cman.isManagerLocked()) {
+					logMain.writeLog(7,
+							logMain.setLogData("<SubutaiAgent>",
+									"Execution is not permitted since container manager locked."));
+				} else if (command->getType() == "PS_REQUEST") {
 					logMain.writeLog(6,
 							logMain.setLogData("<SubutaiAgent>",
 									"PS execution operation is starting.."));
@@ -466,7 +470,11 @@ int main(int argc, char *argv[], char *envp[]) {
 				}
 
 			} else {
-				if (heartbeatInterruptFlag) {
+				if (cman.isManagerLocked() && connection->checkExecutionMessageStatus()) {
+					logMain.writeLog(7,
+							logMain.setLogData("<SubutaiAgent>",
+									"Execution is not permitted since container manager locked."));
+				} else if (heartbeatInterruptFlag) {
 					if (waitHeartbeat) {
 						logMain.writeLog(7,
 								logMain.setLogData("<SubutaiAgent>",
