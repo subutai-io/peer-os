@@ -56,6 +56,7 @@
 using namespace std;
 using std::stringstream;
 using std::string;
+#define LOG_HEARTBEAT_PERIOD 8
 
 class SubutaiTimer
 {
@@ -63,9 +64,10 @@ public:
 	SubutaiTimer(SubutaiLogger, SubutaiEnvironment*, SubutaiContainerManager*, SubutaiConnection*);
 	virtual ~SubutaiTimer( void );
 	bool checkExecutionTimeout(unsigned int* ,bool* ,unsigned int* ,unsigned int*);
-	void sendHeartBeat();
-	bool checkHeartBeatTimer(SubutaiCommand);
+	void sendHeartBeat(bool, bool*);
+	bool checkHeartBeatTimer(SubutaiCommand, list<int>, bool* );
 	bool checkCommandQueueInfoTimer(SubutaiCommand);
+	bool checkIfLxcCommandInProgress(list<int>);
 
 private:
 	SubutaiEnvironment* environment;
@@ -83,8 +85,10 @@ private:
 	bool overflagQueue;
 	unsigned int count;
 	unsigned int countQueue;
+	unsigned int numHeartbeatmod5;
 
 	SubutaiLogger logMain;
+	SubutaiHelper helper;
 };
 #endif /* SUBUTAICONTAINER_H_ */
 

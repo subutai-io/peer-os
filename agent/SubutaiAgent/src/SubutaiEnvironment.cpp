@@ -163,69 +163,18 @@ string SubutaiEnvironment::getAgentArch() {
     } else {
         std::string arch(info.machine);
         std::transform(arch.begin(), arch.end(), arch.begin(), ::toupper);
-        environmentLogger->writeLog(7, environmentLogger->setLogData("<SubutaiAgent>", "Machine architecture:", arch));
+        //environmentLogger->writeLog(7, environmentLogger->setLogData("<SubutaiAgent>", "Machine architecture:", arch));
         return arch;
     }
 }
 
-/**
- *  \details   Checking the machine is lxc or not
- */
-/*
-bool SubutaiEnvironment::isAgentLxc()
-{
-    try
-    {
-        string firstline;
-        ifstream file("/proc/1/cpuset");	//opening root cgroup file
-        getline(file,firstline);
-        file.close();
-        int ret = firstline.find("lxc");
-        if(ret==-1)		//if cgroup is null or not reading successfully
-        {
-            islxc = 0;
-            environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","This machine is not a Lxc Container.."));
-            environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","Subutai Agent IsLxc:",toString(islxc)));
-            getAgentHostname(); //its physical there is no parenthost.
-            parentHostname="";
-            environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","Subutai Agent Hostname:",hostname));
-            return false;
-        }
-        else
-        {
-            islxc = 1;
-            environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","This machine is a Lxc Container.."));
-            environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","Subutai Agent IsLxc:",toString(islxc)));
-            if(getAgentParentHostname())	//trying to get parentHostname
-            {
-                getAgentHostname();
-                environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","Subutai Agent Hostname:",hostname));
-            }
-            else
-            {
-                environmentLogger->writeLog(3,environmentLogger->setLogData("<SubutaiAgent>","ParentHostname cannot be read !!"));
-                getAgentHostname();
-                parentHostname="";
-                environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","Subutai Agent Hostname:",hostname));
-            }
-            return true;
-        }
-    }
-    catch(const std::exception& error)
-    {
-        cout << error.what()<< endl;
-    }
-    return false;
-}*/
 
 /**
- *  \details   IpAddress of the KiskisAgent machine is fetched from statically.
+ *  \details   IpAddress of the SubutaiAgent machine is fetched from statically.
  */
 bool SubutaiEnvironment::getAgentInterfaces()
 {
 	interfaces.clear();
-
-	environmentLogger->writeLog(1, environmentLogger->setLogData("<SubutaiContainer>", "Run ifconfig on resource host"));
 	FILE * fp = popen("ifconfig", "r");
 	if (fp)
 	{
@@ -268,7 +217,7 @@ bool SubutaiEnvironment::getAgentInterfaces()
 	    			struct Interface interface_n;
 	    			interface_n.name = nic; interface_n.mac = address; interface_n.ip = ip;
 	    			interfaces.push_back(interface_n);
-	    			environmentLogger->writeLog(1, environmentLogger->setLogData("<SubutaiContainer>", "Adding interface: " + nic + " " + address + " " + ip));
+	    			//environmentLogger->writeLog(7, environmentLogger->setLogData("<SubutaiContainer>", "Adding interface: " + nic + " " + address + " " + ip));
 				    found_mac = false; found_ip = false; found_name = false; nic = ""; address = ""; ip = "";
 	    		}
 	    	}

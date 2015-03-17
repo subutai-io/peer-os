@@ -200,11 +200,11 @@ string SubutaiResponsePack::createInotifyMessage(string uuid ,string configPoint
 	vector<string> hierarchy = helper.splitResult(configPoint, "/");
 	if(hierarchy.at(2) == "lxc" && hierarchy.at(4) == "rootfs")
 	{
-		vector<SubutaiContainer> containerSet = getContainerSet();
-		for (vector<SubutaiContainer>::iterator it = containerSet.begin(); it != containerSet.end(); it++) {
-			if((*it).getContainerHostnameValue() == hierarchy.at(3))
+		vector<SubutaiContainer*> containerSet = getContainerSet();
+		for (vector<SubutaiContainer*>::iterator it = containerSet.begin(); it != containerSet.end(); it++) {
+			if((*it)->getContainerHostnameValue() == hierarchy.at(3))
 			{
-				uuid = (*it).getContainerIdValue(); break;
+				uuid = (*it)->getContainerIdValue(); break;
 			}
 		}
 		path = "";

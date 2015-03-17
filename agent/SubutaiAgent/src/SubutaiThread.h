@@ -78,7 +78,7 @@ class SubutaiThread
         void setoutBuff(string);
         void seterrBuff(string);
         void setLogger(SubutaiLogger);
-        int optionReadSend(message_queue*, SubutaiCommand*, int, int*);
+        int optionReadSend(message_queue*, SubutaiCommand*, int, int*, int*);
         void checkAndWrite(message_queue*, SubutaiCommand*);
         void checkAndSend(message_queue*, SubutaiCommand*);
         void lastCheckAndSend(message_queue*, SubutaiCommand*);

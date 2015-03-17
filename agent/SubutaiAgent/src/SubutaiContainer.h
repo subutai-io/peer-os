@@ -70,8 +70,6 @@ struct ExecutionResult {
     pid_t pid;
 };
 
-
-
 enum containerStatus { RUNNING, STOPPED, FROZEN };
 
 class SubutaiContainer
@@ -84,7 +82,6 @@ class SubutaiContainer
         void getContainerAllFields();
         bool getContainerInterfaces();
         void setContainerHostname(string);
-        void setContainerStatus(containerStatus);
         string getState();
         void write();
         void clear();
@@ -98,10 +95,9 @@ class SubutaiContainer
         string getContainerStatus();
         string getContainerIdValue();
         string getContainerHostnameValue();
-        string RunPsCommand();
-        string findFullProgramPath(string );
         string RunProgram(string , vector<string>);
         ExecutionResult RunCommand(SubutaiCommand*);
+        ExecutionResult RunCommandAsDaemon(SubutaiCommand*, int*);
         ExecutionResult RunDaemon(SubutaiCommand* );
         ExecutionResult RunProgram(string , vector<string>, bool , lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT, bool captureOutput = true);
         bool hasSubCommand(SubutaiCommand* command);

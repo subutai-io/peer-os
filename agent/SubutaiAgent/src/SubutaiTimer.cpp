@@ -30,21 +30,22 @@ using namespace std;
  */
 SubutaiTimer::SubutaiTimer(SubutaiLogger log, SubutaiEnvironment* env, SubutaiContainerManager* cont, SubutaiConnection* conn)
 {
-    start 			=  	boost::posix_time::second_clock::local_time();
+    start 				=  	boost::posix_time::second_clock::local_time();
     startQueue			=  	boost::posix_time::second_clock::local_time();
-    exectimeout 		=  	30;
-    queuetimeout 		=  	30;
+    exectimeout 		=  	10;
+    queuetimeout 		=  	10;
     startsec  			=  	start.time_of_day().seconds();
     startsecQueue		=  	start.time_of_day().seconds();
     overflag 			=  	false;
     overflagQueue		=  	false;
-    count 			=  	1;
+    count 				=  	1;
     countQueue			=  	1;
-    logMain		 	=	log;
+    logMain		 		=	log;
     response 			= 	new SubutaiResponsePack();
     connection			= 	conn;
     environment 		=	env;
-    containerManager 	        = 	cont;
+    containerManager 	= 	cont;
+    numHeartbeatmod5	= 	0;
 }
 
 /**
@@ -102,18 +103,41 @@ bool SubutaiTimer::checkExecutionTimeout(unsigned int* startsec,bool* overflag,u
 }
 
 
-void SubutaiTimer::sendHeartBeat()
+void SubutaiTimer::sendHeartBeat(bool lxcCommandInProgress,  bool* heartbeatIntFlag)
 {
-    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Starting collecting of HEARTBEAT data"));
+
     response->clear();
     /*
-     * Refresh new agent ip address set for each heartbeat message
+     * Refresh new agent ip address set for each heart beat message
      */
     environment->getAgentInterfaces();
     /*
-     * Update each field of container nodes and set for each heartbeat message
+     * Update each field of container nodes and set for each heart beat message
+     * If lxc destruction command is in progress, wait until it finishes.
+     * If they run at the same time, list_all containers method will try to access
+     * 			the fields of a container, which is destroyed -> Causes segmentation fault.
      */
-    containerManager->updateContainerLists();
+    if(!lxcCommandInProgress)
+    {
+    	//When update container list starts, it blocks execution of system requests.
+    	*heartbeatIntFlag = true;
+    	containerManager->updateContainerLists();
+    	//When update container list finishes, it unlocks the execution of system requests.
+    	*heartbeatIntFlag = false;
+    }
+    else
+    {
+    	/*
+    	 * If an lxc destruction command is in progress, don't try to get any information about the containers.
+    	 * Send the existing information.
+    	 *
+    	 * Update list when the current execution finishes.
+    	 *
+    	 */
+    	logMain.writeLog(7, logMain.setLogData("<SubutaiTimer>","Lxc destruction command is in progress, ",
+    			"wait until it is finished to update container list for heartbeat"));
+    	*heartbeatIntFlag = true;
+    }
 
     response->setInterfaces(environment->getAgentInterfaceValues());
     response->setHostname(environment->getAgentHostnameValue());
@@ -122,18 +146,45 @@ void SubutaiTimer::sendHeartBeat()
     string resp = response->createHeartBeatMessage(environment->getAgentUuidValue(), environment->getAgentHostnameValue());
     connection->sendMessage(resp, "HEARTBEAT_TOPIC");
 
-    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "HeartBeat:", resp));
+    logMain.writeLog(6, logMain.setLogData("<SubutaiTimer>", "HEARTBEAT is sent."));
+    if( numHeartbeatmod5 == 0 )
+    {
+    	logMain.writeLog(7, logMain.setLogData("<SubutaiTimer>", resp));
+    }
+
+    numHeartbeatmod5 = (numHeartbeatmod5 +1 ) % LOG_HEARTBEAT_PERIOD;
 }
 
-bool SubutaiTimer::checkHeartBeatTimer(SubutaiCommand command)
+/*
+ * This method checks the running commands if there is a lxc command running or not.
+ * If Lxc command is in progress send latest Heartbeat.
+ * We cannot tr to get lxc information when some operation on lxc is in progress.
+ *
+ */
+bool SubutaiTimer::checkIfLxcCommandInProgress(list<int> pidList)
+{
+	FILE* file = popen("ps aux | grep destroy | grep -v grep", "r");
+	char buffer[1000];
+	while ( fgets( buffer, 1000, file))
+	{
+		cout << "entry found: " << buffer << endl;
+		return true;
+	}
+	pclose(file);
+
+	return false;
+}
+
+bool SubutaiTimer::checkHeartBeatTimer(SubutaiCommand command, list<int> pidList, bool* heartbeatIntFlag)
 {
     if (checkExecutionTimeout(&startsec, &overflag, &exectimeout, &count)) //checking Default Timeout
     {
-        sendHeartBeat();
+
+        sendHeartBeat(checkIfLxcCommandInProgress(pidList), heartbeatIntFlag);
         start =         boost::posix_time::second_clock::local_time();	//Reset Default Timeout value
         startsec =      start.time_of_day().seconds();
         overflag =      false;
-        exectimeout =   30;
+        exectimeout =   10;
         count =         1;
 
         return true;
@@ -157,12 +208,12 @@ bool SubutaiTimer::checkCommandQueueInfoTimer(SubutaiCommand command)
                 {
                     string resp = response->createInQueueMessage(environment->getAgentUuidValue(), command.getCommandId());
                     connection->sendMessage(resp);
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "IN_QUEUE Response:", resp));
+                    logMain.writeLog(6, logMain.setLogData("<SubutaiTimer>", "IN_QUEUE Response:", command.getCommandId()));
+                    logMain.writeLog(7, logMain.setLogData("<SubutaiTimer>", resp));
                 }
                 else
                 {
-                    cout << "error!!" <<endl;
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Fetched Element:",queueElement));
+                    logMain.writeLog(7, logMain.setLogData("<SubutaiTimer>", "Cannot deserialize: ",queueElement));
                 }
             }
         }
@@ -170,7 +221,7 @@ bool SubutaiTimer::checkCommandQueueInfoTimer(SubutaiCommand command)
         startQueue =            boost::posix_time::second_clock::local_time();	//Reset Default Timeout values
         startsecQueue  =        startQueue.time_of_day().seconds();
         overflagQueue =         false;
-        queuetimeout =          30;
+        queuetimeout =          10;
         countQueue =            1;
 
 
