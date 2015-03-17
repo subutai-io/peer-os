@@ -37,7 +37,7 @@ SubutaiEnvironment::~SubutaiEnvironment() {
 int SubutaiEnvironment::getAgentSettings() {
 	pugi::xml_document doc;
 
-	if (doc.load_file("/etc/subutai-agent/agent.xml").status)//if the settings file does not exist
+	if (doc.load_file("/etc/subutai-agent/agent.xml").status) //if the settings file does not exist
 	{
 		environmentLogger->writeLog(7,
 				environmentLogger->setLogData(
@@ -51,8 +51,8 @@ int SubutaiEnvironment::getAgentSettings() {
 		return 100;
 		exit(1);
 	}
-	connectionUrl = doc.child("Settings").child_value("BrokerIP");//reading url
-	logLevel = doc.child("Settings").child_value("log_level");//reading loglevel
+	connectionUrl = doc.child("Settings").child_value("BrokerIP"); //reading url
+	logLevel = doc.child("Settings").child_value("log_level"); //reading loglevel
 	clientPassword = doc.child("Settings").child_value("clientpasswd");	//reading cleintpassword
 	connectionPort = doc.child("Settings").child_value("Port");
 	connectionOptions = doc.child("Settings").child_value("reconnect_timeout");
@@ -179,7 +179,9 @@ string SubutaiEnvironment::getAgentArch() {
  */
 bool SubutaiEnvironment::getAgentInterfaces() {
 	interfaces.clear();
-	FILE * fp = popen("ifconfig", "r");
+	FILE * fp = popen(
+			"ifconfig -a | grep -e Link -e inet | grep -v inet6 | grep -v /-2",
+			"r");
 	if (fp) {
 		char *line = NULL;
 		size_t n;
@@ -187,42 +189,44 @@ bool SubutaiEnvironment::getAgentInterfaces() {
 		bool found_name = false, found_mac = false, found_ip = false;
 		while ((getline(&line, &n, fp) > 0) && line) {
 			vector<string> splitted = _helper.splitResult(line, " ");
-			if (line[0] != ' ') {
-				found_name = true;
-				found_mac = false;
-				found_ip = false;
-				nic = splitted[0];
-			}
 			if (splitted.size() > 0) {
+				if (line[0] != ' ') {
+					found_name = true;
+					found_mac = false;
+					found_ip = false;
+					nic = splitted[0];
+				}
 				bool found_m = false, found_i = false;
 				for (vector<string>::iterator it_s = splitted.begin();
 						it_s != splitted.end(); it_s++) {
+					if (!strcmp((*it_s).c_str(), "HWaddr")) {
+						found_m = true;
+						continue;
+					}
 					if (found_m) {
 						found_mac = true;
 						address = *it_s;
 						found_m = false;
 					}
-					if (!strcmp((*it_s).c_str(), "HWaddr"))
-						found_m = true;
+					if (!strcmp((*it_s).c_str(), "inet")) {
+						found_i = true;
+						continue;
+					}
 					if (found_i) {
-						found_ip = true;
-						ip = _helper.splitResult((*it_s), " ")[1];
-						if (_helper.splitResult(ip, ":").size() > 1) {
-							ip = _helper.splitResult(ip, ":")[1];
+						vector<string> split_ip = _helper.splitResult((*it_s), ":");
+						if (split_ip.size() > 1) {
+							found_ip = true;
+							ip = split_ip.at(1);
 						}
 						found_i = false;
 					}
-					if (!strcmp((*it_s).c_str(), "inet"))
-						found_i = true;
 				}
-
 				if (found_mac && found_name && found_ip) {
 					struct Interface interface_n;
 					interface_n.name = nic;
 					interface_n.mac = address;
 					interface_n.ip = ip;
 					interfaces.push_back(interface_n);
-					//environmentLogger->writeLog(7, environmentLogger->setLogData("<SubutaiContainer>", "Adding interface: " + nic + " " + address + " " + ip));
 					found_mac = false;
 					found_ip = false;
 					found_name = false;
@@ -234,7 +238,6 @@ bool SubutaiEnvironment::getAgentInterfaces() {
 		}
 	}
 	pclose(fp);
-
 	return true;
 }
 

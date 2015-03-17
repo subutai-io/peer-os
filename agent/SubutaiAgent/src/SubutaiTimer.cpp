@@ -93,7 +93,6 @@ bool SubutaiTimer::checkExecutionTimeout(unsigned int* startsec, bool* overflag,
 
 void SubutaiTimer::sendHeartBeat(bool lxcCommandInProgress,
 		bool* heartbeatIntFlag) {
-
 	response->clear();
 	/*
 	 * Refresh new agent ip address set for each heart beat message
@@ -140,7 +139,6 @@ void SubutaiTimer::sendHeartBeat(bool lxcCommandInProgress,
 	if (numHeartbeatmod5 == 0) {
 		logMain.writeLog(7, logMain.setLogData("<SubutaiTimer>", resp));
 	}
-
 	numHeartbeatmod5 = (numHeartbeatmod5 + 1) % LOG_HEARTBEAT_PERIOD;
 }
 
@@ -154,7 +152,6 @@ bool SubutaiTimer::checkIfLxcCommandInProgress(list<int> pidList) {
 	FILE* file = popen("ps aux | grep destroy | grep -v grep", "r");
 	char buffer[1000];
 	while (fgets(buffer, 1000, file)) {
-		cout << "entry found: " << buffer << endl;
 		return true;
 	}
 	pclose(file);
@@ -166,7 +163,6 @@ bool SubutaiTimer::checkHeartBeatTimer(list<int> pidList,
 		bool* heartbeatIntFlag) {
 	if (checkExecutionTimeout(&startsec, &overflag, &exectimeout, &count)) //checking Default Timeout
 			{
-
 		sendHeartBeat(checkIfLxcCommandInProgress(pidList), heartbeatIntFlag);
 		start = boost::posix_time::second_clock::local_time();//Reset Default Timeout value
 		startsec = start.time_of_day().seconds();

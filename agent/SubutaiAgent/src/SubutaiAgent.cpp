@@ -308,7 +308,6 @@ int main(int argc, char *argv[], char *envp[]) {
 
 			//checking new message arrived
 			if (connection->checkMessageStatus()) {
-
 				command = connection->getMessage(); //fetching message..
 
 				logMain.writeLog(6,
@@ -492,7 +491,6 @@ int main(int argc, char *argv[], char *envp[]) {
 					currentProcess++;
 					delete subprocess;
 				}
-
 			}
 		} catch (const std::exception& error) {
 			logMain.writeLog(6,

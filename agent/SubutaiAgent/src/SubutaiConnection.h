@@ -67,7 +67,9 @@ private:
 	const char* publishedTopic;
 	const char* broadcastTopic;
 	int port;
-	int keepalive;bool receivedMessage;bool connectionStatus;
+	int keepalive;
+	bool receivedMessage;
+	bool connectionStatus;
 	string message;
 	int bufferSize;
 	string certpath;

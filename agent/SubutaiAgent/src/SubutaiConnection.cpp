@@ -172,7 +172,6 @@ void SubutaiConnection::on_message(const struct mosquitto_message *message) {
 
 		string input(buf);
 		if (new_command->deserialize(input)) {
-			cout << new_command->getType() << endl;
 			if (new_command->getType() == "EXECUTE_REQUEST") {
 				addMessageToExecQueue(new_command, input);
 			} else {

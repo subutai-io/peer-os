@@ -73,11 +73,16 @@ vector<string> SubutaiHelper::splitResult(string list, char* delimeter) {
 	while ((pos = list.find(delimeter)) != std::string::npos) {
 		token = list.substr(0, pos);
 		if (pos != 0)
+		{
 			tokens.push_back(token);
+		}
 		list.erase(0, pos + 1);
 	}
 	if (list.size() > 0)
+	{
 		tokens.push_back(list);
+	}
+
 	return tokens;
 }
 

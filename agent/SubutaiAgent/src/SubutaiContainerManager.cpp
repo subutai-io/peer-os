@@ -269,6 +269,7 @@ void SubutaiContainerManager::updateContainerLists() {
 				// Check is there is any new container appears
 				bool containerFound = false;
 				index = 0;
+
 				for (ContainerIterator it = _containers.begin();
 						it != _containers.end(); it++) {
 					if ((*it)->getContainerHostnameValue()
@@ -287,7 +288,6 @@ void SubutaiContainerManager::updateContainerLists() {
 				}
 			}
 		}
-
 		for (int i = size_of_containers - 1; i >= 0; i--) {
 			/*if this container is destroyed, clean both containerIdList and containers array on containerManager*/
 			if (!destroy_container_check[i]) {
