@@ -45,6 +45,7 @@ import org.safehaus.subutai.core.env.impl.tasks.DestroyEnvironmentTask;
 import org.safehaus.subutai.core.env.impl.tasks.GrowEnvironmentTask;
 import org.safehaus.subutai.core.env.impl.tasks.SetSshKeyTask;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
+import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -112,15 +113,28 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    protected User getUser()
+    {
+        User user = identityManager.getUser();
+
+        if ( user == null )
+        {
+            throw new EnvironmentSecurityException( "User not authenticated" );
+        }
+
+        return user;
+    }
+
+
     protected boolean isUserAdmin()
     {
-        return ( identityManager.getUser() != null ) && identityManager.getUser().isAdmin();
+        return getUser().isAdmin();
     }
 
 
     protected Long getUserId()
     {
-        return identityManager.getUser().getId();
+        return getUser().getId();
     }
 
 
@@ -166,6 +180,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public Environment findEnvironment( final UUID environmentId ) throws EnvironmentNotFoundException
     {
+        return findEnvironment( environmentId, false );
+    }
+
+
+    protected Environment findEnvironment( final UUID environmentId, boolean checkAccess )
+            throws EnvironmentNotFoundException
+    {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         EnvironmentImpl environment = environmentDataService.find( environmentId.toString() );
@@ -175,8 +196,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             throw new EnvironmentNotFoundException();
         }
 
-        //check user access
-        checkAccess( environment );
+        //check access to environment
+        if ( checkAccess )
+        {
+            checkAccess( environment );
+        }
 
         //set environment's transient fields
         setEnvironmentTransientFields( environment );
@@ -359,7 +383,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, true );
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
         {
@@ -417,7 +441,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, true );
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
         {
@@ -462,7 +486,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         Preconditions.checkNotNull( containerHost, "Invalid container host" );
 
         final EnvironmentImpl environment =
-                ( EnvironmentImpl ) findEnvironment( UUID.fromString( containerHost.getEnvironmentId() ) );
+                ( EnvironmentImpl ) findEnvironment( UUID.fromString( containerHost.getEnvironmentId() ), true );
 
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
@@ -509,7 +533,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public void removeEnvironment( final UUID environmentId ) throws EnvironmentNotFoundException
     {
-        findEnvironment( environmentId );
+        findEnvironment( environmentId, true );
 
         environmentDataService.remove( environmentId.toString() );
 
@@ -637,7 +661,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, true );
 
         final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
 
