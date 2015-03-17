@@ -51,9 +51,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 #include "SubutaiLogger.h"
-#include "SubutaiConnection.h"
 #include "SubutaiCommand.h"
-#include "SubutaiHelper.h"
 #include "SubutaiException.h"
 
 using namespace std;
@@ -64,63 +62,56 @@ typedef map<int, string>::iterator user_it;
 
 // Execution Result contains exit code of a functions, stdout and/or stderr
 struct ExecutionResult {
-    string out;
-    string err;
-    int exit_code;
-    pid_t pid;
+	string out;
+	string err;
+	int exit_code;
+	pid_t pid;
 };
 
+enum containerStatus {
+	RUNNING, STOPPED, FROZEN
+};
 
-
-enum containerStatus { RUNNING, STOPPED, FROZEN };
-
-class SubutaiContainer
-{
-    public:
-        SubutaiContainer(SubutaiLogger*, lxc_container*);
-        virtual ~SubutaiContainer(void);
-        bool getContainerId();
-        void UpdateUsersList();
-        void getContainerAllFields();
-        bool getContainerInterfaces();
-        void setContainerHostname(string);
-        void setContainerStatus(containerStatus);
-        string getState();
-        void write();
-        void clear();
-        bool checkCWD(string);
-        bool checkUser(string);
-        int getRunAsUserId(string);
-        void PutToFile(string, string);
-        vector<Interface> getContainerInterfaceValues();
-        lxc_container* getLxcContainerValue();
-        string getContainerArch();
-        string getContainerStatus();
-        string getContainerIdValue();
-        string getContainerHostnameValue();
-        string RunPsCommand();
-        string findFullProgramPath(string );
-        string RunProgram(string , vector<string>);
-        ExecutionResult RunCommand(SubutaiCommand*);
-        ExecutionResult RunDaemon(SubutaiCommand* );
-        ExecutionResult RunProgram(string , vector<string>, bool , lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT, bool captureOutput = true);
-        bool hasSubCommand(SubutaiCommand* command);
-    protected:
-        vector<string> ExplodeCommandArguments(SubutaiCommand* command);
-    private:
-        containerStatus 	status;
-        lxc_container* 		container;
-        string 				id;
-        string 				hostname;
-        map<int, string> 	_users;        // List of users available in system
-        vector<Interface> 	interfaces;
-        SubutaiLogger*		containerLogger;
-        SubutaiHelper 		_helper;
-        string              _arch;
-        string              _logEntry;      // <SubutaiContainer::CONTAINER_NAME>
+class SubutaiContainer {
+public:
+	SubutaiContainer(SubutaiLogger*, lxc_container*);
+	virtual ~SubutaiContainer(void);bool getContainerId();
+	void UpdateUsersList();
+	void getContainerAllFields();bool getContainerInterfaces();
+	void setContainerHostname(string);
+	string getState();
+	void write();
+	void clear();bool checkCWD(string);bool checkUser(string);
+	int getRunAsUserId(string);
+	void PutToFile(string, string);
+	vector<Interface> getContainerInterfaceValues();
+	lxc_container* getLxcContainerValue();
+	string getContainerArch();
+	string getContainerStatus();
+	string getContainerIdValue();
+	string getContainerHostnameValue();
+	string RunProgram(string, vector<string>);
+	ExecutionResult RunCommand(SubutaiCommand*);
+	ExecutionResult RunCommandAsDaemon(SubutaiCommand*, int*);
+	ExecutionResult RunDaemon(SubutaiCommand*);
+	ExecutionResult RunProgram(string, vector<string>, bool,
+			lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT,
+			bool captureOutput = true);bool hasSubCommand(
+			SubutaiCommand* command);
+protected:
+	vector<string> ExplodeCommandArguments(SubutaiCommand* command);
+private:
+	containerStatus status;
+	lxc_container* container;
+	string id;
+	string hostname;
+	map<int, string> _users;        // List of users available in system
+	vector<Interface> interfaces;
+	SubutaiLogger* containerLogger;
+	SubutaiHelper _helper;
+	string _arch;
+	string _logEntry;      // <SubutaiContainer::CONTAINER_NAME>
 };
 
 #endif /* SUBUTAICONTAINER_H_ */
-
-
 

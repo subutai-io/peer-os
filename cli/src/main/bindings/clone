@@ -119,6 +119,9 @@ function clone {
   #starting lxc in this method 
   git_child_branch $child
 
+  #wait for ssh service up
+  sleep 2
+
   #restarting ssh service in upstart
   (lxc-attach -n $child -- service ssh restart) > /dev/null 2>&1
 
