@@ -279,8 +279,8 @@ int main(int argc, char *argv[], char *envp[]) {
 			 * In 30 second periods send heartbeat and in_queue responses.
 			 */
 
-			timer.checkHeartBeatTimer(pidList, &heartbeatInterruptFlag);
-			timer.checkCommandQueueInfoTimer(command);
+			timer.checkHeartBeatTimer(&heartbeatInterruptFlag);
+			timer.checkCommandQueueInfoTimer();
 			command->clear();
 			for (list<int>::iterator iter = pidList.begin();
 					iter != pidList.end(); iter++) {
@@ -290,9 +290,10 @@ int main(int argc, char *argv[], char *envp[]) {
 					if (result != 0) {
 						iter = pidList.erase(iter);
 						currentProcess--;
+						/*
 						string resp = response.createInQueueMessage(
 								environment.getAgentUuidValue(),
-								command->getCommandId());
+								command->getCommandId());*/
 					}
 				}
 			}

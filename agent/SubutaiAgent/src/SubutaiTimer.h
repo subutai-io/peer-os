@@ -60,10 +60,13 @@ class SubutaiTimer {
 public:
 	SubutaiTimer(SubutaiLogger, SubutaiEnvironment*, SubutaiContainerManager*,
 			SubutaiConnection*);
-	virtual ~SubutaiTimer(void);bool checkExecutionTimeout(unsigned int*, bool*,
+	virtual ~SubutaiTimer(void);
+	bool checkExecutionTimeout(unsigned int*, bool*,
 			unsigned int*, unsigned int*);
-	void sendHeartBeat(bool, bool*);bool checkHeartBeatTimer(list<int>, bool*);bool checkCommandQueueInfoTimer(
-			SubutaiCommand*);bool checkIfLxcCommandInProgress(list<int>);
+	void sendHeartBeat(bool, bool*);
+	bool checkHeartBeatTimer(bool*);
+	bool checkCommandQueueInfoTimer();
+	bool checkIfLxcCommandInProgress();
 
 private:
 	SubutaiEnvironment* environment;

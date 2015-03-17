@@ -148,7 +148,7 @@ void SubutaiTimer::sendHeartBeat(bool lxcCommandInProgress,
  * We cannot tr to get lxc information when some operation on lxc is in progress.
  *
  */
-bool SubutaiTimer::checkIfLxcCommandInProgress(list<int> pidList) {
+bool SubutaiTimer::checkIfLxcCommandInProgress() {
 	FILE* file = popen("ps aux | grep destroy | grep -v grep", "r");
 	char buffer[1000];
 	while (fgets(buffer, 1000, file)) {
@@ -159,11 +159,10 @@ bool SubutaiTimer::checkIfLxcCommandInProgress(list<int> pidList) {
 	return false;
 }
 
-bool SubutaiTimer::checkHeartBeatTimer(list<int> pidList,
-		bool* heartbeatIntFlag) {
+bool SubutaiTimer::checkHeartBeatTimer(bool* heartbeatIntFlag) {
 	if (checkExecutionTimeout(&startsec, &overflag, &exectimeout, &count)) //checking Default Timeout
 			{
-		sendHeartBeat(checkIfLxcCommandInProgress(pidList), heartbeatIntFlag);
+		sendHeartBeat(checkIfLxcCommandInProgress(), heartbeatIntFlag);
 		start = boost::posix_time::second_clock::local_time();//Reset Default Timeout value
 		startsec = start.time_of_day().seconds();
 		overflag = false;
@@ -175,7 +174,8 @@ bool SubutaiTimer::checkHeartBeatTimer(list<int> pidList,
 	return false;
 }
 
-bool SubutaiTimer::checkCommandQueueInfoTimer(SubutaiCommand* command) {
+bool SubutaiTimer::checkCommandQueueInfoTimer() {
+	SubutaiCommand* command = new SubutaiCommand();
 	if (checkExecutionTimeout(&startsecQueue, &overflagQueue, &queuetimeout,
 			&countQueue)) {   //checking IN_QUEUE Default Timeout
 							  //timeout occured!!
@@ -209,7 +209,9 @@ bool SubutaiTimer::checkCommandQueueInfoTimer(SubutaiCommand* command) {
 		queuetimeout = 10;
 		countQueue = 1;
 
+		free(command);
 		return true;
 	}
+	free(command);
 	return false;
 }
