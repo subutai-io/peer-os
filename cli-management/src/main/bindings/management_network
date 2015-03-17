@@ -484,10 +484,10 @@ function management_network {
       ovs-ofctl add-flow br-int "priority=2500,ip,nw_src=10.10.10.0/24,nw_dst=$ipAdd actions=drop"
       sed -i '/Re-init OVS flows/i \ovs-ofctl add-flow br-int "priority=2500,ip,nw_src=10.10.10.0/24,nw_dst='$ipAdd' actions=drop"' /etc/init.d/service-interface
       ovs-ofctl add-flow br-$vlanID "priority=2600,ip,nw_src=10.10.10.1 actions=normal"
-sed -i '/Re-init OVS flows/i \ovs-ofctl add-flow br-'$vlanID' "priority=2600,ip,nw_src=10.10.10.1 actions=normal"' /etc/init.d/service-interface
+      sed -i '/Re-init OVS flows/i \ovs-ofctl add-flow br-'$vlanID' "priority=2600,ip,nw_src=10.10.10.1 actions=normal"' /etc/init.d/service-interface
 
       ovs-ofctl add-flow br-int "priority=2600,ip,nw_src=10.10.10.1,nw_dst=$ipAdd actions=normal"
-sed -i '/Re-init OVS flows/i \ovs-ofctl add-flow br-int "priority=2600,ip,nw_src=10.10.10.1,nw_dst='$ipAdd' actions=normal"' /etc/init.d/service-interface
+      sed -i '/Re-init OVS flows/i \ovs-ofctl add-flow br-int "priority=2600,ip,nw_src=10.10.10.1,nw_dst='$ipAdd' actions=normal"' /etc/init.d/service-interface
  
       msg_info "Gateway created for $vlanID"
    fi
@@ -842,7 +842,7 @@ if   [ "$status" == "deleteall" ]; then
     ovs-ofctl add-flow br-tun "in_port=$peer_port,dl_vlan=$vlan_id,actions=set_field:$vni_id->tun_id,output:$tunnel_port"
     sed -i '/Re-init OVS flows/i \ovs-ofctl add-flow br-tun "in_port='$peer_port',dl_vlan='$vlan_id',actions=set_field:'$vni_id'->tun_id,output:'$tunnel_port'"' /etc/init.d/service-interface
     ovs-ofctl add-flow br-tun "in_port=$tunnel_port,tun_id=$vni_id,actions=set_field:$vlan_id->vlan_vid,output:$peer_port"
-     sed -i '/Re-init OVS flows/i \ovs-ofctl add-flow br-tun "in_port='$tunnel_port',tun_id='$vni_id',actions=set_field:'$vlan_id'->vlan_vid,output:'$peer_port'"' /etc/init.d/service-interface
+    sed -i '/Re-init OVS flows/i \ovs-ofctl add-flow br-tun "in_port='$tunnel_port',tun_id='$vni_id',actions=set_field:'$vlan_id'->vlan_vid,output:'$peer_port'"' /etc/init.d/service-interface
     echo "$vni_id $vlan_id $ENV_ID" >> $file_name 
     msg_ok "Tunnel: $tunnelName VNI: $vni_id VLAN: $vlan_id ENV_ID: $ENV_ID"
     exit 0
