@@ -195,7 +195,7 @@ public class KeyStoreManager
     public String getEntries( KeyStore keyStore )
     {
         Enumeration<String> enumeration;
-        String entryData = "";
+        StringBuilder entryData = new StringBuilder( "" );
 
         try
         {
@@ -204,17 +204,17 @@ public class KeyStoreManager
             while ( enumeration.hasMoreElements() )
             {
                 String alias = ( String ) enumeration.nextElement();
-                entryData += "\nalias name: " + alias;
+                entryData.append( "\nalias name: " ).append( alias );
                 Certificate certificate = keyStore.getCertificate( alias );
-                entryData += "\nCertificate: " + certificate.toString();
-                entryData += "\n\n**************************************";
+                entryData.append( "\nCertificate: " ).append( certificate.toString() );
+                entryData.append( "\n\n**************************************" );
             }
         }
         catch ( KeyStoreException e )
         {
             LOGGER.error( "Error retrieving keyStore aliases/getting certificate by alias", e );
         }
-        return entryData;
+        return entryData.toString();
     }
 
 
@@ -300,9 +300,20 @@ public class KeyStoreManager
             os.write( buf );
             os.close();
 
-            Writer wr = new OutputStreamWriter( os, Charset.forName( "UTF-8" ) );
-            wr.write( new sun.misc.BASE64Encoder().encode( buf ) );
-            wr.flush();
+            Writer wr = null;
+            try
+            {
+                wr = new OutputStreamWriter( os, Charset.forName( "UTF-8" ) );
+                wr.write( new sun.misc.BASE64Encoder().encode( buf ) );
+                wr.flush();
+            }
+            finally
+            {
+                if ( wr != null )
+                {
+                    wr.close();
+                }
+            }
         }
         catch ( Exception ex )
         {
