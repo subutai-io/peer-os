@@ -44,24 +44,24 @@ using namespace std;
 typedef std::vector<SubutaiContainer*>::iterator ContainerIterator;
 
 class SubutaiContainerManager {
-    public:
-        SubutaiContainerManager(string , SubutaiLogger*);
-        ~SubutaiContainerManager();
-        vector<SubutaiContainer*> findAllContainers();
-        SubutaiContainer* findContainerById(string );
-        vector<SubutaiContainer*> getAllContainers();
-        vector<string> getContainers();
-        bool checkIfTemplate(string, vector<string>, bool );
-        void updateContainerIdListOnStart();
-        void deleteContainerInfo(string);
-        void updateContainerLists();
-    protected:
+public:
+	SubutaiContainerManager(string, SubutaiLogger*);
+	~SubutaiContainerManager();
+	vector<SubutaiContainer*> findAllContainers();
+	SubutaiContainer* findContainerById(string);
+	vector<SubutaiContainer*> getAllContainers();
+	vector<string> getContainers();bool checkIfTemplate(string, vector<string>,
+			bool);
+	void updateContainerIdListOnStart();
+	void deleteContainerInfo(string);
+	void updateContainerLists();
+protected:
 
-    private:
-        string                          _lxc_path;
-        SubutaiLogger*                  _logger;
-        vector<SubutaiContainer*>        _containers;
-        SubutaiHelper					_helper;
+private:
+	string _lxc_path;
+	SubutaiLogger* _logger;
+	vector<SubutaiContainer*> _containers;
+	SubutaiHelper _helper;
 };
 
 #endif

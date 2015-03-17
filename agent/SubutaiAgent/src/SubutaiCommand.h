@@ -40,12 +40,11 @@ using namespace std;
 using std::stringstream;
 using std::string;
 
-class SubutaiCommand
-{
+class SubutaiCommand {
 public:
-	SubutaiCommand( void );
-	virtual ~SubutaiCommand( void );
-	list<pair<string,string> >& getEnvironment();
+	SubutaiCommand(void);
+	virtual ~SubutaiCommand(void);
+	list<pair<string, string> >& getEnvironment();
 	vector<string>& getArguments();
 	vector<string>& getWatchArguments();
 	string& getUuid();
@@ -56,7 +55,7 @@ public:
 	string& getStandardOutput();
 	string& getType();
 	int getPid();
-    int getIsDaemon();
+	int getIsDaemon();
 	string& getHostname();
 	string& getMacAddress();
 	string& getCommandId();
@@ -69,7 +68,7 @@ public:
 	void setIps(vector<string>);
 	void setTimeout(int);
 	void setPid(int);
-	void setEnvironment(list<pair<string,string> >&);
+	void setEnvironment(list<pair<string, string> >&);
 	void setArguments(vector<string>);
 	void setUuid(const string&);
 	void setWorkingDirectory(const string&);
@@ -79,28 +78,28 @@ public:
 	void setStandardError(const string&);
 	void setStandardOutput(const string&);
 	void setType(const string&);
-        void setIsDaemon(int);
-	bool deserialize(string&);					//Deserializing Json String to Command Instance
+	void setIsDaemon(int);
+	bool deserialize(string&);	//Deserializing Json String to Command Instance
 	bool checkCommandString(const string&);
 	void clear();
 private:
-	string        	type;
-	string        	program;
-	string		    uuid;
-	int				pid;
-	int			 	requestSequenceNumber;
-	int				timeout;
-	string       	stdOut;
-	string        	stdErr;
-	string       	workingDirectory;
-	string        	runAs;
-	vector<string>	args;
-	list<pair<string,string> > environment;
-	string			taskUuid;
-	string			macAddress;
-	string			hostname;
-	vector<string>  ips;
-	vector<string>	watchArgs;
-        int             _isDaemon;
+	string type;
+	string program;
+	string uuid;
+	int pid;
+	int requestSequenceNumber;
+	int timeout;
+	string stdOut;
+	string stdErr;
+	string workingDirectory;
+	string runAs;
+	vector<string> args;
+	list<pair<string, string> > environment;
+	string taskUuid;
+	string macAddress;
+	string hostname;
+	vector<string> ips;
+	vector<string> watchArgs;
+	int _isDaemon;
 };
 #endif /* SUBUTAICOMMAND_H_ */

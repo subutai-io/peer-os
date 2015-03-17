@@ -46,10 +46,8 @@
 #include "SubutaiCommand.h"
 #include "SubutaiResponse.h"
 #include "SubutaiUserID.h"
-#include "SubutaiResponsePack.h"
 #include "SubutaiThread.h"
 #include "SubutaiConnection.h"
-#include "SubutaiLogger.h"
 #include "SubutaiWatch.h"
 #include "SubutaiEnvironment.h"
 #include "SubutaiContainerManager.h"
@@ -58,16 +56,17 @@ using std::stringstream;
 using std::string;
 #define LOG_HEARTBEAT_PERIOD 8
 
-class SubutaiTimer
-{
+class SubutaiTimer {
 public:
-	SubutaiTimer(SubutaiLogger, SubutaiEnvironment*, SubutaiContainerManager*, SubutaiConnection*);
-	virtual ~SubutaiTimer( void );
-	bool checkExecutionTimeout(unsigned int* ,bool* ,unsigned int* ,unsigned int*);
+	SubutaiTimer(SubutaiLogger, SubutaiEnvironment*, SubutaiContainerManager*,
+			SubutaiConnection*);
+	virtual ~SubutaiTimer(void);
+	bool checkExecutionTimeout(unsigned int*, bool*,
+			unsigned int*, unsigned int*);
 	void sendHeartBeat(bool, bool*);
-	bool checkHeartBeatTimer(SubutaiCommand, list<int>, bool* );
-	bool checkCommandQueueInfoTimer(SubutaiCommand);
-	bool checkIfLxcCommandInProgress(list<int>);
+	bool checkHeartBeatTimer(bool*);
+	bool checkCommandQueueInfoTimer();
+	bool checkIfLxcCommandInProgress();
 
 private:
 	SubutaiEnvironment* environment;
@@ -79,10 +78,8 @@ private:
 	boost::posix_time::ptime startQueue;
 	unsigned int exectimeout;
 	unsigned int queuetimeout;
-	unsigned int startsec ;
-	unsigned int startsecQueue;
-	bool overflag;
-	bool overflagQueue;
+	unsigned int startsec;
+	unsigned int startsecQueue;bool overflag;bool overflagQueue;
 	unsigned int count;
 	unsigned int countQueue;
 	unsigned int numHeartbeatmod5;
@@ -91,6 +88,4 @@ private:
 	SubutaiHelper helper;
 };
 #endif /* SUBUTAICONTAINER_H_ */
-
-
 

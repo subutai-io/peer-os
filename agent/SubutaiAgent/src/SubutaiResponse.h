@@ -37,11 +37,10 @@ using namespace std;
 using std::stringstream;
 using std::string;
 
-class SubutaiResponse
-{
+class SubutaiResponse {
 public:
-	SubutaiResponse( void );
-	virtual ~SubutaiResponse( void );
+	SubutaiResponse(void);
+	virtual ~SubutaiResponse(void);
 	string& getType();
 	string& getUuid();
 	int getRequestSequenceNumber();
@@ -51,7 +50,7 @@ public:
 	string& getStandardOutput();
 	int getPid();
 	string& getHostname();
-    string& getArch();
+	string& getArch();
 	string& getParentHostname();
 	vector<Interface> getInterfaces();
 	string& getCommandId();
@@ -69,7 +68,7 @@ public:
 	void setPid(int);
 	void setType(const string&);
 	void setUuid(const string&);
-    void setArch(const string&);
+	void setArch(const string&);
 	void setRequestSequenceNumber(int);
 	void setResponseSequenceNumber(int);
 	void setStandardError(const string&);
@@ -79,28 +78,29 @@ public:
 	void setDateTime(const string&);
 	void setChangeType(const string&);
 	void setConfPoints(vector<string>);
-	void serialize(string&);						//Serializing a Chunk Response message to a Json String
-	void serializeDone(string&);					//Serializing a Last Done Response message to a Json string
+	void serialize(string&);//Serializing a Chunk Response message to a Json String
+	void serializeDone(string&);//Serializing a Last Done Response message to a Json string
 	void clear();
 private:
-	string        		type;
-	string		   	 	uuid;
-	int			 		requestSequenceNumber;
-	int			 		responseSequenceNumber;
-	int					exitCode;
-	int					pid;
-	string       		stdOut;
-	string        		stdErr;
-	string				commandId;
-	string				hostname;
-	string				parentHostname;
-	vector<Interface>  	interfaces;
-	string 				configPoint;
-	string				dateTime;
-	string				changeType;
-    string              topic;
-    string              arch;
-	vector<string>  confPoints;
-	vector<SubutaiContainer*>  containers;
+	string type;
+	string uuid;
+	int requestSequenceNumber;
+	int responseSequenceNumber;
+	int exitCode;
+	int pid;
+	string stdOut;
+	string stdErr;
+	string commandId;
+	string hostname;
+	string parentHostname;
+	vector<Interface> interfaces;
+	string configPoint;
+	string dateTime;
+	string changeType;
+	string topic;
+	string arch;
+	vector<string> confPoints;
+	vector<SubutaiContainer*> containers;
 };
+
 #endif /* SUBUTAIRESPONSE_H_ */
