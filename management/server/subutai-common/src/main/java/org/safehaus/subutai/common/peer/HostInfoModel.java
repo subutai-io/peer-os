@@ -78,4 +78,34 @@ public class HostInfoModel implements HostInfo
     {
         return hostname.compareTo( o.getHostname() );
     }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof HostInfoModel ) )
+        {
+            return false;
+        }
+
+        final HostInfoModel that = ( HostInfoModel ) o;
+
+        return hostArchitecture == that.hostArchitecture && hostname.equals( that.hostname ) && id.equals( that.id )
+                && netInterfaces.equals( that.netInterfaces );
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        int result = id.hashCode();
+        result = 31 * result + hostname.hashCode();
+        result = 31 * result + netInterfaces.hashCode();
+        result = 31 * result + hostArchitecture.hashCode();
+        return result;
+    }
 }
