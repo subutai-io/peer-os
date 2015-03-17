@@ -52,9 +52,12 @@ public:
 	vector<SubutaiContainer*> getAllContainers();
 	vector<string> getContainers();bool checkIfTemplate(string, vector<string>,
 			bool);
+	bool checkBrokenLxc();
 	void updateContainerIdListOnStart();
 	void deleteContainerInfo(string);
 	void updateContainerLists();
+	bool isManagerLocked() const;
+
 protected:
 
 private:
@@ -62,6 +65,7 @@ private:
 	SubutaiLogger* _logger;
 	vector<SubutaiContainer*> _containers;
 	SubutaiHelper _helper;
+	bool managerLocked;
 };
 
 #endif
