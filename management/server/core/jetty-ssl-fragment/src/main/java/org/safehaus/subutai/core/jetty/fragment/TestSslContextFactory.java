@@ -27,7 +27,7 @@ public class TestSslContextFactory extends SslContextFactory
     {
         super();
         LOG.error( "CUSTOM SSL FACTORY!!!!! " + id.toString() );
-        TestSslContextFactory.singleton = this;
+        setSslContextFactory( this );
     }
 
 
@@ -35,7 +35,7 @@ public class TestSslContextFactory extends SslContextFactory
     {
         super( trustAll );
         LOG.error( "CUSTOM SSL FACTORY!!!!! " + id.toString() );
-        TestSslContextFactory.singleton = this;
+        setSslContextFactory( this );
     }
 
 
@@ -43,7 +43,7 @@ public class TestSslContextFactory extends SslContextFactory
     {
         super( keyStorePath );
         LOG.error( "CUSTOM SSL FACTORY!!!!! " + id.toString() );
-        TestSslContextFactory.singleton = this;
+        setSslContextFactory( this );
     }
 
 
@@ -59,13 +59,18 @@ public class TestSslContextFactory extends SslContextFactory
     }
 
 
+    private synchronized static void setSslContextFactory( TestSslContextFactory instance )
+    {
+        singleton = instance;
+    }
+
+
     @Override
     protected void doStop() throws Exception
     {
         if ( customStart )
         {
             stop();
-            super.doStop();
         }
         else
         {
