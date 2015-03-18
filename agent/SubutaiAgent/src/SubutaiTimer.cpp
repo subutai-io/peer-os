@@ -91,9 +91,10 @@ bool SubutaiTimer::checkExecutionTimeout(unsigned int* startsec, bool* overflag,
 	return false;	//no timeout occured
 }
 
-void SubutaiTimer::sendHeartBeat(bool lxcCommandInProgress,
+void SubutaiTimer::sendHeartBeat(bool destroyCommandInProgress, bool cloneCommandInProgress,
 		bool* heartbeatIntFlag) {
 	response->clear();
+	bool lxcCommandInProgress = destroyCommandInProgress || cloneCommandInProgress;
 	/*
 	 * Refresh new agent ip address set for each heart beat message
 	 */
@@ -143,12 +144,12 @@ void SubutaiTimer::sendHeartBeat(bool lxcCommandInProgress,
 }
 
 /*
- * This method checks the running commands if there is a lxc command running or not.
+ * This method checks the running commands if there is a lxc destroy command running or not.
  * If Lxc command is in progress send latest Heartbeat.
  * We cannot tr to get lxc information when some operation on lxc is in progress.
  *
  */
-bool SubutaiTimer::checkIfLxcCommandInProgress() {
+bool SubutaiTimer::checkIfDestroyCommandInProgress() {
 	FILE* file = popen("ps aux | grep destroy | grep -v grep", "r");
 	char buffer[1000];
 	while (fgets(buffer, 1000, file)) {
@@ -159,10 +160,28 @@ bool SubutaiTimer::checkIfLxcCommandInProgress() {
 	return false;
 }
 
+/*
+ * This method checks the running commands if there is a lxc clone command running or not.
+ * If Lxc command is in progress send latest Heartbeat.
+ * We cannot tr to get lxc information when some operation on lxc is in progress.
+ *
+ */
+bool SubutaiTimer::checkIfCloneCommandInProgress() {
+	FILE* file = popen("ps aux | grep clone | grep -v grep", "r");
+	char buffer[1000];
+	while (fgets(buffer, 1000, file)) {
+		return true;
+	}
+	pclose(file);
+
+	return false;
+}
+
+
 bool SubutaiTimer::checkHeartBeatTimer(bool* heartbeatIntFlag) {
 	if (checkExecutionTimeout(&startsec, &overflag, &exectimeout, &count)) //checking Default Timeout
 			{
-		sendHeartBeat(checkIfLxcCommandInProgress(), heartbeatIntFlag);
+		sendHeartBeat(checkIfDestroyCommandInProgress(), checkIfCloneCommandInProgress(), heartbeatIntFlag);
 		start = boost::posix_time::second_clock::local_time();//Reset Default Timeout value
 		startsec = start.time_of_day().seconds();
 		overflag = false;

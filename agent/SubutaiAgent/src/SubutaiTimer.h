@@ -63,10 +63,11 @@ public:
 	virtual ~SubutaiTimer(void);
 	bool checkExecutionTimeout(unsigned int*, bool*,
 			unsigned int*, unsigned int*);
-	void sendHeartBeat(bool, bool*);
+	void sendHeartBeat(bool, bool, bool*);
 	bool checkHeartBeatTimer(bool*);
 	bool checkCommandQueueInfoTimer();
-	bool checkIfLxcCommandInProgress();
+	bool checkIfDestroyCommandInProgress();
+	bool checkIfCloneCommandInProgress();
 
 private:
 	SubutaiEnvironment* environment;
