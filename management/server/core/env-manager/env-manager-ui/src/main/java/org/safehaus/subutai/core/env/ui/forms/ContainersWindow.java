@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
+import org.safehaus.subutai.common.mdc.SubutaiExecutors;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.settings.Common;
@@ -82,8 +83,8 @@ public class ContainersWindow extends Window
 
     private void startTableUpdateThread()
     {
-        taskExecutor = Executors.newSingleThreadExecutor();
-        updater = Executors.newSingleThreadScheduledExecutor();
+        taskExecutor = SubutaiExecutors.newSingleThreadExecutor();
+        updater = SubutaiExecutors.newSingleThreadScheduledExecutor();
         updater.scheduleWithFixedDelay( new Runnable()
         {
             @Override

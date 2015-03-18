@@ -22,23 +22,25 @@
  *  @version   1.1.0
  *  @date      Sep 13, 2014
  */
+
 #ifndef SUBUTAIRESPONSEPACK_H_
 #define SUBUTAIRESPONSEPACK_H_
+
 #include "SubutaiResponse.h"
 using namespace std;
-class SubutaiResponsePack : public SubutaiResponse
-{
+
+class SubutaiResponsePack: public SubutaiResponse {
 public:
 	SubutaiResponsePack();
 	virtual ~SubutaiResponsePack();
-	string createResponseMessage(string,int,int,int,string,string,string);
-	string createExitMessage(string,int, int, int,string,int);
-	string createTerminateMessage(string,string,int, int);
-	string createInQueueMessage(string,string);
-	string createHeartBeatMessage(string,string);
-    string createPsResponse(string, string);
-	string createTimeoutMessage(string,int,int,int,string,string,string);
-	string createInotifyMessage(string,string,string,string);
+	string createResponseMessage(string, int, int, int, string, string, string);
+	string createExitMessage(string, int, int, int, string, int);
+	string createTerminateMessage(string, string, int, int);
+	string createInQueueMessage(string, string);
+	string createHeartBeatMessage(string, string);
+	string createPsResponse(string, string);
+	string createTimeoutMessage(string, int, int, int, string, string, string);
+	string createInotifyMessage(string, string, string, string);
 	string createInotifyShowMessage(string, string, vector<string>);
 	string setInotifyResponse(string, string);
 	string unsetInotifyResponse(string, string);
