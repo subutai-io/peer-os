@@ -770,8 +770,8 @@ public class RestServiceImpl implements RestService
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            localPeer.reserveVni( JsonUtil.fromJson( vni, Vni.class ) );
-            return Response.ok().build();
+            int vlan = localPeer.reserveVni( JsonUtil.fromJson( vni, Vni.class ) );
+            return Response.ok( vlan ).build();
         }
         catch ( Exception e )
         {

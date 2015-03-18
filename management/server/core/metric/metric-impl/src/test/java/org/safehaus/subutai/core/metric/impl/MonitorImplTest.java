@@ -30,6 +30,9 @@ import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
+import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
@@ -81,12 +84,17 @@ public class MonitorImplTest
     private static final String METRIC_JSON = " {\"host\":\"test\", \"totalRam\":\"123\"," +
             "\"availableRam\":\"123\", \"usedRam\":\"123\", \"usedCpu\":\"123\","
             + "  \"availableDisk\" : \"123\", \"usedDisk\" : \"123\", \"totalDisk\" : \"123\"}";
+    private static final Long USER_ID = 123l;
     @Mock
     EntityManagerFactory entityManagerFactory;
     @Mock
     EntityManager entityManager;
     @Mock
     PeerManager peerManager;
+    @Mock
+    IdentityManager identityManager;
+    @Mock
+    EnvironmentManager environmentManager;
     @Mock
     MonitorDao monitorDao;
     @Mock
@@ -114,12 +122,16 @@ public class MonitorImplTest
     @Mock
     MonitoringSettings monitoringSettings;
 
+    @Mock
+    User user;
+
 
     static class MonitorImplExt extends MonitorImpl
     {
-        public MonitorImplExt( final PeerManager peerManager, DaoManager daoManager ) throws MonitorException
+        public MonitorImplExt( PeerManager peerManager, DaoManager daoManager, IdentityManager identityManager,
+                               EnvironmentManager environmentManager ) throws MonitorException
         {
-            super( peerManager, daoManager );
+            super( peerManager, daoManager, identityManager, environmentManager );
         }
 
 
@@ -151,7 +163,7 @@ public class MonitorImplTest
         when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
 
 
-        monitor = new MonitorImplExt( peerManager, daoManager );
+        monitor = new MonitorImplExt( peerManager, daoManager, identityManager, environmentManager );
         monitor.setMonitorDao( monitorDao );
 
 
@@ -165,6 +177,8 @@ public class MonitorImplTest
         when( monitorDao.getEnvironmentSubscribersIds( ENVIRONMENT_ID ) )
                 .thenReturn( Sets.newHashSet( SUBSCRIBER_ID ) );
         when( environment.getId() ).thenReturn( ENVIRONMENT_ID );
+        when( environment.getUserId() ).thenReturn( USER_ID );
+        when( identityManager.getUser( USER_ID ) ).thenReturn( user );
         when( localPeer.getId() ).thenReturn( LOCAL_PEER_ID );
         when( localPeer.isLocal() ).thenReturn( true );
         when( remotePeer.isLocal() ).thenReturn( false );
@@ -174,6 +188,7 @@ public class MonitorImplTest
         when( containerHost.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID.toString() );
         when( containerHost.getId() ).thenReturn( HOST_ID );
         when( localPeer.getResourceHosts() ).thenReturn( Sets.newHashSet( resourceHost ) );
+        when( environmentManager.findEnvironment( ENVIRONMENT_ID ) ).thenReturn( environment );
     }
 
 
@@ -228,7 +243,7 @@ public class MonitorImplTest
 
         monitor.notifyOnAlert( containerHostMetric );
 
-        verify( containerHostMetric ).getEnvironmentId();
+        verify( identityManager ).loginWithToken(anyString());
     }
 
 
@@ -703,7 +718,7 @@ public class MonitorImplTest
         Monitor monitor1 = null;
         try
         {
-            monitor1 = new MonitorImpl( peerManager, daoManager );
+            monitor1 = new MonitorImpl( peerManager, daoManager, identityManager, environmentManager );
         }
         catch ( MonitorException e )
         {
