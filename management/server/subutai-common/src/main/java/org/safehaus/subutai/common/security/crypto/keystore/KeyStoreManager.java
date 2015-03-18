@@ -30,7 +30,10 @@ import org.safehaus.subutai.common.security.utils.io.SafeCloseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+/**
+ * Main Class for keystore management. Manages Keystores and Truststores
+ *
+ */
 public class KeyStoreManager
 {
 
@@ -38,9 +41,9 @@ public class KeyStoreManager
     private FileInputStream finStream = null;
     private FileOutputStream foutStream = null;
 
-
     /**
-     * ************************************************************************* **********************************
+     * KeyStoreManager constructor
+     *
      */
     public KeyStoreManager()
     {
@@ -48,8 +51,13 @@ public class KeyStoreManager
     }
 
 
-    /**
-     * ************************************************************************* **********************************
+
+    /**************************************************************************************
+     * Load keystore and create KeyStore object
+     *
+     * @param keyStoreData KeyStoreData
+     *
+     * @return KeyStore
      */
     public KeyStore load( KeyStoreData keyStoreData )
     {
@@ -74,8 +82,11 @@ public class KeyStoreManager
                 else
                 {
                     File keyStoresFolder = new File( file.getParent() );
-                    keyStoresFolder.mkdirs();
-                    file.createNewFile();
+                    if(keyStoresFolder.mkdirs())
+                    {
+                        file.createNewFile();
+                    }
+
                     keyStore = KeyStore.getInstance( keyStoreData.getKeyStoreType().jce() );
                     keyStore.load( null, null );
                     foutStream = new FileOutputStream( file );
@@ -113,8 +124,13 @@ public class KeyStoreManager
     }
 
 
-    /**
-     * ************************************************************************* **********************************
+    /**************************************************************************************
+     * Save changes in the keystore
+     *
+     * @param keyStore KeyStore
+     * @param keyStoreData, KeyStoreData
+     *
+     *
      */
     public void save( KeyStore keyStore, KeyStoreData keyStoreData )
     {
@@ -142,8 +158,13 @@ public class KeyStoreManager
     }
 
 
-    /**
-     * ************************************************************************* **********************************
+    /**************************************************************************************
+     * Get Keypair object
+     *
+     * @param keyStore KeyStore
+     * @param keyStoreData KeyStoreData
+     *
+     * @return KeyPair
      */
     public KeyPair getKeyPair( KeyStore keyStore, KeyStoreData keyStoreData )
     {
@@ -169,8 +190,14 @@ public class KeyStoreManager
     }
 
 
-    /**
-     * ************************************************************************* **********************************
+    /**************************************************************************************
+     * Save x509 Certificate in Keystore
+     *
+     * @param keyStore KeyStore
+     * @param keyStoreData KeyStoreData
+     * @param x509Cert X509Certificate
+     * @param keyPair KeyPair
+     *
      */
     public void saveX509Certificate( KeyStore keyStore, KeyStoreData keyStoreData, X509Certificate x509Cert,
                                      KeyPair keyPair )
@@ -189,8 +216,12 @@ public class KeyStoreManager
     }
 
 
-    /**
-     * ************************************************************************* **********************************
+    /**************************************************************************************
+     *
+     *
+     * @param keyStore KeyStore
+     *
+     * @return String
      */
     public String getEntries( KeyStore keyStore )
     {
@@ -218,9 +249,13 @@ public class KeyStoreManager
     }
 
 
-    /**
-     * *************************************************************************
-     * *********************aliases*************
+    /**************************************************************************************
+     * Delete entry in the Keystore
+     *
+     * @param keyStore KeyStore
+     * @param keyStoreData KeyStoreData
+     *
+     * @return boolean
      */
     public boolean deleteEntry( KeyStore keyStore, KeyStoreData keyStoreData )
     {
@@ -239,8 +274,12 @@ public class KeyStoreManager
     }
 
 
-    /**
-     * ************************************************************************* **********************************
+    /**************************************************************************************
+     * import Hexadecimal format certificate into Keystore
+     *
+     * @param keyStore KeyStore
+     * @param keyStoreData KeyStoreData
+     *
      */
     public void importCertificate( KeyStore keyStore, KeyStoreData keyStoreData )
     {
@@ -277,8 +316,12 @@ public class KeyStoreManager
     }
 
 
-    /**
-     * ************************************************************************* **********************************
+    /**************************************************************************************
+     * Export Certificate as a .cer file.
+     *
+     * @param keyStore KeyStore
+     * @param keyStoreData KeyStoreData
+     *
      */
     @SuppressWarnings( "restriction" )
     public void exportCertificate( KeyStore keyStore, KeyStoreData keyStoreData )
@@ -315,8 +358,13 @@ public class KeyStoreManager
     }
 
 
-    /**
-     * ************************************************************************* **********************************
+    /**************************************************************************************
+     * Export Certificate
+     *
+     * @param keyStore KeyStore ,
+     * @param keyStoreData KeyStoreData
+     *
+     * @return String
      */
     public String exportCertificateHEXString( KeyStore keyStore, KeyStoreData keyStoreData )
     {
@@ -339,8 +387,12 @@ public class KeyStoreManager
     }
 
 
-    /**
-     * ************************************************************************* **********************************
+    /**************************************************************************************
+     * Import Certificate(HEX) into Keystore
+     *
+     * @param keyStore KeyStore
+     * @param keyStoreData KeyStoreData
+     *
      */
     public void importCertificateHEXString( KeyStore keyStore, KeyStoreData keyStoreData )
     {
@@ -371,8 +423,13 @@ public class KeyStoreManager
     }
 
 
-    /**
-     * ************************************************************************* **********************************
+    /**************************************************************************************
+     * Check if keystore entry type is a keypair entry
+     *
+     * @param keyStore KeyStore
+     * @param alias String
+     *
+     * @return boolean
      */
     public static boolean isKeyPairEntry( KeyStore keyStore, String alias ) throws KeyStoreException
     {
@@ -381,8 +438,12 @@ public class KeyStoreManager
     }
 
 
-    /**
-     * ************************************************************************* **********************************
+    /**************************************************************************************
+     * Check if keystore entry type is a key entry
+     *
+     * @param
+     *
+     * @return boolean
      */
     public boolean isKeyEntry( KeyStore keyStoreParam, String alias ) throws KeyStoreException
     {
@@ -391,8 +452,13 @@ public class KeyStoreManager
     }
 
 
-    /**
-     * ************************************************************************* **********************************
+    /**************************************************************************************
+     * Check if keystore entry type is a Trusted Certificate
+     *
+     * @param alias Sring
+     * @param keyStoreParam keyStoreParam
+     *
+     * @return boolean
      */
     public boolean isTrustedCertificateEntry( KeyStore keyStoreParam, String alias ) throws KeyStoreException
     {
@@ -400,8 +466,12 @@ public class KeyStoreManager
     }
 
 
-    /**
-     * ************************************************************************* **********************************
+    /**************************************************************************************
+     * Check if Keystore contains any key data
+     *
+     * @param keyStore KeyStore
+     *
+     * @return boolean
      */
     public boolean containsKey( KeyStore keyStore )
     {
@@ -423,7 +493,7 @@ public class KeyStoreManager
         }
         catch ( KeyStoreException ex )
         {
-            LOGGER.error( "NoCheckKeyStoreKeys.exception.message", ex );
+            LOGGER.error( "CheckKeyStoreKeys exception", ex );
             return false;
         }
     }
