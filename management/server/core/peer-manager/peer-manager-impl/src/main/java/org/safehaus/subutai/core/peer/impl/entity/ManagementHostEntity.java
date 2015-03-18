@@ -106,6 +106,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
     public void addAptSource( final String hostname, final String ip ) throws PeerException
     {
+        //todo use repository manager
         try
         {
             commandUtil.execute( commands.getAddAptSourceCommand( hostname, ip ), this );
@@ -119,6 +120,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
     public void removeAptSource( final String host, final String ip ) throws PeerException
     {
+        //todo use repository manager
         try
         {
             commandUtil.execute( commands.getRemoveAptSourceCommand( ip ), this );
