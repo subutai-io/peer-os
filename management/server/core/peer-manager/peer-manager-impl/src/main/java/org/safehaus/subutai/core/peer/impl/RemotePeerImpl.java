@@ -1112,7 +1112,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void reserveVni( final Vni vni ) throws PeerException
+    public int reserveVni( final Vni vni ) throws PeerException
     {
         Preconditions.checkNotNull( vni, "Invalid vni" );
 
@@ -1127,8 +1127,9 @@ public class RemotePeerImpl implements RemotePeer
 
             params.put( "vni", JsonUtil.to( vni ) );
 
-            //            String alias = String.format( "%s", peerInfo.getId() );
-            post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
+            String response = post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
+
+            return Integer.parseInt( response );
         }
         catch ( Exception e )
         {
@@ -1254,36 +1255,6 @@ public class RemotePeerImpl implements RemotePeer
                     String.format( "Error removing environment certificate %s on peer %s", envId, getName() ), e );
         }
     }
-
-
-    //
-    //    @Override
-    //    public int setupTunnels( final Set<String> peerIps, final Vni vni ) throws PeerException
-    //    {
-    //        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
-    //        Preconditions.checkNotNull( vni, "Invalid vni" );
-    //
-    //        String path = "peer/tunnels";
-    //
-    //        try
-    //        {
-    //            Map<String, String> headers = Maps.newHashMap();
-    //            headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, vni.getEnvironmentId().toString() );
-    //
-    //            Map<String, String> params = Maps.newHashMap();
-    //
-    //            params.put( "peerIps", JsonUtil.to( peerIps ) );
-    //            params.put( "vni", JsonUtil.to( vni ) );
-    //
-    //            String response = post( path, params, headers );
-    //
-    //            return Integer.parseInt( response );
-    //        }
-    //        catch ( Exception e )
-    //        {
-    //            throw new PeerException( String.format( "Error setting up tunnels on peer %s", getName() ), e );
-    //        }
-    //    }
 
 
     //************ END ENVIRONMENT SPECIFIC REST

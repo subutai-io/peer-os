@@ -62,7 +62,7 @@ function start {
     lxc-start -n $lxc -d
     lxc-wait -n $lxc -s RUNNING
     #Delay for system initialization
-    sleep 1
+    sleep 2
     #Restart ssh service
     (lxc-attach -n $lxc -- service ssh start) > /dev/null 2>&1
   fi

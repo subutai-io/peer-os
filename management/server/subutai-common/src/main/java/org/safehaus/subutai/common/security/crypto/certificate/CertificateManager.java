@@ -41,6 +41,9 @@ public class CertificateManager
     private X509Certificate x509cert = null;
 
 
+    /**************************************************************************************
+     *  CertificateManager Constructor
+     */
     public void setDateParamaters()
     {
         Calendar cal = Calendar.getInstance();
@@ -49,7 +52,15 @@ public class CertificateManager
         notAfter = cal.getTime();
     }
 
-
+    /**************************************************************************************
+     * Generate x509 Certificate
+     * @param keyStore KeyStore
+     * @param keyPair KeyPair
+     * @param securityProvider SecurityProvider
+     * @param certificateData CertificateData
+     *
+     * @return X509Certificate
+     */
     public X509Certificate generateSelfSignedCertificate( KeyStore keyStore, KeyPair keyPair,
                                                           SecurityProvider securityProvider,
                                                           CertificateData certificateData )
