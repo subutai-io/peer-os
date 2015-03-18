@@ -408,8 +408,8 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     @Override
     public boolean updateUserPortalModule( final PortalModuleScope portalModuleScope )
     {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader( this.getClass().getClassLoader() );
+        ClassLoader cl = IdentityManagerImpl.class.getClassLoader();
+        Thread.currentThread().setContextClassLoader( IdentityManagerImpl.class.getClassLoader() );
         try
         {
             LOG.debug( "Saving new portal module: ", portalModuleScope.toString() );
