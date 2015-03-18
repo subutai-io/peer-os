@@ -89,6 +89,7 @@ vector<string> SubutaiHelper::splitResult(string list, char* delimeter) {
 void SubutaiHelper::writeToFile(string& path, string& input) {
 	fstream file;	//opening commandQueue.txt
 	file.open(path.c_str(), fstream::in | fstream::out | fstream::app);
+	cout << "write msg to command queue: " << input << endl;
 	file << input;
 	file.close();
 }
@@ -119,6 +120,10 @@ void SubutaiHelper::removeFromFile(string& path, string sub_string) {
 			size_t found = str.find(sub_string);
 			if (found == std::string::npos) {
 				file_tmp << str << endl;
+			}
+			else
+			{
+				cout << "remove message from cmd queue: " << str << endl;
 			}
 		}
 		file_tmp.close();
