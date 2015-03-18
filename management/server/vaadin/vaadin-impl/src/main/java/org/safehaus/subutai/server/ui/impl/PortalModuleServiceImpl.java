@@ -40,9 +40,14 @@ public class PortalModuleServiceImpl implements PortalModuleService
             try
             {
                 IdentityManager identityManager = serviceLocator.getService( IdentityManager.class );
-                PortalModuleScope portalModule =
-                        identityManager.createMockUserPortalModule( module.getId(), module.getName() );
-                identityManager.updateUserPortalModule( portalModule );
+
+                if(identityManager != null)
+                {
+                    PortalModuleScope portalModule =
+                            identityManager.createMockUserPortalModule( module.getId(), module.getName() );
+                    identityManager.updateUserPortalModule( portalModule );
+                }
+
             }
             catch ( NamingException e )
             {

@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.safehaus.subutai.common.mdc.SubutaiExecutors;
 import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 
@@ -46,7 +47,7 @@ public class TerminalForm extends CustomComponent implements Disposable
     {
         setSizeFull();
 
-        executor = Executors.newCachedThreadPool();
+        executor = SubutaiExecutors.newCachedThreadPool();
 
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
         horizontalSplit.setSplitPosition( 200, Unit.PIXELS );

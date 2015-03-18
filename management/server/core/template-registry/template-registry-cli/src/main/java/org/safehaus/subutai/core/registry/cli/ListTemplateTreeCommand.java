@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
 
@@ -17,7 +17,7 @@ import com.google.common.base.Preconditions;
  * CLI for TemplateRegistryManager.ListTemplateTreeCommand command
  */
 @Command( scope = "registry", name = "list-template-tree", description = "List templates tree" )
-public class ListTemplateTreeCommand extends OsgiCommandSupport
+public class ListTemplateTreeCommand extends SubutaiShellCommandSupport
 {
 
     private final TemplateRegistry templateRegistry;

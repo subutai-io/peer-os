@@ -11,11 +11,11 @@ import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
 
@@ -24,7 +24,7 @@ import com.google.common.base.Preconditions;
  * Adds environment container hosts to target environment
  */
 @Command( scope = "env", name = "grow-local", description = "Command to grow local environment" )
-public class GrowLocalEnvironmentCommand extends OsgiCommandSupport
+public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
 {
 
     @Argument( name = "envId", description = "Environment id",

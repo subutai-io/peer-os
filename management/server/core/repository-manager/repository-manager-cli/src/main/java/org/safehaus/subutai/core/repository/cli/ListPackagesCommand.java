@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.repository.cli;
 
 import java.util.Set;
 
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.repository.api.PackageInfo;
 import org.safehaus.subutai.core.repository.api.RepositoryException;
 import org.safehaus.subutai.core.repository.api.RepositoryManager;
@@ -11,13 +12,12 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
 
 
 @Command( scope = "repo", name = "list", description = "Lists packages containing 'term'" )
-public class ListPackagesCommand extends OsgiCommandSupport
+public class ListPackagesCommand extends SubutaiShellCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( ListPackagesCommand.class.getName() );
 

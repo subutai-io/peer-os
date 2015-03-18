@@ -52,14 +52,14 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
 
             if(url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X1))
             {
-                if(ChannelSettings.checkURL(basePath,ChannelSettings.URL_ACCESS_PX1) == 0)
+                if ( ChannelSettings.checkURL( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
                 {
                     status = 1;
                 }
             }
             else if(url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2))
             {
-                if(ChannelSettings.checkURL(basePath,ChannelSettings.URL_ACCESS_PX2) == 0)
+                if ( ChannelSettings.checkURL( basePath, ChannelSettings.URL_ACCESS_PX2 ) == 0 )
                 {
                     status = 1;
                 }
@@ -68,7 +68,8 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
             {
                 //----------------------------------------------------------------------
             }
-            else if(url.getPort() == Integer.parseInt( ChannelSettings.SPECIAL_PORT_X1))
+            else if(   url.getPort() == Integer.parseInt( ChannelSettings.SPECIAL_PORT_X1)
+                    || url.getPort() == Integer.parseInt( ChannelSettings.SPECIAL_SECURE_PORT_X1))
             {
                 String query      =  ( String ) message.get( Message.QUERY_STRING ) ;
                 String paramValue =  UrlUtil.getQueryParameterValue(  "sptoken", query );
@@ -84,7 +85,7 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
                                                   url.getHost()))
                         {
                             User user = channelManagerImpl.getIdentityManager().getUser(userChannelToken.getUserId());
-                            channelManagerImpl.getIdentityManager().loginWithToken(user.getUsername() );
+                            channelManagerImpl.getIdentityManager().loginWithToken( user.getUsername() );
                         }
                         else
                         {

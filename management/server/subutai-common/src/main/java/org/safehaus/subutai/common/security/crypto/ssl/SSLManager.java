@@ -2,6 +2,9 @@ package org.safehaus.subutai.common.security.crypto.ssl;
 
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
 import org.safehaus.subutai.common.security.crypto.ssl.NaiveTrustManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.security.KeyStore;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -10,6 +13,8 @@ import javax.net.ssl.TrustManagerFactory;
 
 public class SSLManager
 {
+	private static final Logger LOGGER = LoggerFactory.getLogger( SSLManager.class );
+
 	private KeyStore     keyStore = null;
 	private KeyStore     trustStore = null;;
 	private KeyStoreData keyStoreData = null;
@@ -37,7 +42,7 @@ public class SSLManager
         }
         catch ( Exception e )
         {
-	        e.printStackTrace();
+			LOGGER.error( "Error getting array of client key managers" );
         }
 		
 		return keyManagers;
@@ -56,7 +61,7 @@ public class SSLManager
         }
         catch ( Exception e )
         {
-	        e.printStackTrace();
+			LOGGER.error( "Error getting array of trust managers" );
         }
 		
 		return trustManagers;

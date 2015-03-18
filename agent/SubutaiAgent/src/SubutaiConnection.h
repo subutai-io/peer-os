@@ -27,41 +27,59 @@
 
 #include "mosquittopp.h"
 #include <iostream>
+#include <queue>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <functional>
+#include <iostream>
+#include <fstream>
 #include "pugixml.hpp"
+
+#include "SubutaiResponsePack.h"
+#include "SubutaiEnvironment.h"
+
+#define MAX_MSG_NUM 300
 using namespace std;
 using std::string;
 
-class SubutaiConnection : public mosqpp::mosquittopp
-{
+class SubutaiConnection: public mosqpp::mosquittopp {
 public:
-	SubutaiConnection(const char*,const char*,const char*,const char*,const char*,int);
+	SubutaiConnection(const char*, const char*, const char*, const char*,
+			const char*, int, SubutaiEnvironment*, SubutaiLogger*);
 	virtual ~SubutaiConnection();
 	bool openSession();
-	bool sendMessage(string, string topic = "");
+	bool sendMessage(string,string topic = "");
 	bool checkMessageStatus();
-	void resetMessageStatus();
-	void setMessage(string);
-	string getMessage();
+	bool addMessageToQueue(	SubutaiCommand*);
+	bool addMessageToExecQueue(SubutaiCommand*,	string&);
+	SubutaiCommand* getMessage();
 	bool reConnect();
 	string getID();
+	SubutaiCommand* getExecutionMessage();
+	bool checkExecutionMessageStatus();
+	void initializeQueue();
 
 private:
-	const char*	host;
+	const char* host;
 	const char* id;
 	const char* subscribedTopic;
 	const char* publishedTopic;
 	const char* broadcastTopic;
-	int	port;
+	int port;
 	int keepalive;
-	bool reveivedMessage;
+	bool receivedMessage;
 	bool connectionStatus;
-	string messsage;
+	string message;
 	int bufferSize;
 	string certpath;
+	queue<SubutaiCommand*> msg_queue;
+	queue<SubutaiCommand*> execution_queue;
+	SubutaiLogger* logger;
+	SubutaiResponsePack response;
+	SubutaiEnvironment* environment;
+	SubutaiHelper helper;
+	string commandQueuePath = "/etc/subutai-agent/commandQueue.txt";
 
 	void on_connect(int);
 	void on_disconnect(int);

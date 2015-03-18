@@ -38,27 +38,24 @@ using namespace std;
 using std::stringstream;
 using std::string;
 
-
-
 //interface struct
 struct Interface {
-    string name;
-    string mac;
-    string ip;
+	string name;
+	string mac;
+	string ip;
 };
 
-
-class SubutaiHelper
-{
-    public:
-		string execCommand(char*, char*);
-		vector<string> splitResult(string, char*);
-		vector<string> runAndSplit(char*, char*, char* );
-		string toString(int);
-        string GenerateUUID();
+class SubutaiHelper {
+public:
+	string execCommand(char*, char*);
+	vector<string> splitResult(string, char*);
+	vector<string> runAndSplit(char*, char*, char*);
+	string toString(int);
+	string GenerateUUID();
+	string& readFromFile(string&);
+	void writeToFile(string&, string&);
+	void removeFromFile(string&, string);
 };
 
 #endif /* SUBUTAIHELPER_H_ */
-
-
 

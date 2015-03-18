@@ -7,10 +7,10 @@ import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
 
@@ -19,7 +19,7 @@ import com.google.common.base.Preconditions;
  * Destroys environment container
  */
 @Command( scope = "env", name = "destroy-container", description = "Command to destroy container" )
-public class DestroyContainerCommand extends OsgiCommandSupport
+public class DestroyContainerCommand extends SubutaiShellCommandSupport
 {
     @Argument( name = "conId", description = "Container id",
             index = 0, multiValued = false, required = true )

@@ -242,7 +242,7 @@ public interface Peer
 
     public Set<Gateway> getGateways() throws PeerException;
 
-    public void reserveVni( Vni vni ) throws PeerException;
+    public int reserveVni( Vni vni ) throws PeerException;
 
     public Set<Vni> getReservedVnis() throws PeerException;
 

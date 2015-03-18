@@ -112,6 +112,13 @@ public class Commands
     }
 
 
+    public RequestBuilder getCleanupEnvironmentNetworkSettingsCommand( int vLanId )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( "-Z", "deleteall", String.valueOf( vLanId ) ) );
+    }
+
+
     public RequestBuilder getRemoveGatewayOnContainerCommand()
     {
         return new RequestBuilder( "route del default gw" );

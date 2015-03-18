@@ -37,8 +37,8 @@ public class IdentityManagerComponent extends CustomComponent implements Disposa
         sheet.addTab( usersTab, "User management space." ).setId( "UsersTab" );
 
         sheet.addTab( rolesTab, "Roles management space" ).setId( "RolesManagement" );
-
-        sheet.addTab( permissionsTab, "Permission edition space." ).setId( "PermissionsTab" );
+        // Temporarily commented to omitting for docs
+        //        sheet.addTab( permissionsTab, "Permission edition space." ).setId( "PermissionsTab" );
 
         verticalLayout.addComponent( sheet );
 

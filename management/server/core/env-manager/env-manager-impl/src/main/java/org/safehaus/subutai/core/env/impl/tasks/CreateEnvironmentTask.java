@@ -9,7 +9,7 @@ import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.util.ExceptionUtil;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
@@ -18,7 +18,6 @@ import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Sets;
@@ -34,6 +33,7 @@ public class CreateEnvironmentTask implements Runnable
     private final Topology topology;
     private final ResultHolder<EnvironmentCreationException> resultHolder;
     private final Semaphore semaphore;
+    private ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
     public CreateEnvironmentTask( final LocalPeer localPeer, final EnvironmentManagerImpl environmentManager,
@@ -56,6 +56,9 @@ public class CreateEnvironmentTask implements Runnable
         {
             Set<Peer> allPeers = Sets.newHashSet( topology.getNodeGroupPlacement().keySet() );
 
+            //exchange environment certificates
+            environmentManager.setupEnvironmentTunnel( environment.getId(), allPeers );
+
             //check availability of subnet
             Map<Peer, Set<Gateway>> usedGateways = environmentManager.getUsedGateways( allPeers );
 
@@ -70,59 +73,36 @@ public class CreateEnvironmentTask implements Runnable
                 {
                     if ( gateway.getIp().equals( environmentGatewayIp ) )
                     {
-                        LOG.error( String.format( "Subnet %s is already used on peer %s. Peer excluded",
-                                environment.getSubnetCidr(), peer.getName() ) );
-                        //exclude peer from environment in case subnet is not available
-                        topology.excludePeer( peer );
-                        break;
+                        throw new EnvironmentCreationException(
+                                String.format( "Subnet %s is already used on peer %s", environment.getSubnetCidr(),
+                                        peer.getName() ) );
                     }
                 }
             }
 
-            if ( topology.getNodeGroupPlacement().isEmpty() )
-            {
-                throw new EnvironmentCreationException( "Subnet is already used on all peers" );
-            }
-
-            allPeers = Sets.newHashSet( topology.getNodeGroupPlacement().keySet() );
-
             //figure out free VNI
             long vni = environmentManager.findFreeVni( allPeers );
-
 
             //reserve VNI on local peer
             Vni newVni = new Vni( vni, environment.getId() );
 
-            localPeer.reserveVni( newVni );
+            int vlan = localPeer.reserveVni( newVni );
+
+            //setup gateway on mgmt host
+            localPeer.getManagementHost().createGateway( environmentGatewayIp, vlan );
 
             //reserve VNI on remote peers
             allPeers.remove( localPeer );
 
             for ( Peer peer : allPeers )
             {
-                try
-                {
-                    peer.reserveVni( newVni );
-                }
-                catch ( PeerException e )
-                {
-                    LOG.error( String.format( "Failed to reserve VNI %d on peer %s. Peer excluded", vni,
-                            peer.getName() ) );
-                    //exclude peer from environment in case VNI reservation failed
-                    topology.excludePeer( peer );
-                }
-            }
-
-
-            if ( topology.getNodeGroupPlacement().isEmpty() )
-            {
-                throw new EnvironmentCreationException( "Failed to reserve VNI on all remote peers" );
+                peer.reserveVni( newVni );
             }
 
             //save environment VNI
             environment.setVni( vni );
 
-            environmentManager.growEnvironment( environment.getId(), topology, false );
+            environmentManager.growEnvironment( environment.getId(), topology, false, false );
         }
         catch ( Exception e )
         {
@@ -131,7 +111,7 @@ public class CreateEnvironmentTask implements Runnable
 
             resultHolder.setResult(
                     e instanceof EnvironmentCreationException ? ( EnvironmentCreationException ) e.getCause() :
-                    new EnvironmentCreationException( ExceptionUtils.getRootCause( e ) ) );
+                    new EnvironmentCreationException( exceptionUtil.getRootCause( e ) ) );
         }
         finally
         {

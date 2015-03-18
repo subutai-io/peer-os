@@ -45,4 +45,15 @@ public class MetricTest
 
         assertThat( metric.toString(), containsString( environmentId.toString() ) );
     }
+
+
+    @Test
+    public void testOutput() throws Exception
+    {
+        metric.setEnvironmentId( UUID.randomUUID() );
+        metric.setHostId( UUID.randomUUID() );
+
+        System.out.println(metric);
+
+    }
 }

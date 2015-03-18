@@ -1,14 +1,14 @@
 package org.safehaus.subutai.core.ssl.manager.cli;
 
 
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory;
 
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 @Command( scope = "ssl-context", name = "ssl-context", description = "gets ssl context" )
-public class ReloadKeyStoreCommand extends OsgiCommandSupport
+public class ReloadKeyStoreCommand extends SubutaiShellCommandSupport
 {
     private final CustomSslContextFactory sslContextFactory;
 

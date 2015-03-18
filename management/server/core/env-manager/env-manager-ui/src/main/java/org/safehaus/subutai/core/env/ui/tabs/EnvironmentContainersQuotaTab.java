@@ -13,6 +13,7 @@ import org.safehaus.subutai.core.env.ui.tabs.subviews.ContainerHostQuotaForm;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.BeanItem;
+import com.vaadin.event.FieldEvents;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.ComboBox;
@@ -117,6 +118,14 @@ public class EnvironmentContainersQuotaTab extends CustomComponent
         environmentContainer.addAll( environmentComponent.getEnvironmentManager().getEnvironments() );
 
         envListComboBox.setContainerDataSource( environmentContainer );
+        envListComboBox.addFocusListener( new FieldEvents.FocusListener()
+        {
+            @Override
+            public void focus( final FieldEvents.FocusEvent event )
+            {
+                environmentContainer.addAll( environmentComponent.getEnvironmentManager().getEnvironments() );
+            }
+        } );
         envListComboBox.addValueChangeListener( new Property.ValueChangeListener()
         {
             @Override
