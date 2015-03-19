@@ -488,7 +488,7 @@ function management_network {
 
       ovs-ofctl add-flow br-int "priority=2600,ip,nw_src=10.10.10.1,nw_dst=$ipAdd actions=normal"
       sed -i '/Re-init OVS flows/i \ovs-ofctl add-flow br-int "priority=2600,ip,nw_src=10.10.10.1,nw_dst='$ipAdd' actions=normal"' /etc/init.d/service-interface
- 
+      net_bridge_blocker 
       msg_info "Gateway created for $vlanID"
    fi
 

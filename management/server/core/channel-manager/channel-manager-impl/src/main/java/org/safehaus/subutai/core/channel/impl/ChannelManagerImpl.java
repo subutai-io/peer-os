@@ -3,9 +3,7 @@ package org.safehaus.subutai.core.channel.impl;
 
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.core.channel.api.ChannelManager;
-import org.safehaus.subutai.core.channel.api.entity.IUserChannelToken;
 import org.safehaus.subutai.core.channel.api.token.ChannelTokenManager;
-import org.safehaus.subutai.core.channel.impl.entity.UserChannelToken;
 import org.safehaus.subutai.core.channel.impl.token.ChannelTokenController;
 import org.safehaus.subutai.core.channel.impl.token.ChannelTokenManagerImpl;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
@@ -14,6 +12,7 @@ import org.safehaus.subutai.core.identity.api.IdentityManager;
 
 /**
  * Created by nisakov on 2/25/15.
+ * Manages all CXF channels (tunnel)
  */
 public class ChannelManagerImpl implements ChannelManager
 {

@@ -21,6 +21,7 @@ import org.apache.cxf.phase.Phase;
 
 /**
  * Created by nisakov on 2/23/15.
+ * CXF interceptor that controls channel (tunnel)
  */
 public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
 {
