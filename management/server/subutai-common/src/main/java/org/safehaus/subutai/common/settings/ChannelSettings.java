@@ -3,6 +3,8 @@ package org.safehaus.subutai.common.settings;
 
 /**
  * Created by talas on 2/27/15.
+ * Class contains general Channel (tunnel) settings
+ *
  */
 public class ChannelSettings
 {

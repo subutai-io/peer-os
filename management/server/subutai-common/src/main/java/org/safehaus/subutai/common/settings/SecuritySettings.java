@@ -3,6 +3,7 @@ package org.safehaus.subutai.common.settings;
 
 /**
  * Created by talas on 2/27/15.
+ * Class contains general Security settings (SSL and Keystore settings).
  */
 public class SecuritySettings
 {
