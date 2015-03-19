@@ -315,10 +315,6 @@ int main(int argc, char *argv[], char *envp[]) {
 					if (result != 0) {
 						iter = pidList.erase(iter);
 						currentProcess--;
-						/*
-						 string resp = response.createInQueueMessage(
-						 environment.getAgentUuidValue(),
-						 command->getCommandId());*/
 					}
 				}
 			}
@@ -535,6 +531,16 @@ int main(int argc, char *argv[], char *envp[]) {
 									argv, target_container));
 					currentProcess++;
 					delete subprocess;
+				}
+				else
+				{
+					if(currentProcess >= ncores)
+					{
+						logMain.writeLog(7,
+							logMain.setLogData("<SubutaiAgent>",
+									"Cannot execute request since all cores are busy. "
+											+ command->getCommandId()));
+					}
 				}
 			}
 		} catch (const std::exception& error) {

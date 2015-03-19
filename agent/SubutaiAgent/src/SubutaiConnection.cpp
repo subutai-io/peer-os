@@ -289,7 +289,6 @@ SubutaiCommand* SubutaiConnection::getMessage() {
 SubutaiCommand* SubutaiConnection::getExecutionMessage() {
 	SubutaiCommand* tmp = execution_queue.front();
 	execution_queue.pop();
-	cout << "new request in execution: " << tmp->getCommandId() << endl;
 	helper.removeFromFile(commandQueuePath, tmp->getCommandId());
 	return tmp;
 }
