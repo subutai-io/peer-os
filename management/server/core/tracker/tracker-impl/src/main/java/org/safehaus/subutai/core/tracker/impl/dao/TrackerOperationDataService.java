@@ -2,8 +2,6 @@ package org.safehaus.subutai.core.tracker.impl.dao;
 
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +18,7 @@ import org.safehaus.subutai.core.tracker.impl.entity.TrackerOperationEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -44,7 +43,7 @@ public class TrackerOperationDataService
 
     public List<TrackerOperationEntity> getAll()
     {
-        List<TrackerOperationEntity> result = new ArrayList<>();
+        List<TrackerOperationEntity> result = Lists.newArrayList();
         EntityManager em = emf.createEntityManager();
         try
         {
@@ -169,7 +168,7 @@ public class TrackerOperationDataService
                                                             final int limit ) throws SQLException
     {
         source = source.toUpperCase();
-        List<TrackerOperationView> result = new ArrayList<>();
+        List<TrackerOperationView> result = Lists.newArrayList();
         EntityManager em = emf.createEntityManager();
         try
         {
@@ -209,7 +208,7 @@ public class TrackerOperationDataService
 
     public List<String> getTrackerOperationSources() throws SQLException
     {
-        List<String> result = Collections.emptyList();
+        List<String> result = Lists.newArrayList();
         EntityManager em = emf.createEntityManager();
         try
         {
