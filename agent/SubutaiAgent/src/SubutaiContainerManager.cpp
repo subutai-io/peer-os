@@ -253,10 +253,12 @@ bool SubutaiContainerManager::checkBrokenLxc() {
 			{
 				_logger->writeLog(3, _logger->setLogData("!!!!!!!!!!!! ERROR: lxc_container: Failed to parse config is occured !!!!!!!!!!!!!!!!!!"));
 				managerLocked = true;
+				pclose(fp);
 				return true;
 			}
 		}
 	}
+	pclose(fp);
 	managerLocked = false;
 	return false;
 }
