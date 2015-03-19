@@ -117,6 +117,24 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
+    public void cleanupEnvironmentNetworkSettings( final UUID environmentId ) throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        Set<Vni> reservedVnis = getReservedVnis();
+
+        for ( Vni vni : reservedVnis )
+        {
+            if ( vni.getEnvironmentId().equals( environmentId ) )
+            {
+                execute( getManagementHost(), commands.getCleanupEnvironmentNetworkSettingsCommand( vni.getVlan() ) );
+                break;
+            }
+        }
+    }
+
+
+    @Override
     public void removeGatewayOnContainer( final String containerName ) throws NetworkManagerException
     {
         execute( getContainerHost( containerName ), commands.getRemoveGatewayOnContainerCommand() );

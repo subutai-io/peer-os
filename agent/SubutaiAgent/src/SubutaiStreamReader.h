@@ -45,11 +45,10 @@
 #include <time.h>
 
 using namespace std;
-class SubutaiStreamReader
-{
+class SubutaiStreamReader {
 public:
 	SubutaiStreamReader();
-	SubutaiStreamReader(string,string,string);
+	SubutaiStreamReader(string, string, string);
 	~SubutaiStreamReader();
 	void setIdentity(string);
 	string& getIdentity();
@@ -82,7 +81,7 @@ private:
 	string identity;		//output or error decision
 	string mode;			//stdout and stderr mode
 	string path;			//stdout and stderr paths
-	fd_set	fileDec;		//filedec
+	fd_set fileDec;		//filedec
 	int mypipe[2];				//pipe for reading
 	int selectResult;		//select result
 	int readResult;			//read result

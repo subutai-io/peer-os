@@ -5,12 +5,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 
 import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
+import org.safehaus.subutai.common.mdc.SubutaiExecutors;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.ContainersDestructionResult;
 import org.safehaus.subutai.common.peer.Peer;
@@ -74,7 +74,7 @@ public class DestroyEnvironmentTask implements Runnable
 
             if ( environment.getStatus() == EnvironmentStatus.EMPTY || environment.getContainerHosts().isEmpty() )
             {
-                environmentManager.removeEnvironment( environment.getId() );
+                environmentManager.removeEnvironment( environment.getId(), false );
                 return;
             }
 
@@ -87,7 +87,7 @@ public class DestroyEnvironmentTask implements Runnable
                 environmentPeers.add( container.getPeer() );
             }
 
-            ExecutorService executorService = Executors.newFixedThreadPool( environmentPeers.size() );
+            ExecutorService executorService = SubutaiExecutors.newFixedThreadPool( environmentPeers.size() );
 
             Set<Future<ContainersDestructionResult>> futures = Sets.newHashSet();
 
@@ -181,7 +181,7 @@ public class DestroyEnvironmentTask implements Runnable
                 {
                     LOG.error( "Error removing environment certificate from local peer", e );
                 }
-                environmentManager.removeEnvironment( environment.getId() );
+                environmentManager.removeEnvironment( environment.getId(), false );
             }
             else
             {

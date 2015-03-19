@@ -793,8 +793,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
-                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder(
+                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
+                    bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1094,11 +1095,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     {
         if ( resourceHostInfo.getHostname().equals( "management" ) )
         {
-            boolean initRequired = managementHost == null;
-            managementHost = new ManagementHostEntity( getId().toString(), resourceHostInfo );
-
-            if ( initRequired )
+            if ( managementHost == null )
             {
+                managementHost = new ManagementHostEntity( getId().toString(), resourceHostInfo );
+                ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
                 try
                 {
                     managementHost.init();
@@ -1111,9 +1111,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             }
             else
             {
+                ( ( AbstractSubutaiHost ) managementHost ).setNetInterfaces( resourceHostInfo.getInterfaces() );
                 managementHostDataService.update( ( ManagementHostEntity ) managementHost );
             }
-            ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
             ( ( AbstractSubutaiHost ) managementHost ).updateHostInfo( resourceHostInfo );
         }
         else
@@ -1545,11 +1545,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
-    public void reserveVni( final Vni vni ) throws PeerException
+    public int reserveVni( final Vni vni ) throws PeerException
     {
         Preconditions.checkNotNull( vni, "Invalid vni" );
 
-        getManagementHost().reserveVni( vni );
+        return getManagementHost().reserveVni( vni );
     }
 
 

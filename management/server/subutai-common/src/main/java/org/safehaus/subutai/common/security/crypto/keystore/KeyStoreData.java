@@ -4,6 +4,11 @@ package org.safehaus.subutai.common.security.crypto.keystore;
 import org.safehaus.subutai.common.settings.SecuritySettings;
 
 
+
+/**************************************************************************************
+ * Keystore input paremeter class for KeyStoreManager
+ *
+ */
 public class KeyStoreData
 {
 	private KeyStoreType keyStoreType = null;
@@ -16,9 +21,10 @@ public class KeyStoreData
 	private boolean override  = false;
 	private String  HEXCert = "";
 
-	/*
-	 * **********************************************************************
-	*/
+	/**************************************************************************************
+	 * Prepare input paremeters for Keytore,port x1
+	 *
+	 */
 	public void setupKeyStorePx1()
 	{
 		keyStoreType       = KeyStoreType.JKS;
@@ -29,9 +35,10 @@ public class KeyStoreData
 		exportFileLocation = SecuritySettings.CERT_EXPORT_DIR;
 	}
 
-	/*
-	 * **********************************************************************
-	*/
+	/**************************************************************************************
+	 * Prepare input paremeters for Keytore,port x2
+	 *
+	 */
 	public void setupKeyStorePx2()
 	{
 		keyStoreType = KeyStoreType.JKS;
@@ -42,9 +49,10 @@ public class KeyStoreData
 		exportFileLocation = SecuritySettings.CERT_EXPORT_DIR;
 	}
 
-	/*
-	 * **********************************************************************
-	*/
+	/**************************************************************************************
+	 * Prepare input paremeters for Truststore,port x1
+	 *
+	 */
 	public void setupTrustStorePx1()
 	{
 		keyStoreType       = KeyStoreType.JKS;
@@ -54,9 +62,11 @@ public class KeyStoreData
 		importFileLocation = SecuritySettings.CERT_IMPORT_DIR;
 		exportFileLocation = SecuritySettings.CERT_EXPORT_DIR;
 	}
-	/*
-	 * **********************************************************************
-	*/
+
+	/**************************************************************************************
+	 * Prepare input paremeters for Truststore,port x2
+	 *
+	 */
 	public void setupTrustStorePx2()
 	{
 		keyStoreType = KeyStoreType.JKS;

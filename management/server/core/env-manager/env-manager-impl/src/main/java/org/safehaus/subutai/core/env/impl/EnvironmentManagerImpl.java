@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.environment.Blueprint;
@@ -18,6 +17,7 @@ import org.safehaus.subutai.common.environment.EnvironmentModificationException;
 import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
+import org.safehaus.subutai.common.mdc.SubutaiExecutors;
 import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.ContainerHost;
@@ -70,7 +70,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private final PeerManager peerManager;
     private final NetworkManager networkManager;
     private final EnvironmentBuilder environmentBuilder;
-    private final ExecutorService executor = Executors.newCachedThreadPool();
+    private final ExecutorService executor = SubutaiExecutors.newCachedThreadPool();
     private final String defaultDomain;
     private final IdentityManager identityManager;
 
@@ -381,9 +381,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void destroyEnvironment( final UUID environmentId, boolean async, boolean forceMetadataRemoval )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
+        destroyEnvironment( environmentId, async, forceMetadataRemoval, true );
+    }
+
+
+    public void destroyEnvironment( final UUID environmentId, boolean async, boolean forceMetadataRemoval,
+                                    boolean checkAccess )
+            throws EnvironmentDestructionException, EnvironmentNotFoundException
+    {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, true );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
         {
@@ -437,11 +445,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public Set<ContainerHost> growEnvironment( final UUID environmentId, final Topology topology, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
+        return growEnvironment( environmentId, topology, async, true );
+    }
+
+
+    public Set<ContainerHost> growEnvironment( final UUID environmentId, final Topology topology, boolean async,
+                                               boolean checkAccess )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, true );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
         {
@@ -483,10 +499,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void destroyContainer( final ContainerHost containerHost, boolean async, boolean forceMetadataRemoval )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
+        destroyContainer( containerHost, async, forceMetadataRemoval, true );
+    }
+
+
+    public void destroyContainer( final ContainerHost containerHost, boolean async, boolean forceMetadataRemoval,
+                                  boolean checkAccess )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
         Preconditions.checkNotNull( containerHost, "Invalid container host" );
 
         final EnvironmentImpl environment =
-                ( EnvironmentImpl ) findEnvironment( UUID.fromString( containerHost.getEnvironmentId() ), true );
+                ( EnvironmentImpl ) findEnvironment( UUID.fromString( containerHost.getEnvironmentId() ), checkAccess );
 
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
@@ -533,7 +557,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public void removeEnvironment( final UUID environmentId ) throws EnvironmentNotFoundException
     {
-        findEnvironment( environmentId, true );
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        removeEnvironment( environmentId, true );
+    }
+
+
+    public void removeEnvironment( final UUID environmentId, boolean checkAccess ) throws EnvironmentNotFoundException
+    {
+        findEnvironment( environmentId, checkAccess );
 
         environmentDataService.remove( environmentId.toString() );
 
@@ -659,9 +691,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void setSshKey( final UUID environmentId, final String sshKey, boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
+        setSshKey( environmentId, sshKey, async, true );
+    }
+
+
+    public void setSshKey( final UUID environmentId, final String sshKey, boolean async, boolean checkAccess )
+            throws EnvironmentNotFoundException, EnvironmentModificationException
+    {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, true );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
 
         final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
 

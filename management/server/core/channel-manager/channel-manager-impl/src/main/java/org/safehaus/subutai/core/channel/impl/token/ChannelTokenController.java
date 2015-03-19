@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Created by nisakov on 3/3/15.
+ * Thread that controls channel-token validity period
  */
 public class ChannelTokenController implements Runnable
 {
