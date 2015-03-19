@@ -96,13 +96,20 @@ getSourcesToRelevantDirectories() {
 	SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/agent/"
 	fileName=`ls | grep subutai|  awk '{print $1}' | head -1`
 
+    #copying agent executable
 	strip ../autoconf/src/subutai-agent
 	cp ../autoconf/src/subutai-agent $fileName/sbin/
-	cp $SOURCE/SubutaiAgent/config/agent.xml $fileName/etc/subutai-agent/
+
+    #copying #etc folder elements {cron.hourly and init.d}
+    cp -a $SOURCE/SubutaiAgent/debian/etc/* $fileName/etc/
+
+    #copying config files {agent.xml and uuid.txt}
+	cp $SOURCE/SubutaiAgent/debian/config/* $fileName/etc/subutai-agent/
 
 	if [ -f $fileName/DEBIAN/control ] ; then
 		rm $fileName/DEBIAN/*
 	fi
+    #copying DEBIAN folder
 	cp $SOURCE/SubutaiAgent/debian/Agent/DEBIAN/* $fileName/DEBIAN/
 }
 
