@@ -15,6 +15,7 @@ import javax.persistence.Query;
 
 /**
  * Created by nisakov on 3/3/15.
+ * Class manages User tokens.
  */
 
 public class ChannelTokenManagerImpl implements ChannelTokenManager
