@@ -10,61 +10,13 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>template-wizard</artifactId>
-  <packaging>bundle</packaging>
+  <packaging>pom</packaging>
   <name>Subutai Template Creation Wizard</name>
   <description>Subutai Template Creation Wizard</description>
-
-  <dependencies>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>vaadin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>vaadin-custom</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>peer-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>template-registry-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>strategy-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-server</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>subutai-common</artifactId>
-    </dependency>
-  </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Bundle-SymbolicName>${project.groupId}.core.template.wizard.ui</Bundle-SymbolicName>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+  <modules>
+    <module>template-wizard-impl</module>
+    <module>template-wizard-api</module>
+    <module>template-wizard-ui</module>
+  </modules>
 
 </project>

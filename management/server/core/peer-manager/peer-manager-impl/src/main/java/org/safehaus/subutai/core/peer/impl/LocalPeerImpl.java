@@ -564,7 +564,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             }
         }
 
-        throw new HostNotFoundException( String.format( "Container host not found by name %s", hostname ) );
+        throw new HostNotFoundException( String.format( "No container host found for name %s", hostname ) );
     }
 
 

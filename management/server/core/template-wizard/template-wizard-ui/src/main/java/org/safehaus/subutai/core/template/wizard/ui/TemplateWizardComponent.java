@@ -1,22 +1,16 @@
 package org.safehaus.subutai.core.template.wizard.ui;
 
 
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.CommandStatus;
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
-import org.safehaus.subutai.core.peer.api.ResourceHostException;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
 
+import com.google.common.collect.Lists;
 import com.vaadin.data.Validator;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.BeanItem;
@@ -45,13 +39,13 @@ public class TemplateWizardComponent extends CustomComponent
     private LocalPeer localPeer;
     private ComboBox parentTemplateComboBox;
     private ComboBox resourceHostComboBox;
-    private TextField templateName;
+    private TextField newTemplateName;
     private TextArea commandsCollection;
     private Button createTemplateButton;
     private TemplateWizardPortalModule portalModule;
 
 
-    public TemplateWizardComponent( TemplateWizardPortalModule portalModule )
+    public TemplateWizardComponent( final TemplateWizardPortalModule portalModule )
     {
         setHeight( 100, Sizeable.Unit.PERCENTAGE );
 
@@ -87,9 +81,9 @@ public class TemplateWizardComponent extends CustomComponent
         resourceHostComboBox.setTextInputAllowed( false );
         resourceHostComboBox.setRequired( true );
 
-        templateName = new TextField( "New template name" );
-        templateName.setRequired( true );
-        templateName.addValidator(
+        newTemplateName = new TextField( "New template name" );
+        newTemplateName.setRequired( true );
+        newTemplateName.addValidator(
                 new AbstractStringValidator( "New template name must be unique and at least 4 chars long." )
                 {
                     @Override
@@ -107,9 +101,10 @@ public class TemplateWizardComponent extends CustomComponent
                                 return false;
                             }
                         }
-                        catch ( HostNotFoundException e )
+                        catch ( HostNotFoundException ignore )
                         {
-                            LOGGER.debug( Marker.ANY_MARKER, "Couldn't get container host by name", e );
+                            //                            LOGGER.debug( Marker.ANY_MARKER, "Couldn't get container
+                            // host by name", e );
                         }
                         return true;
                     }
@@ -120,160 +115,36 @@ public class TemplateWizardComponent extends CustomComponent
 
         createTemplateButton = new Button( "Create template", createTemplateListener );
 
+        Button createContainerHost = new Button( "New container host", new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
+            {
+                BeanItem beanItem = ( BeanItem ) parentTemplateComboBox.getItem( parentTemplateComboBox.getValue() );
+                Template template = ( Template ) beanItem.getBean();
+                portalModule.getTemplateWizard()
+                            .createContainerHost( newTemplateName.getValue(), template.getTemplateName() );
+            }
+        } );
+
+        Button installProducts = new Button( "Install Products", new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
+            {
+                String products[] = commandsCollection.getValue().split( "\n" );
+                portalModule.getTemplateWizard().installProducts( Lists.newArrayList( products ) );
+            }
+        } );
+
         verticalLayout.addComponent( parentTemplateComboBox );
         verticalLayout.addComponent( resourceHostComboBox );
-        verticalLayout.addComponent( templateName );
+        verticalLayout.addComponent( newTemplateName );
         verticalLayout.addComponent( commandsCollection );
         verticalLayout.addComponent( createTemplateButton );
+        verticalLayout.addComponent( createContainerHost );
 
         setCompositionRoot( verticalLayout );
-    }
-
-
-    private RequestBuilder cloneTemplateRequestBuilder( String templateName, String containerName )
-    {
-        return new RequestBuilder( String.format( "subutai clone %s %s", templateName, containerName ) )
-                .withTimeout( 90 );
-    }
-
-
-    private RequestBuilder promoteRequestBuilder( String containerName )
-    {
-        return new RequestBuilder( String.format( "subutai promote %s", containerName ) ).withTimeout( 90 );
-    }
-
-
-    private RequestBuilder exportRequestBuilder( String templateName )
-    {
-        return new RequestBuilder( String.format( "subutai export %s", templateName ) ).withTimeout( 90 );
-    }
-
-
-    private RequestBuilder registerRequestBuilder( String templateName )
-    {
-        return new RequestBuilder( String.format( "subutai register %s", templateName ) ).withTimeout( 90 );
-    }
-
-
-    private void initTemplateCreationProcess( final TrackerOperation trackerOperation, final ResourceHost resourceHost )
-    {
-        BeanItem beanItem = ( BeanItem ) parentTemplateComboBox.getItem( parentTemplateComboBox.getValue() );
-        Template template = ( Template ) beanItem.getBean();
-
-        ContainerHost templateHost = null;
-        try
-        {
-            templateHost = resourceHost.createContainer( template.getTemplateName(), templateName.getValue(), 90 );
-        }
-        catch ( ResourceHostException e )
-        {
-            LOGGER.error( "Error creating container.", e );
-        }
-
-        if ( templateHost == null )
-        {
-            try
-            {
-                resourceHost.importTemplate( template );
-            }
-            catch ( ResourceHostException e )
-            {
-                LOGGER.error( "Error importing template", e );
-            }
-        }
-
-        try
-        {
-            templateHost = resourceHost.createContainer( template.getTemplateName(), templateName.getValue(), 90 );
-        }
-        catch ( ResourceHostException e )
-        {
-            LOGGER.error( "Error creating container.", e );
-        }
-
-        if ( templateHost == null )
-        {
-            return;
-        }
-
-        String commands[] = commandsCollection.getValue().split( "\n" );
-        for ( final String command : commands )
-        {
-
-            try
-            {
-                CommandResult commandResult = templateHost.execute( new RequestBuilder( command ) );
-                trackerOperation.addLog( commandResult.getStdOut() );
-            }
-            catch ( CommandException e )
-            {
-                LOGGER.error( "Error executing command: " + command, e );
-                trackerOperation.addLogFailed( "Error executing command." );
-            }
-        }
-
-        try
-        {
-            CommandResult commandResult = resourceHost.execute( promoteRequestBuilder( templateName.getValue() ) );
-            if ( commandResult.getStatus() == CommandStatus.FAILED
-                    || commandResult.getStatus() == CommandStatus.TIMEOUT )
-            {
-                trackerOperation.addLogFailed( "Error promoting container." );
-                return;
-            }
-            else
-            {
-                trackerOperation.addLog( "Successfully promoted container host." );
-            }
-        }
-        catch ( CommandException e )
-        {
-            LOGGER.error( "Error promoting command.", e );
-            trackerOperation.addLogFailed( "Error promoting command." );
-        }
-
-        try
-        {
-            CommandResult exportCommandResult = resourceHost.execute( exportRequestBuilder( templateName.getValue() ) );
-
-            if ( ( exportCommandResult.getStatus() == CommandStatus.TIMEOUT
-                    || exportCommandResult.getStatus() == CommandStatus.FAILED ) )
-            {
-                trackerOperation.addLogFailed( "Error exporting container." );
-                return;
-            }
-            else
-            {
-                trackerOperation.addLog( "Successfully exported template." );
-            }
-        }
-        catch ( CommandException e )
-        {
-            LOGGER.error( "Error exporting command.", e );
-            trackerOperation.addLogFailed( "Error exporting command." );
-        }
-
-        try
-        {
-            CommandResult registerCommandResult =
-                    resourceHost.execute( registerRequestBuilder( templateName.getValue() ) );
-            if ( registerCommandResult.getStatus() == CommandStatus.FAILED
-                    || registerCommandResult.getStatus() == CommandStatus.TIMEOUT )
-            {
-                trackerOperation.addLogFailed( "Error registering container." );
-                return;
-            }
-            else
-            {
-                trackerOperation.addLog( "Successfully registered template." );
-            }
-        }
-        catch ( CommandException e )
-        {
-            LOGGER.error( "Error registering command.", e );
-            trackerOperation.addLogFailed( "Error registering command." );
-        }
-        trackerOperation.addLogDone( "Successfully created template." );
     }
 
 
@@ -296,7 +167,7 @@ public class TemplateWizardComponent extends CustomComponent
 
             try
             {
-                templateName.validate();
+                newTemplateName.validate();
             }
             catch ( Validator.InvalidValueException e )
             {
@@ -312,7 +183,7 @@ public class TemplateWizardComponent extends CustomComponent
                                                                       .createTrackerOperation( "TemplateWizard",
                                                                               "Started template creation." );
 
-                ProgressWindow progressWindow =
+                final ProgressWindow progressWindow =
                         new ProgressWindow( portalModule.getExecutor(), portalModule.getTracker(),
                                 trackerOperation.getId(), "TemplateWizard" );
                 progressWindow.getWindow().addCloseListener( new Window.CloseListener()
@@ -323,19 +194,29 @@ public class TemplateWizardComponent extends CustomComponent
 
                         parentTemplateComboBox.select( null );
                         resourceHostComboBox.select( null );
-                        templateName.setValue( "" );
+                        newTemplateName.setValue( "" );
                         commandsCollection.setValue( "" );
                     }
                 } );
 
-                progressWindow.getWindow().addFocusListener( new FieldEvents.FocusListener()
+                final FieldEvents.FocusListener focusListener = new FieldEvents.FocusListener()
                 {
                     @Override
                     public void focus( final FieldEvents.FocusEvent event )
                     {
-                        initTemplateCreationProcess( trackerOperation, resourceHost );
+                        progressWindow.getWindow().removeFocusListener( this );
+                        BeanItem beanItem =
+                                ( BeanItem ) parentTemplateComboBox.getItem( parentTemplateComboBox.getValue() );
+                        Template template = ( Template ) beanItem.getBean();
+                        String products[] = commandsCollection.getValue().split( "\n" );
+                        portalModule.getTemplateWizard()
+                                    .createTemplate( newTemplateName.getValue(), template.getTemplateName(),
+                                            Lists.newArrayList( "" ), Lists.newArrayList( products ),
+                                            Lists.newArrayList( "" ), resourceHost.getId(), trackerOperation );
+                        //                        initTemplateCreationProcess( trackerOperation, resourceHost );
                     }
-                } );
+                };
+                progressWindow.getWindow().addFocusListener( focusListener );
                 getUI().addWindow( progressWindow.getWindow() );
                 progressWindow.getWindow().focus();
             }
