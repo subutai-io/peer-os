@@ -89,7 +89,11 @@ function promote {
      msg_error "Container(s) locked by a subutai process"
      exit 1
   fi
- 
+
+  #removing default gw from hosts file
+  sed -i "/.*$SUBUTAI_REST_IP/d" /var/lib/lxc/$lxc/rootfs/etc/hosts 
+  sed -i "s/nameserver 192.168.*/nameserver 10.10.10.1/g" /var/lib/lxc/$lxc/rootfs/etc/resolv.conf
+
   lock_container_read $lxc
   if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
 
