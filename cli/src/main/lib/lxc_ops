@@ -682,5 +682,6 @@ function configure_dns {
      echo "nameserver 8.8.4.4" >> $child_rootfs/etc/resolvconf/resolv.conf.d/head
   fi
 
+  #replaced gateway address
   sed -i "s/nameserver 10.10.10.1/nameserver $gateway/g" $child_rootfs/etc/resolv.conf
 }
