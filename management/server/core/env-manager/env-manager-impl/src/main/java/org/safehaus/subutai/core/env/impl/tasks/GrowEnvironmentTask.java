@@ -86,7 +86,7 @@ public class GrowEnvironmentTask implements Runnable
 
                 if ( !Strings.isNullOrEmpty( environment.getSshKey() ) )
                 {
-                    environmentManager.setSshKey( environment.getId(), environment.getSshKey(), false );
+                    environmentManager.setSshKey( environment.getId(), environment.getSshKey(), false, false );
                 }
 
                 environment.setStatus( EnvironmentStatus.HEALTHY );

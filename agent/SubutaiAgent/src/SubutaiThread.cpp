@@ -631,7 +631,7 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,
 				//send HeartBeat Message..
 				if (this->getoutBuff().empty() && this->geterrBuff().empty()) {
 					/*
-					 * sending I'm alive message with no output and errror buffers
+					 * sending I'm alive message with no output and error buffers
 					 *
 					 *         	"type":"EXECUTE_RESPONSE",
 

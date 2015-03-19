@@ -51,7 +51,7 @@
 #include <unistd.h>
 #include <deque>
 
-//#define COMMAND_ID_MAX 300          // This is a maximum size of commandIdsList
+#define COMMAND_ID_MAX 300          // This is a maximum size of commandIdsList
 
 using namespace std;
 
@@ -70,13 +70,9 @@ void threadSend(message_queue *mq, SubutaiConnection *connection,
 		while (true) {
 			str.resize(2500);
 			mq->receive(&str[0], str.size(), recvd_size, priority);
-
-			logMain->writeLog(6,
-					logMain->setLogData("<SubutaiAgent>::<threadsend>",
-							"Response is ready to send."));
-			logMain->writeLog(7,
-					logMain->setLogData("<SubutaiAgent>::<threadsend>", str));
 			connection->sendMessage(str.c_str());
+			logMain->writeLog(6,
+					logMain->setLogData("<SubutaiAgent>::<threadsend>", str));
 			str.clear();
 		}
 		message_queue::remove("message_queue");
@@ -86,6 +82,35 @@ void threadSend(message_queue *mq, SubutaiConnection *connection,
 		logMain->writeLog(3,
 				logMain->setLogData("<SubutaiAgent>::<threadsend>",
 						"New exception Handled:", ex.what()));
+	}
+}
+
+bool isCommandDuplicate(deque<string>* commandIdsList, string commandID,
+		SubutaiLogger* logMain) {
+	bool isCommandNew = true;
+
+	for (deque<string>::iterator it = commandIdsList->begin();
+			it != commandIdsList->end(); it++) {
+		if ((*it) == commandID) {
+			isCommandNew = false;
+		}
+	}
+
+	if (!isCommandNew) {
+		logMain->writeLog(6,
+				logMain->setLogData("<SubutaiAgent>",
+						"Command is not new!!!!!!!!!!!"));
+		return true;
+	} else {
+		logMain->writeLog(6,
+				logMain->setLogData("<SubutaiAgent>",
+						"Command is new................."));
+		commandIdsList->push_back(commandID);
+		// Remove first command if amount of commands has exceeded maximum size
+		if (commandIdsList->size() > COMMAND_ID_MAX) {
+			commandIdsList->pop_front();
+		}
+		return false;
 	}
 }
 
@@ -106,7 +131,7 @@ int main(int argc, char *argv[], char *envp[]) {
 	SubutaiEnvironment environment(&logMain);
 	string input = "";
 	string sendout;
-	//deque<string> commandIdsList;
+	deque<string> commandIdsList;
 	bool heartbeatInterruptFlag = false;
 	bool waitHeartbeat = true; // helper for logging heartbeat waiting messages.
 
@@ -270,7 +295,7 @@ int main(int argc, char *argv[], char *envp[]) {
 	 * Send initial heartbeat for registration of resource host and
 	 * container nodes attached to this host.
 	 */
-	timer.sendHeartBeat(false, &heartbeatInterruptFlag);
+	timer.sendHeartBeat(false, false, &heartbeatInterruptFlag);
 	logMain.writeLog(6,
 			logMain.setLogData("<SubutaiAgent>", "Sending first heartbeat.."));
 	while (true) {
@@ -291,9 +316,9 @@ int main(int argc, char *argv[], char *envp[]) {
 						iter = pidList.erase(iter);
 						currentProcess--;
 						/*
-						string resp = response.createInQueueMessage(
-								environment.getAgentUuidValue(),
-								command->getCommandId());*/
+						 string resp = response.createInQueueMessage(
+						 environment.getAgentUuidValue(),
+						 command->getCommandId());*/
 					}
 				}
 			}
@@ -310,6 +335,11 @@ int main(int argc, char *argv[], char *envp[]) {
 			//checking new message arrived
 			if (connection->checkMessageStatus()) {
 				command = connection->getMessage(); //fetching message..
+
+				if (isCommandDuplicate(&commandIdsList,
+						command->getCommandId(), &logMain)) {
+					continue;
+				}
 
 				logMain.writeLog(6,
 						logMain.setLogData("<SubutaiAgent>",
@@ -343,7 +373,11 @@ int main(int argc, char *argv[], char *envp[]) {
 					}
 				}
 
-				if (command->getType() == "PS_REQUEST") {
+				if (cman.isManagerLocked()) {
+					logMain.writeLog(7,
+							logMain.setLogData("<SubutaiAgent>",
+									"Execution is not permitted since container manager locked."));
+				} else if (command->getType() == "PS_REQUEST") {
 					logMain.writeLog(6,
 							logMain.setLogData("<SubutaiAgent>",
 									"PS execution operation is starting.."));
@@ -466,7 +500,12 @@ int main(int argc, char *argv[], char *envp[]) {
 				}
 
 			} else {
-				if (heartbeatInterruptFlag) {
+				if (cman.isManagerLocked()
+						&& connection->checkExecutionMessageStatus()) {
+					logMain.writeLog(7,
+							logMain.setLogData("<SubutaiAgent>",
+									"Execution is not permitted since container manager locked."));
+				} else if (heartbeatInterruptFlag) {
 					if (waitHeartbeat) {
 						logMain.writeLog(7,
 								logMain.setLogData("<SubutaiAgent>",
@@ -478,10 +517,15 @@ int main(int argc, char *argv[], char *envp[]) {
 					waitHeartbeat = true;
 					command = connection->getExecutionMessage();
 
+					if (isCommandDuplicate(&commandIdsList,
+							command->getCommandId(), &logMain)) {
+						continue;
+					}
+
 					logMain.writeLog(7,
 							logMain.setLogData("<SubutaiAgent>",
 									"Execute operation is starting for "
-											+ command->getCommand()));
+											+ command->getCommandId()));
 					SubutaiThread* subprocess = new SubutaiThread;
 					subprocess->getLogger().setLogLevel(logMain.getLogLevel());
 					SubutaiContainer* target_container = cman.findContainerById(

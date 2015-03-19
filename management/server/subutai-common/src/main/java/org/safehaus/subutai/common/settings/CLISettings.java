@@ -10,6 +10,7 @@ import com.google.common.collect.Sets;
 
 /**
  * Created by nisakov on 3/9/15.
+ * Class contains list of  cli commands in Subutai.
  */
 public class CLISettings
 {

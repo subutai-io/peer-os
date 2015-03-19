@@ -139,7 +139,7 @@ public class CommandProcessor implements ByteMessageListener
             }
             else
             {
-                LOG.warn( "Callback not found for response: %s", response );
+                LOG.warn( String.format( "Callback not found for response: %s", response ) );
             }
         }
         catch ( Exception e )

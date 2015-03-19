@@ -220,6 +220,9 @@ void SubutaiConnection::on_message(const struct mosquitto_message *message) {
 bool SubutaiConnection::addMessageToQueue(SubutaiCommand* cmd) {
 	if (msg_queue.size() < MAX_MSG_NUM) {
 		msg_queue.push(cmd);
+		logger->writeLog(6,
+				logger->setLogData("<SubutaiConnection>",
+						"New message is received and added to message queue" + cmd->getCommandId()));
 	} else {
 		logger->writeLog(3,
 				logger->setLogData("<SubutaiConnection>",
@@ -236,6 +239,9 @@ bool SubutaiConnection::addMessageToExecQueue(SubutaiCommand* cmd,
 	if (execution_queue.size() < MAX_MSG_NUM) {
 		execution_queue.push(cmd);
 		helper.writeToFile(commandQueuePath, input);
+		logger->writeLog(6,
+						logger->setLogData("<SubutaiConnection>",
+								"New message is received and added to exec queue" + input));
 	} else {
 		logger->writeLog(3,
 				logger->setLogData("<SubutaiConnection>",
@@ -283,6 +289,7 @@ SubutaiCommand* SubutaiConnection::getMessage() {
 SubutaiCommand* SubutaiConnection::getExecutionMessage() {
 	SubutaiCommand* tmp = execution_queue.front();
 	execution_queue.pop();
+	cout << "new request in execution: " << tmp->getCommandId() << endl;
 	helper.removeFromFile(commandQueuePath, tmp->getCommandId());
 	return tmp;
 }

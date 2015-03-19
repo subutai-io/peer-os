@@ -11,7 +11,6 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,8 +25,8 @@ import javax.persistence.Transient;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandUtil;
-import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.host.Interface;
+import org.safehaus.subutai.common.mdc.SubutaiExecutors;
 import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.network.VniVlanMapping;
@@ -45,7 +44,6 @@ import org.safehaus.subutai.core.peer.impl.Commands;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 
@@ -62,13 +60,13 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     String name = "Subutai Management Host";
 
     @Transient
-    private Commands commands;
+    private Commands commands = new Commands();
     @Transient
-    private CommandUtil commandUtil;
+    private CommandUtil commandUtil = new CommandUtil();
     @Transient
-    private ExecutorService singleThreadExecutorService;
+    private ExecutorService singleThreadExecutorService = SubutaiExecutors.newSingleThreadExecutor();
     @Transient
-    ServiceLocator serviceLocator;
+    private ServiceLocator serviceLocator = new ServiceLocator();
 
 
     protected ManagementHostEntity()
@@ -79,10 +77,6 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     public ManagementHostEntity( final String peerId, final ResourceHostInfo resourceHostInfo )
     {
         super( peerId, resourceHostInfo );
-        this.commands = new Commands();
-        this.commandUtil = new CommandUtil();
-        this.singleThreadExecutorService = Executors.newSingleThreadExecutor();
-        this.serviceLocator = new ServiceLocator();
     }
 
 
@@ -112,6 +106,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
     public void addAptSource( final String hostname, final String ip ) throws PeerException
     {
+        //todo use repository manager
         try
         {
             commandUtil.execute( commands.getAddAptSourceCommand( hostname, ip ), this );
@@ -125,6 +120,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
     public void removeAptSource( final String host, final String ip ) throws PeerException
     {
+        //todo use repository manager
         try
         {
             commandUtil.execute( commands.getRemoveAptSourceCommand( ip ), this );
@@ -152,13 +148,11 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
                 String.format( "VLAN must be in the range from %d to %d", Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
 
-        //TODO use network manager
         try
         {
-            commandUtil.execute( new RequestBuilder( "subutai management_network" )
-                    .withCmdArgs( Lists.newArrayList( "-T", gatewayIp, String.valueOf( vlan ) ) ), this );
+            getNetworkManager().setupGateway( gatewayIp, vlan );
         }
-        catch ( CommandException e )
+        catch ( NetworkManagerException e )
         {
             throw new PeerException(
                     String.format( "Error creating gateway tap device with IP %s and VLAN %d", gatewayIp, vlan ), e );
@@ -172,13 +166,11 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
                 String.format( "VLAN must be in the range from %d to %d", Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
 
-        //TODO use network manager
         try
         {
-            commandUtil.execute( new RequestBuilder( "subutai management_network" )
-                    .withCmdArgs( Lists.newArrayList( "-D", String.valueOf( vlan ) ) ), this );
+            getNetworkManager().removeGateway( vlan );
         }
-        catch ( CommandException e )
+        catch ( NetworkManagerException e )
         {
             throw new PeerException( String.format( "Error removing gateway tap device with VLAN %d", vlan ), e );
         }
@@ -189,25 +181,14 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        Set<Vni> reservedVnis = getReservedVnis();
-
-        //TODO use network manager
-        for ( Vni vni : reservedVnis )
+        try
         {
-            if ( vni.getEnvironmentId().equals( environmentId ) )
-            {
-                try
-                {
-                    commandUtil.execute( new RequestBuilder( "subutai management_network" ).withCmdArgs(
-                                    Lists.newArrayList( "-Z", "deleteall", String.valueOf( vni.getVlan() ) ) ), this );
-                }
-                catch ( CommandException e )
-                {
-                    throw new PeerException(
-                            String.format( "Error cleaning up environment %s network settings", environmentId ), e );
-                }
-                break;
-            }
+            getNetworkManager().cleanupEnvironmentNetworkSettings( environmentId );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException(
+                    String.format( "Error cleaning up environment %s network settings", environmentId ), e );
         }
     }
 
@@ -261,28 +242,50 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
-    public void reserveVni( final Vni vni ) throws PeerException
+    public int reserveVni( final Vni vni ) throws PeerException
     {
         Preconditions.checkNotNull( vni, "Invalid vni" );
 
-        //todo exec via queueSequentialTask
-        //check if vni is already reserved
-        if ( findVniByEnvironmentId( vni.getEnvironmentId() ) != null )
+        //need to execute sequentially since other parallel executions can take the same VNI
+        Future<Integer> future = queueSequentialTask( new Callable<Integer>()
         {
-            return;
-        }
+            @Override
+            public Integer call() throws Exception
+            {
 
-        //figure out available vlan
-        int vlan = findAvailableVlanId();
+                //check if vni is already reserved
+                Vni existingVni = findVniByEnvironmentId( vni.getEnvironmentId() );
+                if ( existingVni != null )
+                {
+                    return existingVni.getVlan();
+                }
 
-        //reserve vni & vlan for environment
+                //figure out available vlan
+                int vlan = findAvailableVlanId();
+
+                //reserve vni & vlan for environment
+
+                getNetworkManager().reserveVni( new Vni( vni.getVni(), vlan, vni.getEnvironmentId() ) );
+
+                return vlan;
+            }
+        } );
+
         try
         {
-            getNetworkManager().reserveVni( new Vni( vni.getVni(), vlan, vni.getEnvironmentId() ) );
+            return future.get();
         }
-        catch ( NetworkManagerException e )
+        catch ( InterruptedException e )
         {
-            throw new PeerException( "Error reserving VNI", e );
+            throw new PeerException( e );
+        }
+        catch ( ExecutionException e )
+        {
+            if ( e.getCause() instanceof PeerException )
+            {
+                throw ( PeerException ) e.getCause();
+            }
+            throw new PeerException( "Error reserving VNI", e.getCause() );
         }
     }
 
@@ -293,7 +296,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        //need to execute sequentially since other parallel executions can take the same VNI
+        //need to execute sequentially since other parallel executions can setup the same tunnel
         Future<Integer> future = queueSequentialTask( new Callable<Integer>()
         {
             @Override
@@ -308,7 +311,8 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
                 if ( environmentVni == null )
                 {
                     throw new PeerException(
-                            String.format( "No reserved vni found for environment %s", environmentId ) );
+                            String.format( "Error setting up tunnels: No reserved vni found for environment %s",
+                                    environmentId ) );
                 }
 
 
@@ -354,7 +358,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
             {
                 throw ( PeerException ) e.getCause();
             }
-            throw new PeerException( e.getCause() );
+            throw new PeerException( "Error setting up tunnels", e.getCause() );
         }
     }
 

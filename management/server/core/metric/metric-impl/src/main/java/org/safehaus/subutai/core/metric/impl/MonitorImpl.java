@@ -32,6 +32,9 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.StringUtil;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
+import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
@@ -70,21 +73,28 @@ public class MonitorImpl implements Monitor
             Collections.newSetFromMap( new ConcurrentHashMap<AlertListener, Boolean>() );
     private final Commands commands = new Commands();
     private final PeerManager peerManager;
+    private final IdentityManager identityManager;
+    private final EnvironmentManager environmentManager;
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     protected MonitorDao monitorDao;
     protected DaoManager daoManager;
 
 
-    public MonitorImpl( PeerManager peerManager, DaoManager daoManager ) throws MonitorException
+    public MonitorImpl( PeerManager peerManager, DaoManager daoManager, IdentityManager identityManager,
+                        EnvironmentManager environmentManager ) throws MonitorException
     {
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( daoManager );
+        Preconditions.checkNotNull( identityManager );
+        Preconditions.checkNotNull( environmentManager );
 
         try
         {
             this.daoManager = daoManager;
             this.monitorDao = new MonitorDao( daoManager.getEntityManagerFactory() );
             this.peerManager = peerManager;
+            this.identityManager = identityManager;
+            this.environmentManager = environmentManager;
             peerManager.addRequestListener( new RemoteAlertListener( this ) );
             peerManager.addRequestListener( new RemoteMetricRequestListener( this ) );
             peerManager.addRequestListener( new MonitoringActivationListener( this, peerManager ) );
@@ -706,6 +716,18 @@ public class MonitorImpl implements Monitor
     {
         try
         {
+            //obtain user from environment
+            Environment environment = environmentManager.findEnvironment( metric.getEnvironmentId() );
+            User user = identityManager.getUser( environment.getUserId() );
+
+            if ( user == null )
+            {
+                throw new MonitorException(
+                        String.format( "Failed to retrieve environment's '%s' user", environment.getName() ) );
+            }
+            //login under him
+            identityManager.loginWithToken( user.getUsername() );
+
             //search for subscriber if not found then no-op
             Set<String> subscribersIds = monitorDao.getEnvironmentSubscribersIds( metric.getEnvironmentId() );
             for ( String subscriberId : subscribersIds )
@@ -714,10 +736,10 @@ public class MonitorImpl implements Monitor
                 notifyListener( metric, subscriberId );
             }
         }
-        catch ( DaoException e )
+        catch ( Exception e )
         {
             LOG.error( "Error in notifyOnAlert", e );
-            throw new MonitorException( e );
+            throw e instanceof MonitorException ? ( MonitorException ) e : new MonitorException( e );
         }
     }
 

@@ -69,6 +69,13 @@ public interface NetworkManager
     public void removeGateway( int vLanId ) throws NetworkManagerException;
 
     /**
+     * Cleans up network settings left after environment
+     *
+     * @param environmentId - environment id
+     */
+    public void cleanupEnvironmentNetworkSettings( UUID environmentId ) throws NetworkManagerException;
+
+    /**
      * Removes gateway IP on a container
      */
     public void removeGatewayOnContainer( String containerName ) throws NetworkManagerException;

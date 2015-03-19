@@ -18,9 +18,13 @@ public class HexUtil
 	private HexUtil()
 	{
 	}
-	
-	
-	/**************************************************************************
+
+
+	/**
+	 * Convert hexadecimal string to array of bytes
+	 *
+	 * @param s String
+	 * @return byte[]
 	 */
 	public static byte[] hexStringToByteArray(String s) 
 	{
@@ -34,8 +38,12 @@ public class HexUtil
 	    }
 	    return b;
 	  }
-	
-	/**************************************************************************
+
+	/**
+	 * Convert array of bytes to hexadecimal string
+	 *
+	 * @param b byte[]
+	 * @return String
 	 */
 	public static String byteArrayToHexString(byte[] b) 
 	{
