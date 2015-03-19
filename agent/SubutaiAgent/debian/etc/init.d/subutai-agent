@@ -1,0 +1,49 @@
+#!/bin/bash
+#
+# /etc/init.d/subutai-agent
+#END INIT INFO
+
+case "$1" in
+start)
+        ps aux | grep  [/]sbin/subutai-agent > /dev/null 2>&1
+        if [ $? == 0 ];
+        then
+                echo "Subutai Agent is already running"
+        else
+                start-stop-daemon --start --make-pidfile --pidfile /tmp/subutai-agent.pid --exec /sbin/subutai-agent --background
+                echo "Subutai Agent is running.."
+        fi
+
+;;
+stop)
+        ps aux | grep  [/]sbin/subutai-agent > /dev/null 2>&1
+        if [ $? == 0 ];
+        then
+                if [ -f /tmp/subutai-agent.pid ];
+                then
+                     start-stop-daemon --stop --pidfile /tmp/subutai-agent.pid \
+                           || pkill -f /sbin/subutai-agent
+                     rm /tmp/subutai-agent.pid
+                     echo "Subutai Agent is stopping now.."
+                else
+                     pkill -f /sbin/subutai-agent
+                fi
+        else
+                echo "WARNING: Subutai Agent is not running now.."
+        fi
+        ;;
+restart)
+        $0 stop
+        $0 start
+        ;;
+status)
+        ps aux | grep  [/]sbin/subutai-agent > /dev/null 2>&1
+        if [ $? == 0 ];
+        then
+                echo "Subutai Agent is running now.."
+        else
+                echo "Subutai Agent is not running now.."
+        fi
+        ;;
+
+esac
