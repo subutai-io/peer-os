@@ -208,12 +208,10 @@ bool SubutaiTimer::checkCommandQueueInfoTimer() {
 							environment->getAgentUuidValue(),
 							command->getCommandId());
 					connection->sendMessage(resp);
-					logMain.writeLog(6,
+					logMain.writeLog(7,
 							logMain.setLogData("<SubutaiTimer>",
 									"IN_QUEUE Response:",
-									command->getCommandId()));
-					logMain.writeLog(7,
-							logMain.setLogData("<SubutaiTimer>", resp));
+									resp));
 				} else {
 					logMain.writeLog(7,
 							logMain.setLogData("<SubutaiTimer>",
