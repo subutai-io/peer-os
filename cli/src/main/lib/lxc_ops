@@ -655,3 +655,32 @@ function lxc_quota_modification {
   fi
 
 }
+
+function configure_dns {
+  local container=$1
+  local gateway=$2
+  local child_home=/var/lib/lxc/$container
+  local child_rootfs=$child_home/rootfs
+
+  #add default Gw to /etc/hosts
+  echo "$gateway $SUBUTAI_REST_IP" >> $child_rootfs/etc/hosts 
+  	
+  #add google dns to /etc/resolv.conf and /etc/resolvconf/resolv.conf.d/head
+  if [[ -z `cat $child_rootfs/etc/resolv.conf | grep "nameserver 8.8.8.8"` ]];then 
+     echo "nameserver 8.8.8.8" >> $child_rootfs/etc/resolv.conf
+  fi
+
+  if [[ -z `cat $child_rootfs/etc/resolv.conf | grep "nameserver 8.8.4.4"` ]];then
+     echo "nameserver 8.8.4.4" >> $child_rootfs/etc/resolv.conf
+  fi
+  
+  if [[ -z `cat $child_rootfs/etc/resolvconf/resolv.conf.d/head | grep "nameserver 8.8.8.8"` ]];then
+     echo "nameserver 8.8.8.8" >> $child_rootfs/etc/resolvconf/resolv.conf.d/head
+  fi
+
+  if [[ -z `cat $child_rootfs/etc/resolvconf/resolv.conf.d/head | grep "nameserver 8.8.4.4"` ]];then
+     echo "nameserver 8.8.4.4" >> $child_rootfs/etc/resolvconf/resolv.conf.d/head
+  fi
+
+  sed -i "s/nameserver 10.10.10.1/nameserver $gateway/g" $child_rootfs/etc/resolv.conf
+}
