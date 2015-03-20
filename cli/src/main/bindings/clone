@@ -160,7 +160,9 @@ function clone {
   unlock_container_write $child
 
   if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
-
+  
+  #apt-get updating operation in the container
+  (lxc-attach -n $child -- apt-get update) > /dev/null 2>&1
 }
 
 function clone_description {
