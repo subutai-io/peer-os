@@ -87,12 +87,12 @@ git checkout -- $changelogFile > /dev/null 2>&1
 #------------------------------------------------------
 #(0) exit if there are uncommitted or unstaged files under the specified directory
 #------------------------------------------------------
-require_clean_work_directory
+#require_clean_work_directory
 #------------------------------------------------------
 #(1) check if there are local commits and they are related with specified path
 #------------------------------------------------------
-exitIfNoCommits $changelogFile
-checkCommitsForPath 
+#exitIfNoCommits $changelogFile
+#checkCommitsForPath 
 
 #----------------UPDATE_VERSION-----------------------
 #------------------------------------------------------
