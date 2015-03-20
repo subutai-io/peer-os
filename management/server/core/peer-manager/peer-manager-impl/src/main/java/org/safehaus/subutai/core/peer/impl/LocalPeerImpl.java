@@ -793,9 +793,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
         try
         {
-            commandUtil.execute( new RequestBuilder(
-                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
-                    bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
+                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1093,6 +1092,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
     {
+         //todo put updating host fields logic to updateHostInfo method
         if ( resourceHostInfo.getHostname().equals( "management" ) )
         {
             if ( managementHost == null )
@@ -1142,6 +1142,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
     private void saveResourceHostContainers( ResourceHost resourceHost, Set<ContainerHostInfo> containerHostInfos )
     {
+        //todo put updating host fields logic to updateHostInfo method
         Set<ContainerHost> oldHosts = resourceHost.getContainerHosts();
         Set<UUID> newContainerIds = Sets.newHashSet();
         for ( ContainerHostInfo containerHostInfo : containerHostInfos )
@@ -1173,7 +1174,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 ( ( AbstractSubutaiHost ) containerHost ).setNetInterfaces( containerHostInfo.getInterfaces() );
                 containerHostDataService.update( ( ContainerHostEntity ) containerHost );
             }
-            ( ( AbstractSubutaiHost ) containerHost ).updateHostInfo( containerHostInfo );
+            ( ( ContainerHostEntity ) containerHost ).updateHostInfo( containerHostInfo );
         }
 
         for ( ContainerHost oldHost : oldHosts )
