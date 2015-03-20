@@ -1,4 +1,5 @@
 #!/bin/bash
+shopt -s extglob
 if  ls  /var/log/subutai-agent/*-* > /dev/null 2>&1
 then
         if [ ! -f /var/log/subutai-agent/subutaiagentlogs1.tar.gz ]
