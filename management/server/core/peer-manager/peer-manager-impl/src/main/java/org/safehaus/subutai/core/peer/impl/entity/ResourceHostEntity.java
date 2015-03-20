@@ -368,6 +368,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( templates ), "Invalid template set" );
 
         LOG.debug( String.format( "Preparing templates on %s...", hostname ) );
+
+        //todo queue sequential task
+
         for ( Template p : templates )
         {
             prepareTemplate( p );
@@ -435,6 +438,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         Preconditions.checkNotNull( template, "Invalid template" );
 
+        //todo queue sequential task
+
         try
         {
             commandUtil.execute( new RequestBuilder( "subutai import" ).withTimeout( TEMPLATE_IMPORT_TIMEOUT_SEC )
@@ -456,6 +461,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         if ( template.isRemote() )
         {
+
+            //todo queue sequential task
+
             try
             {
                 LOG.debug( String.format( "Adding remote repository %s to %s...", template.getPeerId(), hostname ) );

@@ -150,6 +150,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
         try
         {
+            //todo first check if such gateway exists, if so then no-op
             getNetworkManager().setupGateway( gatewayIp, vlan );
         }
         catch ( NetworkManagerException e )
