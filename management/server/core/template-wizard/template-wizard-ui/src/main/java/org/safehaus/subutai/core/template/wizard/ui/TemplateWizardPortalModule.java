@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import org.safehaus.subutai.core.template.wizard.api.TemplateWizardManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
@@ -26,6 +27,7 @@ public class TemplateWizardPortalModule implements PortalModule
     private PeerManager peerManager;
     private Tracker tracker;
     private ExecutorService executor;
+    private TemplateWizardManager templateWizard;
 
 
     public Tracker getTracker()
@@ -43,6 +45,18 @@ public class TemplateWizardPortalModule implements PortalModule
     public PeerManager getPeerManager()
     {
         return peerManager;
+    }
+
+
+    public TemplateWizardManager getTemplateWizard()
+    {
+        return templateWizard;
+    }
+
+
+    public void setTemplateWizard( final TemplateWizardManager templateWizard )
+    {
+        this.templateWizard = templateWizard;
     }
 
 

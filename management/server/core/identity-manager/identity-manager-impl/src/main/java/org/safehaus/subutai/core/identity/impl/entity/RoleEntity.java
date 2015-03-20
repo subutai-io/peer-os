@@ -42,7 +42,7 @@ public class RoleEntity implements Role
     private String name;
 
     @Column( name = "permissions" )
-    @OneToMany( fetch = FetchType.EAGER )
+    @OneToMany( fetch = FetchType.EAGER, cascade = { CascadeType.ALL } )
     private Set<PermissionEntity> permissions = new HashSet<>();
 
 

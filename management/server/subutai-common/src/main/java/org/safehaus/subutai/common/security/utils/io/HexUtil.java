@@ -47,19 +47,19 @@ public class HexUtil
 	 */
 	public static String byteArrayToHexString(byte[] b) 
 	{
-		StringBuffer sb = new StringBuffer(b.length * 2);
-		
-	    for (int i = 0; i < b.length; i++)
-	    {
-	    	int v = b[i] & 0xff;
-	    	if (v < 16) 
-	    	{
-	    		sb.append('0');
-	    	}
-	    	
-	        sb.append(Integer.toHexString(v));
-	     }
-	     return sb.toString().toUpperCase();
+        StringBuilder sb = new StringBuilder( b.length * 2 );
+
+        for ( final byte aB : b )
+        {
+            int v = aB & 0xff;
+            if ( v < 16 )
+            {
+                sb.append( '0' );
+            }
+
+            sb.append( Integer.toHexString( v ) );
+        }
+        return sb.toString().toUpperCase();
 	 }
 	
 
@@ -83,7 +83,7 @@ public class HexUtil
 		// Insert any required padding to get groups of exactly 4 characters
 		if ( ( padding > 0 ) && ( padding < 4 ) )
 		{
-			StringBuffer sb = new StringBuffer( hex );
+            StringBuilder sb = new StringBuilder( hex );
 
 			for ( int i = 0; i < padding; i++ )
 			{
@@ -94,7 +94,7 @@ public class HexUtil
 		}
 
 		// Output with leading "0x" and spaces to form groups
-		StringBuffer strBuff = new StringBuffer();
+        StringBuilder strBuff = new StringBuilder();
 
 		strBuff.append( "0x" );
 
@@ -143,7 +143,7 @@ public class HexUtil
 		try
 		{
 			// Divide dump into 8 byte lines
-			StringBuffer strBuff = new StringBuffer();
+            StringBuilder strBuff = new StringBuilder();
 
 			bais = new ByteArrayInputStream( bytes );
 			byte[] line = new byte[8];
@@ -175,8 +175,8 @@ public class HexUtil
 
 	private static String getHexClearLineDump( byte[] bytes, int len )
 	{
-		StringBuffer sbHex = new StringBuffer();
-		StringBuffer sbClr = new StringBuffer();
+        StringBuilder sbHex = new StringBuilder();
+        StringBuilder sbClr = new StringBuilder();
 
 		for ( int cnt = 0; cnt < len; cnt++ )
 		{
@@ -185,7 +185,7 @@ public class HexUtil
 			int i = b & 0xFF;
 
 			// First part of byte will be one hex char
-			int i1 = (int) Math.floor( i / 16 );
+            int i1 = ( int ) Math.floor( i / ( double ) 16 );
 
 			// Second part of byte will be one hex char
 			int i2 = i % 16;
@@ -221,10 +221,9 @@ public class HexUtil
 		 * Put both dumps together in one string (hex, clear) with appropriate
 		 * padding between them (pad to array length)
 		 */
-		StringBuffer strBuff = new StringBuffer();
+        StringBuilder strBuff = new StringBuilder();
 
 		strBuff.append( sbHex.toString() );
-		sbHex = new StringBuffer();
 
 		int i = bytes.length - len;
 		for ( int cnt = 0; cnt < i; cnt++ )
@@ -236,7 +235,6 @@ public class HexUtil
 								 // three
 		                         // spaces
 		strBuff.append( sbClr.toString() );
-		sbClr = new StringBuffer();
 
 		return strBuff.toString();
 	}
