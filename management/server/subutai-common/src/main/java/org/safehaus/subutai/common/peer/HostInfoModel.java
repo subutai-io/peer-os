@@ -23,6 +23,10 @@ public class HostInfoModel implements HostInfo
         this.id = hostInfo.getId();
         this.hostname = hostInfo.getHostname();
         this.hostArchitecture = hostInfo.getArch();
+        if ( hostArchitecture == null )
+        {
+            hostArchitecture = HostArchitecture.AMD64;
+        }
         for ( Interface anInterface : hostInfo.getInterfaces() )
         {
             this.netInterfaces.add( new InterfaceModel( anInterface ) );
@@ -35,7 +39,10 @@ public class HostInfoModel implements HostInfo
         this.id = containerHost.getId();
         this.hostname = containerHost.getHostname();
         this.hostArchitecture = containerHost.getHostArchitecture();
-
+        if ( hostArchitecture == null )
+        {
+            hostArchitecture = HostArchitecture.AMD64;
+        }
         for ( Interface anInterface : containerHost.getNetInterfaces() )
         {
             this.netInterfaces.add( new InterfaceModel( anInterface ) );
