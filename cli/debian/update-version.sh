@@ -129,7 +129,7 @@ sed -i "s/$version/$updatedVersion/1" $changelogFile
 git add .
 git commit -m "Incrementing patch version of $package_name package"
 isSuccesful=$?
-git push origin $branch_name
+#git push origin $branch_name
 isSuccesful=`expr $? + $isSuccesful`
 
 #------------------------------------------------------
