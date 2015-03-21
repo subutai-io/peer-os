@@ -23,8 +23,6 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.command.CommandUtil;
 import org.safehaus.subutai.common.host.Interface;
 import org.safehaus.subutai.common.mdc.SubutaiExecutors;
 import org.safehaus.subutai.common.network.Gateway;
@@ -40,7 +38,8 @@ import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.network.api.Tunnel;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
-import org.safehaus.subutai.core.peer.impl.Commands;
+import org.safehaus.subutai.core.repository.api.RepositoryException;
+import org.safehaus.subutai.core.repository.api.RepositoryManager;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -59,10 +58,6 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     @Column
     String name = "Subutai Management Host";
 
-    @Transient
-    private Commands commands = new Commands();
-    @Transient
-    private CommandUtil commandUtil = new CommandUtil();
     @Transient
     private ExecutorService singleThreadExecutorService = SubutaiExecutors.newSingleThreadExecutor();
     @Transient
@@ -106,28 +101,26 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
     public void addAptSource( final String hostname, final String ip ) throws PeerException
     {
-        //todo use repository manager
         try
         {
-            commandUtil.execute( commands.getAddAptSourceCommand( hostname, ip ), this );
+            getRepositoryManager().addAptSource( hostname, ip );
         }
-        catch ( CommandException e )
+        catch ( RepositoryException e )
         {
-            throw new PeerException( "Could not add remote host as apt source", e.toString() );
+            throw new PeerException( "Error adding apt source", e );
         }
     }
 
 
     public void removeAptSource( final String host, final String ip ) throws PeerException
     {
-        //todo use repository manager
         try
         {
-            commandUtil.execute( commands.getRemoveAptSourceCommand( ip ), this );
+            getRepositoryManager().removeAptSource( ip );
         }
-        catch ( CommandException e )
+        catch ( RepositoryException e )
         {
-            throw new PeerException( "Could not add remote host as apt source", e.toString() );
+            throw new PeerException( "Error removing apt source", e );
         }
     }
 
@@ -148,15 +141,54 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
                 String.format( "VLAN must be in the range from %d to %d", Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
 
+        //need to execute sequentially since other parallel executions can take the same gateway
+        Future<Boolean> future = queueSequentialTask( new Callable<Boolean>()
+        {
+            @Override
+            public Boolean call() throws Exception
+            {
+
+                Gateway newGateway = new Gateway( vlan, gatewayIp );
+
+                try
+                {
+                    Set<Gateway> existingGateways = getGateways();
+                    for ( Gateway gateway : existingGateways )
+                    {
+                        if ( gateway.equals( newGateway ) )
+                        {
+                            return false;
+                        }
+                    }
+
+                    getNetworkManager().setupGateway( gatewayIp, vlan );
+
+                    return true;
+                }
+                catch ( NetworkManagerException e )
+                {
+                    throw new PeerException(
+                            String.format( "Error creating gateway tap device with IP %s and VLAN %d", gatewayIp,
+                                    vlan ), e );
+                }
+            }
+        } );
+
         try
         {
-            //todo first check if such gateway exists, if so then no-op
-            getNetworkManager().setupGateway( gatewayIp, vlan );
+            future.get();
         }
-        catch ( NetworkManagerException e )
+        catch ( InterruptedException e )
         {
-            throw new PeerException(
-                    String.format( "Error creating gateway tap device with IP %s and VLAN %d", gatewayIp, vlan ), e );
+            throw new PeerException( e );
+        }
+        catch ( ExecutionException e )
+        {
+            if ( e.getCause() instanceof PeerException )
+            {
+                throw ( PeerException ) e.getCause();
+            }
+            throw new PeerException( "Error creating gateway", e.getCause() );
         }
     }
 
@@ -199,6 +231,19 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         try
         {
             return serviceLocator.getService( NetworkManager.class );
+        }
+        catch ( NamingException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    protected RepositoryManager getRepositoryManager() throws PeerException
+    {
+        try
+        {
+            return serviceLocator.getService( RepositoryManager.class );
         }
         catch ( NamingException e )
         {
