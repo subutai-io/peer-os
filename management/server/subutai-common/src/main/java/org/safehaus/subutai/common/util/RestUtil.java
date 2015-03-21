@@ -50,9 +50,9 @@ public class RestUtil
         Preconditions.checkArgument( defaultReceiveTimeout > 0, "Receive timeout must be greater than 0" );
         Preconditions.checkArgument( defaultConnectionTimeout > 0, "Connection timeout must be greater than 0" );
 
-        RestUtil.defaultReceiveTimeout = defaultReceiveTimeout;
-        RestUtil.defaultConnectionTimeout = defaultConnectionTimeout;
-        RestUtil.defaultMaxRetransmits = maxRetransmits;
+        setDefaultReceiveTimeout( defaultReceiveTimeout );
+        setDefaultConnectionTimeout( defaultConnectionTimeout );
+        setDefaultMaxRetransmits( maxRetransmits );
     }
 
 
@@ -279,5 +279,23 @@ public class RestUtil
         httpConduit.setTlsClientParameters( tlsClientParameters );
 
         return client;
+    }
+
+
+    private synchronized static void setDefaultReceiveTimeout( final long timeout )
+    {
+        defaultReceiveTimeout = timeout;
+    }
+
+
+    private synchronized static void setDefaultConnectionTimeout( final long timeout )
+    {
+        defaultConnectionTimeout = timeout;
+    }
+
+
+    private synchronized static void setDefaultMaxRetransmits( final int timeout )
+    {
+        defaultMaxRetransmits = timeout;
     }
 }

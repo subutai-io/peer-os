@@ -7,7 +7,7 @@ function demote_usage {
   echo
   echo " "subutai \[-qh\] demote template \[-i Network Configuration\]
   echo "             "parameters:
-  echo "                "i -- set network configuration i.e. "192.168.1.2/24 100"
+  echo "             "i -- set network configuration i.e. "'192.168.1.2/24 100'"
   echo -----------------------------------------------------------------------
 }
 

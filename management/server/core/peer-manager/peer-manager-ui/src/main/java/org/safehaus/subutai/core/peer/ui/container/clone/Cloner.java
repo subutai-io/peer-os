@@ -359,11 +359,11 @@ public class Cloner extends VerticalLayout
             }
             Map<ResourceHostMetric, Integer> sortedBestServers = CollectionUtil.sortMapByValueDesc( bestServers );
 
-            for ( final ResourceHostMetric serverMetric : sortedBestServers.keySet() )
+            for ( final Map.Entry<ResourceHostMetric, Integer> entry : sortedBestServers.entrySet() )
             {
-                ResourceHost rh = localPeer.getResourceHostByName( serverMetric.getHost() );
+                ResourceHost rh = localPeer.getResourceHostByName( entry.getKey().getHost() );
                 List<String> lxcHostNames = new ArrayList<>();
-                for ( int i = 0; i < sortedBestServers.get( serverMetric ); i++ )
+                for ( int i = 0; i < entry.getValue(); i++ )
                 {
                     lxcHostNames.add( StringUtil.trimToSize(
                             String.format( "%s%d%s", productName, lxcHostNames.size() + 1,

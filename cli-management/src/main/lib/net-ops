@@ -31,8 +31,11 @@ function net_bridge_blocker {
       if [ $j -eq $i ]; then continue;fi
       subutai management_network -f ${pairs[$i,0]} "priority=2500 \
            ,dl_type=0x800,nw_src=${pairs[$j,1]},action=drop"
-      sed -i '/Re-init OVS flows/i \subutai management_network -f '${pairs[$i,0]}' "priority=2500,dl_type=0x800,nw_src='${pairs[$j,1]}',action=drop"' /etc/init.d/service-interface
-      local vlan="`echo ${pairs[$j,0]} | awk -F"-" '{printf $2}'`"
+      grep -q -e \
+      '-f '${pairs[$i,0]}' "priority=2500,dl_type=0x800,nw_src='${pairs[$j,1]}',action=drop"' \
+      /etc/init.d/service-interface \
+      || sed -i '/Re-init OVS flows/i \subutai management_network -f '${pairs[$i,0]}' "priority=2500,dl_type=0x800,nw_src='${pairs[$j,1]}',action=drop"' \
+      /etc/init.d/service-interface
     done
   done
 }

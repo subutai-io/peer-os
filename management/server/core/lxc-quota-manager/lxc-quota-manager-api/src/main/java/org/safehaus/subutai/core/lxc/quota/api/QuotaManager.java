@@ -15,6 +15,10 @@ import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.quota.RamQuota;
 
 
+/**
+ * Quota Manager Api layer for reading/setting quota on a container host. {@code QuotaManager} identifies its {@code
+ * ResourceHost} and executes relevant subutai quota command.
+ */
 public interface QuotaManager
 {
     /**

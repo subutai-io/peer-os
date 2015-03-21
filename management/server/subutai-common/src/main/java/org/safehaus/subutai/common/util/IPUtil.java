@@ -3,12 +3,16 @@ package org.safehaus.subutai.common.util;
 
 import java.net.InetAddress;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * Created by nisakov on 3/6/15.
  */
 public class IPUtil
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger( IPUtil.class );
     private static long ipToLong(InetAddress ip)
     {
         byte[] octets = ip.getAddress();
@@ -40,7 +44,7 @@ public class IPUtil
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            LOGGER.error( "Error parsing InetAddress", e );
             return false;
         }
     }
