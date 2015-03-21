@@ -177,7 +177,7 @@ public class PeerManagerImpl implements PeerManager
 
             File peerIdFile = peerIdFilePath.toFile();
 
-            UUID peerId = null;
+            UUID peerId;
 
             try
             {

@@ -8,9 +8,10 @@ import java.util.regex.Pattern;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.CommandUtil;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.repository.api.PackageInfo;
@@ -32,6 +33,7 @@ public class RepositoryManagerImpl implements RepositoryManager
 
     private final PeerManager peerManager;
     protected Commands commands = new Commands();
+    protected CommandUtil commandUtil = new CommandUtil();
 
 
     public RepositoryManagerImpl( final PeerManager peerManager )
@@ -39,33 +41,6 @@ public class RepositoryManagerImpl implements RepositoryManager
         Preconditions.checkNotNull( peerManager, "Peer manager is null" );
 
         this.peerManager = peerManager;
-    }
-
-
-    protected CommandResult executeCommand( RequestBuilder requestBuilder ) throws RepositoryException
-    {
-        try
-        {
-            ManagementHost managementHost = peerManager.getLocalPeer().getManagementHost();
-            CommandResult result = managementHost.execute( requestBuilder );
-            if ( !result.hasSucceeded() )
-            {
-                if ( result.hasCompleted() )
-                {
-                    throw new RepositoryException( result.getStdErr() );
-                }
-                else
-                {
-                    throw new RepositoryException( "Command timed out" );
-                }
-            }
-
-            return result;
-        }
-        catch ( PeerException | CommandException e )
-        {
-            throw new RepositoryException( e );
-        }
     }
 
 
@@ -162,11 +137,30 @@ public class RepositoryManagerImpl implements RepositoryManager
     }
 
 
+    protected ManagementHost getManagementHost() throws HostNotFoundException
+    {
+        return peerManager.getLocalPeer().getManagementHost();
+    }
+
+
+    protected CommandResult executeCommand( RequestBuilder requestBuilder ) throws RepositoryException
+    {
+        try
+        {
+            return commandUtil.execute( requestBuilder, getManagementHost() );
+        }
+        catch ( HostNotFoundException | CommandException e )
+        {
+            throw new RepositoryException( e );
+        }
+    }
+
+
     private CommandResult executeUpdateRepoCommand() throws RepositoryException
     {
         try
         {
-            ManagementHost managementHost = peerManager.getLocalPeer().getManagementHost();
+            ManagementHost managementHost = getManagementHost();
             CommandResult result = managementHost.execute( commands.getUpdateRepoCommand() );
             if ( !result.hasCompleted() )
             {
@@ -175,9 +169,37 @@ public class RepositoryManagerImpl implements RepositoryManager
 
             return result;
         }
-        catch ( PeerException | CommandException e )
+        catch ( HostNotFoundException | CommandException e )
         {
             throw new RepositoryException( e );
+        }
+    }
+
+
+    @Override
+    public void addAptSource( final String hostname, final String ip ) throws RepositoryException
+    {
+        try
+        {
+            commandUtil.execute( commands.getAddAptSourceCommand( hostname, ip ), getManagementHost() );
+        }
+        catch ( HostNotFoundException | CommandException e )
+        {
+            throw new RepositoryException( "Could not add remote host as apt source", e );
+        }
+    }
+
+
+    @Override
+    public void removeAptSource( final String ip ) throws RepositoryException
+    {
+        try
+        {
+            commandUtil.execute( commands.getRemoveAptSourceCommand( ip ), getManagementHost() );
+        }
+        catch ( HostNotFoundException | CommandException e )
+        {
+            throw new RepositoryException( "Could not add remote host as apt source", e );
         }
     }
 }
