@@ -369,8 +369,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         LOG.debug( String.format( "Preparing templates on %s...", hostname ) );
 
-        //todo queue sequential task
-
         for ( Template p : templates )
         {
             prepareTemplate( p );
@@ -434,59 +432,102 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void importTemplate( Template template ) throws ResourceHostException
+    public void importTemplate( final Template template ) throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
 
-        //todo queue sequential task
+        final ResourceHost THIS = this;
+
+        Future<Boolean> future = queueSequentialTask( new Callable<Boolean>()
+        {
+            @Override
+            public Boolean call() throws Exception
+            {
+                try
+                {
+                    commandUtil.execute(
+                            new RequestBuilder( "subutai import" ).withTimeout( TEMPLATE_IMPORT_TIMEOUT_SEC )
+                                                                  .withCmdArgs( Lists.newArrayList(
+                                                                          template.getTemplateName() ) ), THIS );
+
+                    return true;
+                }
+                catch ( CommandException ce )
+                {
+                    LOG.error( "Template import failed", ce );
+                    throw new ResourceHostException( "Template import failed", ce );
+                }
+            }
+        } );
 
         try
         {
-            commandUtil.execute( new RequestBuilder( "subutai import" ).withTimeout( TEMPLATE_IMPORT_TIMEOUT_SEC )
-                                                                       .withCmdArgs( Lists.newArrayList(
-                                                                               template.getTemplateName() ) ), this );
+            future.get();
         }
-        catch ( CommandException ce )
+        catch ( InterruptedException e )
         {
-            LOG.error( "Template import failed", ce );
-            throw new ResourceHostException( "Template import failed", ce );
+            throw new ResourceHostException( e );
+        }
+        catch ( ExecutionException e )
+        {
+            throw new ResourceHostException( "Error importing template", e.getCause() );
         }
     }
 
 
     @Override
-    public void updateRepository( Template template ) throws ResourceHostException
+    public void updateRepository( final Template template ) throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
 
         if ( template.isRemote() )
         {
+            Future<Boolean> future = queueSequentialTask( new Callable<Boolean>()
+            {
+                @Override
+                public Boolean call() throws Exception
+                {
 
-            //todo queue sequential task
+                    try
+                    {
+                        LOG.debug( String.format( "Adding remote repository %s to %s...", template.getPeerId(),
+                                hostname ) );
+                        CommandResult commandResult = execute( new RequestBuilder( String.format(
+                                "echo \"deb http://gw.intra.lan:9999/%1$s trusty main\" > /etc/apt/sources.list"
+                                        + ".d/%1$s.list ", template.getPeerId().toString() ) ) );
+                        if ( !commandResult.hasSucceeded() )
+                        {
+                            LOG.warn( String.format( "Could not add repository %s to %s.", template.getPeerId(),
+                                    hostname ), commandResult );
+                        }
+                        LOG.debug( String.format( "Updating repository index on %s...", hostname ) );
+                        commandResult = execute( new RequestBuilder( "apt-get update" ).withTimeout( 300 ) );
+                        if ( !commandResult.hasSucceeded() )
+                        {
+                            LOG.warn( String.format( "Could not update repository %s on %s.", template.getPeerId(),
+                                    hostname ), commandResult );
+                        }
+                        return true;
+                    }
+                    catch ( CommandException ce )
+                    {
+                        LOG.error( "Command exception.", ce );
+                        throw new ResourceHostException( "General command exception on updating repository.", ce );
+                    }
+                }
+            } );
 
             try
             {
-                LOG.debug( String.format( "Adding remote repository %s to %s...", template.getPeerId(), hostname ) );
-                CommandResult commandResult = execute( new RequestBuilder( String.format(
-                        "echo \"deb http://gw.intra.lan:9999/%1$s trusty main\" > /etc/apt/sources.list.d/%1$s.list ",
-                        template.getPeerId().toString() ) ) );
-                if ( !commandResult.hasSucceeded() )
-                {
-                    LOG.warn( String.format( "Could not add repository %s to %s.", template.getPeerId(), hostname ),
-                            commandResult );
-                }
-                LOG.debug( String.format( "Updating repository index on %s...", hostname ) );
-                commandResult = execute( new RequestBuilder( "apt-get update" ).withTimeout( 300 ) );
-                if ( !commandResult.hasSucceeded() )
-                {
-                    LOG.warn( String.format( "Could not update repository %s on %s.", template.getPeerId(), hostname ),
-                            commandResult );
-                }
+                future.get();
             }
-            catch ( CommandException ce )
+            catch ( InterruptedException e )
             {
-                LOG.error( "Command exception.", ce );
-                throw new ResourceHostException( "General command exception on updating repository.", ce );
+                throw new ResourceHostException( e );
+            }
+            catch ( ExecutionException e )
+            {
+                throw new ResourceHostException( "Error updating repository", e.getCause() );
             }
         }
     }
