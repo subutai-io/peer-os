@@ -332,8 +332,8 @@ int main(int argc, char *argv[], char *envp[]) {
 			if (connection->checkMessageStatus()) {
 				command = connection->getMessage(); //fetching message..
 
-				if (isCommandDuplicate(&commandIdsList,
-						command->getCommandId(), &logMain)) {
+				if (isCommandDuplicate(&commandIdsList, command->getCommandId(),
+						&logMain)) {
 					continue;
 				}
 
@@ -381,23 +381,32 @@ int main(int argc, char *argv[], char *envp[]) {
 					subprocess->getLogger().setLogLevel(logMain.getLogLevel());
 					if (!target_container) {
 						command->setCommand(
-								"for i in `ps aux | grep '[s]h -c' | awk -F \" \" '{print $2}'`;"
-										" do ps aux | grep `pgrep -P $i` | sed '/grep/d' ;"
+								"for i in `ps aux | grep '[s]h -c' | grep -v grep | awk -F \" \" '{print $2}'`;"
+										" do echo `pgrep -P $i` ;"
 										" done 2> /dev/null");
 						command->setWorkingDirectory("/");
-					} else {
-						string cmdline =
-								"for i in `ps aux | grep '[s]h -c' | awk -F \" \" '{print $2}'`;"
-										" do ps aux | grep `pgrep -P $i` | sed '/grep/d' ;"
-										" done 2> /dev/null";
-						target_container->PutToFile("/opt/psrun", cmdline);
-						vector<string> chmod;
-						chmod.push_back("+x");
-						chmod.push_back("/opt/psrun");
-						target_container->RunProgram("chmod", chmod);
-						command->setCommand("/opt/psrun");
+						subprocess->threadFunction(&messageQueue, command,
+								argv);
 					}
-					subprocess->threadFunction(&messageQueue, command, argv);
+
+					//PS REQUEST will not be permitted on containers.
+					else {
+						/*
+						 string cmdline =
+						 "for i in `ps aux | grep '[s]h -c' | awk -F \" \" '{print $2}'`;"
+						 " do ps aux | grep `pgrep -P $i` | sed '/grep/d' ;"
+						 " done 2> /dev/null";
+						 target_container->PutToFile("/opt/psrun", cmdline);
+						 vector<string> chmod;
+						 chmod.push_back("+x");
+						 chmod.push_back("/opt/psrun");
+						 target_container->RunProgram("chmod", chmod);
+						 command->setCommand("/opt/psrun");
+						 */
+						logMain.writeLog(7,
+								logMain.setLogData("<SubutaiAgent>",
+										"Running ps on container is not permittable."));
+					}
 
 					delete subprocess;
 				} else if (command->getType() == "TERMINATE_REQUEST") {
@@ -531,15 +540,12 @@ int main(int argc, char *argv[], char *envp[]) {
 									argv, target_container));
 					currentProcess++;
 					delete subprocess;
-				}
-				else
-				{
-					if(currentProcess >= ncores)
-					{
+				} else {
+					if (currentProcess >= ncores) {
 						logMain.writeLog(7,
-							logMain.setLogData("<SubutaiAgent>",
-									"Cannot execute request since all cores are busy. "
-											+ command->getCommandId()));
+								logMain.setLogData("<SubutaiAgent>",
+										"Cannot execute request since all cores are busy. "
+												+ command->getCommandId()));
 					}
 				}
 			}
