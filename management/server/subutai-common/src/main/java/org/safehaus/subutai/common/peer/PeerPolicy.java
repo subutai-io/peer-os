@@ -127,4 +127,18 @@ public class PeerPolicy {
         }
         return false;
     }
+
+
+    @Override
+    public int hashCode()
+    {
+        int result = remotePeerId.hashCode();
+        result = 31 * result + diskUsagePercentageLimit;
+        result = 31 * result + cpuUsagePercentageLimit;
+        result = 31 * result + memoryUsagePercentageLimit;
+        result = 31 * result + networkUsagePercentageLimit;
+        result = 31 * result + environmentCountLimit;
+        result = 31 * result + containerCountLimit;
+        return result;
+    }
 }

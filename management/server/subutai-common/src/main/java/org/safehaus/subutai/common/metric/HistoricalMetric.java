@@ -17,7 +17,7 @@ public class HistoricalMetric {
     public HistoricalMetric( Host host, MetricType metricType, int timestamp, double value ) {
         this.host = host;
         this.metricType = metricType;
-        this.timestamp = new Date( new Long( timestamp ) * 1000 );
+        this.timestamp = new Date( ( long ) timestamp * 1000 );
         this.value = value;
     }
 
