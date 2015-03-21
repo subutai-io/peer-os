@@ -51,7 +51,7 @@ public:
 	bool openSession();
 	bool sendMessage(string,string topic = "");
 	bool checkMessageStatus();
-	bool addMessageToQueue(	SubutaiCommand*);
+	bool addMessageToQueue(	SubutaiCommand*, string);
 	bool addMessageToExecQueue(SubutaiCommand*,	string&);
 	SubutaiCommand* getMessage();
 	bool reConnect();
