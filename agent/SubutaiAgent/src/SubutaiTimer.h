@@ -54,7 +54,7 @@
 using namespace std;
 using std::stringstream;
 using std::string;
-#define LOG_HEARTBEAT_PERIOD 8
+#define LOG_HEARTBEAT_PERIOD 1
 
 class SubutaiTimer {
 public:
