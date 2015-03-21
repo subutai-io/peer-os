@@ -36,23 +36,26 @@ public class BrokerImpl implements Broker
 
     protected MessageRoutingListener messageRouter;
     protected PooledConnectionFactory pool;
-    private String brokerUrl;
-    private int maxBrokerConnections;
-    private boolean isPersistent;
-    private int messageTimeout;
+    private final String brokerUrl;
+    private final int maxBrokerConnections;
+    private final boolean isPersistent;
+    private final int messageTimeout;
+    private final int idleConnectionTimeout;
 
 
     public BrokerImpl( final String brokerUrl, final int maxBrokerConnections, final boolean isPersistent,
-                       final int messageTimeout )
+                       final int messageTimeout, final int idleConnectionTimeout )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( brokerUrl ), "Invalid broker URL" );
         Preconditions.checkArgument( maxBrokerConnections > 0, "Max broker connections number must be greater than 0" );
         Preconditions.checkArgument( messageTimeout > 0, "Message timeout must be greater than 0" );
+        Preconditions.checkArgument( idleConnectionTimeout > 0, "Idle connection timeout must be greater than 0" );
 
         this.brokerUrl = brokerUrl;
         this.maxBrokerConnections = maxBrokerConnections;
         this.isPersistent = isPersistent;
         this.messageTimeout = messageTimeout;
+        this.idleConnectionTimeout = idleConnectionTimeout;
         this.messageRouter = new MessageRoutingListener();
     }
 
@@ -150,6 +153,7 @@ public class BrokerImpl implements Broker
         amqFactory.setCheckForDuplicates( true );
         pool = new PooledConnectionFactory( amqFactory );
         pool.setMaxConnections( maxBrokerConnections + Topic.values().length );
+        pool.setIdleTimeout( idleConnectionTimeout * 1000 );
         pool.start();
     }
 
