@@ -48,7 +48,7 @@ public class BrokerImpl implements Broker
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( brokerUrl ), "Invalid broker URL" );
         Preconditions.checkArgument( maxBrokerConnections > 0, "Max broker connections number must be greater than 0" );
-        Preconditions.checkArgument( messageTimeout > 0, "Message timeout must be greater than 0" );
+        Preconditions.checkArgument( messageTimeout >= 0, "Message timeout must be greater than or equal to 0" );
         Preconditions.checkArgument( idleConnectionTimeout > 0, "Idle connection timeout must be greater than 0" );
 
         this.brokerUrl = brokerUrl;
