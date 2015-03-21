@@ -95,6 +95,10 @@ public class MessengerDao
     public Envelope getEnvelope( UUID messageId )
     {
         MessageEntity messageEntity = messageDataService.find( messageId.toString() );
+        if ( messageEntity == null )
+        {
+            return null;
+        }
         return new Envelope( messageEntity );
     }
 }

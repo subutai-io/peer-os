@@ -123,6 +123,8 @@ public class EnvironmentContainersQuotaTab extends CustomComponent
             @Override
             public void focus( final FieldEvents.FocusEvent event )
             {
+                envListComboBox.setValue( null );
+                environmentContainer.removeAllItems();
                 environmentContainer.addAll( environmentComponent.getEnvironmentManager().getEnvironments() );
             }
         } );
@@ -187,6 +189,7 @@ public class EnvironmentContainersQuotaTab extends CustomComponent
     private void updateContainersTable()
     {
         UUID envId = ( UUID ) envListComboBox.getValue();
+        envContainerHostContainer.removeAllItems();
         if ( envId != null )
         {
             form.setVisible( false );
@@ -194,7 +197,6 @@ public class EnvironmentContainersQuotaTab extends CustomComponent
             BeanItem beanItem = ( BeanItem ) envListComboBox.getItem( envId );
             Environment selectedEnvironment = ( Environment ) beanItem.getBean();
 
-            envContainerHostContainer.removeAllItems();
             envContainerHostContainer.addAll( selectedEnvironment.getContainerHosts() );
         }
     }

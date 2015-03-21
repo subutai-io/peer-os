@@ -92,7 +92,7 @@ require_clean_work_directory
 #(1) check if there are local commits and they are related with specified path
 #------------------------------------------------------
 exitIfNoCommits $changelogFile
-checkCommitsForPath 
+checkCommitsForPath
 
 #----------------UPDATE_VERSION-----------------------
 #------------------------------------------------------

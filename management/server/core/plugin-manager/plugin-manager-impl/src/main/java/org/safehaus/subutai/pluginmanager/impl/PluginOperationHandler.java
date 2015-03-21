@@ -70,11 +70,11 @@ public class PluginOperationHandler implements Runnable
         }
         catch ( PluginManagerException e )
         {
-            isRemoveSuccessful = false;
+            setIsRemoveSuccessful( false );
             trackerOperation.addLogFailed( String.format( "%s, Removing operation is failed...", e.getMessage() ) );
             return;
         }
-        isRemoveSuccessful = true;
+        setIsRemoveSuccessful( true );
         trackerOperation.addLogDone( "Plugin is removed successfully." );
 
     }
@@ -98,11 +98,11 @@ public class PluginOperationHandler implements Runnable
         }
         catch ( PluginManagerException e )
         {
-            isInstallSuccessful = false;
+            setIsInstallSuccessful( false );
             trackerOperation.addLogFailed( String.format( "%s, Installing operation is failed...", e.getMessage() ) );
             return;
         }
-        isInstallSuccessful = true;
+        setIsInstallSuccessful( true );
         trackerOperation.addLogDone( "Plugin is installed successfully." );
 
     }
@@ -126,5 +126,17 @@ public class PluginOperationHandler implements Runnable
             trackerOperation.addLogFailed( String.format( "%s, Upgrade operation is failed...", e.getMessage() ) );
         }
         trackerOperation.addLogDone( "Plugin is upgraded successfully." );
+    }
+
+
+    private synchronized static void setIsInstallSuccessful( final boolean state )
+    {
+        isInstallSuccessful = state;
+    }
+
+
+    private synchronized static void setIsRemoveSuccessful( final boolean state )
+    {
+        isRemoveSuccessful = state;
     }
 }

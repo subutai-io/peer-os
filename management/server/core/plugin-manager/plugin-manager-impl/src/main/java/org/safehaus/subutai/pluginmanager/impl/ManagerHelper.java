@@ -4,19 +4,15 @@ package org.safehaus.subutai.pluginmanager.impl;
 import java.util.List;
 import java.util.Set;
 
-import javax.management.Notification;
-
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.CommandUtil;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.pluginmanager.api.PluginInfo;
 import org.safehaus.subutai.pluginmanager.api.PluginManagerException;
 
@@ -92,9 +88,8 @@ public class ManagerHelper
     private List<String> parseLines( String result )
     {
         String eol = System.getProperty( "line.separator" );
-        List<String> lines = StringUtil.splitString( result, eol );
 
-        return lines;
+        return StringUtil.splitString( result, eol );
     }
 
 
