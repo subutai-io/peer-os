@@ -242,7 +242,7 @@ public class RequestBuilder
     public Request build( UUID id )
     {
         return new RequestImpl( type, id, cwd, command, cmdArgs, envVars, outputRedirection, errRedirection, runAs,
-                timeout, isDaemon, configPoints );
+                timeout, isDaemon, configPoints, pid );
     }
 
 
@@ -342,13 +342,14 @@ public class RequestBuilder
         private String runAs;
         private Integer timeout;
         private Integer isDaemon;
+        private Integer pid;
         private Set<String> configPoints;
 
 
         RequestImpl( final RequestType type, final UUID id, final String workingDirectory, final String command,
                      final List<String> args, final Map<String, String> environment, final OutputRedirection stdOut,
                      final OutputRedirection stdErr, final String runAs, final Integer timeout, final Integer isDaemon,
-                     final Set<String> configPoints )
+                     final Set<String> configPoints, final int pid )
         {
             this.type = type;
             this.id = id;
@@ -363,6 +364,7 @@ public class RequestBuilder
             this.timeout = timeout;
             this.isDaemon = isDaemon;
             this.configPoints = configPoints;
+            this.pid = pid;
         }
 
 
@@ -454,6 +456,13 @@ public class RequestBuilder
         public Set<String> getConfigPoints()
         {
             return configPoints;
+        }
+
+
+        @Override
+        public Integer getPid()
+        {
+            return pid;
         }
     }
 }
