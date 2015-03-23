@@ -73,7 +73,7 @@ public class GrowEnvironmentTask implements Runnable
                 Set<Peer> newRemotePeers = Sets.newHashSet( topology.getNodeGroupPlacement().keySet() );
                 newRemotePeers.removeAll( environment.getPeers() );
 
-                op.addLog( "Setting up secure channel..." );
+                op.addLog( "Setting up/Ensuring secure channel..." );
 
                 environmentManager.setupEnvironmentTunnel( environment.getId(), newRemotePeers );
 
