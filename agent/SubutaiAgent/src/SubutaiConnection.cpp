@@ -175,7 +175,7 @@ void SubutaiConnection::on_message(const struct mosquitto_message *message) {
 			if (new_command->getType() == "EXECUTE_REQUEST") {
 				addMessageToExecQueue(new_command, input);
 			} else {
-				addMessageToQueue(new_command);
+				addMessageToQueue(new_command, input);
 			}
 		} else {
 			logger->writeLog(3,
@@ -217,12 +217,12 @@ void SubutaiConnection::on_message(const struct mosquitto_message *message) {
 /**
  *  \details   This method adds new message to message queue.
  */
-bool SubutaiConnection::addMessageToQueue(SubutaiCommand* cmd) {
+bool SubutaiConnection::addMessageToQueue(SubutaiCommand* cmd, string input) {
 	if (msg_queue.size() < MAX_MSG_NUM) {
 		msg_queue.push(cmd);
 		logger->writeLog(6,
 				logger->setLogData("<SubutaiConnection>",
-						"New message is received and added to message queue" + cmd->getCommandId()));
+						"New message is received and added to message queue\n" + input));
 	} else {
 		logger->writeLog(3,
 				logger->setLogData("<SubutaiConnection>",
