@@ -316,6 +316,8 @@ public class PeerRegisterForm extends CustomComponent
 
     private void unregisterMeFromRemote( final PeerInfo peerToUnregister, final PeerInfo remotePeerInfo )
     {
+        //TODO Add cross peer environment existence, and warn user if he really wants to unregister peer
+        //and on unregister event remove tunnel between peers, and all environment related vni's and vlan's
         new Thread( new Runnable()
         {
             @Override
