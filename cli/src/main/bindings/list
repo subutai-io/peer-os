@@ -91,20 +91,21 @@ function list_templates {
     echo -e "--------\t-------"
   fi
  
-  #echo "temp list: "$templates
- 
   temp="`echo $templates`"
   templates=""
   local foundTemplate="false"
 
+  #find a template in template list
   for templ in $temp; do
     foundTemplate="false"
     for template in $tempList; do
       if [ "$template" == "`echo $templ`" ]; then
           templates="$templates $templ"
+          #template found then we should skip
           foundTemplate="true"
       fi
     done
+    #we could not found the template in the list it might be in the container list
     if [ "$foundTemplate" == "false" ]; then
       for lxc in $lxc_list; do
         if [ "$lxc" == "`echo $templ`" ]; then
@@ -198,6 +199,7 @@ function list_containers {
   temp="`echo $containers`"
   containers=""
 
+  ##find a container in container list
   for cont in $temp; do
     for container in $lxc_list; do
       if [ "$container" == "`echo $cont`" ]; then
