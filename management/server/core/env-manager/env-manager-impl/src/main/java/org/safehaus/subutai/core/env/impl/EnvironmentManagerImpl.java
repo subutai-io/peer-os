@@ -9,9 +9,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.environment.Blueprint;
 import org.safehaus.subutai.common.environment.ContainerHostNotFoundException;
@@ -54,10 +51,13 @@ import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -70,6 +70,7 @@ import com.google.common.collect.Sets;
  */
 public class EnvironmentManagerImpl implements EnvironmentManager
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger( EnvironmentManagerImpl.class );
     private static final String TRACKER_SOURCE = "Environment Manager";
 
     private final PeerManager peerManager;
@@ -130,47 +131,40 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             Environment environment = findEnvironment( environmentId );
             Set<ContainerHost> containerHosts = environment.getContainerHosts();
+
             for ( final ContainerHost containerHost : containerHosts )
             {
-                RequestBuilder getHostname = new RequestBuilder( "hostname" );
-
-                CommandResult result = containerHost.execute( getHostname );
-                EnvironmentContainerImpl environmentContainer =
-                        environmentContainerDataService.find( containerHost.getId().toString() );
-                environmentContainer.setHostname( result.getStdOut() );
-
-                Set<HostInterface> updatedInterfaces = Sets.newHashSet();
-                for ( final Interface anInterface : containerHost.getNetInterfaces() )
+                try
                 {
-                    /**
-                     * This command gets interface mac/ip address separated by new line. Order comes respectively.
-                     */
-                    RequestBuilder getInterfaceAddress = new RequestBuilder(
-                            String.format( "ip addr show %s | awk '/(inet |link\\/ether)/ { print $2 }' | cut -d/ -f1",
-                                    anInterface.getInterfaceName() ) );
-                    CommandResult interfaceInfo = containerHost.execute( getInterfaceAddress );
-                    String netInfo[] = interfaceInfo.getStdOut().split( "\n" );
+                    ContainerHost updatedContainerHost =
+                            peerManager.getLocalPeer().getContainerHostById( containerHost.getId() );
+                    EnvironmentContainerImpl environmentContainer =
+                            environmentContainerDataService.find( containerHost.getId().toString() );
+                    environmentContainer.setHostname( updatedContainerHost.getHostname() );
+                    Set<HostInterface> updatedInterfaces = Sets.newHashSet();
 
-                    HostInterface hostInterface = ( HostInterface ) anInterface;
-                    hostInterface.setMac( netInfo[0] );
-                    hostInterface.setIp( netInfo[1] );
+                    for ( final Interface anInterface : updatedContainerHost.getNetInterfaces() )
+                    {
+                        HostInterface hostInterface = new HostInterface( anInterface );
+                        updatedInterfaces.add( hostInterface );
+                        hostInterface.setHost( environmentContainer );
+                    }
 
-                    updatedInterfaces.add( hostInterface );
+                    environmentContainer.getNetInterfaces().clear();
+                    environmentContainer.getNetInterfaces().addAll( updatedInterfaces );
+
+                    environmentContainerDataService.update( environmentContainer );
                 }
-                environmentContainer.getNetInterfaces().clear();
-                environmentContainer.getNetInterfaces().addAll( updatedInterfaces );
-
-                environmentContainerDataService.update( environmentContainer );
+                catch ( HostNotFoundException e )
+                {
+                    LOGGER.info( "Specified container host is not local one", e );
+                }
             }
         }
         catch ( EnvironmentNotFoundException e )
         {
             throw new EnvironmentManagerException(
                     String.format( "Couldn't find environment by id: %s", environmentId.toString() ), e );
-        }
-        catch ( CommandException e )
-        {
-            throw new EnvironmentManagerException( "Error executing command on ContainerHost", e );
         }
     }
 
