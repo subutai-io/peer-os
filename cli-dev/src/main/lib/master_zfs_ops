@@ -173,7 +173,9 @@ function fs_master_export {
   cp $lxc_home/config $debian_root
   cp $lxc_home/fstab  $debian_root
   cp $lxc_home/packages  $debian_root
-
+  #copying .git folder from rootfs to debian root
+  cp -a $lxc_home/rootfs/.git $debian_root/ 
+ 
   msg_info "Building debian package file for master"
 
   pkg=`deb_pkg $container`
@@ -308,6 +310,8 @@ function fs_master_import {
   lxc_home=/var/lib/lxc/master
   lxc_rootfs=$lxc_home/rootfs
   mkdir -p $lxc_rootfs
+  #copying .git folder from rootfs to debian root
+  cp -a $debian_root/.git $lxc_home/
   cp $config $lxc_home
   cp $fstab $lxc_home
   cp $debian_root/packages $lxc_home

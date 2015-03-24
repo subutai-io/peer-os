@@ -195,6 +195,8 @@ function import {
   cp $config $lxc_home;
   cp $debian_root/fstab $lxc_home;
   cp $debian_root/packages $lxc_home;
+  #copying .git folder from rootfs to debian root
+  cp -a $debian_root/.git $lxc_home/;
 
   fs_recv $template $deltas $lxc_rootfs  
 
