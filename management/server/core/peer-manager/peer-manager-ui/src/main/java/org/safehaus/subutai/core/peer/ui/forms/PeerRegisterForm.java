@@ -10,6 +10,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.environment.Environment;
+import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
@@ -20,6 +21,7 @@ import org.safehaus.subutai.common.settings.ChannelSettings;
 import org.safehaus.subutai.common.settings.SecuritySettings;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
+import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.ui.PeerManagerPortalModule;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.slf4j.Logger;
@@ -320,33 +322,58 @@ public class PeerRegisterForm extends CustomComponent
 
     private void unregisterMeFromRemote( final PeerInfo peerToUnregister, final PeerInfo remotePeerInfo )
     {
-        boolean relationExists = false;
+        int relationExists = 0;
         for ( final Iterator<Environment> itEnv = module.getEnvironmentManager().getEnvironments().iterator();
-              itEnv.hasNext() && !relationExists; )
+              itEnv.hasNext() && relationExists == 0; )
         {
             Environment environment = itEnv.next();
             for ( final Iterator<Peer> itPeer = environment.getPeers().iterator();
-                  itPeer.hasNext() && !relationExists; )
+                  itPeer.hasNext() && relationExists == 0; )
             {
                 Peer peer = itPeer.next();
                 if ( peer.getPeerInfo().equals( remotePeerInfo ) )
                 {
-                    relationExists = true;
+                    relationExists = 1;
                 }
             }
         }
 
-        if ( relationExists )
+        for ( final Iterator<ResourceHost> itResource =
+                      module.getPeerManager().getLocalPeer().getResourceHosts().iterator();
+              itResource.hasNext() && relationExists == 0; )
         {
-            ConfirmationDialog alert = new ConfirmationDialog(
-                    String.format( "Do you want to unregister this peer? You have existing environments." ), "Yes",
-                    "No" );
+            ResourceHost resourceHost = itResource.next();
+            for ( final Iterator<ContainerHost> itContainer = resourceHost.getContainerHosts().iterator();
+                  itContainer.hasNext() && relationExists == 0; )
+            {
+                ContainerHost containerHost = itContainer.next();
+                if ( containerHost.getPeerId().equalsIgnoreCase( remotePeerInfo.getId().toString() ) )
+                {
+                    relationExists = 2;
+                }
+            }
+        }
+
+        if ( relationExists != 0 )
+        {
+            String msg = "";
+            switch ( relationExists )
+            {
+                case 1:
+                    msg = "Please destroy all cross peer environments, before proceeding further!!!";
+                    break;
+                case 2:
+                    msg = "You cannot deregister remote Peer, because you are a carrier of remote Peer resources!!!"
+                            + " Contact with Peer to snapshot all his data.";
+                    break;
+            }
+            ConfirmationDialog alert = new ConfirmationDialog( msg, "Ok", "" );
             alert.getOk().addClickListener( new Button.ClickListener()
             {
                 @Override
                 public void buttonClick( Button.ClickEvent clickEvent )
                 {
-                    unregisterPeer( peerToUnregister, remotePeerInfo );
+                    //                    unregisterPeer( peerToUnregister, remotePeerInfo );
                 }
             } );
 
