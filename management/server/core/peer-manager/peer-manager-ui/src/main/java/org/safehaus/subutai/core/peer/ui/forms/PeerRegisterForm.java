@@ -360,11 +360,11 @@ public class PeerRegisterForm extends CustomComponent
             switch ( relationExists )
             {
                 case 1:
-                    msg = "Please destroy all cross peer environments, before proceeding further!!!";
+                    msg = "Please destroy all cross peer environments, before you proceed!!!";
                     break;
                 case 2:
-                    msg = "You cannot deregister remote Peer, because you are a carrier of remote Peer resources!!!"
-                            + " Contact with Peer to snapshot all his data.";
+                    msg = "You cannot unregister Peer, because you are a carrier of Peer's resources!!!"
+                            + " Contact with Peer to migrate all his data.";
                     break;
             }
             ConfirmationDialog alert = new ConfirmationDialog( msg, "Ok", "" );

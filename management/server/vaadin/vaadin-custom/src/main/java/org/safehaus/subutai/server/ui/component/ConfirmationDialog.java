@@ -31,6 +31,10 @@ public class ConfirmationDialog
         alert.setClosable( false );
 
         cancel = new Button( cancelLabel );
+        if ( "".equalsIgnoreCase( cancelLabel ) )
+        {
+            cancel.setVisible( false );
+        }
         ok = new Button( yesLabel );
     }
 

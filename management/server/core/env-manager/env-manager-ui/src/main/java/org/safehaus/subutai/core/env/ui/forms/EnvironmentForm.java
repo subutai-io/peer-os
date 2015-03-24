@@ -37,6 +37,7 @@ public class EnvironmentForm
     private static final String DATE = "Date";
     private static final String REMOVE = "Remove";
     private static final String CONTAINERS = "Containers";
+    private static final String REFRESH_METADATA = "Refresh Info";
     private static final String NAME = "Name";
     private static final String STATUS = "Status";
     private static final String DESTROY = "Destroy";
@@ -132,7 +133,7 @@ public class EnvironmentForm
             final Button sshKeyBtn = new Button( SSH_KEY );
             final Button destroyBtn = new Button( DESTROY );
             final Button removeBtn = new Button( REMOVE );
-            final Button refreshContainersButton = new Button( "Refresh Info" );
+            final Button refreshContainersButton = new Button( REFRESH_METADATA );
             containersBtn.setId( environment.getName() + "-containers" );
             containersBtn.addClickListener( new Button.ClickListener()
             {
@@ -230,6 +231,7 @@ public class EnvironmentForm
             destroyBtn.setEnabled( !isEnvironmentUnderModification );
             containersBtn.setEnabled( !isEnvironmentUnderModification );
             sshKeyBtn.setEnabled( !isEnvironmentUnderModification );
+            refreshContainersButton.setEnabled( !isEnvironmentUnderModification );
 
             Embedded icon = isEnvironmentUnderModification ? new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) ) :
                             environment.getStatus().equals( EnvironmentStatus.HEALTHY ) ?
@@ -244,7 +246,7 @@ public class EnvironmentForm
 
             environmentsTable.addItem( new Object[] {
                     environment.getId(), environment.getName(), getCreationDate( environment.getCreationTimestamp() ),
-                    icon, containersBtn, sshKeyBtn, destroyBtn, removeBtn, refreshContainersButton
+                    icon, containersBtn, sshKeyBtn, destroyBtn, refreshContainersButton, removeBtn
             }, null );
         }
         environmentsTable.refreshRowCache();
@@ -284,8 +286,8 @@ public class EnvironmentForm
         table.addContainerProperty( CONTAINERS, Button.class, null );
         table.addContainerProperty( SSH_KEY, Button.class, null );
         table.addContainerProperty( DESTROY, Button.class, null );
+        table.addContainerProperty( REFRESH_METADATA, Button.class, null );
         table.addContainerProperty( REMOVE, Button.class, null );
-        table.addContainerProperty( "Refresh Info", Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setEnabled( true );
