@@ -13,8 +13,11 @@ import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vaadin.server.ClientConnector;
 import com.vaadin.server.ThemeResource;
@@ -27,6 +30,8 @@ import com.vaadin.ui.VerticalLayout;
 
 public class EnvironmentForm
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger( EnvironmentForm.class );
+
     private static final String ID = "Id";
     private static final String SSH_KEY = "Ssh key";
     private static final String DATE = "Date";
@@ -127,6 +132,7 @@ public class EnvironmentForm
             final Button sshKeyBtn = new Button( SSH_KEY );
             final Button destroyBtn = new Button( DESTROY );
             final Button removeBtn = new Button( REMOVE );
+            final Button refreshContainersButton = new Button( "Refresh Info" );
             containersBtn.setId( environment.getName() + "-containers" );
             containersBtn.addClickListener( new Button.ClickListener()
             {
@@ -146,8 +152,7 @@ public class EnvironmentForm
                 {
 
                     ConfirmationDialog alert =
-                            new ConfirmationDialog( "Do you really want to destroy this environment?",
-                                    "Yes", "No" );
+                            new ConfirmationDialog( "Do you really want to destroy this environment?", "Yes", "No" );
                     alert.getOk().addClickListener( new Button.ClickListener()
                     {
                         @Override
@@ -180,9 +185,8 @@ public class EnvironmentForm
                 @Override
                 public void buttonClick( final Button.ClickEvent event )
                 {
-                    ConfirmationDialog alert =
-                            new ConfirmationDialog( "Do you really want to remove this environment without destroying it?",
-                                    "Yes", "No" );
+                    ConfirmationDialog alert = new ConfirmationDialog(
+                            "Do you really want to remove this environment without destroying it?", "Yes", "No" );
                     alert.getOk().addClickListener( new Button.ClickListener()
                     {
                         @Override
@@ -200,6 +204,23 @@ public class EnvironmentForm
                     } );
 
                     contentRoot.getUI().addWindow( alert.getAlert() );
+                }
+            } );
+
+            refreshContainersButton.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( final Button.ClickEvent event )
+                {
+                    try
+                    {
+                        environmentManager.updateEnvironmentContainersMetadata( environment.getId() );
+                    }
+                    catch ( EnvironmentManagerException e )
+                    {
+                        LOGGER.error( "Error updating containers metadata", e );
+                        Notification.show( "Error updating containers metadata", Notification.Type.WARNING_MESSAGE );
+                    }
                 }
             } );
 
@@ -223,7 +244,7 @@ public class EnvironmentForm
 
             environmentsTable.addItem( new Object[] {
                     environment.getId(), environment.getName(), getCreationDate( environment.getCreationTimestamp() ),
-                    icon, containersBtn, sshKeyBtn, destroyBtn, removeBtn
+                    icon, containersBtn, sshKeyBtn, destroyBtn, removeBtn, refreshContainersButton
             }, null );
         }
         environmentsTable.refreshRowCache();
@@ -264,6 +285,7 @@ public class EnvironmentForm
         table.addContainerProperty( SSH_KEY, Button.class, null );
         table.addContainerProperty( DESTROY, Button.class, null );
         table.addContainerProperty( REMOVE, Button.class, null );
+        table.addContainerProperty( "Refresh Info", Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setEnabled( true );

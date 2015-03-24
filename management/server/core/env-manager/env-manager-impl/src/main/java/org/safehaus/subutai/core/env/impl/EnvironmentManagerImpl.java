@@ -9,6 +9,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
+import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.environment.Blueprint;
 import org.safehaus.subutai.common.environment.ContainerHostNotFoundException;
@@ -17,6 +20,7 @@ import org.safehaus.subutai.common.environment.EnvironmentModificationException;
 import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
+import org.safehaus.subutai.common.host.Interface;
 import org.safehaus.subutai.common.mdc.SubutaiExecutors;
 import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
@@ -37,6 +41,7 @@ import org.safehaus.subutai.core.env.impl.dao.EnvironmentContainerDataService;
 import org.safehaus.subutai.core.env.impl.dao.EnvironmentDataService;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
+import org.safehaus.subutai.core.env.impl.entity.HostInterface;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentTunnelException;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
@@ -115,6 +120,58 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public String getDefaultDomainName()
     {
         return defaultDomain;
+    }
+
+
+    @Override
+    public void updateEnvironmentContainersMetadata( final UUID environmentId ) throws EnvironmentManagerException
+    {
+        try
+        {
+            Environment environment = findEnvironment( environmentId );
+            Set<ContainerHost> containerHosts = environment.getContainerHosts();
+            for ( final ContainerHost containerHost : containerHosts )
+            {
+                RequestBuilder getHostname = new RequestBuilder( "hostname" );
+
+                CommandResult result = containerHost.execute( getHostname );
+                EnvironmentContainerImpl environmentContainer =
+                        environmentContainerDataService.find( containerHost.getId().toString() );
+                environmentContainer.setHostname( result.getStdOut() );
+
+                Set<HostInterface> updatedInterfaces = Sets.newHashSet();
+                for ( final Interface anInterface : containerHost.getNetInterfaces() )
+                {
+                    /**
+                     * This command gets interface mac/ip address separated by new line. Order comes respectively.
+                     */
+                    RequestBuilder getInterfaceAddress = new RequestBuilder(
+                            String.format( "ip addr show %s | awk '/(inet |link\\/ether)/ { print $2 }' | cut -d/ -f1",
+                                    anInterface.getInterfaceName() ) );
+                    CommandResult interfaceInfo = containerHost.execute( getInterfaceAddress );
+                    String netInfo[] = interfaceInfo.getStdOut().split( "\n" );
+
+                    HostInterface hostInterface = ( HostInterface ) anInterface;
+                    hostInterface.setMac( netInfo[0] );
+                    hostInterface.setIp( netInfo[1] );
+
+                    updatedInterfaces.add( hostInterface );
+                }
+                environmentContainer.getNetInterfaces().clear();
+                environmentContainer.getNetInterfaces().addAll( updatedInterfaces );
+
+                environmentContainerDataService.update( environmentContainer );
+            }
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            throw new EnvironmentManagerException(
+                    String.format( "Couldn't find environment by id: %s", environmentId.toString() ), e );
+        }
+        catch ( CommandException e )
+        {
+            throw new EnvironmentManagerException( "Error executing command on ContainerHost", e );
+        }
     }
 
 

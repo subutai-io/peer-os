@@ -313,6 +313,12 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     }
 
 
+    public void setHostname( final String hostname )
+    {
+        this.hostname = hostname;
+    }
+
+
     @Override
     public CommandResult execute( final RequestBuilder requestBuilder ) throws CommandException
     {
