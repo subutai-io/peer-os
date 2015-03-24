@@ -176,6 +176,7 @@ function export {
   cp /var/lib/lxc/$container/config $debian_root
   cp /var/lib/lxc/$container/fstab  $debian_root
   cp /var/lib/lxc/$container/packages  $debian_root
+  #copying .git folder from rootfs to debian root
   cp -a /var/lib/lxc/$container/rootfs/.git $debian_root/
 
   pkg=`deb_pkg $container $version`
