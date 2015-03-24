@@ -487,15 +487,16 @@ comparePrevAndNextVersions(){
 #parameters $1: package name with absolute path $2: jenkins ssh ip address with username  
 removePackagePeerSync() {
   echo "Remove Operation is starting.."
-  removePackageName=$1
-  echo "RemovePackageName= "$removePackageName
+  pathToRepo=$1
+  packageName=$2
+  echo "RemovePackageName= $pathToRepo $packageName"
 
-  if [ ! -z "$removePackageName" ]; then
+  if [ ! -z "$packageName" ]; then
     #removing missing or changed packages in the list
-    echo "Removing $removePackageName from $2"
-    ssh $2 "rm $removePackageName"
-    purePackageName=$(echo $removePackageName | awk -F"/" '{print $6}' | awk -F"_" '{print $1}')
-    ssh $2 "cd /repo/ksks && reprepro remove trusty $purePackageName"
+    echo "Removing $pathToRepo$packageName from $3"
+    ssh $3 "rm $pathToRepo$packageName"
+    purePackageName=$(echo $pathToRepo$packageName | awk -F"/" '{print $6}' | awk -F"_" '{print $1}')
+    ssh $3 "cd /repo/ksks && reprepro remove trusty $purePackageName"
   fi
 }
 
@@ -532,7 +533,7 @@ setRepoOnJenkinsPeer() {
 	
     #remove the latest debian package from jenkins peer
     fullPathOfPckg=$path_to_repo$latestPack
-    removePackagePeerSync $fullPathOfPckg $mgmt_ip_address
+    removePackagePeerSync $path_to_repo "$latestPack" $mgmt_ip_address
     #copy the latest debian packagefrom jenkins to jenkins peer
     scp $pack_path_jenkins/$deb_name $mgmt_ip_address:$path_to_repo
     echo "copying package from $pack_path_jenkins/$deb_name to $mgmt_ip_address:$path_to_repo"
