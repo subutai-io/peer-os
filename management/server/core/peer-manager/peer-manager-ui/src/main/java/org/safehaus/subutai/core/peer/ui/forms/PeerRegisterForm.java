@@ -338,6 +338,8 @@ public class PeerRegisterForm extends CustomComponent
             }
         }
 
+        //TODO this check is redundant because there is no info to gather about ContainerHost owner
+        // but need to implement container owner identification
         for ( final Iterator<ResourceHost> itResource =
                       module.getPeerManager().getLocalPeer().getResourceHosts().iterator();
               itResource.hasNext() && relationExists == 0; )
