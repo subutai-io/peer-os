@@ -320,7 +320,12 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public boolean unregister( final String uuid ) throws PeerException
     {
-        ManagementHostEntity managementHost = ( ManagementHostEntity ) getLocalPeer().getManagementHost();
+        ManagementHost mgmHost = getLocalPeer().getManagementHost();
+        if ( !( mgmHost instanceof ManagementHostEntity ) )
+        {
+            return false;
+        }
+        ManagementHostEntity managementHost = ( ManagementHostEntity ) mgmHost;
         UUID remotePeerId = UUID.fromString( uuid );
         PeerInfo p = getPeerInfo( remotePeerId );
         managementHost.removeAptSource( p.getId().toString(), p.getIp() );
