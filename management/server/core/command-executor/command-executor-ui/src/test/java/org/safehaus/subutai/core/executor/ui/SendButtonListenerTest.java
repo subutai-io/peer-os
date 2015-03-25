@@ -108,16 +108,15 @@ public class SendButtonListenerTest
         when( terminalForm.getRunAsTxtFld() ).thenReturn( textField );
         when( terminalForm.getIndicator() ).thenReturn( label );
         when( terminalForm.getTaskCount() ).thenReturn( atomicInteger );
-        when( terminalForm.getDaemonChk() ).thenReturn( checkBox );
+        when( terminalForm.getDaemonChk() ).thenReturn(checkBox);
+        when( terminalForm.getHostTree() ).thenReturn( hostTree );
+        when( hostTree.getSelectedHosts() ).thenReturn( Sets.<HostInfo>newHashSet() );
     }
 
 
     @Test
     public void testButtonClick() throws Exception
     {
-        when( terminalForm.getHostTree() ).thenReturn( hostTree );
-        when( hostTree.getSelectedHosts() ).thenReturn( Sets.<HostInfo>newHashSet() );
-
         listener.buttonClick( null );
 
         verify( terminalForm ).addOutput( anyString() );
