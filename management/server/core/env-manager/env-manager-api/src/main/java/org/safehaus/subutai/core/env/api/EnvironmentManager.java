@@ -156,4 +156,12 @@ public interface EnvironmentManager
      * @return - default domain name
      */
     public String getDefaultDomainName();
+
+
+    /**
+     * Updates environment container hosts metadata (hostname, network interface)
+     *
+     * @param environmentId - target environment Id
+     */
+    public void updateEnvironmentContainersMetadata( UUID environmentId ) throws EnvironmentManagerException;
 }

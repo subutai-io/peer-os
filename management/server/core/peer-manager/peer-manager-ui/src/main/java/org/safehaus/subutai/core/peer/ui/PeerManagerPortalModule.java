@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.peer.ui;
 import java.io.File;
 
 import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -22,6 +23,7 @@ public class PeerManagerPortalModule implements PortalModule
     private TemplateRegistry registry;
     private HostRegistry hostRegistry;
     private CustomSslContextFactory sslContextFactory;
+    private EnvironmentManager environmentManager;
 
 
     public void setSslContextFactory( final CustomSslContextFactory sslContextFactory )
@@ -33,6 +35,18 @@ public class PeerManagerPortalModule implements PortalModule
     public CustomSslContextFactory getSslContextFactory()
     {
         return sslContextFactory;
+    }
+
+
+    public EnvironmentManager getEnvironmentManager()
+    {
+        return environmentManager;
+    }
+
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
+        this.environmentManager = environmentManager;
     }
 
 
