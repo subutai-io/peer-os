@@ -17,6 +17,7 @@ import org.safehaus.subutai.common.environment.EnvironmentModificationException;
 import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
+import org.safehaus.subutai.common.host.Interface;
 import org.safehaus.subutai.common.mdc.SubutaiExecutors;
 import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
@@ -37,6 +38,7 @@ import org.safehaus.subutai.core.env.impl.dao.EnvironmentContainerDataService;
 import org.safehaus.subutai.core.env.impl.dao.EnvironmentDataService;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
+import org.safehaus.subutai.core.env.impl.entity.HostInterface;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentTunnelException;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
@@ -49,10 +51,13 @@ import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -65,6 +70,7 @@ import com.google.common.collect.Sets;
  */
 public class EnvironmentManagerImpl implements EnvironmentManager
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger( EnvironmentManagerImpl.class );
     private static final String TRACKER_SOURCE = "Environment Manager";
 
     private final PeerManager peerManager;
@@ -115,6 +121,51 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public String getDefaultDomainName()
     {
         return defaultDomain;
+    }
+
+
+    @Override
+    public void updateEnvironmentContainersMetadata( final UUID environmentId ) throws EnvironmentManagerException
+    {
+        try
+        {
+            Environment environment = findEnvironment( environmentId );
+            Set<ContainerHost> containerHosts = environment.getContainerHosts();
+
+            for ( final ContainerHost containerHost : containerHosts )
+            {
+                try
+                {
+                    ContainerHost updatedContainerHost =
+                            peerManager.getLocalPeer().getContainerHostById( containerHost.getId() );
+                    EnvironmentContainerImpl environmentContainer =
+                            environmentContainerDataService.find( containerHost.getId().toString() );
+                    environmentContainer.setHostname( updatedContainerHost.getHostname() );
+                    Set<HostInterface> updatedInterfaces = Sets.newHashSet();
+
+                    for ( final Interface anInterface : updatedContainerHost.getNetInterfaces() )
+                    {
+                        HostInterface hostInterface = new HostInterface( anInterface );
+                        updatedInterfaces.add( hostInterface );
+                        hostInterface.setHost( environmentContainer );
+                    }
+
+                    environmentContainer.getNetInterfaces().clear();
+                    environmentContainer.getNetInterfaces().addAll( updatedInterfaces );
+
+                    environmentContainerDataService.update( environmentContainer );
+                }
+                catch ( HostNotFoundException e )
+                {
+                    LOGGER.info( "Specified container host is not local one", e );
+                }
+            }
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            throw new EnvironmentManagerException(
+                    String.format( "Couldn't find environment by id: %s", environmentId.toString() ), e );
+        }
     }
 
 

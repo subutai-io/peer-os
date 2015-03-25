@@ -2,12 +2,16 @@ package org.safehaus.subutai.core.peer.ui.forms;
 
 
 import java.security.KeyStore;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.environment.Environment;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.peer.PeerStatus;
@@ -17,7 +21,11 @@ import org.safehaus.subutai.common.settings.ChannelSettings;
 import org.safehaus.subutai.common.settings.SecuritySettings;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
+import org.safehaus.subutai.core.peer.api.ContainerGroup;
+import org.safehaus.subutai.core.peer.api.ContainerGroupNotFoundException;
+import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.ui.PeerManagerPortalModule;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -201,21 +209,22 @@ public class PeerRegisterForm extends CustomComponent
             /**
              * According to peer status perform sufficient action
              */
+            //TODO perform different actions on peer response
             PeerManageActionsComponent.PeerManagerActionsListener listener =
                     new PeerManageActionsComponent.PeerManagerActionsListener()
 
                     {
                         @Override
-                        public void OnPositiveButtonTrigger( final PeerInfo peer )
+                        public void OnPositiveButtonTrigger( final PeerInfo peer,
+                                                             PeerManageActionsComponent.PeerManageUpdateViewListener updateViewListener )
                         {
                             switch ( peer.getStatus() )
                             {
                                 case REQUESTED:
                                     PeerInfo selfPeer = module.getPeerManager().getLocalPeerInfo();
-                                    approvePeerRegistration( selfPeer, peer );
+                                    approvePeerRegistration( selfPeer, peer, updateViewListener );
                                     break;
                                 case REGISTERED:
-                                    //TODO In further devs plan to support several states
                                     break;
                                 case BLOCKED:
                                     break;
@@ -224,23 +233,24 @@ public class PeerRegisterForm extends CustomComponent
 
 
                         @Override
-                        public void OnNegativeButtonTrigger( final PeerInfo peer )
+                        public void OnNegativeButtonTrigger( final PeerInfo peer,
+                                                             PeerManageActionsComponent.PeerManageUpdateViewListener updateViewListener )
                         {
-                            //TODO perform different actions on peer rejected request
+
                             PeerInfo selfPeer = module.getPeerManager().getLocalPeerInfo();
                             switch ( peer.getStatus() )
                             {
                                 case REJECTED:
-                                    removeMeFromRemote( selfPeer, peer );
+                                    removeMeFromRemote( selfPeer, peer, updateViewListener );
                                     break;
                                 case BLOCKED:
                                 case BLOCKED_PEER:
                                 case REQUESTED:
                                 case REQUEST_SENT:
-                                    rejectPeerRegistration( selfPeer, peer );
+                                    rejectPeerRegistration( selfPeer, peer, updateViewListener );
                                     break;
                                 case APPROVED:
-                                    unregisterMeFromRemote( selfPeer, peer );
+                                    unregisterMeFromRemote( selfPeer, peer, updateViewListener );
                                     break;
                             }
                         }
@@ -314,7 +324,85 @@ public class PeerRegisterForm extends CustomComponent
     }
 
 
-    private void unregisterMeFromRemote( final PeerInfo peerToUnregister, final PeerInfo remotePeerInfo )
+    private void unregisterMeFromRemote( final PeerInfo peerToUnregister, final PeerInfo remotePeerInfo,
+                                         final PeerManageActionsComponent.PeerManageUpdateViewListener updateViewListener )
+    {
+        int relationExists = 0;
+        for ( final Iterator<Environment> itEnv = module.getEnvironmentManager().getEnvironments().iterator();
+              itEnv.hasNext() && relationExists == 0; )
+        {
+            Environment environment = itEnv.next();
+            for ( final Iterator<Peer> itPeer = environment.getPeers().iterator();
+                  itPeer.hasNext() && relationExists == 0; )
+            {
+                Peer peer = itPeer.next();
+                if ( peer.getPeerInfo().equals( remotePeerInfo ) )
+                {
+                    relationExists = 1;
+                }
+            }
+        }
+
+        for ( final Iterator<ResourceHost> itResource =
+                      module.getPeerManager().getLocalPeer().getResourceHosts().iterator();
+              itResource.hasNext() && relationExists == 0; )
+        {
+            ResourceHost resourceHost = itResource.next();
+            for ( final Iterator<ContainerHost> itContainer = resourceHost.getContainerHosts().iterator();
+                  itContainer.hasNext() && relationExists == 0; )
+            {
+                ContainerHost containerHost = itContainer.next();
+                try
+                {
+                    ContainerGroup containerGroup = module.getPeerManager().getLocalPeer()
+                                                          .findContainerGroupByContainerId( containerHost.getId() );
+
+                    if ( containerGroup.getInitiatorPeerId().equals( remotePeerInfo.getId() ) )
+                    {
+                        relationExists = 2;
+                    }
+                }
+                catch ( ContainerGroupNotFoundException e )
+                {
+                    LOG.info( "Couldn't get container group by container id", e );
+                }
+            }
+        }
+
+        if ( relationExists != 0 )
+        {
+            String msg = "";
+            switch ( relationExists )
+            {
+                case 1:
+                    msg = "Please destroy all cross peer environments, before you proceed!!!";
+                    break;
+                case 2:
+                    msg = "You cannot unregister Peer, because you are a carrier of Peer's resources!!!"
+                            + " Contact with Peer to migrate all his data.";
+                    break;
+            }
+            ConfirmationDialog alert = new ConfirmationDialog( msg, "Ok", "" );
+            alert.getOk().addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
+                    //                    unregisterPeer( peerToUnregister, remotePeerInfo );
+                }
+            } );
+
+            getUI().addWindow( alert.getAlert() );
+        }
+        else
+        {
+            unregisterPeer( peerToUnregister, remotePeerInfo, updateViewListener );
+        }
+    }
+
+
+    private void unregisterPeer( final PeerInfo peerToUnregister, final PeerInfo remotePeerInfo,
+                                 final PeerManageActionsComponent.PeerManageUpdateViewListener updateViewListener )
     {
         new Thread( new Runnable()
         {
@@ -356,7 +444,14 @@ public class PeerRegisterForm extends CustomComponent
 
                         module.getPeerManager().unregister( remotePeerInfo.getId().toString() );
 
-                        peersTable.removeItem( remotePeerInfo.getId() );
+                        getUI().access( new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                peersTable.removeItem( remotePeerInfo.getId() );
+                            }
+                        } );
                     }
                     else
                     {
@@ -375,12 +470,17 @@ public class PeerRegisterForm extends CustomComponent
                     Notification.show( "Error sending unregister request to remote peer.",
                             Notification.Type.WARNING_MESSAGE );
                 }
+                if ( updateViewListener != null )
+                {
+                    updateViewListener.updateViewCallback();
+                }
             }
         } ).start();
     }
 
 
-    private void removeMeFromRemote( final PeerInfo peerToUnregister, final PeerInfo remotePeerInfo )
+    private void removeMeFromRemote( final PeerInfo peerToUnregister, final PeerInfo remotePeerInfo,
+                                     final PeerManageActionsComponent.PeerManageUpdateViewListener updateViewListener )
     {
         new Thread( new Runnable()
         {
@@ -399,7 +499,15 @@ public class PeerRegisterForm extends CustomComponent
                     {
                         LOG.info( response.toString() );
                         Notification.show( String.format( "Request sent to %s!", remotePeerInfo.getName() ) );
-                        peersTable.removeItem( remotePeerInfo.getId() );
+                        getUI().access( new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                peersTable.removeItem( remotePeerInfo.getId() );
+                            }
+                        } );
+
                         module.getPeerManager().unregister( remotePeerInfo.getId().toString() );
                     }
                     else
@@ -413,12 +521,17 @@ public class PeerRegisterForm extends CustomComponent
                     LOG.error( "Error sending remove peer request", e );
                     Notification.show( "Error sending remove peer request", Notification.Type.WARNING_MESSAGE );
                 }
+                if ( updateViewListener != null )
+                {
+                    updateViewListener.updateViewCallback();
+                }
             }
         } ).start();
     }
 
 
-    private void approvePeerRegistration( final PeerInfo peerToUpdateOnRemote, final PeerInfo remotePeer )
+    private void approvePeerRegistration( final PeerInfo peerToUpdateOnRemote, final PeerInfo remotePeer,
+                                          final PeerManageActionsComponent.PeerManageUpdateViewListener updateViewListener )
     {
         new Thread( new Runnable()
         {
@@ -478,8 +591,17 @@ public class PeerRegisterForm extends CustomComponent
 
                         remotePeer.setStatus( PeerStatus.APPROVED );
 
-                        Property property = peersTable.getItem( remotePeer.getId() ).getItemProperty( "Status" );
-                        property.setValue( remotePeer.getStatus() );
+                        getUI().access( new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                Property property =
+                                        peersTable.getItem( remotePeer.getId() ).getItemProperty( "Status" );
+                                property.setValue( remotePeer.getStatus() );
+                            }
+                        } );
+
                         module.getPeerManager().update( remotePeer );
                     }
                     else
@@ -492,6 +614,10 @@ public class PeerRegisterForm extends CustomComponent
                 {
                     Notification.show( "Couldn't send approval request to peer", Notification.Type.ERROR_MESSAGE );
                 }
+                if ( updateViewListener != null )
+                {
+                    updateViewListener.updateViewCallback();
+                }
             }
         } ).start();
     }
@@ -499,11 +625,13 @@ public class PeerRegisterForm extends CustomComponent
 
     /**
      * Peer request rejection intented to be handled before they exchange with keys
-     *
-     * @param peerToUpdateOnRemote - local peer info to update/send to remote peer
+     *  @param peerToUpdateOnRemote - local peer info to update/send to remote peer
      * @param remotePeer - remote peer whose request was rejected
+     * @param updateViewListener - used to update peers table with relevant buttons captions
      */
-    private void rejectPeerRegistration( final PeerInfo peerToUpdateOnRemote, final PeerInfo remotePeer )
+    private void rejectPeerRegistration( final PeerInfo peerToUpdateOnRemote, final PeerInfo remotePeer,
+                                         final PeerManageActionsComponent.PeerManageUpdateViewListener
+                                                 updateViewListener )
     {
         new Thread( new Runnable()
         {
@@ -543,8 +671,16 @@ public class PeerRegisterForm extends CustomComponent
                         //            keyStoreManager.deleteEntry( keyStore, keyStoreData );
                         //***********************************************************************
                         remotePeer.setStatus( PeerStatus.REJECTED );
-                        Property property = peersTable.getItem( remotePeer.getId() ).getItemProperty( "Status" );
-                        property.setValue( remotePeer.getStatus() );
+                        getUI().access( new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                Property property =
+                                        peersTable.getItem( remotePeer.getId() ).getItemProperty( "Status" );
+                                property.setValue( remotePeer.getStatus() );
+                            }
+                        } );
                         module.getPeerManager().update( remotePeer );
                     }
                     else
@@ -556,6 +692,10 @@ public class PeerRegisterForm extends CustomComponent
                 {
                     LOG.error( "Rejecting peer registration failed", e );
                     Notification.show( "Peer reject request failed", Notification.Type.WARNING_MESSAGE );
+                }
+                if ( updateViewListener != null )
+                {
+                    updateViewListener.updateViewCallback();
                 }
             }
         } ).start();

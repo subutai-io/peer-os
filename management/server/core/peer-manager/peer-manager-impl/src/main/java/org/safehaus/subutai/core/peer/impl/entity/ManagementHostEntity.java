@@ -226,6 +226,33 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
+    public Set<Tunnel> listTunnels() throws PeerException
+    {
+        try
+        {
+            return getNetworkManager().listTunnels();
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( "Error retrieving peer tunnels", e );
+        }
+    }
+
+
+    @Override
+    public void removeTunnel( final int tunnelId ) throws PeerException
+    {
+        try
+        {
+            getNetworkManager().removeTunnel( tunnelId );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( "Error removing tunnel", e );
+        }
+    }
+
+
     protected NetworkManager getNetworkManager() throws PeerException
     {
         try

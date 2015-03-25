@@ -5,9 +5,9 @@ import java.io.File;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentEventListener;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -23,7 +23,7 @@ public class EnvironmentManagerPortalModule implements PortalModule, Environment
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerPortalModule.class.getName() );
     private final static String MODULE_IMAGE = "environment.jpg";
-    private final static String MODULE_NAME = "Environment2";
+    private final static String MODULE_NAME = "Environment";
     private final EnvironmentManager environmentManager;
     private final PeerManager peerManager;
     private final TemplateRegistry templateRegistry;
