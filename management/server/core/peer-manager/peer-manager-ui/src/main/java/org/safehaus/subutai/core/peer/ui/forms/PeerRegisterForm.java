@@ -354,19 +354,15 @@ public class PeerRegisterForm extends CustomComponent
                     ContainerGroup containerGroup = module.getPeerManager().getLocalPeer()
                                                           .findContainerGroupByContainerId( containerHost.getId() );
 
-                    if ( containerGroup.getOwnerId().equals( remotePeerInfo.getId() ) )
+                    if ( containerGroup.getInitiatorPeerId().equals( remotePeerInfo.getId() ) )
                     {
                         relationExists = 2;
                     }
                 }
                 catch ( ContainerGroupNotFoundException e )
                 {
-                    LOG.error( "Couldn't get container group by container id", e );
+                    LOG.info( "Couldn't get container group by container id", e );
                 }
-                //                if ( containerHost.getPeerId().equalsIgnoreCase( remotePeerInfo.getId().toString() ) )
-                //                {
-                //                    relationExists = 2;
-                //                }
             }
         }
 
