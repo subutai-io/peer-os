@@ -103,24 +103,6 @@ public class CreateContainerTask implements Callable<ContainerHost>
         return containerHost;
     }
 
-
-    //    @Override
-    //    public void prepareTemplates( List<Template> templates ) throws ResourceHostException
-    //    {
-    //
-    //        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( templates ), "Invalid template set" );
-    //
-    //        LOG.debug( String.format( "Preparing templates on %s...", hostname ) );
-    //
-    //        for ( Template p : templates )
-    //        {
-    //            prepareTemplate( p );
-    //        }
-    //        LOG.debug( "Template successfully prepared." );
-    //    }
-
-
-    //    @Override
     private void prepareTemplate( final Template template ) throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
@@ -139,9 +121,9 @@ public class CreateContainerTask implements Callable<ContainerHost>
         importTemplate( template );
         if ( !isTemplateExists( template ) )
         {
-            LOG.debug( String.format( "Could not prepare template %s on %s.", template.getTemplateName(), hostname ) );
+            LOG.debug( String.format( "Could not prepare template %s on %s.", template.getTemplateName(), resourceHost.getHostname() ) );
             throw new ResourceHostException(
-                    String.format( "Could not prepare template %s on %s", template.getTemplateName(), hostname ) );
+                    String.format( "Could not prepare template %s on %s", template.getTemplateName(), resourceHost.getHostname() ) );
         }
     }
 
@@ -159,11 +141,11 @@ public class CreateContainerTask implements Callable<ContainerHost>
                 String[] lines = commandresult.getStdOut().split( "\n" );
                 if ( lines.length == 3 && lines[2].startsWith( template.getTemplateName() ) )
                 {
-                    LOG.debug( String.format( "Template %s exists on %s.", template.getTemplateName(), hostname ) );
+                    LOG.debug( String.format( "Template %s exists on %s.", template.getTemplateName(), resourceHost.getHostname() ) );
                     return true;
                 }
             }
-            LOG.warn( String.format( "Template %s does not exists on %s.", template.getTemplateName(), hostname ) );
+            LOG.warn( String.format( "Template %s does not exists on %s.", template.getTemplateName(), resourceHost.getHostname() ) );
             return false;
         }
         catch ( CommandException ce )
@@ -201,20 +183,20 @@ public class CreateContainerTask implements Callable<ContainerHost>
         {
             try
             {
-                LOG.debug( String.format( "Adding remote repository %s to %s...", template.getPeerId(), hostname ) );
+                LOG.debug( String.format( "Adding remote repository %s to %s...", template.getPeerId(), resourceHost.getHostname() ) );
                 CommandResult commandResult = resourceHost.execute( new RequestBuilder( String.format(
                         "echo \"deb http://gw.intra.lan:9999/%1$s trusty main\" > /etc/apt/sources.list"
                                 + ".d/%1$s.list ", template.getPeerId().toString() ) ) );
                 if ( !commandResult.hasSucceeded() )
                 {
-                    LOG.warn( String.format( "Could not add repository %s to %s.", template.getPeerId(), hostname ),
+                    LOG.warn( String.format( "Could not add repository %s to %s.", template.getPeerId(), resourceHost.getHostname() ),
                             commandResult );
                 }
-                LOG.debug( String.format( "Updating repository index on %s...", hostname ) );
+                LOG.debug( String.format( "Updating repository index on %s...", resourceHost.getHostname() ) );
                 commandResult = resourceHost.execute( new RequestBuilder( "apt-get update" ).withTimeout( 300 ) );
                 if ( !commandResult.hasSucceeded() )
                 {
-                    LOG.warn( String.format( "Could not update repository %s on %s.", template.getPeerId(), hostname ),
+                    LOG.warn( String.format( "Could not update repository %s on %s.", template.getPeerId(), resourceHost.getHostname() ),
                             commandResult );
                 }
             }
