@@ -4,7 +4,7 @@
 
 DAEMON=/sbin/subutai-agent
 PIDFILE=/var/run/subutai-agent.pid
-FAULTLOG=/var/log/subutai-agent/fault.log
+FAULTLOG=/var/log/subutai-agent/agent-fault.log
 agentPid=""
 
 getProcessId() {
