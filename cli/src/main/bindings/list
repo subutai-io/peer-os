@@ -76,7 +76,9 @@ function list_templates {
   else
     local templates="$1"
   fi
+  local tempList=`fs_list_templates`
   local mode="$2"
+  local lxc_list=`lxc-ls`
 
   if [ "false" == "$subutai_quiet" -a -z "$mode" ]; then
     echo -e "TEMPLATE"
@@ -88,6 +90,32 @@ function list_templates {
     echo -e "TEMPLATE\tPARENTS"
     echo -e "--------\t-------"
   fi
+ 
+  temp="`echo $templates`"
+  templates=""
+  local foundTemplate="false"
+
+  #find a template in template list
+  for templ in $temp; do
+    foundTemplate="false"
+    for template in $tempList; do
+      if [ "$template" == "`echo $templ`" ]; then
+          templates="$templates $templ"
+          #template found then we should skip
+          foundTemplate="true"
+      fi
+    done
+    #we could not found the template in the list it might be in the container list
+    if [ "$foundTemplate" == "false" ]; then
+      for lxc in $lxc_list; do
+        if [ "$lxc" == "`echo $templ`" ]; then
+          msg_error "Provided operand $lxc is a container not a template"
+          exit 1
+        fi
+      done
+    fi
+  done
+  temp=""
 
   for template in $templates; do
     if [ "false" == "`fs_is_template $template`" ]; then
@@ -166,6 +194,21 @@ function list_containers {
   if [ "fancy"  == "$mode" ]; then
     local lxc_list_fancy=`lxc-ls -f`
   fi
+
+ 
+  temp="`echo $containers`"
+  containers=""
+
+  ##find a container in container list
+  for cont in $temp; do
+    for container in $lxc_list; do
+      if [ "$container" == "`echo $cont`" ]; then
+        containers="$containers $cont"
+      fi
+    done
+  done
+
+  temp=""   
 
   for container in $containers; do
     if [ "true" == "`fs_is_template $container`" ]; then
@@ -289,7 +332,7 @@ function list {
     fi
   elif [ "true" == "$containers" ]; then
     if [ "false" == "$parents" -a "false" == "$ancestors" -a "false"  == "$fancy" ]; then
-      list_containers "$operands" 
+      list_containers "$operands"
     elif [ "true" == "$fancy" ]; then
       list_containers "$operands" "fancy"
     elif [ "true" == "$parents" ]; then
