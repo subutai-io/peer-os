@@ -21,6 +21,8 @@ import org.safehaus.subutai.common.settings.ChannelSettings;
 import org.safehaus.subutai.common.settings.SecuritySettings;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
+import org.safehaus.subutai.core.peer.api.ContainerGroup;
+import org.safehaus.subutai.core.peer.api.ContainerGroupNotFoundException;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.ui.PeerManagerPortalModule;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
@@ -338,8 +340,6 @@ public class PeerRegisterForm extends CustomComponent
             }
         }
 
-        //TODO this check is redundant because there is no info to gather about ContainerHost owner
-        // but need to implement container owner identification
         for ( final Iterator<ResourceHost> itResource =
                       module.getPeerManager().getLocalPeer().getResourceHosts().iterator();
               itResource.hasNext() && relationExists == 0; )
@@ -349,10 +349,24 @@ public class PeerRegisterForm extends CustomComponent
                   itContainer.hasNext() && relationExists == 0; )
             {
                 ContainerHost containerHost = itContainer.next();
-                if ( containerHost.getPeerId().equalsIgnoreCase( remotePeerInfo.getId().toString() ) )
+                try
                 {
-                    relationExists = 2;
+                    ContainerGroup containerGroup = module.getPeerManager().getLocalPeer()
+                                                          .findContainerGroupByContainerId( containerHost.getId() );
+
+                    if ( containerGroup.getOwnerId().equals( remotePeerInfo.getId() ) )
+                    {
+                        relationExists = 2;
+                    }
                 }
+                catch ( ContainerGroupNotFoundException e )
+                {
+                    LOG.error( "Couldn't get container group by container id", e );
+                }
+                //                if ( containerHost.getPeerId().equalsIgnoreCase( remotePeerInfo.getId().toString() ) )
+                //                {
+                //                    relationExists = 2;
+                //                }
             }
         }
 
