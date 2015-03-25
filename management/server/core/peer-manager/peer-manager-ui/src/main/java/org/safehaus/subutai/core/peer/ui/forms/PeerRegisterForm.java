@@ -215,13 +215,14 @@ public class PeerRegisterForm extends CustomComponent
 
                     {
                         @Override
-                        public void OnPositiveButtonTrigger( final PeerInfo peer )
+                        public void OnPositiveButtonTrigger( final PeerInfo peer,
+                                                             PeerManageActionsComponent.PeerManageUpdateViewListener updateViewListener )
                         {
                             switch ( peer.getStatus() )
                             {
                                 case REQUESTED:
                                     PeerInfo selfPeer = module.getPeerManager().getLocalPeerInfo();
-                                    approvePeerRegistration( selfPeer, peer );
+                                    approvePeerRegistration( selfPeer, peer, updateViewListener );
                                     break;
                                 case REGISTERED:
                                     break;
@@ -232,23 +233,24 @@ public class PeerRegisterForm extends CustomComponent
 
 
                         @Override
-                        public void OnNegativeButtonTrigger( final PeerInfo peer )
+                        public void OnNegativeButtonTrigger( final PeerInfo peer,
+                                                             PeerManageActionsComponent.PeerManageUpdateViewListener updateViewListener )
                         {
 
                             PeerInfo selfPeer = module.getPeerManager().getLocalPeerInfo();
                             switch ( peer.getStatus() )
                             {
                                 case REJECTED:
-                                    removeMeFromRemote( selfPeer, peer );
+                                    removeMeFromRemote( selfPeer, peer, updateViewListener );
                                     break;
                                 case BLOCKED:
                                 case BLOCKED_PEER:
                                 case REQUESTED:
                                 case REQUEST_SENT:
-                                    rejectPeerRegistration( selfPeer, peer );
+                                    rejectPeerRegistration( selfPeer, peer, updateViewListener );
                                     break;
                                 case APPROVED:
-                                    unregisterMeFromRemote( selfPeer, peer );
+                                    unregisterMeFromRemote( selfPeer, peer, updateViewListener );
                                     break;
                             }
                         }
@@ -322,7 +324,8 @@ public class PeerRegisterForm extends CustomComponent
     }
 
 
-    private void unregisterMeFromRemote( final PeerInfo peerToUnregister, final PeerInfo remotePeerInfo )
+    private void unregisterMeFromRemote( final PeerInfo peerToUnregister, final PeerInfo remotePeerInfo,
+                                         final PeerManageActionsComponent.PeerManageUpdateViewListener updateViewListener )
     {
         int relationExists = 0;
         for ( final Iterator<Environment> itEnv = module.getEnvironmentManager().getEnvironments().iterator();
@@ -393,12 +396,13 @@ public class PeerRegisterForm extends CustomComponent
         }
         else
         {
-            unregisterPeer( peerToUnregister, remotePeerInfo );
+            unregisterPeer( peerToUnregister, remotePeerInfo, updateViewListener );
         }
     }
 
 
-    private void unregisterPeer( final PeerInfo peerToUnregister, final PeerInfo remotePeerInfo )
+    private void unregisterPeer( final PeerInfo peerToUnregister, final PeerInfo remotePeerInfo,
+                                 final PeerManageActionsComponent.PeerManageUpdateViewListener updateViewListener )
     {
         new Thread( new Runnable()
         {
@@ -466,12 +470,17 @@ public class PeerRegisterForm extends CustomComponent
                     Notification.show( "Error sending unregister request to remote peer.",
                             Notification.Type.WARNING_MESSAGE );
                 }
+                if ( updateViewListener != null )
+                {
+                    updateViewListener.updateViewCallback();
+                }
             }
         } ).start();
     }
 
 
-    private void removeMeFromRemote( final PeerInfo peerToUnregister, final PeerInfo remotePeerInfo )
+    private void removeMeFromRemote( final PeerInfo peerToUnregister, final PeerInfo remotePeerInfo,
+                                     final PeerManageActionsComponent.PeerManageUpdateViewListener updateViewListener )
     {
         new Thread( new Runnable()
         {
@@ -512,12 +521,17 @@ public class PeerRegisterForm extends CustomComponent
                     LOG.error( "Error sending remove peer request", e );
                     Notification.show( "Error sending remove peer request", Notification.Type.WARNING_MESSAGE );
                 }
+                if ( updateViewListener != null )
+                {
+                    updateViewListener.updateViewCallback();
+                }
             }
         } ).start();
     }
 
 
-    private void approvePeerRegistration( final PeerInfo peerToUpdateOnRemote, final PeerInfo remotePeer )
+    private void approvePeerRegistration( final PeerInfo peerToUpdateOnRemote, final PeerInfo remotePeer,
+                                          final PeerManageActionsComponent.PeerManageUpdateViewListener updateViewListener )
     {
         new Thread( new Runnable()
         {
@@ -600,6 +614,10 @@ public class PeerRegisterForm extends CustomComponent
                 {
                     Notification.show( "Couldn't send approval request to peer", Notification.Type.ERROR_MESSAGE );
                 }
+                if ( updateViewListener != null )
+                {
+                    updateViewListener.updateViewCallback();
+                }
             }
         } ).start();
     }
@@ -607,11 +625,13 @@ public class PeerRegisterForm extends CustomComponent
 
     /**
      * Peer request rejection intented to be handled before they exchange with keys
-     *
-     * @param peerToUpdateOnRemote - local peer info to update/send to remote peer
+     *  @param peerToUpdateOnRemote - local peer info to update/send to remote peer
      * @param remotePeer - remote peer whose request was rejected
+     * @param updateViewListener - used to update peers table with relevant buttons captions
      */
-    private void rejectPeerRegistration( final PeerInfo peerToUpdateOnRemote, final PeerInfo remotePeer )
+    private void rejectPeerRegistration( final PeerInfo peerToUpdateOnRemote, final PeerInfo remotePeer,
+                                         final PeerManageActionsComponent.PeerManageUpdateViewListener
+                                                 updateViewListener )
     {
         new Thread( new Runnable()
         {
@@ -672,6 +692,10 @@ public class PeerRegisterForm extends CustomComponent
                 {
                     LOG.error( "Rejecting peer registration failed", e );
                     Notification.show( "Peer reject request failed", Notification.Type.WARNING_MESSAGE );
+                }
+                if ( updateViewListener != null )
+                {
+                    updateViewListener.updateViewCallback();
                 }
             }
         } ).start();
