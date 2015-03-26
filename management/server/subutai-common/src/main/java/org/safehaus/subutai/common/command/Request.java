@@ -37,4 +37,6 @@ public interface Request
     public Integer isDaemon();
 
     public Set<String> getConfigPoints();
+
+    public Integer getPid();
 }

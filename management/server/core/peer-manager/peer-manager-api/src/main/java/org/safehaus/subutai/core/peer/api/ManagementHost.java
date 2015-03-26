@@ -36,4 +36,6 @@ public interface ManagementHost extends Host
     public void removeGateway( int vlan ) throws PeerException;
 
     public void cleanupEnvironmentNetworkSettings( final UUID environmentId ) throws PeerException;
+
+    public void removeTunnel( String peerIp ) throws PeerException;
 }

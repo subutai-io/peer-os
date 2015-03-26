@@ -20,9 +20,15 @@ public class PeerManageActionsComponent extends HorizontalLayout
 
     public interface PeerManagerActionsListener
     {
-        public void OnPositiveButtonTrigger( PeerInfo peer );
+        public void OnPositiveButtonTrigger( PeerInfo peer, PeerManageUpdateViewListener updateViewListener );
 
-        public void OnNegativeButtonTrigger( PeerInfo peer );
+        public void OnNegativeButtonTrigger( PeerInfo peer, PeerManageUpdateViewListener updateViewListener );
+    }
+
+
+    public interface PeerManageUpdateViewListener
+    {
+        public void updateViewCallback();
     }
 
 
@@ -43,8 +49,14 @@ public class PeerManageActionsComponent extends HorizontalLayout
             {
                 if ( listener != null )
                 {
-                    listener.OnPositiveButtonTrigger( peer );
-                    updateView();
+                    listener.OnPositiveButtonTrigger( peer, new PeerManageUpdateViewListener()
+                    {
+                        @Override
+                        public void updateViewCallback()
+                        {
+                            updateView();
+                        }
+                    } );
                 }
             }
         } );
@@ -56,8 +68,14 @@ public class PeerManageActionsComponent extends HorizontalLayout
             {
                 if ( listener != null )
                 {
-                    listener.OnNegativeButtonTrigger( peer );
-                    updateView();
+                    listener.OnNegativeButtonTrigger( peer, new PeerManageUpdateViewListener()
+                    {
+                        @Override
+                        public void updateViewCallback()
+                        {
+                            updateView();
+                        }
+                    } );
                 }
             }
         } );

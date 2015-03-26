@@ -4,5 +4,5 @@ Section: devel
 Installed-Size: 89000
 Maintainer: subutai
 Architecture: all
-Version: 1.0.14
+Version: 1.0.15
 Description: This is a hadoop package of subutai distribution.
