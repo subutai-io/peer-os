@@ -269,7 +269,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
         try
         {
-            return resourceHost.createContainer( template.getTemplateName(), containerName, 180 );
+            return resourceHost
+                    .createContainer( template.getTemplateName(), /*Arrays.asList( template ), */containerName, 180 );
         }
         catch ( ResourceHostException e )
         {
@@ -341,7 +342,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 try
                 {
                     serverMetricMap.add( resourceHost.getHostMetric() );
-                    resourceHost.prepareTemplates( request.getTemplates() );
+                    //                    resourceHost.prepareTemplates( request.getTemplates() );
                 }
                 catch ( ResourceHostException e )
                 {
@@ -400,8 +401,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
                 String ipAddress = allAddresses[request.getIpAddressOffset() + currentIpAddressOffset];
                 taskFutures.add( executorService.submit(
-                        new CreateContainerWrapperTask( resourceHostEntity, templateName, hostname,
-                                String.format( "%s/%s", ipAddress, networkPrefix ), vlan, gateway,
+                        new CreateContainerWrapperTask( resourceHostEntity, templateName, /*request.getTemplates(),*/
+                                hostname, String.format( "%s/%s", ipAddress, networkPrefix ), vlan, gateway,
                                 WAIT_CONTAINER_CONNECTION_SEC ) ) );
 
                 currentIpAddressOffset++;
@@ -540,6 +541,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
     private void tryToRegister( final Template template ) throws RegistryException
     {
+        LOG.debug( String.format( "Trying to register template %s...", template.getTemplateName() ) );
         if ( templateRegistry.getTemplate( template.getTemplateName() ) == null )
         {
             templateRegistry.registerTemplate( template );
@@ -586,6 +588,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         }
 
         throw new HostNotFoundException( String.format( "Container host not found by id %s", hostId ) );
+    }
+
+
+    @Override
+    public HostInfo getContainerHostInfoById( final UUID containerHostId ) throws PeerException
+    {
+        ContainerHost containerHost = getContainerHostById( containerHostId );
+
+        return new HostInfoModel( containerHost );
     }
 
 
@@ -1092,7 +1103,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
     {
-         //todo put updating host fields logic to updateHostInfo method
+        //todo put updating host fields logic to updateHostInfo method
         if ( resourceHostInfo.getHostname().equals( "management" ) )
         {
             if ( managementHost == null )

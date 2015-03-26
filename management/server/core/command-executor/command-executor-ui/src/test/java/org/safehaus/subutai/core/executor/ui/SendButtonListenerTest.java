@@ -109,15 +109,14 @@ public class SendButtonListenerTest
         when( terminalForm.getIndicator() ).thenReturn( label );
         when( terminalForm.getTaskCount() ).thenReturn( atomicInteger );
         when( terminalForm.getDaemonChk() ).thenReturn(checkBox);
+        when( terminalForm.getHostTree() ).thenReturn( hostTree );
+        when( hostTree.getSelectedHosts() ).thenReturn( Sets.<HostInfo>newHashSet() );
     }
 
 
     @Test
     public void testButtonClick() throws Exception
     {
-        when( terminalForm.getHostTree() ).thenReturn( hostTree );
-        when( hostTree.getSelectedHosts() ).thenReturn( Sets.<HostInfo>newHashSet() );
-
         listener.buttonClick( null );
 
         verify( terminalForm ).addOutput( anyString() );
@@ -181,6 +180,7 @@ public class SendButtonListenerTest
         when( textField.getValue() ).thenReturn( "1" );
         when( comboBox.getValue() ).thenReturn( RequestType.TERMINATE_REQUEST );
         when( checkBox.getValue() ).thenReturn( true );
+        when( terminalForm.getHostTree() ).thenReturn( hostTree );
 
         listener.executeCommand( resourceHosts );
         when( comboBox.getValue() ).thenReturn( RequestType.PS_REQUEST );

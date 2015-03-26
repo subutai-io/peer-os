@@ -508,7 +508,8 @@ public class RestServiceImpl implements RestService
                                                           .getAvailableDiskQuota(
                                                                   JsonUtil.<DiskPartition>from( diskPartition,
                                                                           new TypeToken<DiskPartition>()
-                                                                          {}.getType() ) ) ) ).build();
+                                                                          {
+                                                                          }.getType() ) ) ) ).build();
         }
         catch ( Exception e )
         {
@@ -654,7 +655,8 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.getContainerHostById( UUID.fromString( containerId ) )
                      .setCpuSet( JsonUtil.<Set<Integer>>fromJson( cpuSet, new TypeToken<Set<Integer>>()
-                     {}.getType() ) );
+                     {
+                     }.getType() ) );
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -673,7 +675,8 @@ public class RestServiceImpl implements RestService
             return Response.ok( JsonUtil.toJson( localPeer.getContainerHostById( UUID.fromString( containerId ) )
                                                           .getDiskQuota( JsonUtil.<DiskPartition>from( diskPartition,
                                                                   new TypeToken<DiskPartition>()
-                                                                  {}.getType() ) ) ) ).build();
+                                                                  {
+                                                                  }.getType() ) ) ) ).build();
         }
         catch ( Exception e )
         {
@@ -690,7 +693,8 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.getContainerHostById( UUID.fromString( containerId ) )
                      .setRamQuota( JsonUtil.<RamQuota>fromJson( ramQuota, new TypeToken<RamQuota>()
-                     {}.getType() ) );
+                     {
+                     }.getType() ) );
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -708,7 +712,8 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.getContainerHostById( UUID.fromString( containerId ) )
                      .setDiskQuota( JsonUtil.<DiskQuota>fromJson( diskQuota, new TypeToken<DiskQuota>()
-                     {}.getType() ) );
+                     {
+                     }.getType() ) );
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -726,6 +731,23 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.setDefaultGateway( localPeer.getContainerHostById( UUID.fromString( containerId ) ), gatewayIp );
             return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response getContainerHostInfoById( final String containerId )
+    {
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        try
+        {
+            UUID uuid = JsonUtil.fromJson( containerId, UUID.class );
+
+            return Response.ok( JsonUtil.toJson( localPeer.getContainerHostInfoById( uuid ) ) ).build();
         }
         catch ( Exception e )
         {

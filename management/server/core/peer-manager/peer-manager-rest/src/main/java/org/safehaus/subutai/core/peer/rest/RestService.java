@@ -244,6 +244,11 @@ public interface RestService
     Response setDefaultGateway( @FormParam( "containerId" ) String containerId,
                                 @FormParam( "gatewayIp" ) String gatewayIp );
 
+
+    @GET
+    @Path( "container/info" )
+    Response getContainerHostInfoById( @QueryParam( "containerId" ) String containerId );
+
     @POST
     @Path( "vni" )
     @Produces( { MediaType.TEXT_PLAIN } )
