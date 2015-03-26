@@ -16,6 +16,7 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
@@ -1267,12 +1268,16 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public String getContainerHostMetadataById( final UUID containerHostId ) throws PeerException
+    public HostInfo getContainerHostInfoById( final UUID containerHostId ) throws PeerException
     {
-        String path = String.format( "peer/container/%s/metadata", containerHostId.toString() );
+        String path = String.format( "peer/container/info" );
         try
         {
-            return get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, null );
+            Map<String, String> params = Maps.newHashMap();
+
+            params.put( "containerId", JsonUtil.to( containerHostId ) );
+            String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, null );
+            return JsonUtil.fromJson( response, HostInfoModel.class );
         }
         catch ( Exception e )
         {

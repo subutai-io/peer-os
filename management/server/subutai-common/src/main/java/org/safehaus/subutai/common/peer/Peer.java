@@ -11,6 +11,7 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
@@ -279,5 +280,5 @@ public interface Peer
      *
      * @return - containerHost
      */
-    public String getContainerHostMetadataById( UUID containerHostId ) throws PeerException;
+    public HostInfo getContainerHostInfoById( UUID containerHostId ) throws PeerException;
 }

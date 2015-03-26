@@ -740,14 +740,14 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getContainerHostMetaDataById( final String containerId )
+    public Response getContainerHostInfoById( final String containerId )
     {
         LocalPeer localPeer = peerManager.getLocalPeer();
         try
         {
-            UUID uuid = UUID.fromString( containerId );
+            UUID uuid = JsonUtil.fromJson( containerId, UUID.class );
 
-            return Response.ok( localPeer.getContainerHostMetadataById( uuid ) ).build();
+            return Response.ok( localPeer.getContainerHostInfoById( uuid ) ).build();
         }
         catch ( Exception e )
         {

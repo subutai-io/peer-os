@@ -24,7 +24,6 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.CommandUtil;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.datatypes.ContainerMetadata;
 import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.host.HostInfo;
@@ -58,7 +57,6 @@ import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.ExceptionUtil;
-import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
@@ -271,7 +269,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
         try
         {
-            return resourceHost.createContainer( template.getTemplateName(), containerName, 180 );
+            return resourceHost
+                    .createContainer( template.getTemplateName(), /*Arrays.asList( template ), */containerName, 180 );
         }
         catch ( ResourceHostException e )
         {
@@ -343,7 +342,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 try
                 {
                     serverMetricMap.add( resourceHost.getHostMetric() );
-                    resourceHost.prepareTemplates( request.getTemplates() );
+                    //                    resourceHost.prepareTemplates( request.getTemplates() );
                 }
                 catch ( ResourceHostException e )
                 {
@@ -402,8 +401,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
                 String ipAddress = allAddresses[request.getIpAddressOffset() + currentIpAddressOffset];
                 taskFutures.add( executorService.submit(
-                        new CreateContainerWrapperTask( resourceHostEntity, templateName, hostname,
-                                String.format( "%s/%s", ipAddress, networkPrefix ), vlan, gateway,
+                        new CreateContainerWrapperTask( resourceHostEntity, templateName, /*request.getTemplates(),*/
+                                hostname, String.format( "%s/%s", ipAddress, networkPrefix ), vlan, gateway,
                                 WAIT_CONTAINER_CONNECTION_SEC ) ) );
 
                 currentIpAddressOffset++;
@@ -542,6 +541,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
     private void tryToRegister( final Template template ) throws RegistryException
     {
+        LOG.debug( String.format( "Trying to register template %s...", template.getTemplateName() ) );
         if ( templateRegistry.getTemplate( template.getTemplateName() ) == null )
         {
             templateRegistry.registerTemplate( template );
@@ -592,14 +592,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
-    public String getContainerHostMetadataById( final UUID containerHostId ) throws PeerException
+    public HostInfo getContainerHostInfoById( final UUID containerHostId ) throws PeerException
     {
         ContainerHost containerHost = getContainerHostById( containerHostId );
 
-        ContainerMetadata containerMetadata =
-                new ContainerMetadata( containerHost.getHostname(), containerHost.getNetInterfaces() );
-
-        return JsonUtil.toJson( containerMetadata );
+        return new HostInfoModel( containerHost );
     }
 
 

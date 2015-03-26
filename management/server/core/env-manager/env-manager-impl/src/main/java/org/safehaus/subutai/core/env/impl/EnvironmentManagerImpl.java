@@ -10,7 +10,6 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.dao.DaoManager;
-import org.safehaus.subutai.common.datatypes.ContainerMetadata;
 import org.safehaus.subutai.common.environment.Blueprint;
 import org.safehaus.subutai.common.environment.ContainerHostNotFoundException;
 import org.safehaus.subutai.common.environment.Environment;
@@ -18,6 +17,7 @@ import org.safehaus.subutai.common.environment.EnvironmentModificationException;
 import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
+import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.host.Interface;
 import org.safehaus.subutai.common.mdc.SubutaiExecutors;
 import org.safehaus.subutai.common.network.Gateway;
@@ -27,7 +27,6 @@ import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentEventListener;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
@@ -137,20 +136,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 try
                 {
-                    ContainerMetadata updatedContainerHost = JsonUtil.fromJson(
-                            containerHost.getPeer().getContainerHostMetadataById( containerHost.getId() ),
-                            ContainerMetadata.class );
-                    if ( updatedContainerHost == null )
+                    HostInfo hostInfo = containerHost.getPeer().getContainerHostInfoById( containerHost.getId() );
+                    if ( hostInfo == null )
                     {
                         return;
                     }
 
                     EnvironmentContainerImpl environmentContainer =
                             environmentContainerDataService.find( containerHost.getId().toString() );
-                    environmentContainer.setHostname( updatedContainerHost.getHostname() );
+                    environmentContainer.setHostname( hostInfo.getHostname() );
                     Set<HostInterface> updatedInterfaces = Sets.newHashSet();
 
-                    for ( final Interface anInterface : updatedContainerHost.getNetInterfaces() )
+                    for ( final Interface anInterface : hostInfo.getInterfaces() )
                     {
                         HostInterface hostInterface = new HostInterface( anInterface );
                         updatedInterfaces.add( hostInterface );
