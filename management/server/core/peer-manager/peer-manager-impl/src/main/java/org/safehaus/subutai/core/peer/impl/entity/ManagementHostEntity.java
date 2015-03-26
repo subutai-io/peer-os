@@ -226,7 +226,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    public Set<Tunnel> listTunnels() throws PeerException
+    private Set<Tunnel> listTunnels() throws PeerException
     {
         try
         {
@@ -240,11 +240,20 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
-    public void removeTunnel( final int tunnelId ) throws PeerException
+    public void removeTunnel( final String peerIp ) throws PeerException
     {
         try
         {
-            getNetworkManager().removeTunnel( tunnelId );
+            Set<Tunnel> tunnels = listTunnels();
+            for ( final Tunnel tunnel : tunnels )
+            {
+                if ( tunnel.getTunnelIp().equalsIgnoreCase( peerIp ) )
+                {
+                    getNetworkManager().removeTunnel( tunnel.getTunnelId() );
+                    break;
+                }
+            }
+
         }
         catch ( NetworkManagerException e )
         {
