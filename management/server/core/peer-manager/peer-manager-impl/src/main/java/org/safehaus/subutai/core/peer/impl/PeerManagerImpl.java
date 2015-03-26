@@ -31,7 +31,6 @@ import org.safehaus.subutai.core.key.api.KeyManagerException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.metric.api.Monitor;
-import org.safehaus.subutai.core.network.api.Tunnel;
 import org.safehaus.subutai.core.peer.api.EnvironmentContext;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -330,15 +329,6 @@ public class PeerManagerImpl implements PeerManager
         PeerInfo p = getPeerInfo( remotePeerId );
         managementHost.removeAptSource( p.getId().toString(), p.getIp() );
 
-        Set<Tunnel> tunnels = managementHost.listTunnels();
-        for ( final Tunnel tunnel : tunnels )
-        {
-            if ( tunnel.getTunnelIp().equalsIgnoreCase( p.getIp() ) )
-            {
-                managementHost.removeTunnel( tunnel.getTunnelId() );
-                break;
-            }
-        }
         PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( remotePeerId );
         // Remove peer policy of the target remote peer from the local peer
         if ( peerPolicy != null )

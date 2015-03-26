@@ -11,6 +11,7 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
@@ -272,4 +273,12 @@ public interface Peer
      * @param environmentId - environment whose certificates need to be removed
      */
     public void removeEnvironmentCertificates( UUID environmentId ) throws PeerException;
+
+
+    /**
+     * Gets containerHost by Id specified
+     *
+     * @return - containerHost
+     */
+    public HostInfo getContainerHostInfoById( UUID containerHostId ) throws PeerException;
 }

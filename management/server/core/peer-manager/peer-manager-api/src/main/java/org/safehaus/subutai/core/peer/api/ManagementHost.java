@@ -37,5 +37,5 @@ public interface ManagementHost extends Host
 
     public void cleanupEnvironmentNetworkSettings( final UUID environmentId ) throws PeerException;
 
-    public void removeTunnel( int tunnelId ) throws PeerException;
+    public void removeTunnel( String peerIp ) throws PeerException;
 }

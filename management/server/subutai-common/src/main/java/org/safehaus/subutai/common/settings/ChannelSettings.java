@@ -2,9 +2,7 @@ package org.safehaus.subutai.common.settings;
 
 
 /**
- * Created by talas on 2/27/15.
- * Class contains general Channel (tunnel) settings
- *
+ * Created by talas on 2/27/15. Class contains general Channel (tunnel) settings
  */
 public class ChannelSettings
 {
@@ -33,6 +31,7 @@ public class ChannelSettings
             "/cxf/peer/container/quota/ram/info", "/cxf/peer/container/quota/cpu", "/cxf/peer/container/quota/cpu/info",
             "/cxf/peer/container/quota/cpuset", "/cxf/peer/container/quota/disk", "/cxf/peer/container/gateway",
             "/cxf/peer/vni", "/cxf/peer/cert/import", "/cxf/peer/cert/export", "/cxf/peer/cert/remove",
+            "/cxf/peer/container/info",
 
             "/cxf/environments", "/cxf/environments/domain", "/cxf/environments/container/environmentId",
             "/cxf/environments/container/state", "/cxf/environments/{environmentId}", "/cxf/environments/grow",
