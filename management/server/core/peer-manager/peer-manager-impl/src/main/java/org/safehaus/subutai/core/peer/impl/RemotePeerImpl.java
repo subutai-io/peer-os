@@ -1276,12 +1276,12 @@ public class RemotePeerImpl implements RemotePeer
             Map<String, String> params = Maps.newHashMap();
 
             params.put( "containerId", JsonUtil.to( containerHostId ) );
-            String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, null );
+            String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, null );
             return JsonUtil.fromJson( response, HostInfoModel.class );
         }
         catch ( Exception e )
         {
-            throw new PeerException( String.format( "Error obtaining gateways from peer %s", getName() ), e );
+            throw new PeerException( String.format( "Error getting hostInfo from peer %s", getName() ), e );
         }
     }
 

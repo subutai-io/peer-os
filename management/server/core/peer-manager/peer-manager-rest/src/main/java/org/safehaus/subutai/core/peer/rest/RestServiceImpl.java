@@ -747,7 +747,7 @@ public class RestServiceImpl implements RestService
         {
             UUID uuid = JsonUtil.fromJson( containerId, UUID.class );
 
-            return Response.ok( localPeer.getContainerHostInfoById( uuid ) ).build();
+            return Response.ok( JsonUtil.toJson( localPeer.getContainerHostInfoById( uuid ) ) ).build();
         }
         catch ( Exception e )
         {
