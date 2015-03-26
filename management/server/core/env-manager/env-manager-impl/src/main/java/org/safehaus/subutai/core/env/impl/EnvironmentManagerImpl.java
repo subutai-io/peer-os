@@ -10,6 +10,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.dao.DaoManager;
+import org.safehaus.subutai.common.datatypes.ContainerMetadata;
 import org.safehaus.subutai.common.environment.Blueprint;
 import org.safehaus.subutai.common.environment.ContainerHostNotFoundException;
 import org.safehaus.subutai.common.environment.Environment;
@@ -26,6 +27,7 @@ import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentEventListener;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
@@ -51,7 +53,6 @@ import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
-import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -136,8 +137,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 try
                 {
-                    ContainerHost updatedContainerHost =
-                            peerManager.getLocalPeer().getContainerHostById( containerHost.getId() );
+                    ContainerMetadata updatedContainerHost = JsonUtil.fromJson(
+                            containerHost.getPeer().getContainerHostMetadataById( containerHost.getId() ),
+                            ContainerMetadata.class );
+                    if ( updatedContainerHost == null )
+                    {
+                        return;
+                    }
+
                     EnvironmentContainerImpl environmentContainer =
                             environmentContainerDataService.find( containerHost.getId().toString() );
                     environmentContainer.setHostname( updatedContainerHost.getHostname() );
@@ -155,9 +162,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
                     environmentContainerDataService.update( environmentContainer );
                 }
-                catch ( HostNotFoundException e )
+                catch ( PeerException e )
                 {
-                    LOGGER.info( "Specified container host is not local one", e );
+                    LOGGER.info( "Couldn't get ContainerHost from specified Peer.", e );
                 }
             }
         }

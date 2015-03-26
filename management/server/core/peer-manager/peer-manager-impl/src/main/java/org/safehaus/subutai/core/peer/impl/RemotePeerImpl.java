@@ -383,7 +383,8 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, alias, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<ProcessResourceUsage>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -606,7 +607,8 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, alias, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<Set<Integer>>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -665,7 +667,8 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, alias, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<DiskQuota>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -807,7 +810,8 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, alias, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<DiskQuota>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -838,7 +842,8 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, alias, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<PeerQuotaInfo>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -869,7 +874,8 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, alias, params, headers );
 
             return JsonUtil.fromJson( response, new TypeToken<QuotaInfo>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -1261,6 +1267,21 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public String getContainerHostMetadataById( final UUID containerHostId ) throws PeerException
+    {
+        String path = String.format( "peer/container/%s/metadata", containerHostId.toString() );
+        try
+        {
+            return get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, null );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( String.format( "Error obtaining gateways from peer %s", getName() ), e );
+        }
+    }
+
+
+    @Override
     public Set<Gateway> getGateways() throws PeerException
     {
         String path = "peer/gateways";
@@ -1269,7 +1290,8 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, null );
 
             return JsonUtil.fromJson( response, new TypeToken<Set<Gateway>>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -1288,7 +1310,8 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, null );
 
             return JsonUtil.fromJson( response, new TypeToken<Set<Vni>>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {

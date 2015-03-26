@@ -272,4 +272,12 @@ public interface Peer
      * @param environmentId - environment whose certificates need to be removed
      */
     public void removeEnvironmentCertificates( UUID environmentId ) throws PeerException;
+
+
+    /**
+     * Gets containerHost by Id specified
+     *
+     * @return - containerHost
+     */
+    public String getContainerHostMetadataById( UUID containerHostId ) throws PeerException;
 }

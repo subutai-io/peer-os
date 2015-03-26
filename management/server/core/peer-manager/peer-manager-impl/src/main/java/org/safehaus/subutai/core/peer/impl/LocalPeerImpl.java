@@ -24,6 +24,7 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.CommandUtil;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.datatypes.ContainerMetadata;
 import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.host.HostInfo;
@@ -57,6 +58,7 @@ import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.ExceptionUtil;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
@@ -590,6 +592,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
+    public String getContainerHostMetadataById( final UUID containerHostId ) throws PeerException
+    {
+        ContainerHost containerHost = getContainerHostById( containerHostId );
+
+        ContainerMetadata containerMetadata =
+                new ContainerMetadata( containerHost.getHostname(), containerHost.getNetInterfaces() );
+
+        return JsonUtil.toJson( containerMetadata );
+    }
+
+
+    @Override
     public ResourceHost getResourceHostByName( String hostname ) throws HostNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid resource host hostname" );
@@ -1092,7 +1106,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
     {
-         //todo put updating host fields logic to updateHostInfo method
+        //todo put updating host fields logic to updateHostInfo method
         if ( resourceHostInfo.getHostname().equals( "management" ) )
         {
             if ( managementHost == null )
