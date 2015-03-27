@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.template.wizard.impl;
 
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -214,7 +215,8 @@ public class TemplateWizardManagerImpl implements TemplateWizardManager
         try
         {
             trackerOperation.addLog( "Creating container host" );
-            containerHost = resourceHost.createContainer( template.getTemplateName(), containerName, 90 );
+            containerHost = resourceHost
+                    .createContainer( template.getTemplateName(),/* Arrays.asList( template ),*/ containerName, 90 );
         }
         catch ( ResourceHostException e )
         {
@@ -223,32 +225,32 @@ public class TemplateWizardManagerImpl implements TemplateWizardManager
         }
         if ( containerHost == null )
         {
-            importTemplateTree( template );
+//            importTemplateTree( template );
             containerHost = createContainerHost( containerName );
         }
         return containerHost;
     }
-
-
-    private void importTemplateTree( Template template )
-    {
-        try
-        {
-            resourceHost.importTemplate( template );
-        }
-        catch ( ResourceHostException e )
-        {
-            Template parent = templateRegistry
-                    .getParentTemplate( template.getTemplateName(), template.getTemplateVersion(),
-                            template.getLxcArch() );
-            if ( parent == null )
-            {
-                throw new RuntimeException( "Couldn't construct template tree" );
-            }
-            importTemplateTree( parent );
-            importTemplateTree( template );
-        }
-    }
+//
+//
+//    private void importTemplateTree( Template template )
+//    {
+//        try
+//        {
+//            resourceHost.importTemplate( template );
+//        }
+//        catch ( ResourceHostException e )
+//        {
+//            Template parent = templateRegistry
+//                    .getParentTemplate( template.getTemplateName(), template.getTemplateVersion(),
+//                            template.getLxcArch() );
+//            if ( parent == null )
+//            {
+//                throw new RuntimeException( "Couldn't construct template tree" );
+//            }
+//            importTemplateTree( parent );
+//            importTemplateTree( template );
+//        }
+//    }
 
 
     private void installProducts( ContainerHost containerHost )
