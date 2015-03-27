@@ -150,9 +150,10 @@ public class RestServiceImpl implements RestService
     {
         PeerInfo p = JsonUtil.fromJson( peer, PeerInfo.class );
 
-        if ( peerManager.getPeerInfo( p.getId() ) == null )
+        if ( peerManager.getPeerInfo( p.getId() ) != null )
         {
-            return Response.status( Response.Status.CONFLICT ).entity( "Peer already registered" ).build();
+            return Response.status( Response.Status.CONFLICT )
+                           .entity( String.format( "%s already registered", p.getName() ) ).build();
         }
 
         p.setStatus( PeerStatus.REQUESTED );

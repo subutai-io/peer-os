@@ -313,9 +313,9 @@ public class PeerRegisterForm extends CustomComponent
                     }
                     else if ( response.getStatus() == Response.Status.CONFLICT.getStatusCode() )
                     {
-                        Notification.show( String.format( "You already registered on %s", peerToRegister.getName() ),
-                                Notification.Type.WARNING_MESSAGE );
-                        LOG.warn( "Peer already registered" );
+                        String reason = response.readEntity( String.class );
+                        Notification.show( reason, Notification.Type.WARNING_MESSAGE );
+                        LOG.warn( reason );
                     }
                     else
                     {
