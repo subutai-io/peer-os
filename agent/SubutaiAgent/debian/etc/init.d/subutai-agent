@@ -1,103 +1,53 @@
 #!/bin/bash
-#
-# Licensed to the Apache Software Foundation (ASF) under one or more
-# contributor license agreements. The ASF licenses this file to You
-# under the Apache License, Version 2.0 (the "License"); you may not
-# use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License. For additional information regarding
-# copyright in this work, please see the NOTICE file in the top level
-# directory of this distribution.
-#
-
 # Service script of subutai-agent component
 # /etc/init.d/subutai-agent
 
 DAEMON=/sbin/subutai-agent
-NAME=subutai-agent
-PIDFILE=/var/run/$NAME.pid
-FAULTLOG=/var/log/$NAME/agent-fault.log
-DESC="Subutai Agent"
-CMD_PATT="subutai-agent"
-LOGFILE=/var/log/chop-webapp.log
-. /lib/lsb/init-functions
-PID_NOT_FOUND_MESSAGE="could not access process of $DESC"
+PIDFILE=/var/run/subutai-agent.pid
+FAULTLOG=/var/log/subutai-agent/agent-fault.log
+agentPid=""
 
-if [ `id -u` -ne 0 ]; then
-  echo "You need root privileges to run this script"
-  exit 1
-fi
-
-is_running()
-{
-  if [ -f $PIDFILE ]; then
-    pid=`cat $PIDFILE`
-    grep -Eq "$CMD_PATT" "/proc/$pid/cmdline" 2>/dev/null && return 0
-    return 1
-  fi
-  return 3
+getProcessId() {
+  agentPid=$(ps aux | grep /sbin/subutai-agent | grep -v grep | awk -F" " '{print $2}')
 }
 
-case "$1" in
-start)
-  is_running
-  stat=$?
-  case "$stat" in
-    0) echo $DESC "is already running..." ;;
-    1) echo "$PID_NOT_FOUND_MESSAGE" ;;
-    *)
-      echo "Starting "$DESC" ... "
-      [ -e `dirname "$PIDFILE"` ] || \
-        install -d -m755 `dirname $PIDFILE`
+case "$1" in 
+  start)
+    getProcessId
+    if [ -f $PIDFILE ] && [ ! -z "$agentPid"]; then
+      echo "Subutai Agent is already running"
+    else
+      echo "Subutai Agent is starting now.."
       start-stop-daemon --start --make-pidfile --pidfile $PIDFILE \
-      --exec $DAEMON >> $FAULTLOG 2>&1 &
-      ;;
-  esac
-;;
-
-stop)
-  is_running
-  stat=$?
-  case "$stat" in
-    0)
-      echo "Stopping" $DESC
-      echo "PID: " $PIDFILE
+      --exec $DAEMON >> $FAULTLOG 2>&1 &  
+      sleep 1
+      getProcessId
+      echo "Subutai Agent is started.. ($agentPid)"
+    fi	
+  ;;
+  stop)
+    if [ -f $PIDFILE ];	then   	 
       start-stop-daemon --stop --pidfile $PIDFILE
-      rm -f "$PIDFILE";;
-    1) echo "No running process found for $DESC"
-       $0 kill ;;
-    *) echo $DESC" is not running..." ;;
-  esac
+      echo "Subutai Agent is stopping now.."
+      rm $PIDFILE
+    else
+      echo "WARNING: Subutai Agent is not running now.."
+    fi
+  ;;
+  restart)
+    $0 stop
+    $0 start
+  ;;
+  status)    
+    getProcessId
+    if [ -f $PIDFILE ]; then
+      if [ -z "$agentPid" ]; then
+        echo "Subutai Agent is not running now.."
+      else
+        echo "Subutai Agent is running now.. ($agentPid)"
+      fi
+    else
+      echo "Subutai Agent is not running now.."
+    fi
 ;;
-
-restart)
-  $0 stop
-  $0 start
-;;
-
-status)
-  is_running
-  stat=$?
-  case "$stat" in
-    0) log_success_msg "$DESC is running" ;;
-    1) log_failure_msg "$PID_NOT_FOUND_MESSAGE" ;;
-    *) log_success_msg "$DESC is not running" ;;
-  esac
-  exit "$stat"
-;;
-kill)
-  start-stop-daemon -K -p "$PIDFILE" -R TERM/30/KILL/5 >/dev/null
-  rm -f "$PIDFILE"
-  echo "Removed pid file of $DESC"
-;;
-*)
-  echo "Usage: $0 {start|stop|restart|status|kill}"
-  exit 1
 esac
