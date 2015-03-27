@@ -1,104 +1,67 @@
 #!/bin/bash
+#management server service script
 #
-# Licensed to the Apache Software Foundation (ASF) under one or more
-# contributor license agreements. The ASF licenses this file to You
-# under the Apache License, Version 2.0 (the "License"); you may not
-# use this file except in compliance with the License.
-# You may obtain a copy of the License at
+#Subutai Management Host main Script
 #
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License. For additional information regarding
-# copyright in this work, please see the NOTICE file in the top level
-# directory of this distribution.
-#
-
-# Subutai Management server service script
-
-. /lib/lsb/init-functions
-
 SUBUTAI_HOME="/opt/subutai-management"
-SUBUTAI_BIN="$SUBUTAI_HOME/bin"
-DESC="Subutai Management"
-NAME=subutai-management
-PIDFILE="/var/run/$NAME/$NAME.pid"
-CMD_PATT="karaf.+"
+SUBUTAI_BIN="/opt/subutai-management/bin"
+SUBUTAI_DATA="/opt/subutai-management/data"
+SUBUTAI_PID=$(pgrep -l -f karaf | grep java | awk '{print $1}')
 
 
-is_running()
-{
-  if [ -f $PIDFILE ]; then
-    pid=`cat $PIDFILE`
-    grep -Eq "$CMD_PATT" "/proc/$pid/cmdline" 2>/dev/null && return 0
-    return 1
-  fi
-  return 3
+getPid() {
+	SUBUTAI_PID=$(pgrep -l -f karaf | grep java | awk '{print $1}')
 }
+
+do_start() {
+        if [ -z "$SUBUTAI_PID" ];
+        then
+                sudo $SUBUTAI_BIN/start
+                echo "Subutai-Management is starting.."
+                sleep 3
+                getPid
+                echo "Subutai-Management is started..($SUBUTAI_PID)"
+        else
+                echo "Subutai-Management is already running..($SUBUTAI_PID)"
+        fi
+}
+
+do_stop() {
+        if [ -z "$SUBUTAI_PID" ];
+        then
+                echo "Subutai-Management is not running now.."
+        else
+                echo "Subutai-Management is stopping now..($SUBUTAI_PID)"
+                sudo pkill -f karaf
+        fi
+}
+
+get_status() {
+        if [ -z "$SUBUTAI_PID" ];
+        then
+                echo "Subutai-Management is not running now.."
+        else
+                echo "Subutai-Management is running now..($SUBUTAI_PID)"
+        fi
+}
+
 
 case "$1" in
 start)
-  is_running
-  stat=$?
-  case "$stat" in
-    0) echo $DESC "is already running..." ;;
-    1) echo "Could not access pidfile for $DESC" ;;
-    *)
-      echo "Starting "$DESC" ... "
-      [ -e `dirname "$PIDFILE"` ] || \
-        install -d -m755 `dirname $PIDFILE`
-
-      DAEMON=$SUBUTAI_BIN/karaf
-      ARGS=" start"
-      start-stop-daemon --start --make-pidfile --pidfile "$PIDFILE" --background \
-      --exec "${DAEMON}" -- ${ARGS}
-  esac
+        do_start
 ;;
-
 stop)
-  is_running
-  stat=$?
-  case "$stat" in
-    0)
-      echo "Stopping" $DESC
-      echo "PID: " $PIDFILE
-      start-stop-daemon -K -p "$PIDFILE" -R TERM/30/KILL/5 >/dev/null
-      rm -f "$PIDFILE";;
-    1) echo "Could not access pidfile for $DESC"
-       $0 kill
-      ;;
-    *) echo $DESC" is not running..." ;;
-  esac
+        do_stop
 ;;
-
 restart)
-  $0 stop
-  $0 start
+	echo "Subutai-Management is restarting now.."
+        sudo pkill -f karaf
+        sudo $SUBUTAI_BIN/start
+	sleep 3
+        getPid
+        echo "Subutai-Management is started..($SUBUTAI_PID)"
 ;;
-
 status)
-  is_running
-  stat=$?
-  case "$stat" in
-    0)
-      pid=`cat $PIDFILE`
-      log_success_msg "$DESC is running(pid:$pid)" ;;
-    1) log_failure_msg "could not access pidfile for $DESC" ;;
-    *) log_success_msg "$DESC is not running" ;;
-  esac
-  exit "$stat"
+        get_status
 ;;
-
-kill)
-  start-stop-daemon -K -p "$PIDFILE" -R TERM/30/KILL/5 >/dev/null
-  rm -f "$PIDFILE"
-  echo "$DESC is killed..."
-;;
-
-*)
-  echo "Usage: $0 {start|stop|restart|status}"
-  exit 1
 esac
