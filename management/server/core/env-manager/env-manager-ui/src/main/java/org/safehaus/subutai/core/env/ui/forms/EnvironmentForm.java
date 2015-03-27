@@ -162,6 +162,7 @@ public class EnvironmentForm
                             destroyBtn.setEnabled( false );
                             containersBtn.setEnabled( false );
                             sshKeyBtn.setEnabled( false );
+                            refreshContainersButton.setEnabled( false );
                             destroyEnvironment( environment );
                         }
                     } );
