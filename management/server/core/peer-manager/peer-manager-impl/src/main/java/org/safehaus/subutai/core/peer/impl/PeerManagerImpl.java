@@ -328,6 +328,7 @@ public class PeerManagerImpl implements PeerManager
         UUID remotePeerId = UUID.fromString( uuid );
         PeerInfo p = getPeerInfo( remotePeerId );
         managementHost.removeAptSource( p.getId().toString(), p.getIp() );
+        managementHost.removeTunnel( p.getIp() );
 
         PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( remotePeerId );
         // Remove peer policy of the target remote peer from the local peer
