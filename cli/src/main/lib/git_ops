@@ -63,6 +63,9 @@ function git_add_commit {
   fi
 
   lxc-wait -n $lxc -s RUNNING
+  #add changes
+  lxc-attach -n $lxc -- git add --all :/
+  #commit changes
   o=`lxc-attach -n $lxc \
     -- git -C / commit -a -m \
     "commit changes for $lxc template" 2>&1 > /dev/null`
