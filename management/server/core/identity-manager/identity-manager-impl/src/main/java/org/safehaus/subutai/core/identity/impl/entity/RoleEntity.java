@@ -13,9 +13,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -24,7 +21,6 @@ import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.PortalModuleScope;
 import org.safehaus.subutai.core.identity.api.RestEndpointScope;
 import org.safehaus.subutai.core.identity.api.Role;
-import org.safehaus.subutai.core.identity.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,12 +40,6 @@ public class RoleEntity implements Role
     @Column( name = "permissions" )
     @OneToMany( fetch = FetchType.EAGER, cascade = { CascadeType.ALL } )
     private Set<PermissionEntity> permissions = new HashSet<>();
-
-
-    @ManyToMany( targetEntity = UserEntity.class )
-    @JoinTable( name = "subutai_user_role", joinColumns = @JoinColumn( name = "role_name", referencedColumnName =
-            "name" ), inverseJoinColumns = @JoinColumn( name = "user_id", referencedColumnName = "user_id" ) )
-    Set<User> users = new HashSet<>();
 
 
     @OneToMany( fetch = FetchType.EAGER, cascade = {
@@ -80,12 +70,11 @@ public class RoleEntity implements Role
     }
 
 
-    public RoleEntity( final String name, final Set<PermissionEntity> permissions, final Set<User> users )
+    public RoleEntity( final String name, final Set<PermissionEntity> permissions )
     {
 
         this.name = name;
         this.permissions = permissions;
-        this.users = users;
     }
 
 
