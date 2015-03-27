@@ -1,49 +1,53 @@
 #!/bin/bash
-#
+# Service script of subutai-agent component
 # /etc/init.d/subutai-agent
-#END INIT INFO
 
-case "$1" in
-start)
-        ps aux | grep  [/]sbin/subutai-agent > /dev/null 2>&1
-        if [ $? == 0 ];
-        then
-                echo "Subutai Agent is already running"
-        else
-                start-stop-daemon --start --make-pidfile --pidfile /tmp/subutai-agent.pid --exec /sbin/subutai-agent --background
-                echo "Subutai Agent is running.."
-        fi
+DAEMON=/sbin/subutai-agent
+PIDFILE=/var/run/subutai-agent.pid
+FAULTLOG=/var/log/subutai-agent/agent-fault.log
+agentPid=""
 
+getProcessId() {
+  agentPid=$(ps aux | grep /sbin/subutai-agent | grep -v grep | awk -F" " '{print $2}')
+}
+
+case "$1" in 
+  start)
+    getProcessId
+    if [ -f $PIDFILE ] && [ ! -z "$agentPid"]; then
+      echo "Subutai Agent is already running"
+    else
+      echo "Subutai Agent is starting now.."
+      start-stop-daemon --start --make-pidfile --pidfile $PIDFILE \
+      --exec $DAEMON >> $FAULTLOG 2>&1 &  
+      sleep 1
+      getProcessId
+      echo "Subutai Agent is started.. ($agentPid)"
+    fi	
+  ;;
+  stop)
+    if [ -f $PIDFILE ];	then   	 
+      start-stop-daemon --stop --pidfile $PIDFILE
+      echo "Subutai Agent is stopping now.."
+      rm $PIDFILE
+    else
+      echo "WARNING: Subutai Agent is not running now.."
+    fi
+  ;;
+  restart)
+    $0 stop
+    $0 start
+  ;;
+  status)    
+    getProcessId
+    if [ -f $PIDFILE ]; then
+      if [ -z "$agentPid" ]; then
+        echo "Subutai Agent is not running now.."
+      else
+        echo "Subutai Agent is running now.. ($agentPid)"
+      fi
+    else
+      echo "Subutai Agent is not running now.."
+    fi
 ;;
-stop)
-        ps aux | grep  [/]sbin/subutai-agent > /dev/null 2>&1
-        if [ $? == 0 ];
-        then
-                if [ -f /tmp/subutai-agent.pid ];
-                then
-                     start-stop-daemon --stop --pidfile /tmp/subutai-agent.pid \
-                           || pkill -f /sbin/subutai-agent
-                     rm /tmp/subutai-agent.pid
-                     echo "Subutai Agent is stopping now.."
-                else
-                     pkill -f /sbin/subutai-agent
-                fi
-        else
-                echo "WARNING: Subutai Agent is not running now.."
-        fi
-        ;;
-restart)
-        $0 stop
-        $0 start
-        ;;
-status)
-        ps aux | grep  [/]sbin/subutai-agent > /dev/null 2>&1
-        if [ $? == 0 ];
-        then
-                echo "Subutai Agent is running now.."
-        else
-                echo "Subutai Agent is not running now.."
-        fi
-        ;;
-
 esac

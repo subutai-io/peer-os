@@ -1,4 +1,3 @@
-sudo cp /etc/subutai-agent/subutai-agent /etc/init.d
 sudo service subutai-agent start
 if grep -Fxq "/etc/init.d/subutai-agent start" /etc/rc.local
 then
