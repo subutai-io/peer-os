@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.safehaus.subutai.common.protocol.api.DataService;
+import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.impl.entity.RoleEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 
-public class RoleDataService implements DataService<String, RoleEntity>
+public class RoleDataService implements DataService<String, Role>
 {
     private static final Logger LOG = LoggerFactory.getLogger( RoleDataService.class );
     EntityManagerFactory emf;
@@ -60,14 +61,14 @@ public class RoleDataService implements DataService<String, RoleEntity>
 
 
     @Override
-    public List<RoleEntity> getAll()
+    public List<Role> getAll()
     {
-        List<RoleEntity> result = Lists.newArrayList();
+        List<Role> result = Lists.newArrayList();
         EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
-            result = em.createQuery( "select h from RoleEntity h", RoleEntity.class ).getResultList();
+            result = em.createQuery( "select h from RoleEntity h" ).getResultList();
             em.getTransaction().commit();
         }
         catch ( Exception e )
@@ -87,7 +88,7 @@ public class RoleDataService implements DataService<String, RoleEntity>
 
 
     @Override
-    public void persist( final RoleEntity item )
+    public void persist( final Role item )
     {
         EntityManager em = emf.createEntityManager();
         try
@@ -139,7 +140,7 @@ public class RoleDataService implements DataService<String, RoleEntity>
 
 
     @Override
-    public void update( final RoleEntity item )
+    public void update( final Role item )
     {
         EntityManager em = emf.createEntityManager();
         try
