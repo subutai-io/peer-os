@@ -470,9 +470,14 @@ ExecutionResult SubutaiContainer::RunDaemon(SubutaiCommand* command) {
 
 	// Parsing arguments
 	vector<string> pr = ExplodeCommandArguments(command);
-	int ret;
+	bool exceptional_command = false;
 	SubutaiHelper h;
-	if (hasSubCommand(command)) {
+	if (pr.size()>0)
+	{
+		if (!strcmp(pr.at(0).c_str(),"sed"))
+			exceptional_command =true;
+	}
+	if (hasSubCommand(command) || exceptional_command) {
 		char* args[3];
 		args[0] = "sh";
 		args[1] = "-c";
@@ -485,7 +490,7 @@ ExecutionResult SubutaiContainer::RunDaemon(SubutaiCommand* command) {
 		args[3] = NULL;
 		lxc_attach_command_t cmd = { args[0], args };
 		try {
-			ret = this->container->attach(this->container,
+			this->container->attach(this->container,
 					lxc_attach_run_command, &cmd, &opts, &pid);
 		} catch (std::exception e) {
 			containerLogger->writeLog(3,
@@ -509,7 +514,7 @@ ExecutionResult SubutaiContainer::RunDaemon(SubutaiCommand* command) {
 		lxc_attach_command_t cmd = { const_cast<char*>(programName.c_str()),
 				args };
 		try {
-			ret = this->container->attach(this->container,
+			this->container->attach(this->container,
 					lxc_attach_run_command, &cmd, &opts, &pid);
 		} catch (std::exception e) {
 			containerLogger->writeLog(1,
