@@ -216,7 +216,8 @@ public class PeerRegisterForm extends CustomComponent
                     {
                         @Override
                         public void OnPositiveButtonTrigger( final PeerInfo peer,
-                                                             PeerManageActionsComponent.PeerManageUpdateViewListener updateViewListener )
+                                                             PeerManageActionsComponent.PeerManageUpdateViewListener
+                                                                     updateViewListener )
                         {
                             switch ( peer.getStatus() )
                             {
@@ -234,7 +235,8 @@ public class PeerRegisterForm extends CustomComponent
 
                         @Override
                         public void OnNegativeButtonTrigger( final PeerInfo peer,
-                                                             PeerManageActionsComponent.PeerManageUpdateViewListener updateViewListener )
+                                                             PeerManageActionsComponent.PeerManageUpdateViewListener
+                                                                     updateViewListener )
                         {
 
                             PeerInfo selfPeer = module.getPeerManager().getLocalPeerInfo();
@@ -309,6 +311,12 @@ public class PeerRegisterForm extends CustomComponent
                             }
                         }
                     }
+                    else if ( response.getStatus() == Response.Status.CONFLICT.getStatusCode() )
+                    {
+                        Notification.show( String.format( "You already registered on %s", peerToRegister.getName() ),
+                                Notification.Type.WARNING_MESSAGE );
+                        LOG.warn( "Peer already registered" );
+                    }
                     else
                     {
                         LOG.warn( "Response for registering peer: " + response.toString() );
@@ -325,7 +333,8 @@ public class PeerRegisterForm extends CustomComponent
 
 
     private void unregisterMeFromRemote( final PeerInfo peerToUnregister, final PeerInfo remotePeerInfo,
-                                         final PeerManageActionsComponent.PeerManageUpdateViewListener updateViewListener )
+                                         final PeerManageActionsComponent.PeerManageUpdateViewListener
+                                                 updateViewListener )
     {
         int relationExists = 0;
         for ( final Iterator<Environment> itEnv = module.getEnvironmentManager().getEnvironments().iterator();
@@ -531,7 +540,8 @@ public class PeerRegisterForm extends CustomComponent
 
 
     private void approvePeerRegistration( final PeerInfo peerToUpdateOnRemote, final PeerInfo remotePeer,
-                                          final PeerManageActionsComponent.PeerManageUpdateViewListener updateViewListener )
+                                          final PeerManageActionsComponent.PeerManageUpdateViewListener
+                                                  updateViewListener )
     {
         new Thread( new Runnable()
         {
@@ -625,7 +635,8 @@ public class PeerRegisterForm extends CustomComponent
 
     /**
      * Peer request rejection intented to be handled before they exchange with keys
-     *  @param peerToUpdateOnRemote - local peer info to update/send to remote peer
+     *
+     * @param peerToUpdateOnRemote - local peer info to update/send to remote peer
      * @param remotePeer - remote peer whose request was rejected
      * @param updateViewListener - used to update peers table with relevant buttons captions
      */
