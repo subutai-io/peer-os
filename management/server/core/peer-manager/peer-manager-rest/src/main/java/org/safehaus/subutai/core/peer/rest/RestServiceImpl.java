@@ -149,6 +149,13 @@ public class RestServiceImpl implements RestService
     public Response processRegisterRequest( String peer )
     {
         PeerInfo p = JsonUtil.fromJson( peer, PeerInfo.class );
+
+        if ( peerManager.getPeerInfo( p.getId() ) != null )
+        {
+            return Response.status( Response.Status.CONFLICT )
+                           .entity( String.format( "%s already registered", p.getName() ) ).build();
+        }
+
         p.setStatus( PeerStatus.REQUESTED );
         p.setName( String.format( "Peer on %s", p.getIp() ) );
         try

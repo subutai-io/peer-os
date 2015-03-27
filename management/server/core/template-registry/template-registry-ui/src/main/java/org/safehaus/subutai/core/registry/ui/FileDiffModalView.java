@@ -57,6 +57,11 @@ public class FileDiffModalView extends Window
                 append = true;
                 continue;
             }
+            if ( str.startsWith( "diff --git" ) )
+            {
+                append = false;
+                continue;
+            }
             if ( append )
             {
                 //TODO correctly format output git diff string for showing precise changes
@@ -160,6 +165,10 @@ public class FileDiffModalView extends Window
                             lineFormat += "</div>";
                             result += lineFormat;
                         }
+                        if ( !( i == parsedString.length - 1 ) )
+                        {
+                            i--;
+                        }
                     }
                     else
                     {
@@ -190,7 +199,7 @@ public class FileDiffModalView extends Window
                     lineFormat += "</div>";
                     result += lineFormat;
                 }
-                else
+                else if ( !"\\ No newline at end of file".equals( str ) )
                 {
                     String lineFormat = "<div style=\"background-color: ";
                     lineFormat += "\">";
