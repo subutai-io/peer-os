@@ -144,10 +144,9 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
             case STATE_EXISTING_ENTITY_SELECTED:
                 newBean.setEnabled( false );
                 form.setVisible( true );
+                usersTable.setEnabled( false );
                 break;
             case STATE_SAVE_EXISTING_ENTITY:
-                newBean.setEnabled( false );
-                break;
             case STATE_SAVE_NEW_ENTITY:
                 newBean.setEnabled( true );
                 usersTable.setEnabled( true );
@@ -156,12 +155,12 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
             case STATE_REMOVE_ENTITY:
                 newBean.setEnabled( true );
                 form.setVisible( false );
+                usersTable.setEnabled( true );
                 break;
             case STATE_NEW_ENTITY:
                 form.setVisible( true );
                 newBean.setEnabled( false );
                 usersTable.setEnabled( false );
-                //                usersTable.select( null );
                 break;
             case STATE_CANCEL:
                 form.setVisible( false );
@@ -178,7 +177,8 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
         identityManager.updateUser( value.getBean() );
         if ( newValue )
         {
-            beans.addBean( value.getBean() );
+            beans.removeAllItems();
+            beans.addAll( identityManager.getAllUsers() );
             refreshControls( FormState.STATE_SAVE_NEW_ENTITY );
         }
         else

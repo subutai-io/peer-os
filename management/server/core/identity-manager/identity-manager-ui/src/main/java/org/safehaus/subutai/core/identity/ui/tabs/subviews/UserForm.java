@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.api.User;
+import org.safehaus.subutai.core.identity.ui.ErrorUtils;
 import org.safehaus.subutai.core.identity.ui.tabs.TabCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,6 @@ import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.validator.AbstractStringValidator;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Field;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
@@ -39,6 +39,7 @@ public class UserForm extends VerticalLayout
 
     private BeanFieldGroup<User> userFieldGroup = new BeanFieldGroup<>( User.class );
 
+    private FormLayout form;
 
     private boolean newValue;
 
@@ -58,7 +59,9 @@ public class UserForm extends VerticalLayout
     private TextField username = new TextField( "Username" )
     {
         {
+            setRequired( true );
             setInputPrompt( "Username" );
+            setRequiredError( "Please enter username." );
             setEnabled( false );
         }
     };
@@ -66,13 +69,17 @@ public class UserForm extends VerticalLayout
     private TextField fullName = new TextField( "Full name" )
     {
         {
+            setRequired( true );
             setInputPrompt( "Full name" );
+            setRequiredError( "Please enter full name." );
         }
     };
 
     private TextField email = new TextField( "Email" )
     {
         {
+            setRequired( true );
+            setRequiredError( "Please enter e-mail address." );
             setInputPrompt( "Email" );
             addValidator( new EmailValidator( "Incorrect email format!!!" ) );
         }
@@ -81,34 +88,37 @@ public class UserForm extends VerticalLayout
     private PasswordField password = new PasswordField( "Password" )
     {
         {
+            setRequired( true );
+            setRequiredError( "Please enter password." );
             setInputPrompt( "Password" );
-        }
-    };
-
-    private PasswordField confirmPassword = new PasswordField( "Confirm password" )
-    {
-        {
-            setInputPrompt( "Confirm password" );
-            addValidator( new AbstractStringValidator( "Passwords do not match!!!" )
+            addValidator( new AbstractStringValidator( "Passwords do not match." )
             {
                 @Override
                 protected boolean isValidValue( final String value )
                 {
-                    return password.getValue().equals( value );
+                    return value.equals( confirmPassword.getValue() );
                 }
             } );
         }
     };
+
+
+    private PasswordField confirmPassword = new PasswordField( "Confirm password" )
+    {
+        {
+            setRequired( true );
+            setRequiredError( "Please enter password confirm." );
+            setInputPrompt( "Confirm password" );
+        }
+    };
+
 
     private TwinColSelect rolesSelector = new TwinColSelect( "User roles" )
     {
         {
             setItemCaptionMode( ItemCaptionMode.PROPERTY );
             setItemCaptionPropertyId( "name" );
-            setImmediate( true );
             setSpacing( true );
-            setRequired( true );
-            setNullSelectionAllowed( false );
         }
     };
 
@@ -136,8 +146,8 @@ public class UserForm extends VerticalLayout
         HorizontalLayout buttons = new HorizontalLayout( saveButton, cancelButton, removeButton );
         buttons.setSpacing( true );
 
-        final FormLayout form = new FormLayout();
-        form.addComponents( username, email, fullName, password, confirmPassword, rolesSelector );
+        form = new FormLayout();
+        form.addComponents( username, fullName, email, password, confirmPassword, rolesSelector );
 
         addComponents( form, buttons );
 
@@ -158,6 +168,11 @@ public class UserForm extends VerticalLayout
             userFieldGroup.bind( password, "password" );
             confirmPassword.setValue( user.getBean().getPassword() );
 
+            if ( newValue )
+            {
+                password.setValue( "" );
+                confirmPassword.setValue( "" );
+            }
             // Pre-select user roles
             User userBean = user.getBean();
             Set<String> roleNames = new HashSet<>();
@@ -169,16 +184,12 @@ public class UserForm extends VerticalLayout
 
             if ( !newValue )
             {
-                userFieldGroup.setReadOnly( true );
-                Field<?> fullNameField = userFieldGroup.getField( "fullname" );
-                fullNameField.setReadOnly( false );
-
-                Field<?> passwordField = userFieldGroup.getField( "password" );
-                passwordField.setReadOnly( false );
+                username.setReadOnly( true );
+                removeButton.setVisible( true );
             }
             else
             {
-                userFieldGroup.setReadOnly( false );
+                username.setReadOnly( false );
                 removeButton.setVisible( false );
             }
         }
@@ -197,11 +208,18 @@ public class UserForm extends VerticalLayout
             {
                 userFieldGroup.commit();
 
+                Collection<String> selectedRoleNames = ( Collection<String> ) rolesSelector.getValue();
+                if ( selectedRoleNames.size() < 1 )
+                {
+                    Notification.show( "Please select at least one role." );
+                    return;
+                }
+
                 if ( callback != null )
                 {
                     User user = userFieldGroup.getItemDataSource().getBean();
                     user.removeAllRoles();
-                    Collection<String> selectedRoleNames = ( Collection<String> ) rolesSelector.getValue();
+
                     for ( final String roleName : selectedRoleNames )
                     {
                         BeanItem beanItem = ( BeanItem ) rolesSelector.getItem( roleName );
@@ -209,12 +227,12 @@ public class UserForm extends VerticalLayout
                     }
 
                     callback.saveOperation( userFieldGroup.getItemDataSource(), newValue );
+                    Notification.show( "Successfully saved." );
                 }
             }
             catch ( FieldGroup.CommitException e )
             {
-                LOGGER.error( "Error commit permission fieldGroup changes", e );
-                Notification.show( e.getMessage(), Notification.Type.WARNING_MESSAGE );
+                ErrorUtils.showComponentErrors( userFieldGroup.getFields() );
             }
         }
     };
