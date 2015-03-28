@@ -351,7 +351,7 @@ public class RestServiceImpl implements RestService
                 remotePeer.setStatus( PeerStatus.APPROVED );
 
                 peerManager.update( remotePeer );
-                return Response.ok().build();
+                return Response.ok( String.format( "%s registered.", remotePeer.getName() ) ).build();
             }
             else
             {
