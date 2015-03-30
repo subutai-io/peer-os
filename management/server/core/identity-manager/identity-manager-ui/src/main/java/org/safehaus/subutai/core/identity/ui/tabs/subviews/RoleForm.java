@@ -282,6 +282,7 @@ public class RoleForm extends VerticalLayout
                     }
 
                     callback.saveOperation( permissionFieldGroup.getItemDataSource(), newValue );
+                    Notification.show( "Successfully saved." );
                 }
             }
             catch ( FieldGroup.CommitException e )

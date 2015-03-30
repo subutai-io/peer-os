@@ -317,10 +317,8 @@ public interface IdentityManager
      * Erase existing {@code Role} from database
      *
      * @param role - {@code Role}
-     *
-     * @return - result for erase operation
      */
-    public boolean deleteRole( Role role );
+    public void deleteRole( Role role );
 
     public boolean isAuthenticated();
 

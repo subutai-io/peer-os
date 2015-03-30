@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.identity.ui.ErrorUtils;
@@ -33,6 +34,7 @@ import com.vaadin.ui.themes.Reindeer;
 public class UserForm extends VerticalLayout
 {
 
+    private final IdentityManager identityManager;
     private TabCallback<BeanItem<User>> callback;
 
     private static final Logger LOGGER = LoggerFactory.getLogger( UserForm.class );
@@ -121,15 +123,16 @@ public class UserForm extends VerticalLayout
             setSpacing( true );
         }
     };
+    private final BeanContainer<String, Role> permissionsContainer;
 
 
-    public UserForm( TabCallback<BeanItem<User>> callback, List<Role> roles )
+    public UserForm( TabCallback<BeanItem<User>> callback, IdentityManager identityManager )
     {
         init();
-
-        BeanContainer<String, Role> permissionsContainer = new BeanContainer<>( Role.class );
+        this.identityManager = identityManager;
+        permissionsContainer = new BeanContainer<>( Role.class );
         permissionsContainer.setBeanIdProperty( "name" );
-        permissionsContainer.addAll( roles );
+        //        permissionsContainer.addAll( roles );
         rolesSelector.setContainerDataSource( permissionsContainer );
         rolesSelector.setItemCaptionPropertyId( "name" );
 
@@ -160,6 +163,9 @@ public class UserForm extends VerticalLayout
         this.newValue = newValue;
         if ( user != null )
         {
+            List<Role> roles = identityManager.getAllRoles();
+            permissionsContainer.removeAllItems();
+            permissionsContainer.addAll( roles );
             userFieldGroup.setItemDataSource( user );
 
             userFieldGroup.bind( username, "username" );
