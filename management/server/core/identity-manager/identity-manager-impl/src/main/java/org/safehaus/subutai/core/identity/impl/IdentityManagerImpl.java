@@ -461,8 +461,8 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
                 return false;
             }
             portalModuleDataService.update( ( PortalModuleScopeEntity ) portalModuleScope );
-            List<RoleEntity> roles = roleDataService.getAll();
-            for ( RoleEntity roleEntity : roles )
+            List<Role> roles = roleDataService.getAll();
+            for ( Role roleEntity : roles )
             {
                 if ( roleEntity.getName().equalsIgnoreCase( Roles.ADMIN.getRoleName() ) )
                 {

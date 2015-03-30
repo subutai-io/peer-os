@@ -17,6 +17,7 @@ import org.safehaus.subutai.common.environment.EnvironmentModificationException;
 import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
+import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.host.Interface;
 import org.safehaus.subutai.common.mdc.SubutaiExecutors;
 import org.safehaus.subutai.common.network.Gateway;
@@ -51,7 +52,6 @@ import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
-import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -136,14 +136,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 try
                 {
-                    ContainerHost updatedContainerHost =
-                            peerManager.getLocalPeer().getContainerHostById( containerHost.getId() );
+                    HostInfo hostInfo = containerHost.getPeer().getContainerHostInfoById( containerHost.getId() );
+                    if ( hostInfo == null )
+                    {
+                        return;
+                    }
+
                     EnvironmentContainerImpl environmentContainer =
                             environmentContainerDataService.find( containerHost.getId().toString() );
-                    environmentContainer.setHostname( updatedContainerHost.getHostname() );
+                    environmentContainer.setHostname( hostInfo.getHostname() );
                     Set<HostInterface> updatedInterfaces = Sets.newHashSet();
 
-                    for ( final Interface anInterface : updatedContainerHost.getNetInterfaces() )
+                    for ( final Interface anInterface : hostInfo.getInterfaces() )
                     {
                         HostInterface hostInterface = new HostInterface( anInterface );
                         updatedInterfaces.add( hostInterface );
@@ -155,9 +159,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
                     environmentContainerDataService.update( environmentContainer );
                 }
-                catch ( HostNotFoundException e )
+                catch ( PeerException e )
                 {
-                    LOGGER.info( "Specified container host is not local one", e );
+                    LOGGER.info( "Couldn't get ContainerHost from specified Peer.", e );
                 }
             }
         }
