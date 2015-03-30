@@ -145,10 +145,9 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
             case STATE_EXISTING_ENTITY_SELECTED:
                 newBean.setEnabled( false );
                 form.setVisible( true );
+                rolesTable.setEnabled( false );
                 break;
             case STATE_SAVE_EXISTING_ENTITY:
-                newBean.setEnabled( false );
-                break;
             case STATE_SAVE_NEW_ENTITY:
                 newBean.setEnabled( true );
                 rolesTable.setEnabled( true );
@@ -157,6 +156,7 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
             case STATE_REMOVE_ENTITY:
                 newBean.setEnabled( true );
                 form.setVisible( false );
+                rolesTable.setEnabled( true );
                 break;
             case STATE_NEW_ENTITY:
                 form.setVisible( true );

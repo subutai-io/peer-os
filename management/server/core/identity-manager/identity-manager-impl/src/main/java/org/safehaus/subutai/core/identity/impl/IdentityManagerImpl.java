@@ -783,14 +783,14 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     @Override
     public Role getRole( final String name )
     {
-        return null;
+        return roleDataService.find( name );
     }
 
 
     @Override
-    public boolean deleteRole( final Role role )
+    public void deleteRole( final Role role )
     {
-        return false;
+        roleDataService.remove( role.getName() );
     }
 
 
