@@ -20,8 +20,7 @@ import org.apache.cxf.phase.Phase;
 
 
 /**
- * Created by nisakov on 2/23/15.
- * CXF interceptor that controls channel (tunnel)
+ * Created by nisakov on 2/23/15. CXF interceptor that controls channel (tunnel)
  */
 public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
 {
@@ -29,7 +28,7 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
     private ChannelManagerImpl channelManagerImpl = null;
 
 
-    public CXFInterceptor(ChannelManagerImpl channelManagerImpl)
+    public CXFInterceptor( ChannelManagerImpl channelManagerImpl )
     {
         super( Phase.RECEIVE );
         this.channelManagerImpl = channelManagerImpl;
@@ -45,15 +44,22 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
     {
         try
         {
-            URL url = new URL( ( String ) message.get( Message.REQUEST_URL ) );
+            Boolean isClient = ( Boolean ) message.get( Message.REQUESTOR_ROLE );
+
+            if ( isClient )
+            {
+                return;
+            }
+            String requestUrl = ( String ) message.get( Message.REQUEST_URL );
+            URL url = new URL( requestUrl );
             String basePath = url.getPath();
 
 
             int status = 0;
 
-            if(url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X1))
+            if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X1 ) )
             {
-                if(ChannelSettings.checkURLArray(basePath,ChannelSettings.URL_ACCESS_PX1) == 0)
+                if ( ChannelSettings.checkURLArray( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
                 {
                     status = 1;
                 }
@@ -68,9 +74,9 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
                     }
                 }*/
             }
-            else if(url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2))
+            else if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
             {
-                if(ChannelSettings.checkURLArray( basePath, ChannelSettings.URL_ACCESS_PX2) == 0)
+                if ( ChannelSettings.checkURLArray( basePath, ChannelSettings.URL_ACCESS_PX2 ) == 0 )
                 {
                     status = 1;
                 }
@@ -85,35 +91,36 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
                     }
                 }*/
             }
-            else if(url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X3))
+            else if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X3 ) )
             {
                 //----------------------------------------------------------------------
             }
-            else if(   url.getPort() == Integer.parseInt( ChannelSettings.SPECIAL_PORT_X1)
-                    || url.getPort() == Integer.parseInt( ChannelSettings.SPECIAL_SECURE_PORT_X1))
+            else if ( url.getPort() == Integer.parseInt( ChannelSettings.SPECIAL_PORT_X1 ) || url.getPort() == Integer
+                    .parseInt( ChannelSettings.SPECIAL_SECURE_PORT_X1 ) )
             {
-                String query      =  ( String ) message.get( Message.QUERY_STRING ) ;
-                String paramValue =  UrlUtil.getQueryParameterValue(  "sptoken", query );
+                String query = ( String ) message.get( Message.QUERY_STRING );
+                String paramValue = UrlUtil.getQueryParameterValue( "sptoken", query );
 
-                if(!"".equals(paramValue))
+                if ( !"".equals( paramValue ) )
                 {
-                    IUserChannelToken userChannelToken= channelManagerImpl.getChannelTokenManager().getUserChannelToken(paramValue);
+                    IUserChannelToken userChannelToken =
+                            channelManagerImpl.getChannelTokenManager().getUserChannelToken( paramValue );
 
-                    if(userChannelToken != null)
+                    if ( userChannelToken != null )
                     {
-                        if( IPUtil.isValidIPRange(userChannelToken.getIpRangeStart(),
-                                                  userChannelToken.getIpRangeStart(),
-                                                  url.getHost()))
+                        if ( IPUtil
+                                .isValidIPRange( userChannelToken.getIpRangeStart(), userChannelToken.getIpRangeStart(),
+                                        url.getHost() ) )
                         {
-                            User user = channelManagerImpl.getIdentityManager().getUser(userChannelToken.getUserId());
+                            User user = channelManagerImpl.getIdentityManager().getUser( userChannelToken.getUserId() );
 
-                            if(channelManagerImpl.getIdentityManager().checkRestPermissions( user,basePath ) != 1)
+                            if ( channelManagerImpl.getIdentityManager().checkRestPermissions( user, basePath ) != 1 )
                             {
                                 status = 1;
                             }
                             else
                             {
-                                channelManagerImpl.getIdentityManager().loginWithToken(user.getUsername() );
+                                channelManagerImpl.getIdentityManager().loginWithToken( user.getUsername() );
                             }
                         }
                         else
@@ -130,20 +137,19 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
                 {
                     status = 1;
                 }
-
             }
 
 
             //----------------------------------------------------------------------------------------------
             //--------------- Redirect ---------------------------------------------------------------------
-            if(status == 1)
+            if ( status == 1 )
             {
                 LOG.warn( "*********  Access to" + basePath + "  is blocked (403) **********************" );
 
                 message.put( Message.RESPONSE_CODE, 403 );
                 message.getInterceptorChain().abort();
             }
-            else if(status == 2)
+            else if ( status == 2 )
             {
                 LOG.warn( "*********  Access to" + basePath + "  is blocked (404) **********************" );
 
@@ -158,7 +164,7 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
         }
         catch ( MalformedURLException ignore )
         {
-            LOG.error( "MalformedURLException:" + ignore.toString() );
+            LOG.error( "MalformedURLException:" + ignore.toString(), ignore );
         }
     }
 
@@ -168,6 +174,4 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
     {
         super.handleFault( message );
     }
-
-
 }
