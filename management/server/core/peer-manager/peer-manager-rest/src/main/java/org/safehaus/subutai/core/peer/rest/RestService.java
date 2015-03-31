@@ -80,9 +80,13 @@ public interface RestService
     @POST
     @Path( "register" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    //    public Response processRegisterRequest( @FormParam( "peer" ) String peer,
-    //                                            @FormParam( "root_cert_px2" ) String root_cert_px2 );
     public Response processRegisterRequest( @FormParam( "peer" ) String peer );
+
+
+    @POST
+    @Path( "register/{peerIp}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response sendRegistrationRequest( @PathParam( "peerIp" ) String peerIp );
 
 
     @DELETE

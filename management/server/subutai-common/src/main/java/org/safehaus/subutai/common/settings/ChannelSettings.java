@@ -17,7 +17,7 @@ public class ChannelSettings
     public static String[] URL_ACCESS_PX1 = {
             // All  Services
             "/{*}",
-            "/cxf/peer/register",
+            "/cxf/peer/register", "/cxf/peer/register/{$}",
             "/cxf/peer/reject",
             "/cxf/peer/approve",
             "/cxf/peer/remove",
