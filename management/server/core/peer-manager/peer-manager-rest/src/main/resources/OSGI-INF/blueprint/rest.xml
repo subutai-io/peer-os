@@ -20,10 +20,14 @@
   <bean id="peerRestServiceImpl" class="org.safehaus.subutai.core.peer.rest.RestServiceImpl">
     <argument ref="peerManager" />
     <property name="sslContextFactory" ref="sslContextFactory" />
+    <property name="environmentManager" ref="environmentManager" />
   </bean>
 
   <reference id="peerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+
+  <reference id="environmentManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.env.api.EnvironmentManager" />
 
   <reference id="sslContextFactory" availability="mandatory"
              interface="org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory" />
