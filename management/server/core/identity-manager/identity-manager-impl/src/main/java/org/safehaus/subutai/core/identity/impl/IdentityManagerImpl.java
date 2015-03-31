@@ -172,10 +172,18 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
                 {
                     for(RestEndpointScope restEndpointScope : restEndpointScopeList )
                     {
-                        if(ChannelSettings.checkURL(restURL,restEndpointScope.getRestEndpoint()) == 1)
+                        if(restEndpointScope.getRestEndpoint().contains( "{*}" ))
                         {
                             status = 1;
                             break;
+                        }
+                        else
+                        {
+                            if ( ChannelSettings.checkURL( restURL, restEndpointScope.getRestEndpoint() ) == 1 )
+                            {
+                                status = 1;
+                                break;
+                            }
                         }
                     }
                 }
