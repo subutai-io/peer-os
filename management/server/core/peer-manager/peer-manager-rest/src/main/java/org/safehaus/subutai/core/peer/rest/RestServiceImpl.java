@@ -455,6 +455,7 @@ public class RestServiceImpl implements RestService
             if ( host instanceof ContainerHost )
             {
                 ContainerHost containerHost = ( ( ContainerHost ) host );
+                //todo remove this and use EnvironmentManager.destroyContainer
                 if ( containerHost.getEnvironmentId() != null )
                 {
                     environmentManager.destroyContainer( containerHost, false, false );
