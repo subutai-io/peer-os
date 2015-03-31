@@ -15,6 +15,8 @@ public class ChannelSettings
 
 
     public static String[] URL_ACCESS_PX1 = {
+            // All  Services
+            "/{*}",
             "/cxf/peer/register", "/cxf/peer/reject", "/cxf/peer/approve", "/cxf/peer/remove",
             "/cxf/peer/trust_request", "/cxf/peer/trust_response",
     };
@@ -80,7 +82,125 @@ public class ChannelSettings
             //"/cxf/tracker/operations/{source}/{uuid}",
             "/cxf/tracker/operations/{$}/{$}",
             //"/cxf/tracker/operations/{source}/{dateFrom}/{dateTo}/{limit}",
-            "/cxf/tracker/operations/{$}/{$}/{$}/{$}", "/cxf/tracker/operations/sources"
+            "/cxf/tracker/operations/{$}/{$}/{$}/{$}", "/cxf/tracker/operations/sources",
+
+
+            //"/cxf/{plugin_name}/cluster/destroy",
+            "/cxf/{$}/clusters",
+            //"/cxf/{$name_of_plugin}/clusters/{$`clusterName}",
+            "/cxf/{$}/clusters/{$}",
+            //"/cxf/{name_of_plugin}/install",
+            "/cxf/{$}/install",
+            //"/cxf/{name_of_plugin}/destroy",
+            "/cxf/{$}/destroy",
+            //"/cxf/{$name_of_plugin}/clusters/{$clusterName}/start",
+            "/cxf/{$}/clusters/{$}/start",
+            //"/cxf/{$name_of_plugin}/clusters/{$clusterName}/stop",
+            "/cxf/{$}/clusters/{$}/stop",
+            //"/cxf/{$name_of_plugin}/clusters/{clusterName}/destroy/node/{lxcHostname}/type/{nodeType}",
+            "/cxf/{$}/clusters/{$}/destroy/node/{$}/type/{$}",
+            //"/cxf/{$name_of_plugin}/clusters/{clusterName}/add/node/{lxcHostname}/type/{nodeType}",
+            "/cxf/{$}/clusters/{$}/add/node/{$}/type/{$}",
+
+            //"/cxf/{$name_of_plugin}/clusters/{clusterName}/check/node/{lxcHostname}",
+            "/cxf/{$}/clusters/{$}/check/node/{$}",
+
+            //"/cxf/{$name_of_plugin}/clusters/configure_environment/{environmentId}/clusterName/{clusterName}/nodes/{nodes}",
+            "/cxf/{$}/clusters/configure_environment/{$}/clusterName/{$}/nodes/{$}",
+
+            //"/cxf/{$name_of_plugin}/clusters/remove/{clusterName}",
+            "/cxf/{$}/clusters/remove/{$}",
+
+            //"/cxf/{$name_of_plugin}/clusters/{clusterName}/check",
+            "/cxf/{$}/clusters/{$}/check",
+
+            //"/cxf/{$name_of_plugin}/clusters/{clusterName}/start/node/{lxcHostname}",
+            "/cxf/{$}/clusters/{$}/start/node/{$}",
+
+            //"/cxf/{$name_of_plugin}/clusters/{clusterName}/stop/node/{lxcHostname}",
+            "/cxf/{$}/clusters/{$}/stop/node/{$}",
+
+            //"/cxf/{$name_of_plugin}/clusters/{clusterName}/add",
+            "/cxf/{$}/clusters/{$}/add",
+
+            //"/cxf/{$name_of_plugin}/clusters/{clusterName}/remove/node/{lxcHostname}",
+            "/cxf/{$}/clusters/{$}/remove/node/{$}",
+
+            //"/cxf/{$name_of_plugin}/configure_environment",
+            "/cxf/{$}/configure_environment",
+
+            //"/cxf/{$name_of_plugin}/clusters/{clusterName}/status",
+            "/cxf/{$}/clusters/{$}/status",
+
+            //"/cxf/{$name_of_plugin}/clusters/{clusterName}/status/secondary",
+            "/cxf/{$}/clusters/{$}/status/secondary",
+
+            //"/cxf/{$name_of_plugin}/clusters/job/{clusterName}/start",
+            "/cxf/{$}/clusters/job/{$}/start",
+
+            //"/cxf/{$name_of_plugin}/clusters/job/{clusterName}/stop",
+            "/cxf/{$}/clusters/job/{$}/stop",
+
+            //"/cxf/{$name_of_plugin}/clusters/job/{clusterName}/status",
+            "/cxf/{$}/clusters/job/{$}/status",
+
+            //"/cxf/{$name_of_plugin}/clusters/{clusterName}/nodes",
+            "/cxf/{$}/clusters/{$}/nodes",
+
+            //"/cxf/{$name_of_plugin}/clusters/{clusterName}/node/{hostname}/status",
+            "/cxf/{$}/clusters/{$}/node/{hostname}/status",
+
+            //"/cxf/{$name_of_plugin}/clusters/{clusterName}/task/{hostname}/status",
+            "/cxf/{$}/clusters/{$}/task/{hostname}/status",
+
+            //"/cxf/{$name_of_plugin}/clusters/destroy/{clusterName}",
+            "/cxf/{$}/clusters/destroy/{$}",
+
+            //"/cxf/{$name_of_plugin}/clusters/{clusterName}/add/node/{lxcHostName}",
+            "/cxf/{$}/clusters/{$}/add/node/{$}",
+
+            //"/cxf/{$}/clusters/{clusterName}/destroy/node/{lxcHostName}",
+            "/cxf/{$}/clusters/{$}/destroy/node/{$}",
+
+            //"/cxf/{$name_of_plugin}/clusters/{clusterName}/add/node/{lxcHostname}",
+            "/cxf/{$}/clusters/{$}/add/node/{$}",
+
+            //"/cxf/{$name_of_plugin}/clusters/remove/{clusterName}",
+            "/cxf/{$}/clusters/remove/{clusterName}",
+
+            //"/cxf/{$name_of_plugin}/clusters/{clusterName}/remove/node/{lxcHostName}",
+            "/cxf/{$}/clusters/{$}/remove/node/{$}",
+
+            //"/cxf/{$name_of_plugin}/clusters/destroy/{clusterName}",
+            "/cxf/{$}/clusters/destroy/{$}",
+
+            //"/cxf/{$name_of_plugin}/clusters/{clusterName}/actualize_master_ip",
+            "/cxf/{$}/clusters/{$}/actualize_master_ip",
+
+            //"/cxf/{$name_of_plugin}/clusters/{clusterName}/change_master/nodes/{lxcHostName}/{keepSlave}",
+            "/cxf/{$}/clusters/{$}/change_master/nodes/{$}/{$}",
+
+            //"/cxf/{$name_of_plugin}/clusters/clusters/{clusterName}/start/node/{lxcHostName}/master/{master}",
+            "/cxf/{$}/clusters/clusters/{$}/start/node/{$}/master/{$}",
+
+            //"/cxf/{$name_of_plugin}/clusters/{clusterName}/stop/node/{lxcHostName}/master/{master}",
+            "/cxf/{$}/clusters/{$}/stop/node/{$}/master/{$}",
+
+            //"/cxf/{$name_of_plugin}/clusters/{clusterName}/check/node/{lxcHostName}/master/{master}",
+            "/cxf/{$}/clusters/{$}/check/node/{$}/master/{$}",
+
+            //"/cxf/{$name_of_plugin}/importData",
+            "/cxf/{$}/importData",
+
+            //"/cxf/{$name_of_plugin}/exportData",
+            "/cxf/{$}/exportData",
+
+            //"/cxf/{$name_of_plugin}/clusters/{clusterName}/add/node",
+            "/cxf/{$}/clusters/{$}/add/node",
+
+            //"/cxf/{$name_of_plugin}/clusters/{clusterName}/add/node{lxcHostname}"
+            "/cxf/{$}/clusters/{$}/add/node/{$}"
+
     };
 
     public static String[] URL_ACCESS_PX3 = {
@@ -113,8 +233,9 @@ public class ChannelSettings
     public static short checkURL( String uri, String URL_ACCESS )
     {
         short status = 0;
+
         String subURI[] = uri.split( "/" );
-        int subURIsize  = subURI.length;
+        int subURIsize = subURI.length;
         String subURL_ACCESS[] = URL_ACCESS.split( "/" );
 
         if ( subURIsize == subURL_ACCESS.length )
