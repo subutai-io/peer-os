@@ -439,9 +439,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     String.format( "Environment status is %s", environment.getStatus() ) );
         }
 
+        ContainerHost environmentContainer;
         try
         {
-            environment.getContainerHostById( containerHost.getId() );
+            environmentContainer = environment.getContainerHostById( containerHost.getId() );
         }
         catch ( ContainerHostNotFoundException e )
         {
@@ -453,7 +454,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
 
         DestroyContainerTask destroyContainerTask =
-                new DestroyContainerTask( this, environment, containerHost, forceMetadataRemoval, resultHolder, op );
+                new DestroyContainerTask( this, environment, environmentContainer, forceMetadataRemoval, resultHolder,
+                        op );
 
         executor.submit( destroyContainerTask );
 
