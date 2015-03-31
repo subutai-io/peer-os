@@ -16,87 +16,163 @@ public class ChannelSettings
 
     public static String[] URL_ACCESS_PX1 = {
             // All  Services
-            "/{*}", "/cxf/peer/register", "/cxf/peer/reject", "/cxf/peer/approve", "/cxf/peer/approve/{$}",
+            "/{*}",
+            "/cxf/peer/register",
+            "/cxf/peer/reject",
+            "/cxf/peer/approve",
             "/cxf/peer/remove",
-            "/cxf/peer/trust_request", "/cxf/peer/trust_response",
+            "/cxf/peer/trust_request",
+            "/cxf/peer/trust_response",
+            "/cxf/peer/approve/{$}"
     };
 
     public static String[] URL_ACCESS_PX2 = {
-            "/cxf/peer/", "/cxf/peer/getlist", "/cxf/peer/me", "/cxf/peer/id", "/cxf/peer/update",
-            "/cxf/peer/registered_peers", "/cxf/peer/ping", "/cxf/peer/template/get", "/cxf/peer/unregister",
 
-            "/cxf/peer/container/quota", "/cxf/peer/container/quota/info", "/cxf/peer/container/destroy",
-            "/cxf/peer/container/start", "/cxf/peer/container/stop", "/cxf/peer/container/isconnected",
-            "/cxf/peer/container/state", "/cxf/peer/container/resource/usage",
-            "/cxf/peer/container/quota/ram/available", "/cxf/peer/container/quota/cpu/available",
-            "/cxf/peer/container/quota/disk/available", "/cxf/peer/container/quota/ram",
-            "/cxf/peer/container/quota/ram/info", "/cxf/peer/container/quota/cpu", "/cxf/peer/container/quota/cpu/info",
-            "/cxf/peer/container/quota/cpuset", "/cxf/peer/container/quota/disk", "/cxf/peer/container/gateway",
-            "/cxf/peer/vni", "/cxf/peer/cert/import", "/cxf/peer/cert/export", "/cxf/peer/cert/remove",
+            "/cxf/peer/",
+            "/cxf/peer/getlist",
+            "/cxf/peer/me",
+            "/cxf/peer/id",
+            "/cxf/peer/update",
+            "/cxf/peer/registered_peers",
+            "/cxf/peer/ping",
+            "/cxf/peer/template/get",
+            "/cxf/peer/unregister",
+            "/cxf/peer/container/quota",
+            "/cxf/peer/container/quota/info",
+            "/cxf/peer/container/destroy",
+            "/cxf/peer/container/start",
+            "/cxf/peer/container/stop",
+            "/cxf/peer/container/isconnected",
+            "/cxf/peer/container/state",
+            "/cxf/peer/container/resource/usage",
+            "/cxf/peer/container/quota/ram/available",
+            "/cxf/peer/container/quota/cpu/available",
+            "/cxf/peer/container/quota/disk/available",
+            "/cxf/peer/container/quota/ram",
+            "/cxf/peer/container/quota/ram/info",
+            "/cxf/peer/container/quota/cpu",
+            "/cxf/peer/container/quota/cpu/info",
+            "/cxf/peer/container/quota/cpuset",
+            "/cxf/peer/container/quota/disk",
+            "/cxf/peer/container/gateway",
+            "/cxf/peer/vni",
+            "/cxf/peer/cert/import",
+            "/cxf/peer/cert/export",
+            "/cxf/peer/cert/remove",
             "/cxf/peer/container/info",
 
-            "/cxf/environments", "/cxf/environments/domain", "/cxf/environments/container/environmentId",
-            "/cxf/environments/container/state", "/cxf/environments/{$}", "/cxf/environments/grow",
-            "/cxf/environments/key", "/cxf/environments/container",
+            "/cxf/environments",
+            "/cxf/environments/domain",
+            "/cxf/environments/container/environmentId",
+            "/cxf/environments/container/state",
+
+            //"/cxf/environments/{environmentId}",
+            "/cxf/environments/{$}",
+
+            "/cxf/environments/grow",
+            "/cxf/environments/key",
+            "/cxf/environments/container",
 
             "/cxf/hosts",
 
-            "/cxf/identity/key/{$}",
+            "/cxf/identity/key/{username}",
 
-            "/cxf/messenger/message", "/cxf/peer/gateways",
+            "/cxf/messenger/message",
+
+            "/cxf/peer/gateways",
 
             "/cxf/monitor/metrics/resource-hosts",
+
             //"/cxf/monitor/metrics/containers-hosts/{environmentId}",
-            "/cxf/monitor/metrics/containers-hosts/{$}", "/cxf/monitor/alert",
+            "/cxf/monitor/metrics/containers-hosts/{$}",
 
-            "/cxf/scripts/", "/cxf/scripts/{$}",
+            "/cxf/monitor/alert",
 
-            "/cxf/registry/templates", "/cxf/registry/templates/import", "/cxf/registry/templates/tree",
+            "/cxf/scripts/",
+
+            //"/cxf/scripts/{scriptName}",
+            "/cxf/scripts/{$}",
+
+            "/cxf/registry/templates",
+            "/cxf/registry/templates/import",
+            "/cxf/registry/templates/tree",
+
             //"/cxf/registry/templates/arch/{lxcArch}",
-            "/cxf/registry/templates/arch/{$}", "/cxf/registry/templates/plain-list", "/cxf/registry/templates/{$}",
+            "/cxf/registry/templates/arch/{$}",
+
+            "/cxf/registry/templates/plain-list",
+
+            //"/cxf/registry/templates/{templateName}",
+            "/cxf/registry/templates/{$}",
+
             //"/cxf/registry/templates/arch/{lxcArch}/plain-list",
+            "/cxf/registry/templates/arch/{$}/plain-list",
+
             //"/cxf/registry/templates/{templateName}/{templateVersion}/download/{token}",
             "/cxf/registry/templates/{$}/{$}/download/{$}",
+
             //"/cxf/registry/templates/{templateName}/{templateVersion}",
             "/cxf/registry/templates/{$}/{$}",
+
             //"/cxf/registry/templates/{templateName}/{templateVersion}/remove",
-            "/cxf/registry/templates/{$}/{$}/remove", "/cxf/registry/templates/{$}/{$}/arch/{$}",
+            "/cxf/registry/templates/{$}/{$}/remove",
+
+            //"/cxf/registry/templates/{templateName}/{templateVersion}/arch/{lxcArch}",
             "/cxf/registry/templates/{$}/{$}/arch/{$}",
+
             //"/cxf/registry/templates/{childTemplateName}/parent",
             "/cxf/registry/templates/{$}/parent",
+
             //"/cxf/registry/templates/{childTemplateName}/{templateVersion}/arch/{lxcArch}/parent",
-            "/cxf/registry/templates/{$}/{$}/arch/{$}/parent", "/cxf/registry/templates/{$}/parents",
+            "/cxf/registry/templates/{$}/{$}/arch/{$}/parent",
+
+            //"/cxf/registry/templates/{childTemplateName}/parents",
+            "/cxf/registry/templates/{$}/parents",
+
             //"/cxf/registry/templates/{childTemplateName}/{templateVersion}/parents",
             "/cxf/registry/templates/{$}/{$}/parents",
+
             //"/cxf/registry/templates/{parentTemplateName}/children",
             "/cxf/registry/templates/{$}/children",
+
             //"/cxf/registry/templates/{parentTemplateName}/{templateVersion}/children",
             "/cxf/registry/templates/{$}/{$}/arch/{$}/children",
+
             //"/cxf/registry/templates/{templateName}/{templateVersion}/is-used-on-fai",
             "/cxf/registry/templates/{$}/{$}/is-used-on-fai",
+
             //"/cxf/registry/templates/{templateName}/{templateVersion}/fai/{faiHostname}/is-used/{isInUse}",
             "/cxf/registry/templates/{$}/{$}/fai/{$}/is-used/{$}",
 
             //"/cxf/tracker/operations/{source}/{uuid}",
             "/cxf/tracker/operations/{$}/{$}",
+
             //"/cxf/tracker/operations/{source}/{dateFrom}/{dateTo}/{limit}",
-            "/cxf/tracker/operations/{$}/{$}/{$}/{$}", "/cxf/tracker/operations/sources",
+            "/cxf/tracker/operations/{$}/{$}/{$}/{$}",
 
+            "/cxf/tracker/operations/sources",
 
-            //"/cxf/{plugin_name}/cluster/destroy",
+            //"/cxf/{plugin_name}/clusters",
             "/cxf/{$}/clusters",
+
             //"/cxf/{$name_of_plugin}/clusters/{$`clusterName}",
             "/cxf/{$}/clusters/{$}",
+
             //"/cxf/{name_of_plugin}/install",
             "/cxf/{$}/install",
+
             //"/cxf/{name_of_plugin}/destroy",
             "/cxf/{$}/destroy",
+
             //"/cxf/{$name_of_plugin}/clusters/{$clusterName}/start",
             "/cxf/{$}/clusters/{$}/start",
+
             //"/cxf/{$name_of_plugin}/clusters/{$clusterName}/stop",
             "/cxf/{$}/clusters/{$}/stop",
+
             //"/cxf/{$name_of_plugin}/clusters/{clusterName}/destroy/node/{lxcHostname}/type/{nodeType}",
             "/cxf/{$}/clusters/{$}/destroy/node/{$}/type/{$}",
+
             //"/cxf/{$name_of_plugin}/clusters/{clusterName}/add/node/{lxcHostname}/type/{nodeType}",
             "/cxf/{$}/clusters/{$}/add/node/{$}/type/{$}",
 
