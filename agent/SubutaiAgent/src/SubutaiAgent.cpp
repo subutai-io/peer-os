@@ -325,7 +325,21 @@ int main(int argc, char *argv[], char *envp[]) {
 				logMain.writeLog(6,
 						logMain.setLogData("<SubutaiAgent>", "RC:",
 								helper.toString(rc)));
-				connection->reconnect();
+                //Try to reconnect broker
+                while (true) {
+                    if (!connection->openSession()) {
+                        sleep(reconnectDelay);
+                        logMain.writeLog(6,
+                                logMain.setLogData("<SubutaiAgent>",
+                                        "Trying connect to MQTT Broker:",
+                                        environment.getAgentConnectionUrlValue()));
+                        if (connection->reConnect()) {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
 			}
 
 			//checking new message arrived
