@@ -19,6 +19,7 @@ public class ChannelSettings
             "/{*}",
             "/cxf/peer/register", "/cxf/peer/reject", "/cxf/peer/approve", "/cxf/peer/remove",
             "/cxf/peer/trust_request", "/cxf/peer/trust_response",
+            "/cxf/peer/approve/{$}"
     };
 
     public static String[] URL_ACCESS_PX2 = {
