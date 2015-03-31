@@ -345,14 +345,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 throw new EnvironmentDestructionException( e );
             }
         }
-        //        else
-        //        {
-        //            if ( !exceptions.isEmpty() )
-        //            {
-        //                LOG.error( String.format( "There were errors while destroying environment: %s", exceptions
-        // ) );
-        //            }
-        //        }
     }
 
 
