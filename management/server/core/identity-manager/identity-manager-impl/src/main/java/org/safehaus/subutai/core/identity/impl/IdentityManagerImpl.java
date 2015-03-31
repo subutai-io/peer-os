@@ -148,6 +148,49 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     }
 
 
+    /**
+     * Check if user has access to the Rest service
+     *
+     * @param user User
+     * @param restURL String
+     *
+     * @return short
+     */
+    public short checkRestPermissions(  User user , String restURL )
+    {
+        short status = 0;
+
+        if ( user != null )
+        {
+            Set<Role> roles = user.getRoles();
+
+            for(Role role : roles)
+            {
+                Set<RestEndpointScope> restEndpointScopeList = role.getAccessibleRestEndpoints();
+
+                if(restEndpointScopeList !=null)
+                {
+                    for(RestEndpointScope restEndpointScope : restEndpointScopeList )
+                    {
+                        if(ChannelSettings.checkURL(restURL,restEndpointScope.getRestEndpoint()) == 1)
+                        {
+                            status = 1;
+                            break;
+                        }
+                    }
+                }
+                if(status == 1)
+                {
+                    break;
+                }
+            }
+
+        }
+
+        return status;
+
+    }
+
     private void checkDefaultUser( String username )
     {
 
@@ -418,8 +461,8 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
                 return false;
             }
             portalModuleDataService.update( ( PortalModuleScopeEntity ) portalModuleScope );
-            List<RoleEntity> roles = roleDataService.getAll();
-            for ( RoleEntity roleEntity : roles )
+            List<Role> roles = roleDataService.getAll();
+            for ( Role roleEntity : roles )
             {
                 if ( roleEntity.getName().equalsIgnoreCase( Roles.ADMIN.getRoleName() ) )
                 {
@@ -783,14 +826,14 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     @Override
     public Role getRole( final String name )
     {
-        return null;
+        return roleDataService.find( name );
     }
 
 
     @Override
-    public boolean deleteRole( final Role role )
+    public void deleteRole( final Role role )
     {
-        return false;
+        roleDataService.remove( role.getName() );
     }
 
 

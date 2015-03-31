@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.host.ContainerHostState;
@@ -26,7 +27,9 @@ import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.quota.RamQuota;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
+import org.safehaus.subutai.common.settings.ChannelSettings;
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -34,6 +37,8 @@ import org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
@@ -149,6 +154,14 @@ public class RestServiceImpl implements RestService
     public Response processRegisterRequest( String peer )
     {
         PeerInfo p = JsonUtil.fromJson( peer, PeerInfo.class );
+        LOGGER.debug( peer );
+
+        if ( peerManager.getPeerInfo( p.getId() ) != null )
+        {
+            return Response.status( Response.Status.CONFLICT )
+                           .entity( String.format( "%s already registered", p.getName() ) ).build();
+        }
+
         p.setStatus( PeerStatus.REQUESTED );
         p.setName( String.format( "Peer on %s", p.getIp() ) );
         try
@@ -277,6 +290,80 @@ public class RestServiceImpl implements RestService
 
 
         return Response.ok( HEXCert ).build();
+    }
+
+
+    @Override
+    public Response approveForRegistrationRequest( final String peerId )
+    {
+        //************ Send Trust SSL Cert **************************************
+
+        KeyStore keyStore;
+        KeyStoreData keyStoreData;
+        KeyStoreManager keyStoreManager;
+
+        keyStoreData = new KeyStoreData();
+        keyStoreData.setupKeyStorePx2();
+
+        keyStoreManager = new KeyStoreManager();
+        keyStore = keyStoreManager.load( keyStoreData );
+
+        String cert = keyStoreManager.exportCertificateHEXString( keyStore, keyStoreData );
+
+
+        //***********************************************************************
+
+        UUID uuid = JsonUtil.fromJson( peerId, UUID.class );
+        PeerInfo remotePeer = peerManager.getPeerInfo( uuid );
+        PeerInfo peerToUpdateOnRemote = peerManager.getLocalPeerInfo();
+
+        String baseUrl = String.format( "https://%s:%s/cxf", remotePeer.getIp(), ChannelSettings.SECURE_PORT_X1 );
+        WebClient client = RestUtil.createTrustedWebClient( baseUrl );//WebClient.create( baseUrl );
+        client.type( MediaType.APPLICATION_FORM_URLENCODED ).accept( MediaType.APPLICATION_JSON );
+
+        Form form = new Form();
+        form.set( "approvedPeer", JsonUtil.toJson( peerToUpdateOnRemote ) );
+        form.set( "root_cert_px2", cert );
+
+        try
+        {
+            Response response = client.path( "peer/approve" ).put( form );
+            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+            {
+                LOGGER.info( response.readEntity( String.class ) );
+                remotePeer.setStatus( PeerStatus.APPROVED );
+                String root_cert_px2 = response.readEntity( String.class );
+                //************ Save Trust SSL Cert **************************************
+
+                keyStoreData = new KeyStoreData();
+                keyStoreData.setupTrustStorePx2();
+                keyStoreData.setHEXCert( root_cert_px2 );
+                keyStoreData.setAlias( remotePeer.getId().toString() );
+
+                keyStoreManager = new KeyStoreManager();
+                keyStore = keyStoreManager.load( keyStoreData );
+
+                keyStoreManager.importCertificateHEXString( keyStore, keyStoreData );
+                //***********************************************************************
+
+                sslContextFactory.reloadTrustStore();
+
+                remotePeer.setStatus( PeerStatus.APPROVED );
+
+                peerManager.update( remotePeer );
+                return Response.ok( String.format( "%s registered.", remotePeer.getName() ) ).build();
+            }
+            else
+            {
+                LOGGER.warn( "Response for registering peer: " + response.toString() );
+                return Response.status( Response.Status.EXPECTATION_FAILED )
+                               .entity( "Error occurred on peer to register" ).build();
+            }
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().entity( e.toString() ).build();
+        }
     }
 
 

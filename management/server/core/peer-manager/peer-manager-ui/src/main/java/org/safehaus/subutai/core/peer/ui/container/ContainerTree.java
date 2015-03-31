@@ -241,7 +241,7 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
         }
 
 
-        catch ( PeerException e )
+        catch ( Exception e )
         {
             LOG.error( "Error on building container tree.", e );
         }
