@@ -16,8 +16,8 @@ public class ChannelSettings
 
     public static String[] URL_ACCESS_PX1 = {
             // All  Services
-            "/{*}",
-            "/cxf/peer/register", "/cxf/peer/reject", "/cxf/peer/approve", "/cxf/peer/remove",
+            "/{*}", "/cxf/peer/register", "/cxf/peer/reject", "/cxf/peer/approve", "/cxf/peer/approve/{$}",
+            "/cxf/peer/remove",
             "/cxf/peer/trust_request", "/cxf/peer/trust_response",
     };
 
@@ -36,12 +36,12 @@ public class ChannelSettings
             "/cxf/peer/container/info",
 
             "/cxf/environments", "/cxf/environments/domain", "/cxf/environments/container/environmentId",
-            "/cxf/environments/container/state", "/cxf/environments/{environmentId}", "/cxf/environments/grow",
+            "/cxf/environments/container/state", "/cxf/environments/{$}", "/cxf/environments/grow",
             "/cxf/environments/key", "/cxf/environments/container",
 
             "/cxf/hosts",
 
-            "/cxf/identity/key/{username}",
+            "/cxf/identity/key/{$}",
 
             "/cxf/messenger/message", "/cxf/peer/gateways",
 
@@ -49,25 +49,23 @@ public class ChannelSettings
             //"/cxf/monitor/metrics/containers-hosts/{environmentId}",
             "/cxf/monitor/metrics/containers-hosts/{$}", "/cxf/monitor/alert",
 
-            "/cxf/scripts/", "/cxf/scripts/{scriptName}",
+            "/cxf/scripts/", "/cxf/scripts/{$}",
 
             "/cxf/registry/templates", "/cxf/registry/templates/import", "/cxf/registry/templates/tree",
             //"/cxf/registry/templates/arch/{lxcArch}",
-            "/cxf/registry/templates/arch/{$}", "/cxf/registry/templates/plain-list",
-            "/cxf/registry/templates/{templateName}",
+            "/cxf/registry/templates/arch/{$}", "/cxf/registry/templates/plain-list", "/cxf/registry/templates/{$}",
             //"/cxf/registry/templates/arch/{lxcArch}/plain-list",
             //"/cxf/registry/templates/{templateName}/{templateVersion}/download/{token}",
-            "/cxf/registry/templates/{$}sd/{$}/download/{$}",
+            "/cxf/registry/templates/{$}/{$}/download/{$}",
             //"/cxf/registry/templates/{templateName}/{templateVersion}",
             "/cxf/registry/templates/{$}/{$}",
             //"/cxf/registry/templates/{templateName}/{templateVersion}/remove",
-            "/cxf/registry/templates/{$}/{$}/remove",
-            "/cxf/registry/templates/{templateName}/{templateVersion}/arch/{lxcArch}",
+            "/cxf/registry/templates/{$}/{$}/remove", "/cxf/registry/templates/{$}/{$}/arch/{$}",
             "/cxf/registry/templates/{$}/{$}/arch/{$}",
             //"/cxf/registry/templates/{childTemplateName}/parent",
             "/cxf/registry/templates/{$}/parent",
             //"/cxf/registry/templates/{childTemplateName}/{templateVersion}/arch/{lxcArch}/parent",
-            "/cxf/registry/templates/{$}/{$}/arch/{$}/parent", "/cxf/registry/templates/{childTemplateName}/parents",
+            "/cxf/registry/templates/{$}/{$}/arch/{$}/parent", "/cxf/registry/templates/{$}/parents",
             //"/cxf/registry/templates/{childTemplateName}/{templateVersion}/parents",
             "/cxf/registry/templates/{$}/{$}/parents",
             //"/cxf/registry/templates/{parentTemplateName}/children",
@@ -148,10 +146,10 @@ public class ChannelSettings
             "/cxf/{$}/clusters/{$}/nodes",
 
             //"/cxf/{$name_of_plugin}/clusters/{clusterName}/node/{hostname}/status",
-            "/cxf/{$}/clusters/{$}/node/{hostname}/status",
+            "/cxf/{$}/clusters/{$}/node/{$}/status",
 
             //"/cxf/{$name_of_plugin}/clusters/{clusterName}/task/{hostname}/status",
-            "/cxf/{$}/clusters/{$}/task/{hostname}/status",
+            "/cxf/{$}/clusters/{$}/task/{$}/status",
 
             //"/cxf/{$name_of_plugin}/clusters/destroy/{clusterName}",
             "/cxf/{$}/clusters/destroy/{$}",
@@ -166,7 +164,7 @@ public class ChannelSettings
             "/cxf/{$}/clusters/{$}/add/node/{$}",
 
             //"/cxf/{$name_of_plugin}/clusters/remove/{clusterName}",
-            "/cxf/{$}/clusters/remove/{clusterName}",
+            "/cxf/{$}/clusters/remove/{$}",
 
             //"/cxf/{$name_of_plugin}/clusters/{clusterName}/remove/node/{lxcHostName}",
             "/cxf/{$}/clusters/{$}/remove/node/{$}",
