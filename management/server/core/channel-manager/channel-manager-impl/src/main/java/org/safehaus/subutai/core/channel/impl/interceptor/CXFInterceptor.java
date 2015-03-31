@@ -44,12 +44,6 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
     {
         try
         {
-            Boolean isClient = ( Boolean ) message.get( Message.REQUESTOR_ROLE );
-
-            if ( isClient )
-            {
-                return;
-            }
             String requestUrl = ( String ) message.get( Message.REQUEST_URL );
             URL url = new URL( requestUrl );
             String basePath = url.getPath();
@@ -164,7 +158,7 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
         }
         catch ( MalformedURLException ignore )
         {
-            LOG.error( "MalformedURLException:" + ignore.toString(), ignore );
+            LOG.warn( "MalformedURLException:" + ignore.toString(), ignore );
         }
     }
 
