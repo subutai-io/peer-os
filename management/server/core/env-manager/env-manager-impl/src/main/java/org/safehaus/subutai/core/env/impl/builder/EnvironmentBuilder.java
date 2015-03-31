@@ -145,7 +145,7 @@ public class EnvironmentBuilder
         }
 
         //collect results
-        Set<Throwable> errors = Sets.newHashSet();
+        Set<String> errors = Sets.newHashSet();
 
         for ( int i = 0; i < placement.size(); i++ )
         {
@@ -162,13 +162,13 @@ public class EnvironmentBuilder
 
                     if ( result.getException() != null )
                     {
-                        errors.add( result.getException() );
+                        errors.add( exceptionUtil.getRootCauseMessage( result.getException() ) );
                     }
                 }
             }
             catch ( ExecutionException | InterruptedException e )
             {
-                errors.add( exceptionUtil.getRootCause( e ) );
+                errors.add( exceptionUtil.getRootCauseMessage( e ) );
             }
         }
 
@@ -176,6 +176,7 @@ public class EnvironmentBuilder
 
         if ( !errors.isEmpty() )
         {
+
             throw new EnvironmentBuildException(
                     String.format( "There were errors during container creation:  %s", errors ), null );
         }
