@@ -371,9 +371,9 @@ public class PeerRegisterForm extends CustomComponent
                         relationExists = 2;
                     }
                 }
-                catch ( ContainerGroupNotFoundException e )
+                catch ( ContainerGroupNotFoundException ignore )
                 {
-                    LOG.info( "Couldn't get container group by container id", e );
+                    //                    LOG.debug( "Couldn't get container group by container id", ignore );
                 }
             }
         }
