@@ -489,6 +489,7 @@ ExecutionResult SubutaiContainer::RunDaemon(SubutaiCommand* command) {
 		args[2] = const_cast<char*>(cmdLine.c_str());
 		args[3] = NULL;
 		lxc_attach_command_t cmd = { args[0], args };
+
 		try {
 			this->container->attach(this->container,
 					lxc_attach_run_command, &cmd, &opts, &pid);
@@ -497,6 +498,7 @@ ExecutionResult SubutaiContainer::RunDaemon(SubutaiCommand* command) {
 					containerLogger->setLogData(_logEntry, "Daemon Exception: ",
 							string(e.what())));
 		}
+
 	} else {
 		char* args[pr.size() + 1];
 		int i = 0;
@@ -649,8 +651,12 @@ bool SubutaiContainer::hasSubCommand(SubutaiCommand* command) {
 				|| it->compare(">>") == 0 || it->compare(";") == 0
 				|| it->compare("&") == 0 || it->compare("&&") == 0
 				|| it->compare("<") == 0) {
+			containerLogger->writeLog(3,
+							containerLogger->setLogData(_logEntry, "does not have subcommand"));
 			return true;
 		}
 	}
+	containerLogger->writeLog(3,
+								containerLogger->setLogData(_logEntry, "HAS subcommand"));
 	return false;
 }

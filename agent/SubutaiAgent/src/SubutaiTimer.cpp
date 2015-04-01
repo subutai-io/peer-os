@@ -125,7 +125,6 @@ void SubutaiTimer::sendHeartBeat(bool destroyCommandInProgress, bool cloneComman
 						"wait until it is finished to update container list for heartbeat"));
 		*heartbeatIntFlag = true;
 	}
-
 	response->setInterfaces(environment->getAgentInterfaceValues());
 	response->setHostname(environment->getAgentHostnameValue());
 	response->setArch(environment->getAgentArch());
