@@ -50,21 +50,24 @@ public:
 	SubutaiThread();
 	virtual ~SubutaiThread();
 	int threadFunction(message_queue*, SubutaiCommand*, char*[],
-			SubutaiContainer* cont = NULL);bool checkCWD(SubutaiCommand*,
-			SubutaiContainer* cont = NULL);bool checkUID(SubutaiCommand*,
 			SubutaiContainer* cont = NULL);
+	bool checkCWD(SubutaiCommand*,SubutaiContainer* cont = NULL);
+	bool checkUID(SubutaiCommand*,SubutaiContainer* cont = NULL);
 	static string getProcessPid(const char*);
-	string createExecString(SubutaiCommand*);bool ExecuteCommand(
-			SubutaiCommand*, SubutaiContainer* cont);
+	string createExecString(SubutaiCommand*);
+	bool ExecuteCommand(SubutaiCommand*, SubutaiContainer* cont);
 	SubutaiUserID& getUserID();
 	SubutaiResponsePack& getResponse();
 	SubutaiLogger& getLogger();
 	SubutaiStreamReader& getErrorStream();
-	SubutaiStreamReader& getOutputStream();bool& getCWDERR();bool& getUIDERR();
+	SubutaiStreamReader& getOutputStream();
+	bool& getCWDERR();
+	void setCWDERR(bool);
+	bool& getUIDERR();
+	void setUIDERR(bool);
 	int& getEXITSTATUS();
 	void setEXITSTATUS(int);
-	void setCWDERR(bool);
-	void setUIDERR(bool);bool& getACTFLAG();
+	bool& getACTFLAG();
 	void setACTFLAG(bool);
 	int& getResponsecount();
 	void setResponsecount(int);
@@ -79,8 +82,8 @@ public:
 	void checkAndWrite(message_queue*, SubutaiCommand*);
 	void checkAndSend(message_queue*, SubutaiCommand*);
 	void lastCheckAndSend(message_queue*, SubutaiCommand*);
-	void captureOutputBuffer(message_queue*, SubutaiCommand*, bool, bool);bool checkExecutionTimeout(
-			unsigned int*, bool*, unsigned int*, unsigned int*);
+	void captureOutputBuffer(message_queue*, SubutaiCommand*, bool, bool);
+	bool checkExecutionTimeout(unsigned int*, bool*, unsigned int*, unsigned int*);
 private:
 	SubutaiUserID uid;
 	SubutaiLogger logger;
@@ -94,7 +97,8 @@ private:
 	pid_t pid;
 	uid_t euid, ruid;
 	int responsecount;
-	int processpid;bool ACTFLAG;//flag for acrivity check for stderr and stdout
+	int processpid;
+	bool ACTFLAG;//flag for acrivity check for stderr and stdout
 	bool CWDERR;             //CWD error flag
 	bool UIDERR;		        //UID error flag
 	int EXITSTATUS;         //Execution Error Detection Flag

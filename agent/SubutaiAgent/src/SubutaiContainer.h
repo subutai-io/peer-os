@@ -80,8 +80,9 @@ public:
 	void getContainerAllFields();bool getContainerInterfaces();
 	void setContainerHostname(string);
 	string getState();
-	void write();
-	void clear();bool checkCWD(string);bool checkUser(string);
+	void clear();
+	bool checkCWD(string);
+	bool checkUser(string);
 	int getRunAsUserId(string);
 	void PutToFile(string, string);
 	vector<Interface> getContainerInterfaceValues();
@@ -96,8 +97,8 @@ public:
 	ExecutionResult RunDaemon(SubutaiCommand*);
 	ExecutionResult RunProgram(string, vector<string>, bool,
 			lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT,
-			bool captureOutput = true);bool hasSubCommand(
-			SubutaiCommand* command);
+			bool captureOutput = true);
+	bool hasSubCommand(	SubutaiCommand* command);
 protected:
 	vector<string> ExplodeCommandArguments(SubutaiCommand* command);
 private:

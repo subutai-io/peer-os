@@ -80,11 +80,14 @@ public:
 	char* getBuffer();bool checkNotification(SubutaiContainerManager*);
 	string getModificationTime(string, bool);
 private:
-	bool folderExistenceChecker(const string &);bool checkDuplicateName(
-			const string &);
+	bool folderExistenceChecker(const string &);
+	bool checkDuplicateName(const string &);
+
 	struct wd_elem {
 		int pd;
-		string name;bool operator()(const wd_elem &l, const wd_elem &r) const {
+		string name;
+
+		bool operator()(const wd_elem &l, const wd_elem &r) const {
 			return l.pd < r.pd ? true :
 					l.pd == r.pd && l.name < r.name ? true : false;
 		}
