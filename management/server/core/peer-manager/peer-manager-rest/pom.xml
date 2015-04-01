@@ -28,6 +28,11 @@
 
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>env-manager-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>ssl-context-manager-api</artifactId>
     </dependency>
 

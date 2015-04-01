@@ -17,7 +17,7 @@ public class ChannelSettings
     public static String[] URL_ACCESS_PX1 = {
             // All  Services
             "/{*}",
-            "/cxf/peer/register",
+            "/cxf/peer/register", "/cxf/peer/register/{$}",
             "/cxf/peer/reject",
             "/cxf/peer/approve",
             "/cxf/peer/remove",
@@ -34,8 +34,11 @@ public class ChannelSettings
             "/cxf/peer/id",
             "/cxf/peer/update",
             "/cxf/peer/registered_peers",
+            "/cxf/peer/peer_policy",
             "/cxf/peer/ping",
             "/cxf/peer/template/get",
+            "/cxf/peer/vni",
+            "/cxf/peer/gateways",
             "/cxf/peer/unregister",
             "/cxf/peer/container/quota",
             "/cxf/peer/container/quota/info",
@@ -49,17 +52,17 @@ public class ChannelSettings
             "/cxf/peer/container/quota/cpu/available",
             "/cxf/peer/container/quota/disk/available",
             "/cxf/peer/container/quota/ram",
+            "/cxf/peer/container/quota/ram2",
             "/cxf/peer/container/quota/ram/info",
             "/cxf/peer/container/quota/cpu",
             "/cxf/peer/container/quota/cpu/info",
             "/cxf/peer/container/quota/cpuset",
             "/cxf/peer/container/quota/disk",
             "/cxf/peer/container/gateway",
-            "/cxf/peer/vni",
+            "/cxf/peer/container/info",
             "/cxf/peer/cert/import",
             "/cxf/peer/cert/export",
             "/cxf/peer/cert/remove",
-            "/cxf/peer/container/info",
 
             "/cxf/environments",
             "/cxf/environments/domain",
@@ -78,8 +81,6 @@ public class ChannelSettings
             "/cxf/identity/key/{username}",
 
             "/cxf/messenger/message",
-
-            "/cxf/peer/gateways",
 
             "/cxf/monitor/metrics/resource-hosts",
 
@@ -125,9 +126,6 @@ public class ChannelSettings
 
             //"/cxf/registry/templates/{childTemplateName}/{templateVersion}/arch/{lxcArch}/parent",
             "/cxf/registry/templates/{$}/{$}/arch/{$}/parent",
-
-            //"/cxf/registry/templates/{childTemplateName}/parents",
-            "/cxf/registry/templates/{$}/parents",
 
             //"/cxf/registry/templates/{childTemplateName}/{templateVersion}/parents",
             "/cxf/registry/templates/{$}/{$}/parents",
