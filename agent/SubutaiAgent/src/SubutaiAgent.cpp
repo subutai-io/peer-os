@@ -21,7 +21,6 @@
  *  		   It also creates a new process using KAThread Class when the new Execute Request comes.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @author    Ozlem Ceren SAHIN
  *  @version   1.1.0
  *  @date      Sep 13, 2014
  *
