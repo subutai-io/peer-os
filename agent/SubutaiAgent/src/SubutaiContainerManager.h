@@ -50,8 +50,8 @@ public:
 	vector<SubutaiContainer*> findAllContainers();
 	SubutaiContainer* findContainerById(string);
 	vector<SubutaiContainer*> getAllContainers();
-	vector<string> getContainers();bool checkIfTemplate(string, vector<string>,
-			bool);
+	vector<string> getContainers();
+	bool checkIfTemplate(string, vector<string>, bool);
 	bool checkBrokenLxc();
 	void updateContainerIdListOnStart();
 	void deleteContainerInfo(string);
