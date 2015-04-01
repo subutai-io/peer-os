@@ -287,10 +287,7 @@ void SubutaiContainerManager::updateContainerLists() {
 		 * that may cause segmentation fault on free() calls inside list_all_containers.
 		 *
 		 */
-		cout << "<SubutaiContainerManager> Get list of containers via api" << endl;
 		num = list_all_containers(_lxc_path.c_str(), &names, &cont);
-		cout << "<SubutaiContainerManager> Starting add - remove operations to update container vector." << endl;
-
 		bool destroy_container_check[size_of_containers];
 
 		/* hold destroy container check array to control which container is deleted. */
@@ -298,7 +295,6 @@ void SubutaiContainerManager::updateContainerLists() {
 			destroy_container_check[i] = false;
 		}
 		for (int i = 0; i < num; i++) {
-
 			if (!checkIfTemplate(names[i], subutai_containers,
 					isSubutaiAvailable)) {
 				// Check if there is any new container
