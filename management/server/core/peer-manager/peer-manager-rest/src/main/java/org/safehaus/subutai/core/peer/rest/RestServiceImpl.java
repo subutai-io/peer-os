@@ -31,7 +31,6 @@ import org.safehaus.subutai.common.settings.ChannelSettings;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory;
@@ -52,7 +51,6 @@ public class RestServiceImpl implements RestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
     private PeerManager peerManager;
-    private EnvironmentManager environmentManager;
     private CustomSslContextFactory sslContextFactory;
 
 
@@ -65,12 +63,6 @@ public class RestServiceImpl implements RestService
     public void setSslContextFactory( final CustomSslContextFactory sslContextFactory )
     {
         this.sslContextFactory = sslContextFactory;
-    }
-
-
-    public void setEnvironmentManager( final EnvironmentManager environmentManager )
-    {
-        this.environmentManager = environmentManager;
     }
 
 
@@ -507,16 +499,7 @@ public class RestServiceImpl implements RestService
             Host host = localPeer.bindHost( containerId );
             if ( host instanceof ContainerHost )
             {
-                ContainerHost containerHost = ( ( ContainerHost ) host );
-                //todo remove this and use EnvironmentManager.destroyContainer
-                if ( containerHost.getEnvironmentId() != null )
-                {
-                    environmentManager.destroyContainer( containerHost, false, false );
-                }
-                else
-                {
-                    containerHost.dispose();
-                }
+                ( ( ContainerHost ) host ).dispose();
             }
 
             return Response.ok().build();
