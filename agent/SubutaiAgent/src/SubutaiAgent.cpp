@@ -23,6 +23,7 @@
  *  @author    Bilal BAL
  *  @version   1.1.0
  *  @date      Sep 13, 2014
+ *
  */
 /** \mainpage  Welcome to Project Subutai Agent
  *	\section   Subutai Agent
@@ -31,7 +32,15 @@
  * 	 	 	   It's purpose is to perform a very simple reduced set of instructions to
  * 	 	 	   manage any system administration task.
  * 	 	 	   The agent may run on physical servers, virtual machines or inside Linux Containers.
+ *
+ *  \section   Change of Architecture
+ * 	 	 	   The agent runs on physical servers and virtual machines. Performing a task on a linux
+ * 	 	 	   container is handled by the agent on resource hosts.
+ *
+ * 	 	 	   Edit date: 10.2014
+ * 	 	 	   Authors: Ozlem Ceren Sahin, Mikhail Savochkin
  */
+
 
 #include "SubutaiCommand.h"
 #include "SubutaiResponse.h"

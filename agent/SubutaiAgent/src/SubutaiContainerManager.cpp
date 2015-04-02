@@ -297,7 +297,7 @@ void SubutaiContainerManager::updateContainerLists() {
 		for (int i = 0; i < num; i++) {
 			if (!checkIfTemplate(names[i], subutai_containers,
 					isSubutaiAvailable)) {
-				// Check is there is any new container appears
+				// Check if there is any new container
 				bool containerFound = false;
 				index = 0;
 
@@ -326,9 +326,25 @@ void SubutaiContainerManager::updateContainerLists() {
 						(_containers.at(i))->getContainerHostnameValue());
 				//_logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>",
 				//		"Erasing container " + _containers.at(i)->getContainerHostnameValue() + " from container vector."));
+				SubutaiContainer* c_tmp = _containers.at(i);
 				_containers.erase(_containers.begin() + i);
+				cout << "free c_tmp" << endl;
+				free(c_tmp);
+				cout << "free c_tmp done" << endl;
 			}
 		}
+		if(names != NULL)
+		{
+			cout << "free names" << endl;
+			for (int i = 0; i < num; i++) {
+				free(names[i]);
+			}
+			free(names);
+			cout << "free names done" << endl;
+		}
+		cout << "free cont" << endl;
+		if ( cont != NULL)	free(cont);
+		cout << "free cont done" << endl;
 	} catch (SubutaiException e) {
 		_logger->writeLog(3,
 				_logger->setLogData("<SubutaiContainerManager>",
@@ -338,7 +354,7 @@ void SubutaiContainerManager::updateContainerLists() {
 				_logger->setLogData("<SubutaiContainerManager>",
 						string(e.what())));
 	}
-	_logger->writeLog(3,
+	_logger->writeLog(7,
 			_logger->setLogData("<SubutaiContainerManager>",
 					"Updating all container informations.."));
 	for (ContainerIterator it = _containers.begin(); it != _containers.end();
