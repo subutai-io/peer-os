@@ -51,7 +51,6 @@ public class RestServiceImpl implements RestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
     private PeerManager peerManager;
-
     private CustomSslContextFactory sslContextFactory;
 
 
@@ -177,6 +176,59 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response sendRegistrationRequest( final String peerIp )
+    {
+        String baseUrl = String.format( "https://%s:%s/cxf", peerIp, ChannelSettings.SECURE_PORT_X1 );
+        WebClient client = RestUtil.createTrustedWebClient( baseUrl );//WebClient.create( baseUrl );
+        client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
+        Form form = new Form();
+        form.set( "peer", JsonUtil.toJson( peerManager.getLocalPeerInfo() ) );
+
+        try
+        {
+            Response response = client.path( "peer/register" ).form( form );
+            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+            {
+                String responseString = response.readEntity( String.class );
+                LOGGER.info( response.toString() );
+                PeerInfo remotePeerInfo = JsonUtil.from( responseString, new TypeToken<PeerInfo>()
+                {
+                }.getType() );
+                if ( remotePeerInfo != null )
+                {
+                    remotePeerInfo.setStatus( PeerStatus.REQUEST_SENT );
+                    try
+                    {
+                        peerManager.register( remotePeerInfo );
+                    }
+                    catch ( PeerException e )
+                    {
+                        LOGGER.error( "Couldn't register peer", e );
+                    }
+                }
+                return Response.ok().build();
+            }
+            else if ( response.getStatus() == Response.Status.CONFLICT.getStatusCode() )
+            {
+                String reason = response.readEntity( String.class );
+                LOGGER.warn( reason );
+                return Response.serverError().entity( reason ).build();
+            }
+            else
+            {
+                LOGGER.warn( "Response for registering peer: " + response.toString() );
+                return Response.serverError().build();
+            }
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "error sending request", e );
+            return Response.serverError().entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
     public Response unregisterPeer( String peerId )
     {
         UUID id = JsonUtil.fromJson( peerId, UUID.class );
@@ -212,7 +264,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception pe )
         {
-            return Response.status( Response.Status.NOT_FOUND ).entity( pe.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( pe.toString() ).build();
         }
     }
 

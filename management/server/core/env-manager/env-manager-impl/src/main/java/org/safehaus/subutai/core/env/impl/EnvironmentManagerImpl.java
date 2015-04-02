@@ -18,7 +18,6 @@ import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.host.HostInfo;
-import org.safehaus.subutai.common.host.Interface;
 import org.safehaus.subutai.common.mdc.SubutaiExecutors;
 import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
@@ -39,7 +38,6 @@ import org.safehaus.subutai.core.env.impl.dao.EnvironmentContainerDataService;
 import org.safehaus.subutai.core.env.impl.dao.EnvironmentDataService;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
-import org.safehaus.subutai.core.env.impl.entity.HostInterface;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentTunnelException;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
@@ -137,31 +135,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 try
                 {
                     HostInfo hostInfo = containerHost.getPeer().getContainerHostInfoById( containerHost.getId() );
-                    if ( hostInfo == null )
-                    {
-                        return;
-                    }
 
                     EnvironmentContainerImpl environmentContainer =
                             environmentContainerDataService.find( containerHost.getId().toString() );
                     environmentContainer.setHostname( hostInfo.getHostname() );
-                    Set<HostInterface> updatedInterfaces = Sets.newHashSet();
-
-                    for ( final Interface anInterface : hostInfo.getInterfaces() )
-                    {
-                        HostInterface hostInterface = new HostInterface( anInterface );
-                        updatedInterfaces.add( hostInterface );
-                        hostInterface.setHost( environmentContainer );
-                    }
-
-                    environmentContainer.getNetInterfaces().clear();
-                    environmentContainer.getNetInterfaces().addAll( updatedInterfaces );
+                    environmentContainer.setNetInterfaces( hostInfo.getInterfaces() );
 
                     environmentContainerDataService.update( environmentContainer );
                 }
-                catch ( PeerException e )
+                catch ( Exception e )
                 {
-                    LOGGER.info( "Couldn't get ContainerHost from specified Peer.", e );
+                    LOGGER.error( "Couldn't get container host info from hosting peer", e );
                 }
             }
         }
@@ -361,14 +345,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 throw new EnvironmentDestructionException( e );
             }
         }
-        //        else
-        //        {
-        //            if ( !exceptions.isEmpty() )
-        //            {
-        //                LOG.error( String.format( "There were errors while destroying environment: %s", exceptions
-        // ) );
-        //            }
-        //        }
     }
 
 
@@ -463,9 +439,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     String.format( "Environment status is %s", environment.getStatus() ) );
         }
 
+        ContainerHost environmentContainer;
         try
         {
-            environment.getContainerHostById( containerHost.getId() );
+            environmentContainer = environment.getContainerHostById( containerHost.getId() );
         }
         catch ( ContainerHostNotFoundException e )
         {
@@ -477,7 +454,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
 
         DestroyContainerTask destroyContainerTask =
-                new DestroyContainerTask( this, environment, containerHost, forceMetadataRemoval, resultHolder, op );
+                new DestroyContainerTask( this, environment, environmentContainer, forceMetadataRemoval, resultHolder,
+                        op );
 
         executor.submit( destroyContainerTask );
 

@@ -316,10 +316,6 @@ string SubutaiContainer::getContainerStatus() {
 	return this->container->state(this->container);
 }
 
-void SubutaiContainer::write() {
-	cout << hostname << " " << id << endl;
-}
-
 /**
  *  \details   getting SubutaiContainer uuid value.
  */

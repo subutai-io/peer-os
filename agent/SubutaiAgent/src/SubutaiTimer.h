@@ -80,7 +80,9 @@ private:
 	unsigned int exectimeout;
 	unsigned int queuetimeout;
 	unsigned int startsec;
-	unsigned int startsecQueue;bool overflag;bool overflagQueue;
+	unsigned int startsecQueue;
+	bool overflag;
+	bool overflagQueue;
 	unsigned int count;
 	unsigned int countQueue;
 	unsigned int numHeartbeatmod5;
