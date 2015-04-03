@@ -68,10 +68,11 @@ public class ChannelSettings
             "/cxf/environments/domain",
             "/cxf/environments/container/environmentId",
             "/cxf/environments/container/state",
+            "/cxf/environments/container/start",
+            "/cxf/environments/container/stop",
 
             //"/cxf/environments/{environmentId}",
             "/cxf/environments/{$}",
-
             "/cxf/environments/grow",
             "/cxf/environments/key",
             "/cxf/environments/container",
