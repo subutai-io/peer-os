@@ -253,7 +253,6 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
                     break;
                 }
             }
-
         }
         catch ( NetworkManagerException e )
         {
@@ -411,7 +410,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
             {
                 throw ( PeerException ) e.getCause();
             }
-            throw new PeerException( "Error reserving VNI", e.getCause() );
+            throw new PeerException( "Error releasing VNI", e.getCause() );
         }
     }
 
