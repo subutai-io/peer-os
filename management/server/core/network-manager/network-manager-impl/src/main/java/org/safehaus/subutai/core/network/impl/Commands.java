@@ -153,6 +153,14 @@ public class Commands
     }
 
 
+    public RequestBuilder getReleaseVniCommand( long vni, int vlan, UUID environmentId )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
+                Lists.newArrayList( "-Z delete", String.valueOf( vni ), String.valueOf( vlan ),
+                        environmentId.toString() ) );
+    }
+
+
     public RequestBuilder getListReservedVnisCommand()
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-Z", "list" ) );

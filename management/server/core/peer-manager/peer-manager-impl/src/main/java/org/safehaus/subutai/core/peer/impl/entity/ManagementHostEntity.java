@@ -373,6 +373,50 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
+    public void releaseVni( final Vni vni ) throws PeerException
+    {
+        Preconditions.checkNotNull( vni, "Invalid vni" );
+
+        //need to execute sequentially since other parallel executions can take the same VNI
+        Future<Void> future = queueSequentialTask( new Callable<Void>()
+        {
+            @Override
+            public Void call() throws Exception
+            {
+
+                //find vni associated with environment
+                Vni existingVni = findVniByEnvironmentId( vni.getEnvironmentId() );
+                if ( existingVni == null )
+                {
+                    throw new PeerException( "Requested vni associated to environment doesn't exist" );
+                }
+
+                //release vni
+                getNetworkManager().releaseVni( existingVni );
+                return null;
+            }
+        } );
+
+        try
+        {
+            future.get();
+        }
+        catch ( InterruptedException e )
+        {
+            throw new PeerException( e );
+        }
+        catch ( ExecutionException e )
+        {
+            if ( e.getCause() instanceof PeerException )
+            {
+                throw ( PeerException ) e.getCause();
+            }
+            throw new PeerException( "Error reserving VNI", e.getCause() );
+        }
+    }
+
+
+    @Override
     public int setupTunnels( final Set<String> peerIps, final UUID environmentId ) throws PeerException
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );

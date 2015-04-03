@@ -138,6 +138,14 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    protected String delete( String path, String alias, Map<String, String> params, Map<String, String> headers )
+            throws HTTPException
+    {
+
+        return request( RestUtil.RequestType.DELETE, path, alias, params, headers );
+    }
+
+
     @Override
     public UUID getId()
     {
@@ -1137,6 +1145,32 @@ public class RemotePeerImpl implements RemotePeer
             String response = post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
 
             return Integer.parseInt( response );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( String.format( "Error reserving vni %s on peer %s", vni, getName() ), e );
+        }
+    }
+
+
+    @Override
+    public void releaseVni( final Vni vni ) throws PeerException
+    {
+        Preconditions.checkNotNull( vni, "Invalid vni" );
+
+        String path = "peer/vni";
+
+        try
+        {
+            Map<String, String> headers = Maps.newHashMap();
+            headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, vni.getEnvironmentId().toString() );
+
+            Map<String, String> params = Maps.newHashMap();
+
+            params.put( "vni", JsonUtil.to( vni ) );
+
+            String response = delete( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
+            LOG.info( String.format( "Environment vni release response: %s", response ) );
         }
         catch ( Exception e )
         {

@@ -11,6 +11,7 @@ import java.util.concurrent.Semaphore;
 import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.mdc.SubutaiExecutors;
+import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.ContainersDestructionResult;
 import org.safehaus.subutai.common.peer.Peer;
@@ -23,6 +24,7 @@ import org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
+import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,6 +94,38 @@ public class DestroyEnvironmentTask implements Runnable
             for ( ContainerHost container : environment.getContainerHosts() )
             {
                 environmentPeers.add( container.getPeer() );
+            }
+
+            try
+            {
+                //Remove Gateway
+                ManagementHost managementHost = localPeer.getManagementHost();
+                Vni environmentVni = null;
+                for ( final Vni vni : managementHost.getReservedVnis() )
+                {
+                    if ( vni.getEnvironmentId().equals( environment.getId() ) )
+                    {
+                        environmentVni = vni;
+                        break;
+                    }
+                }
+
+
+                if ( environmentVni == null )
+                {
+                    throw new PeerException( "Environment VNI is NULL, aborting gateway, vni, vlan removal" );
+                }
+
+                managementHost.removeGateway( environmentVni.getVlan() );
+
+                //Remove reserved vni vlan
+                //command: subutai mangement_network -Z delete vni vlan env_id
+
+                managementHost.releaseVni( environmentVni );
+            }
+            catch ( PeerException e )
+            {
+                e.printStackTrace();
             }
 
             ExecutorService executorService = SubutaiExecutors.newFixedThreadPool( environmentPeers.size() );

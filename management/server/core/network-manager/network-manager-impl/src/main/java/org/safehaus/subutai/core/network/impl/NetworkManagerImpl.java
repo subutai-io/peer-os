@@ -266,6 +266,18 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
+    public void releaseVni( final Vni vni ) throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( vni );
+        Preconditions.checkArgument( NumUtil.isIntBetween( vni.getVlan(), Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+
+
+        execute( getManagementHost(),
+                commands.getReleaseVniCommand( vni.getVni(), vni.getVlan(), vni.getEnvironmentId() ) );
+    }
+
+
+    @Override
     public Set<Vni> getReservedVnis() throws NetworkManagerException
     {
         Set<Vni> reservedVnis = Sets.newHashSet();

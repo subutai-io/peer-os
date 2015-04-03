@@ -36,7 +36,7 @@ public class RestUtil
 
     public static enum RequestType
     {
-        GET, POST
+        GET, DELETE, POST
     }
 
 
@@ -122,7 +122,21 @@ public class RestUtil
                     client.header( entry.getKey(), entry.getValue() );
                 }
             }
-            response = requestType == RequestType.GET ? client.get() : client.form( form );
+            //            response = requestType == RequestType.GET ? client.get() : client.form( form );
+            switch ( requestType )
+            {
+                case GET:
+                    response = client.get();
+                    break;
+                case POST:
+                    response = client.form( form );
+                    break;
+                case DELETE:
+                    response = client.delete();
+                    break;
+                default:
+                    throw new HTTPException( "Invalid RequestType: " + requestType.name() );
+            }
             if ( !NumUtil.isIntBetween( response.getStatus(), 200, 299 ) )
             {
                 if ( response.hasEntity() )

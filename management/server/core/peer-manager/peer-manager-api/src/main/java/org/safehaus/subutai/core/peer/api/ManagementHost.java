@@ -29,6 +29,8 @@ public interface ManagementHost extends Host
 
     public int reserveVni( Vni vni ) throws PeerException;
 
+    public void releaseVni( Vni vni ) throws PeerException;
+
     public Set<Gateway> getGateways() throws PeerException;
 
     public void createGateway( String gatewayIp, int vlan ) throws PeerException;

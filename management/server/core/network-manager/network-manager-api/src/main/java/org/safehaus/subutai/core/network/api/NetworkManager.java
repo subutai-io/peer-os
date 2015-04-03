@@ -106,6 +106,8 @@ public interface NetworkManager
 
     public void reserveVni( Vni vni ) throws NetworkManagerException;
 
+    public void releaseVni( Vni vni ) throws NetworkManagerException;
+
     public Set<Vni> getReservedVnis() throws NetworkManagerException;
 
     /**
