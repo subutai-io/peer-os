@@ -158,7 +158,7 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
         }
         catch ( MalformedURLException ignore )
         {
-            LOG.warn( "MalformedURLException:" + ignore.toString(), ignore );
+            //            LOG.warn( "MalformedURLException:" + ignore.toString(), ignore );
         }
     }
 
