@@ -11,7 +11,6 @@ import java.util.concurrent.Semaphore;
 import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.mdc.SubutaiExecutors;
-import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.ContainersDestructionResult;
 import org.safehaus.subutai.common.peer.Peer;
@@ -96,46 +95,20 @@ public class DestroyEnvironmentTask implements Runnable
                 environmentPeers.add( container.getPeer() );
             }
 
-            try
+            if ( !environmentPeers.contains( localPeer ) )
             {
-                //Remove Gateway
-                op.addLog( "Removing gateway" );
-                ManagementHost managementHost = localPeer.getManagementHost();
-                Vni environmentVni = null;
-
-                op.addLog( "Getting environment vni" );
-
-                for ( final Vni vni : managementHost.getReservedVnis() )
+                try
                 {
-                    if ( vni.getEnvironmentId().equals( environment.getId() ) )
+                    ManagementHost managementHost = localPeer.getManagementHost();
+                    if ( managementHost != null )
                     {
-                        environmentVni = vni;
-                        break;
+                        managementHost.cleanupEnvironmentNetworkSettings( environment.getId() );
                     }
                 }
-
-                if ( environmentVni == null )
+                catch ( PeerException e )
                 {
-                    op.addLog( "Couldn't get environment vni" );
-                    throw new PeerException( "Environment VNI is NULL, aborting gateway, vni, vlan removal" );
+                    LOG.error( "Couldn't get local LocalPeer#ManagementHost", e );
                 }
-
-                managementHost.removeGateway( environmentVni.getVlan() );
-
-                op.addLog( "Gateway removed." );
-                //Remove reserved vni vlan
-                //command: subutai mangement_network -Z delete vni vlan env_id
-
-                op.addLog( String.format( "Releasing environment vni (%d) from peers", environmentVni.getVni() ) );
-                for ( final Peer peer : environmentPeers )
-                {
-                    peer.releaseVni( environmentVni );
-                    op.addLog( String.format( "Vni released from peer %s", peer.getName() ) );
-                }
-            }
-            catch ( PeerException e )
-            {
-                LOG.error( String.format( "Error clearing up environment network configurations" ), e );
             }
 
             ExecutorService executorService = SubutaiExecutors.newFixedThreadPool( environmentPeers.size() );
