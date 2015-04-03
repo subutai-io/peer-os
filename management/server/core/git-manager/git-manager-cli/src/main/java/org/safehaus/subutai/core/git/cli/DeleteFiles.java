@@ -5,12 +5,12 @@ import java.util.List;
 
 import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitManager;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
 
@@ -19,7 +19,7 @@ import com.google.common.base.Preconditions;
  * Deletes file(s) from working directory and index
  */
 @Command( scope = "git", name = "delete-files", description = "Delete files from repo" )
-public class DeleteFiles extends OsgiCommandSupport
+public class DeleteFiles extends SubutaiShellCommandSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( DeleteFiles.class.getName() );

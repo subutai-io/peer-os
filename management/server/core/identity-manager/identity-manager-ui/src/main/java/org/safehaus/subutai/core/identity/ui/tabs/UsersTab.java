@@ -4,6 +4,8 @@ package org.safehaus.subutai.core.identity.ui.tabs;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.identity.ui.tabs.subviews.UserForm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItem;
@@ -37,6 +39,8 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
     private Button newBean;
     private UserForm form;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger( UsersTab.class );
+
 
     public UsersTab( final IdentityManager identityManager )
     {
@@ -68,7 +72,7 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
 
         // Create a form for editing a selected or new item.
         // It is invisible until actually used.
-        form = new UserForm( this, identityManager.getAllRoles() );
+        form = new UserForm( this, identityManager );
         form.setVisible( false );
 
         // When the user selects an item, show it in the form
@@ -140,10 +144,9 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
             case STATE_EXISTING_ENTITY_SELECTED:
                 newBean.setEnabled( false );
                 form.setVisible( true );
+                usersTable.setEnabled( false );
                 break;
             case STATE_SAVE_EXISTING_ENTITY:
-                newBean.setEnabled( false );
-                break;
             case STATE_SAVE_NEW_ENTITY:
                 newBean.setEnabled( true );
                 usersTable.setEnabled( true );
@@ -152,12 +155,12 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
             case STATE_REMOVE_ENTITY:
                 newBean.setEnabled( true );
                 form.setVisible( false );
+                usersTable.setEnabled( true );
                 break;
             case STATE_NEW_ENTITY:
                 form.setVisible( true );
                 newBean.setEnabled( false );
                 usersTable.setEnabled( false );
-                //                usersTable.select( null );
                 break;
             case STATE_CANCEL:
                 form.setVisible( false );
@@ -174,7 +177,8 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
         identityManager.updateUser( value.getBean() );
         if ( newValue )
         {
-            beans.addBean( value.getBean() );
+            beans.removeAllItems();
+            beans.addAll( identityManager.getAllUsers() );
             refreshControls( FormState.STATE_SAVE_NEW_ENTITY );
         }
         else

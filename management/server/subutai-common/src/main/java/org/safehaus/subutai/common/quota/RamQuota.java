@@ -11,7 +11,7 @@ import com.google.common.base.Strings;
 /**
  * RAM quota
  */
-public class RamQuota
+public class RamQuota extends QuotaInfo
 {
     private static final String QUOTA_REGEX = "(\\d+)(K|M|G)?";
     private static final Pattern QUOTA_PATTERN = Pattern.compile( QUOTA_REGEX );
@@ -56,6 +56,20 @@ public class RamQuota
         {
             throw new IllegalArgumentException( String.format( "Unparseable result: %s", quotaString ) );
         }
+    }
+
+
+    @Override
+    public String getQuotaKey()
+    {
+        return QuotaType.QUOTA_TYPE_RAM.getKey();
+    }
+
+
+    @Override
+    public QuotaType getQuotaType()
+    {
+        return QuotaType.QUOTA_TYPE_RAM;
     }
 
 

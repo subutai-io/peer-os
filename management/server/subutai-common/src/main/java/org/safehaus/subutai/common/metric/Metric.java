@@ -7,7 +7,7 @@ import com.google.common.base.Objects;
 
 
 /**
- * Interface for metrics
+ * Abstract class for metrics
  *
  * {"host":"py991745969", "totalRam":"16501141504", "availableRam":"15651282944", "usedRam":"849711104",
  * "usedCpu":"22220161270753", "availableDiskRootfs":"293251227648", "availableDiskVar":"1175086145536",

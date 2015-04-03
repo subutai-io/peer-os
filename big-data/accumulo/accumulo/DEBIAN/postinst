@@ -6,9 +6,8 @@ accumuloVersion=1.6.1
 accumuloHome="/opt/accumulo-$accumuloVersion"
 accumuloConf="/etc/accumulo"
 
-if [[ "x$ACCUMULO_HOME" != "x" ]];
-then
-        accumuloHome=$ACCUMULO_HOME
+if [[ "x$ACCUMULO_HOME" != "x" ]]; then
+  accumuloHome=$ACCUMULO_HOME
 fi
 
 # Create symlink to configuration files and scripts
@@ -26,45 +25,38 @@ ln -sf $accumuloConf/slaves $accumuloHome/conf/
 ln -sf $accumuloConf/tracers $accumuloHome/conf/
 ln -sf $accumuloConf/monitor $accumuloHome/conf/
 
-if [ "x$JAVA_HOME" = "x" ];
-then
+if [ "x$JAVA_HOME" = "x" ]; then
 	$accumuloHome/bin/accumulo-property.sh JAVA_HOME /usr/lib/jvm/java-1.7.0-openjdk-amd64
 else
 	$accumuloHome/bin/accumulo-property.sh JAVA_HOME $JAVA_HOME 
 fi
 
-if [ "x$HADOOP_HOME" = "x" ];
-then
+if [ "x$HADOOP_HOME" = "x" ]; then
 	$accumuloHome/bin/accumulo-property.sh HADOOP_HOME /opt/hadoop-1.2.1
 else
-        $accumuloHome/bin/accumulo-property.sh HADOOP_HOME $HADOOP_HOME
+  $accumuloHome/bin/accumulo-property.sh HADOOP_HOME $HADOOP_HOME
 fi
 
-if [ "x$HADOOP_PREFIX" = "x" ];
-then
+if [ "x$HADOOP_PREFIX" = "x" ]; then
 	$accumuloHome/bin/accumulo-property.sh HADOOP_PREFIX /opt/hadoop-1.2.1
 else
-        $accumuloHome/bin/accumulo-property.sh HADOOP_PREFIX $HADOOP_PREFIX
+  $accumuloHome/bin/accumulo-property.sh HADOOP_PREFIX $HADOOP_PREFIX
 fi
 
-if [ "x$HADOOP_CONF_DIR" = "x" ];
-then
-        $accumuloHome/bin/accumulo-property.sh HADOOP_CONF_DIR /etc/hadoop
+if [ "x$HADOOP_CONF_DIR" = "x" ]; then
+  $accumuloHome/bin/accumulo-property.sh HADOOP_CONF_DIR /etc/hadoop
 else
-        $accumuloHome/bin/accumulo-property.sh HADOOP_CONF_DIR $HADOOP_PREFIX/conf
+  $accumuloHome/bin/accumulo-property.sh HADOOP_CONF_DIR $HADOOP_PREFIX/conf
 fi
 
-if [ "x$ZOOKEEPER_HOME" = "x" ];
-then
-        $accumuloHome/bin/accumulo-property.sh ZOOKEEPER_HOME /opt/zookeeper-3.4.5
+if [ "x$ZOOKEEPER_HOME" = "x" ]; then
+  $accumuloHome/bin/accumulo-property.sh ZOOKEEPER_HOME /opt/zookeeper-3.4.5
 else
-        $accumuloHome/bin/accumulo-property.sh ZOOKEEPER_HOME $ZOOKEEPER_HOME
+  $accumuloHome/bin/accumulo-property.sh ZOOKEEPER_HOME $ZOOKEEPER_HOME
 fi
 
-if [ "x$ACCUMULO_LOG_DIR" = "x" ];
-then
-        $accumuloHome/bin/accumulo-property.sh ACCUMULO_LOG_DIR $accumuloHome/log
+if [ "x$ACCUMULO_LOG_DIR" = "x" ]; then
+  $accumuloHome/bin/accumulo-property.sh ACCUMULO_LOG_DIR $accumuloHome/log
 else
-        $accumuloHome/bin/accumulo-property.sh ACCUMULO_LOG_DIR $ACCUMULO_LOG_DIR
+  $accumuloHome/bin/accumulo-property.sh ACCUMULO_LOG_DIR $ACCUMULO_LOG_DIR
 fi
-

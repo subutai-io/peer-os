@@ -7,6 +7,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -79,9 +80,13 @@ public interface RestService
     @POST
     @Path( "register" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    //    public Response processRegisterRequest( @FormParam( "peer" ) String peer,
-    //                                            @FormParam( "root_cert_px2" ) String root_cert_px2 );
     public Response processRegisterRequest( @FormParam( "peer" ) String peer );
+
+
+    @POST
+    @Path( "register/{peerIp}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response sendRegistrationRequest( @PathParam( "peerIp" ) String peerIp );
 
 
     @DELETE
@@ -107,6 +112,12 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response approveForRegistrationRequest( @FormParam( "approvedPeer" ) String approvedPeer,
                                                    @FormParam( "root_cert_px2" ) String root_cert_px2 );
+
+
+    @PUT
+    @Path( "approve/{peerId}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response approveForRegistrationRequest( @PathParam( "peerId" ) String peerId );
 
 
     @PUT
@@ -244,9 +255,14 @@ public interface RestService
     Response setDefaultGateway( @FormParam( "containerId" ) String containerId,
                                 @FormParam( "gatewayIp" ) String gatewayIp );
 
+
+    @GET
+    @Path( "container/info" )
+    Response getContainerHostInfoById( @QueryParam( "containerId" ) String containerId );
+
     @POST
     @Path( "vni" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( { MediaType.TEXT_PLAIN } )
     Response reserveVni( @FormParam( "vni" ) String vni );
 
 

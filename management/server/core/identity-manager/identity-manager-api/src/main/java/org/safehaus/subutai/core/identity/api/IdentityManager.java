@@ -49,6 +49,16 @@ public interface IdentityManager
 
 
     /**
+     * Check User Rest URL
+     *
+     *
+     *
+     *
+     *
+     */
+    public short checkRestPermissions(  User user , String restURL );
+
+    /**
      * Get {@code Subject} for target session
      *
      * @param sessionId - session id
@@ -141,10 +151,69 @@ public interface IdentityManager
      */
     public boolean deleteUser( User user );
 
+    //-------------------------- CliCommandScope ----------------------
 
-    //-------------------------- UserPortalModule ---------------------
+    /**
+     * Get all available cli commands registered in system
+     *
+     * @return - list of {@code CliCommand} interface objects
+     */
+    public List<CliCommand> getAllCliCommands();
+
+    /**
+     * Create sample {@code CliCommand} instance of CliCommandEntity with intention of usability for further db CRUD
+     * operations
+     *
+     * @param scope - scope of {@link CliCommand#getScope()}
+     * @param name - name of {@link CliCommand#getName()}
+     */
+    public CliCommand createMockCliCommand( String scope, String name );
+
+    /**
+     * Update/persist passed {@code CliCommand} object to database
+     *
+     * @param cliCommand - cliCommand
+     *
+     * @return - operation result denoted as true or false
+     */
+    public boolean updateCliCommand( CliCommand cliCommand );
+
+
+    //-------------------------- RestEndpointScope --------------------
+
+    /**
+     * List all rest endpoints registered in system
+     *
+     * @return - set of {@code RestEndpointScope} objects
+     */
+    public Set<RestEndpointScope> getAllRestEndpoints();
+
+    /**
+     * Create sample {@code RestEndpointScope} instance of RestEndpointScopeEntity with intention of usability for
+     * further db CRUD operations
+     *
+     * @param endpoint - uri of {@link RestEndpointScope#getRestEndpoint()}
+     * @param port - port of {@link RestEndpointScope#getPort()}
+     */
+    public RestEndpointScope createMockRestEndpoint( String endpoint, String port );
+
+
+    /**
+     * Update/persist passed {@code RestEndpointScope} object to database
+     *
+     * @param endpointScope - endPointScope
+     *
+     * @return - operation result denoted as true or false
+     */
+    public boolean updateRestEndpoint( RestEndpointScope endpointScope );
+
+    //-------------------------- PortalModuleScope --------------------
 
     public Set<PortalModuleScope> getAllPortalModules();
+
+    public PortalModuleScope createMockUserPortalModule( String moduleKey, String moduleName );
+
+    public boolean updateUserPortalModule( PortalModuleScope portalModuleScope );
 
 
     //<-------------------------- Permissions -------------------------
@@ -248,17 +317,11 @@ public interface IdentityManager
      * Erase existing {@code Role} from database
      *
      * @param role - {@code Role}
-     *
-     * @return - result for erase operation
      */
-    public boolean deleteRole( Role role );
+    public void deleteRole( Role role );
 
     public boolean isAuthenticated();
 
     public Set<String> getRoles( Serializable shiroSessionId );
-
-    public PortalModuleScope createMockUserPortalModule( String moduleKey, String moduleName );
-
-    public boolean updateUserPortalModule( PortalModuleScope portalModuleScope );
 }
 

@@ -394,6 +394,72 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response startContainer( final String containerId )
+    {
+        if ( !UUIDUtil.isStringAUuid( containerId ) )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
+        }
+
+        UUID hostId = UUID.fromString( containerId );
+
+        Environment environment = findEnvironmentByContainerId( hostId );
+
+        if ( environment != null )
+        {
+            try
+            {
+                ContainerHost containerHost = environment.getContainerHostById( hostId );
+
+                containerHost.start();
+
+                return Response.ok().build();
+            }
+            catch ( ContainerHostNotFoundException | PeerException e )
+            {
+                return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+            }
+        }
+
+        return Response.status( Response.Status.NOT_FOUND ).build();
+    }
+
+
+    @Override
+    public Response stopContainer( final String containerId )
+    {
+        if ( !UUIDUtil.isStringAUuid( containerId ) )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
+        }
+
+        UUID hostId = UUID.fromString( containerId );
+
+        Environment environment = findEnvironmentByContainerId( hostId );
+
+        if ( environment != null )
+        {
+            try
+            {
+                ContainerHost containerHost = environment.getContainerHostById( hostId );
+
+                containerHost.stop();
+
+                return Response.ok().build();
+            }
+            catch ( ContainerHostNotFoundException | PeerException e )
+            {
+                return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+            }
+        }
+
+        return Response.status( Response.Status.NOT_FOUND ).build();
+    }
+
+
+    @Override
     public Response setSshKey( final String environmentId, final String key )
     {
         if ( !UUIDUtil.isStringAUuid( environmentId ) )

@@ -7,18 +7,18 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
 
 
 @Command( scope = "host", name = "container-host", description = "Prints details about container host" )
-public class GetContainerHostInfoCommand extends OsgiCommandSupport
+public class GetContainerHostInfoCommand extends SubutaiShellCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( GetContainerHostInfoCommand.class.getName() );
 

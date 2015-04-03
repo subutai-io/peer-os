@@ -5,9 +5,6 @@
 package org.safehaus.subutai.common.util;
 
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
@@ -23,14 +20,6 @@ import com.google.common.base.Preconditions;
  */
 public class ServiceLocator
 {
-
-    private final Map<String, Object> cache;
-
-
-    public ServiceLocator()
-    {
-        this.cache = new ConcurrentHashMap<>();
-    }
 
 
     /**
@@ -93,25 +82,6 @@ public class ServiceLocator
 
     public <T> T getService( Class<T> clazz ) throws NamingException
     {
-        Preconditions.checkNotNull( clazz, "Class is null" );
-
-        String serviceName = clazz.getName();
-
-        Object cachedObj = cache.get( serviceName );
-        if ( cachedObj == null )
-        {
-            BundleContext ctx = FrameworkUtil.getBundle( clazz ).getBundleContext();
-            if ( ctx != null )
-            {
-                ServiceReference serviceReference = ctx.getServiceReference( clazz.getName() );
-                if ( serviceReference != null )
-                {
-                    cachedObj = ctx.getService( serviceReference );
-                    cache.put( serviceName, cachedObj );
-                }
-            }
-        }
-
-        return clazz.cast( cachedObj );
+        return getServiceNoCache( clazz );
     }
 }

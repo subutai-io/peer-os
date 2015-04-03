@@ -42,6 +42,7 @@ import org.safehaus.subutai.core.peer.impl.command.CommandResponseListener;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerGroupRequestListener;
 import org.safehaus.subutai.core.peer.impl.container.DestroyEnvironmentContainersRequestListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
+import org.safehaus.subutai.core.peer.impl.entity.ManagementHostEntity;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequestListener;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -177,7 +178,7 @@ public class PeerManagerImpl implements PeerManager
 
             File peerIdFile = peerIdFilePath.toFile();
 
-            UUID peerId = null;
+            UUID peerId;
 
             try
             {
@@ -318,10 +319,17 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public boolean unregister( final String uuid ) throws PeerException
     {
-        ManagementHost managementHost = getLocalPeer().getManagementHost();
+        ManagementHost mgmHost = getLocalPeer().getManagementHost();
+        if ( !( mgmHost instanceof ManagementHostEntity ) )
+        {
+            return false;
+        }
+        ManagementHostEntity managementHost = ( ManagementHostEntity ) mgmHost;
         UUID remotePeerId = UUID.fromString( uuid );
         PeerInfo p = getPeerInfo( remotePeerId );
         managementHost.removeAptSource( p.getId().toString(), p.getIp() );
+        managementHost.removeTunnel( p.getIp() );
+
         PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( remotePeerId );
         // Remove peer policy of the target remote peer from the local peer
         if ( peerPolicy != null )

@@ -5,17 +5,19 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 
 import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
+import org.safehaus.subutai.common.mdc.SubutaiExecutors;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.ContainersDestructionResult;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.util.ExceptionUtil;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
 import org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
@@ -23,8 +25,6 @@ import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -49,12 +49,15 @@ public class DestroyEnvironmentTask implements Runnable
     private final boolean forceMetadataRemoval;
     private final LocalPeer localPeer;
     private final Semaphore semaphore;
+    private final TrackerOperation op;
+    private ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
     public DestroyEnvironmentTask( final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
                                    final Set<Throwable> exceptions,
                                    final ResultHolder<EnvironmentDestructionException> resultHolder,
-                                   final boolean forceMetadataRemoval, final LocalPeer localPeer )
+                                   final boolean forceMetadataRemoval, final LocalPeer localPeer,
+                                   final TrackerOperation op )
     {
         this.environmentManager = environmentManager;
         this.environment = environment;
@@ -62,6 +65,7 @@ public class DestroyEnvironmentTask implements Runnable
         this.resultHolder = resultHolder;
         this.forceMetadataRemoval = forceMetadataRemoval;
         this.localPeer = localPeer;
+        this.op = op;
         this.semaphore = new Semaphore( 0 );
     }
 
@@ -74,7 +78,10 @@ public class DestroyEnvironmentTask implements Runnable
 
             if ( environment.getStatus() == EnvironmentStatus.EMPTY || environment.getContainerHosts().isEmpty() )
             {
-                environmentManager.removeEnvironment( environment.getId() );
+                environmentManager.removeEnvironment( environment.getId(), false );
+
+                op.addLogDone( "Environment destroyed successfully" );
+
                 return;
             }
 
@@ -87,9 +94,11 @@ public class DestroyEnvironmentTask implements Runnable
                 environmentPeers.add( container.getPeer() );
             }
 
-            ExecutorService executorService = Executors.newFixedThreadPool( environmentPeers.size() );
+            ExecutorService executorService = SubutaiExecutors.newFixedThreadPool( environmentPeers.size() );
 
             Set<Future<ContainersDestructionResult>> futures = Sets.newHashSet();
+
+            op.addLog( "Destroying environment containers..." );
 
             for ( Peer peer : environmentPeers )
             {
@@ -107,7 +116,11 @@ public class DestroyEnvironmentTask implements Runnable
                 }
                 catch ( ExecutionException | InterruptedException e )
                 {
-                    exceptions.add( ExceptionUtils.getRootCause( e ) );
+                    Throwable cause = exceptionUtil.getRootCause( e );
+
+                    exceptions.add( cause );
+
+                    op.addLog( String.format( "Error destroying containers: %s", cause.getMessage() ) );
                 }
             }
 
@@ -125,6 +138,8 @@ public class DestroyEnvironmentTask implements Runnable
                     }
                     else
                     {
+                        op.addLog( String.format( "Error destroying containers: %s", result.getException() ) );
+
                         exceptions.add( new EnvironmentDestructionException( result.getException() ) );
                     }
                 }
@@ -151,22 +166,31 @@ public class DestroyEnvironmentTask implements Runnable
                 }
             }
 
-            //remove certificates
             if ( !forceMetadataRemoval )
             {
                 environmentPeers.removeAll( environment.getPeers() );
             }
+
+            //remove certificates
             for ( Peer peer : environmentPeers )
             {
                 if ( !peer.isLocal() )
                 {
                     try
                     {
+                        op.addLog( String.format( "Removing environment certificate on peer %s...", peer.getName() ) );
+
                         peer.removeEnvironmentCertificates( environment.getId() );
                     }
                     catch ( PeerException e )
                     {
-                        exceptions.add( ExceptionUtils.getRootCause( e ) );
+                        Throwable cause = exceptionUtil.getRootCause( e );
+
+                        op.addLog(
+                                String.format( "Error removing environment certificate on peer %s: %s", peer.getName(),
+                                        cause.getMessage() ) );
+
+                        exceptions.add( cause );
                     }
                 }
             }
@@ -175,17 +199,26 @@ public class DestroyEnvironmentTask implements Runnable
             {
                 try
                 {
+                    op.addLog( "Removing environment certificate on local peer..." );
+
                     localPeer.removeEnvironmentCertificates( environment.getId() );
                 }
                 catch ( PeerException e )
                 {
+                    op.addLog( String.format( "Error removing environment certificate on local peer: %s",
+                            e.getMessage() ) );
+
                     LOG.error( "Error removing environment certificate from local peer", e );
                 }
-                environmentManager.removeEnvironment( environment.getId() );
+                environmentManager.removeEnvironment( environment.getId(), false );
+
+                op.addLogDone( "Environment destroyed successfully" );
             }
             else
             {
                 environment.setStatus( EnvironmentStatus.UNHEALTHY );
+
+                op.addLogDone( "Environment destroyed partially" );
             }
         }
         catch ( EnvironmentNotFoundException e )
@@ -193,6 +226,8 @@ public class DestroyEnvironmentTask implements Runnable
             LOG.error( String.format( "Error destroying environment %s", environment.getId() ), e );
 
             resultHolder.setResult( new EnvironmentDestructionException( e ) );
+
+            op.addLogFailed( String.format( "Error destroying environment: %s", e.getMessage() ) );
         }
         finally
         {

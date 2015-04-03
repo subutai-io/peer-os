@@ -56,6 +56,7 @@ import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
 import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.util.ExceptionUtil;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
@@ -99,7 +100,6 @@ import org.safehaus.subutai.core.strategy.api.StrategyNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
@@ -134,6 +134,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     private HostRegistry hostRegistry;
     private Set<RequestListener> requestListeners;
     private CommandUtil commandUtil = new CommandUtil();
+    private ExceptionUtil exceptionUtil = new ExceptionUtil();
+
     private CustomSslContextFactory sslContextFactory;
 
 
@@ -267,7 +269,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
         try
         {
-            return resourceHost.createContainer( template.getTemplateName(), containerName, 180 );
+            return resourceHost
+                    .createContainer( template.getTemplateName(), /*Arrays.asList( template ), */containerName, 180 );
         }
         catch ( ResourceHostException e )
         {
@@ -339,7 +342,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 try
                 {
                     serverMetricMap.add( resourceHost.getHostMetric() );
-                    resourceHost.prepareTemplates( request.getTemplates() );
+                    //                    resourceHost.prepareTemplates( request.getTemplates() );
                 }
                 catch ( ResourceHostException e )
                 {
@@ -398,8 +401,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
                 String ipAddress = allAddresses[request.getIpAddressOffset() + currentIpAddressOffset];
                 taskFutures.add( executorService.submit(
-                        new CreateContainerWrapperTask( resourceHostEntity, templateName, hostname,
-                                String.format( "%s/%s", ipAddress, networkPrefix ), vlan, gateway,
+                        new CreateContainerWrapperTask( resourceHostEntity, templateName, /*request.getTemplates(),*/
+                                hostname, String.format( "%s/%s", ipAddress, networkPrefix ), vlan, gateway,
                                 WAIT_CONTAINER_CONNECTION_SEC ) ) );
 
                 currentIpAddressOffset++;
@@ -538,6 +541,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
     private void tryToRegister( final Template template ) throws RegistryException
     {
+        LOG.debug( String.format( "Trying to register template %s...", template.getTemplateName() ) );
         if ( templateRegistry.getTemplate( template.getTemplateName() ) == null )
         {
             templateRegistry.registerTemplate( template );
@@ -562,7 +566,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
             }
         }
 
-        throw new HostNotFoundException( String.format( "Container host not found by name %s", hostname ) );
+        throw new HostNotFoundException( String.format( "No container host found for name %s", hostname ) );
     }
 
 
@@ -584,6 +588,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         }
 
         throw new HostNotFoundException( String.format( "Container host not found by id %s", hostId ) );
+    }
+
+
+    @Override
+    public HostInfo getContainerHostInfoById( final UUID containerHostId ) throws PeerException
+    {
+        ContainerHost containerHost = getContainerHostById( containerHostId );
+
+        return new HostInfoModel( containerHost );
     }
 
 
@@ -758,8 +771,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 }
                 catch ( PeerException e )
                 {
-                    LOG.error( "Error cleaning up environment network configuration",
-                            ExceptionUtils.getRootCause( e ) );
+                    LOG.error( "Error cleaning up environment network configuration", exceptionUtil.getRootCause( e ) );
                 }
             }
             else
@@ -1091,21 +1103,27 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
     {
+        //todo put updating host fields logic to updateHostInfo method
         if ( resourceHostInfo.getHostname().equals( "management" ) )
         {
             if ( managementHost == null )
             {
                 managementHost = new ManagementHostEntity( getId().toString(), resourceHostInfo );
+                ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
                 try
                 {
                     managementHost.init();
                 }
                 catch ( Exception e )
                 {
-                    LOG.error( e.toString() );
+                    LOG.error( "Error initializing management host", e );
                 }
                 managementHostDataService.persist( ( ManagementHostEntity ) managementHost );
-                ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
+            }
+            else
+            {
+                ( ( AbstractSubutaiHost ) managementHost ).setNetInterfaces( resourceHostInfo.getInterfaces() );
+                managementHostDataService.update( ( ManagementHostEntity ) managementHost );
             }
             ( ( AbstractSubutaiHost ) managementHost ).updateHostInfo( resourceHostInfo );
         }
@@ -1135,6 +1153,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
     private void saveResourceHostContainers( ResourceHost resourceHost, Set<ContainerHostInfo> containerHostInfos )
     {
+        //todo put updating host fields logic to updateHostInfo method
         Set<ContainerHost> oldHosts = resourceHost.getContainerHosts();
         Set<UUID> newContainerIds = Sets.newHashSet();
         for ( ContainerHostInfo containerHostInfo : containerHostInfos )
@@ -1166,7 +1185,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 ( ( AbstractSubutaiHost ) containerHost ).setNetInterfaces( containerHostInfo.getInterfaces() );
                 containerHostDataService.update( ( ContainerHostEntity ) containerHost );
             }
-            ( ( AbstractSubutaiHost ) containerHost ).updateHostInfo( containerHostInfo );
+            ( ( ContainerHostEntity ) containerHost ).updateHostInfo( containerHostInfo );
         }
 
         for ( ContainerHost oldHost : oldHosts )
@@ -1497,7 +1516,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 }
                 catch ( ExecutionException | InterruptedException e )
                 {
-                    errors.add( ExceptionUtils.getRootCause( e ) );
+                    errors.add( exceptionUtil.getRootCause( e ) );
                 }
             }
 
@@ -1510,7 +1529,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 }
                 catch ( PeerException e )
                 {
-                    errors.add( ExceptionUtils.getRootCause( e ) );
+                    errors.add( exceptionUtil.getRootCause( e ) );
                 }
             }
 
@@ -1538,11 +1557,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
-    public void reserveVni( final Vni vni ) throws PeerException
+    public int reserveVni( final Vni vni ) throws PeerException
     {
         Preconditions.checkNotNull( vni, "Invalid vni" );
 
-        getManagementHost().reserveVni( vni );
+        return getManagementHost().reserveVni( vni );
     }
 
 

@@ -56,14 +56,12 @@ using std::endl;
 #define EVENT_BUF_LEN       ( 1024 * ( EVENT_SIZE + NAME_MAX + 1) )
 #define WATCH_FLAGS         ( IN_CREATE | IN_DELETE | IN_MODIFY | IN_ATTRIB)
 
-class SubutaiWatch
-{
+class SubutaiWatch {
 public:
-	SubutaiWatch(SubutaiConnection*,SubutaiResponsePack*,SubutaiLogger*);
-	virtual ~SubutaiWatch(void );
-	void initialize(unsigned int);
-	bool addWatcher(const string &);
-	bool eraseWatcher(const string &);
+	SubutaiWatch(SubutaiConnection*, SubutaiResponsePack*, SubutaiLogger*);
+	virtual ~SubutaiWatch(void);
+	void initialize(unsigned int);bool addWatcher(const string &);bool eraseWatcher(
+			const string &);
 	string get(int);
 	int get(int, string);
 	void cleanup();
@@ -79,37 +77,37 @@ public:
 	void setNewDirectory(string);
 	void setCurrentDirectory(string);
 	void clearBuffer();
-	char* getBuffer();
-	bool checkNotification(SubutaiContainerManager*);
+	char* getBuffer();bool checkNotification(SubutaiContainerManager*);
 	string getModificationTime(string, bool);
 private:
 	bool folderExistenceChecker(const string &);
 	bool checkDuplicateName(const string &);
-	struct wd_elem
-	{
+
+	struct wd_elem {
 		int pd;
 		string name;
-		bool operator() (const wd_elem &l, const wd_elem &r) const
-		{
-			return l.pd < r.pd ? true : l.pd == r.pd && l.name < r.name ? true : false;
+
+		bool operator()(const wd_elem &l, const wd_elem &r) const {
+			return l.pd < r.pd ? true :
+					l.pd == r.pd && l.name < r.name ? true : false;
 		}
 	};
-	map<int, wd_elem> 				watch;
-	map<wd_elem, int, wd_elem> 		rwatch;
-	fd_set 							watch_set;
-	int 							fd;
-	int 							wd;
-	char 							buffer[ EVENT_BUF_LEN ];
-	string 							currentDirectory;
-	string 							newDirectory;
-	timeval 						timeout;
-	int 							selectResult;
-	int 							readResult;
-	string 							sendout;
-	SubutaiResponsePack*   	 		watchRepsonse;
-	SubutaiConnection*				watchConnection;
-	SubutaiLogger*					watchLogger;
-	SubutaiHelper 					helper;
+	map<int, wd_elem> watch;
+	map<wd_elem, int, wd_elem> rwatch;
+	fd_set watch_set;
+	int fd;
+	int wd;
+	char buffer[ EVENT_BUF_LEN];
+	string currentDirectory;
+	string newDirectory;
+	timeval timeout;
+	int selectResult;
+	int readResult;
+	string sendout;
+	SubutaiResponsePack* watchRepsonse;
+	SubutaiConnection* watchConnection;
+	SubutaiLogger* watchLogger;
+	SubutaiHelper helper;
 
 };
 #endif /* SUBUTAIWATCH_H_ */

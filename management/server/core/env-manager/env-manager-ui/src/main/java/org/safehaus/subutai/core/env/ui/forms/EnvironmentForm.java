@@ -13,8 +13,11 @@ import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vaadin.server.ClientConnector;
 import com.vaadin.server.ThemeResource;
@@ -27,11 +30,14 @@ import com.vaadin.ui.VerticalLayout;
 
 public class EnvironmentForm
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger( EnvironmentForm.class );
+
     private static final String ID = "Id";
     private static final String SSH_KEY = "Ssh key";
     private static final String DATE = "Date";
     private static final String REMOVE = "Remove";
     private static final String CONTAINERS = "Containers";
+    private static final String REFRESH_METADATA = "Refresh Info";
     private static final String NAME = "Name";
     private static final String STATUS = "Status";
     private static final String DESTROY = "Destroy";
@@ -127,6 +133,7 @@ public class EnvironmentForm
             final Button sshKeyBtn = new Button( SSH_KEY );
             final Button destroyBtn = new Button( DESTROY );
             final Button removeBtn = new Button( REMOVE );
+            final Button refreshContainersButton = new Button( REFRESH_METADATA );
             containersBtn.setId( environment.getName() + "-containers" );
             containersBtn.addClickListener( new Button.ClickListener()
             {
@@ -146,8 +153,7 @@ public class EnvironmentForm
                 {
 
                     ConfirmationDialog alert =
-                            new ConfirmationDialog( "Do you really want to destroy this environment?",
-                                    "Yes", "No" );
+                            new ConfirmationDialog( "Do you really want to destroy this environment?", "Yes", "No" );
                     alert.getOk().addClickListener( new Button.ClickListener()
                     {
                         @Override
@@ -156,6 +162,7 @@ public class EnvironmentForm
                             destroyBtn.setEnabled( false );
                             containersBtn.setEnabled( false );
                             sshKeyBtn.setEnabled( false );
+                            refreshContainersButton.setEnabled( false );
                             destroyEnvironment( environment );
                         }
                     } );
@@ -180,9 +187,8 @@ public class EnvironmentForm
                 @Override
                 public void buttonClick( final Button.ClickEvent event )
                 {
-                    ConfirmationDialog alert =
-                            new ConfirmationDialog( "Do you really want to remove this environment without destroying it?",
-                                    "Yes", "No" );
+                    ConfirmationDialog alert = new ConfirmationDialog(
+                            "Do you really want to remove this environment without destroying it?", "Yes", "No" );
                     alert.getOk().addClickListener( new Button.ClickListener()
                     {
                         @Override
@@ -203,12 +209,30 @@ public class EnvironmentForm
                 }
             } );
 
+            refreshContainersButton.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( final Button.ClickEvent event )
+                {
+                    try
+                    {
+                        environmentManager.updateEnvironmentContainersMetadata( environment.getId() );
+                    }
+                    catch ( EnvironmentManagerException e )
+                    {
+                        LOGGER.error( "Error updating containers metadata", e );
+                        Notification.show( "Error updating containers metadata", Notification.Type.WARNING_MESSAGE );
+                    }
+                }
+            } );
+
             boolean isEnvironmentUnderModification =
                     environment.getStatus().equals( EnvironmentStatus.UNDER_MODIFICATION );
 
             destroyBtn.setEnabled( !isEnvironmentUnderModification );
             containersBtn.setEnabled( !isEnvironmentUnderModification );
             sshKeyBtn.setEnabled( !isEnvironmentUnderModification );
+            refreshContainersButton.setEnabled( !isEnvironmentUnderModification );
 
             Embedded icon = isEnvironmentUnderModification ? new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) ) :
                             environment.getStatus().equals( EnvironmentStatus.HEALTHY ) ?
@@ -223,7 +247,7 @@ public class EnvironmentForm
 
             environmentsTable.addItem( new Object[] {
                     environment.getId(), environment.getName(), getCreationDate( environment.getCreationTimestamp() ),
-                    icon, containersBtn, sshKeyBtn, destroyBtn, removeBtn
+                    icon, containersBtn, sshKeyBtn, destroyBtn, refreshContainersButton, removeBtn
             }, null );
         }
         environmentsTable.refreshRowCache();
@@ -263,6 +287,7 @@ public class EnvironmentForm
         table.addContainerProperty( CONTAINERS, Button.class, null );
         table.addContainerProperty( SSH_KEY, Button.class, null );
         table.addContainerProperty( DESTROY, Button.class, null );
+        table.addContainerProperty( REFRESH_METADATA, Button.class, null );
         table.addContainerProperty( REMOVE, Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );

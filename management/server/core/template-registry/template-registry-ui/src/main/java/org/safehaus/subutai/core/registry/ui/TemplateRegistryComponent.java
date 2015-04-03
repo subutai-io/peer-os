@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.git.api.GitChangedFile;
@@ -27,13 +26,14 @@ import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Tree;
@@ -47,33 +47,68 @@ import com.vaadin.ui.themes.Runo;
 public class TemplateRegistryComponent extends CustomComponent
 {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger( TemplateRegistryComponent.class );
     private static final String VALUE_PROPERTY = "value";
-    private static final String PHYSICAL_IMG = "img/lxc/physical.png";
     private static final String ICON = "icon";
+    private static final String CAPTION = "caption";
+    private static final String PHYSICAL_IMG = "img/lxc/physical.png";
+    private static final String TEMPLATE_PROPERTY = "Template Property";
+    private static final String TEMPLATE_VALUE = "Value";
     private final TemplateRegistry registryManager;
+
     private HierarchicalContainer container;
     private Tree templateTree;
 
-    private Table templateInfoTable;
-    private Table changedFilesTable;
 
-    private static final String TEMPLATE_PROPERTY = "Template Property";
-    private static final String TEMPLATE_VALUE = "Value";
-    private static final Logger LOGGER = LoggerFactory.getLogger( TemplateRegistryComponent.class );
+    private BeanContainer<String, Template> templatesBeanContainer =
+            new BeanContainer<String, Template>( Template.class )
+            {
+                {
+                    setBeanIdProperty( "templateName" );
+                }
+            };
 
 
-    private interface TemplateValue
+    private BeanContainer<String, GitChangedFile> changedFilesBeanContainer =
+            new BeanContainer<String, GitChangedFile>( GitChangedFile.class )
+            {
+                {
+                    setBeanIdProperty( "gitFilePath" );
+                }
+            };
+
+
+    private ComboBox templateA = new ComboBox( "Template A" )
     {
-        public String getTemplateProperty( Template template );
-    }
+        {
+            setItemCaptionMode( ItemCaptionMode.PROPERTY );
+            setItemCaptionPropertyId( "templateName" );
+            setNullSelectionAllowed( false );
+            setImmediate( true );
+            setContainerDataSource( templatesBeanContainer );
+            setTextInputAllowed( false );
+            setRequired( true );
+        }
+    };
 
-
-    private interface CustomListener extends Property.ValueChangeListener
+    private ComboBox templateB = new ComboBox( "Template B" )
     {
+        {
+            setItemCaptionMode( ItemCaptionMode.PROPERTY );
+            setItemCaptionPropertyId( "templateName" );
+            setNullSelectionAllowed( false );
+            setImmediate( true );
+            setContainerDataSource( templatesBeanContainer );
+            setTextInputAllowed( false );
+            setRequired( true );
+        }
+    };
 
-    }
 
-
+    /**
+     * I used this approach to simplify work with tables, which have static rows but changing values on corresponding
+     * columns
+     */
     private Map<String, TemplateValue> templatePropertiesMap = new HashMap<String, TemplateValue>()
     {
         {
@@ -122,16 +157,22 @@ public class TemplateRegistryComponent extends CustomComponent
                 @Override
                 public String getTemplateProperty( final Template template )
                 {
-                    String rsHosts = "";
+                    StringBuilder buf = new StringBuilder();
                     for ( final String rh : template.getFaisUsingThisTemplate() )
                     {
-                        rsHosts += rh + "; ";
+                        buf.append( rh ).append( "; " );
                     }
-                    return rsHosts;
+                    return buf.toString();
                 }
             } );
         }
     };
+
+
+    private interface TemplateValue
+    {
+        public String getTemplateProperty( Template template );
+    }
 
 
     public TemplateRegistryComponent( final TemplateRegistry registryManager )
@@ -140,90 +181,138 @@ public class TemplateRegistryComponent extends CustomComponent
 
         this.registryManager = registryManager;
 
-        HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
-        horizontalSplit.setStyleName( Runo.SPLITPANEL_SMALL );
-        horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
+        setupView();
+    }
 
-        container = new HierarchicalContainer();
-        container.addContainerProperty( VALUE_PROPERTY, Template.class, null );
-        container.addContainerProperty( ICON, Resource.class, new ThemeResource( PHYSICAL_IMG ) );
 
-        final BeanContainer<String, GitChangedFile> dataContainer = new BeanContainer<>( GitChangedFile.class );
-        dataContainer.setBeanIdProperty( "gitFilePath" );
-        dataContainer.addAll( new ArrayList<GitChangedFile>() );
+    private void setupView()
+    {
+        // Containers
+        container = createTreeContent( registryManager.getAllTemplates() );
+        changedFilesBeanContainer.addAll( new ArrayList<GitChangedFile>() );
+        templatesBeanContainer.addAll( registryManager.getAllTemplates() );
 
-        changedFilesTable = new Table( "Changed Files." );
+
+        Table changedFilesTable = new Table( "Changed Files." );
         changedFilesTable.setWidth( "40%" );
         changedFilesTable.setImmediate( true );
-        changedFilesTable.setContainerDataSource( dataContainer );
-        changedFilesTable.addItemClickListener( new ItemClickEvent.ItemClickListener()
-        {
-            @Override
-            public void itemClick( final ItemClickEvent event )
-            {
-                BeanItem<GitChangedFile> file = dataContainer.getItem( event.getItemId() );
+        changedFilesTable.setContainerDataSource( changedFilesBeanContainer );
+        changedFilesTable.setColumnHeaders( "File Path", "Status" );
 
-                if ( file == null )
-                {
-                    return;
-                }
 
-                Item item = templateTree.getItem( templateTree.getValue() );
-
-                if ( item != null )
-                {
-                    final Template template = ( Template ) item.getItemProperty( VALUE_PROPERTY ).getValue();
-                    if ( template != null )
-                    {
-
-                        GitChangedFile gitFile = file.getBean();
-                        String fileDiff = registryManager
-                                .getChangedFileVersions( template.getParentTemplateName(), template.getTemplateName(),
-                                        gitFile );
-                        FileDiffModalView modalView =
-                                new FileDiffModalView( gitFile.getGitFilePath(), new HorizontalLayout(), fileDiff );
-
-                        getUI().addWindow( modalView );
-                    }
-                }
-            }
-        } );
-
-        templateInfoTable = new Table( "Template Info" );
-        templateInfoTable.setWidth( "25%" );
-        templateInfoTable.setImmediate( true );
-        templateInfoTable.addContainerProperty( TEMPLATE_PROPERTY, String.class, null );
-        templateInfoTable.addContainerProperty( TEMPLATE_VALUE, String.class, null );
-
-        for ( String key : templatePropertiesMap.keySet() )
-        {
-            templateInfoTable.addItem( new Object[] { key, "" }, key );
-        }
+        // Tree View
 
         templateTree = new Tree( "Templates" );
         templateTree.setContainerDataSource( container );
+        templateTree.setItemCaptionMode( AbstractSelect.ItemCaptionMode.PROPERTY );
+        templateTree.setItemCaptionPropertyId( CAPTION );
         templateTree.setItemIconPropertyId( ICON );
         templateTree.setImmediate( true );
-        templateTree.setItemDescriptionGenerator( new AbstractSelect.ItemDescriptionGenerator()
+        for ( final Object id : templateTree.getItemIds() )
+        {
+            templateTree.expandItem( id );
+        }
+
+
+        // Build templates layout
+
+        // Templates basic info tables
+
+        final Table templateBInfoTable = new Table( "Template Info" );
+        templateBInfoTable.setWidth( "80%" );
+        templateBInfoTable.setImmediate( true );
+        templateBInfoTable.addContainerProperty( TEMPLATE_PROPERTY, String.class, null );
+        templateBInfoTable.addContainerProperty( TEMPLATE_VALUE, String.class, null );
+
+        //adding rows
+        for ( String key : templatePropertiesMap.keySet() )
+        {
+            templateBInfoTable.addItem( new Object[] { key, "" }, key );
+        }
+
+        final Table templateAInfoTable = new Table( "Template Info" );
+        templateAInfoTable.setWidth( "80%" );
+        templateAInfoTable.setImmediate( true );
+        templateAInfoTable.addContainerProperty( TEMPLATE_PROPERTY, String.class, null );
+        templateAInfoTable.addContainerProperty( TEMPLATE_VALUE, String.class, null );
+
+        //adding rows
+        for ( String key : templatePropertiesMap.keySet() )
+        {
+            templateAInfoTable.addItem( new Object[] { key, "" }, key );
+        }
+
+        VerticalLayout firstTemplateComponents = new VerticalLayout();
+        firstTemplateComponents.setSpacing( true );
+        firstTemplateComponents.addComponent( templateA );
+        firstTemplateComponents.addComponent( templateAInfoTable );
+        firstTemplateComponents.setId( "firstTemplateComponentsId" );
+
+        VerticalLayout secondTemplateComponents = new VerticalLayout();
+        secondTemplateComponents.setSpacing( true );
+        secondTemplateComponents.addComponent( templateB );
+        secondTemplateComponents.addComponent( templateBInfoTable );
+        secondTemplateComponents.setId( "secondTemplateComponentsId" );
+
+        Button swapTemplates = new Button( "Swap Templates" );
+        swapTemplates.setId( "swapTemplatesId" );
+        swapTemplates.addClickListener( new Button.ClickListener()
         {
             @Override
-            public String generateDescription( Component source, Object itemId, Object propertyId )
+            public void buttonClick( final Button.ClickEvent event )
             {
-                String description = "";
-                Item item = templateTree.getItem( itemId );
-                if ( item != null )
-                {
-                    Template template = ( Template ) item.getItemProperty( VALUE_PROPERTY ).getValue();
-                    if ( template != null )
-                    {
-                        description = getTemplateDescription( template );
-                    }
-                }
-                return description;
+                Object firstSelected = templateA.getValue();
+                templateA.select( templateB.getValue() );
+                templateB.select( firstSelected );
             }
         } );
 
-        templateTree.addValueChangeListener( new Property.ValueChangeListener()
+        HorizontalLayout generalInfoHorizontalLayout = new HorizontalLayout();
+        generalInfoHorizontalLayout.setSpacing( true );
+        generalInfoHorizontalLayout.setSizeFull();
+        generalInfoHorizontalLayout.setId( "generalInfoHorizontalLayoutId" );
+        generalInfoHorizontalLayout.addComponent( secondTemplateComponents );
+        generalInfoHorizontalLayout.setExpandRatio( secondTemplateComponents, 2.0f );
+        generalInfoHorizontalLayout.addComponent( swapTemplates );
+        generalInfoHorizontalLayout.setExpandRatio( swapTemplates, 1.0f );
+        generalInfoHorizontalLayout.setComponentAlignment( swapTemplates, Alignment.MIDDLE_CENTER );
+        generalInfoHorizontalLayout.addComponent( firstTemplateComponents );
+        generalInfoHorizontalLayout.setExpandRatio( firstTemplateComponents, 2.0f );
+        generalInfoHorizontalLayout.setId( "generalInfoHorizontalLayoutId" );
+
+        VerticalLayout baseLayout = new VerticalLayout();
+        baseLayout.setSpacing( true );
+        baseLayout.setId( "baseLayoutId" );
+        baseLayout.setSizeFull();
+        baseLayout.addComponent( generalInfoHorizontalLayout );
+        baseLayout.addComponent( changedFilesTable );
+
+        HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
+        horizontalSplit.setStyleName( Runo.SPLITPANEL_SMALL );
+        horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
+        horizontalSplit.setFirstComponent( templateTree );
+        horizontalSplit.setSecondComponent( baseLayout );
+        setCompositionRoot( horizontalSplit );
+
+        //Listeners
+        Property.ValueChangeListener templateComboBoxListener = new Property.ValueChangeListener()
+        {
+            @Override
+            public void valueChange( final Property.ValueChangeEvent event )
+            {
+                BeanItem<Template> item = templatesBeanContainer.getItem( event.getProperty().getValue() );
+                Template template = item.getBean();
+                if ( event.getProperty().getValue().equals( templateA.getValue() ) )
+                {
+                    showSelectedTemplateInfo( template, templateAInfoTable );
+                }
+                else
+                {
+                    showSelectedTemplateInfo( template, templateBInfoTable );
+                }
+            }
+        };
+        Property.ValueChangeListener treeClickListener = new Property.ValueChangeListener()
         {
             @Override
             public void valueChange( Property.ValueChangeEvent event )
@@ -235,29 +324,15 @@ public class TemplateRegistryComponent extends CustomComponent
                     final Template template = ( Template ) item.getItemProperty( VALUE_PROPERTY ).getValue();
                     if ( template != null )
                     {
-                        Notification.show( template.toString() );
-                        getUI().access( new Runnable()
+                        if ( template.getParentTemplateName() != null )
                         {
-                            @Override
-                            public void run()
-                            {
-                                showSelectedTemplateInfo( template );
-                            }
-                        } );
-
-                        showSelectedTemplateInfo( template );
-
-                        dataContainer.removeAllItems();
-                        try
-                        {
-                            List<GitChangedFile> changedFiles = registryManager.getChangedFiles( template );
-
-                            dataContainer.addAll( changedFiles );
+                            templateA.select( template.getParentTemplateName() );
                         }
-                        catch ( RegistryException e )
+                        else
                         {
-                            e.printStackTrace();
+                            templateA.select( template.getTemplateName() );
                         }
+                        templateB.select( template.getTemplateName() );
                     }
                     else
                     {
@@ -265,53 +340,141 @@ public class TemplateRegistryComponent extends CustomComponent
                     }
                 }
             }
-        } );
+        };
+        AbstractSelect.ItemDescriptionGenerator treeItemDescriptionGenerator =
+                new AbstractSelect.ItemDescriptionGenerator()
+                {
+                    @Override
+                    public String generateDescription( Component source, Object itemId, Object propertyId )
+                    {
+                        String description = "";
+                        Item item = templateTree.getItem( itemId );
+                        if ( item != null )
+                        {
+                            Template template = ( Template ) item.getItemProperty( VALUE_PROPERTY ).getValue();
+                            if ( template != null )
+                            {
+                                description = getTemplateDescription( template );
+                            }
+                        }
+                        return description;
+                    }
+                };
+        ItemClickEvent.ItemClickListener changedFileRowClickListener = new ItemClickEvent.ItemClickListener()
+        {
+            @Override
+            public void itemClick( final ItemClickEvent event )
+            {
+                BeanItem<GitChangedFile> file = changedFilesBeanContainer.getItem( event.getItemId() );
 
-        fillTemplateTree();
+                if ( file == null )
+                {
+                    return;
+                }
 
-        horizontalSplit.setFirstComponent( templateTree );
-
-        VerticalLayout verticalLayout = new VerticalLayout();
-        verticalLayout.setSpacing( true );
-        verticalLayout.setSizeFull();
+                showFileDiff( file );
+            }
+        };
 
 
-        verticalLayout.addComponent( templateInfoTable );
-        verticalLayout.addComponent( changedFilesTable );
-
-        Label confirmationLbl = new Label( "<font style='color:red'>some lines which were deleted</font><br/>"
-                + "<font style='color:green'>some lines which were added</font><br/>" );
-        confirmationLbl.setContentMode( ContentMode.HTML );
-
-        verticalLayout.addComponent( confirmationLbl );
-
-        horizontalSplit.setSecondComponent( verticalLayout );
-        setCompositionRoot( horizontalSplit );
+        //setting listeners
+        templateTree.setItemDescriptionGenerator( treeItemDescriptionGenerator );
+        templateTree.addValueChangeListener( treeClickListener );
+        templateA.addValueChangeListener( templateComboBoxListener );
+        templateB.addValueChangeListener( templateComboBoxListener );
+        changedFilesTable.addItemClickListener( changedFileRowClickListener );
     }
 
 
-    private void showSelectedTemplateInfo( Template template )
+    private void showSelectedTemplateInfo( Template template, Table templateInfoTable )
     {
         for ( String key : templatePropertiesMap.keySet() )
         {
             Property item = templateInfoTable.getItem( key ).getItemProperty( TEMPLATE_VALUE );
-            String templateValue = ( String ) item.getValue();
-            templateValue = templatePropertiesMap.get( key ).getTemplateProperty( template );
             item.setValue( templatePropertiesMap.get( key ).getTemplateProperty( template ) );
         }
-        StringBuilder products = new StringBuilder();
-        for ( String product : template.getProducts() )
-        {
-            product = product + "\n";
-            products.append( product );
-        }
 
-        StringBuilder packages = new StringBuilder();
-        Set<String> diff = registryManager.getPackagesDiff( template );
-        for ( String templatePackage : diff )
+        changedFilesBeanContainer.removeAllItems();
+        try
         {
-            packages.append( templatePackage ).append( "\n" );
+            BeanItem<Template> aBeanItem = templatesBeanContainer.getItem( templateA.getValue() );
+            BeanItem<Template> bBeanItem = templatesBeanContainer.getItem( templateB.getValue() );
+
+            if ( aBeanItem != null && bBeanItem != null )
+            {
+                Template aTemplate = aBeanItem.getBean();
+                Template bTemplate = bBeanItem.getBean();
+                List<GitChangedFile> changedFiles = registryManager.getChangedFiles( aTemplate, bTemplate );
+                changedFilesBeanContainer.addAll( changedFiles );
+            }
         }
+        catch ( RegistryException e )
+        {
+            LOGGER.error( "Error retrieving changed file list", e );
+        }
+    }
+
+
+    /**
+     * Construct hierarchical templates tree
+     *
+     * @param templates - templates list
+     *
+     * @return - {@code HierarchicalContainer} object with relevant hierarchy
+     */
+    public HierarchicalContainer createTreeContent( List<Template> templates )
+    {
+
+        HierarchicalContainer container = new HierarchicalContainer();
+        container.addContainerProperty( CAPTION, String.class, "" );
+        container.addContainerProperty( VALUE_PROPERTY, Template.class, null );
+        container.addContainerProperty( ICON, Resource.class, new ThemeResource( PHYSICAL_IMG ) );
+
+        new Object()
+        {
+
+            @SuppressWarnings( "unchecked" )
+            public void put( List<Template> data, HierarchicalContainer container )
+            {
+
+                for ( Template template : data )
+                {
+                    String orgId = template.getPk().toString();
+
+                    if ( !container.containsId( orgId ) )
+                    {
+                        container.addItem( orgId );
+                        container.getItem( orgId ).getItemProperty( CAPTION ).setValue( template.getTemplateName() );
+                        container.getItem( orgId ).getItemProperty( VALUE_PROPERTY ).setValue( template );
+
+                        if ( template.getChildren() == null || template.getChildren().isEmpty() )
+                        {
+                            container.setChildrenAllowed( orgId, false );
+                        }
+                        else
+                        {
+                            container.setChildrenAllowed( orgId, true );
+                        }
+
+                        if ( template.getParentTemplateName() == null || "".equals( template.getParentTemplateName() ) )
+                        {
+                            container.setParent( orgId, null );
+                        }
+                        else
+                        {
+                            if ( !container.containsId( template.getPk().toString() ) )
+                            {
+                                put( template.getChildren(), container );
+                            }
+                            container.setParent( orgId, TemplateRegistryComponent.this.registryManager
+                                    .getParentTemplate( template.getTemplateName() ).getPk().toString() );
+                        }
+                    }
+                }
+            }
+        }.put( templates, container );
+
+        return container;
     }
 
 
@@ -327,56 +490,46 @@ public class TemplateRegistryComponent extends CustomComponent
     }
 
 
-    private void fillTemplateTree()
+    /**
+     * Represent to user file diff between two templates
+     *
+     * @param file - changed file as {@code GitChangedFile} object wrapped in {@code BeanItem<>}
+     */
+    private void showFileDiff( BeanItem<GitChangedFile> file )
     {
-        container.removeAllItems();
-        List<Template> templatesTree = new ArrayList<>( registryManager.getTemplateTree() );
+        BeanItem<Template> bBeanItem = templatesBeanContainer.getItem( templateB.getValue() );
+        BeanItem<Template> aBeanItem = templatesBeanContainer.getItem( templateA.getValue() );
 
-        for ( final Template template : templatesTree )
+        if ( aBeanItem == null && bBeanItem == null )
         {
-            String itemId = String.format( "%s-%s-%s", template.getTemplateName(), template.getLxcArch(),
-                    template.getTemplateVersion().toString() );
-            Item templateItem = container.addItem( itemId );
-            if ( templateItem != null && templateItem.getItemProperty( VALUE_PROPERTY ) != null )
-            {
-                templateItem.getItemProperty( VALUE_PROPERTY ).setValue( template );
-            }
-            templateTree.setItemCaption( itemId, template.getTemplateName() );
-            addTemplateTreeChildren( template );
+            return;
         }
-    }
+        Template aTemplate;
+        Template bTemplate;
 
-
-    private void addTemplateTreeChildren( Template template )
-    {
-        String itemId = String.format( "%s-%s-%s", template.getTemplateName(), template.getLxcArch(),
-                template.getTemplateVersion().toString() );
-        List<Template> children = template.getChildren();
-        for ( final Template child : children )
+        if ( aBeanItem != null )
         {
-            String childItemId = String.format( "%s-%s-%s", child.getTemplateName(), child.getLxcArch(),
-                    child.getTemplateVersion().toString() );
-            Item childTemplateItem = container.addItem( childItemId );
-            if ( childTemplateItem == null )
-            {
-                childTemplateItem = container.getItem( childItemId );
-            }
-            if ( childTemplateItem != null && childTemplateItem.getItemProperty( VALUE_PROPERTY ) != null )
-            {
-                childTemplateItem.getItemProperty( VALUE_PROPERTY ).setValue( child );
-            }
-            templateTree.setItemCaption( childItemId, child.getTemplateName() );
-            container.setParent( childItemId, itemId );
-            addTemplateTreeChildren( child );
-        }
-        if ( template.getChildren() == null || template.getChildren().isEmpty() )
-        {
-            container.setChildrenAllowed( itemId, false );
+            aTemplate = aBeanItem.getBean();
         }
         else
         {
-            container.setChildrenAllowed( itemId, true );
-            templateTree.expandItem( itemId );
+            aTemplate = bBeanItem.getBean();
         }
+        if ( bBeanItem != null )
+        {
+            bTemplate = bBeanItem.getBean();
+        }
+        else
+        {
+            bTemplate = aBeanItem.getBean();
+        }
+
+        GitChangedFile gitFile = file.getBean();
+        String fileDiff = registryManager
+                .getChangedFileVersions( aTemplate.getTemplateName(), bTemplate.getTemplateName(), gitFile );
+        FileDiffModalView modalView =
+                new FileDiffModalView( gitFile.getGitFilePath(), new HorizontalLayout(), fileDiff );
+
+        getUI().addWindow( modalView );
     }
 }

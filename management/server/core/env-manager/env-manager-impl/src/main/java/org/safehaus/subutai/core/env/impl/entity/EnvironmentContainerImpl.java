@@ -143,9 +143,16 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
         this.sshGroupId = sshGroupId;
         this.hostsGroupId = hostsGroupId;
         this.domainName = domainName;
-        for ( Interface anInterface : hostInfo.getInterfaces() )
+        setNetInterfaces( hostInfo.getInterfaces() );
+    }
+
+
+    public void setNetInterfaces( Set<Interface> interfaces )
+    {
+        this.interfaces.clear();
+        for ( Interface iface : interfaces )
         {
-            HostInterface hostInterface = new HostInterface( anInterface );
+            HostInterface hostInterface = new HostInterface( iface );
             hostInterface.setHost( this );
             this.interfaces.add( hostInterface );
         }
@@ -310,6 +317,12 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public String getHostname()
     {
         return this.hostname;
+    }
+
+
+    public void setHostname( final String hostname )
+    {
+        this.hostname = hostname;
     }
 
 

@@ -27,7 +27,7 @@ public interface ManagementHost extends Host
 
     public Set<Vni> getReservedVnis() throws PeerException;
 
-    public void reserveVni( Vni vni ) throws PeerException;
+    public int reserveVni( Vni vni ) throws PeerException;
 
     public Set<Gateway> getGateways() throws PeerException;
 
@@ -36,4 +36,6 @@ public interface ManagementHost extends Host
     public void removeGateway( int vlan ) throws PeerException;
 
     public void cleanupEnvironmentNetworkSettings( final UUID environmentId ) throws PeerException;
+
+    public void removeTunnel( String peerIp ) throws PeerException;
 }

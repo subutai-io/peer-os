@@ -174,7 +174,20 @@ public class SendButtonListener implements Button.ClickListener, CommandCallback
             return false;
         }
 
+        if ( form.getRequestTypeCombo().getValue() == RequestType.PS_REQUEST )
+        {
+            Set<HostInfo> hosts = form.getHostTree().getSelectedHosts();
 
+            for ( HostInfo hostInfo : hosts )
+            {
+                if ( hostInfo instanceof ContainerHostInfo )
+                {
+                    form.addOutput( String.format(
+                            "You could not send PS_REQUEST to container host. Please select only resource hosts.%n" ) );
+                    return false;
+                }
+            }
+        }
         return true;
     }
 
@@ -244,7 +257,7 @@ public class SendButtonListener implements Button.ClickListener, CommandCallback
         }
         if ( commandResult.hasCompleted() )
         {
-            if ( response.getExitCode() != 0 )
+            if ( response.getExitCode() != null )
             {
                 out.append( "Exit code: " ).append( response.getExitCode() ).append( String.format( "%n%n" ) );
             }

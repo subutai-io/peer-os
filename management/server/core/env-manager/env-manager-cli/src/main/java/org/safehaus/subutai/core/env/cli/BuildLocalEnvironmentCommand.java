@@ -6,11 +6,11 @@ import org.safehaus.subutai.common.environment.NodeGroup;
 import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
 
@@ -19,7 +19,7 @@ import com.google.common.base.Preconditions;
  * Karaf console command support Command to build environment on local peer
  */
 @Command( scope = "env", name = "build-local", description = "Command to build environment on local peer" )
-public class BuildLocalEnvironmentCommand extends OsgiCommandSupport
+public class BuildLocalEnvironmentCommand extends SubutaiShellCommandSupport
 {
 
 

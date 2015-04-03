@@ -15,13 +15,13 @@ import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.util.ExceptionUtil;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
@@ -38,6 +38,7 @@ public class EnvironmentBuilder
     private final TemplateRegistry templateRegistry;
     private final PeerManager peerManager;
     private final String defaultDomain;
+    private ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
     public EnvironmentBuilder( final TemplateRegistry templateRegistry, final PeerManager peerManager,
@@ -144,7 +145,7 @@ public class EnvironmentBuilder
         }
 
         //collect results
-        Set<Throwable> errors = Sets.newHashSet();
+        Set<String> errors = Sets.newHashSet();
 
         for ( int i = 0; i < placement.size(); i++ )
         {
@@ -161,13 +162,13 @@ public class EnvironmentBuilder
 
                     if ( result.getException() != null )
                     {
-                        errors.add( result.getException() );
+                        errors.add( exceptionUtil.getRootCauseMessage( result.getException() ) );
                     }
                 }
             }
             catch ( ExecutionException | InterruptedException e )
             {
-                errors.add( ExceptionUtils.getRootCause( e ) );
+                errors.add( exceptionUtil.getRootCauseMessage( e ) );
             }
         }
 
@@ -175,6 +176,7 @@ public class EnvironmentBuilder
 
         if ( !errors.isEmpty() )
         {
+
             throw new EnvironmentBuildException(
                     String.format( "There were errors during container creation:  %s", errors ), null );
         }

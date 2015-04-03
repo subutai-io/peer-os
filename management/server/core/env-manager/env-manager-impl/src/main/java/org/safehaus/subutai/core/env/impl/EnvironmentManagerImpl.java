@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.environment.Blueprint;
@@ -18,12 +17,15 @@ import org.safehaus.subutai.common.environment.EnvironmentModificationException;
 import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.environment.Topology;
+import org.safehaus.subutai.common.host.HostInfo;
+import org.safehaus.subutai.common.mdc.SubutaiExecutors;
 import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.env.api.EnvironmentEventListener;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
@@ -45,11 +47,13 @@ import org.safehaus.subutai.core.env.impl.tasks.DestroyEnvironmentTask;
 import org.safehaus.subutai.core.env.impl.tasks.GrowEnvironmentTask;
 import org.safehaus.subutai.core.env.impl.tasks.SetSshKeyTask;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
+import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,14 +68,16 @@ import com.google.common.collect.Sets;
  */
 public class EnvironmentManagerImpl implements EnvironmentManager
 {
-    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerImpl.class.getName() );
+    private static final Logger LOGGER = LoggerFactory.getLogger( EnvironmentManagerImpl.class );
+    private static final String TRACKER_SOURCE = "Environment Manager";
 
     private final PeerManager peerManager;
     private final NetworkManager networkManager;
     private final EnvironmentBuilder environmentBuilder;
-    private final ExecutorService executor = Executors.newCachedThreadPool();
+    private final ExecutorService executor = SubutaiExecutors.newCachedThreadPool();
     private final String defaultDomain;
     private final IdentityManager identityManager;
+    private final Tracker tracker;
 
     private final Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
 
@@ -84,52 +90,69 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private BlueprintDataService blueprintDataService;
 
 
-    public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager,
-                                   final NetworkManager networkManager, final DaoManager daoManager,
-                                   final String defaultDomain, final IdentityManager identityManager )
+    @Override
+    public void saveBlueprint( final Blueprint blueprint ) throws EnvironmentManagerException
     {
-        Preconditions.checkNotNull( templateRegistry );
-        Preconditions.checkNotNull( peerManager );
-        Preconditions.checkNotNull( networkManager );
-        Preconditions.checkNotNull( daoManager );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( defaultDomain ) );
-        Preconditions.checkNotNull( identityManager );
+        Preconditions.checkNotNull( blueprint, "Invalid blueprint" );
 
-        this.peerManager = peerManager;
-        this.networkManager = networkManager;
-        this.daoManager = daoManager;
-        this.defaultDomain = defaultDomain;
-        this.environmentBuilder = new EnvironmentBuilder( templateRegistry, peerManager, defaultDomain );
-        this.identityManager = identityManager;
+        blueprintDataService.persist( blueprint );
     }
 
 
-    public void init() throws SQLException
+    @Override
+    public void removeBlueprint( final UUID blueprintId ) throws EnvironmentManagerException
     {
-        this.blueprintDataService = new BlueprintDataService( daoManager );
-        this.environmentDataService = new EnvironmentDataService( daoManager );
-        this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager );
+        Preconditions.checkNotNull( blueprintId, "Invalid blueprint id" );
+
+        blueprintDataService.remove( blueprintId );
     }
 
 
-    protected boolean isUserAdmin()
+    @Override
+    public Set<Blueprint> getBlueprints() throws EnvironmentManagerException
     {
-        return ( identityManager.getUser() != null ) && identityManager.getUser().isAdmin();
+        return blueprintDataService.getAll();
     }
 
 
-    protected Long getUserId()
+    @Override
+    public String getDefaultDomainName()
     {
-        return identityManager.getUser().getId();
+        return defaultDomain;
     }
 
 
-    protected void checkAccess( Environment environment )
+    @Override
+    public void updateEnvironmentContainersMetadata( final UUID environmentId ) throws EnvironmentManagerException
     {
-        if ( !( isUserAdmin() || Objects.equals( environment.getUserId(), getUserId() ) ) )
+        try
         {
-            throw new EnvironmentSecurityException(
-                    String.format( "Access to environment %s is denied", environment.getName() ) );
+            Environment environment = findEnvironment( environmentId );
+            Set<ContainerHost> containerHosts = environment.getContainerHosts();
+
+            for ( final ContainerHost containerHost : containerHosts )
+            {
+                try
+                {
+                    HostInfo hostInfo = containerHost.getPeer().getContainerHostInfoById( containerHost.getId() );
+
+                    EnvironmentContainerImpl environmentContainer =
+                            environmentContainerDataService.find( containerHost.getId().toString() );
+                    environmentContainer.setHostname( hostInfo.getHostname() );
+                    environmentContainer.setNetInterfaces( hostInfo.getInterfaces() );
+
+                    environmentContainerDataService.update( environmentContainer );
+                }
+                catch ( Exception e )
+                {
+                    LOGGER.error( "Couldn't get container host info from hosting peer", e );
+                }
+            }
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            throw new EnvironmentManagerException(
+                    String.format( "Couldn't find environment by id: %s", environmentId.toString() ), e );
         }
     }
 
@@ -166,6 +189,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public Environment findEnvironment( final UUID environmentId ) throws EnvironmentNotFoundException
     {
+        return findEnvironment( environmentId, false );
+    }
+
+
+    protected Environment findEnvironment( final UUID environmentId, boolean checkAccess )
+            throws EnvironmentNotFoundException
+    {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         EnvironmentImpl environment = environmentDataService.find( environmentId.toString() );
@@ -175,8 +205,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             throw new EnvironmentNotFoundException();
         }
 
-        //check user access
-        checkAccess( environment );
+        //check access to environment
+        if ( checkAccess )
+        {
+            checkAccess( environment );
+        }
 
         //set environment's transient fields
         setEnvironmentTransientFields( environment );
@@ -205,20 +238,24 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     @Override
     public Environment createEnvironment( final String name, final Topology topology, final String subnetCidr,
-                                          final String sshKey, boolean async ) throws EnvironmentCreationException
+                                          final String sshKey, final boolean async ) throws EnvironmentCreationException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( subnetCidr ), "Invalid subnet CIDR" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
+
         final EnvironmentImpl environment = createEmptyEnvironment( name, subnetCidr, sshKey );
+
+        TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Creating environment %s ", environment.getId() ) );
 
         final ResultHolder<EnvironmentCreationException> resultHolder = new ResultHolder<>();
 
 
         CreateEnvironmentTask createEnvironmentTask =
-                new CreateEnvironmentTask( peerManager.getLocalPeer(), this, environment, topology, resultHolder );
+                new CreateEnvironmentTask( peerManager.getLocalPeer(), this, environment, topology, resultHolder, op );
 
         executor.submit( createEnvironmentTask );
 
@@ -250,7 +287,262 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void setupEnvironmentTunnel( UUID environmentId, Set<Peer> peers ) throws EnvironmentTunnelException
+    @Override
+    public void destroyEnvironment( final UUID environmentId, final boolean async, final boolean forceMetadataRemoval )
+            throws EnvironmentDestructionException, EnvironmentNotFoundException
+    {
+        TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Destroying environment %s", environmentId ) );
+
+        destroyEnvironment( environmentId, async, forceMetadataRemoval, true, op );
+    }
+
+
+    public void destroyEnvironment( final UUID environmentId, boolean async, final boolean forceMetadataRemoval,
+                                    final boolean checkAccess, final TrackerOperation op )
+            throws EnvironmentDestructionException, EnvironmentNotFoundException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+        {
+            op.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
+
+            throw new EnvironmentDestructionException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
+
+        final ResultHolder<EnvironmentDestructionException> resultHolder = new ResultHolder<>();
+
+        final Set<Throwable> exceptions = Sets.newHashSet();
+
+        DestroyEnvironmentTask destroyEnvironmentTask =
+                new DestroyEnvironmentTask( this, environment, exceptions, resultHolder, forceMetadataRemoval,
+                        peerManager.getLocalPeer(), op );
+
+        executor.submit( destroyEnvironmentTask );
+
+        if ( !async )
+        {
+            try
+            {
+                destroyEnvironmentTask.waitCompletion();
+
+                if ( !exceptions.isEmpty() )
+                {
+                    throw new EnvironmentDestructionException(
+                            String.format( "There were errors while destroying environment: %s", exceptions ) );
+                }
+                else if ( resultHolder.getResult() != null )
+                {
+                    throw resultHolder.getResult();
+                }
+            }
+            catch ( InterruptedException e )
+            {
+                throw new EnvironmentDestructionException( e );
+            }
+        }
+    }
+
+
+    @Override
+    public Set<ContainerHost> growEnvironment( final UUID environmentId, final Topology topology, final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Growing environment %s", environmentId ) );
+
+        return growEnvironment( environmentId, topology, async, true, op );
+    }
+
+
+    public Set<ContainerHost> growEnvironment( final UUID environmentId, final Topology topology, final boolean async,
+                                               final boolean checkAccess, final TrackerOperation op )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+        Preconditions.checkNotNull( topology, "Invalid topology" );
+        Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+        {
+            op.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
+
+            throw new EnvironmentModificationException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
+
+        final Set<ContainerHost> newContainers = Sets.newHashSet();
+
+        final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
+
+        GrowEnvironmentTask growEnvironmentTask =
+                new GrowEnvironmentTask( this, environment, topology, resultHolder, newContainers, op );
+
+        executor.submit( growEnvironmentTask );
+
+        if ( !async )
+        {
+            try
+            {
+                growEnvironmentTask.waitCompletion();
+
+                if ( resultHolder.getResult() != null )
+                {
+                    throw resultHolder.getResult();
+                }
+            }
+            catch ( InterruptedException e )
+            {
+                throw new EnvironmentModificationException( e );
+            }
+        }
+
+        return newContainers;
+    }
+
+
+    @Override
+    public void destroyContainer( final ContainerHost containerHost, final boolean async,
+                                  final boolean forceMetadataRemoval )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        Preconditions.checkNotNull( containerHost, "Invalid container host" );
+
+        TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Destroying container %s", containerHost.getHostname() ) );
+
+        destroyContainer( containerHost, async, forceMetadataRemoval, true, op );
+    }
+
+
+    public void destroyContainer( final ContainerHost containerHost, final boolean async,
+                                  final boolean forceMetadataRemoval, final boolean checkAccess,
+                                  final TrackerOperation op )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        Preconditions.checkNotNull( containerHost, "Invalid container host" );
+
+        final EnvironmentImpl environment =
+                ( EnvironmentImpl ) findEnvironment( UUID.fromString( containerHost.getEnvironmentId() ), checkAccess );
+
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+        {
+            op.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
+
+            throw new EnvironmentModificationException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
+
+        ContainerHost environmentContainer;
+        try
+        {
+            environmentContainer = environment.getContainerHostById( containerHost.getId() );
+        }
+        catch ( ContainerHostNotFoundException e )
+        {
+            op.addLogFailed( String.format( "Container not registered: %s", e.getMessage() ) );
+
+            throw new EnvironmentModificationException( e );
+        }
+
+        final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
+
+        DestroyContainerTask destroyContainerTask =
+                new DestroyContainerTask( this, environment, environmentContainer, forceMetadataRemoval, resultHolder,
+                        op );
+
+        executor.submit( destroyContainerTask );
+
+        if ( !async )
+        {
+            try
+            {
+                destroyContainerTask.waitCompletion();
+
+                if ( resultHolder.getResult() != null )
+                {
+                    throw resultHolder.getResult();
+                }
+            }
+            catch ( InterruptedException e )
+            {
+                throw new EnvironmentModificationException( e );
+            }
+        }
+    }
+
+
+    @Override
+    public void setSshKey( final UUID environmentId, final String sshKey, final boolean async )
+            throws EnvironmentNotFoundException, EnvironmentModificationException
+    {
+        TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Setting environment %s ssh key", environmentId ) );
+
+        setSshKey( environmentId, sshKey, async, true, op );
+    }
+
+
+    public void setSshKey( final UUID environmentId, final String sshKey, final boolean async,
+                           final boolean checkAccess, final TrackerOperation op )
+            throws EnvironmentNotFoundException, EnvironmentModificationException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+
+        final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
+
+        SetSshKeyTask setSshKeyTask = new SetSshKeyTask( environment, networkManager, resultHolder, sshKey, op );
+
+        executor.submit( setSshKeyTask );
+
+        if ( !async )
+        {
+            try
+            {
+                setSshKeyTask.waitCompletion();
+
+                if ( resultHolder.getResult() != null )
+                {
+                    throw resultHolder.getResult();
+                }
+            }
+            catch ( InterruptedException e )
+            {
+                throw new EnvironmentModificationException( e );
+            }
+        }
+    }
+
+
+    @Override
+    public void removeEnvironment( final UUID environmentId ) throws EnvironmentNotFoundException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        removeEnvironment( environmentId, true );
+    }
+
+
+    public void removeEnvironment( final UUID environmentId, final boolean checkAccess )
+            throws EnvironmentNotFoundException
+    {
+        findEnvironment( environmentId, checkAccess );
+
+        environmentDataService.remove( environmentId.toString() );
+
+        notifyOnEnvironmentDestroyed( environmentId );
+    }
+
+
+    public void setupEnvironmentTunnel( final UUID environmentId, Set<Peer> peers ) throws EnvironmentTunnelException
     {
         String localEnvAlias =
                 String.format( "env_%s_%s", peerManager.getLocalPeer().getId().toString(), environmentId.toString() );
@@ -280,7 +572,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public Map<Peer, Set<Gateway>> getUsedGateways( Set<Peer> peers ) throws EnvironmentManagerException
+    public Map<Peer, Set<Gateway>> getUsedGateways( final Set<Peer> peers ) throws EnvironmentManagerException
     {
         Map<Peer, Set<Gateway>> usedGateways = Maps.newHashMap();
 
@@ -341,190 +633,26 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void saveEnvironment( EnvironmentImpl environment )
+    public void saveEnvironment( final EnvironmentImpl environment )
     {
         environmentDataService.persist( environment );
     }
 
 
-    public void build( EnvironmentImpl environment, Topology topology ) throws EnvironmentBuildException
+    public void build( final EnvironmentImpl environment, final Topology topology ) throws EnvironmentBuildException
     {
         environmentBuilder.build( environment, topology );
     }
 
 
-    @Override
-    public void destroyEnvironment( final UUID environmentId, boolean async, boolean forceMetadataRemoval )
-            throws EnvironmentDestructionException, EnvironmentNotFoundException
-    {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-
-        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
-
-        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
-        {
-            throw new EnvironmentDestructionException(
-                    String.format( "Environment status is %s", environment.getStatus() ) );
-        }
-
-        final ResultHolder<EnvironmentDestructionException> resultHolder = new ResultHolder<>();
-
-        final Set<Throwable> exceptions = Sets.newHashSet();
-
-
-        DestroyEnvironmentTask destroyEnvironmentTask =
-                new DestroyEnvironmentTask( this, environment, exceptions, resultHolder, forceMetadataRemoval,
-                        peerManager.getLocalPeer() );
-
-        executor.submit( destroyEnvironmentTask );
-
-        if ( !async )
-        {
-            try
-            {
-                destroyEnvironmentTask.waitCompletion();
-
-                if ( !exceptions.isEmpty() )
-                {
-                    throw new EnvironmentDestructionException(
-                            String.format( "There were errors while destroying environment: %s", exceptions ) );
-                }
-                else if ( resultHolder.getResult() != null )
-                {
-                    throw resultHolder.getResult();
-                }
-            }
-            catch ( InterruptedException e )
-            {
-                throw new EnvironmentDestructionException( e );
-            }
-        }
-        else
-        {
-            if ( !exceptions.isEmpty() )
-            {
-                LOG.error( String.format( "There were errors while destroying environment: %s", exceptions ) );
-            }
-        }
-    }
-
-
-    @Override
-    public Set<ContainerHost> growEnvironment( final UUID environmentId, final Topology topology, boolean async )
-            throws EnvironmentModificationException, EnvironmentNotFoundException
-    {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-        Preconditions.checkNotNull( topology, "Invalid topology" );
-        Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
-
-        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
-
-        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
-        {
-            throw new EnvironmentModificationException(
-                    String.format( "Environment status is %s", environment.getStatus() ) );
-        }
-
-        final Set<ContainerHost> newContainers = Sets.newHashSet();
-
-        final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
-
-        GrowEnvironmentTask growEnvironmentTask =
-                new GrowEnvironmentTask( this, environment, topology, resultHolder, newContainers );
-
-        executor.submit( growEnvironmentTask );
-
-        if ( !async )
-        {
-            try
-            {
-                growEnvironmentTask.waitCompletion();
-
-                if ( resultHolder.getResult() != null )
-                {
-                    throw resultHolder.getResult();
-                }
-            }
-            catch ( InterruptedException e )
-            {
-                throw new EnvironmentModificationException( e );
-            }
-        }
-
-        return newContainers;
-    }
-
-
-    @Override
-    public void destroyContainer( final ContainerHost containerHost, boolean async, boolean forceMetadataRemoval )
-            throws EnvironmentModificationException, EnvironmentNotFoundException
-    {
-        Preconditions.checkNotNull( containerHost, "Invalid container host" );
-
-        final EnvironmentImpl environment =
-                ( EnvironmentImpl ) findEnvironment( UUID.fromString( containerHost.getEnvironmentId() ) );
-
-
-        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
-        {
-            throw new EnvironmentModificationException(
-                    String.format( "Environment status is %s", environment.getStatus() ) );
-        }
-
-        try
-        {
-            environment.getContainerHostById( containerHost.getId() );
-        }
-        catch ( ContainerHostNotFoundException e )
-        {
-            throw new EnvironmentModificationException( e );
-        }
-
-        final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
-
-        DestroyContainerTask destroyContainerTask =
-                new DestroyContainerTask( this, environment, containerHost, forceMetadataRemoval, resultHolder );
-
-        executor.submit( destroyContainerTask );
-
-        if ( !async )
-        {
-            try
-            {
-                destroyContainerTask.waitCompletion();
-
-                if ( resultHolder.getResult() != null )
-                {
-                    throw resultHolder.getResult();
-                }
-            }
-            catch ( InterruptedException e )
-            {
-                throw new EnvironmentModificationException( e );
-            }
-        }
-    }
-
-
-    @Override
-    public void removeEnvironment( final UUID environmentId ) throws EnvironmentNotFoundException
-    {
-        findEnvironment( environmentId );
-
-        environmentDataService.remove( environmentId.toString() );
-
-        notifyOnEnvironmentDestroyed( environmentId );
-    }
-
-
-    public void setEnvironmentTransientFields( Environment environment )
+    public void setEnvironmentTransientFields( final Environment environment )
     {
         ( ( EnvironmentImpl ) environment ).setDataService( environmentDataService );
         ( ( EnvironmentImpl ) environment ).setEnvironmentManager( this );
     }
 
 
-    public void setContainersTransientFields( Set<ContainerHost> containers )
+    public void setContainersTransientFields( final Set<ContainerHost> containers )
     {
         for ( ContainerHost containerHost : containers )
         {
@@ -535,7 +663,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void configureSsh( Set<ContainerHost> containerHosts ) throws NetworkManagerException
+    public void configureSsh( final Set<ContainerHost> containerHosts ) throws NetworkManagerException
     {
         Map<Integer, Set<ContainerHost>> sshGroups = Maps.newHashMap();
 
@@ -569,7 +697,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void configureHosts( Set<ContainerHost> containerHosts ) throws NetworkManagerException
+    public void configureHosts( final Set<ContainerHost> containerHosts ) throws NetworkManagerException
     {
         Map<Integer, Set<ContainerHost>> hostGroups = Maps.newHashMap();
 
@@ -606,72 +734,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    @Override
-    public void saveBlueprint( final Blueprint blueprint ) throws EnvironmentManagerException
-    {
-        Preconditions.checkNotNull( blueprint, "Invalid blueprint" );
-
-        blueprintDataService.persist( blueprint );
-    }
-
-
-    @Override
-    public void removeBlueprint( final UUID blueprintId ) throws EnvironmentManagerException
-    {
-        Preconditions.checkNotNull( blueprintId, "Invalid blueprint id" );
-
-        blueprintDataService.remove( blueprintId );
-    }
-
-
-    @Override
-    public Set<Blueprint> getBlueprints() throws EnvironmentManagerException
-    {
-        return blueprintDataService.getAll();
-    }
-
-
-    @Override
-    public void setSshKey( final UUID environmentId, final String sshKey, boolean async )
-            throws EnvironmentNotFoundException, EnvironmentModificationException
-    {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-
-        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
-
-        final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
-
-        SetSshKeyTask setSshKeyTask = new SetSshKeyTask( environment, networkManager, resultHolder, sshKey );
-
-        executor.submit( setSshKeyTask );
-
-        if ( !async )
-        {
-            try
-            {
-                setSshKeyTask.waitCompletion();
-
-                if ( resultHolder.getResult() != null )
-                {
-                    throw resultHolder.getResult();
-                }
-            }
-            catch ( InterruptedException e )
-            {
-                throw new EnvironmentModificationException( e );
-            }
-        }
-    }
-
-
-    @Override
-    public String getDefaultDomainName()
-    {
-        return defaultDomain;
-    }
-
-
-    public void registerListener( EnvironmentEventListener listener )
+    public void registerListener( final EnvironmentEventListener listener )
     {
         if ( listener != null )
         {
@@ -680,7 +743,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void unregisterListener( EnvironmentEventListener listener )
+    public void unregisterListener( final EnvironmentEventListener listener )
     {
         if ( listener != null )
         {
@@ -749,6 +812,72 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     listener.onEnvironmentDestroyed( environmentId );
                 }
             } );
+        }
+    }
+
+
+    public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager,
+                                   final NetworkManager networkManager, final DaoManager daoManager,
+                                   final String defaultDomain, final IdentityManager identityManager,
+                                   final Tracker tracker )
+    {
+        Preconditions.checkNotNull( templateRegistry );
+        Preconditions.checkNotNull( peerManager );
+        Preconditions.checkNotNull( networkManager );
+        Preconditions.checkNotNull( daoManager );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( defaultDomain ) );
+        Preconditions.checkNotNull( identityManager );
+        Preconditions.checkNotNull( tracker );
+
+        this.peerManager = peerManager;
+        this.networkManager = networkManager;
+        this.daoManager = daoManager;
+        this.defaultDomain = defaultDomain;
+        this.environmentBuilder = new EnvironmentBuilder( templateRegistry, peerManager, defaultDomain );
+        this.identityManager = identityManager;
+        this.tracker = tracker;
+    }
+
+
+    public void init() throws SQLException
+    {
+        this.blueprintDataService = new BlueprintDataService( daoManager );
+        this.environmentDataService = new EnvironmentDataService( daoManager );
+        this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager );
+    }
+
+
+    protected User getUser()
+    {
+        User user = identityManager.getUser();
+
+        if ( user == null )
+        {
+            throw new EnvironmentSecurityException( "User not authenticated" );
+        }
+
+        return user;
+    }
+
+
+    protected boolean isUserAdmin()
+    {
+        return getUser().isAdmin();
+    }
+
+
+    protected Long getUserId()
+    {
+        return getUser().getId();
+    }
+
+
+    protected void checkAccess( final Environment environment )
+    {
+        if ( !( isUserAdmin() || Objects.equals( environment.getUserId(), getUserId() ) ) )
+        {
+            throw new EnvironmentSecurityException(
+                    String.format( "Access to environment %s is denied", environment.getName() ) );
         }
     }
 }

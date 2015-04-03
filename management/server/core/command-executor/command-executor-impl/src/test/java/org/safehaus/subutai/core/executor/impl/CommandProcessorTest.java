@@ -284,6 +284,13 @@ public class CommandProcessorTest
             {
                 return null;
             }
+
+
+            @Override
+            public Integer getPid()
+            {
+                return null;
+            }
         };
 
         when( resourceHostInfo.getId() ).thenReturn( HOST_ID );

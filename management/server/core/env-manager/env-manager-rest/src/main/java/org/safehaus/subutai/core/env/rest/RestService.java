@@ -30,10 +30,6 @@ public interface RestService
     @Produces( { MediaType.TEXT_PLAIN } )
     public Response getContainerEnvironmentId( @QueryParam( "containerId" ) String containerId );
 
-    @GET
-    @Path( "container/state" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getContainerState( @QueryParam( "containerId" ) String containerId );
 
     @GET
     @Path( "{environmentId}" )
@@ -65,4 +61,19 @@ public interface RestService
     @DELETE
     @Path( "container" )
     public Response destroyContainer( @QueryParam( "containerId" ) String containerId );
+
+    @GET
+    @Path( "container/state" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getContainerState( @QueryParam( "containerId" ) String containerId );
+
+    @POST
+    @Path( "container/start" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response startContainer( @QueryParam( "containerId" ) String containerId );
+
+    @POST
+    @Path( "container/stop" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response stopContainer( @QueryParam( "containerId" ) String containerId );
 }

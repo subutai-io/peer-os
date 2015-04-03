@@ -32,14 +32,13 @@
 #include <pwd.h>
 #include <syslog.h>
 using namespace std;
-class SubutaiUserID
-{
+class SubutaiUserID {
 public:
 	SubutaiUserID();
 	virtual ~SubutaiUserID();
-	void doSetuid( uid_t &);
-	void undoSetuid( uid_t &);
-	bool getIDs(uid_t&,uid_t&,string);
+	void doSetuid(uid_t &);
+	void undoSetuid(uid_t &);
+	bool getIDs(uid_t&, uid_t&, string);
 	bool checkRootUser();
 };
 #endif /* SUBUTAIUSERID_H_ */

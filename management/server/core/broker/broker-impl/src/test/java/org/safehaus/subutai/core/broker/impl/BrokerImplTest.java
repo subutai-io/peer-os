@@ -42,6 +42,7 @@ public class BrokerImplTest
     private static final int MAX_BROKER_CONNECTIONS = 1;
     private static final String BROKER_URL = "vm://localhost";
     private static final int MESSAGE_TIMEOUT = 10;
+    private static final int IDLE_CONNECTION_TIMEOUT = 300;
     private static final String TOPIC = "topic";
     private static final String TEXT_MESSAGE = "message";
     private static final byte[] BYTE_MESSAGE = { 0 };
@@ -74,7 +75,7 @@ public class BrokerImplTest
     @Before
     public void setUp() throws Exception
     {
-        broker = new BrokerImpl( BROKER_URL, MAX_BROKER_CONNECTIONS, true, MESSAGE_TIMEOUT );
+        broker = new BrokerImpl( BROKER_URL, MAX_BROKER_CONNECTIONS, true, MESSAGE_TIMEOUT, IDLE_CONNECTION_TIMEOUT );
         when( pool.createConnection() ).thenReturn( connection );
         when( connection.createSession( anyBoolean(), anyInt() ) ).thenReturn( session );
         when( session.createProducer( any( Destination.class ) ) ).thenReturn( producer );
@@ -93,7 +94,7 @@ public class BrokerImplTest
         //test url
         try
         {
-            new BrokerImpl( null, MAX_BROKER_CONNECTIONS, true, MESSAGE_TIMEOUT );
+            new BrokerImpl( null, MAX_BROKER_CONNECTIONS, true, MESSAGE_TIMEOUT, IDLE_CONNECTION_TIMEOUT );
             fail( "Expected IllegalArgumentException" );
         }
         catch ( IllegalArgumentException e )
@@ -102,7 +103,7 @@ public class BrokerImplTest
         //test max connections
         try
         {
-            new BrokerImpl( BROKER_URL, -1, true, MESSAGE_TIMEOUT );
+            new BrokerImpl( BROKER_URL, -1, true, MESSAGE_TIMEOUT, IDLE_CONNECTION_TIMEOUT );
             fail( "Expected IllegalArgumentException" );
         }
         catch ( IllegalArgumentException e )
@@ -111,7 +112,15 @@ public class BrokerImplTest
         //check message timeout
         try
         {
-            new BrokerImpl( BROKER_URL, MAX_BROKER_CONNECTIONS, true, -1 );
+            new BrokerImpl( BROKER_URL, MAX_BROKER_CONNECTIONS, true, -1, IDLE_CONNECTION_TIMEOUT );
+            fail( "Expected IllegalArgumentException" );
+        }
+        catch ( IllegalArgumentException e )
+        {
+        }        //check message timeout
+        try
+        {
+            new BrokerImpl( BROKER_URL, MAX_BROKER_CONNECTIONS, true, MESSAGE_TIMEOUT, -1 );
             fail( "Expected IllegalArgumentException" );
         }
         catch ( IllegalArgumentException e )

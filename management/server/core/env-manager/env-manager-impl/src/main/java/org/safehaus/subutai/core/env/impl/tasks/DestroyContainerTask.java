@@ -8,6 +8,7 @@ import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
@@ -40,11 +41,13 @@ public class DestroyContainerTask implements Runnable
     private final boolean forceMetadataRemoval;
     private final ResultHolder<EnvironmentModificationException> resultHolder;
     private final Semaphore semaphore;
+    private final TrackerOperation op;
 
 
     public DestroyContainerTask( final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
                                  final ContainerHost containerHost, final boolean forceMetadataRemoval,
-                                 final ResultHolder<EnvironmentModificationException> resultHolder )
+                                 final ResultHolder<EnvironmentModificationException> resultHolder,
+                                 final TrackerOperation op )
     {
         this.environmentManager = environmentManager;
         this.environment = environment;
@@ -52,6 +55,7 @@ public class DestroyContainerTask implements Runnable
         this.forceMetadataRemoval = forceMetadataRemoval;
         this.resultHolder = resultHolder;
         this.semaphore = new Semaphore( 0 );
+        this.op = op;
     }
 
 
@@ -81,6 +85,7 @@ public class DestroyContainerTask implements Runnable
                     {
                         if ( forceMetadataRemoval )
                         {
+                            op.addLog( String.format( "Error destroying container: %s", e.getMessage() ) );
                             resultHolder.setResult( new EnvironmentModificationException( e ) );
                         }
                         else
@@ -106,7 +111,7 @@ public class DestroyContainerTask implements Runnable
             {
                 try
                 {
-                    environmentManager.removeEnvironment( environment.getId() );
+                    environmentManager.removeEnvironment( environment.getId(), false );
                 }
                 catch ( EnvironmentNotFoundException e )
                 {
@@ -117,11 +122,14 @@ public class DestroyContainerTask implements Runnable
             {
                 environment.setStatus( EnvironmentStatus.HEALTHY );
             }
+
+            op.addLogDone( "Container destroyed successfully" );
         }
         catch ( EnvironmentModificationException e )
         {
             LOG.error( String.format( "Error destroying container %s", containerHost.getHostname() ), e );
             resultHolder.setResult( e );
+            op.addLogFailed( String.format( "Error destroying container: %s", e.getMessage() ) );
         }
         finally
         {

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Created by nisakov on 3/3/15.
+ * Thread that controls channel-token validity period
  */
 public class ChannelTokenController implements Runnable
 {
@@ -28,13 +29,13 @@ public class ChannelTokenController implements Runnable
             {
                 Thread.sleep(60 * 60 * 1000 );
 
-                LOG.info( "******** Channel Token Controller invoked *********" );
+                LOG.info( "******** Channel Token controller invoked *********" );
                 channelTokenManager.setTokenValidity();
             }
         }
         catch (InterruptedException e)
         {
-            e.printStackTrace();
+            LOG.error( "Error in ChannelToken controller" , e );
         }
     }
 }

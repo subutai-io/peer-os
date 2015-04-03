@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.network.cli;
 
 
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.slf4j.Logger;
@@ -8,13 +9,12 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
 
 
 @Command( scope = "net", name = "remove-container-ip", description = "Removes container IP" )
-public class RemoveContainerIpCommand extends OsgiCommandSupport
+public class RemoveContainerIpCommand extends SubutaiShellCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( RemoveContainerIpCommand.class.getName() );
 

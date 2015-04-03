@@ -3,12 +3,12 @@ package org.safehaus.subutai.core.git.cli;
 
 import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitManager;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
 
@@ -17,7 +17,7 @@ import com.google.common.base.Preconditions;
  * Pushes to remote branch
  */
 @Command( scope = "git", name = "push", description = "Push to remote branch" )
-public class Push extends OsgiCommandSupport
+public class Push extends SubutaiShellCommandSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( Push.class.getName() );

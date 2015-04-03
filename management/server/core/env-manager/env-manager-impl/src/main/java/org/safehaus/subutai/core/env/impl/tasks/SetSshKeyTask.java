@@ -5,6 +5,7 @@ import java.util.concurrent.Semaphore;
 
 import org.safehaus.subutai.common.environment.EnvironmentModificationException;
 import org.safehaus.subutai.common.environment.EnvironmentStatus;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
 import org.safehaus.subutai.core.network.api.NetworkManager;
@@ -32,16 +33,19 @@ public class SetSshKeyTask implements Runnable
     private final ResultHolder<EnvironmentModificationException> resultHolder;
     private final String sshKey;
     private final Semaphore semaphore;
+    private final TrackerOperation op;
 
 
     public SetSshKeyTask( final EnvironmentImpl environment, final NetworkManager networkManager,
-                          final ResultHolder<EnvironmentModificationException> resultHolder, final String sshKey )
+                          final ResultHolder<EnvironmentModificationException> resultHolder, final String sshKey,
+                          final TrackerOperation op )
     {
         this.environment = environment;
         this.networkManager = networkManager;
         this.resultHolder = resultHolder;
         this.sshKey = Strings.isNullOrEmpty( sshKey ) ? null : sshKey.trim();
         this.semaphore = new Semaphore( 0 );
+        this.op = op;
     }
 
 
@@ -73,12 +77,15 @@ public class SetSshKeyTask implements Runnable
             }
 
             environment.setStatus( EnvironmentStatus.HEALTHY );
+
+            op.addLogDone( "Environment ssh key is successfully set" );
         }
         catch ( NetworkManagerException e )
         {
             LOG.error( String.format( "Error setting ssh key to environment %s", environment.getName() ), e );
             environment.setStatus( EnvironmentStatus.UNHEALTHY );
             resultHolder.setResult( new EnvironmentModificationException( e ) );
+            op.addLogFailed( String.format( "Error setting environment ssh key: %s", e.getMessage() ) );
         }
         finally
         {

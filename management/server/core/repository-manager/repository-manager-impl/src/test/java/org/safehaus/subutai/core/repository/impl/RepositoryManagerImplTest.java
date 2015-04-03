@@ -10,7 +10,9 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.CommandUtil;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -61,6 +63,8 @@ public class RepositoryManagerImplTest
 
     @Mock
     Commands commands;
+    @Mock
+    CommandUtil commandUtil;
 
     @Mock
     RequestBuilder requestBuilder;
@@ -71,11 +75,13 @@ public class RepositoryManagerImplTest
     @Before
     public void setUp() throws Exception
     {
-        when( peerManager.getLocalPeer() ).thenReturn( localPeer, localPeer );
-        when( localPeer.getManagementHost() ).thenReturn( managementHost, managementHost );
-        when( managementHost.execute( any( RequestBuilder.class ) ) ).thenReturn( result, result );
+        when( peerManager.getLocalPeer() ).thenReturn( localPeer );
+        when( localPeer.getManagementHost() ).thenReturn( managementHost );
+        when( managementHost.execute( any( RequestBuilder.class ) ) ).thenReturn( result );
+        when(commandUtil.execute( any( RequestBuilder.class ), any( Host.class ) )).thenReturn( result );
         repositoryManager = new RepositoryManagerImpl( peerManager );
         repositoryManager.commands = commands;
+        repositoryManager.commandUtil = commandUtil;
         when( result.hasSucceeded() ).thenReturn( true, true );
         when( result.hasCompleted() ).thenReturn( true, false );
     }
@@ -99,37 +105,11 @@ public class RepositoryManagerImplTest
     @Test
     public void testExecuteCommand() throws Exception
     {
-        when( result.hasSucceeded() ).thenReturn( true ).thenReturn( false );
+        when( commandUtil.execute( any( RequestBuilder.class ), any( Host.class ) ) ).thenReturn( result ).thenThrow( new CommandException( "" ) );
 
         CommandResult commandResult = repositoryManager.executeCommand( requestBuilder );
 
         assertEquals( result, commandResult );
-
-
-        when( result.hasCompleted() ).thenReturn( true ).thenReturn( false );
-
-        try
-        {
-            repositoryManager.executeCommand( requestBuilder );
-
-            fail( "Expected RepositoryException" );
-        }
-        catch ( RepositoryException e )
-        {
-        }
-        try
-        {
-            repositoryManager.executeCommand( requestBuilder );
-
-            fail( "Expected RepositoryException" );
-        }
-        catch ( RepositoryException e )
-        {
-        }
-
-
-        CommandException exception = mock( CommandException.class );
-        doThrow( exception ).when( managementHost ).execute( any( RequestBuilder.class ) );
 
         try
         {

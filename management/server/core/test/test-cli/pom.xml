@@ -25,6 +25,11 @@
       <groupId>org.apache.karaf.shell</groupId>
       <artifactId>org.apache.karaf.shell.console</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-cli-rbac</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

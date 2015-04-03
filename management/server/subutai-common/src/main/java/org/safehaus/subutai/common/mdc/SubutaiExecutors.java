@@ -300,9 +300,16 @@ public class SubutaiExecutors
         }
 
 
-        protected void finalize()
+        protected void finalize() throws Throwable
         {
-            super.shutdown();
+            try
+            {
+                super.shutdown();
+            }
+            finally
+            {
+                super.finalize();
+            }
         }
     }
 

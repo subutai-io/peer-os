@@ -94,7 +94,7 @@ public class Commands
     public RequestBuilder getSetupGatewayCommand( String gatewayIp, int vLanId )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-T", gatewayIp, String.valueOf( vLanId ) ) );
+                .withCmdArgs( Lists.newArrayList( "-T", gatewayIp, String.valueOf( vLanId ) ) ).withTimeout( 90 );
     }
 
 
@@ -109,6 +109,13 @@ public class Commands
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
                 .withCmdArgs( Lists.newArrayList( "-D", String.valueOf( vLanId ) ) );
+    }
+
+
+    public RequestBuilder getCleanupEnvironmentNetworkSettingsCommand( int vLanId )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( "-Z", "deleteall", String.valueOf( vLanId ) ) );
     }
 
 

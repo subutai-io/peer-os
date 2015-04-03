@@ -4,11 +4,11 @@ package org.safehaus.subutai.core.registry.cli;
 import java.util.List;
 
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -18,7 +18,7 @@ import com.google.common.base.Strings;
  * CLI for TemplateRegistryManager.getParentTemplates command
  */
 @Command( scope = "registry", name = "get-parent-templates", description = "Get all parent templates" )
-public class GetParentTemplatesCommand extends OsgiCommandSupport
+public class GetParentTemplatesCommand extends SubutaiShellCommandSupport
 {
     @Argument( index = 0, name = "child template name", required = true, multiValued = false,
             description = "child template name" )

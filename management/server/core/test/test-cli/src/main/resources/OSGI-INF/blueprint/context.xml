@@ -1,14 +1,15 @@
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+<blueprint xmlns:shell="http://karaf.apache.org/xmlns/shell/v1.0.0"
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <reference id="test" availability="mandatory"
              interface="org.safehaus.subutai.core.test.api.Test" />
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="test/exec">
-      <action class="org.safehaus.subutai.core.test.cli.TestExecutor">
-        <argument ref="test" />
-      </action>
-    </command>
-  </command-bundle>
+  <shell:command-bundle>
+    <shell:command name="test/exec">
+      <shell:action class="org.safehaus.subutai.core.test.cli.TestExecutor">
+        <shell:argument ref="test" />
+      </shell:action>
+    </shell:command>
+  </shell:command-bundle>
 
 </blueprint>
