@@ -1174,7 +1174,7 @@ public class RemotePeerImpl implements RemotePeer
         }
         catch ( Exception e )
         {
-            throw new PeerException( String.format( "Error reserving vni %s on peer %s", vni, getName() ), e );
+            throw new PeerException( String.format( "Error releasing vni %s on peer %s", vni, getName() ), e );
         }
     }
 

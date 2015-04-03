@@ -105,13 +105,13 @@ public class RestUtil
             {
                 for ( Map.Entry<String, String> entry : params.entrySet() )
                 {
-                    if ( requestType == RequestType.GET )
+                    if ( requestType == RequestType.POST )
                     {
-                        client.query( entry.getKey(), entry.getValue() );
+                        form.set( entry.getKey(), entry.getValue() );
                     }
                     else
                     {
-                        form.set( entry.getKey(), entry.getValue() );
+                        client.query( entry.getKey(), entry.getValue() );
                     }
                 }
             }
