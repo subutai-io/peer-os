@@ -99,8 +99,12 @@ public class DestroyEnvironmentTask implements Runnable
             try
             {
                 //Remove Gateway
+                op.addLog( "Removing gateway" );
                 ManagementHost managementHost = localPeer.getManagementHost();
                 Vni environmentVni = null;
+
+                op.addLog( "Getting environment vni" );
+
                 for ( final Vni vni : managementHost.getReservedVnis() )
                 {
                     if ( vni.getEnvironmentId().equals( environment.getId() ) )
@@ -110,22 +114,28 @@ public class DestroyEnvironmentTask implements Runnable
                     }
                 }
 
-
                 if ( environmentVni == null )
                 {
+                    op.addLog( "Couldn't get environment vni" );
                     throw new PeerException( "Environment VNI is NULL, aborting gateway, vni, vlan removal" );
                 }
 
                 managementHost.removeGateway( environmentVni.getVlan() );
 
+                op.addLog( "Gateway removed." );
                 //Remove reserved vni vlan
                 //command: subutai mangement_network -Z delete vni vlan env_id
 
-                managementHost.releaseVni( environmentVni );
+                op.addLog( String.format( "Releasing environment vni (%d) from peers", environmentVni.getVni() ) );
+                for ( final Peer peer : environmentPeers )
+                {
+                    peer.releaseVni( environmentVni );
+                    op.addLog( String.format( "Vni released from peer %s", peer.getName() ) );
+                }
             }
             catch ( PeerException e )
             {
-                e.printStackTrace();
+                LOG.error( String.format( "Error clearing up environment network configurations" ), e );
             }
 
             ExecutorService executorService = SubutaiExecutors.newFixedThreadPool( environmentPeers.size() );
