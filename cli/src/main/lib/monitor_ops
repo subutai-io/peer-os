@@ -299,9 +299,12 @@ function get_physical_total_ram {
 # returns the available ram capacity of the physical machine
 # in bytes
 function get_physical_available_ram {
-  local total_ram=$(get_physical_total_ram)
-  local used_ram=$(get_physical_used_ram)
-  echo "$(($total_ram - $used_ram))"
+#  local total_ram=$(get_physical_total_ram)
+#  local used_ram=$(get_physical_used_ram)
+#  echo "$(($total_ram - $used_ram))"
+#  return
+  local total_ram_kb=$(grep MemFree /proc/meminfo | awk '{print $2}')
+  echo "$(($total_ram_kb * 1024))"
   return
 }
 
