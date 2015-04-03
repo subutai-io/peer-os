@@ -1566,15 +1566,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
 
     @Override
-    public void releaseVni( final Vni vni ) throws PeerException
-    {
-        Preconditions.checkNotNull( vni, "Invalid vni" );
-
-        getManagementHost().releaseVni( vni );
-    }
-
-
-    @Override
     public Set<Vni> getReservedVnis() throws PeerException
     {
         return getManagementHost().getReservedVnis();

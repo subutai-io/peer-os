@@ -245,8 +245,6 @@ public interface Peer
 
     public int reserveVni( Vni vni ) throws PeerException;
 
-    public void releaseVni( Vni vni ) throws PeerException;
-
     public Set<Vni> getReservedVnis() throws PeerException;
 
     /**

@@ -78,28 +78,10 @@ public class RestUtil
                     LOG.debug( String.format( "Request type: %s, %s", requestType, url ) );
                     client = createTrustedWebClientWithAuth( url, alias );
                     break;
-                case ChannelSettings.SECURE_PORT_X3:
-                    client = createTrustedWebClientWithEnvAuth( url, "environment certificate alias" );
-                    break;
                 default:
                     client = createWebClient( url );
                     break;
             }
-            //            switch ( port )
-            //            {
-            //                case ChannelSettings.SECURE_PORT_X1:
-            //                    client = createTrustedWebClient( url );
-            //                    break;
-            //                case ChannelSettings.SECURE_PORT_X2:
-            //                    client = createTrustedWebClientWithAuth( url, alias );
-            //                    break;
-            //                case ChannelSettings.SECURE_PORT_X3:
-            //                    client = createTrustedWebClientWithEnvAuth( url, "environment certificate alias" );
-            //                    break;
-            //                default:
-            //                    client = createWebClient( url );
-            //                    break;
-            //            }
             Form form = new Form();
             if ( params != null )
             {
@@ -135,7 +117,7 @@ public class RestUtil
                     response = client.delete();
                     break;
                 default:
-                    throw new HTTPException( "Invalid RequestType: " + requestType.name() );
+                    throw new HTTPException( String.format( "Unrecognized requestType: %s", requestType.name() ) );
             }
             if ( !NumUtil.isIntBetween( response.getStatus(), 200, 299 ) )
             {
@@ -256,40 +238,6 @@ public class RestUtil
         tlsClientParameters.setTrustManagers( sslManager.getClientTrustManagers() );
         tlsClientParameters.setKeyManagers( sslManager.getClientKeyManagers() );
         tlsClientParameters.setCertAlias( alias );
-        httpConduit.setTlsClientParameters( tlsClientParameters );
-
-        return client;
-    }
-
-
-    public static WebClient createTrustedWebClientWithEnvAuth( String url, String environmentAlias )
-    {
-        WebClient client = WebClient.create( url );
-        HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
-
-        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
-        httpClientPolicy.setConnectionTimeout( defaultConnectionTimeout );
-        httpClientPolicy.setReceiveTimeout( defaultReceiveTimeout );
-        httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
-
-        httpConduit.setClient( httpClientPolicy );
-
-        KeyStoreManager keyStoreManager = new KeyStoreManager();
-        KeyStoreData keyStoreData = new KeyStoreData();
-        keyStoreData.setupKeyStorePx2();
-        keyStoreData.setAlias( environmentAlias );
-        KeyStore keyStore = keyStoreManager.load( keyStoreData );
-
-        KeyStoreData trustStoreData = new KeyStoreData();
-        trustStoreData.setupTrustStorePx2();
-        KeyStore trustStore = keyStoreManager.load( trustStoreData );
-
-        SSLManager sslManager = new SSLManager( keyStore, keyStoreData, trustStore, trustStoreData );
-
-        TLSClientParameters tlsClientParameters = new TLSClientParameters();
-        tlsClientParameters.setDisableCNCheck( true );
-        tlsClientParameters.setTrustManagers( sslManager.getClientTrustManagers() );
-        tlsClientParameters.setKeyManagers( sslManager.getClientKeyManagers() );
         httpConduit.setTlsClientParameters( tlsClientParameters );
 
         return client;

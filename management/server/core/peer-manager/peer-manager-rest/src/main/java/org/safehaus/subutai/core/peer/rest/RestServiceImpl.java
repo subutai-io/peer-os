@@ -942,22 +942,6 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response releaseVni( final String vni )
-    {
-        try
-        {
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            localPeer.releaseVni( JsonUtil.fromJson( vni, Vni.class ) );
-            return Response.accepted( "Releasing vni" ).build();
-        }
-        catch ( Exception e )
-        {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
-
-
-    @Override
     public Response importEnvironmentCert( final String envCert, final String alias )
     {
         try

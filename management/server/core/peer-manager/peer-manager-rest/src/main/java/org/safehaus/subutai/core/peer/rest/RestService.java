@@ -268,12 +268,6 @@ public interface RestService
     Response reserveVni( @FormParam( "vni" ) String vni );
 
 
-    @DELETE
-    @Path( "vni" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    Response releaseVni( @FormParam( "vni" ) String vni );
-
-
     @POST
     @Path( "cert/import" )
     @Produces( { MediaType.APPLICATION_JSON } )
