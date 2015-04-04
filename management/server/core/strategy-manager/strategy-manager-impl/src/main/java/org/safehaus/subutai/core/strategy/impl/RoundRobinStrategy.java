@@ -39,6 +39,8 @@ public class RoundRobinStrategy extends AbstractContainerPlacementStrategy
             return;
         }
 
+        setDistributionCriteria( criteria );
+
         List<ResourceHostMetric> sortedMetrics = sortServers( serverMetrics );
 
 
