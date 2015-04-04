@@ -129,4 +129,10 @@ public class BestServerStrategy extends RoundRobinStrategy
 
         return Collections.unmodifiableList( list );
     }
+
+
+    public void setCriteria( final List<Criteria> criteria )
+    {
+        this.criteria = criteria;
+    }
 }

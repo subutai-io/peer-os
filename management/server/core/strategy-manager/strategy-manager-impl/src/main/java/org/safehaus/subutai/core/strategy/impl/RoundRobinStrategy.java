@@ -39,6 +39,11 @@ public class RoundRobinStrategy extends AbstractContainerPlacementStrategy
             return;
         }
 
+        if ( this instanceof BestServerStrategy )
+        {
+            ( ( BestServerStrategy ) this ).setCriteria( criteria );
+        }
+
         List<ResourceHostMetric> sortedMetrics = sortServers( serverMetrics );
 
 
