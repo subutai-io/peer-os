@@ -17,8 +17,6 @@ import com.google.common.collect.Lists;
 
 public class BestServerStrategy extends RoundRobinStrategy
 {
-    private List<Criteria> criteria = Lists.newArrayList();
-
 
     @Override
     public String getId()
@@ -43,7 +41,7 @@ public class BestServerStrategy extends RoundRobinStrategy
         {
             grades.put( a, 0 );
         }
-        for ( Criteria sf : criteria )
+        for ( Criteria sf : getDistributionCriteria() )
         {
             ResourceHostMetric a = getBestMatch( serverMetrics, MetricComparator.create( sf ) );
             if ( a != null )
@@ -128,11 +126,5 @@ public class BestServerStrategy extends RoundRobinStrategy
         list.add( c );
 
         return Collections.unmodifiableList( list );
-    }
-
-
-    public void setCriteria( final List<Criteria> criteria )
-    {
-        this.criteria = criteria;
     }
 }
