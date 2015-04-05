@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -111,6 +112,7 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
             }
             res.put( e.getKey(), total );
         }
+        clearPlacementInfo();
         return res;
     }
 
@@ -140,5 +142,13 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
     public void setDistributionCriteria( final List<Criteria> distributionCriteria )
     {
         this.distributionCriteria = distributionCriteria;
+        for ( Iterator<Criteria> it = this.distributionCriteria.iterator(); it.hasNext(); )
+        {
+            Criteria criteria1 = it.next();
+            if ( criteria1.getValue().equals( false ) )
+            {
+                it.remove();
+            }
+        }
     }
 }
