@@ -167,7 +167,7 @@ public interface IdentityManager
      * @param scope - scope of {@link CliCommand#getScope()}
      * @param name - name of {@link CliCommand#getName()}
      */
-    public CliCommand createMockCliCommand( String scope, String name );
+    public CliCommand createCliCommand( String scope, String name );
 
     /**
      * Update/persist passed {@code CliCommand} object to database
@@ -188,32 +188,11 @@ public interface IdentityManager
      */
     public Set<RestEndpointScope> getAllRestEndpoints();
 
-    /**
-     * Create sample {@code RestEndpointScope} instance of RestEndpointScopeEntity with intention of usability for
-     * further db CRUD operations
-     *
-     * @param endpoint - uri of {@link RestEndpointScope#getRestEndpoint()}
-     * @param port - port of {@link RestEndpointScope#getPort()}
-     */
-    public RestEndpointScope createMockRestEndpoint( String endpoint, String port );
-
-
-    /**
-     * Update/persist passed {@code RestEndpointScope} object to database
-     *
-     * @param endpointScope - endPointScope
-     *
-     * @return - operation result denoted as true or false
-     */
-    public boolean updateRestEndpoint( RestEndpointScope endpointScope );
-
     //-------------------------- PortalModuleScope --------------------
 
     public Set<PortalModuleScope> getAllPortalModules();
 
-    public PortalModuleScope createMockUserPortalModule( String moduleKey, String moduleName );
-
-    public boolean updateUserPortalModule( PortalModuleScope portalModuleScope );
+    public boolean updateUserPortalModule( String moduleKey, String moduleName );
 
 
     //<-------------------------- Permissions -------------------------
@@ -235,8 +214,7 @@ public interface IdentityManager
      *
      * @return - {@code Permission} entity
      */
-    public Permission createMockPermission( String permissionName, PermissionGroup permissionGroup,
-                                            String description );
+    public Permission createPermission( String permissionName, PermissionGroup permissionGroup, String description );
 
 
     /**
@@ -284,13 +262,11 @@ public interface IdentityManager
     /**
      * Create sample {@code Role} for persisting purposes
      *
-     * @param permissionName - permission name
-     * @param permissionGroup - permission group {@link PermissionGroup}
-     * @param description - description
+     * @param roleName - role name
      *
      * @return - {@code Role} entity
      */
-    public Role createMockRole( String permissionName, PermissionGroup permissionGroup, String description );
+    public Role createRole( String roleName );
 
 
     /**

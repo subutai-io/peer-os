@@ -106,7 +106,7 @@ public class PermissionsTab extends CustomComponent implements TabCallback<BeanI
 
                 // Create a new item; this will create a new bean
                 BeanItem<Permission> newPermission = new BeanItem<>(
-                        identityManager.createMockPermission( "", PermissionGroup.DEFAULT_PERMISSIONS, "" ) );
+                        identityManager.createPermission( "", PermissionGroup.DEFAULT_PERMISSIONS, "" ) );
 
                 // The form was opened for editing a new item
                 refreshControls( FormState.STATE_NEW_ENTITY );

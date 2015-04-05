@@ -43,7 +43,7 @@ public abstract class SubutaiShellCommandSupport extends OsgiCommandSupport
             if ( identityManager != null )
             {
                 User user = identityManager.getUser();
-                CliCommand temp = identityManager.createMockCliCommand( command.scope(), command.name() );
+                CliCommand temp = identityManager.createCliCommand( command.scope(), command.name() );
                 if ( user != null )
                 {
                     Set<Role> roles = user.getRoles();
