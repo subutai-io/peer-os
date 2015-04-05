@@ -81,6 +81,7 @@ public abstract class AbstractSubutaiHost implements Host
         this.peerId = peerId;
         this.hostId = hostInfo.getId().toString();
         this.hostname = hostInfo.getHostname();
+        this.hostArchitecture = hostInfo.getArch();
 
         for ( Interface s : hostInfo.getInterfaces() )
         {

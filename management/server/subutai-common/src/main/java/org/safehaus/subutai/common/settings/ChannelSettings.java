@@ -337,4 +337,5 @@ public class ChannelSettings
         }
 
         return status;
-    }}
+    }
+}
