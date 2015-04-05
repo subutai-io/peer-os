@@ -143,6 +143,7 @@
 
   <!--Plugins DataSource-->
   <bean id="pluginsJDBC" class="org.h2.jdbcx.JdbcDataSource">
+    <!--<property name="URL" value="jdbc:h2:/var/lib/subutai/db/plugins/pluginsDb;AUTO_SERVER=true" />-->
     <property name="URL" value="jdbc:h2:/var/lib/subutai/db/plugins/pluginsDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
