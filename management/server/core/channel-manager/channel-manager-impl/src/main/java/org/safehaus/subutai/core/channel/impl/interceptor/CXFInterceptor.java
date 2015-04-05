@@ -10,6 +10,7 @@ import org.safehaus.subutai.common.util.UrlUtil;
 import org.safehaus.subutai.core.channel.api.entity.IUserChannelToken;
 import org.safehaus.subutai.core.channel.impl.ChannelManagerImpl;
 import org.safehaus.subutai.core.identity.api.User;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,9 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
+
+import javax.servlet.http.HttpServletResponse;
 
 
 /**
@@ -102,8 +106,8 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
                     if(userChannelToken != null)
                     {
                         if( IPUtil.isValidIPRange(userChannelToken.getIpRangeStart(),
-                                                  userChannelToken.getIpRangeStart(),
-                                                  url.getHost()))
+                                userChannelToken.getIpRangeStart(),
+                                url.getHost()))
                         {
                             User user = channelManagerImpl.getIdentityManager().getUser(userChannelToken.getUserId());
 
@@ -135,24 +139,40 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
 
 
             //----------------------------------------------------------------------------------------------
-            //--------------- Redirect ---------------------------------------------------------------------
-            if(status == 1)
+            //--------------- if error occurs --------------------------------------------------------------
+            if(status != 0)
             {
-                LOG.warn( "*********  Access to" + basePath + "  is blocked (403) **********************" );
+                String error = "";
+                int errorStatus = 0;
 
-                message.put( Message.RESPONSE_CODE, 403 );
+                HttpServletResponse response = (HttpServletResponse)message.getExchange().getInMessage().get( AbstractHTTPDestination.HTTP_RESPONSE);
+
+                if(status == 1)
+                {
+                    errorStatus = 403;
+                    error =  "*********  Access to " + basePath + "  is blocked (403) **********************";
+
+                }
+                else if(status == 2)
+                {
+                    errorStatus = 404;
+                    error =  "*********  Access to " + basePath + "  is blocked (404) **********************";
+                }
+
+
+                try
+                {
+                    response.setStatus( errorStatus );
+                    response.getOutputStream().write( error.getBytes() );
+                    response.getOutputStream().flush();
+                }
+                catch(Exception Ex )
+                {
+                    LOG.error( "Error writing to response:" + Ex.toString());
+                }
+
+                LOG.warn(error);
                 message.getInterceptorChain().abort();
-            }
-            else if(status == 2)
-            {
-                LOG.warn( "*********  Access to" + basePath + "  is blocked (404) **********************" );
-
-                message.put( Message.RESPONSE_CODE, 403 );
-                message.getInterceptorChain().abort();
-            }
-            else
-            {
-
             }
             //-----------------------------------------------------------------------------------------------
         }
