@@ -111,6 +111,7 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
             }
             res.put( e.getKey(), total );
         }
+        clearPlacementInfo();
         return res;
     }
 
