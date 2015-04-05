@@ -91,7 +91,7 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
     /**
      * Optional method to implement if placement uses simple logic to calculate container slots on a resource host
      *
-     * @param serverMetrics - metrics of all connected resource hots
+     * @param serverMetrics - metrics of all connected resource hosts
      *
      * @return map where key is a resource host metric and value is a number of containers this resource host can
      * accommodate

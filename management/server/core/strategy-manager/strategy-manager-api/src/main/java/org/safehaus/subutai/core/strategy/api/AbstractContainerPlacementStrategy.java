@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.safehaus.subutai.common.metric.ResourceHostMetric;
+import org.safehaus.subutai.common.protocol.Criteria;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -24,6 +25,7 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
     public static final String DEFAULT_NODE_TYPE = "default";
     private final Map<ResourceHostMetric, Map<String, Integer>> placementInfoMap = new HashMap<>();
     private List<CriteriaDef> criteria = Lists.newArrayList();
+    private List<Criteria> distributionCriteria = Lists.newArrayList();
 
 
     protected void clearPlacementInfo()
@@ -126,5 +128,17 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
             }
         } );
         return result;
+    }
+
+
+    public List<Criteria> getDistributionCriteria()
+    {
+        return distributionCriteria;
+    }
+
+
+    public void setDistributionCriteria( final List<Criteria> distributionCriteria )
+    {
+        this.distributionCriteria = distributionCriteria;
     }
 }

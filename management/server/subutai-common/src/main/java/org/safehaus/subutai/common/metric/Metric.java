@@ -174,4 +174,34 @@ public abstract class Metric
                       .add( "totalDiskRootfs", totalDiskRootfs ).add( "totalDiskVar", totalDiskVar )
                       .add( "totalDiskHome", totalDiskHome ).add( "totalDiskOpt", totalDiskOpt ).toString();
     }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof Metric ) )
+        {
+            return false;
+        }
+
+        final Metric metric = ( Metric ) o;
+
+        if ( hostId != null ? !hostId.equals( metric.hostId ) : metric.hostId != null )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return hostId != null ? hostId.hashCode() : 0;
+    }
 }
