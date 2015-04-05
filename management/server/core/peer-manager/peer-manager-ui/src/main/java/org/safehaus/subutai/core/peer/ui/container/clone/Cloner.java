@@ -427,13 +427,15 @@ public class Cloner extends VerticalLayout
             for ( String lxc : entry.getValue() )
             {
                 //                Embedded progressIcon = new Embedded("", new ThemeResource(loadIconSource));
+                if ( lxcTable.getItem( lxc ) == null )
+                {
+                    lxcTable.addItem( new Object[] {
+                            null, lxc, null /*progressIcon*/
+                    }, lxc );
 
-                lxcTable.addItem( new Object[] {
-                        null, lxc, null /*progressIcon*/
-                }, lxc );
-
-                lxcTable.setParent( lxc, host.getHostname() );
-                lxcTable.setChildrenAllowed( lxc, false );
+                    lxcTable.setParent( lxc, host.getHostname() );
+                    lxcTable.setChildrenAllowed( lxc, false );
+                }
             }
         }
     }
