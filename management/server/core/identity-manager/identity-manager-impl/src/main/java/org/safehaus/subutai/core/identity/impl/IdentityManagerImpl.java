@@ -156,7 +156,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
      *
      * @return short
      */
-    public short checkRestPermissions(  User user , String restURL )
+    public short checkRestPermissions( User user, String restURL )
     {
         short status = 0;
 
@@ -164,15 +164,15 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         {
             Set<Role> roles = user.getRoles();
 
-            for(Role role : roles)
+            for ( Role role : roles )
             {
                 Set<RestEndpointScope> restEndpointScopeList = role.getAccessibleRestEndpoints();
 
-                if(restEndpointScopeList !=null)
+                if ( restEndpointScopeList != null )
                 {
-                    for(RestEndpointScope restEndpointScope : restEndpointScopeList )
+                    for ( RestEndpointScope restEndpointScope : restEndpointScopeList )
                     {
-                        if(restEndpointScope.getRestEndpoint().contains( "{*}" ))
+                        if ( restEndpointScope.getRestEndpoint().contains( "{*}" ) )
                         {
                             status = 1;
                             break;
@@ -187,17 +187,16 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
                         }
                     }
                 }
-                if(status == 1)
+                if ( status == 1 )
                 {
                     break;
                 }
             }
-
         }
 
         return status;
-
     }
+
 
     private void checkDefaultUser( String username )
     {
@@ -450,25 +449,15 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
 
 
     @Override
-    public PortalModuleScope createMockUserPortalModule( final String moduleKey, final String moduleName )
-    {
-        return new PortalModuleScopeEntity( moduleKey, moduleName );
-    }
-
-
-    @Override
-    public boolean updateUserPortalModule( final PortalModuleScope portalModuleScope )
+    public boolean updateUserPortalModule( String moduleKey, String moduleName )
     {
         ClassLoader cl = IdentityManagerImpl.class.getClassLoader();
         Thread.currentThread().setContextClassLoader( IdentityManagerImpl.class.getClassLoader() );
         try
         {
-            LOG.debug( "Saving new portal module: ", portalModuleScope.toString() );
-            if ( !( portalModuleScope instanceof PortalModuleScopeEntity ) )
-            {
-                return false;
-            }
-            portalModuleDataService.update( ( PortalModuleScopeEntity ) portalModuleScope );
+            LOG.debug( "Saving new portal module: ", moduleName );
+            PortalModuleScopeEntity portalModuleScope = new PortalModuleScopeEntity( moduleKey, moduleName );
+            portalModuleDataService.update( portalModuleScope );
             List<Role> roles = roleDataService.getAll();
             for ( Role roleEntity : roles )
             {
@@ -698,7 +687,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
 
 
     @Override
-    public CliCommand createMockCliCommand( final String scope, final String name )
+    public CliCommand createCliCommand( final String scope, final String name )
     {
         return new CliCommandEntity( scope, name );
     }
@@ -726,25 +715,6 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
 
 
     @Override
-    public RestEndpointScope createMockRestEndpoint( final String endpoint, final String port )
-    {
-        return new RestEndpointScopeEntity( endpoint );
-    }
-
-
-    @Override
-    public boolean updateRestEndpoint( final RestEndpointScope endpointScope )
-    {
-        if ( !( endpointScope instanceof RestEndpointScopeEntity ) )
-        {
-            return false;
-        }
-        restEndpointDataService.update( ( RestEndpointScopeEntity ) endpointScope );
-        return false;
-    }
-
-
-    @Override
     public Set<PortalModuleScope> getAllPortalModules()
     {
         Set<PortalModuleScope> portalModules = Sets.newHashSet();
@@ -763,8 +733,8 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
 
 
     @Override
-    public Permission createMockPermission( final String permissionName, final PermissionGroup permissionGroup,
-                                            final String description )
+    public Permission createPermission( final String permissionName, final PermissionGroup permissionGroup,
+                                        final String description )
     {
         return new PermissionEntity( permissionName, permissionGroup, description );
     }
@@ -811,10 +781,9 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
 
 
     @Override
-    public Role createMockRole( final String permissionName, final PermissionGroup permissionGroup,
-                                final String description )
+    public Role createRole( final String roleName )
     {
-        return new RoleEntity( "" );
+        return new RoleEntity( roleName );
     }
 
 
@@ -826,7 +795,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         {
             return false;
         }
-        roleDataService.update( ( RoleEntity ) role );
+        roleDataService.update( role );
         return true;
     }
 

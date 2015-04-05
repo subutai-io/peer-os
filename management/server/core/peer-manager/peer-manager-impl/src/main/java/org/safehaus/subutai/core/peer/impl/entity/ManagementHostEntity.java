@@ -253,7 +253,6 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
                     break;
                 }
             }
-
         }
         catch ( NetworkManagerException e )
         {
