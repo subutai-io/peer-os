@@ -29,4 +29,15 @@ public class RepositoryExceptionTest
 
         assertEquals( CAUSE, exception.getCause() );
     }
+
+
+    @Test
+    public void testMessageNCause() throws Exception
+    {
+        RepositoryException exception = new RepositoryException( MESSAGE, CAUSE );
+
+        assertEquals( CAUSE, exception.getCause() );
+        assertEquals( MESSAGE, exception.getMessage() );
+
+    }
 }
