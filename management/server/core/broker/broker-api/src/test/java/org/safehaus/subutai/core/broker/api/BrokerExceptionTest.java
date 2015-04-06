@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.broker.api;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class BrokerExceptionTest
@@ -23,5 +24,13 @@ public class BrokerExceptionTest
         BrokerException exception2 = new BrokerException( MSG );
 
         assertEquals( MSG, exception2.getMessage() );
+    }
+
+
+    @Test
+    public void testTopicEnum() throws Exception
+    {
+        assertTrue( Topic.valueOf( "HEARTBEAT_TOPIC" ) == Topic.HEARTBEAT_TOPIC );
+
     }
 }
