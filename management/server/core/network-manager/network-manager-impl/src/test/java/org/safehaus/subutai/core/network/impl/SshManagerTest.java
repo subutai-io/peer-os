@@ -15,9 +15,12 @@ import org.safehaus.subutai.core.network.api.NetworkManagerException;
 
 import com.google.common.collect.Sets;
 
+import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -49,7 +52,7 @@ public class SshManagerTest
 
     private void verifyCommandUtilExec() throws CommandException
     {
-        verify( commandUtil ).execute( any( RequestBuilder.class ), eq( containerHost ) );
+        verify( commandUtil, atLeastOnce() ).execute( any( RequestBuilder.class ), eq( containerHost ) );
     }
 
 
@@ -126,8 +129,56 @@ public class SshManagerTest
 
         verifyCommandUtilExec();
 
+        reset( result );
+
+        try
+        {
+            sshManager.read();
+
+            fail( "Expected NetworkManagerException" );
+        }
+        catch ( NetworkManagerException e )
+        {
+
+        }
+
         throwCommandException();
 
         sshManager.read();
+    }
+
+
+    @Test( expected = NetworkManagerException.class )
+    public void testWrite() throws Exception
+    {
+        sshManager.write();
+
+        verifyCommandUtilExec();
+
+        throwCommandException();
+
+        sshManager.write();
+    }
+
+
+    @Test( expected = NetworkManagerException.class )
+    public void testConfig() throws Exception
+    {
+        sshManager.config();
+
+        verifyCommandUtilExec();
+
+        throwCommandException();
+
+        sshManager.config();
+    }
+
+
+    @Test
+    public void testExecute() throws Exception
+    {
+        sshManager.execute();
+
+        verifyCommandUtilExec();
     }
 }

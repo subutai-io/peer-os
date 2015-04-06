@@ -469,7 +469,7 @@ public class NetworkManagerImplTest
     @Test
     public void testGetHostManager() throws Exception
     {
-        assertNotNull( spyNetworkManager.getHostManager( containers, DOMAIN ) );
+        assertNotNull( networkManager.getHostManager( containers, DOMAIN ) );
     }
 
 
@@ -477,6 +477,6 @@ public class NetworkManagerImplTest
     public void testGetSshManager() throws Exception
     {
 
-        assertNotNull( spyNetworkManager.getSshManager( containers ) );
+        assertNotNull( networkManager.getSshManager( containers ) );
     }
 }
