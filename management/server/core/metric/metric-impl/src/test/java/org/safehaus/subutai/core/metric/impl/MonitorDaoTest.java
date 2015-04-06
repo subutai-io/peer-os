@@ -16,7 +16,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.exception.DaoException;
+import org.safehaus.subutai.core.metric.impl.model.Subscriber;
+import org.safehaus.subutai.core.metric.impl.model.SubscriberPK;
 
+import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -130,5 +133,33 @@ public class MonitorDaoTest
         throwDbException();
 
         monitorDao.getEnvironmentSubscribersIds( ENVIRONMENT_ID );
+    }
+
+
+    @Test
+    public void testSubscriber() throws Exception
+    {
+        Subscriber subscriber = new Subscriber( ENVIRONMENT_ID.toString(), SUBSCRIBER_ID );
+
+        assertEquals( ENVIRONMENT_ID, UUID.fromString( subscriber.getEnvironmentId() ) );
+        assertEquals( SUBSCRIBER_ID, subscriber.getSubscriberId() );
+    }
+
+
+    @Test
+    public void testSubscriberPK() throws Exception
+    {
+        SubscriberPK subscriberPK = new SubscriberPK();
+        subscriberPK.setSubscriberId( SUBSCRIBER_ID );
+        subscriberPK.setEnvironmentId( ENVIRONMENT_ID.toString() );
+
+        assertEquals( ENVIRONMENT_ID, UUID.fromString( subscriberPK.getEnvironmentId() ) );
+        assertEquals( SUBSCRIBER_ID, subscriberPK.getSubscriberId() );
+
+        SubscriberPK subscriberPK2 = new SubscriberPK();
+        subscriberPK2.setSubscriberId( SUBSCRIBER_ID );
+        subscriberPK2.setEnvironmentId( ENVIRONMENT_ID.toString() );
+
+        assertEquals( subscriberPK2, subscriberPK );
     }
 }
