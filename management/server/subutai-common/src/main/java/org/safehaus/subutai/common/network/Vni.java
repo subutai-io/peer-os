@@ -63,4 +63,45 @@ public class Vni
         return Objects.toStringHelper( this ).add( "vni", vni ).add( "environmentId", environmentId )
                       .add( "vlan", vlan ).toString();
     }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof Vni ) )
+        {
+            return false;
+        }
+
+        final Vni vni1 = ( Vni ) o;
+
+        if ( vlan != vni1.vlan )
+        {
+            return false;
+        }
+        if ( vni != vni1.vni )
+        {
+            return false;
+        }
+        if ( !environmentId.equals( vni1.environmentId ) )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        int result = ( int ) ( vni ^ ( vni >>> 32 ) );
+        result = 31 * result + environmentId.hashCode();
+        result = 31 * result + vlan;
+        return result;
+    }
 }

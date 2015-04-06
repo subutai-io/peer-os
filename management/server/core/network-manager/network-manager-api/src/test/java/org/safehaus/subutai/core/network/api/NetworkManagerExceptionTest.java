@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.network.impl;
+package org.safehaus.subutai.core.network.api;
 
 
 import org.junit.Test;
