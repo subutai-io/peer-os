@@ -78,9 +78,14 @@ public class ContainerHostQuotaForm extends VerticalLayout
     private Component parent;
 
 
-    public ContainerHostQuotaForm( ExecutorService executorService, Component parent )
+    public void setExecutorService( final ExecutorService executorService )
     {
         this.executorService = executorService;
+    }
+
+
+    public ContainerHostQuotaForm( Component parent )
+    {
         this.parent = parent;
         init();
     }

@@ -45,8 +45,8 @@ public class MonitorFormTest
     EnvironmentManager environmentManager;
     @Mock
     Table metricsTable;
-    @Mock
-    ExecutorService executorService;
+//    @Mock
+//    ExecutorService executorService;
 
     @Mock
     HostRegistry hostRegistry;
@@ -77,7 +77,7 @@ public class MonitorFormTest
 
         monitorForm = new MonitorForm( serviceLocator, hostRegistry );
         monitorForm.metricTable = metricsTable;
-        monitorForm.executorService = executorService;
+//        monitorForm.executorService = executorService;
         containerHostMetric = JsonUtil.fromJson( METRIC, ContainerHostMetricImpl.class );
         resourceHostMetric = JsonUtil.fromJson( METRIC, ResourceHostMetricImpl.class );
     }

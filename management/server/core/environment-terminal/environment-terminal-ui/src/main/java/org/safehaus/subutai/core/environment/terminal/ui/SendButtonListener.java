@@ -31,12 +31,17 @@ public class SendButtonListener implements Button.ClickListener
     private static final Logger LOG = LoggerFactory.getLogger( SendButtonListener.class.getName() );
 
     private final TerminalForm form;
-    private final ExecutorService executor;
+    private ExecutorService executor;
 
 
-    public SendButtonListener( final TerminalForm form, ExecutorService executor )
+    public SendButtonListener( final TerminalForm form )
     {
         this.form = form;
+    }
+
+
+    public void setExecutor( final ExecutorService executor )
+    {
         this.executor = executor;
     }
 

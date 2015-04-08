@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.server.ui.component.ConcurrentComponent;
 import org.slf4j.Logger;
@@ -43,7 +42,7 @@ import com.vaadin.ui.UI;
  */
 @SuppressWarnings( "serial" )
 
-public final class EnvironmentTree extends ConcurrentComponent implements Disposable
+public final class EnvironmentTree extends ConcurrentComponent
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( UI.getCurrent().getClass().getName() );
@@ -339,11 +338,5 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
                 item.getItemProperty( ICON_PROPERTY ).setValue( new ThemeResource( "img/lxc/virtual_offline.png" ) );
             }
         }
-    }
-
-
-    public void dispose()
-    {
-        scheduler.shutdown();
     }
 }
