@@ -62,7 +62,7 @@ public class TerminalFormTest
     }
 
 
-    @Ignore
+//    @Ignore
     @Test
     public void testAddOutput() throws Exception
     {

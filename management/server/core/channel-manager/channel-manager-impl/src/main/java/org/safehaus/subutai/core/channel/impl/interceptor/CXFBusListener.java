@@ -11,7 +11,6 @@ import org.apache.cxf.feature.AbstractFeature;
 
 
 /**
- * Created by talas on 2/23/15.
  * Bus listener class
  */
 public class CXFBusListener extends AbstractFeature

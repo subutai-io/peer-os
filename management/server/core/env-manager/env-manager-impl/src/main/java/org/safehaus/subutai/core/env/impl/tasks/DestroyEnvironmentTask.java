@@ -23,6 +23,7 @@ import org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.ResultHolder;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
+import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,6 +93,22 @@ public class DestroyEnvironmentTask implements Runnable
             for ( ContainerHost container : environment.getContainerHosts() )
             {
                 environmentPeers.add( container.getPeer() );
+            }
+
+            if ( !environmentPeers.contains( localPeer ) )
+            {
+                try
+                {
+                    ManagementHost managementHost = localPeer.getManagementHost();
+                    if ( managementHost != null )
+                    {
+                        managementHost.cleanupEnvironmentNetworkSettings( environment.getId() );
+                    }
+                }
+                catch ( PeerException e )
+                {
+                    LOG.error( "Couldn't get local LocalPeer#ManagementHost", e );
+                }
             }
 
             ExecutorService executorService = SubutaiExecutors.newFixedThreadPool( environmentPeers.size() );

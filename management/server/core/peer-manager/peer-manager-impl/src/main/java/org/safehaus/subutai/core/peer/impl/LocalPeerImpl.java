@@ -37,6 +37,7 @@ import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
+import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
@@ -112,7 +113,7 @@ import com.google.common.collect.Sets;
 /**
  * Local peer implementation
  */
-public class LocalPeerImpl implements LocalPeer, HostListener
+public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 {
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
@@ -201,9 +202,19 @@ public class LocalPeerImpl implements LocalPeer, HostListener
     }
 
 
-    public void shutdown()
+    public void dispose()
     {
         hostRegistry.removeHostListener( this );
+
+        if ( managementHost != null )
+        {
+            ( ( Disposable ) managementHost ).dispose();
+        }
+
+        for ( ResourceHost resourceHost : getResourceHosts() )
+        {
+            ( ( Disposable ) resourceHost ).dispose();
+        }
     }
 
 
@@ -383,13 +394,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         }
 
 
-        List<Future<ContainerHost>> taskFutures = Lists.newArrayList();
-        ExecutorService executorService = Executors.newFixedThreadPool( request.getNumberOfContainers() );
-
         String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
         String[] allAddresses = cidr.getInfo().getAllAddresses();
         String gateway = cidr.getInfo().getLowAddress();
         int currentIpAddressOffset = 0;
+
+        List<Future<ContainerHost>> taskFutures = Lists.newArrayList();
+        ExecutorService executorService = Executors.newFixedThreadPool( request.getNumberOfContainers() );
 
         //create containers in parallel on each resource host
         for ( Map.Entry<ResourceHost, Set<String>> resourceHostDistribution : containerDistribution.entrySet() )
@@ -804,8 +815,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
-                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder(
+                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
+                    bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1520,6 +1532,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 }
             }
 
+            executorService.shutdown();
+
             //cleanup environment network settings
             if ( containerGroup.getContainerIds().size() == destroyedContainersIds.size() )
             {
@@ -1532,8 +1546,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                     errors.add( exceptionUtil.getRootCause( e ) );
                 }
             }
-
-            executorService.shutdown();
         }
 
         String exception = null;

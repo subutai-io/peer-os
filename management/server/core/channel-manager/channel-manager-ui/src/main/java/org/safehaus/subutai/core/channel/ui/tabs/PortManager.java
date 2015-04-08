@@ -12,9 +12,6 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 
 
-/**
- * Created by ermek on 3/4/15.
- */
 public class PortManager extends Panel
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( UserTokenManager.class );

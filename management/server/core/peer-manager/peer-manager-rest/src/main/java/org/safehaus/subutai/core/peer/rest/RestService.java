@@ -77,6 +77,8 @@ public interface RestService
                                           @FormParam( "root_cert_px2" ) String root_cert_px2,
                                           @FormParam( "status" ) short status );
 
+    //TODO move all registration process operations to peerManager and remove duplicated code pieces from
+    // PeerRegistrationUI and RestServiceImpl
     @POST
     @Path( "register" )
     @Produces( { MediaType.APPLICATION_JSON } )

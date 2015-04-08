@@ -13,9 +13,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 
-/**
- * Created by talas on 12/7/14.
- */
 @Entity
 @Table( name = "tracker_operation" )
 @Access( AccessType.FIELD )

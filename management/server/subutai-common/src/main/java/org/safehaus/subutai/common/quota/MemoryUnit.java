@@ -1,9 +1,6 @@
 package org.safehaus.subutai.common.quota;
 
 
-/**
- * Created by talas on 10/8/14.
- */
 public enum MemoryUnit
 {
     BYTES( "B", "Bytes", 0 ),

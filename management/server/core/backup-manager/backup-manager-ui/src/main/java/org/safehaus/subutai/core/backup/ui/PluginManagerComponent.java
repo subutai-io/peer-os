@@ -19,9 +19,6 @@ import com.vaadin.ui.Layout;
 import com.vaadin.ui.Table;
 
 
-/**
- * Created by ebru on 08.12.2014.
- */
 public class PluginManagerComponent extends CustomComponent implements Disposable
 {
     protected static final String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";

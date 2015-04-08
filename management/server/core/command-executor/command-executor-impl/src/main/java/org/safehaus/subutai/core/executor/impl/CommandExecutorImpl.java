@@ -98,5 +98,6 @@ public class CommandExecutorImpl implements CommandExecutor
     public void dispose()
     {
         broker.removeMessageListener( commandProcessor );
+        commandProcessor.dispose();
     }
 }

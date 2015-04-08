@@ -160,13 +160,17 @@ public class BrokerImpl implements Broker
 
     private void sendMessage( String topic, Object message ) throws BrokerException
     {
+        Connection connection = null;
+        Session session = null;
+        MessageProducer producer = null;
+
         try
         {
-            Connection connection = pool.createConnection();
+            connection = pool.createConnection();
             connection.start();
-            Session session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
+            session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
             Destination destination = session.createTopic( topic );
-            MessageProducer producer = session.createProducer( destination );
+            producer = session.createProducer( destination );
             producer.setDeliveryMode( isPersistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT );
             producer.setTimeToLive( messageTimeout * 1000 );
 
@@ -184,14 +188,49 @@ public class BrokerImpl implements Broker
 
             producer.send( msg );
 
-            producer.close();
-            session.close();
-            connection.close();
         }
         catch ( JMSException e )
         {
             LOG.error( "Error in sendMessage", e );
             throw new BrokerException( e );
+        }
+        finally
+        {
+            if ( producer != null )
+            {
+                try
+                {
+                    producer.close();
+                }
+                catch ( JMSException e )
+                {
+                    //ignore
+                }
+            }
+
+            if ( session != null )
+            {
+                try
+                {
+                    session.close();
+                }
+                catch ( JMSException e )
+                {
+                    //ignore
+                }
+            }
+
+            if ( connection != null )
+            {
+                try
+                {
+                    connection.close();
+                }
+                catch ( JMSException e )
+                {
+                    //ignore
+                }
+            }
         }
     }
 }

@@ -12,9 +12,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 
 
-/**
- * Created by bahadyr on 9/25/14.
- */
+
 @Ignore
 @RunWith(MockitoJUnitRunner.class)
 public class PeerManagerImplTest

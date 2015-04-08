@@ -17,11 +17,6 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
- * Created by talas on 3/12/15.
- */
-
-
-/**
  * Filters out karaf user shell command accessibility according to his/her role permission Check is made upon existence
  * of a command pattern in identity registry
  */
@@ -43,7 +38,7 @@ public abstract class SubutaiShellCommandSupport extends OsgiCommandSupport
             if ( identityManager != null )
             {
                 User user = identityManager.getUser();
-                CliCommand temp = identityManager.createMockCliCommand( command.scope(), command.name() );
+                CliCommand temp = identityManager.createCliCommand( command.scope(), command.name() );
                 if ( user != null )
                 {
                     Set<Role> roles = user.getRoles();

@@ -27,9 +27,6 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.data.Property;
 
-/**
- * Created by ermek on 3/4/15.
- */
 public class UserTokenManager extends Panel
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( UserTokenManager.class );

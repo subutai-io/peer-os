@@ -24,6 +24,7 @@ import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.metric.HistoricalMetric;
 import org.safehaus.subutai.common.metric.MetricType;
+import org.safehaus.subutai.common.metric.OwnerResourceUsage;
 import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
@@ -60,6 +61,7 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -81,10 +83,16 @@ public class MonitorImplTest
     private static final UUID HOST_ID = UUID.randomUUID();
     private static final String HOST = "test";
     private static final double METRIC_VALUE = 123;
-    private static final String METRIC_JSON = " {\"host\":\"test\", \"totalRam\":\"123\"," +
-            "\"availableRam\":\"123\", \"usedRam\":\"123\", \"usedCpu\":\"123\","
-            + "  \"availableDisk\" : \"123\", \"usedDisk\" : \"123\", \"totalDisk\" : \"123\"}";
+    private static final String METRIC_JSON =
+            "{\"host\":\"test\", \"totalRam\":\"123\", \"availableRam\":\"123\", " + "\"usedRam\":\"123\","
+                    + "  \"usedCpu\":\"123\", \"availableDiskRootfs\":\"123\", " + "\"availableDiskVar\":\"123\","
+                    + "  \"availableDiskHome\":\"123\", \"availableDiskOpt\":\"123\", " + "\"usedDiskRootfs\":\"123\","
+                    + "  \"usedDiskVar\":\"123\", \"usedDiskHome\":\"123\", \"usedDiskOpt\":\"123\", "
+                    + "\"totalDiskRootfs\":\"123\"," + "  \"totalDiskVar\":\"123\", \"totalDiskHome\":\"123\", "
+                    + "\"totalDiskOpt\":\"123\"}";
     private static final Long USER_ID = 123l;
+    private static final int PID = 123;
+    private static final UUID OWNER_ID = UUID.randomUUID();
     @Mock
     EntityManagerFactory entityManagerFactory;
     @Mock
@@ -243,7 +251,7 @@ public class MonitorImplTest
 
         monitor.notifyOnAlert( containerHostMetric );
 
-        verify( identityManager ).loginWithToken(anyString());
+        verify( identityManager ).loginWithToken( anyString() );
     }
 
 
@@ -494,6 +502,31 @@ public class MonitorImplTest
 
 
     @Test
+    public void testtestGetLocalContainerHostMetricsTakingSet() throws Exception
+    {
+        CommandResult commandResult = mock( CommandResult.class );
+        when( commandResult.hasSucceeded() ).thenReturn( true );
+        when( commandResult.getStdOut() ).thenReturn( METRIC_JSON );
+        when( containerHost.isLocal() ).thenReturn( true );
+        ContainerGroup containerGroup = mock( ContainerGroup.class );
+        when( localPeer.findContainerGroupByContainerId( HOST_ID ) ).thenReturn( containerGroup );
+        when( resourceHost.getContainerHostById( HOST_ID ) ).thenReturn( containerHost );
+        when( localPeer.getResourceHostByContainerId( HOST_ID ) ).thenReturn( resourceHost );
+        when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
+        when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
+
+
+        Set<ContainerHostMetric> metrics = monitor.getLocalContainerHostsMetrics( Sets.newHashSet( containerHost ) );
+
+        verify( containerHost, atLeastOnce() ).getId();
+
+        ContainerHostMetric metric = monitor.getLocalContainerHostMetric( containerHost );
+
+        assertTrue( metrics.contains( metric ) );
+    }
+
+
+    @Test
     public void testGetLocalContainerHostMetricsWithException() throws Exception
     {
         ContainerGroup containerGroup = mock( ContainerGroup.class );
@@ -587,6 +620,23 @@ public class MonitorImplTest
 
 
         ResourceHostMetric metric = metrics.iterator().next();
+        assertEquals( LOCAL_PEER_ID, metric.getPeerId() );
+        assertEquals( HOST, metric.getHost() );
+        assertEquals( METRIC_VALUE, metric.getTotalRam() );
+    }
+
+
+    @Test
+    public void testGetResourceHostMetric() throws Exception
+    {
+        CommandResult commandResult = mock( CommandResult.class );
+        when( commandResult.hasSucceeded() ).thenReturn( true );
+        when( commandResult.getStdOut() ).thenReturn( METRIC_JSON );
+        when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
+        monitor.getResourceHostMetric( resourceHost );
+
+        ResourceHostMetric metric = monitor.getResourceHostMetric( resourceHost );
+
         assertEquals( LOCAL_PEER_ID, metric.getPeerId() );
         assertEquals( HOST, metric.getHost() );
         assertEquals( METRIC_VALUE, metric.getTotalRam() );
@@ -747,5 +797,44 @@ public class MonitorImplTest
         List<HistoricalMetric> historicalMetric = monitor1.getHistoricalMetric( containerHost, MetricType.CPU );
         assertNotNull( historicalMetric );
         assertTrue( historicalMetric.size() == 2 );
+    }
+
+
+    @Test( expected = MonitorException.class )
+    public void testGetProcessResourceUsage() throws Exception
+    {
+        CommandResult commandResult = mock( CommandResult.class );
+        when( commandResult.hasSucceeded() ).thenReturn( true ).thenReturn( false );
+        when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
+        when( localPeer.getResourceHostByContainerName( containerHost.getHostname() ) ).thenReturn( resourceHost );
+
+        monitor.getProcessResourceUsage( containerHost, PID );
+
+        verify( commandResult ).getStdOut();
+
+        monitor.getProcessResourceUsage( containerHost, PID );
+    }
+
+
+    @Test
+    public void testGetOwnerResourceUsage() throws Exception
+    {
+        CommandResult commandResult = mock( CommandResult.class );
+        when( commandResult.hasSucceeded() ).thenReturn( true );
+        when( commandResult.getStdOut() ).thenReturn( METRIC_JSON );
+        when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
+        ContainerGroup containerGroup = mock( ContainerGroup.class );
+        when( localPeer.findContainerGroupsByOwnerId( OWNER_ID ) ).thenReturn( Sets.newHashSet( containerGroup ) );
+        when( localPeer.findContainerGroupByContainerId( HOST_ID ) ).thenReturn( containerGroup );
+        when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( HOST_ID ) );
+        when( localPeer.getContainerHostById( HOST_ID ) ).thenReturn( containerHost );
+        when( containerHost.isLocal() ).thenReturn( true );
+        when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
+        when( localPeer.getResourceHostByContainerId( HOST_ID ) ).thenReturn( resourceHost );
+        when( resourceHost.getContainerHostById( HOST_ID ) ).thenReturn( containerHost );
+
+        OwnerResourceUsage ownerResourceUsage = monitor.getOwnerResourceUsage( OWNER_ID );
+
+        assertEquals( METRIC_VALUE, ownerResourceUsage.getUsedCpu() );
     }
 }

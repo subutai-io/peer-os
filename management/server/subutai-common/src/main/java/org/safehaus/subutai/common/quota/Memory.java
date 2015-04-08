@@ -5,9 +5,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-/**
- * Created by talas on 12/2/14.
- */
 public class Memory
 {
     MemoryUnit unit;

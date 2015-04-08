@@ -9,9 +9,6 @@ import org.safehaus.subutai.core.identity.impl.entity.PermissionEntity;
 import org.safehaus.subutai.core.identity.impl.entity.PermissionPK;
 
 
-/**
- * Created by talas on 2/5/15.
- */
 public class PermissionTestUtils
 {
     private static PermissionEntity testPermission =

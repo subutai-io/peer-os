@@ -4,9 +4,6 @@ package org.safehaus.subutai.common.quota;
 import com.google.common.base.Preconditions;
 
 
-/**
- * Created by talas on 12/2/14.
- */
 public class MemoryQuotaInfo extends QuotaInfo
 {
     private DiskQuotaUnit quotaUnit;

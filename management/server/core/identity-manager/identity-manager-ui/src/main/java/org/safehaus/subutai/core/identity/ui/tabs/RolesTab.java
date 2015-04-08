@@ -2,7 +2,6 @@ package org.safehaus.subutai.core.identity.ui.tabs;
 
 
 import org.safehaus.subutai.core.identity.api.IdentityManager;
-import org.safehaus.subutai.core.identity.api.PermissionGroup;
 import org.safehaus.subutai.core.identity.api.Role;
 import org.safehaus.subutai.core.identity.ui.tabs.subviews.RoleForm;
 
@@ -17,9 +16,6 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
 
-/**
- * Created by talas on 1/26/15.
- */
 public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Role>>
 {
     private enum FormState
@@ -106,8 +102,7 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
             {
 
                 // Create a new item; this will create a new bean
-                BeanItem<Role> newPermission = new BeanItem<>(
-                        identityManager.createMockRole( null, PermissionGroup.ENVIRONMENT_PERMISSIONS, null ) );
+                BeanItem<Role> newPermission = new BeanItem<>( identityManager.createRole( "" ) );
 
                 // The form was opened for editing a new item
                 refreshControls( FormState.STATE_NEW_ENTITY );

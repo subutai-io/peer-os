@@ -39,6 +39,8 @@ public class RoundRobinStrategy extends AbstractContainerPlacementStrategy
             return;
         }
 
+        setDistributionCriteria( criteria );
+
         List<ResourceHostMetric> sortedMetrics = sortServers( serverMetrics );
 
 
@@ -57,7 +59,6 @@ public class RoundRobinStrategy extends AbstractContainerPlacementStrategy
             }
         }
         // add node distribution counts
-        clearPlacementInfo();
         for ( Map.Entry<ResourceHostMetric, Integer> e : slots.entrySet() )
         {
             addPlacementInfo( e.getKey(), DEFAULT_NODE_TYPE, e.getValue() );

@@ -26,7 +26,7 @@ public class HostManager
     private Set<ContainerHost> containerHosts;
     private String domainName;
     private Commands commands;
-    private CommandUtil commandUtil;
+    protected CommandUtil commandUtil;
 
 
     public HostManager( Set<ContainerHost> containerHosts, String domainName )
@@ -43,13 +43,6 @@ public class HostManager
 
     public void execute() throws NetworkManagerException
     {
-        write();
-    }
-
-
-    private void write() throws NetworkManagerException
-    {
-
         if ( !CollectionUtil.isCollectionEmpty( containerHosts ) )
         {
             try

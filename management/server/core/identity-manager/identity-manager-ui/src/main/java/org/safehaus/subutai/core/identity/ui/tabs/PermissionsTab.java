@@ -16,9 +16,6 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
 
-/**
- * Created by talas on 1/26/15.
- */
 public class PermissionsTab extends CustomComponent implements TabCallback<BeanItem<Permission>>
 {
     private enum FormState
@@ -106,7 +103,7 @@ public class PermissionsTab extends CustomComponent implements TabCallback<BeanI
 
                 // Create a new item; this will create a new bean
                 BeanItem<Permission> newPermission = new BeanItem<>(
-                        identityManager.createMockPermission( "", PermissionGroup.DEFAULT_PERMISSIONS, "" ) );
+                        identityManager.createPermission( "", PermissionGroup.DEFAULT_PERMISSIONS, "" ) );
 
                 // The form was opened for editing a new item
                 refreshControls( FormState.STATE_NEW_ENTITY );

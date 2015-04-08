@@ -80,6 +80,7 @@ public class PeerManagerImpl implements PeerManager
     private CommandResponseListener commandResponseListener;
     private Set<RequestListener> requestListeners = Sets.newHashSet();
     private MessageResponseListener messageResponseListener;
+    private MessageRequestListener messageRequestListener;
     private HostRegistry hostRegistry;
     private DaoManager daoManager;
     private KeyManager keyManager;
@@ -242,7 +243,8 @@ public class PeerManagerImpl implements PeerManager
         commandResponseListener = new CommandResponseListener();
         addRequestListener( commandResponseListener );
         //subscribe to peer message requests
-        messenger.addMessageListener( new MessageRequestListener( this, messenger, requestListeners ) );
+        messageRequestListener = new MessageRequestListener( this, messenger, requestListeners );
+        messenger.addMessageListener( messageRequestListener );
         //subscribe to peer message responses
         messageResponseListener = new MessageResponseListener( messenger );
         messenger.addMessageListener( messageResponseListener );
@@ -257,7 +259,10 @@ public class PeerManagerImpl implements PeerManager
 
     public void destroy()
     {
-        localPeer.shutdown();
+        localPeer.dispose();
+        commandResponseListener.dispose();
+        messageRequestListener.dispose();
+        messageResponseListener.dispose();
     }
 
 

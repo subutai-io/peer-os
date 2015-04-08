@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -30,6 +31,7 @@ public class ExpiringCache<K, V>
     private final Map<K, CacheEntry<V>> entries = new ConcurrentHashMap<>();
 
     private final ScheduledExecutorService evictor;
+    private final ExecutorService expirationNotifier;
 
 
     /**
@@ -39,6 +41,8 @@ public class ExpiringCache<K, V>
     {
 
         evictor = Executors.newSingleThreadScheduledExecutor();
+
+        expirationNotifier = Executors.newCachedThreadPool();
 
         evictor.scheduleWithFixedDelay( new Runnable()
         {
@@ -76,7 +80,7 @@ public class ExpiringCache<K, V>
 
     private void evictEntry( final CacheEntryWithExpiryCallback callback )
     {
-        evictor.execute( new Runnable()
+        expirationNotifier.execute( new Runnable()
         {
 
             public void run()
@@ -208,6 +212,7 @@ public class ExpiringCache<K, V>
     public void dispose()
     {
         evictor.shutdown();
+        expirationNotifier.shutdown();
         entries.clear();
     }
 }

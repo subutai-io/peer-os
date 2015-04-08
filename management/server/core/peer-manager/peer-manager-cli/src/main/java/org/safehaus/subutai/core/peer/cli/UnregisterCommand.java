@@ -8,9 +8,6 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 
-/**
- * Created by bahadyr on 8/28/14.
- */
 @Command( scope = "peer", name = "unregister" )
 public class UnregisterCommand extends SubutaiShellCommandSupport
 {

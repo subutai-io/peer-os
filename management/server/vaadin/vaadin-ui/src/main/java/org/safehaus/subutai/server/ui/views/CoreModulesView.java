@@ -32,9 +32,6 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
 
-/**
- * Created by talas on 9/17/14.
- */
 public class CoreModulesView extends VerticalLayout implements View, PortalModuleListener
 {
 

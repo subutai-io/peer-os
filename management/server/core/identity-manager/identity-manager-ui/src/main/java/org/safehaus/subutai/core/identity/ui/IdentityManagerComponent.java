@@ -13,9 +13,6 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
 
 
-/**
- * Created by talas on 1/21/15.
- */
 public class IdentityManagerComponent extends CustomComponent implements Disposable
 {
     public IdentityManagerComponent( final IdentityManagerPortalModule portalModule, IdentityManager identityManager )

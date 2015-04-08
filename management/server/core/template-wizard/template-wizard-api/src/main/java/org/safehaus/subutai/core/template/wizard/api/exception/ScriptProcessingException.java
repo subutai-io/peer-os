@@ -1,9 +1,6 @@
 package org.safehaus.subutai.core.template.wizard.api.exception;
 
 
-/**
- * Created by talas on 3/18/15.
- */
 public class ScriptProcessingException extends TemplateWizardException
 {
     public ScriptProcessingException()

@@ -10,9 +10,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>template-wizard-impl</artifactId>
-  <packaging>bundle</packaging>
   <name>Subutai Template Creation Wizard Impl</name>
   <description>Subutai Template Creation Wizard Impl</description>
+  <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>

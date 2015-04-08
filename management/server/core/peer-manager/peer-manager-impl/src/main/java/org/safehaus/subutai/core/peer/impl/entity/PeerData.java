@@ -11,11 +11,6 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 
 
-/**
- * Created by nisakov on 1/13/15.
- */
-
-
 @Entity
 @Table( name = "peer_data" )
 @Access( AccessType.FIELD )

@@ -26,6 +26,7 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.metric.api.Monitor;
@@ -51,7 +52,7 @@ import com.google.common.collect.Sets;
 @Entity
 @Table( name = "resource_host" )
 @Access( AccessType.FIELD )
-public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceHost
+public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceHost, Disposable
 {
     private static final int CONNECT_TIMEOUT = 300;
 
@@ -76,6 +77,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     public ResourceHostEntity()
     {
+    }
+
+
+    public void dispose()
+    {
+        singleThreadExecutorService.shutdown();
     }
 
 

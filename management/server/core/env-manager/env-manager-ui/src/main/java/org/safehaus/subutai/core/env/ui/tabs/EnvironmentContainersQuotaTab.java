@@ -106,6 +106,15 @@ public class EnvironmentContainersQuotaTab extends CustomComponent
     {
         this.environmentComponent = environmentComponent;
         init();
+
+        addDetachListener( new DetachListener()
+        {
+            @Override
+            public void detach( final DetachEvent event )
+            {
+                executorService.shutdown();
+            }
+        } );
     }
 
 

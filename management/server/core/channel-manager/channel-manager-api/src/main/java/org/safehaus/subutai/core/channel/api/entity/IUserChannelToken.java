@@ -4,9 +4,6 @@ package org.safehaus.subutai.core.channel.api.entity;
 import java.sql.Timestamp;
 
 
-/**
- * Created by nisakov on 3/4/15.
- */
 public interface IUserChannelToken
 {
     public Long getUserId();

@@ -6,8 +6,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
-import javax.ws.rs.core.Response;
-
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
@@ -62,7 +60,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.ext.form.Form;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -98,6 +95,8 @@ public class RemotePeerImpl implements RemotePeer
         String url = "";
 
         String port = String.valueOf( peerInfo.getPort() );
+
+        //switch case for formatting request url
         switch ( port )
         {
             case ChannelSettings.OPEN_PORT:
@@ -135,6 +134,14 @@ public class RemotePeerImpl implements RemotePeer
     {
 
         return request( RestUtil.RequestType.POST, path, alias, params, headers );
+    }
+
+
+    protected String delete( String path, String alias, Map<String, String> params, Map<String, String> headers )
+            throws HTTPException
+    {
+
+        return request( RestUtil.RequestType.DELETE, path, alias, params, headers );
     }
 
 
@@ -1202,15 +1209,16 @@ public class RemotePeerImpl implements RemotePeer
             WebClient client = RestUtil.createTrustedWebClientWithAuth( url, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS );
             client.path( path );
 
-            Form form = new Form();
-            form.set( "environmentId", envId );
+            Map<String, String> params = Maps.newHashMap();
+            params.put( "environmentId", envId );
 
-            client.header( Common.ENVIRONMENT_ID_HEADER_NAME, envId );
+            Map<String, String> headers = Maps.newHashMap();
+            headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, envId );
 
-            Response response = client.post( form );
-            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+            String response = post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
+            if ( response != null && !"".equals( response ) )
             {
-                return response.readEntity( String.class );
+                return response;
             }
             else
             {
@@ -1220,7 +1228,7 @@ public class RemotePeerImpl implements RemotePeer
         catch ( Exception e )
         {
             throw new PeerException(
-                    String.format( "Error importing environment certificate %s on peer %s", envId, getName() ), e );
+                    String.format( "Error exporting environment certificate %s on peer %s", envId, getName() ), e );
         }
     }
 
@@ -1240,21 +1248,15 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-
-            String url = String.format( "https://%s:%s/cxf", peerInfo.getIp(), ChannelSettings.SECURE_PORT_X2 );
             String environmentRequestAlias = String.format( "env_%s_%s", localPeer.getId().toString(), envId );
 
-            WebClient client = RestUtil.createTrustedWebClientWithEnvAuth( url, environmentRequestAlias );
-            client.path( path );
-            client.query( "environmentId", JsonUtil.toJson( environmentId ) );
+            Map<String, String> params = Maps.newHashMap();
+            params.put( "environmentId", JsonUtil.toJson( environmentId ) );
 
-            client.header( Common.ENVIRONMENT_ID_HEADER_NAME, envId );
+            Map<String, String> headers = Maps.newHashMap();
+            headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, envId );
 
-            Response response = client.delete();
-            if ( response.getStatus() != Response.Status.NO_CONTENT.getStatusCode() )
-            {
-                throw new Exception( "Invalid status code." );
-            }
+            delete( path, environmentRequestAlias, params, headers );
         }
         catch ( Exception e )
         {

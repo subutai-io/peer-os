@@ -33,6 +33,7 @@ import org.safehaus.subutai.core.strategy.api.StrategyManager;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -289,7 +290,7 @@ public class Cloner extends VerticalLayout
             return;
         }
 
-        Set<Host> resourceHosts = containerTree.getSelectedHosts();
+        Set<Host> resourceHosts = Sets.newHashSet( containerTree.getSelectedHosts() );
 
         for ( Iterator<Host> iterator = resourceHosts.iterator(); iterator.hasNext(); )
         {
@@ -427,13 +428,15 @@ public class Cloner extends VerticalLayout
             for ( String lxc : entry.getValue() )
             {
                 //                Embedded progressIcon = new Embedded("", new ThemeResource(loadIconSource));
+                if ( lxcTable.getItem( lxc ) == null )
+                {
+                    lxcTable.addItem( new Object[] {
+                            null, lxc, null /*progressIcon*/
+                    }, lxc );
 
-                lxcTable.addItem( new Object[] {
-                        null, lxc, null /*progressIcon*/
-                }, lxc );
-
-                lxcTable.setParent( lxc, host.getHostname() );
-                lxcTable.setChildrenAllowed( lxc, false );
+                    lxcTable.setParent( lxc, host.getHostname() );
+                    lxcTable.setChildrenAllowed( lxc, false );
+                }
             }
         }
     }

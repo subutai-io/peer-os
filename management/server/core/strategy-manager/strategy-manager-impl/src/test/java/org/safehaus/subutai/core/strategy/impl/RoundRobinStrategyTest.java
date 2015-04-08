@@ -7,9 +7,6 @@ import org.junit.Test;
 import static junit.framework.Assert.assertEquals;
 
 
-/**
- * Created by ermek on 10/9/14.
- */
 public class RoundRobinStrategyTest
 {
     RoundRobinStrategy roundRobinStrategy;

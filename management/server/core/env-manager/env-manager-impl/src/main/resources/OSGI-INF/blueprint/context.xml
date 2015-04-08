@@ -41,7 +41,7 @@
                         bind-method="registerListener" unbind-method="unregisterListener" />
   </reference-list>
 
-  <bean id="environmentManager" scope="singleton" init-method="init"
+  <bean id="environmentManager" scope="singleton" init-method="init" destroy-method="dispose"
         class="org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl">
     <argument ref="templateRegistry" />
     <argument ref="peerManager" />

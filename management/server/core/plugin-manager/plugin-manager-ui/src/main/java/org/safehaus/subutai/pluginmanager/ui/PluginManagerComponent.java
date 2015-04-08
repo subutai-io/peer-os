@@ -9,9 +9,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.management.Notification;
-
-import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.pluginmanager.api.OperationType;
 import org.safehaus.subutai.pluginmanager.api.PluginInfo;
@@ -19,7 +16,6 @@ import org.safehaus.subutai.pluginmanager.api.PluginManager;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 
-import com.vaadin.server.ClientConnector;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Button;
@@ -87,10 +83,27 @@ public class PluginManagerComponent extends CustomComponent
         contentRoot.addComponent( pluginsTable, 0, 1, 0, 9 );
 
         setCompositionRoot( contentRoot );
+
+        addDetachListener( new DetachListener()
+        {
+            @Override
+            public void detach( final DetachEvent event )
+            {
+                if ( updater != null )
+                {
+                    updater.shutdown();
+                }
+            }
+        } );
     }
+
 
     private void startTableUpdateThread( final HorizontalLayout controlsContent )
     {
+        if ( updater != null )
+        {
+            updater.shutdown();
+        }
         updater = Executors.newSingleThreadScheduledExecutor();
         updater.scheduleWithFixedDelay( new Runnable()
         {
@@ -103,7 +116,7 @@ public class PluginManagerComponent extends CustomComponent
                     @Override
                     public void run()
                     {
-                        listPluginsClickHandler( );
+                        listPluginsClickHandler();
                     }
                 } );
             }
@@ -127,12 +140,13 @@ public class PluginManagerComponent extends CustomComponent
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                listPluginsClickHandler( );
+                listPluginsClickHandler();
             }
         } );
 
         controlsContent.addComponent( listPluginsBtn );
     }
+
 
     private void getListInstalledPluginsButton( final HorizontalLayout controlsContent )
     {
@@ -198,6 +212,7 @@ public class PluginManagerComponent extends CustomComponent
         controlsContent.addComponent( browser );
     }
 
+
     private void refreshUI()
     {
         listPluginsClickHandler();
@@ -250,7 +265,7 @@ public class PluginManagerComponent extends CustomComponent
     }
 
 
-    private void listPluginsClickHandler( )
+    private void listPluginsClickHandler()
     {
         pluginsTable.removeAllItems();
         boolean isInstalled = false;
@@ -272,21 +287,21 @@ public class PluginManagerComponent extends CustomComponent
             }
 
 
-            pluginsTable.addItem( new Object[] { p, availableOperations }, null);
+            pluginsTable.addItem( new Object[] { p, availableOperations }, null );
 
             List<Object> itemIds = new ArrayList<>( pluginsTable.getItemIds() );
-            if( itemIds.size() == 0 )
+            if ( itemIds.size() == 0 )
             {
                 com.vaadin.ui.Notification.show( "There is no available plugins in repo to be installed" );
                 return;
             }
-            else{
+            else
+            {
                 int count = itemIds.size();
                 Object itemId = itemIds.get( count - 1 );
                 addClickListenerToRemoveButton( removeButton, p, itemId, availableOperations, installButton );
                 addClickListenerToInstallButton( installButton, p, itemId, availableOperations, removeButton );
             }
-
         }
     }
 
@@ -320,17 +335,17 @@ public class PluginManagerComponent extends CustomComponent
             }, null );
 
             List<Object> itemIds = new ArrayList<>( pluginsTable.getItemIds() );
-            if( itemIds.size() == 0 )
+            if ( itemIds.size() == 0 )
             {
                 com.vaadin.ui.Notification.show( "There is no available plugins in repo to be installed" );
                 return;
             }
-            else{
+            else
+            {
                 int count = itemIds.size();
                 Object itemId = itemIds.get( count - 1 );
                 //addClickListenerToInstallButton( installButton, p.getPluginName(), itemId );
             }
-
 
 
             isTableRemoved = false;
@@ -338,8 +353,9 @@ public class PluginManagerComponent extends CustomComponent
     }
 
 
-    private void addClickListenerToInstallButton( final Button installButton, final String pluginName, final Object itemId,
-                                                  final HorizontalLayout availableOperations, final Button removeButton )
+    private void addClickListenerToInstallButton( final Button installButton, final String pluginName,
+                                                  final Object itemId, final HorizontalLayout availableOperations,
+                                                  final Button removeButton )
     {
         installButton.addClickListener( new Button.ClickListener()
         {
@@ -366,7 +382,7 @@ public class PluginManagerComponent extends CustomComponent
                             @Override
                             public void windowClose( Window.CloseEvent closeEvent )
                             {
-                                if( pluginManager.operationSuccessful( OperationType.INSTALL ))
+                                if ( pluginManager.operationSuccessful( OperationType.INSTALL ) )
                                 {
                                     availableOperations.removeComponent( installButton );
                                     availableOperations.addComponent( removeButton );
@@ -429,8 +445,9 @@ public class PluginManagerComponent extends CustomComponent
     }
 
 
-    private void addClickListenerToRemoveButton( final Button removeButton, final String pluginName, final Object itemId,
-                                                 final HorizontalLayout availableOperations, final Button installButton )
+    private void addClickListenerToRemoveButton( final Button removeButton, final String pluginName,
+                                                 final Object itemId, final HorizontalLayout availableOperations,
+                                                 final Button installButton )
     {
         removeButton.addClickListener( new Button.ClickListener()
         {
@@ -457,7 +474,7 @@ public class PluginManagerComponent extends CustomComponent
                             @Override
                             public void windowClose( Window.CloseEvent closeEvent )
                             {
-                                if( pluginManager.operationSuccessful( OperationType.REMOVE ))
+                                if ( pluginManager.operationSuccessful( OperationType.REMOVE ) )
                                 {
                                     availableOperations.removeComponent( removeButton );
                                     availableOperations.addComponent( installButton );
@@ -477,7 +494,6 @@ public class PluginManagerComponent extends CustomComponent
                     }
                 } );
                 contentRoot.getUI().addWindow( alert.getAlert() );
-
             }
         } );
     }
@@ -516,9 +532,9 @@ public class PluginManagerComponent extends CustomComponent
     }
 
 
-//    @Override
-//    public void dispose()
-//    {
-//        this.pluginManager = null;
-//    }
+    //    @Override
+    //    public void dispose()
+    //    {
+    //        this.pluginManager = null;
+    //    }
 }

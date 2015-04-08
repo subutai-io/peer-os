@@ -10,7 +10,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -89,16 +88,6 @@ public class MessengerImplTest
 
         when( localPeer.getId() ).thenReturn( LOCAL_PEER_ID );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
-    }
-
-
-    @Ignore
-    @Test
-    public void testInit() throws Exception
-    {
-        messenger.init();
-
-        verify( messageSender ).init();
     }
 
 

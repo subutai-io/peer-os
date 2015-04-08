@@ -25,4 +25,6 @@ public abstract class ResourceHostMetric extends Metric
     {
         return Objects.toStringHelper( this ).add( "metric", super.toString() ).add( "peerId", peerId ).toString();
     }
+
+
 }

@@ -1,6 +1,10 @@
 package org.safehaus.subutai.core.channel.impl;
 
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.core.channel.api.ChannelManager;
 import org.safehaus.subutai.core.channel.api.token.ChannelTokenManager;
@@ -9,9 +13,7 @@ import org.safehaus.subutai.core.channel.impl.token.ChannelTokenManagerImpl;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 
 
-
 /**
- * Created by nisakov on 2/25/15.
  * Manages all CXF channels (tunnel)
  */
 public class ChannelManagerImpl implements ChannelManager
@@ -19,17 +21,26 @@ public class ChannelManagerImpl implements ChannelManager
     private DaoManager daoManager = null;
     private ChannelTokenManager channelTokenManager = null;
     private IdentityManager identityManager = null;
+    private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+
 
     public void init()
     {
         channelTokenManager = new ChannelTokenManagerImpl();
         channelTokenManager.setEntityManagerFactory( daoManager.getEntityManagerFactory() );
 
+        executorService
+                .scheduleWithFixedDelay( new ChannelTokenController( channelTokenManager ), 1, 1, TimeUnit.HOURS );
         //-------------------------------------------------------------
-        new Thread( new ChannelTokenController(channelTokenManager) ).start();
+        //        new Thread( new ChannelTokenController( channelTokenManager ) ).start();
         //-------------------------------------------------------------
     }
 
+
+    public void destroy()
+    {
+        executorService.shutdown();
+    }
 
 
     public DaoManager getDaoManager()
@@ -37,6 +48,7 @@ public class ChannelManagerImpl implements ChannelManager
 
         return daoManager;
     }
+
 
     public void setDaoManager( DaoManager daoManager )
     {

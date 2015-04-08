@@ -11,9 +11,6 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 
 
-/**
- * Created by timur on 10/6/14.
- */
 public class StrategyManagerImplTest
 {
     StrategyManagerImpl strategyManager;

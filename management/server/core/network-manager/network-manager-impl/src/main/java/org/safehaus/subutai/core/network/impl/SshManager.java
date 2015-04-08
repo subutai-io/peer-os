@@ -28,7 +28,7 @@ public class SshManager
 
     private String keys;
     private Commands commands;
-    private CommandUtil commandUtil;
+    protected CommandUtil commandUtil;
 
 
     public SshManager( Set<ContainerHost> containerHosts )
@@ -108,7 +108,7 @@ public class SshManager
     }
 
 
-    private void create() throws NetworkManagerException
+    protected void create() throws NetworkManagerException
     {
         for ( ContainerHost host : containerHosts )
         {
@@ -125,7 +125,7 @@ public class SshManager
     }
 
 
-    private void read() throws NetworkManagerException
+    protected void read() throws NetworkManagerException
     {
         StringBuilder value = new StringBuilder();
 
@@ -155,7 +155,7 @@ public class SshManager
     }
 
 
-    private void write() throws NetworkManagerException
+    protected void write() throws NetworkManagerException
     {
         for ( ContainerHost host : containerHosts )
         {
@@ -172,7 +172,7 @@ public class SshManager
     }
 
 
-    private void config() throws NetworkManagerException
+    protected void config() throws NetworkManagerException
     {
         for ( ContainerHost host : containerHosts )
         {

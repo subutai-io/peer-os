@@ -95,8 +95,6 @@ public class TrackerImpl implements Tracker
         try
         {
             dataService.saveTrackerOperation( source, po );
-            //            dbUtil.update( "merge into tracker_operation(source,id,ts,info) values(?,?,?,?)", source.toLowerCase(),
-            //                    po.getId(), po.createDate(), new StringReader( GSON.toJson( po ) ) );
             return true;
         }
         catch ( SQLException e )
@@ -152,16 +150,6 @@ public class TrackerImpl implements Tracker
         try
         {
             list = dataService.getTrackerOperations( source, fromDate, toDate, limit );
-            //            ResultSet rs = dbUtil.select( "select info from tracker_operation where source = ? and ts
-            // between ? and ?"
-            //                    + " order by ts desc limit ?", source.toLowerCase(), fromDate, toDate, limit );
-            //
-            //            TrackerOperationViewImpl productOperationViewImpl = createTrackerOperation( rs );
-            //            while ( productOperationViewImpl != null )
-            //            {
-            //                list.add( productOperationViewImpl );
-            //                productOperationViewImpl = createTrackerOperation( rs );
-            //            }
         }
         catch ( SQLException | JsonSyntaxException ex )
         {
@@ -182,16 +170,6 @@ public class TrackerImpl implements Tracker
         try
         {
             sources = dataService.getTrackerOperationSources();
-            //            ResultSet rs = dbUtil.select( "select distinct source from tracker_operation" );
-
-            //            while ( rs != null && rs.next() )
-            //            {
-            //                String source = rs.getString( "source" );
-            //                if ( !Strings.isNullOrEmpty( source ) )
-            //                {
-            //                    sources.add( source.toLowerCase() );
-            //                }
-            //            }
         }
         catch ( SQLException e )
         {

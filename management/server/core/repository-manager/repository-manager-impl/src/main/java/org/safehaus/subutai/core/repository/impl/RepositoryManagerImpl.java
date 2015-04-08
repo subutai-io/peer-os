@@ -156,7 +156,7 @@ public class RepositoryManagerImpl implements RepositoryManager
     }
 
 
-    private CommandResult executeUpdateRepoCommand() throws RepositoryException
+    protected CommandResult executeUpdateRepoCommand() throws RepositoryException
     {
         try
         {

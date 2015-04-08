@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class MessageListenerTest
@@ -101,5 +102,12 @@ public class MessageListenerTest
         MessageException messageException = new MessageException( ERR_MSG );
 
         assertEquals( ERR_MSG, messageException.getMessage() );
+    }
+
+
+    @Test
+    public void testMessageStatusEnum() throws Exception
+    {
+        assertTrue( MessageStatus.valueOf( "EXPIRED" ) == MessageStatus.EXPIRED );
     }
 }

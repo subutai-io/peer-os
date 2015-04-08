@@ -12,9 +12,6 @@ import org.safehaus.subutai.server.ui.api.PortalModule;
 import com.vaadin.ui.Component;
 
 
-/**
- * Created by ebru on 08.12.2014.
- */
 public class PluginManagerPortalModule implements PortalModule
 {
     public static final String MODULE_IMAGE = "backup.png";
