@@ -321,8 +321,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         //setup networking
         int vlan = setupTunnels( request.getPeerIps(), request.getEnvironmentId() );
 
-        //create gateway
-        managementHost.createGateway( cidr.getInfo().getLowAddress(), vlan );
+
+        //create gateway if initiator is not local peer
+        if ( !getId().equals( request.getInitiatorPeerId() ) )
+        {
+            managementHost.createGateway( cidr.getInfo().getLowAddress(), vlan );
+        }
 
 
         //try to register remote templates with local registry
@@ -815,9 +819,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder(
-                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
-                    bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
+                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
