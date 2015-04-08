@@ -41,12 +41,6 @@ public class HostsCommand extends SubutaiShellCommandSupport
     }
 
 
-    //    public void setSecurityManager( final SecurityManager securityManager )
-    //    {
-    //        this.securityManager = securityManager;
-    //    }
-
-
     @Override
     protected Object doExecute() throws Exception
     {
@@ -54,7 +48,7 @@ public class HostsCommand extends SubutaiShellCommandSupport
         User user = identityManager.getUser();
 
         LocalPeer localPeer = peerManager.getLocalPeer();
-        //        localPeer.init();
+
         ManagementHost managementHost = localPeer.getManagementHost();
         if ( managementHost == null )
         {
@@ -77,20 +71,6 @@ public class HostsCommand extends SubutaiShellCommandSupport
         return null;
     }
 
-    //
-    //    private String getSessionId( final Set<Principal> principals )
-    //    {
-    //        String result = "";
-    //        for ( Principal p : principals )
-    //        {
-    //            if ( p.getName().contains( "session" ) )
-    //            {
-    //                result = p.getName().split( ":" )[1];
-    //            }
-    //        }
-    //        return result;
-    //    }
-
 
     private void print( Host host, String padding ) throws PeerException
     {
@@ -101,19 +81,6 @@ public class HostsCommand extends SubutaiShellCommandSupport
         {
             ContainerHost c = ( ContainerHost ) host;
             containerInfo += c.getState();
-            //            if ( c.getEnvironmentId() != null )
-            //            {
-            //                containerInfo += " " + c.getEnvironmentId();
-            //            }
-            //
-            //            if ( c.getInitiatorPeerId() != null )
-            //            {
-            //                Peer peer = peerManager.getPeer( UUID.fromString( c.getPeerId() ) );
-            //                if ( peer != null )
-            //                {
-            //                    containerInfo += " " + peer.getPeerInfo().getIp();
-            //                }
-            //            }
         }
 
         System.out

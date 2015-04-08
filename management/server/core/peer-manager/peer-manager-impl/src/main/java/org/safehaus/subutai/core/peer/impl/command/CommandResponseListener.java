@@ -7,6 +7,7 @@ import java.util.concurrent.Semaphore;
 import org.safehaus.subutai.common.cache.EntryExpiryCallback;
 import org.safehaus.subutai.common.cache.ExpiringCache;
 import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.core.peer.api.Payload;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.impl.RecipientType;
@@ -15,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class CommandResponseListener extends RequestListener
+public class CommandResponseListener extends RequestListener implements Disposable
 {
     private static final Logger LOG = LoggerFactory.getLogger( CommandResponseListener.class.getName() );
 

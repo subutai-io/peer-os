@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.safehaus.subutai.common.cache.ExpiringCache;
 import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageListener;
 import org.safehaus.subutai.core.messenger.api.MessageStatus;
@@ -18,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class MessageResponseListener extends MessageListener
+public class MessageResponseListener extends MessageListener implements Disposable
 {
     private static final Logger LOG = LoggerFactory.getLogger( MessageResponseListener.class.getName() );
 

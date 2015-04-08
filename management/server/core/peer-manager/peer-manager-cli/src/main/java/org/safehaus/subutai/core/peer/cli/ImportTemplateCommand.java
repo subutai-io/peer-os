@@ -21,7 +21,6 @@ public class ImportTemplateCommand extends SubutaiShellCommandSupport
 
     private PeerManager peerManager;
 
-    //    private PeerCommandDispatcher peerCommandDispatcher;
 
     private TemplateRegistry templateRegistry;
 
@@ -43,12 +42,6 @@ public class ImportTemplateCommand extends SubutaiShellCommandSupport
         this.peerManager = peerManager;
     }
 
-    //
-    //    public void setPeerCommandDispatcher( final PeerCommandDispatcher peerCommandDispatcher )
-    //    {
-    //        this.peerCommandDispatcher = peerCommandDispatcher;
-    //    }
-
 
     public void setTemplateRegistry( final TemplateRegistry templateRegistry )
     {
@@ -59,7 +52,6 @@ public class ImportTemplateCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        //System.out.println( "Start..." );
         Template template = templateRegistry.getTemplate( templateName );
         if ( template != null )
         {
@@ -67,7 +59,6 @@ public class ImportTemplateCommand extends SubutaiShellCommandSupport
             return -1;
         }
 
-        //        peerManager.peers();
 
         template = peerManager.getPeer( UUID.fromString( peerId ) ).getTemplate( templateName );
         if ( template != null )
