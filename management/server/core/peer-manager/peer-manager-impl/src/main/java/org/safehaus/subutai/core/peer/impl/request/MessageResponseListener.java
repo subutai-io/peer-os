@@ -35,6 +35,12 @@ public class MessageResponseListener extends MessageListener
     }
 
 
+    public void dispose()
+    {
+        responses.dispose();
+    }
+
+
     public MessageResponse waitResponse( MessageRequest request, int requestTimeout, int responseTimeout )
             throws PeerException
     {

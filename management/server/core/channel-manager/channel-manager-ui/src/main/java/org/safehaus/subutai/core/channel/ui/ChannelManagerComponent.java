@@ -13,9 +13,6 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
 
 
-/**
- * Created by ermek on 3/4/15.
- */
 public class ChannelManagerComponent extends CustomComponent implements Disposable
 {
     public ChannelManagerComponent ( final ChannelManagerPortalModule portalModule, ChannelManager channelManager , IdentityManager identityManager)

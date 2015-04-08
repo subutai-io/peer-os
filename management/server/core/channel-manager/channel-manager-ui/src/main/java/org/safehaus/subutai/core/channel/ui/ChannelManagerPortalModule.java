@@ -11,9 +11,6 @@ import org.safehaus.subutai.server.ui.api.PortalModule;
 import com.vaadin.ui.Component;
 
 
-/**
- * Created by ermek on 3/4/15.
- */
 public class ChannelManagerPortalModule implements PortalModule
 {
     private final static String MODULE_IMAGE = "chanel.png";

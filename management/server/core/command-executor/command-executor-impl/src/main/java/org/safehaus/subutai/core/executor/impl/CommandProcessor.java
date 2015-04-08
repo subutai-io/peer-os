@@ -12,7 +12,6 @@ import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.broker.api.Broker;
-import org.safehaus.subutai.core.broker.api.BrokerException;
 import org.safehaus.subutai.core.broker.api.ByteMessageListener;
 import org.safehaus.subutai.core.broker.api.Topic;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
@@ -88,7 +87,7 @@ public class CommandProcessor implements ByteMessageListener
 
             broker.sendTextMessage( targetHost.getId().toString(), command );
         }
-        catch ( BrokerException e )
+        catch ( Exception e )
         {
             remove( request.getCommandId() );
 
@@ -177,5 +176,11 @@ public class CommandProcessor implements ByteMessageListener
         Preconditions.checkNotNull( commandId );
 
         commands.remove( commandId );
+    }
+
+
+    protected void dispose()
+    {
+        commands.dispose();
     }
 }

@@ -258,6 +258,8 @@ public class PeerManagerImpl implements PeerManager
     public void destroy()
     {
         localPeer.shutdown();
+        commandResponseListener.dispose();
+        messageResponseListener.dispose();
     }
 
 

@@ -30,6 +30,12 @@ public class CommandResponseListener extends RequestListener
     }
 
 
+    public void dispose()
+    {
+        callbacks.dispose();
+    }
+
+
     public void addCallback( UUID commandId, CommandCallback callback, int timeout, final Semaphore semaphore )
     {
         if ( callback != null )
