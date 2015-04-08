@@ -29,6 +29,7 @@ import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.network.VniVlanMapping;
 import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.NumUtil;
@@ -49,7 +50,7 @@ import com.google.common.collect.Sets;
 @Entity
 @Table( name = "management_host" )
 @Access( AccessType.FIELD )
-public class ManagementHostEntity extends AbstractSubutaiHost implements ManagementHost
+public class ManagementHostEntity extends AbstractSubutaiHost implements ManagementHost, Disposable
 {
     private static final String GATEWAY_INTERFACE_NAME_REGEX = "^br-(\\d+)$";
     private static final Pattern GATEWAY_INTERFACE_NAME_PATTERN = Pattern.compile( GATEWAY_INTERFACE_NAME_REGEX );
