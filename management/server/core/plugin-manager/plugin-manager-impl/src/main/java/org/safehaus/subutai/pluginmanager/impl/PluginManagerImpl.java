@@ -45,6 +45,12 @@ public class PluginManagerImpl implements PluginManager
     }
 
 
+    public void destroy()
+    {
+        executor.shutdown();
+    }
+
+
     public Tracker getTracker()
     {
         return tracker;
@@ -148,16 +154,17 @@ public class PluginManagerImpl implements PluginManager
     }
 
 
-//    @Override
-//    public List<String> getInstalledPluginNames()
-//    {
-//        List<String> names = new ArrayList<>();
-//        for ( PluginInfo p : getInstalledPlugins() )
-//        {
-//            names.add( p.getPluginName() );
-//        }
-//        return names;
-//    }
+    //    @Override
+    //    public List<String> getInstalledPluginNames()
+    //    {
+    //        List<String> names = new ArrayList<>();
+    //        for ( PluginInfo p : getInstalledPlugins() )
+    //        {
+    //            names.add( p.getPluginName() );
+    //        }
+    //        return names;
+    //    }
+
 
     @Override
     public Set<String> getInstalledPluginNames()
@@ -217,7 +224,7 @@ public class PluginManagerImpl implements PluginManager
         {
             return false;
         }
-        if( result.contains( "install ok installed" ))
+        if ( result.contains( "install ok installed" ) )
         {
             return true;
         }

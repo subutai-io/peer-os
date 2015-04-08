@@ -1,9 +1,6 @@
 package org.safehaus.subutai.common.quota;
 
 
-/**
- * Created by talas on 12/2/14.
- */
 public class CpuQuotaInfo extends QuotaInfo
 {
     private int percentage;

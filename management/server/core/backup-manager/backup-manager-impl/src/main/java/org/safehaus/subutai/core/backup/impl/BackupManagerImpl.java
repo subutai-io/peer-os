@@ -7,9 +7,6 @@ import java.util.UUID;
 import org.safehaus.subutai.core.backup.api.BackupManager;
 
 
-/**
- * Created by talas on 12/25/14.
- */
 public class BackupManagerImpl implements BackupManager
 {
     @Override

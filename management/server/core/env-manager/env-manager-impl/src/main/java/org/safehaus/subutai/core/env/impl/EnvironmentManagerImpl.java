@@ -847,6 +847,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    public void dispose()
+    {
+        executor.shutdown();
+    }
+
+
     protected User getUser()
     {
         User user = identityManager.getUser();

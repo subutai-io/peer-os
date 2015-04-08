@@ -15,9 +15,6 @@ import org.safehaus.subutai.server.ui.api.PortalModule;
 import com.vaadin.ui.Component;
 
 
-/**
- * Created by talas on 2/10/15.
- */
 public class TemplateWizardPortalModule implements PortalModule
 {
     private final static String MODULE_IMAGE = "magic.gif";
@@ -67,6 +64,12 @@ public class TemplateWizardPortalModule implements PortalModule
         this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
         this.tracker = tracker;
+    }
+
+
+    public void dispose()
+    {
+        executor.shutdown();
     }
 
 

@@ -1,9 +1,6 @@
 package org.safehaus.subutai.common.util;
 
 
-/**
- * Created by nisakov on 3/5/15.
- */
 public class UrlUtil
 {
     public static String getQueryParameterValue(String paramName,String query)

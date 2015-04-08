@@ -79,4 +79,27 @@ public class CommandsTest
     {
         assertEquals( new RequestBuilder( "apt-get update" ).withTimeout( 120 ), commands.getUpdateRepoCommand() );
     }
+
+
+    @Test
+    public void testGetAddAptSourceCommand() throws Exception
+    {
+        assertEquals( new RequestBuilder( String.format(
+                "sed '/^path_map.*$/ s/$/ ; %s %s/' apt-cacher.conf > apt-cacher.conf"
+                        + ".new && mv apt-cacher.conf.new apt-cacher.conf && /etc/init.d/apt-cacher reload", ARGUMENT,
+                ( "http://" + ARGUMENT + "/ksks" ).replace( ".", "\\." ).replace( "/", "\\/" ) ) )
+                .withCwd( "/etc/apt-cacher/" ), commands.getAddAptSourceCommand( ARGUMENT, ARGUMENT ) );
+    }
+
+
+    @Test
+    public void testGetRemoveAptSourceCommand() throws Exception
+    {
+        assertEquals( new RequestBuilder(
+                String.format( "sed -e 's,;\\s*[a-f0-9]\\{8\\}-[a-f0-9]\\{4\\}-[a-f0-9]\\{4\\}-[a-f0-9]\\{4" +
+                                "\\}-[a-f0-9]\\{12\\}\\s*http:\\/\\/%s/ksks\\s*,,g' apt-cacher.conf > apt-cacher.conf"
+                                + ".new && mv apt-cacher.conf.new apt-cacher.conf && /etc/init.d/apt-cacher reload",
+                        ARGUMENT.replace( ".", "\\." ) ) ).withCwd( "/etc/apt-cacher/" ),
+                commands.getRemoveAptSourceCommand( ARGUMENT ) );
+    }
 }

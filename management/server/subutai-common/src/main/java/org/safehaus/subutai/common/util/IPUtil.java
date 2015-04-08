@@ -7,9 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-/**
- * Created by nisakov on 3/6/15.
- */
+
 public class IPUtil
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( IPUtil.class );

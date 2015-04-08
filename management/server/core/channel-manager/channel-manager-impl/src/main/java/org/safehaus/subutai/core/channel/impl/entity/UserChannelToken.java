@@ -10,10 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import org.safehaus.subutai.core.channel.api.entity.IUserChannelToken;
 
-/**
- * Created by nisakov on 3/3/15.
- */
-
 
 @Entity
 @Table( name = "user_channel_token" )

@@ -4,9 +4,6 @@ package org.safehaus.subutai.core.template.wizard.api;
 import java.util.EventListener;
 
 
-/**
- * Created by talas on 3/18/15.
- */
 public interface PhaseLifecycle
 {
 

@@ -8,10 +8,6 @@ import org.safehaus.subutai.common.settings.Common;
 import com.google.gson.annotations.Expose;
 
 
-/**
- * Created by talas on 12/19/14.
- */
-
 public class TemplateVersion implements Serializable
 {
     @Expose

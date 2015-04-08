@@ -137,6 +137,10 @@ public class BrokerImplTest
         verify( session ).createTopic( TOPIC );
         verify( session ).createTextMessage( TEXT_MESSAGE );
         verify( producer ).send( any( Message.class ) );
+
+        verify( producer ).close();
+        verify( session ).close();
+        verify( connection ).close();
     }
 
 

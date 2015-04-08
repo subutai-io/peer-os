@@ -4,9 +4,6 @@ package org.safehaus.subutai.core.tracker.impl.entity;
 import java.io.Serializable;
 
 
-/**
- * Created by talas on 12/7/14.
- */
 public class TrackerOperationPK implements Serializable
 {
     private String source;

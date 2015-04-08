@@ -29,9 +29,6 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 
-/**
- * Created by talas on 2/10/15.
- */
 public class TemplateWizardComponent extends CustomComponent
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( TemplateWizardComponent.class );

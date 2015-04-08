@@ -10,9 +10,6 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Image;
 
 
-/**
- * Created by talas on 9/16/14.
- */
 public class ModuleView extends CssLayout
 {
 

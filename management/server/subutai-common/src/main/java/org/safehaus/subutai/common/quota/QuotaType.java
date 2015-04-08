@@ -1,10 +1,6 @@
 package org.safehaus.subutai.common.quota;
 
 
-/**
- * Created by talas on 10/7/14.
- */
-
 public enum QuotaType
 {
     QUOTA_TYPE_CPU( "cpu" ),

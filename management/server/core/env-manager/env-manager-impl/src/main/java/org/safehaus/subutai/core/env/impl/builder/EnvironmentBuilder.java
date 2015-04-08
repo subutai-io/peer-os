@@ -88,10 +88,7 @@ public class EnvironmentBuilder
         }
 
 
-        ExecutorService taskExecutor = Executors.newFixedThreadPool( placement.size() );
 
-        CompletionService<Set<NodeGroupBuildResult>> taskCompletionService =
-                new ExecutorCompletionService<>( taskExecutor );
 
 
         //collect all existing and new peers
@@ -129,6 +126,12 @@ public class EnvironmentBuilder
         }
 
         int currentLastUsedIpIndex = environment.getLastUsedIpIndex();
+
+        ExecutorService taskExecutor = Executors.newFixedThreadPool( placement.size() );
+
+        CompletionService<Set<NodeGroupBuildResult>> taskCompletionService =
+                new ExecutorCompletionService<>( taskExecutor );
+
         //submit parallel environment part creation tasks across peers
         for ( Map.Entry<Peer, Set<NodeGroup>> peerPlacement : placement.entrySet() )
         {

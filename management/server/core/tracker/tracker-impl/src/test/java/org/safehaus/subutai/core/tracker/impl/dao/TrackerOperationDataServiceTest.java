@@ -15,6 +15,7 @@ import javax.persistence.TypedQuery;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.impl.TrackerImpl;
@@ -33,7 +34,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-
+@Ignore
 public class TrackerOperationDataServiceTest
 {
 

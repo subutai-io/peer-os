@@ -7,7 +7,6 @@ import org.safehaus.subutai.core.channel.api.token.ChannelTokenManager;
 
 
 /**
- * Created by nisakov on 3/3/15.
  * Manages  overall Subutai channel (tunnel).
  */
 public interface ChannelManager

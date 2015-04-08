@@ -7,9 +7,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Window;
 
 
-/**
- * Created by talas on 1/6/15.
- */
 public class FileDiffModalView extends Window
 {
 

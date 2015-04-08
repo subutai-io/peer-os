@@ -34,7 +34,7 @@
     <module>command-executor</module>
     <module>wol-manager</module>
     <module>key-manager</module>
-    <module>backup-manager</module>
+    <!--<module>backup-manager</module>-->
     <module>plugin-manager</module>
     <module>env-manager</module>
     <module>identity-manager</module>
@@ -44,7 +44,6 @@
     <module>jetty-ssl-fragment</module>
     <module>ssl-context-manager</module>
     <module>subutai-cli-rbac</module>
-    <!--    <module>shiro-manager-parent</module>-->
   </modules>
 
 </project>

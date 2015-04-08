@@ -9,7 +9,6 @@ import org.safehaus.subutai.core.channel.api.entity.IUserChannelToken;
 
 
 /**
- * Created by nisakov on 3/3/15.
  * Manages user channel tokens.
  */
 public interface ChannelTokenManager

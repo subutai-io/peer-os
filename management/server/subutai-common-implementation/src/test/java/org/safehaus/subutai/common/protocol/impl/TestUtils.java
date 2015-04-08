@@ -11,9 +11,6 @@ import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.settings.Common;
 
 
-/**
- * Created by talas on 11/4/14.
- */
 public class TestUtils
 {
 

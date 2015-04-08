@@ -15,9 +15,6 @@ import org.safehaus.subutai.core.identity.api.PortalModuleScope;
 import com.google.common.base.Preconditions;
 
 
-/**
- * Created by talas on 3/7/15.
- */
 @Entity
 @Access( AccessType.FIELD )
 @Table( name = "user_portal_module" )

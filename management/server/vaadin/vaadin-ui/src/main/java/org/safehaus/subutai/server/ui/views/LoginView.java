@@ -30,9 +30,6 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 
-/**
- * Created by timur on 12/8/14.
- */
 public class LoginView extends VerticalLayout implements View
 
 {

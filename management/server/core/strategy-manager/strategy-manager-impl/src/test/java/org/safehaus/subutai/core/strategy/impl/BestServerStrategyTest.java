@@ -12,9 +12,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 
-/**
- * Created by ermek on 10/9/14.
- */
 public class BestServerStrategyTest
 {
     BestServerStrategy bestServerStrategy;

@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.metric.impl;
 
 
-public class Constants
+public final class Constants
 {
 
     private Constants()

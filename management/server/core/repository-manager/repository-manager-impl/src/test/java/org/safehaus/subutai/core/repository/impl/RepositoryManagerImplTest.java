@@ -25,8 +25,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -78,7 +78,7 @@ public class RepositoryManagerImplTest
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
         when( localPeer.getManagementHost() ).thenReturn( managementHost );
         when( managementHost.execute( any( RequestBuilder.class ) ) ).thenReturn( result );
-        when(commandUtil.execute( any( RequestBuilder.class ), any( Host.class ) )).thenReturn( result );
+        when( commandUtil.execute( any( RequestBuilder.class ), any( Host.class ) ) ).thenReturn( result );
         repositoryManager = new RepositoryManagerImpl( peerManager );
         repositoryManager.commands = commands;
         repositoryManager.commandUtil = commandUtil;
@@ -105,7 +105,8 @@ public class RepositoryManagerImplTest
     @Test
     public void testExecuteCommand() throws Exception
     {
-        when( commandUtil.execute( any( RequestBuilder.class ), any( Host.class ) ) ).thenReturn( result ).thenThrow( new CommandException( "" ) );
+        when( commandUtil.execute( any( RequestBuilder.class ), any( Host.class ) ) ).thenReturn( result ).thenThrow(
+                new CommandException( "" ) );
 
         CommandResult commandResult = repositoryManager.executeCommand( requestBuilder );
 
@@ -190,7 +191,7 @@ public class RepositoryManagerImplTest
     }
 
 
-    @Test
+    @Test( expected = RepositoryException.class )
     public void testGetFullPackageName() throws Exception
     {
 
@@ -199,5 +200,38 @@ public class RepositoryManagerImplTest
         String fullPackageName = repositoryManager.getFullPackageName( SHORT_NAME );
 
         assertEquals( FULL_NAME, fullPackageName );
+
+        when( result.getStdOut() ).thenReturn( "" );
+
+        repositoryManager.getFullPackageName( ARGUMENT );
+    }
+
+
+    @Test( expected = RepositoryException.class )
+    public void testExecuteUpdateRepoCommand() throws Exception
+    {
+        doThrow( new CommandException( "" ) ).when( managementHost ).execute( any( RequestBuilder.class ) );
+
+        repositoryManager.executeUpdateRepoCommand();
+    }
+
+
+    @Test( expected = RepositoryException.class )
+    public void testAddAptSource() throws Exception
+    {
+        doThrow( new CommandException( "" ) ).when( commandUtil )
+                                             .execute( any( RequestBuilder.class ), eq( managementHost ) );
+
+        repositoryManager.addAptSource( ARGUMENT, ARGUMENT );
+    }
+
+
+    @Test( expected = RepositoryException.class )
+    public void testRemoveAptSource() throws Exception
+    {
+        doThrow( new CommandException( "" ) ).when( commandUtil )
+                                             .execute( any( RequestBuilder.class ), eq( managementHost ) );
+
+        repositoryManager.removeAptSource( ARGUMENT );
     }
 }

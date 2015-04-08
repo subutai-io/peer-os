@@ -2,7 +2,6 @@ package org.safehaus.subutai.core.environment.terminal.ui;
 
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.common.mdc.SubutaiExecutors;
@@ -145,6 +144,15 @@ public class TerminalForm extends CustomComponent implements Disposable
 
 
         setCompositionRoot( horizontalSplit );
+
+        addDetachListener( new DetachListener()
+        {
+            @Override
+            public void detach( final DetachEvent event )
+            {
+                dispose();
+            }
+        } );
     }
 
 

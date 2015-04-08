@@ -15,11 +15,6 @@ import com.google.common.collect.Lists;
 
 
 /**
- * Created by talas on 3/18/15.
- */
-
-
-/**
  * manages products installation
  */
 public class ProductsInstallationProcedure extends AbstractPhaseLifecycle

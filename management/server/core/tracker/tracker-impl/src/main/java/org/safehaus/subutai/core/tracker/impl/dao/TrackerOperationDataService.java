@@ -23,9 +23,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 
-/**
- * Created by talas on 12/7/14.
- */
 public class TrackerOperationDataService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( TrackerOperationDataService.class );

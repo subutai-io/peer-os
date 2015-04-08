@@ -16,9 +16,6 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 
-/**
- * Created by talas on 12/8/14.
- */
 @Command( scope = "quota", name = "get-quota", description = "Gets quota for specified container" )
 public class GetQuota extends SubutaiShellCommandSupport
 {

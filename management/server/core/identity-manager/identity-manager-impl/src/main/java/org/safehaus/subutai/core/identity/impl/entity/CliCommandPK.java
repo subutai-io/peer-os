@@ -4,9 +4,6 @@ package org.safehaus.subutai.core.identity.impl.entity;
 import com.google.common.base.Preconditions;
 
 
-/**
- * Created by talas on 3/13/15.
- */
 public class CliCommandPK
 {
     private String scope;
