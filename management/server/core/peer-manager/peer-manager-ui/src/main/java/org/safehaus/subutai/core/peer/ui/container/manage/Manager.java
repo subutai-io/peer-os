@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.peer.ui.container.manage;
 
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.common.host.ContainerHostState;
@@ -41,7 +42,7 @@ public class Manager extends VerticalLayout
     private final Label indicator;
     private final TreeTable lxcTable;
     private final PeerManager peerManager;
-    private final ExecutorService executorService;
+    private ExecutorService executorService;
 
     private static final AtomicInteger processPending = new AtomicInteger( 0 );
 
@@ -59,10 +60,9 @@ public class Manager extends VerticalLayout
     private Action.Handler contextMenu;
 
 
-    public Manager( final ExecutorService executorService, final PeerManager peerManager )
+    public Manager( final PeerManager peerManager )
     {
 
-        this.executorService = executorService;
 
         setSpacing( true );
         setMargin( true );
@@ -111,6 +111,24 @@ public class Manager extends VerticalLayout
         addComponent( lxcTable );
 
         binContextMenu();
+
+        addAttachListener( new AttachListener()
+        {
+            @Override
+            public void attach( final AttachEvent event )
+            {
+                executorService = Executors.newCachedThreadPool();
+            }
+        } );
+
+        addDetachListener( new DetachListener()
+        {
+            @Override
+            public void detach( final DetachEvent event )
+            {
+                executorService.shutdown();
+            }
+        } );
     }
 
 

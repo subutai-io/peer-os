@@ -5,7 +5,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.common.mdc.SubutaiExecutors;
-import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 
 import com.google.common.base.Strings;
@@ -28,7 +27,7 @@ import com.vaadin.ui.TextField;
 /**
  * Environment Terminal
  */
-public class TerminalForm extends CustomComponent implements Disposable
+public class TerminalForm extends CustomComponent
 {
     protected final EnvironmentTree environmentTree;
     protected final TextField programTxtFld;
@@ -46,7 +45,6 @@ public class TerminalForm extends CustomComponent implements Disposable
     {
         setSizeFull();
 
-        executor = SubutaiExecutors.newCachedThreadPool();
 
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
         horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
@@ -129,7 +127,8 @@ public class TerminalForm extends CustomComponent implements Disposable
             }
         } );
 
-        sendBtn.addClickListener( new SendButtonListener( this, executor ) );
+        final SendButtonListener sendButtonListener = new SendButtonListener( this );
+        sendBtn.addClickListener( sendButtonListener );
 
         clearBtn.addClickListener( new Button.ClickListener()
         {
@@ -150,7 +149,17 @@ public class TerminalForm extends CustomComponent implements Disposable
             @Override
             public void detach( final DetachEvent event )
             {
-                dispose();
+                executor.shutdown();
+            }
+        } );
+
+        addAttachListener( new AttachListener()
+        {
+            @Override
+            public void attach( final AttachEvent event )
+            {
+                executor = SubutaiExecutors.newCachedThreadPool();
+                sendButtonListener.setExecutor( executor );
             }
         } );
     }
@@ -169,12 +178,5 @@ public class TerminalForm extends CustomComponent implements Disposable
             commandOutputTxtArea.setValue( String.format( "%s%s", commandOutputTxtArea.getValue(), output ) );
             commandOutputTxtArea.setCursorPosition( commandOutputTxtArea.getValue().length() - 1 );
         }
-    }
-
-
-    public void dispose()
-    {
-        environmentTree.dispose();
-        executor.shutdown();
     }
 }
