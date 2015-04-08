@@ -4,7 +4,7 @@ Section: devel
 Installed-Size: 43766
 Maintainer: subutai
 Architecture: amd64
-Version: 1.1.5
+Version: 1.1.6
 Depends: subutai-hadoop
 Description: This is a hbase package of subutai distribution.
 

@@ -27,12 +27,8 @@ fi
 CMD_PATT="hbase"
 
 check_process(){
-  if [ $# == 1 ]; then
-    role=$1
-  elif [ $# == 2 ]; then
-    pid_file=$1
-    role=$2
-  fi
+  pid_file=$2
+  role=$1
   if [ -f $pid_dir/$pid_file ] && [ "x$pid_file" != "x" ]; then
     pid=`cat $pid_dir/$pid_file`
     if grep -Eq "$CMD_PATT" "/proc/$pid/cmdline"; then
@@ -91,9 +87,9 @@ case "$1" in
   ;;
 
   status)
-    check_process $pidMaster "HMaster"
-    check_process $pidZookeeper "HQuorumPeer"
-    check_process $pidRegion "HRegionServer"
+    check_process "HMaster" $pidMaster
+    check_process "HRegionServer" $pidRegion
+    check_process "HQuorumPeer" $pidZookeeper
     ;;
   kill)
     kill_service $pidMaster
@@ -105,3 +101,4 @@ case "$1" in
     echo "Usage: $0 {start|stop|restart|status|kill}"
     exit 1
 esac
+
