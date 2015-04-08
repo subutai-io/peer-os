@@ -91,9 +91,11 @@ bool SubutaiTimer::checkExecutionTimeout(unsigned int* startsec, bool* overflag,
 	return false;	//no timeout occured
 }
 
-void SubutaiTimer::sendHeartBeat(bool destroyCommandInProgress, bool cloneCommandInProgress,
-		bool* heartbeatIntFlag) {
+void SubutaiTimer::sendHeartBeat( bool* heartbeatIntFlag) {
 	response->clear();
+	bool destroyCommandInProgress = checkIfDestroyCommandInProgress();
+	bool cloneCommandInProgress = checkIfCloneCommandInProgress();
+
 	bool lxcCommandInProgress = destroyCommandInProgress || cloneCommandInProgress;
 	/*
 	 * Refresh new agent ip address set for each heart beat message
@@ -181,7 +183,7 @@ bool SubutaiTimer::checkIfCloneCommandInProgress() {
 bool SubutaiTimer::checkHeartBeatTimer(bool* heartbeatIntFlag) {
 	if (checkExecutionTimeout(&startsec, &overflag, &exectimeout, &count)) //checking Default Timeout
 			{
-		sendHeartBeat(checkIfDestroyCommandInProgress(), checkIfCloneCommandInProgress(), heartbeatIntFlag);
+		sendHeartBeat(heartbeatIntFlag);
 		start = boost::posix_time::second_clock::local_time();//Reset Default Timeout value
 		startsec = start.time_of_day().seconds();
 		overflag = false;
