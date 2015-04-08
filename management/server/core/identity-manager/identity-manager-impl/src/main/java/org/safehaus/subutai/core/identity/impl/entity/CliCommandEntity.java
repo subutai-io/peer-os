@@ -14,9 +14,6 @@ import org.safehaus.subutai.core.identity.api.CliCommand;
 import com.google.common.base.Preconditions;
 
 
-/**
- * Created by talas on 3/13/15.
- */
 @Entity
 @Table( name = "cli_command_entity" )
 @Access( AccessType.FIELD )

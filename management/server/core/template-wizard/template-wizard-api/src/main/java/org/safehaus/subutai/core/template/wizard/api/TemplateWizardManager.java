@@ -1,10 +1,6 @@
 package org.safehaus.subutai.core.template.wizard.api;
 
 
-/**
- * Created by talas on 3/18/15.
- */
-
 
 import java.util.List;
 import java.util.UUID;

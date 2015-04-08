@@ -19,9 +19,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 
-/**
- * Created by talas on 2/5/15.
- */
 public class PermissionDataService implements DataService<PermissionPK, PermissionEntity>
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( PermissionDataService.class );

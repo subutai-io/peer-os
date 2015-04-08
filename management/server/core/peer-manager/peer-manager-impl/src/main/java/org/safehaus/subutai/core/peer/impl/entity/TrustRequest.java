@@ -13,9 +13,6 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 
 
-/**
- * Created by nisakov on 2/24/15.
- */
 @Entity
 @Table( name = "trust_handshake" )
 

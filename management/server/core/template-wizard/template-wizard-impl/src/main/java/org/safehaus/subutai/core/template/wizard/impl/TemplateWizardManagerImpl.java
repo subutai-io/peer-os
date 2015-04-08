@@ -25,9 +25,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 
-/**
- * Created by talas on 3/18/15.
- */
 public class TemplateWizardManagerImpl implements TemplateWizardManager
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( TemplateWizardManagerImpl.class );

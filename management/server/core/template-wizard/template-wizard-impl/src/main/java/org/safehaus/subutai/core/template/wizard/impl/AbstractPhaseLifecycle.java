@@ -8,9 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-/**
- * Created by talas on 3/18/15.
- */
 public abstract class AbstractPhaseLifecycle implements PhaseLifecycle
 {
     private static final Logger LOG = LoggerFactory.getLogger( AbstractPhaseLifecycle.class );

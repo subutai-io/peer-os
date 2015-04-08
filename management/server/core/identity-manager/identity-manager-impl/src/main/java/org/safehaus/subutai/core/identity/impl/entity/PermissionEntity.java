@@ -18,9 +18,6 @@ import org.safehaus.subutai.core.identity.api.PermissionGroup;
 import com.google.common.base.Preconditions;
 
 
-/**
- * Created by talas on 2/4/15.
- */
 @Entity
 @Access( AccessType.FIELD )
 @IdClass( PermissionPK.class )

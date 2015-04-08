@@ -15,9 +15,6 @@ import org.safehaus.subutai.core.identity.api.RestEndpointScope;
 import com.google.common.base.Preconditions;
 
 
-/**
- * Created by talas on 3/9/15.
- */
 @Entity
 @Access( AccessType.FIELD )
 @Table( name = "rest_endpoints_scope" )

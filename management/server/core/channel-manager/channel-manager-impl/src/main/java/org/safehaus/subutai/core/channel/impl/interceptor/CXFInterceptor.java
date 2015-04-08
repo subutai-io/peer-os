@@ -23,7 +23,7 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 
 /**
- * Created by nisakov on 2/23/15. CXF interceptor that controls channel (tunnel)
+ * CXF interceptor that controls channel (tunnel)
  */
 public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
 {

@@ -17,9 +17,6 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
 
-/**
- * Created by talas on 1/26/15.
- */
 public class UsersTab extends CustomComponent implements TabCallback<BeanItem<User>>
 {
     private enum FormState

@@ -17,9 +17,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 
-/**
- * Created by talas on 2/5/15.
- */
 public class PortalModuleDataService implements DataService<String, PortalModuleScopeEntity>
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( PortalModuleDataService.class );

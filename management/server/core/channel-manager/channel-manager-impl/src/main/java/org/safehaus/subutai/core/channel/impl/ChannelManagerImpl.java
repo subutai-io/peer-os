@@ -14,7 +14,7 @@ import org.safehaus.subutai.core.identity.api.IdentityManager;
 
 
 /**
- * Created by nisakov on 2/25/15. Manages all CXF channels (tunnel)
+ * Manages all CXF channels (tunnel)
  */
 public class ChannelManagerImpl implements ChannelManager
 {

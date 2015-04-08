@@ -8,10 +8,6 @@ import org.safehaus.subutai.core.identity.api.PermissionGroup;
 import com.google.common.base.Preconditions;
 
 
-/**
- * Created by talas on 2/4/15.
- */
-
 public class PermissionPK implements Serializable
 {
     private String name;

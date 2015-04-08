@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Set;
 
 
-/**
- * Created by timur on 1/21/15.
- */
 public interface Role extends Serializable
 {
     public String getName();

@@ -7,9 +7,6 @@ import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.apache.karaf.shell.commands.Command;
 
 
-/**
- * Created by talas on 12/8/14.
- */
 @Command( scope = "quota", name = "list-quota", description = "list all available quotas" )
 public class ListQuotaTypes extends SubutaiShellCommandSupport
 {

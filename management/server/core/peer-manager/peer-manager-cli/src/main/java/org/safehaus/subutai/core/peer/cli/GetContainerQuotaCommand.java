@@ -15,9 +15,6 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 
-/**
- * Created by talas on 12/12/14.
- */
 @Command( scope = "peer", name = "get-quota", description = "gets quota information from peer for container" )
 public class GetContainerQuotaCommand extends SubutaiShellCommandSupport
 {
