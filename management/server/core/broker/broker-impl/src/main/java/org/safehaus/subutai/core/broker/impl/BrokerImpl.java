@@ -150,6 +150,7 @@ public class BrokerImpl implements Broker
     private void setupConnectionPool()
     {
         ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory( brokerUrl );
+        amqFactory.setWatchTopicAdvisories( false );
         amqFactory.setCheckForDuplicates( true );
         pool = new PooledConnectionFactory( amqFactory );
         pool.setMaxConnections( maxBrokerConnections + Topic.values().length );
@@ -187,7 +188,6 @@ public class BrokerImpl implements Broker
             }
 
             producer.send( msg );
-
         }
         catch ( JMSException e )
         {
