@@ -79,6 +79,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
+    public void dispose()
+    {
+        singleThreadExecutorService.shutdown();
+    }
+
+
     public ResourceHostEntity( final String peerId, final HostInfo resourceHostInfo )
     {
         super( peerId, resourceHostInfo );

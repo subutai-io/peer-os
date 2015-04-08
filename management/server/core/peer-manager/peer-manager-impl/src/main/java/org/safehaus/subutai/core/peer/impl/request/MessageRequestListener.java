@@ -31,6 +31,12 @@ public class MessageRequestListener extends MessageListener
     }
 
 
+    public void dispose()
+    {
+        notifier.shutdown();
+    }
+
+
     @Override
     public void onMessage( final Message message )
     {

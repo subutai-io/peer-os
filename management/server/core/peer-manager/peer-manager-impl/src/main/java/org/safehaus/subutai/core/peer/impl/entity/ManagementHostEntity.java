@@ -81,6 +81,12 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
+    public void dispose()
+    {
+        singleThreadExecutorService.shutdown();
+    }
+
+
     public <T> Future<T> queueSequentialTask( Callable<T> callable )
     {
         return singleThreadExecutorService.submit( callable );

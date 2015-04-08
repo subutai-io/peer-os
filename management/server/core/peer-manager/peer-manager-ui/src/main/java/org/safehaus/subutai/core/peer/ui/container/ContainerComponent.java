@@ -78,6 +78,15 @@ public class ContainerComponent extends CustomComponent implements Disposable
 
         horizontalSplit.setSecondComponent( verticalLayout );
         setCompositionRoot( horizontalSplit );
+
+        addDetachListener( new DetachListener()
+        {
+            @Override
+            public void detach( final DetachEvent event )
+            {
+                executorService.shutdown();
+            }
+        } );
     }
 
 

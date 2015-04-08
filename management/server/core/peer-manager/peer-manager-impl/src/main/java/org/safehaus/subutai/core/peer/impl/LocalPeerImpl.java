@@ -383,13 +383,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener
         }
 
 
-        List<Future<ContainerHost>> taskFutures = Lists.newArrayList();
-        ExecutorService executorService = Executors.newFixedThreadPool( request.getNumberOfContainers() );
-
         String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
         String[] allAddresses = cidr.getInfo().getAllAddresses();
         String gateway = cidr.getInfo().getLowAddress();
         int currentIpAddressOffset = 0;
+
+        List<Future<ContainerHost>> taskFutures = Lists.newArrayList();
+        ExecutorService executorService = Executors.newFixedThreadPool( request.getNumberOfContainers() );
 
         //create containers in parallel on each resource host
         for ( Map.Entry<ResourceHost, Set<String>> resourceHostDistribution : containerDistribution.entrySet() )
@@ -804,8 +804,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener
 
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
-                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder(
+                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
+                    bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1520,6 +1521,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 }
             }
 
+            executorService.shutdown();
+
             //cleanup environment network settings
             if ( containerGroup.getContainerIds().size() == destroyedContainersIds.size() )
             {
@@ -1533,7 +1536,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener
                 }
             }
 
-            executorService.shutdown();
         }
 
         String exception = null;
