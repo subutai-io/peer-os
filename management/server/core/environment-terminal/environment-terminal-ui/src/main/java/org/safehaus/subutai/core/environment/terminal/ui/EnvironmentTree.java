@@ -356,40 +356,35 @@ public final class EnvironmentTree extends ConcurrentComponent
                 presentItems.add( itemId );
 
                 Item peer = container.getItem( peerId );
+
                 if ( peer == null )
                 {
                     peer = container.addItem( peerId );
+                }
+                if ( peer != null )
+                {
                     container.setChildrenAllowed( peerId, true );
+
                     tree.setItemCaption( peerId, ec.getPeer().getName() );
-                    if ( peer.getItemProperty( VALUE_PROPERTY ) != null )
-                    {
-                        peer.getItemProperty( VALUE_PROPERTY ).setValue( null );
-                    }
-                }
-                Item item = container.getItem( itemId );
 
-                if ( item == null )
-                {
-                    item = container.addItem( itemId );
-                }
-                container.setParent( itemId, peerId );
-                container.setChildrenAllowed( itemId, false );
-                tree.setItemCaption( itemId, ec.getHostname() );
-                if ( item.getItemProperty( VALUE_PROPERTY ) != null )
-                {
-                    item.getItemProperty( VALUE_PROPERTY ).setValue( ec );
-                }
+                    peer.getItemProperty( VALUE_PROPERTY ).setValue( null );
 
-                if ( item.getItemProperty( ICON_PROPERTY ) != null )
-                {
-                    if ( ec.isConnected() )
+                    Item item = container.getItem( itemId );
+
+                    if ( item == null )
                     {
-                        item.getItemProperty( ICON_PROPERTY ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
+                        item = container.addItem( itemId );
                     }
-                    else
+
+                    if ( item != null )
                     {
-                        item.getItemProperty( ICON_PROPERTY )
-                            .setValue( new ThemeResource( "img/lxc/virtual_offline.png" ) );
+                        container.setParent( itemId, peerId );
+                        container.setChildrenAllowed( itemId, false );
+                        tree.setItemCaption( itemId, ec.getHostname() );
+                        item.getItemProperty( VALUE_PROPERTY ).setValue( ec );
+
+                        item.getItemProperty( ICON_PROPERTY ).setValue( new ThemeResource(
+                                ec.isConnected() ? "img/lxc/virtual.png" : "img/lxc/virtual_offline.png" ) );
                     }
                 }
             }
