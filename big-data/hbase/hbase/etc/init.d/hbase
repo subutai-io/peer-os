@@ -28,10 +28,10 @@ CMD_PATT="hbase"
 
 check_process(){
   if [ $# == 1 ]; then
-    role=$1
+    local role=$1
   elif [ $# == 2 ]; then
-    pid_file=$1
-    role=$2
+    local pid_file=$1
+    local role=$2
   fi
   if [ -f $pid_dir/$pid_file ] && [ "x$pid_file" != "x" ]; then
     pid=`cat $pid_dir/$pid_file`
@@ -105,3 +105,4 @@ case "$1" in
     echo "Usage: $0 {start|stop|restart|status|kill}"
     exit 1
 esac
+
