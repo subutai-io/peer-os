@@ -6,8 +6,6 @@
 package org.safehaus.subutai.core.tracker.impl;
 
 
-import java.sql.Clob;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -61,22 +59,6 @@ public class TrackerImpl implements Tracker
 
         return dataService.getTrackerOperation( source, operationTrackId );
     }
-
-
-//    private TrackerOperationViewImpl createTrackerOperation( ResultSet rs ) throws SQLException
-//    {
-//        if ( rs != null && rs.next() )
-//        {
-//            Clob infoClob = rs.getClob( "info" );
-//            if ( infoClob != null && infoClob.length() > 0 )
-//            {
-//                String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
-//                TrackerOperationImpl po = GSON.fromJson( info, TrackerOperationImpl.class );
-//                return new TrackerOperationViewImpl( po );
-//            }
-//        }
-//        return null;
-//    }
 
 
     /**
