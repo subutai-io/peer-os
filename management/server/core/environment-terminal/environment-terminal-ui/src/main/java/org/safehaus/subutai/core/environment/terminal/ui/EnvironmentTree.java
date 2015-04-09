@@ -100,7 +100,7 @@ public final class EnvironmentTree extends ConcurrentComponent
                 String description = "";
 
                 Item item = tree.getItem( itemId );
-                if ( item != null )
+                if ( item != null && item.getItemProperty( VALUE_PROPERTY ) != null )
                 {
                     ContainerHost ec = ( ContainerHost ) item.getItemProperty( VALUE_PROPERTY ).getValue();
                     if ( ec != null )
@@ -317,7 +317,7 @@ public final class EnvironmentTree extends ConcurrentComponent
                     {
                         if ( !matchedContainerNames.contains( ec.getHostname() ) )
                         {
-                            String peerId = ec.getPeerId().toString();
+                            String peerId = ec.getPeerId();
                             String itemId = peerId + ":" + ec.getId();
                             tree.unselect( itemId );
                         }
@@ -361,7 +361,10 @@ public final class EnvironmentTree extends ConcurrentComponent
                     peer = container.addItem( peerId );
                     container.setChildrenAllowed( peerId, true );
                     tree.setItemCaption( peerId, ec.getPeer().getName() );
-                    peer.getItemProperty( VALUE_PROPERTY ).setValue( null );
+                    if ( peer.getItemProperty( VALUE_PROPERTY ) != null )
+                    {
+                        peer.getItemProperty( VALUE_PROPERTY ).setValue( null );
+                    }
                 }
                 Item item = container.getItem( itemId );
 
@@ -372,16 +375,22 @@ public final class EnvironmentTree extends ConcurrentComponent
                 container.setParent( itemId, peerId );
                 container.setChildrenAllowed( itemId, false );
                 tree.setItemCaption( itemId, ec.getHostname() );
-                item.getItemProperty( VALUE_PROPERTY ).setValue( ec );
-
-                if ( ec.isConnected() )
+                if ( item.getItemProperty( VALUE_PROPERTY ) != null )
                 {
-                    item.getItemProperty( ICON_PROPERTY ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
+                    item.getItemProperty( VALUE_PROPERTY ).setValue( ec );
                 }
-                else
+
+                if ( item.getItemProperty( ICON_PROPERTY ) != null )
                 {
-                    item.getItemProperty( ICON_PROPERTY )
-                        .setValue( new ThemeResource( "img/lxc/virtual_offline.png" ) );
+                    if ( ec.isConnected() )
+                    {
+                        item.getItemProperty( ICON_PROPERTY ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
+                    }
+                    else
+                    {
+                        item.getItemProperty( ICON_PROPERTY )
+                            .setValue( new ThemeResource( "img/lxc/virtual_offline.png" ) );
+                    }
                 }
             }
 
