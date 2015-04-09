@@ -216,12 +216,6 @@ public class TrackerImpl implements Tracker
     }
 
 
-    public DaoManager getDaoManager()
-    {
-        return daoManager;
-    }
-
-
     public void setDaoManager( final DaoManager daoManager )
     {
         this.daoManager = daoManager;
