@@ -166,12 +166,6 @@ public class TerminalForm extends CustomComponent
     }
 
 
-    protected void updateEnvironment()
-    {
-
-    }
-
-
     protected void show( String msg )
     {
         Notification.show( msg );
