@@ -42,7 +42,7 @@ public class TrackerImpl implements Tracker
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Logger LOG = LoggerFactory.getLogger( TrackerImpl.class.getName() );
     private static final String SOURCE_IS_EMPTY_MSG = "Source is null or empty";
-    private TrackerOperationDataService dataService;
+    protected TrackerOperationDataService dataService;
     private DaoManager daoManager;
 
 
@@ -63,20 +63,20 @@ public class TrackerImpl implements Tracker
     }
 
 
-    private TrackerOperationViewImpl createTrackerOperation( ResultSet rs ) throws SQLException
-    {
-        if ( rs != null && rs.next() )
-        {
-            Clob infoClob = rs.getClob( "info" );
-            if ( infoClob != null && infoClob.length() > 0 )
-            {
-                String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
-                TrackerOperationImpl po = GSON.fromJson( info, TrackerOperationImpl.class );
-                return new TrackerOperationViewImpl( po );
-            }
-        }
-        return null;
-    }
+//    private TrackerOperationViewImpl createTrackerOperation( ResultSet rs ) throws SQLException
+//    {
+//        if ( rs != null && rs.next() )
+//        {
+//            Clob infoClob = rs.getClob( "info" );
+//            if ( infoClob != null && infoClob.length() > 0 )
+//            {
+//                String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
+//                TrackerOperationImpl po = GSON.fromJson( info, TrackerOperationImpl.class );
+//                return new TrackerOperationViewImpl( po );
+//            }
+//        }
+//        return null;
+//    }
 
 
     /**
