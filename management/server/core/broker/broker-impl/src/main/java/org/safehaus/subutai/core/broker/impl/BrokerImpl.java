@@ -189,7 +189,7 @@ public class BrokerImpl implements Broker
 
             producer.send( msg );
         }
-        catch ( JMSException e )
+        catch ( Exception e )
         {
             LOG.error( "Error in sendMessage", e );
             throw new BrokerException( e );
