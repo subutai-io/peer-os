@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.environment.terminal.ui;
 
 
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -41,14 +42,14 @@ public class TerminalForm extends CustomComponent
     private ExecutorService executor;
 
 
-    public TerminalForm( final EnvironmentManager environmentManager )
+    public TerminalForm( final EnvironmentManager environmentManager, final Date updateDate )
     {
         setSizeFull();
 
 
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
         horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
-        environmentTree = new EnvironmentTree( environmentManager );
+        environmentTree = new EnvironmentTree( environmentManager, updateDate );
         horizontalSplit.setFirstComponent( environmentTree );
 
         GridLayout grid = new GridLayout( 20, 11 );
