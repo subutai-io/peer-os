@@ -7,9 +7,9 @@ import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
+import javax.jms.TopicSubscriber;
 
 import org.safehaus.subutai.core.broker.api.Broker;
 import org.safehaus.subutai.core.broker.api.BrokerException;
@@ -111,8 +111,12 @@ public class BrokerImpl implements Broker
 
     public void init() throws BrokerException
     {
-        setupConnectionPool();
-        setupRouter();
+        ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory( brokerUrl );
+        amqFactory.setWatchTopicAdvisories( false );
+        amqFactory.setCheckForDuplicates( true );
+
+        setupConnectionPool( amqFactory );
+        setupRouter( amqFactory );
     }
 
 
@@ -125,18 +129,22 @@ public class BrokerImpl implements Broker
     }
 
 
-    protected void setupRouter() throws BrokerException
+    protected void setupRouter( ActiveMQConnectionFactory amqFactory ) throws BrokerException
     {
         try
         {
+
+            Connection connection = amqFactory.createConnection();
+            connection.setClientID( "subutai" );
+            connection.start();
+
             for ( Topic topic : Topic.values() )
             {
-                Connection connection = pool.createConnection();
-                connection.start();
-                Session session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
-                Destination topicDestination = session.createTopic( topic.name() );
-                MessageConsumer consumer = session.createConsumer( topicDestination );
-                consumer.setMessageListener( messageRouter );
+                Session session = connection.createSession( false, Session.CLIENT_ACKNOWLEDGE );
+                javax.jms.Topic topicDestination = session.createTopic( topic.name() );
+                TopicSubscriber topicSubscriber = session.createDurableSubscriber( topicDestination,
+                        String.format( "%s-subutai-subscriber", topic.name() ) );
+                topicSubscriber.setMessageListener( messageRouter );
             }
         }
         catch ( JMSException e )
@@ -147,13 +155,10 @@ public class BrokerImpl implements Broker
     }
 
 
-    private void setupConnectionPool()
+    private void setupConnectionPool( ActiveMQConnectionFactory amqFactory )
     {
-        ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory( brokerUrl );
-        amqFactory.setWatchTopicAdvisories( false );
-        amqFactory.setCheckForDuplicates( true );
         pool = new PooledConnectionFactory( amqFactory );
-        pool.setMaxConnections( maxBrokerConnections + Topic.values().length );
+        pool.setMaxConnections( maxBrokerConnections );
         pool.setIdleTimeout( idleConnectionTimeout * 1000 );
         pool.start();
     }

@@ -56,6 +56,9 @@ public class MessageRoutingListener implements MessageListener
                     notifyListener( listener, message );
                 }
             }
+
+            //ack message
+            message.acknowledge();
         }
         catch ( JMSException e )
         {
