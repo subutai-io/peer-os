@@ -79,7 +79,7 @@ public class RemotePeerMessageSender implements Callable<Boolean>
 
                 messengerDao.markAsSent( envelope );
             }
-            catch ( HTTPException e )
+            catch ( Exception e )
             {
                 messengerDao.incrementDeliveryAttempts( envelope );
 
