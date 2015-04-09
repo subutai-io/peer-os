@@ -235,6 +235,7 @@ int main(int argc, char *argv[], char *envp[]) {
 	}
 
 	while (true) {
+
 		if (!connection->openSession()) {
 			sleep(reconnectDelay);
 			logMain.writeLog(6,
@@ -304,7 +305,7 @@ int main(int argc, char *argv[], char *envp[]) {
 	 * Send initial heartbeat for registration of resource host and
 	 * container nodes attached to this host.
 	 */
-	timer.sendHeartBeat(false, false, &heartbeatInterruptFlag);
+	timer.sendHeartBeat( &heartbeatInterruptFlag);
 	logMain.writeLog(6,
 			logMain.setLogData("<SubutaiAgent>", "Sending first heartbeat.."));
 	while (true) {

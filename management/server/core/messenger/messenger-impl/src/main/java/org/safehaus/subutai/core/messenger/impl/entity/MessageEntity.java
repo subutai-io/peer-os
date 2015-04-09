@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.messenger.impl.entity;
 
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -33,7 +32,7 @@ import com.google.common.base.Preconditions;
 @Entity
 @Table( name = "message" )
 @Access( AccessType.FIELD )
-public class MessageEntity implements Message, Serializable
+public class MessageEntity implements Message
 {
     public static final int MAX_SENDER_LEN = 50;
     @Id

@@ -63,7 +63,7 @@ public:
 	virtual ~SubutaiTimer(void);
 	bool checkExecutionTimeout(unsigned int*, bool*,
 			unsigned int*, unsigned int*);
-	void sendHeartBeat(bool, bool, bool*);
+	void sendHeartBeat(bool*);
 	bool checkHeartBeatTimer(bool*);
 	bool checkCommandQueueInfoTimer();
 	bool checkIfDestroyCommandInProgress();

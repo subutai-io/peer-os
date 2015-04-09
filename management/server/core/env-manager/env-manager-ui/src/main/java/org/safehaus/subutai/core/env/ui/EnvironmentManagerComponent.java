@@ -51,7 +51,7 @@ public class EnvironmentManagerComponent extends CustomComponent
         formSheet.addTab( environmentForm.getContentRoot(), "Environments" );
         formSheet.getTab( 1 ).setId( "Environments" );
 
-        EnvironmentContainersQuotaTab envContainersTab = new EnvironmentContainersQuotaTab( this );
+        final EnvironmentContainersQuotaTab envContainersTab = new EnvironmentContainersQuotaTab( this );
         formSheet.addTab( envContainersTab, "Environment Container Quota" ).setId( "EnvironmentContainersTab" );
 
         verticalLayout.addComponent( formSheet );
@@ -64,6 +64,4 @@ public class EnvironmentManagerComponent extends CustomComponent
     {
         return environmentManager;
     }
-
-
 }

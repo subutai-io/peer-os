@@ -6,7 +6,6 @@ import java.util.concurrent.Executors;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.ui.PeerManagerPortalModule;
@@ -21,17 +20,16 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
 
 
-public class ContainerComponent extends CustomComponent implements Disposable
+public class ContainerComponent extends CustomComponent
 {
 
     private static final String MANAGER_TAB_CAPTION = "Manage";
-    private ExecutorService executorService;
 
 
     public ContainerComponent( PeerManagerPortalModule peerManagerPortalModule ) throws NamingException
     {
         final ServiceLocator serviceLocator = new ServiceLocator();
-        executorService = Executors.newFixedThreadPool( 5 );
+
         final StrategyManager strategyManager = serviceLocator.getService( StrategyManager.class );
         final PeerManager peerManager = serviceLocator.getService( PeerManager.class );
 
@@ -56,7 +54,7 @@ public class ContainerComponent extends CustomComponent implements Disposable
         TabSheet commandsSheet = new TabSheet();
         commandsSheet.setStyleName( Runo.TABSHEET_SMALL );
         commandsSheet.setSizeFull();
-        final Manager manager = new Manager( executorService, peerManager );
+        final Manager manager = new Manager( peerManager );
         commandsSheet.addTab(
                 new Cloner( peerManagerPortalModule.getRegistry(), peerManager.getLocalPeer(), strategyManager,
                         containerTree ), "Clone" );
@@ -78,20 +76,5 @@ public class ContainerComponent extends CustomComponent implements Disposable
 
         horizontalSplit.setSecondComponent( verticalLayout );
         setCompositionRoot( horizontalSplit );
-
-        addDetachListener( new DetachListener()
-        {
-            @Override
-            public void detach( final DetachEvent event )
-            {
-                executorService.shutdown();
-            }
-        } );
-    }
-
-
-    public void dispose()
-    {
-        executorService.shutdown();
     }
 }

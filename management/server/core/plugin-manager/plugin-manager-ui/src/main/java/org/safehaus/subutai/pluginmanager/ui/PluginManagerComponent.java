@@ -84,26 +84,28 @@ public class PluginManagerComponent extends CustomComponent
 
         setCompositionRoot( contentRoot );
 
+
+        addAttachListener( new AttachListener()
+        {
+            @Override
+            public void attach( final AttachEvent event )
+            {
+                //startTableUpdateThread(  );
+            }
+        } );
         addDetachListener( new DetachListener()
         {
             @Override
             public void detach( final DetachEvent event )
             {
-                if ( updater != null )
-                {
-                    updater.shutdown();
-                }
+                //updater.shutdown();
             }
         } );
     }
 
 
-    private void startTableUpdateThread( final HorizontalLayout controlsContent )
+    private void startTableUpdateThread()
     {
-        if ( updater != null )
-        {
-            updater.shutdown();
-        }
         updater = Executors.newSingleThreadScheduledExecutor();
         updater.scheduleWithFixedDelay( new Runnable()
         {

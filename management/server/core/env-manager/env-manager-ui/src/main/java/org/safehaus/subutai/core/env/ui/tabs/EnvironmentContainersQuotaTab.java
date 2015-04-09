@@ -28,8 +28,8 @@ public class EnvironmentContainersQuotaTab extends CustomComponent
 {
     private EnvironmentManagerComponent environmentComponent;
 
-    private ExecutorService executorService = SubutaiExecutors.newCachedThreadPool();
-    private ContainerHostQuotaForm form = new ContainerHostQuotaForm( executorService, this );
+    private ExecutorService executorService;
+    private ContainerHostQuotaForm form = new ContainerHostQuotaForm( this );
 
     private Label indicator;
 
@@ -106,15 +106,6 @@ public class EnvironmentContainersQuotaTab extends CustomComponent
     {
         this.environmentComponent = environmentComponent;
         init();
-
-        addDetachListener( new DetachListener()
-        {
-            @Override
-            public void detach( final DetachEvent event )
-            {
-                executorService.shutdown();
-            }
-        } );
     }
 
 
@@ -165,6 +156,24 @@ public class EnvironmentContainersQuotaTab extends CustomComponent
         verticalLayout.addComponents( topRow, hLayout );
 
         setCompositionRoot( verticalLayout );
+
+        addAttachListener( new AttachListener()
+        {
+            @Override
+            public void attach( final AttachEvent event )
+            {
+                executorService = SubutaiExecutors.newCachedThreadPool();
+                form.setExecutorService( executorService );
+            }
+        } );
+        addDetachListener( new DetachListener()
+        {
+            @Override
+            public void detach( final DetachEvent event )
+            {
+                executorService.shutdown();
+            }
+        } );
     }
 
 

@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.naming.NamingException;
 
@@ -68,7 +66,6 @@ public class MonitorForm extends CustomComponent
     private PeerManager peerManager;
     private ComboBox environmentCombo;
     protected Table metricTable;
-    protected ExecutorService executorService = Executors.newCachedThreadPool();
     private VerticalLayout chartsLayout;
 
     private Window showProgress;
@@ -139,15 +136,6 @@ public class MonitorForm extends CustomComponent
 
         horizontalSplit.setSizeFull();
         setCompositionRoot( horizontalSplit );
-
-        addDetachListener( new DetachListener()
-        {
-            @Override
-            public void detach( final DetachEvent event )
-            {
-                executorService.shutdown();
-            }
-        } );
     }
 
 
@@ -167,8 +155,7 @@ public class MonitorForm extends CustomComponent
             {
                 try
                 {
-                    ContainerHost containerHost =
-                            peerManager.getLocalPeer().getContainerHostById( hostInfo.getId() );
+                    ContainerHost containerHost = peerManager.getLocalPeer().getContainerHostById( hostInfo.getId() );
                     hosts.add( containerHost );
                 }
                 catch ( HostNotFoundException e )
@@ -199,21 +186,25 @@ public class MonitorForm extends CustomComponent
 
         if ( hosts.size() > 0 )
         {
-            try {
+            try
+            {
                 historicalCpuMetric.putAll( monitor.getHistoricalMetrics( hosts, MetricType.CPU ) );
                 historicalRamMetric.putAll( monitor.getHistoricalMetrics( hosts, MetricType.RAM ) );
                 historicalDiskVarMetric.putAll( monitor.getHistoricalMetrics( hosts, MetricType.DISK_VAR ) );
                 historicalDiskHomeMetric.putAll( monitor.getHistoricalMetrics( hosts, MetricType.DISK_HOME ) );
                 historicalDiskOptMetric.putAll( monitor.getHistoricalMetrics( hosts, MetricType.DISK_OPT ) );
                 historicalDiskRootfsMetric.putAll( monitor.getHistoricalMetrics( hosts, MetricType.DISK_ROOTFS ) );
-            } catch ( Exception e ) {
+            }
+            catch ( Exception e )
+            {
                 Notification.show( "Error occurred while getting metrics!", Notification.Type.WARNING_MESSAGE );
                 showProgress.close();
                 LOG.error( e.getMessage() );
                 return;
             }
         }
-        else {
+        else
+        {
             Notification.show( "Select host to draw metrics", Notification.Type.WARNING_MESSAGE );
             showProgress.close();
             return;
@@ -244,7 +235,7 @@ public class MonitorForm extends CustomComponent
 
     private void addRamMetrics( Map<UUID, List<HistoricalMetric>> hostMetrics )
     {
-        addMetrics( hostMetrics,"RAM(MB)" );
+        addMetrics( hostMetrics, "RAM(MB)" );
     }
 
 
@@ -256,19 +247,19 @@ public class MonitorForm extends CustomComponent
 
     private void addVarDiskMetrics( Map<UUID, List<HistoricalMetric>> hostMetrics )
     {
-        addMetrics( hostMetrics,"Var Dataset(MB)" );
+        addMetrics( hostMetrics, "Var Dataset(MB)" );
     }
 
 
     private void addOptDiskMetrics( Map<UUID, List<HistoricalMetric>> hostMetrics )
     {
-        addMetrics( hostMetrics,"Opt Dataset(MB)" );
+        addMetrics( hostMetrics, "Opt Dataset(MB)" );
     }
 
 
     private void addRootfsDiskMetrics( Map<UUID, List<HistoricalMetric>> hostMetrics )
     {
-        addMetrics( hostMetrics,"Rootfs Dataset(MB)" );
+        addMetrics( hostMetrics, "Rootfs Dataset(MB)" );
     }
 
 
@@ -290,18 +281,22 @@ public class MonitorForm extends CustomComponent
     }
 
 
-    private XYDataset createMetricsDataset( final Map<UUID, List<HistoricalMetric>> hostMetrics ) {
+    private XYDataset createMetricsDataset( final Map<UUID, List<HistoricalMetric>> hostMetrics )
+    {
 
         TimeSeries localTimeSeries;
         TimeSeriesCollection timeSeriesCollection = new TimeSeriesCollection();
-        if ( hostMetrics.size() == 0 ) {
+        if ( hostMetrics.size() == 0 )
+        {
             return timeSeriesCollection;
         }
 
-        for ( final Map.Entry<UUID, List<HistoricalMetric>> entry : hostMetrics.entrySet() ) {
+        for ( final Map.Entry<UUID, List<HistoricalMetric>> entry : hostMetrics.entrySet() )
+        {
             List<HistoricalMetric> historicalMetrics = entry.getValue();
             localTimeSeries = new TimeSeries( historicalMetrics.get( 0 ).getHost().getHostname() );
-            for ( HistoricalMetric historicalMetric : historicalMetrics ) {
+            for ( HistoricalMetric historicalMetric : historicalMetrics )
+            {
                 localTimeSeries.add( new Minute( historicalMetric.getTimestamp() ), historicalMetric.getValue() );
             }
             timeSeriesCollection.addSeries( localTimeSeries );
@@ -311,14 +306,16 @@ public class MonitorForm extends CustomComponent
 
 
     private static JFreeChart createChart( String chartTitle, String categoryXAxis, String categoryYAxis,
-                                           XYDataset localXYDataset ) {
-        JFreeChart localJFreeChart = ChartFactory.createTimeSeriesChart( chartTitle , categoryXAxis,
-                categoryYAxis, localXYDataset, true, true, false);
-        XYPlot localXYPlot = (XYPlot) localJFreeChart.getPlot();
+                                           XYDataset localXYDataset )
+    {
+        JFreeChart localJFreeChart = ChartFactory
+                .createTimeSeriesChart( chartTitle, categoryXAxis, categoryYAxis, localXYDataset, true, true, false );
+        XYPlot localXYPlot = ( XYPlot ) localJFreeChart.getPlot();
         BasicStroke stroke = new BasicStroke( 2.0f );
         XYItemRenderer renderer = localXYPlot.getRenderer();
         int seriesCount = localXYPlot.getSeriesCount();
-        for ( int i = 0; i < seriesCount; i ++ ) {
+        for ( int i = 0; i < seriesCount; i++ )
+        {
             renderer.setSeriesStroke( i, stroke );
         }
         return localJFreeChart;
