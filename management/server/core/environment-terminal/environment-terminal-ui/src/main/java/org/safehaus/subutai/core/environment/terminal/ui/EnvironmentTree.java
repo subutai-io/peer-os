@@ -55,7 +55,7 @@ public final class EnvironmentTree extends ConcurrentComponent
     private Environment environment;
     private ScheduledExecutorService scheduler;
     private final EnvironmentManager environmentManager;
-    private final ComboBox env;
+    private final ComboBox envCombo;
     private final Date updateDate;
 
 
@@ -70,12 +70,12 @@ public final class EnvironmentTree extends ConcurrentComponent
 
         BeanItemContainer<Environment> environments = new BeanItemContainer<>( Environment.class );
         environments.addAll( environmentManager.getEnvironments() );
-        env = new ComboBox( null, environments );
+        envCombo = new ComboBox( null, environments );
 
-        env.setItemCaptionPropertyId( "name" );
-        env.setImmediate( true );
-        env.setTextInputAllowed( false );
-        env.setNullSelectionAllowed( false );
+        envCombo.setItemCaptionPropertyId( "name" );
+        envCombo.setImmediate( true );
+        envCombo.setTextInputAllowed( false );
+        envCombo.setNullSelectionAllowed( false );
         Property.ValueChangeListener listener = new Property.ValueChangeListener()
         {
             public void valueChange( Property.ValueChangeEvent event )
@@ -86,7 +86,7 @@ public final class EnvironmentTree extends ConcurrentComponent
             }
         };
 
-        env.addValueChangeListener( listener );
+        envCombo.addValueChangeListener( listener );
 
         tree = new Tree( "List of containers" );
         tree.setContainerDataSource( getNodeContainer() );
@@ -145,7 +145,7 @@ public final class EnvironmentTree extends ConcurrentComponent
         GridLayout grid = new GridLayout( 1, 3 );
 
         grid.addComponent( new Label( "Environments:" ), 0, 0 );
-        grid.addComponent( env, 0, 1 );
+        grid.addComponent( envCombo, 0, 1 );
         grid.addComponent( tree, 0, 2 );
 
         addComponent( grid );
@@ -186,17 +186,16 @@ public final class EnvironmentTree extends ConcurrentComponent
                             || System.currentTimeMillis() - lastUpdateDate.getTime() > 30 * 1000 )
                     {
 
-                        LOG.info( "Refreshing environment tree..." );
-                        //refresh env combo
+                        //refresh envCombo combo
                         Set<Environment> environments = environmentManager.getEnvironments();
                         Set<Environment> envs = Sets.newHashSet(
-                                ( Collection<Environment> ) env.getContainerDataSource().getItemIds() );
+                                ( Collection<Environment> ) envCombo.getContainerDataSource().getItemIds() );
 
                         for ( Environment environment1 : environments )
                         {
                             if ( !envs.contains( environment1 ) )
                             {
-                                env.getContainerDataSource().addItem( environment1 );
+                                envCombo.getContainerDataSource().addItem( environment1 );
                             }
                         }
 
@@ -204,26 +203,15 @@ public final class EnvironmentTree extends ConcurrentComponent
                         {
                             if ( !environments.contains( environment1 ) )
                             {
-                                env.getContainerDataSource().removeItem( environment1 );
+                                envCombo.getContainerDataSource().removeItem( environment1 );
                             }
                         }
 
-                        //refresh selected env
+                        //refresh selected env container tree
                         if ( environment != null )
                         {
-                            try
-                            {
-                                environment = environmentManager.findEnvironment( environment.getId() );
-                                refreshContainers();
-                            }
-                            catch ( EnvironmentNotFoundException e )
-                            {
-                                environment = null;
-                                env.setValue( null );
-                                tree.removeAllItems();
-                            }
+                            refreshContainers();
                         }
-                        LOG.info( "Refreshing done." );
 
                         lastUpdateDate.setTime( System.currentTimeMillis() );
                     }
@@ -347,66 +335,77 @@ public final class EnvironmentTree extends ConcurrentComponent
 
         if ( environment != null )
         {
-            Set<String> presentItems = Sets.newHashSet();
-            for ( ContainerHost ec : environment.getContainerHosts() )
+            try
             {
-                String peerId = ec.getPeerId();
-                String itemId = peerId + ":" + ec.getId();
-                presentItems.add( peerId );
-                presentItems.add( itemId );
+                Environment env = environmentManager.findEnvironment( environment.getId() );
 
-                Item peer = container.getItem( peerId );
-
-                if ( peer == null )
+                Set<String> presentItems = Sets.newHashSet();
+                for ( ContainerHost ec : env.getContainerHosts() )
                 {
-                    peer = container.addItem( peerId );
-                }
-                if ( peer != null )
-                {
-                    container.setChildrenAllowed( peerId, true );
+                    String peerId = ec.getPeerId();
+                    String itemId = peerId + ":" + ec.getId();
+                    presentItems.add( peerId );
+                    presentItems.add( itemId );
 
-                    tree.setItemCaption( peerId, ec.getPeer().getName() );
+                    Item peer = container.getItem( peerId );
 
-                    peer.getItemProperty( VALUE_PROPERTY ).setValue( null );
-
-                    Item item = container.getItem( itemId );
-
-                    if ( item == null )
+                    if ( peer == null )
                     {
-                        item = container.addItem( itemId );
+                        peer = container.addItem( peerId );
                     }
-
-                    if ( item != null )
+                    if ( peer != null )
                     {
-                        container.setParent( itemId, peerId );
-                        container.setChildrenAllowed( itemId, false );
-                        tree.setItemCaption( itemId, ec.getHostname() );
-                        item.getItemProperty( VALUE_PROPERTY ).setValue( ec );
+                        container.setChildrenAllowed( peerId, true );
 
-                        item.getItemProperty( ICON_PROPERTY ).setValue( new ThemeResource(
-                                ec.isConnected() ? "img/lxc/virtual.png" : "img/lxc/virtual_offline.png" ) );
-                    }
-                }
-            }
+                        tree.setItemCaption( peerId, ec.getPeer().getName() );
 
-            Set<String> allItemsIds = Sets.newHashSet();
-            allItemsIds.addAll( ( Collection<String> ) container.getItemIds() );
-            for ( String itemId : allItemsIds )
-            {
-                if ( !presentItems.contains( itemId ) )
-                {
-                    container.removeItem( itemId );
-                    for ( Iterator<ContainerHost> iterator = selectedContainers.iterator(); iterator.hasNext(); )
-                    {
-                        final ContainerHost ec = iterator.next();
-                        String peerId = ec.getPeerId();
-                        String ecId = peerId + ":" + ec.getId();
-                        if ( !presentItems.contains( ecId ) )
+                        peer.getItemProperty( VALUE_PROPERTY ).setValue( null );
+
+                        Item item = container.getItem( itemId );
+
+                        if ( item == null )
                         {
-                            iterator.remove();
+                            item = container.addItem( itemId );
+                        }
+
+                        if ( item != null )
+                        {
+                            container.setParent( itemId, peerId );
+                            container.setChildrenAllowed( itemId, false );
+                            tree.setItemCaption( itemId, ec.getHostname() );
+                            item.getItemProperty( VALUE_PROPERTY ).setValue( ec );
+
+                            item.getItemProperty( ICON_PROPERTY ).setValue( new ThemeResource(
+                                    ec.isConnected() ? "img/lxc/virtual.png" : "img/lxc/virtual_offline.png" ) );
                         }
                     }
                 }
+
+                Set<String> allItemsIds = Sets.newHashSet();
+                allItemsIds.addAll( ( Collection<String> ) container.getItemIds() );
+                for ( String itemId : allItemsIds )
+                {
+                    if ( !presentItems.contains( itemId ) )
+                    {
+                        container.removeItem( itemId );
+                        for ( Iterator<ContainerHost> iterator = selectedContainers.iterator(); iterator.hasNext(); )
+                        {
+                            final ContainerHost ec = iterator.next();
+                            String peerId = ec.getPeerId();
+                            String ecId = peerId + ":" + ec.getId();
+                            if ( !presentItems.contains( ecId ) )
+                            {
+                                iterator.remove();
+                            }
+                        }
+                    }
+                }
+            }
+            catch ( EnvironmentNotFoundException e )
+            {
+                environment = null;
+                envCombo.setValue( null );
+                tree.removeAllItems();
             }
         }
     }

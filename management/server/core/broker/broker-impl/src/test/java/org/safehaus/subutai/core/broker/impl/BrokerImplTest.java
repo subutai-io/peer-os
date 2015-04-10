@@ -11,6 +11,7 @@ import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
+import javax.jms.TopicSubscriber;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,12 +23,14 @@ import org.safehaus.subutai.core.broker.api.ByteMessageListener;
 import org.safehaus.subutai.core.broker.api.TextMessageListener;
 import org.safehaus.subutai.core.broker.api.Topic;
 
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.pool.PooledConnectionFactory;
 
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -68,6 +71,12 @@ public class BrokerImplTest
 
     @Mock
     TextMessageListener textMessageListener;
+
+    @Mock
+    ActiveMQConnectionFactory amqFactory;
+
+    @Mock
+    TopicSubscriber topicSubscriber;
 
     BrokerImpl broker;
 
@@ -212,18 +221,21 @@ public class BrokerImplTest
     @Test
     public void testSetupRouter() throws Exception
     {
+        when( amqFactory.createConnection() ).thenReturn( connection );
+        when( session.createDurableSubscriber( any( javax.jms.Topic.class ), anyString() ) )
+                .thenReturn( topicSubscriber );
 
-        broker.setupRouter();
+        broker.setupRouter( amqFactory );
 
-        verify( pool, times( Topic.values().length ) ).createConnection();
-        verify( consumer, times( Topic.values().length ) ).setMessageListener( messageRouter );
+        verify( connection, times( Topic.values().length ) ).createSession(anyBoolean(), anyInt());
+        verify( topicSubscriber, times( Topic.values().length ) ).setMessageListener( messageRouter );
 
         JMSException exception = mock( JMSException.class );
-        doThrow( exception ).when( pool ).createConnection();
+        doThrow( exception ).when( amqFactory ).createConnection();
 
         try
         {
-            broker.setupRouter();
+            broker.setupRouter( amqFactory );
             fail( "Expected BrokerException" );
         }
         catch ( BrokerException e )

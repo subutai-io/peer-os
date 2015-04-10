@@ -23,9 +23,7 @@ import javax.persistence.Table;
 } )
 public class TrackerOperationEntity
 {
-    //source varchar(100), " +
-    //    "id uuid, ts timestamp, "
-    //            + "info clob, PRIMARY KEY (source, id))
+
     public static final String QUERY_GET_OPERATION = "getTrackerOperation";
 
     @Id
@@ -50,6 +48,9 @@ public class TrackerOperationEntity
         this.ts = ts;
         this.info = info;
     }
+
+
+    public TrackerOperationEntity() {}
 
 
     public String getInfo()
