@@ -37,6 +37,7 @@ passwd=$(cat password.dat)
 #Change activemq.xml
 sed -i '/keyStore=.*/c\      keyStore="/opt/apache-activemq-5.9.1/conf/broker.ks" keyStorePassword="'$passwd'"' activemq.xml
 sed -i '/trustStore=.*/c\      trustStore="/opt/apache-activemq-5.9.1/conf/broker.ts" trustStorePassword="'$passwd'"/>' activemq.xml
+sed -i '/<broker xmlns/c\  <broker xmlns="http://activemq.apache.org/schema/core" brokerName="localhost" dataDirectory="${activemq.data}" persistent="true" advisorySupport="false">' activemq.xml
 
 #Deleting and copied files
 mv activemq.xml $fileName/opt/apache-activemq-5.9.1/conf/
