@@ -133,13 +133,11 @@ public class BrokerImpl implements Broker
     {
         try
         {
-
-            Connection connection = amqFactory.createConnection();
-            connection.setClientID( "subutai" );
-            connection.start();
-
             for ( Topic topic : Topic.values() )
             {
+                Connection connection = amqFactory.createConnection();
+                connection.setClientID( String.format( "%s-subutai-client", topic.name() ) );
+                connection.start();
                 Session session = connection.createSession( false, Session.CLIENT_ACKNOWLEDGE );
                 javax.jms.Topic topicDestination = session.createTopic( topic.name() );
                 TopicSubscriber topicSubscriber = session.createDurableSubscriber( topicDestination,
