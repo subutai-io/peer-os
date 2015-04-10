@@ -123,161 +123,168 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
     public Set<NodeGroupBuildResult> call() throws NodeGroupBuildException
     {
 
-        Set<NodeGroupBuildResult> results = Sets.newHashSet();
-        LocalPeer localPeer = peerManager.getLocalPeer();
-
-        //check if environment has reserved VNI
-        Set<Vni> reservedVnis;
         try
         {
-            reservedVnis = peer.getReservedVnis();
-        }
-        catch ( PeerException e )
-        {
-            throw new NodeGroupBuildException(
-                    String.format( "Error obtaining reserved vnis on peer %s", peer.getName() ), e );
-        }
+            Set<NodeGroupBuildResult> results = Sets.newHashSet();
+            LocalPeer localPeer = peerManager.getLocalPeer();
 
-        //check availability of subnet
-        Set<Gateway> gateways;
-        try
-        {
-            gateways = peer.getGateways();
-        }
-        catch ( PeerException e )
-        {
-            throw new NodeGroupBuildException( String.format( "Error obtaining gateways on peer %s", peer.getName() ),
-                    e );
-        }
-
-        SubnetUtils subnetUtils = new SubnetUtils( environment.getSubnetCidr() );
-        String environmentGatewayIp = subnetUtils.getInfo().getLowAddress();
-
-        Gateway usedGateway = null;
-
-        for ( Gateway gateway : gateways )
-        {
-            if ( gateway.getIp().equals( environmentGatewayIp ) )
+            //check if environment has reserved VNI
+            Set<Vni> reservedVnis;
+            try
             {
-                usedGateway = gateway;
-                break;
+                reservedVnis = peer.getReservedVnis();
             }
-        }
-
-        if ( usedGateway != null )
-        {
-            boolean subnetIsUsed = true;
-
-            //check if subnet is used for this environment
-            for ( Vni reservedVni : reservedVnis )
+            catch ( PeerException e )
             {
-                if ( reservedVni.getEnvironmentId().equals( environment.getId() ) )
+                throw new NodeGroupBuildException(
+                        String.format( "Error obtaining reserved vnis on peer %s", peer.getName() ), e );
+            }
+
+            //check availability of subnet
+            Set<Gateway> gateways;
+            try
+            {
+                gateways = peer.getGateways();
+            }
+            catch ( PeerException e )
+            {
+                throw new NodeGroupBuildException(
+                        String.format( "Error obtaining gateways on peer %s", peer.getName() ), e );
+            }
+
+            SubnetUtils subnetUtils = new SubnetUtils( environment.getSubnetCidr() );
+            String environmentGatewayIp = subnetUtils.getInfo().getLowAddress();
+
+            Gateway usedGateway = null;
+
+            for ( Gateway gateway : gateways )
+            {
+                if ( gateway.getIp().equals( environmentGatewayIp ) )
                 {
-                    if ( reservedVni.getVlan() == usedGateway.getVlan() )
-                    {
-                        //this subnet is used for this environment, all is ok
-                        subnetIsUsed = false;
-                    }
+                    usedGateway = gateway;
                     break;
                 }
             }
 
-            if ( subnetIsUsed )
+            if ( usedGateway != null )
             {
-                throw new NodeGroupBuildException(
-                        String.format( "Subnet is already in use on peer %s", peer.getName() ), null );
-            }
-        }
+                boolean subnetIsUsed = true;
 
-        Vni environmentVni = null;
-        for ( Vni reservedVni : reservedVnis )
-        {
-            if ( reservedVni.getEnvironmentId().equals( environment.getId() ) )
-            {
-                environmentVni = reservedVni;
-                break;
-            }
-        }
-
-        if ( environmentVni == null )
-        {
-
-            //try to reserve VNI
-            environmentVni = new Vni( environment.getVni(), environment.getId() );
-
-            try
-            {
-                peer.reserveVni( environmentVni );
-            }
-            catch ( PeerException e )
-            {
-                throw new NodeGroupBuildException( String.format( "Could not reserve VNI on peer %s", peer.getName() ),
-                        e );
-            }
-        }
-
-        int currentIpAddressOffset = 0;
-
-        for ( NodeGroup nodeGroup : nodeGroups )
-        {
-            NodeGroupBuildException exception = null;
-            Set<EnvironmentContainerImpl> containers = Sets.newHashSet();
-
-            try
-            {
-
-                Set<String> peerIps = Sets.newHashSet();
-
-                //add initiator peer mandatorily
-                peerIps.add( localPeer.getManagementHost()
-                                      .getIpByInterfaceName( Common.MANAGEMENT_HOST_EXTERNAL_IP_INTERFACE ) );
-
-
-                for ( Peer aPeer : allPeers )
+                //check if subnet is used for this environment
+                for ( Vni reservedVni : reservedVnis )
                 {
-                    if ( !aPeer.getId().equals( localPeer.getId() ) && !aPeer.getId().equals( peer.getId() ) )
+                    if ( reservedVni.getEnvironmentId().equals( environment.getId() ) )
                     {
-                        peerIps.add( aPeer.getPeerInfo().getIp() );
+                        if ( reservedVni.getVlan() == usedGateway.getVlan() )
+                        {
+                            //this subnet is used for this environment, all is ok
+                            subnetIsUsed = false;
+                        }
+                        break;
                     }
                 }
 
-
-                Set<HostInfoModel> newHosts = peer.createContainerGroup(
-                        new CreateContainerGroupRequest( peerIps, environment.getId(), localPeer.getId(),
-                                localPeer.getOwnerId(), environment.getSubnetCidr(),
-                                fetchRequiredTemplates( peer.getId(), nodeGroup.getTemplateName() ),
-                                nodeGroup.getNumberOfContainers(),
-                                nodeGroup.getContainerPlacementStrategy().getStrategyId(),
-                                nodeGroup.getContainerPlacementStrategy().getCriteriaAsList(),
-                                ipAddressOffset + currentIpAddressOffset ) );
-
-                currentIpAddressOffset += nodeGroup.getNumberOfContainers();
-
-                for ( HostInfoModel newHost : newHosts )
+                if ( subnetIsUsed )
                 {
-                    containers.add( new EnvironmentContainerImpl( localPeer.getId(), peer, nodeGroup.getName(), newHost,
-                            templateRegistry.getTemplate( nodeGroup.getTemplateName() ), nodeGroup.getSshGroupId(),
-                            nodeGroup.getHostsGroupId(), defaultDomain ) );
+                    throw new NodeGroupBuildException(
+                            String.format( "Subnet is already in use on peer %s", peer.getName() ), null );
                 }
+            }
+
+            Vni environmentVni = null;
+            for ( Vni reservedVni : reservedVnis )
+            {
+                if ( reservedVni.getEnvironmentId().equals( environment.getId() ) )
+                {
+                    environmentVni = reservedVni;
+                    break;
+                }
+            }
+
+            if ( environmentVni == null )
+            {
+
+                //try to reserve VNI
+                environmentVni = new Vni( environment.getVni(), environment.getId() );
+
+                try
+                {
+                    peer.reserveVni( environmentVni );
+                }
+                catch ( PeerException e )
+                {
+                    throw new NodeGroupBuildException(
+                            String.format( "Could not reserve VNI on peer %s", peer.getName() ), e );
+                }
+            }
+
+            int currentIpAddressOffset = 0;
+
+            for ( NodeGroup nodeGroup : nodeGroups )
+            {
+                NodeGroupBuildException exception = null;
+                Set<EnvironmentContainerImpl> containers = Sets.newHashSet();
+
+                try
+                {
+
+                    Set<String> peerIps = Sets.newHashSet();
+
+                    //add initiator peer mandatorily
+                    peerIps.add( localPeer.getManagementHost()
+                                          .getIpByInterfaceName( Common.MANAGEMENT_HOST_EXTERNAL_IP_INTERFACE ) );
 
 
-                if ( containers.size() < nodeGroup.getNumberOfContainers() )
+                    for ( Peer aPeer : allPeers )
+                    {
+                        if ( !aPeer.getId().equals( localPeer.getId() ) && !aPeer.getId().equals( peer.getId() ) )
+                        {
+                            peerIps.add( aPeer.getPeerInfo().getIp() );
+                        }
+                    }
+
+
+                    Set<HostInfoModel> newHosts = peer.createContainerGroup(
+                            new CreateContainerGroupRequest( peerIps, environment.getId(), localPeer.getId(),
+                                    localPeer.getOwnerId(), environment.getSubnetCidr(),
+                                    fetchRequiredTemplates( peer.getId(), nodeGroup.getTemplateName() ),
+                                    nodeGroup.getNumberOfContainers(),
+                                    nodeGroup.getContainerPlacementStrategy().getStrategyId(),
+                                    nodeGroup.getContainerPlacementStrategy().getCriteriaAsList(),
+                                    ipAddressOffset + currentIpAddressOffset ) );
+
+                    currentIpAddressOffset += nodeGroup.getNumberOfContainers();
+
+                    for ( HostInfoModel newHost : newHosts )
+                    {
+                        containers.add( new EnvironmentContainerImpl( localPeer.getId(), peer, nodeGroup.getName(),
+                                newHost, templateRegistry.getTemplate( nodeGroup.getTemplateName() ),
+                                nodeGroup.getSshGroupId(), nodeGroup.getHostsGroupId(), defaultDomain ) );
+                    }
+
+
+                    if ( containers.size() < nodeGroup.getNumberOfContainers() )
+                    {
+                        exception = new NodeGroupBuildException(
+                                String.format( "Requested %d but created only %d containers",
+                                        nodeGroup.getNumberOfContainers(), containers.size() ), null );
+                    }
+                }
+                catch ( Exception e )
                 {
                     exception = new NodeGroupBuildException(
-                            String.format( "Requested %d but created only %d containers",
-                                    nodeGroup.getNumberOfContainers(), containers.size() ), null );
+                            String.format( "Error creating node group %s on peer %s", nodeGroup, peer.getName() ),
+                            exceptionUtil.getRootCause( e ) );
                 }
-            }
-            catch ( Exception e )
-            {
-                exception = new NodeGroupBuildException(
-                        String.format( "Error creating node group %s on peer %s", nodeGroup, peer.getName() ),
-                        exceptionUtil.getRootCause( e ) );
+
+                results.add( new NodeGroupBuildResult( containers, exception ) );
             }
 
-            results.add( new NodeGroupBuildResult( containers, exception ) );
+            return results;
         }
-
-        return results;
+        catch ( Exception e )
+        {
+            throw new NodeGroupBuildException( "Error building node group", exceptionUtil.getRootCause( e ) );
+        }
     }
 }
