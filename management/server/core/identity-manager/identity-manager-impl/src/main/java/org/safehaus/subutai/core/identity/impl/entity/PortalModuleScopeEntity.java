@@ -17,7 +17,7 @@ import com.google.common.base.Preconditions;
 
 @Entity
 @Access( AccessType.FIELD )
-@Table( name = "user_portal_module" )
+@Table( name = "portal_module" )
 public class PortalModuleScopeEntity implements PortalModuleScope, Serializable
 {
     @Id

@@ -8,12 +8,12 @@ import java.util.Set;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import org.safehaus.subutai.core.identity.api.CliCommand;
@@ -37,25 +37,34 @@ public class RoleEntity implements Role
     @Id
     private String name;
 
-    @Column( name = "permissions" )
-    @OneToMany( fetch = FetchType.EAGER, cascade = { CascadeType.ALL } )
+    @ManyToMany( targetEntity = PermissionEntity.class, fetch = FetchType.EAGER )
+    @JoinTable( name = "subutai_role_permission", joinColumns = @JoinColumn( name = "role_name", referencedColumnName
+            = "name" ), inverseJoinColumns = {
+            @JoinColumn( name = "permission_name", referencedColumnName = "permission_name" ),
+            @JoinColumn( name = "permission_group", referencedColumnName = "permission_group" )
+    } )
     private Set<PermissionEntity> permissions = new HashSet<>();
 
-
-    @OneToMany( fetch = FetchType.EAGER, cascade = {
-            CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH
-    } )
-    @Column( name = "accessible_modules" )
+    @ManyToMany( targetEntity = PortalModuleScopeEntity.class, fetch = FetchType.EAGER )
+    @JoinTable( name = "subutai_role_module", joinColumns = @JoinColumn( name = "role_name", referencedColumnName =
+            "name" ), inverseJoinColumns = @JoinColumn( name = "module_key", referencedColumnName = "module_key" ) )
     Set<PortalModuleScopeEntity> accessibleModules = new HashSet<>();
 
 
-    @OneToMany( fetch = FetchType.EAGER, cascade = CascadeType.ALL )
-    @Column( name = "accessible_rest_endpoints" )
+    @ManyToMany( targetEntity = RestEndpointScopeEntity.class, fetch = FetchType.EAGER )
+    @JoinTable( name = "subutai_role_rest", joinColumns = @JoinColumn( name = "role_name", referencedColumnName =
+            "name" ), inverseJoinColumns = {
+            @JoinColumn( name = "rest_endpoint", referencedColumnName = "rest_endpoint" )
+    } )
     Set<RestEndpointScopeEntity> accessibleRestEndpoints = new HashSet<>();
 
 
-    @OneToMany( fetch = FetchType.EAGER, cascade = CascadeType.ALL )
-    @Column( name = "accessible_cli_commands" )
+    @ManyToMany( targetEntity = CliCommandEntity.class, fetch = FetchType.EAGER )
+    @JoinTable( name = "subutai_role_cli", joinColumns = @JoinColumn( name = "role_name", referencedColumnName =
+            "name" ), inverseJoinColumns = {
+            @JoinColumn( name = "cli_scope", referencedColumnName = "cli_scope" ),
+            @JoinColumn( name = "cli_name", referencedColumnName = "cli_name" )
+    } )
     List<CliCommandEntity> cliCommands = new ArrayList<>();
 
 

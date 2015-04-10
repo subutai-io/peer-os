@@ -15,7 +15,7 @@ import com.google.common.base.Preconditions;
 
 
 @Entity
-@Table( name = "cli_command_entity" )
+@Table( name = "cli_command" )
 @Access( AccessType.FIELD )
 @IdClass( CliCommandPK.class )
 public class CliCommandEntity implements CliCommand
