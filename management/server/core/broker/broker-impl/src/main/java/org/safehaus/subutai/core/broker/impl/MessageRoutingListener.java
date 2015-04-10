@@ -46,6 +46,9 @@ public class MessageRoutingListener implements MessageListener
     {
         try
         {
+            //ack message
+            message.acknowledge();
+
             //assume we are always using topics
             Topic destination = ( Topic ) message.getJMSDestination();
 
@@ -56,9 +59,6 @@ public class MessageRoutingListener implements MessageListener
                     notifyListener( listener, message );
                 }
             }
-
-            //ack message
-            message.acknowledge();
         }
         catch ( JMSException e )
         {
