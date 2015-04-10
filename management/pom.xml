@@ -871,23 +871,18 @@
       <!-- broker -->
       <dependency>
         <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-all</artifactId>
-        <version>5.10.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.activemq</groupId>
         <artifactId>activemq-client</artifactId>
-        <version>5.10.0</version>
+        <version>5.11.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.activemq</groupId>
         <artifactId>activemq-pool</artifactId>
-        <version>5.10.0</version>
+        <version>5.11.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.activemq</groupId>
         <artifactId>activemq-jms-pool</artifactId>
-        <version>5.10.0</version>
+        <version>5.11.0</version>
       </dependency>
       <dependency>
         <groupId>javax.management.j2ee</groupId>
