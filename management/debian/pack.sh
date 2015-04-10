@@ -125,6 +125,11 @@ cp $SOURCE/$distroName $BASE/
 cd $BASE
 tar xzvf $distroName
 cp -a $BASE/$distroFolderName/* $BASE/$fileName/opt/subutai-management/
+
+#configuring environment parameters
+sed -i '/# export JAVA_MAX_MEM/c\  export JAVA_MAX_MEM=3G' $BASE/$fileName/opt/subutai-management/bin/setenv
+sed -i '/# export JAVA_MAX_PERM_MEM/c\  export JAVA_MAX_PERM_MEM=1G' $BASE/$fileName/opt/subutai-management/bin/setenv
+
 #removing subutai and subutai.tar.gz fodler and files
 rm $BASE/$distroName
 rm -rf $BASE/$distroFolderName
