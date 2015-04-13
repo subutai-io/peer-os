@@ -55,10 +55,10 @@ public class TrackerComponent extends CustomComponent
     private ComboBox sourcesCombo, limitCombo;
     private Date fromDateValue, toDateValue;
     private volatile UUID trackID;
-    private volatile boolean track = false;
+    protected volatile boolean track = false;
     private volatile String source;
     private List<TrackerOperationView> currentOperations = new ArrayList<>();
-    private int limit = 10;
+    protected int limit = 10;
 
 
     public TrackerComponent( Tracker tracker, ExecutorService executor )
@@ -202,7 +202,7 @@ public class TrackerComponent extends CustomComponent
     }
 
 
-    private void onLimitValueChange( String value )
+    protected void onLimitValueChange( String value )
     {
         limit = "ALL".equals( value ) ? Integer.MAX_VALUE : Integer.parseInt( value );
     }
@@ -432,7 +432,7 @@ public class TrackerComponent extends CustomComponent
     }
 
 
-    private void stopTracking()
+    protected void stopTracking()
     {
         track = false;
     }

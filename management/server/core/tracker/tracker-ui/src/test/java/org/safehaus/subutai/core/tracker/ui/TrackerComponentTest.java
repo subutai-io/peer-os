@@ -18,6 +18,8 @@ import org.safehaus.subutai.core.tracker.impl.TrackerOperationViewImpl;
 
 import com.google.common.collect.Lists;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -41,6 +43,7 @@ public class TrackerComponentTest
     private static final String SOURCE = "source";
     private static final String DESCRIPTION = "description";
     private static final UUID OPERATION_ID = UUID.randomUUID();
+    private static final String LIMIT = "123";
     private TrackerComponent trackerComponent;
     private TrackerOperationImpl po;
 
@@ -138,5 +141,23 @@ public class TrackerComponentTest
         trackerComponent.populateOperations();
 
         verify( tracker ).getTrackerOperations( anyString(), any( Date.class ), any( Date.class ), anyInt() );
+    }
+
+
+    @Test
+    public void testOnLimitValueChange() throws Exception
+    {
+        trackerComponent.onLimitValueChange( LIMIT );
+
+        assertEquals( Integer.parseInt( LIMIT ), trackerComponent.limit );
+    }
+
+
+    @Test
+    public void testStopTracking() throws Exception
+    {
+        trackerComponent.stopTracking();
+
+        assertFalse( trackerComponent.track );
     }
 }
