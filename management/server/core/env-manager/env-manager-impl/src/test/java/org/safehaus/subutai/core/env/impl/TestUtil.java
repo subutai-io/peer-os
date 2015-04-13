@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.env.impl;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.common.settings.Common;
 
 
 public class TestUtil
@@ -11,6 +12,7 @@ public class TestUtil
     public static final String TEMPLATE_NAME = "master";
     public static final int NUMBER_OF_CONTAINERS = 3;
     public static final String SUBNET = "192.168.1.0/24";
+    public static final String GATEWAY_IP = "192.168.1.1";
     public static final boolean ASYNC = true;
     public static final boolean FORCE = true;
     public static final UUID ENV_ID = UUID.randomUUID();
@@ -32,4 +34,6 @@ public class TestUtil
                     + "\"numberOfContainers\": 4,\"sshGroupId\": 1,"
                     + "\"hostsGroupId\": 1,\"containerPlacementStrategy\": {"
                     + "\"strategyId\": \"ROUND_ROBIN\",\"criteria\": []" + "}}]}}", PEER_ID, TEMPLATE_NAME );
+    public static final Long VNI = Common.MIN_VNI_ID;
+    public static final int VLAN = Common.MIN_VLAN_ID;
 }
