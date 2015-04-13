@@ -16,6 +16,7 @@ import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.DiskQuotaUnit;
+import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.quota.RamQuota;
@@ -27,6 +28,8 @@ import org.safehaus.subutai.core.peer.api.ResourceHost;
 
 import com.google.common.collect.Sets;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
@@ -132,8 +135,7 @@ public class QuotaManagerImplTest1
 
         when( resourceHost.execute(
                 commands.getWriteDiskQuotaCommand( containerHostname, diskQuota.getDiskPartition().getPartitionName(),
-                        String.format( "%s%s", diskQuota.getDiskQuotaUnit() == DiskQuotaUnit.UNLIMITED ? "" :
-                                               diskQuota.getDiskQuotaValue(),
+                        String.format( "%s%s", diskQuota.getDiskQuotaValue(),
                                 diskQuota.getDiskQuotaUnit().getAcronym() ) ) ) ).thenReturn( commandResultDisk );
 
         when( resourceHost.execute( commands.getReadCpuSetCommand( containerHostname ) ) )
@@ -163,6 +165,7 @@ public class QuotaManagerImplTest1
     {
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResultRam );
         quotaManager.setQuota( containerName, ramQuota );
+
         when( commandResultRam.hasSucceeded() ).thenReturn( false );
         quotaManager.setQuota( containerName, new RamQuota( RamQuotaUnit.GB, 10 ) );
     }
@@ -179,35 +182,39 @@ public class QuotaManagerImplTest1
     public void testGetRamQuota() throws Exception
     {
         int result = quotaManager.getRamQuota( uuid );
-        System.out.println( result );
+        assertEquals( ramQuota.getRamQuotaValue(), result );
     }
 
 
     @Test
     public void testGetRamQuotaInfo() throws Exception
     {
-        quotaManager.getRamQuotaInfo( uuid );
+        MemoryQuotaInfo memoryQuotaInfo = quotaManager.getRamQuotaInfo( uuid );
+        assertEquals( ramQuota.getRamQuotaValue(), ( int ) memoryQuotaInfo.getMemoryQuota() );
     }
 
 
     @Test
-    public void testSetRamQuota() throws Exception
+    public void testSetGetRamQuota() throws Exception
     {
         quotaManager.setRamQuota( uuid, ramQuota.getRamQuotaValue() );
+        assertEquals( ramQuota.getRamQuotaValue(), quotaManager.getRamQuota( uuid ) );
     }
 
 
     @Test
     public void testGetCpuQuota() throws Exception
     {
-        quotaManager.getCpuQuota( uuid );
+        quotaManager.setCpuQuota( uuid, cpuQuotaInfo.getPercentage() );
+        assertEquals( cpuQuotaInfo.getPercentage(), quotaManager.getCpuQuota( uuid ) );
     }
 
 
     @Test
     public void testGetCpuQuotaInfo() throws Exception
     {
-        quotaManager.getCpuQuotaInfo( uuid );
+        quotaManager.setCpuQuota( uuid, cpuQuotaInfo.getPercentage() );
+        assertEquals( cpuQuotaInfo, quotaManager.getCpuQuotaInfo( uuid ) );
     }
 
 
@@ -215,13 +222,15 @@ public class QuotaManagerImplTest1
     public void testSetCpuQuota() throws Exception
     {
         quotaManager.setCpuQuota( uuid, cpuQuotaInfo.getPercentage() );
+        assertEquals( quotaManager.getCpuQuota( uuid ), cpuQuotaInfo.getPercentage() );
     }
 
 
     @Test
     public void testGetCpuSet() throws Exception
     {
-        quotaManager.getCpuSet( uuid );
+        quotaManager.setCpuSet( uuid, cpuSet );
+        assertArrayEquals( cpuSet.toArray(), quotaManager.getCpuSet( uuid ).toArray() );
     }
 
 
@@ -229,13 +238,15 @@ public class QuotaManagerImplTest1
     public void testSetCpuSet() throws Exception
     {
         quotaManager.setCpuSet( uuid, cpuSet );
+        assertArrayEquals( cpuSet.toArray(), quotaManager.getCpuSet( uuid ).toArray() );
     }
 
 
     @Test
     public void testGetDiskQuota() throws Exception
     {
-        quotaManager.getDiskQuota( uuid, DiskPartition.HOME );
+        quotaManager.setDiskQuota( uuid, diskQuota );
+        assertEquals( diskQuota, quotaManager.getDiskQuota( uuid, DiskPartition.HOME ) );
     }
 
 
@@ -243,6 +254,7 @@ public class QuotaManagerImplTest1
     public void testSetDiskQuota() throws Exception
     {
         quotaManager.setDiskQuota( uuid, diskQuota );
+        assertEquals( diskQuota, quotaManager.getDiskQuota( uuid, DiskPartition.HOME ) );
     }
 
 
@@ -250,13 +262,14 @@ public class QuotaManagerImplTest1
     public void testSetRamQuota1() throws Exception
     {
         quotaManager.setRamQuota( uuid, ramQuota );
+        assertEquals( ramQuota.getRamQuotaValue(), ( int ) quotaManager.getRamQuotaInfo( uuid ).getMemoryQuota() );
     }
 
 
     @Test( expected = QuotaException.class )
     public void testGetAvailableRamQuota() throws Exception
     {
-        quotaManager.getAvailableRamQuota( uuid );
+        assertEquals( ramQuota.getRamQuotaValue(), quotaManager.getAvailableRamQuota( uuid ) );
 
         //For failed command execution test
         when( commandResultRam.hasSucceeded() ).thenReturn( false );
@@ -267,7 +280,7 @@ public class QuotaManagerImplTest1
     @Test( expected = QuotaException.class )
     public void testGetAvailableCpuQuota() throws Exception
     {
-        quotaManager.getAvailableCpuQuota( uuid );
+        assertEquals( cpuQuotaInfo.getPercentage(), quotaManager.getAvailableCpuQuota( uuid ) );
 
         //For failed command host not found exception test
         when( localPeer.getContainerHostById( uuid ) )
@@ -279,7 +292,7 @@ public class QuotaManagerImplTest1
     @Test( expected = QuotaException.class )
     public void testGetAvailableDiskQuota() throws Exception
     {
-        quotaManager.getAvailableDiskQuota( uuid, DiskPartition.HOME );
+        assertEquals( diskQuota, quotaManager.getAvailableDiskQuota( uuid, DiskPartition.HOME ) );
 
         //For resource host not found exception test
         when( localPeer.getResourceHostByContainerId( uuid ) )
@@ -291,41 +304,48 @@ public class QuotaManagerImplTest1
     @Test
     public void testGetQuotaInfoCpu() throws Exception
     {
-        quotaManager.getQuotaInfo( uuid, QuotaType.QUOTA_TYPE_CPU );
+        assertEquals( cpuQuotaInfo, quotaManager.getQuotaInfo( uuid, QuotaType.QUOTA_TYPE_CPU ) );
     }
 
 
     @Test
     public void testGetQuotaInfoRootfs() throws Exception
     {
-        quotaManager.getQuotaInfo( uuid, QuotaType.QUOTA_TYPE_DISK_ROOTFS );
+        DiskQuota diskQuota = new DiskQuota( DiskPartition.ROOT_FS, DiskQuotaUnit.TB, 2 );
+        assertEquals( diskQuota, quotaManager.getQuotaInfo( uuid, QuotaType.QUOTA_TYPE_DISK_ROOTFS ) );
     }
 
 
     @Test
     public void testGetQuotaInfoVar() throws Exception
     {
-        quotaManager.getQuotaInfo( uuid, QuotaType.QUOTA_TYPE_DISK_VAR );
+        DiskQuota diskQuota = new DiskQuota( DiskPartition.VAR, DiskQuotaUnit.TB, 2 );
+        assertEquals( diskQuota, quotaManager.getQuotaInfo( uuid, QuotaType.QUOTA_TYPE_DISK_VAR ) );
     }
 
 
     @Test
     public void testGetQuotaInfoOpt() throws Exception
     {
-        quotaManager.getQuotaInfo( uuid, QuotaType.QUOTA_TYPE_DISK_OPT );
+        DiskQuota diskQuota = new DiskQuota( DiskPartition.OPT, DiskQuotaUnit.TB, 2 );
+        assertEquals( diskQuota, quotaManager.getQuotaInfo( uuid, QuotaType.QUOTA_TYPE_DISK_OPT ) );
     }
 
 
     @Test
     public void testGetQuotaInfoHome() throws Exception
     {
-        quotaManager.getQuotaInfo( uuid, QuotaType.QUOTA_TYPE_DISK_HOME );
+        assertEquals( diskQuota, quotaManager.getQuotaInfo( uuid, QuotaType.QUOTA_TYPE_DISK_HOME ) );
     }
 
 
+    //TODO Remove deprecated MemoryQuotaInfo and replace with RamQuota
     @Test
+    //    @Ignore
     public void testGetQuotaInfoRam() throws Exception
     {
         quotaManager.getQuotaInfo( uuid, QuotaType.QUOTA_TYPE_RAM );
+        //        assertEquals( ramQuota.getQuotaValue(),
+        //                quotaManager.getQuotaInfo( uuid, QuotaType.QUOTA_TYPE_RAM ).getQuotaValue() );
     }
 }
