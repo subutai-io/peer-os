@@ -2,7 +2,6 @@ package org.safehaus.subutai.core.jetty.fragment;
 
 
 import java.security.KeyStore;
-import java.util.UUID;
 
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
@@ -13,8 +12,6 @@ public class SslContextFactoryFragment extends SslContextFactory
 {
     private static Logger LOG = LoggerFactory.getLogger( SslContextFactoryFragment.class.getName() );
 
-    private static UUID id = UUID.randomUUID();
-
     private static volatile SslContextFactoryFragment singleton;
 
     private boolean customStart = false;
@@ -23,43 +20,13 @@ public class SslContextFactoryFragment extends SslContextFactory
     private String _trustStorePassword = "subutai";
 
 
-    public SslContextFactoryFragment()
-    {
-        super();
-        LOG.error( "CUSTOM SSL FACTORY!!!!! " + id.toString() );
-        setSslContextFactory( this );
-    }
-
-
-    public SslContextFactoryFragment( final boolean trustAll )
-    {
-        super( trustAll );
-        LOG.error( "CUSTOM SSL FACTORY!!!!! " + id.toString() );
-        setSslContextFactory( this );
-    }
-
-
-    public SslContextFactoryFragment( final String keyStorePath )
-    {
-        super( keyStorePath );
-        LOG.error( "CUSTOM SSL FACTORY!!!!! " + id.toString() );
-        setSslContextFactory( this );
-    }
-
-
     public static SslContextFactoryFragment getSingleton()
     {
         return singleton;
     }
 
 
-    public static void DO_IT()
-    {
-        LOG.error( "THE ID >>>> " + id.toString() );
-    }
-
-
-    private synchronized static void setSslContextFactory( SslContextFactoryFragment instance )
+    public synchronized static void setSslContextFactory( SslContextFactoryFragment instance )
     {
         singleton = instance;
     }
