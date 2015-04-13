@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.test.ui;
 
 
-import org.safehaus.subutai.core.jetty.fragment.TestSslContextFactory;
+import org.safehaus.subutai.core.jetty.fragment.SslContextFactoryFragment;
 import org.safehaus.subutai.core.test.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +61,7 @@ public class TestComponent extends CustomComponent
             @Override
             public void buttonClick( final Button.ClickEvent event )
             {
-                TestSslContextFactory.DO_IT();
+                SslContextFactoryFragment.DO_IT();
             }
         } );
 

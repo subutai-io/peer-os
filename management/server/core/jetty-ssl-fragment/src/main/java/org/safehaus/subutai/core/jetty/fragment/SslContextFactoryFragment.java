@@ -9,13 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class TestSslContextFactory extends SslContextFactory
+public class SslContextFactoryFragment extends SslContextFactory
 {
-    private static Logger LOG = LoggerFactory.getLogger( TestSslContextFactory.class.getName() );
+    private static Logger LOG = LoggerFactory.getLogger( SslContextFactoryFragment.class.getName() );
 
     private static UUID id = UUID.randomUUID();
 
-    private static volatile TestSslContextFactory singleton;
+    private static volatile SslContextFactoryFragment singleton;
 
     private boolean customStart = false;
 
@@ -23,7 +23,7 @@ public class TestSslContextFactory extends SslContextFactory
     private String _trustStorePassword = "subutai";
 
 
-    public TestSslContextFactory()
+    public SslContextFactoryFragment()
     {
         super();
         LOG.error( "CUSTOM SSL FACTORY!!!!! " + id.toString() );
@@ -31,7 +31,7 @@ public class TestSslContextFactory extends SslContextFactory
     }
 
 
-    public TestSslContextFactory( final boolean trustAll )
+    public SslContextFactoryFragment( final boolean trustAll )
     {
         super( trustAll );
         LOG.error( "CUSTOM SSL FACTORY!!!!! " + id.toString() );
@@ -39,7 +39,7 @@ public class TestSslContextFactory extends SslContextFactory
     }
 
 
-    public TestSslContextFactory( final String keyStorePath )
+    public SslContextFactoryFragment( final String keyStorePath )
     {
         super( keyStorePath );
         LOG.error( "CUSTOM SSL FACTORY!!!!! " + id.toString() );
@@ -47,7 +47,7 @@ public class TestSslContextFactory extends SslContextFactory
     }
 
 
-    public static TestSslContextFactory getSingleton()
+    public static SslContextFactoryFragment getSingleton()
     {
         return singleton;
     }
@@ -59,7 +59,7 @@ public class TestSslContextFactory extends SslContextFactory
     }
 
 
-    private synchronized static void setSslContextFactory( TestSslContextFactory instance )
+    private synchronized static void setSslContextFactory( SslContextFactoryFragment instance )
     {
         singleton = instance;
     }

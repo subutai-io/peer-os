@@ -9,7 +9,7 @@
   <reference id="hostRegistry" availability="mandatory"
              interface="org.safehaus.subutai.core.hostregistry.api.HostRegistry" />
   <reference id="sslContextFactory" availability="mandatory"
-             interface="org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory" />
+             interface="org.safehaus.subutai.core.ssl.manager.api.SubutaiSslContextFactory" />
   <reference id="environmentManager" availability="optional"
              interface="org.safehaus.subutai.core.env.api.EnvironmentManager" />
 
