@@ -9,11 +9,15 @@ package org.safehaus.subutai.core.tracker.impl;
 import java.util.Date;
 import java.util.UUID;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.test.SystemOutRedirectTest;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
@@ -43,6 +47,12 @@ public class TrackerImplTest extends SystemOutRedirectTest
     private TrackerOperationImpl productOperation;
     @Mock
     private TrackerOperationView productOperationView;
+    @Mock
+    DaoManager daoManager;
+    @Mock
+    EntityManagerFactory entityManagerFactory;
+    @Mock
+    EntityManager entityManager;
 
     private TrackerImpl tracker;
 
@@ -52,6 +62,19 @@ public class TrackerImplTest extends SystemOutRedirectTest
     {
         tracker = new TrackerImpl();
         tracker.dataService = dataService;
+    }
+
+
+    @Test
+    public void testInit() throws Exception
+    {
+        tracker.setDaoManager( daoManager );
+        when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
+        when( entityManagerFactory.createEntityManager() ).thenReturn( entityManager );
+
+        tracker.init();
+
+        verify( entityManager ).close();
     }
 
 

@@ -11,6 +11,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.Table;
 
 import org.safehaus.subutai.core.identity.api.Permission;
 import org.safehaus.subutai.core.identity.api.PermissionGroup;
@@ -21,6 +22,7 @@ import com.google.common.base.Preconditions;
 @Entity
 @Access( AccessType.FIELD )
 @IdClass( PermissionPK.class )
+@Table( name = "permission" )
 public class PermissionEntity implements Permission, Serializable
 {
     @Id

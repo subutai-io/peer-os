@@ -17,7 +17,7 @@ import com.google.common.base.Preconditions;
 
 @Entity
 @Access( AccessType.FIELD )
-@Table( name = "rest_endpoints_scope" )
+@Table( name = "rest_endpoints" )
 public class RestEndpointScopeEntity implements Serializable, RestEndpointScope
 {
     @Id
