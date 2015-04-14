@@ -149,6 +149,8 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
     public void setNetInterfaces( Set<Interface> interfaces )
     {
+        Preconditions.checkNotNull( interfaces );
+
         this.interfaces.clear();
         for ( Interface iface : interfaces )
         {
@@ -161,19 +163,33 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
     public void setDataService( final DataService dataService )
     {
+        Preconditions.checkNotNull( dataService );
+
         this.dataService = dataService;
     }
 
 
     public void setPeer( final Peer peer )
     {
+        Preconditions.checkNotNull( peer );
+
         this.peer = peer;
     }
 
 
     public void setEnvironmentManager( final EnvironmentManager environmentManager )
     {
+        Preconditions.checkNotNull( environmentManager );
+
         this.environmentManager = environmentManager;
+    }
+
+
+    public void setEnvironment( Environment environment )
+    {
+        Preconditions.checkNotNull( environment );
+
+        this.environment = environment;
     }
 
 
@@ -400,12 +416,6 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     }
 
 
-    public void setEnvironment( Environment environment )
-    {
-        this.environment = environment;
-    }
-
-
     @Override
     public HostArchitecture getHostArchitecture()
     {
@@ -517,7 +527,8 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
         return getPeer().getAvailableDiskQuota( this, diskPartition );
     }
 
-    //unsupported
+    //unsupported  START
+    //TODO remove these methods from ContainerHost
 
 
     @Override
@@ -544,6 +555,8 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
         throw new UnsupportedOperationException( "Unsupported operation." );
     }
 
+    //unsupported END
+
 
     public int getSshGroupId()
     {
@@ -563,6 +576,13 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     }
 
 
+    protected void setHostId( UUID id )
+    {
+        Preconditions.checkNotNull( id );
+        this.hostId = id.toString();
+    }
+
+
     @Override
     public boolean equals( final Object o )
     {
@@ -577,7 +597,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
         final EnvironmentContainerImpl container = ( EnvironmentContainerImpl ) o;
 
-        if ( hostId != null ? !hostId.equals( container.hostId ) : container.hostId != null )
+        if ( hostId != null ? !hostId.equals( container.getHostId() ) : container.getHostId() != null )
         {
             return false;
         }
