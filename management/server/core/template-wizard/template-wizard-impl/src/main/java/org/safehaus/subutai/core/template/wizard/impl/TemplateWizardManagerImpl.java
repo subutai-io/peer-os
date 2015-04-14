@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.template.wizard.impl;
 
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,7 +29,7 @@ public class TemplateWizardManagerImpl implements TemplateWizardManager
     private static final Logger LOGGER = LoggerFactory.getLogger( TemplateWizardManagerImpl.class );
 
 
-    private volatile InstallationPhase currentPhase;
+    private volatile InstallationPhase currentPhase = InstallationPhase.NO_OP;
 
 
     private volatile List<String> products = Lists.newArrayList();
@@ -97,6 +96,7 @@ public class TemplateWizardManagerImpl implements TemplateWizardManager
         catch ( HostNotFoundException e )
         {
             LOGGER.error( "Error getting resourceHost", e );
+            throw new RuntimeException( e );
         }
 
         triggerTemplateCreation();
@@ -104,22 +104,49 @@ public class TemplateWizardManagerImpl implements TemplateWizardManager
 
 
     @Override
-    public void createContainerHost( final String newTemplateName, final String templateName )
+    public void createContainerHost( final String newTemplateName, final String templateName, final UUID resourceHostId,
+                                     TrackerOperation trackerOperation )
     {
         Preconditions.checkNotNull( newTemplateName, "Invalid parameter value for newTemplateName" );
         Preconditions.checkNotNull( templateName, "Invalid parameter value for templateName" );
+        Preconditions.checkNotNull( resourceHostId, "Resource host id cannot be null" );
+        Preconditions.checkNotNull( trackerOperation, "Invalid trackerOperation value" );
 
         this.newTemplateName = newTemplateName;
         this.template = templateRegistry.getTemplate( templateName );
+        this.trackerOperation = trackerOperation;
+        try
+        {
+            this.resourceHost = peerManager.getLocalPeer().getResourceHostById( resourceHostId );
+        }
+        catch ( HostNotFoundException e )
+        {
+            LOGGER.error( "Error getting resourceHost", e );
+            throw new RuntimeException( e );
+        }
 
-        createContainerHost( newTemplateName );
+        createContainerHost( newTemplateName, true );
     }
 
 
     @Override
-    public void installProducts( final List<String> products )
+    public void installProducts( final List<String> products, final UUID containerHostId,
+                                 final TrackerOperation trackerOperation )
     {
+        Preconditions.checkNotNull( products, "Products cannot be null" );
+        Preconditions.checkNotNull( containerHostId, "Invalid container host id" );
+        Preconditions.checkNotNull( trackerOperation, "Tracker operation? Is it null?" );
+        try
+        {
+            this.containerHost = peerManager.getLocalPeer().getContainerHostById( containerHostId );
+        }
+        catch ( HostNotFoundException e )
+        {
+            LOGGER.error( "Error getting container host", e );
+            throw new RuntimeException( e );
+        }
         this.products = products;
+        this.trackerOperation = trackerOperation;
         installProducts( containerHost );
     }
 
@@ -127,7 +154,7 @@ public class TemplateWizardManagerImpl implements TemplateWizardManager
     private void triggerTemplateCreation()
     {
         // #1 Create ContainerHost
-        containerHost = createContainerHost( newTemplateName );
+        containerHost = createContainerHost( newTemplateName, true );
 
         if ( containerHost == null )
         {
@@ -206,48 +233,30 @@ public class TemplateWizardManagerImpl implements TemplateWizardManager
     }
 
 
-    private ContainerHost createContainerHost( String containerName )
+    private ContainerHost createContainerHost( String containerName, boolean repeat )
     {
         ContainerHost containerHost = null;
-        try
+        if ( repeat )
         {
-            trackerOperation.addLog( "Creating container host" );
-            containerHost = resourceHost
-                    .createContainer( template.getTemplateName(),/* Arrays.asList( template ),*/ containerName, 90 );
-        }
-        catch ( ResourceHostException e )
-        {
-            //            trackerOperation.addLogFailed( "Failed to create container host" );
-            LOGGER.warn( "Error creating container.", e );
-        }
-        if ( containerHost == null )
-        {
-//            importTemplateTree( template );
-            containerHost = createContainerHost( containerName );
+            try
+            {
+                trackerOperation.addLog( "Creating container host" );
+                containerHost = resourceHost
+                        .createContainer( template.getTemplateName(),/* Arrays.asList( template ),*/ containerName,
+                                90 );
+            }
+            catch ( ResourceHostException e )
+            {
+                //            trackerOperation.addLogFailed( "Failed to create container host" );
+                LOGGER.warn( "Error creating container.", e );
+            }
+            if ( containerHost == null )
+            {
+                containerHost = createContainerHost( containerName, false );
+            }
         }
         return containerHost;
     }
-//
-//
-//    private void importTemplateTree( Template template )
-//    {
-//        try
-//        {
-//            resourceHost.importTemplate( template );
-//        }
-//        catch ( ResourceHostException e )
-//        {
-//            Template parent = templateRegistry
-//                    .getParentTemplate( template.getTemplateName(), template.getTemplateVersion(),
-//                            template.getLxcArch() );
-//            if ( parent == null )
-//            {
-//                throw new RuntimeException( "Couldn't construct template tree" );
-//            }
-//            importTemplateTree( parent );
-//            importTemplateTree( template );
-//        }
-//    }
 
 
     private void installProducts( ContainerHost containerHost )

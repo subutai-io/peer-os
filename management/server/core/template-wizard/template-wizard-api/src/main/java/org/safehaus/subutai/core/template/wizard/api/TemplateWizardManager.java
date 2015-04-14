@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.template.wizard.api;
 
 
-
 import java.util.List;
 import java.util.UUID;
 
@@ -25,7 +24,8 @@ public interface TemplateWizardManager
 
     public void postInstallationScripts( List<String> scripts );
 
-    public void createContainerHost( String newTemplateName, String templateName );
+    public void createContainerHost( String newTemplateName, String templateName, final UUID uuid,
+                                     final TrackerOperation trackerOperation );
 
-    public void installProducts( List<String> products );
+    public void installProducts( List<String> products, UUID containerHostId, TrackerOperation trackerOperation );
 }
