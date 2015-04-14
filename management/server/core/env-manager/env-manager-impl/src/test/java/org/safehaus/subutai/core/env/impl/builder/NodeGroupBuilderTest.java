@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.env.impl.builder;
 
 
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.Before;
@@ -29,6 +30,8 @@ import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import com.google.common.collect.Sets;
 
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNotNull;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -179,20 +182,26 @@ public class NodeGroupBuilderTest
     }
 
 
-    @Test( expected = NodeGroupBuildException.class )
+    @Test
     public void testCallWithException5() throws Exception
     {
         when( nodeGroup.getNumberOfContainers() ).thenReturn( 2 );
 
-        nodeGroupBuilder.call();
+        Set<NodeGroupBuildResult> resultSet = nodeGroupBuilder.call();
+
+        assertFalse( resultSet.isEmpty() );
+        assertNotNull( resultSet.iterator().next().getException() );
     }
 
 
-    @Test( expected = NodeGroupBuildException.class )
+    @Test
     public void testCallWithException6() throws Exception
     {
         when( peer2.getPeerInfo() ).thenReturn( null );
 
-        nodeGroupBuilder.call();
+        Set<NodeGroupBuildResult> resultSet = nodeGroupBuilder.call();
+
+        assertFalse( resultSet.isEmpty() );
+        assertNotNull( resultSet.iterator().next().getException() );
     }
 }
