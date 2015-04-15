@@ -38,10 +38,10 @@ public class DestroyContainerTask implements Runnable
     private final EnvironmentManagerImpl environmentManager;
     private final EnvironmentImpl environment;
     private final ContainerHost containerHost;
-    private final boolean forceMetadataRemoval;
     private final ResultHolder<EnvironmentModificationException> resultHolder;
-    private final Semaphore semaphore;
     private final TrackerOperation op;
+    protected boolean forceMetadataRemoval;
+    protected Semaphore semaphore;
 
 
     public DestroyContainerTask( final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
