@@ -85,9 +85,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private final DaoManager daoManager;
 
     //************* Data Managers ******************
-    private EnvironmentDataService environmentDataService;
-    private EnvironmentContainerDataService environmentContainerDataService;
-    private BlueprintDataService blueprintDataService;
+    protected EnvironmentDataService environmentDataService;
+    protected EnvironmentContainerDataService environmentContainerDataService;
+    protected BlueprintDataService blueprintDataService;
 
 
     @Override
