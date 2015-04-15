@@ -39,4 +39,6 @@ public class TestUtil
     public static final String SSH_KEY = "ssh key";
     public static final Long USER_ID = 123l;
     public static final int LAST_USED_IP_IDX = 123;
+    public static final String ERR_MSG = "error";
+    public static final String PEER_NAME = "peer";
 }
