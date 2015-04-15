@@ -32,8 +32,8 @@ public class SetSshKeyTask implements Runnable
     private final NetworkManager networkManager;
     private final ResultHolder<EnvironmentModificationException> resultHolder;
     private final String sshKey;
-    private final Semaphore semaphore;
     private final TrackerOperation op;
+    protected Semaphore semaphore;
 
 
     public SetSshKeyTask( final EnvironmentImpl environment, final NetworkManager networkManager,
