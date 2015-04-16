@@ -15,7 +15,7 @@ import org.apache.karaf.shell.commands.Command;
 public class MessageCommand extends SubutaiShellCommandSupport
 {
     @Argument( index = 0, name = "peer id", multiValued = false, required = true, description = "Id of target peer" )
-    private String peerId;
+    protected String peerId;
     @Argument( index = 1, name = "message", multiValued = false, required = true, description = "Message to send" )
     private String message;
 

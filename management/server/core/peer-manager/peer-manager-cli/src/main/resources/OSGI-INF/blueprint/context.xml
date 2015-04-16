@@ -18,24 +18,8 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="peer/register">
-      <action class="org.safehaus.subutai.core.peer.cli.RegisterCommand">
-        <property name="peerManager" ref="peerManager" />
-      </action>
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="peer/ls">
       <action class="org.safehaus.subutai.core.peer.cli.ListCommand">
-        <property name="peerManager" ref="peerManager" />
-      </action>
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="peer/unregister">
-      <action class="org.safehaus.subutai.core.peer.cli.UnregisterCommand">
         <property name="peerManager" ref="peerManager" />
       </action>
     </command>
@@ -54,7 +38,6 @@
       <action class="org.safehaus.subutai.core.peer.cli.ImportTemplateCommand">
         <property name="peerManager" ref="peerManager" />
         <property name="templateRegistry" ref="templateRegistry" />
-        <!--<property name="peerCommandDispatcher" ref="peerCommandDispatcher" />-->
       </action>
     </command>
   </command-bundle>
@@ -104,13 +87,6 @@
     <command name="peer/get-reserved-vni">
       <action class="org.safehaus.subutai.core.peer.cli.GetReservedVnisCommand">
         <property name="peerManager" ref="peerManager" />
-      </action>
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="peer/jetty">
-      <action class="org.safehaus.subutai.core.peer.cli.JettyCommand">
       </action>
     </command>
   </command-bundle>

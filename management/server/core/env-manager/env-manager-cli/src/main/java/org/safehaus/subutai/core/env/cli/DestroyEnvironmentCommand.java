@@ -24,21 +24,24 @@ public class DestroyEnvironmentCommand extends SubutaiShellCommandSupport
     /**
      * {@value environmentId} target environment id to destroy
      * {@code required = true}
-     */ private String environmentId;
+     */
+            String environmentId;
 
     @Argument( name = "async", description = "asynchronous destruction",
             index = 1, multiValued = false, required = false )
     /**
      * {@value async} execute destroy environment asynchronously
      * <p> {@code required = false}, {@code default = false}</p>
-     */ private boolean async = false;
+     */
+            boolean async = false;
 
     @Argument( name = "force", description = "force metadata removal",
             index = 2, multiValued = false, required = false )
     /**
      * {@value forceMetadataRemoval} force metadata removal despite exception handled
      * <p> {@code required = false}, {@code default = false}</p>
-     */ private boolean forceMetadataRemoval = false;
+     */
+            boolean forceMetadataRemoval = false;
 
 
     private final EnvironmentManager environmentManager;

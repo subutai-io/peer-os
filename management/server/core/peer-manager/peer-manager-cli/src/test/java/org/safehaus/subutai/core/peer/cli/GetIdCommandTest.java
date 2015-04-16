@@ -1,29 +1,48 @@
 package org.safehaus.subutai.core.peer.cli;
 
 
+import java.util.UUID;
+
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.common.test.SystemOutRedirectTest;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 
-import static org.mockito.Mockito.mock;
+import static junit.framework.TestCase.assertTrue;
+import static org.mockito.Mockito.when;
 
 
-@Ignore
-public class GetIdCommandTest
+@RunWith( MockitoJUnitRunner.class )
+public class GetIdCommandTest extends SystemOutRedirectTest
 {
-    GetIdCommand getIdCommand;
+    private static final UUID ID = UUID.randomUUID();
+    @Mock
+    PeerManager peerManager;
+    @Mock
+    LocalPeer localPeer;
+
+    GetIdCommand command;
 
 
     @Before
-    public void init()
+    public void setUp() throws Exception
     {
-        getIdCommand = mock( GetIdCommand.class );
+        command = new GetIdCommand();
+        command.setPeerManager( peerManager );
+        when( peerManager.getLocalPeer() ).thenReturn( localPeer );
+        when( localPeer.getId() ).thenReturn( ID );
     }
 
 
     @Test
-    public void test()
+    public void testDoExecute() throws Exception
     {
+        command.doExecute();
 
+        assertTrue( getSysOut().contains( ID.toString() ) );
     }
 }

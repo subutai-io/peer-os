@@ -73,21 +73,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     private final PeerManager peerManager;
     private final NetworkManager networkManager;
-    private final EnvironmentBuilder environmentBuilder;
-    private final ExecutorService executor = SubutaiExecutors.newCachedThreadPool();
+    protected ExecutorService executor = SubutaiExecutors.newCachedThreadPool();
     private final String defaultDomain;
     private final IdentityManager identityManager;
     private final Tracker tracker;
 
-    private final Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
+    protected Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
 
-    //************* DaoManager ******************
     private final DaoManager daoManager;
 
-    //************* Data Managers ******************
-    private EnvironmentDataService environmentDataService;
-    private EnvironmentContainerDataService environmentContainerDataService;
-    private BlueprintDataService blueprintDataService;
+    protected EnvironmentBuilder environmentBuilder;
+    protected EnvironmentDataService environmentDataService;
+    protected EnvironmentContainerDataService environmentContainerDataService;
+    protected BlueprintDataService blueprintDataService;
 
 
     @Override

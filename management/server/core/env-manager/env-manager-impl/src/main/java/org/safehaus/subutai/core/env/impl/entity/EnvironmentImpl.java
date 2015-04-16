@@ -325,13 +325,25 @@ public class EnvironmentImpl implements Environment, Serializable
 
     public void setDataService( final EnvironmentDataService dataService )
     {
+        Preconditions.checkNotNull( dataService );
+
         this.dataService = dataService;
     }
 
 
     public void setEnvironmentManager( final EnvironmentManager environmentManager )
     {
+        Preconditions.checkNotNull( environmentManager );
+
         this.environmentManager = environmentManager;
+    }
+
+
+    protected void setEnvironmentId( UUID environmentId )
+    {
+        Preconditions.checkNotNull( environmentId );
+
+        this.environmentId = environmentId.toString();
     }
 
 
@@ -349,7 +361,7 @@ public class EnvironmentImpl implements Environment, Serializable
 
         final EnvironmentImpl that = ( EnvironmentImpl ) o;
 
-        if ( environmentId != null ? !environmentId.equals( that.environmentId ) : that.environmentId != null )
+        if ( getId() != null ? !getId().equals( that.getId() ) : that.getId() != null )
         {
             return false;
         }
@@ -361,7 +373,7 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public int hashCode()
     {
-        return environmentId != null ? environmentId.hashCode() : 0;
+        return getId() != null ? getId().hashCode() : 0;
     }
 
 

@@ -10,7 +10,7 @@ import org.safehaus.subutai.common.command.Response;
 
 public class BlockingCommandCallback implements CommandCallback
 {
-    private final Semaphore completionSemaphore;
+    protected Semaphore completionSemaphore;
     private final CommandCallback callback;
     private CommandResult commandResult;
 

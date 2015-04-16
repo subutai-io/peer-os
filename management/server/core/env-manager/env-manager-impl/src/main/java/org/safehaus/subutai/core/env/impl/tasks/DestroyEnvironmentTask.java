@@ -42,16 +42,17 @@ import com.google.common.collect.Sets;
 public class DestroyEnvironmentTask implements Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger( DestroyEnvironmentTask.class.getName() );
+    protected static final String CONTAINER_GROUP_NOT_FOUND = "Container group not found";
 
     private final EnvironmentManagerImpl environmentManager;
     private final EnvironmentImpl environment;
     private final Set<Throwable> exceptions;
     private final ResultHolder<EnvironmentDestructionException> resultHolder;
-    private final boolean forceMetadataRemoval;
     private final LocalPeer localPeer;
-    private final Semaphore semaphore;
     private final TrackerOperation op;
-    private ExceptionUtil exceptionUtil = new ExceptionUtil();
+    protected ExceptionUtil exceptionUtil = new ExceptionUtil();
+    protected Semaphore semaphore;
+    protected boolean forceMetadataRemoval;
 
 
     public DestroyEnvironmentTask( final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
@@ -107,11 +108,11 @@ public class DestroyEnvironmentTask implements Runnable
                 }
                 catch ( PeerException e )
                 {
-                    LOG.error( "Couldn't get local LocalPeer#ManagementHost", e );
+                    LOG.error( "Error cleaning up environment network settings", e );
                 }
             }
 
-            ExecutorService executorService = SubutaiExecutors.newFixedThreadPool( environmentPeers.size() );
+            ExecutorService executorService = getExecutor( environmentPeers.size() );
 
             Set<Future<ContainersDestructionResult>> futures = Sets.newHashSet();
 
@@ -149,7 +150,7 @@ public class DestroyEnvironmentTask implements Runnable
                 if ( !Strings.isNullOrEmpty( result.getException() ) )
                 {
 
-                    if ( result.getException().equals( "Container group not found" ) )
+                    if ( result.getException().equals( CONTAINER_GROUP_NOT_FOUND ) )
                     {
                         deleteAllPeerContainers = true;
                     }
@@ -250,6 +251,12 @@ public class DestroyEnvironmentTask implements Runnable
         {
             semaphore.release();
         }
+    }
+
+
+    protected ExecutorService getExecutor( int numOfThreads )
+    {
+        return SubutaiExecutors.newFixedThreadPool( numOfThreads );
     }
 
 

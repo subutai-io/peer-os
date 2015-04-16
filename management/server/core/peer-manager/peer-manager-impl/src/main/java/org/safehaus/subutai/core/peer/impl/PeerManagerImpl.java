@@ -25,14 +25,10 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
-import org.safehaus.subutai.core.key.api.KeyInfo;
 import org.safehaus.subutai.core.key.api.KeyManager;
-import org.safehaus.subutai.core.key.api.KeyManagerException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.metric.api.Monitor;
-import org.safehaus.subutai.core.peer.api.EnvironmentContext;
-import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -55,6 +51,8 @@ import org.apache.commons.io.FileUtils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
+//import org.safehaus.subutai.core.peer.api.EnvironmentContext;
 
 
 /**
@@ -127,25 +125,6 @@ public class PeerManagerImpl implements PeerManager
     public void setIdentityManager( final IdentityManager identityManager )
     {
         this.identityManager = identityManager;
-    }
-
-
-    @Override
-    public EnvironmentContext prepareEnvironment( final UUID environmentId, String email )
-    {
-        EnvironmentContext environmentContext = new EnvironmentContext();
-        try
-        {
-            ManagementHost managementHost = localPeer.getManagementHost();
-            KeyInfo keyInfo = keyManager.generateKey( managementHost, environmentId.toString(), email );
-            keyInfo.getPublicKeyId();
-            String gpgPublicKey = keyManager.readKey( managementHost, keyInfo.getPublicKeyId() );
-        }
-        catch ( KeyManagerException | HostNotFoundException e )
-        {
-            LOG.error( e.toString(), e );
-        }
-        return null;
     }
 
 
