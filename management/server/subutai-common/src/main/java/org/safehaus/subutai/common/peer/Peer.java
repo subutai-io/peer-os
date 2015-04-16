@@ -66,7 +66,6 @@ public interface Peer
 
     public boolean isLocal();
 
-    @Deprecated
     public PeerQuotaInfo getQuota( ContainerHost host, QuotaType quotaType ) throws PeerException;
 
 
@@ -81,7 +80,6 @@ public interface Peer
     public QuotaInfo getQuotaInfo( ContainerHost host, QuotaType quotaType ) throws PeerException;
 
 
-    @Deprecated
     public void setQuota( ContainerHost host, QuotaInfo quotaInfo ) throws PeerException;
 
     public Template getTemplate( String templateName ) throws PeerException;

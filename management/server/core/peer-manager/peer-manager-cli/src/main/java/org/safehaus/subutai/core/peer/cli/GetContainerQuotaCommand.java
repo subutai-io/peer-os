@@ -23,15 +23,15 @@ public class GetContainerQuotaCommand extends SubutaiShellCommandSupport
 
     @Argument( index = 1, name = "environment id", multiValued = false, required = true, description = "Id of "
             + "environment" )
-    private String environmentId;
+    protected String environmentId;
 
     @Argument( index = 2, name = "container name", multiValued = false, required = true, description = "container "
             + "name" )
-    private String containerName;
+    protected String containerName;
 
     @Argument( index = 3, name = "quota type", multiValued = false, required = true, description = "quota type "
             + "(quota:list-quota to list all quotas)" )
-    private String quotaType;
+    protected String quotaType;
 
     private PeerManager peerManager;
     private EnvironmentManager environmentManager;
