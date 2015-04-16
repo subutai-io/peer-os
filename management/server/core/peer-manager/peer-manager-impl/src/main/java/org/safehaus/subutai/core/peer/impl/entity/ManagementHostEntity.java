@@ -149,6 +149,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
                 String.format( "VLAN must be in the range from %d to %d", Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
 
         //need to execute sequentially since other parallel executions can take the same gateway
+        //TODO extract task to separate class
         Future<Boolean> future = queueSequentialTask( new Callable<Boolean>()
         {
             @Override
@@ -335,6 +336,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         Preconditions.checkNotNull( vni, "Invalid vni" );
 
         //need to execute sequentially since other parallel executions can take the same VNI
+        //TODO extract task to separate class
         Future<Integer> future = queueSequentialTask( new Callable<Integer>()
         {
             @Override
@@ -385,6 +387,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         //need to execute sequentially since other parallel executions can setup the same tunnel
+        //TODO extract task to separate class
         Future<Integer> future = queueSequentialTask( new Callable<Integer>()
         {
             @Override
