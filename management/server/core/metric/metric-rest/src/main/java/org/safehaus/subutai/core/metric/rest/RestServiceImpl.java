@@ -6,13 +6,14 @@ import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.environment.Environment;
+import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
-import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +49,7 @@ public class RestServiceImpl implements RestService
             Set<ResourceHostMetric> metrics = monitor.getResourceHostsMetrics();
             return Response.ok( JsonUtil.toJson( metrics ) ).build();
         }
-        catch ( MonitorException e )
+        catch ( Exception e )
         {
             LOG.error( "Error in getResourceHostsMetrics", e );
             return Response.serverError().entity( e ).build();
@@ -63,17 +64,19 @@ public class RestServiceImpl implements RestService
         {
             UUID environmentId = UUID.fromString( uuid );
 
-            Environment environment = environmentManager.getEnvironmentByUUID( environmentId );
-            if ( environment != null )
+            Environment environment;
+            try
             {
-                Set<ContainerHostMetric> metrics = monitor.getContainerHostsMetrics( environment );
-                return Response.ok( JsonUtil.toJson( metrics ) ).build();
+                environment = environmentManager.findEnvironment( environmentId );
             }
-            else
+            catch ( EnvironmentNotFoundException e )
             {
                 return Response.status( Response.Status.NOT_FOUND )
                                .entity( String.format( "Environment %s is not found", uuid ) ).build();
             }
+
+            Set<ContainerHostMetric> metrics = monitor.getContainerHostsMetrics( environment );
+            return Response.ok( JsonUtil.toJson( metrics ) ).build();
         }
         catch ( NullPointerException | IllegalArgumentException e )
         {

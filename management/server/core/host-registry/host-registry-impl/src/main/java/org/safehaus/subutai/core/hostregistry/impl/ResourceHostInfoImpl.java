@@ -4,11 +4,11 @@ package org.safehaus.subutai.core.hostregistry.impl;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.host.HostArchitecture;
+import org.safehaus.subutai.common.host.HostInfo;
+import org.safehaus.subutai.common.host.Interface;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.HostArchitecture;
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
-import org.safehaus.subutai.core.hostregistry.api.Interface;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 
 import com.google.common.base.Objects;
@@ -60,17 +60,7 @@ public class ResourceHostInfoImpl implements ResourceHostInfo
 
         if ( !CollectionUtil.isCollectionEmpty( containers ) )
         {
-            //TODO remove this temp workaround when agent is fixed
-            for ( ContainerHostInfoImpl containerHostInfo : containers )
-            {
-                if ( !CollectionUtil.isCollectionEmpty( containerHostInfo.getInterfaces() ) )
-                {
-                    result.add( containerHostInfo );
-                }
-            }
-            //TODO
-
-            //            result.addAll( containers );
+            result.addAll( containers );
         }
 
         return result;

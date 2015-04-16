@@ -2,10 +2,11 @@ package org.safehaus.subutai.core.messenger.impl;
 
 
 import java.sql.Timestamp;
+import java.util.Map;
 import java.util.UUID;
 
 import org.safehaus.subutai.core.messenger.api.Message;
-import org.safehaus.subutai.core.messenger.impl.model.MessageEntity;
+import org.safehaus.subutai.core.messenger.impl.entity.MessageEntity;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -20,6 +21,7 @@ public class Envelope
     private final UUID targetPeerId;
     private final String recipient;
     private final int timeToLive;
+    private final Map<String, String> headers;
     private transient boolean isSent;
     private transient Timestamp createDate;
 
@@ -34,10 +36,12 @@ public class Envelope
         this.timeToLive = message.getTimeToLive();
         this.isSent = message.getIsSent();
         this.createDate = new Timestamp( message.getCreateDate() );
+        this.headers = message.getHeaders();
     }
 
 
-    public Envelope( final Message message, UUID targetPeerId, String recipient, int timeToLive )
+    public Envelope( final Message message, UUID targetPeerId, String recipient, int timeToLive,
+                     Map<String, String> headers )
     {
 
         Preconditions.checkNotNull( targetPeerId, "Target peer id is null" );
@@ -49,6 +53,7 @@ public class Envelope
         this.targetPeerId = targetPeerId;
         this.recipient = recipient;
         this.timeToLive = timeToLive;
+        this.headers = headers;
     }
 
 
@@ -97,5 +102,11 @@ public class Envelope
     public void setCreateDate( final Timestamp createDate )
     {
         this.createDate = ( Timestamp ) createDate.clone();
+    }
+
+
+    public Map<String, String> getHeaders()
+    {
+        return headers;
     }
 }

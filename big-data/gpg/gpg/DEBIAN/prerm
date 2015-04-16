@@ -1,0 +1,50 @@
+#!/bin/bash
+set -e
+
+cd /opt/subutai-gpg/libgpg-error-1.17
+echo "Removing libgpg-error-1.17 ..."
+make uninstall > /dev/null 2>&1
+
+cd /opt/subutai-gpg/libgcrypt-1.6.2
+./mkinstalldirs
+echo "Removing libgcrypt-1.6.2 ..."
+make uninstall > /dev/null 2>&1
+
+cd /opt/subutai-gpg/libksba-1.3.2
+echo "Removing libksba-1.3.2 ..."
+make uninstall > /dev/null 2>&1
+
+cd /opt/subutai-gpg/libassuan-2.2.0
+echo "Removing libassuan-2.2.0 ..."
+make uninstall > /dev/null 2>&1
+
+cd /opt/subutai-gpg/npth-1.1
+echo "Removing npth-1.1 ..."
+make uninstall > /dev/null 2>&1
+
+cd /opt/subutai-gpg/gnupg-2.1.1
+echo "Removing gnupg-2.1.1 ..."
+make uninstall > /dev/null 2>&1
+
+deleteFromBashrc(){
+  local file=$HOME/.bashrc
+  local search="SSH_AUTH_SOCK="
+  if grep "$search" $file; then
+    sed -i '/SSH_AUTH_SOCK=/d' $file
+    sed -i '/export SSH_AUTH_SOCK/d' $file
+  fi
+}
+
+stopGPGAgent(){
+  pid=`ps axu | grep [g]pg-agent | awk '{print $2}' | head -1`
+  if [ ! -z $pid ]; then
+    echo "stopping gpg-agent : $pid"
+    kill -9 $pid
+  fi
+}
+
+deleteFromBashrc
+stopGPGAgent
+
+
+

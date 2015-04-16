@@ -1,12 +1,12 @@
 package org.safehaus.subutai.core.peer.api;
 
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.core.strategy.api.ServerMetric;
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Host;
 
 
 /**
@@ -14,42 +14,25 @@ import org.safehaus.subutai.core.strategy.api.ServerMetric;
  */
 public interface ResourceHost extends Host
 {
-    //    public void createContainer( ContainerCreateOrder contanerCreateOrder );
-
-    void prepareTemplates( List<Template> templates ) throws ResourceHostException;
-
-    void prepareTemplate( Template p ) throws ResourceHostException;
-
-    boolean isTemplateExist( Template template ) throws ResourceHostException;
-
-    void importTemplate( Template template ) throws ResourceHostException;
-
-    void updateRepository( Template template ) throws ResourceHostException;
-
-    public Set<ContainerHost> getContainerHostsByNameList( Set<String> cloneNames );
-
-    public ServerMetric getMetric() throws ResourceHostException;
+    public ResourceHostMetric getHostMetric() throws ResourceHostException;
 
     public Set<ContainerHost> getContainerHosts();
 
-    public void addContainerHost( ContainerHost containerHost );
+    public ContainerHost getContainerHostByName( String hostname ) throws HostNotFoundException;
 
-    public ContainerHost getContainerHostByName( String hostname );
+    public ContainerHost getContainerHostById( UUID id ) throws HostNotFoundException;
 
-    public Set<ContainerHost> getContainerHostsByEnvironmentId( UUID environmentId );
+    public void startContainerHost( ContainerHost containerHost ) throws ResourceHostException;
 
-    public ContainerHost getContainerHostById( String id );
-
-    public boolean startContainerHost( ContainerHost containerHost ) throws ResourceHostException;
-
-    public boolean stopContainerHost( ContainerHost containerHost ) throws ResourceHostException;
+    public void stopContainerHost( ContainerHost containerHost ) throws ResourceHostException;
 
     public void destroyContainerHost( ContainerHost containerHost ) throws ResourceHostException;
 
-    public void removeContainerHost( ContainerHost result ) throws ResourceHostException;
+    public ContainerState getContainerHostState( final ContainerHost container ) throws ResourceHostException;
 
-    //    void onHeartbeat( ResourceHostInfo resourceHostInfo );
-    public void queue( HostTask hostTask );
+    public ContainerHost createContainer( String templateName, String hostname, int timeout )
+            throws ResourceHostException;
 
-    void cloneContainer( String templateName, String hostname ) throws ResourceHostException;
+    public ContainerHost createContainer( String templateName, String hostname, String ip, int vlan, String gateway,
+                                          int timeout ) throws ResourceHostException;
 }

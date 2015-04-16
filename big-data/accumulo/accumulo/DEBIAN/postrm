@@ -3,14 +3,14 @@ set -e
 accumuloVer=1.6.1
 # Remove Accumulo Files and Folders
 if [ -d "/opt/accumulo-$accumuloVer" ]; then
-	rm -r /opt/accumulo-$accumuloVer
+  rm -r /opt/accumulo-$accumuloVer
 fi
 
 #Remove paths and exports from relevant files
 FilePath="/etc/profile"
 
 if [ -f "/etc/profile.d/accumulo-home.sh" ]; then
-	rm /etc/profile.d/accumulo-home.sh
+  rm /etc/profile.d/accumulo-home.sh
 fi
 
 . $FilePath

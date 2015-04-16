@@ -17,12 +17,10 @@
 
   <modules>
     <module>file-tracker</module>
-    <module>environment-manager</module>
     <module>environment-terminal</module>
     <module>git-manager</module>
     <module>lxc-quota-manager</module>
     <module>network-manager</module>
-    <module>security-manager</module>
     <module>peer-manager</module>
     <module>strategy-manager</module>
     <module>template-registry</module>
@@ -36,6 +34,16 @@
     <module>command-executor</module>
     <module>wol-manager</module>
     <module>key-manager</module>
+    <!--<module>backup-manager</module>-->
+    <module>plugin-manager</module>
+    <module>env-manager</module>
+    <module>identity-manager</module>
+    <module>template-wizard</module>
+    <module>channel-manager</module>
+    <module>test</module>
+    <module>jetty-ssl-fragment</module>
+    <module>ssl-context-manager</module>
+    <module>subutai-cli-rbac</module>
   </modules>
 
 </project>

@@ -5,8 +5,9 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.core.peer.ui.container.ContainerComponent;
-import org.safehaus.subutai.core.peer.ui.forms.PeerGroupComponent;
 import org.safehaus.subutai.core.peer.ui.forms.PeerRegisterForm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
@@ -14,11 +15,9 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
 
 
-/**
- * Created by bahadyr on 8/28/14.
- */
 public class PeerComponent extends CustomComponent implements Disposable
 {
+    protected static final Logger LOG = LoggerFactory.getLogger( PeerComponent.class );
 
 
     public PeerComponent( PeerManagerPortalModule peerManagerPortalModule )
@@ -38,10 +37,9 @@ public class PeerComponent extends CustomComponent implements Disposable
         }
         catch ( NamingException e )
         {
-            peerManagerPortalModule.LOG.error( "Could not create container component.", e );
+            LOG.error( "Could not create container component.", e );
         }
         sheet.addTab( new PeerRegisterForm( peerManagerPortalModule ), "Registration" );
-        sheet.addTab( new PeerGroupComponent( peerManagerPortalModule ), "Peer groups" );
 
         verticalLayout.addComponent( sheet );
 
@@ -53,6 +51,6 @@ public class PeerComponent extends CustomComponent implements Disposable
     @Override
     public void dispose()
     {
-        final PeerManagerPortalModule peerManagerPortalModule = null;
+
     }
 }

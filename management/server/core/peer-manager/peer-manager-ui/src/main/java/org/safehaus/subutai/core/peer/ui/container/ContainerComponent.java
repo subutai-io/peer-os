@@ -6,10 +6,7 @@ import java.util.concurrent.Executors;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.ui.PeerManagerPortalModule;
 import org.safehaus.subutai.core.peer.ui.container.clone.Cloner;
@@ -23,29 +20,18 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
 
 
-public class ContainerComponent extends CustomComponent implements Disposable
+public class ContainerComponent extends CustomComponent
 {
 
     private static final String MANAGER_TAB_CAPTION = "Manage";
-    //    private final AgentTree agentTree;
-    private final ContainerTree containerTree;
-    private final ServiceLocator serviceLocator;
-    private ExecutorService executorService;
-    private PeerManagerPortalModule peerManagerPortalModule;
 
 
     public ContainerComponent( PeerManagerPortalModule peerManagerPortalModule ) throws NamingException
     {
+        final ServiceLocator serviceLocator = new ServiceLocator();
 
-        this.peerManagerPortalModule = peerManagerPortalModule;
-        //        final ContainerManager containerManager = serviceLocator.getService( ContainerManager.class );
-        //        final AgentManager agentManager = serviceLocator.getService( AgentManager.class );
-        serviceLocator = new ServiceLocator();
-        executorService = Executors.newFixedThreadPool( 5 );
-        final QuotaManager quotaManager = serviceLocator.getService( QuotaManager.class );
         final StrategyManager strategyManager = serviceLocator.getService( StrategyManager.class );
         final PeerManager peerManager = serviceLocator.getService( PeerManager.class );
-        final HostRegistry hostRegistry = serviceLocator.getService( HostRegistry.class );
 
         setHeight( 100, Unit.PERCENTAGE );
 
@@ -54,11 +40,10 @@ public class ContainerComponent extends CustomComponent implements Disposable
         horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
 
 
-        //        agentTree = new AgentTree( agentManager );
-        containerTree = new ContainerTree( peerManager.getLocalPeer(), hostRegistry );
+        final ContainerTree containerTree =
+                new ContainerTree( peerManager.getLocalPeer(), peerManagerPortalModule.getHostRegistry() );
 
         VerticalLayout treeLayout = new VerticalLayout();
-        //        treeLayout.addComponent( agentTree );
         treeLayout.addComponent( containerTree );
 
         horizontalSplit.setFirstComponent( treeLayout );
@@ -69,8 +54,10 @@ public class ContainerComponent extends CustomComponent implements Disposable
         TabSheet commandsSheet = new TabSheet();
         commandsSheet.setStyleName( Runo.TABSHEET_SMALL );
         commandsSheet.setSizeFull();
-        final Manager manager = new Manager( executorService, quotaManager, peerManager );
-        commandsSheet.addTab( new Cloner( peerManager.getLocalPeer(), strategyManager, containerTree ), "Clone" );
+        final Manager manager = new Manager( peerManager );
+        commandsSheet.addTab(
+                new Cloner( peerManagerPortalModule.getRegistry(), peerManager.getLocalPeer(), strategyManager,
+                        containerTree ), "Clone" );
         commandsSheet.addTab( manager, MANAGER_TAB_CAPTION );
         commandsSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
         {
@@ -89,12 +76,5 @@ public class ContainerComponent extends CustomComponent implements Disposable
 
         horizontalSplit.setSecondComponent( verticalLayout );
         setCompositionRoot( horizontalSplit );
-    }
-
-
-    public void dispose()
-    {
-        //        agentTree.dispose();
-        executorService.shutdown();
     }
 }

@@ -11,10 +11,11 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.safehaus.subutai.common.protocol.api.DataService;
-import org.safehaus.subutai.core.messenger.impl.model.MessageEntity;
+import org.safehaus.subutai.core.messenger.impl.entity.MessageEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 
@@ -26,6 +27,8 @@ public class MessageDataService implements DataService<String, MessageEntity>
 
     public MessageDataService( EntityManagerFactory entityManagerFactory )
     {
+        Preconditions.checkNotNull( entityManagerFactory );
+
         this.emf = entityManagerFactory;
     }
 
@@ -190,8 +193,8 @@ public class MessageDataService implements DataService<String, MessageEntity>
     }
 
 
-    public List<MessageEntity> getSelectMessages( final String targetPeer, final int wideningIntervalSec,
-                                                  final int messageLimitPerPeer )
+    public List<MessageEntity> getMessages( final String targetPeer, final int wideningIntervalSec,
+                                            final int messageLimitPerPeer )
     {
 
         List<MessageEntity> result = new ArrayList<>();
@@ -200,11 +203,14 @@ public class MessageDataService implements DataService<String, MessageEntity>
         {
             em.getTransaction().begin();
             long ts = System.currentTimeMillis();
-            Query query = em.createQuery( "select e from MessageEntity e where e.targetPeerId = :targetPeerId"
-                    + " and e.isSent =false and e.createDate + e.attempts * 1000 * :intval < :ts1"
-                    + " and :ts1 - e.createDate <= e.timeToLive * 1000 order by e.createDate asc" )
-                            .setMaxResults( messageLimitPerPeer ).setParameter( "targetPeerId", targetPeer )
-                            .setParameter( "intval", wideningIntervalSec ).setParameter( "ts1", ts );
+            TypedQuery<MessageEntity> query = em.createQuery(
+                    "select e from MessageEntity e where e.targetPeerId = :targetPeerId"
+                            + " and e.isSent =false and e.createDate + e.attempts * 1000 * :intval < :ts1"
+                            + " and :ts1 - e.createDate <= e.timeToLive * 1000 order by e.createDate asc",
+                    MessageEntity.class ).setMaxResults( messageLimitPerPeer )
+                                                .setParameter( "targetPeerId", targetPeer )
+                                                .setParameter( "intval", wideningIntervalSec )
+                                                .setParameter( "ts1", ts );
             result = query.getResultList();
             em.getTransaction().commit();
         }

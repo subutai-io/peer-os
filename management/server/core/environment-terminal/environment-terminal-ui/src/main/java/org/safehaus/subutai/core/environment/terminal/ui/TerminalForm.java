@@ -1,12 +1,12 @@
 package org.safehaus.subutai.core.environment.terminal.ui;
 
 
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.safehaus.subutai.common.protocol.Disposable;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.common.mdc.SubutaiExecutors;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
 
 import com.google.common.base.Strings;
 import com.vaadin.event.ShortcutAction;
@@ -14,6 +14,7 @@ import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -27,33 +28,37 @@ import com.vaadin.ui.TextField;
 /**
  * Environment Terminal
  */
-public class TerminalForm extends CustomComponent implements Disposable
+public class TerminalForm extends CustomComponent
 {
     protected final EnvironmentTree environmentTree;
     protected final TextField programTxtFld;
     protected final TextField timeoutTxtFld;
     protected final TextField workDirTxtFld;
+    protected final CheckBox daemonChk;
+
     protected final Label indicator;
     private final TextArea commandOutputTxtArea;
     protected AtomicInteger taskCount = new AtomicInteger();
     private ExecutorService executor;
 
 
-    public TerminalForm( final EnvironmentManager environmentManager )
+    public TerminalForm( final EnvironmentManager environmentManager, final Date updateDate )
     {
         setSizeFull();
 
-        executor = Executors.newCachedThreadPool();
 
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
         horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
-        environmentTree = new EnvironmentTree( environmentManager );
+        environmentTree = new EnvironmentTree( environmentManager, updateDate );
         horizontalSplit.setFirstComponent( environmentTree );
 
         GridLayout grid = new GridLayout( 20, 11 );
         grid.setSizeFull();
         grid.setMargin( true );
         grid.setSpacing( true );
+
+        horizontalSplit.setSecondComponent( grid );
+
         commandOutputTxtArea = new TextArea( "Commands output" );
         commandOutputTxtArea.setSizeFull();
         commandOutputTxtArea.setImmediate( true );
@@ -83,6 +88,8 @@ public class TerminalForm extends CustomComponent implements Disposable
         controls.addComponent( clearBtn );
         final Button sendBtn = new Button( "Send" );
         controls.addComponent( sendBtn );
+        daemonChk = new CheckBox( "Daemon" );
+        controls.addComponent( daemonChk );
         indicator = new Label();
         indicator.setId( "terminal_indicator" );
         indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
@@ -112,12 +119,6 @@ public class TerminalForm extends CustomComponent implements Disposable
             }
         } );
 
-
-        grid.addComponent( filterControls, 0, 10, 19, 10 );
-
-        horizontalSplit.setSecondComponent( grid );
-        setCompositionRoot( horizontalSplit );
-
         programTxtFld.addShortcutListener( new ShortcutListener( "Shortcut Name", ShortcutAction.KeyCode.ENTER, null )
         {
             @Override
@@ -127,7 +128,8 @@ public class TerminalForm extends CustomComponent implements Disposable
             }
         } );
 
-        sendBtn.addClickListener( new SendButtonListener( this, executor ) );
+        final SendButtonListener sendButtonListener = new SendButtonListener( this );
+        sendBtn.addClickListener( sendButtonListener );
 
         clearBtn.addClickListener( new Button.ClickListener()
         {
@@ -135,6 +137,30 @@ public class TerminalForm extends CustomComponent implements Disposable
             public void buttonClick( Button.ClickEvent event )
             {
                 commandOutputTxtArea.setValue( "" );
+            }
+        } );
+
+        grid.addComponent( filterControls, 0, 10, 19, 10 );
+
+
+        setCompositionRoot( horizontalSplit );
+
+        addDetachListener( new DetachListener()
+        {
+            @Override
+            public void detach( final DetachEvent event )
+            {
+                executor.shutdown();
+            }
+        } );
+
+        addAttachListener( new AttachListener()
+        {
+            @Override
+            public void attach( final AttachEvent event )
+            {
+                executor = SubutaiExecutors.newCachedThreadPool();
+                sendButtonListener.setExecutor( executor );
             }
         } );
     }
@@ -153,12 +179,5 @@ public class TerminalForm extends CustomComponent implements Disposable
             commandOutputTxtArea.setValue( String.format( "%s%s", commandOutputTxtArea.getValue(), output ) );
             commandOutputTxtArea.setCursorPosition( commandOutputTxtArea.getValue().length() - 1 );
         }
-    }
-
-
-    public void dispose()
-    {
-        environmentTree.dispose();
-        executor.shutdown();
     }
 }

@@ -16,4 +16,6 @@ public interface PortalModuleService
     public void addListener( final PortalModuleListener listener );
 
     public void removeListener( final PortalModuleListener listener );
+
+    public void loadDependentModule( String moduleId );
 }

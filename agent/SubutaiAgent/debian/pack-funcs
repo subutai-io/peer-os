@@ -96,13 +96,20 @@ getSourcesToRelevantDirectories() {
 	SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/agent/"
 	fileName=`ls | grep subutai|  awk '{print $1}' | head -1`
 
+    #copying agent executable
 	strip ../autoconf/src/subutai-agent
 	cp ../autoconf/src/subutai-agent $fileName/sbin/
-	cp $SOURCE/SubutaiAgent/config/agent.xml $fileName/etc/subutai-agent/
+
+    #copying #etc folder elements {cron.hourly and init.d}
+    cp -a $SOURCE/SubutaiAgent/debian/etc/* $fileName/etc/
+
+    #copying config files {agent.xml and uuid.txt}
+	cp $SOURCE/SubutaiAgent/debian/config/* $fileName/etc/subutai-agent/
 
 	if [ -f $fileName/DEBIAN/control ] ; then
 		rm $fileName/DEBIAN/*
 	fi
+    #copying DEBIAN folder
 	cp $SOURCE/SubutaiAgent/debian/Agent/DEBIAN/* $fileName/DEBIAN/
 }
 
@@ -123,16 +130,15 @@ createDebian() {
 	md5sum `find ./$packageName -type f | awk '/.\//{ print substr($0, 3) }'` >> $packageName/DEBIAN/md5sums
 	dpkg-deb -z8 -Zgzip --build $packageName/
 
-	#when deb is created copy new deb to Bigdata folder.
-	cp $packageName.deb /var/lib/jenkins/Automation/Bigdata/agent/
+	#when deb is created copy new deb to Automation_ISO/Packages folder.
+	cp $packageName.deb /var/lib/jenkins/Automation/Automation_ISO/Packages/agent/
 }
 
 
 generateRepoPackage() {
   #Basic path definitions
   BASE="/var/lib/jenkins/jobs/master.agent/Agent/deb"
-  #SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
-  TARGET="/var/lib/jenkins/Automation/Bigdata/agent"
+  TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/agent"
   PACK="/var/lib/jenkins/Automation/Automation_ISO/mgmt-repo/template-repo-package/"
   ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
 
@@ -164,15 +170,41 @@ generateRepoPackage() {
      exit 1
   fi
 
-  templateName="temp"
+  #starting to genereate template repo package
+  generateTemplateRepo
+  echo "Repo wrapper package Successfully created."
 
+  popd
+
+}
+
+
+#generate Template repo package structure
+generateTemplateRepo() {
+  pushd $BASE
+  templateName="temp"
+  archType="amd64"
   #check temp folder does exist or not
   if [ -d "$templateName" ]; then
     rm -rf "$BASE/$templateName"
   fi
-  cp -a $PACK $BASE/$templateName
 
-  sed -i "s/template/subutai-repo-$purePackageName/g" $BASE/$templateName/DEBIAN/control
+  #creating main folders  
+  mkdir -p $BASE/$templateName/DEBIAN
+  mkdir -p $BASE/$templateName/repo/ksks/amd64/trusty
+
+  #generating and filling control file 
+  touch $BASE/$templateName/DEBIAN/control
+  chmod 755 $BASE/$templateName/DEBIAN/control
+  echo "Package: subutai-repo-$purePackageName" >> $BASE/$templateName/DEBIAN/control
+  echo "Version: $version_new" >> $BASE/$templateName/DEBIAN/control
+  echo "Architecture: $archType" >> $BASE/$templateName/DEBIAN/control
+  echo "Maintainer: <subut.ai>" >> $BASE/$templateName/DEBIAN/control
+  echo "Priority: optional" >> $BASE/$templateName/DEBIAN/control
+  echo "Description: This is subutai repo $purePackageName wrapper package" >> $BASE/$templateName/DEBIAN/control
+  echo "Homepage: http://www.safehaus.org" >> $BASE/$templateName/DEBIAN/control
+  echo "Section: devel" >> $BASE/$templateName/DEBIAN/control
+ 
   cp $currentPackage $BASE/$templateName/repo/ksks/amd64/trusty/
   mv $BASE/$templateName/ $BASE/subutai-repo-$shortCurrentPackage
 
@@ -183,20 +215,6 @@ generateRepoPackage() {
   mv $BASE/subutai-repo-"$shortCurrentPackage".deb $ISOPATH
   rm -rf $BASE/subutai-repo-$shortCurrentPackage
   rm -rf $BASE/$templateName
-
-  echo "Repo wrapper package Successfully created."
-
   popd
-
 }
-
-
-
-
-
-
-
-
-
-
 

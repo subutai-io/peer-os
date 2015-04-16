@@ -2,10 +2,18 @@ package org.safehaus.subutai.server.ui.views;
 
 
 import java.util.HashMap;
+import java.util.Map;
+
+import javax.naming.NamingException;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
+import org.safehaus.subutai.core.identity.api.PortalModuleScope;
+import org.safehaus.subutai.core.identity.api.Role;
+import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.server.ui.MainUI;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.server.ui.api.PortalModuleListener;
@@ -24,9 +32,6 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
 
-/**
- * Created by talas on 9/17/14.
- */
 public class CoreModulesView extends VerticalLayout implements View, PortalModuleListener
 {
 
@@ -35,6 +40,8 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
     private CssLayout modulesLayout;
     private HashMap<String, PortalModule> modules = new HashMap<>();
     private HashMap<String, AbstractLayout> moduleViews = new HashMap<>();
+    private static PortalModuleService portalModuleService = null;
+    private static final ServiceLocator serviceLocator = new ServiceLocator();
 
 
     public CoreModulesView()
@@ -50,7 +57,37 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
     @Override
     public void enter( ViewChangeListener.ViewChangeEvent event )
     {
+        try
+        {
+            for ( final Map.Entry<String, AbstractLayout> entry : moduleViews.entrySet() )
+            {
+                AbstractLayout layout = moduleViews.get( entry.getKey() );
+                if ( layout != null )
+                {
+                    layout.setVisible( false );
+                }
+            }
 
+            IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+            User user = identityManager.getUser();
+            for ( final Role role : user.getRoles() )
+            {
+                for ( final PortalModuleScope module : role.getAccessibleModules() )
+                {
+                    AbstractLayout layout = moduleViews.get( module.getModuleKey() );
+                    if ( layout != null )
+                    {
+                        layout.setVisible( true );
+                    }
+                }
+            }
+        }
+        catch ( NamingException e )
+        {
+            LOG.error( "Error getting identityManager service", e );
+        }
+
+        LOG.debug( "User entered CoreModulesView" );
     }
 
 
@@ -100,18 +137,21 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
 
     public static PortalModuleService getPortalModuleService()
     {
-        // get bundle instance via the OSGi Framework Util class
-        BundleContext ctx = FrameworkUtil.getBundle( PortalModuleService.class ).getBundleContext();
-        if ( ctx != null )
+        if ( portalModuleService == null )
         {
-            ServiceReference serviceReference = ctx.getServiceReference( PortalModuleService.class.getName() );
-            if ( serviceReference != null )
+            // get bundle instance via the OSGi Framework Util class
+            BundleContext ctx = FrameworkUtil.getBundle( PortalModuleService.class ).getBundleContext();
+            if ( ctx != null )
             {
-                return PortalModuleService.class.cast( ctx.getService( serviceReference ) );
+                ServiceReference serviceReference = ctx.getServiceReference( PortalModuleService.class.getName() );
+                if ( serviceReference != null )
+                {
+                    portalModuleService = PortalModuleService.class.cast( ctx.getService( serviceReference ) );
+                    //                    return PortalModuleService.class.cast( ctx.getService( serviceReference ) );
+                }
             }
         }
-
-        return null;
+        return portalModuleService;
     }
 
 
@@ -166,6 +206,18 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
     }
 
 
+    @Override
+    public void loadDependentModule( final String moduleId )
+    {
+        ModuleView moduleView = ( ModuleView ) getModuleViews().get( moduleId );
+        if ( moduleView == null )
+        {
+            return;
+        }
+        moduleView.addModuleTab();
+    }
+
+
     private void removeModule( PortalModule module )
     {
         ModuleView moduleView = ( ModuleView ) moduleViews.get( module.getId() );
@@ -173,5 +225,11 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
         {
             modulesLayout.removeComponent( moduleView );
         }
+    }
+
+
+    public HashMap<String, AbstractLayout> getModuleViews()
+    {
+        return moduleViews;
     }
 }

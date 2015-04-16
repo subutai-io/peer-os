@@ -18,9 +18,13 @@ import static org.junit.Assert.assertThat;
 public class MetricTest
 {
 
-    private static final String METRIC_JSON = " {\"host\":\"test\", \"totalRam\":\"123\"," +
-            "\"availableRam\":\"123\", \"usedRam\":\"123\", \"usedCpu\":\"123\","
-            + "  \"availableDisk\" : \"123\", \"usedDisk\" : \"123\", \"totalDisk\" : \"123\"}";
+    private static final String METRIC_JSON =
+            "{\"host\":\"test\", \"totalRam\":\"123\", \"availableRam\":\"123\", " + "\"usedRam\":\"123\","
+                    + "  \"usedCpu\":\"123\", \"availableDiskRootfs\":\"123\", " + "\"availableDiskVar\":\"123\","
+                    + "  \"availableDiskHome\":\"123\", \"availableDiskOpt\":\"123\", " + "\"usedDiskRootfs\":\"123\","
+                    + "  \"usedDiskVar\":\"123\", \"usedDiskHome\":\"123\", \"usedDiskOpt\":\"123\", "
+                    + "\"totalDiskRootfs\":\"123\"," + "  \"totalDiskVar\":\"123\", \"totalDiskHome\":\"123\", "
+                    + "\"totalDiskOpt\":\"123\"}";
     private static final String HOST = "test";
     private static final double VALUE = 123;
     ContainerHostMetricImpl metric = JsonUtil.fromJson( METRIC_JSON, ContainerHostMetricImpl.class );
@@ -34,9 +38,6 @@ public class MetricTest
         assertTrue( VALUE == metric.getAvailableRam() );
         assertTrue( VALUE == metric.getUsedRam() );
         assertTrue( VALUE == metric.getUsedCpu() );
-        assertTrue( VALUE == metric.getAvailableDisk() );
-        assertTrue( VALUE == metric.getUsedDisk() );
-        assertTrue( VALUE == metric.getTotalDisk() );
     }
 
 
@@ -46,7 +47,17 @@ public class MetricTest
         UUID environmentId = UUID.randomUUID();
         metric.setEnvironmentId( environmentId );
 
-        assertThat( metric.toString(), containsString( HOST ) );
         assertThat( metric.toString(), containsString( environmentId.toString() ) );
+    }
+
+
+    @Test
+    public void testOutput() throws Exception
+    {
+        metric.setEnvironmentId( UUID.randomUUID() );
+        metric.setHostId( UUID.randomUUID() );
+
+        System.out.println(metric);
+
     }
 }

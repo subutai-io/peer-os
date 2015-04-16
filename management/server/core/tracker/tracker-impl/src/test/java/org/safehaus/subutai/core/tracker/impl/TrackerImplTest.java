@@ -6,219 +6,133 @@
 package org.safehaus.subutai.core.tracker.impl;
 
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.sql.Clob;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
-import javax.sql.DataSource;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
-import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
+import org.safehaus.subutai.common.dao.DaoManager;
+import org.safehaus.subutai.common.test.SystemOutRedirectTest;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
-import org.safehaus.subutai.common.util.DbUtil;
-import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.core.tracker.impl.dao.TrackerOperationDataService;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertNull;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertThat;
+import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.anyVararg;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
 /**
  * Test for TrackerImpl class
  */
-@Ignore
 @RunWith( MockitoJUnitRunner.class )
-public class TrackerImplTest
+public class TrackerImplTest extends SystemOutRedirectTest
 {
-
-    @Mock
-    DataSource dataSource;
-    @Mock
-    DbUtil dbUtil;
-    @Mock
-    ResultSet resultSet;
-    @Mock
-    Clob clobInfo;
-    TrackerImpl tracker;
     private static final String SOURCE = "source";
     private static final String DESCRIPTION = "description";
-    private static final String DONE = "done";
-    private static final UUID operationId = UUID.randomUUID();
+    private static final UUID OPERATION_ID = UUID.randomUUID();
 
+    @Mock
+    TrackerOperationDataService dataService;
+    @Mock
     private TrackerOperationImpl productOperation;
+    @Mock
+    private TrackerOperationView productOperationView;
+    @Mock
+    DaoManager daoManager;
+    @Mock
+    EntityManagerFactory entityManagerFactory;
+    @Mock
+    EntityManager entityManager;
 
-
-    private ByteArrayOutputStream myOut;
+    private TrackerImpl tracker;
 
 
     @Before
-    public void setUp() throws SQLException
+    public void setUp() throws Exception
     {
-        productOperation = new TrackerOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
-        tracker = new TrackerImplExt( dataSource, dbUtil );
-        when( dbUtil.select( anyString(), anyVararg() ) ).thenReturn( resultSet );
-        when( resultSet.next() ).thenReturn( true ).thenReturn( false );
-        when( resultSet.getClob( "info" ) ).thenReturn( clobInfo );
-        when( resultSet.getString( SOURCE ) ).thenReturn( SOURCE );
-        when( clobInfo.length() ).thenReturn( 1L );
-
-        when( clobInfo.getSubString( anyLong(), anyInt() ) ).thenReturn( JsonUtil.toJson( productOperation ) );
-
-        myOut = new ByteArrayOutputStream();
-        System.setOut( new PrintStream( myOut ) );
+        tracker = new TrackerImpl();
+        tracker.dataService = dataService;
     }
 
 
-    @After
-    public void tearDown() throws Exception
+    @Test
+    public void testInit() throws Exception
     {
-        System.setOut( System.out );
-    }
+        tracker.setDaoManager( daoManager );
+        when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
+        when( entityManagerFactory.createEntityManager() ).thenReturn( entityManager );
 
+        tracker.init();
 
-    private String getSysOut()
-    {
-        return myOut.toString().trim();
-    }
-
-
-    @Test( expected = NullPointerException.class )
-    public void constructorShouldFailOnNullDataSource() throws Exception
-    {
-        //        new TrackerImpl( (DataSource)null );
+        verify( entityManager ).close();
     }
 
 
     @Test
     public void testGetProductOperation() throws Exception
     {
-        TrackerOperationView pv = tracker.getTrackerOperation( SOURCE, operationId );
+        tracker.getTrackerOperation( SOURCE, OPERATION_ID );
 
-        assertNotNull( pv );
+        verify( dataService ).getTrackerOperation( SOURCE, OPERATION_ID );
     }
 
 
     @Test
-    public void testGetProductOperationException() throws Exception
+    public void testSaveTrackerOperation() throws Exception
     {
-        when( dbUtil.select( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
+        tracker.saveTrackerOperation( SOURCE, productOperation );
 
-        TrackerOperationView pv = tracker.getTrackerOperation( SOURCE, operationId );
-
-        assertNull( pv );
+        verify( dataService ).saveTrackerOperation( SOURCE, productOperation );
     }
 
 
     @Test
-    public void testSaveProductOperation() throws Exception
+    public void testCreateTrackerOperation() throws Exception
     {
-        assertTrue( tracker.saveTrackerOperation( SOURCE, productOperation ) );
+        tracker.createTrackerOperation( SOURCE, DESCRIPTION );
+        verify( dataService ).saveTrackerOperation( eq( SOURCE ), isA( TrackerOperationImpl.class ) );
     }
 
 
     @Test
-    public void testSaveProductOperationException() throws Exception
+    public void testGetTrackerOperations() throws Exception
     {
-        when( dbUtil.update( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
 
-        assertFalse( tracker.saveTrackerOperation( SOURCE, productOperation ) );
+        tracker.getTrackerOperations( SOURCE, new Date(), new Date(), 1 );
+
+        verify( dataService ).getTrackerOperations( eq( SOURCE ), isA( Date.class ), isA( Date.class ), anyInt() );
     }
 
 
     @Test
-    public void testCreateProductOperation() throws Exception
+    public void testGetTrackerOperationSources() throws Exception
     {
-        TrackerOperation po = tracker.createTrackerOperation( SOURCE, DESCRIPTION );
+        tracker.getTrackerOperationSources();
 
-        assertNotNull( po );
-    }
-
-
-    @Test
-    public void testCreateProductOperationException() throws Exception
-    {
-
-        when( dbUtil.update( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
-
-        TrackerOperation po = tracker.createTrackerOperation( SOURCE, DESCRIPTION );
-
-        assertNull( po );
-    }
-
-
-    @Test
-    public void testGetProductOperations() throws Exception
-    {
-
-        List<TrackerOperationView> pos = tracker.getTrackerOperations( SOURCE, new Date(), new Date(), 1 );
-
-        assertNotNull( pos );
-        assertFalse( pos.isEmpty() );
-    }
-
-
-    @Test
-    public void testGetProductOperationsException() throws Exception
-    {
-        when( dbUtil.select( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
-
-        List<TrackerOperationView> pos = tracker.getTrackerOperations( SOURCE, new Date(), new Date(), 1 );
-
-        assertNotNull( pos );
-        assertTrue( pos.isEmpty() );
-    }
-
-
-    @Test
-    public void testGetProductOperationSources() throws Exception
-    {
-        List<String> sources = tracker.getTrackerOperationSources();
-
-        assertNotNull( sources );
-        assertFalse( sources.isEmpty() );
-    }
-
-
-    @Test
-    public void testGetProductOperationSourcesException() throws Exception
-    {
-        when( dbUtil.select( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
-
-        List<String> sources = tracker.getTrackerOperationSources();
-
-        assertNotNull( sources );
-        assertTrue( sources.isEmpty() );
+        verify( dataService ).getTrackerOperationSources();
     }
 
 
     @Test
     public void testPrintOperationLog() throws Exception
     {
-        productOperation.addLogDone( DONE );
-        when( clobInfo.getSubString( anyLong(), anyInt() ) ).thenReturn( JsonUtil.toJson( productOperation ) );
+        when( dataService.getTrackerOperation( SOURCE, OPERATION_ID ) ).thenReturn( productOperationView );
+        when( productOperationView.getLog() ).thenReturn( "log" );
+        when( productOperationView.getState() ).thenReturn( OperationState.RUNNING )
+                                               .thenReturn( OperationState.SUCCEEDED );
 
-        tracker.printOperationLog( SOURCE, operationId, 1000 );
+        tracker.printOperationLog( SOURCE, OPERATION_ID, 200 );
 
-        assertThat( getSysOut(), containsString( DONE ) );
+        assertEquals( "log", getSysOut() );
     }
 }

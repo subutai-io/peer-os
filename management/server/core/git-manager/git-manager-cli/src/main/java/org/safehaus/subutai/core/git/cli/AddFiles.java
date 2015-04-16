@@ -6,12 +6,12 @@ import java.util.Collection;
 
 import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitManager;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
 
@@ -20,7 +20,7 @@ import com.google.common.base.Preconditions;
  * Adds file(s) to commit
  */
 @Command( scope = "git", name = "add-files", description = "Add files to commit" )
-public class AddFiles extends OsgiCommandSupport
+public class AddFiles extends SubutaiShellCommandSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( AddFiles.class.getName() );

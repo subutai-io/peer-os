@@ -37,8 +37,9 @@ public class HeartBeatListener implements ByteMessageListener
         try
         {
             String response = new String( message, "UTF-8" );
-            LOG.info( response );
             HeartBeat heartBeat = jsonUtil.from( response, HeartBeat.class );
+
+//            LOG.info( heartBeat.getHostInfo().toString() );
 
             registry.registerHost( heartBeat.getHostInfo() );
         }

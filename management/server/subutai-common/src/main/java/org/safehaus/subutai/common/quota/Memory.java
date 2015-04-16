@@ -5,9 +5,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-/**
- * Created by talas on 12/2/14.
- */
 public class Memory
 {
     MemoryUnit unit;
@@ -66,7 +63,7 @@ public class Memory
     {
         if ( unit == MemoryUnit.NONE || value == null )
         {
-            return unit.getShortName();
+            return unit.getAcronym();
         }
         else if ( unit == MemoryUnit.BYTES )
         {
@@ -74,7 +71,7 @@ public class Memory
         }
         else
         {
-            return String.valueOf( value ) + unit.getShortName();
+            return String.valueOf( value ) + unit.getAcronym();
         }
     }
 }

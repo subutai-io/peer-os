@@ -17,16 +17,17 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.command.RequestType;
 import org.safehaus.subutai.common.command.Response;
+import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.server.ui.component.HostTree;
 
 import com.google.common.collect.Sets;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
@@ -72,6 +73,8 @@ public class SendButtonListenerTest
     @Mock
     ComboBox comboBox;
     @Mock
+    CheckBox checkBox;
+    @Mock
     Label label;
     @Mock
     AtomicInteger atomicInteger;
@@ -105,15 +108,15 @@ public class SendButtonListenerTest
         when( terminalForm.getRunAsTxtFld() ).thenReturn( textField );
         when( terminalForm.getIndicator() ).thenReturn( label );
         when( terminalForm.getTaskCount() ).thenReturn( atomicInteger );
+        when( terminalForm.getDaemonChk() ).thenReturn(checkBox);
+        when( terminalForm.getHostTree() ).thenReturn( hostTree );
+        when( hostTree.getSelectedHosts() ).thenReturn( Sets.<HostInfo>newHashSet() );
     }
 
 
     @Test
     public void testButtonClick() throws Exception
     {
-        when( terminalForm.getHostTree() ).thenReturn( hostTree );
-        when( hostTree.getSelectedHosts() ).thenReturn( Sets.<HostInfo>newHashSet() );
-
         listener.buttonClick( null );
 
         verify( terminalForm ).addOutput( anyString() );
@@ -176,6 +179,8 @@ public class SendButtonListenerTest
 
         when( textField.getValue() ).thenReturn( "1" );
         when( comboBox.getValue() ).thenReturn( RequestType.TERMINATE_REQUEST );
+        when( checkBox.getValue() ).thenReturn( true );
+        when( terminalForm.getHostTree() ).thenReturn( hostTree );
 
         listener.executeCommand( resourceHosts );
         when( comboBox.getValue() ).thenReturn( RequestType.PS_REQUEST );

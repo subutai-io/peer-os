@@ -18,11 +18,11 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.OutputRedirection;
 import org.safehaus.subutai.common.command.Request;
 import org.safehaus.subutai.common.command.RequestType;
+import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.core.broker.api.Broker;
 import org.safehaus.subutai.core.broker.api.BrokerException;
 import org.safehaus.subutai.core.broker.api.Topic;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
@@ -281,6 +281,13 @@ public class CommandProcessorTest
 
             @Override
             public Set<String> getConfigPoints()
+            {
+                return null;
+            }
+
+
+            @Override
+            public Integer getPid()
             {
                 return null;
             }

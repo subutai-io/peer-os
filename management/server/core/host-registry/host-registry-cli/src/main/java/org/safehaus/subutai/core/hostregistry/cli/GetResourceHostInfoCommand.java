@@ -7,18 +7,18 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
 
 
 @Command( scope = "host", name = "resource-host", description = "Prints details about resource host" )
-public class GetResourceHostInfoCommand extends OsgiCommandSupport
+public class GetResourceHostInfoCommand extends SubutaiShellCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( GetResourceHostInfoCommand.class.getName() );
 

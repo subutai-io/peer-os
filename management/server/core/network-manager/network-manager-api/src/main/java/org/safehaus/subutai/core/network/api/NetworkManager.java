@@ -2,15 +2,24 @@ package org.safehaus.subutai.core.network.api;
 
 
 import java.util.Set;
+import java.util.UUID;
+
+import org.safehaus.subutai.common.network.Vni;
+import org.safehaus.subutai.common.network.VniVlanMapping;
+import org.safehaus.subutai.common.peer.ContainerHost;
 
 
 public interface NetworkManager
 {
+    public static final String TUNNEL_PREFIX = "tunnel";
+    public static final String TUNNEL_TYPE = "vxlan";
+
     /**
      * Sets up an N2N connection to super node on management host
      */
     public void setupN2NConnection( String superNodeIp, int superNodePort, String interfaceName, String communityName,
-                                    String localIp, String pathToKeyFile ) throws NetworkManagerException;
+                                    String localIp, String keyType, String pathToKeyFile )
+            throws NetworkManagerException;
 
     /**
      * Removes N2N connection to super node on management host
@@ -20,12 +29,12 @@ public interface NetworkManager
     /**
      * Sets up tunnel to another peer on management host
      */
-    public void setupTunnel( String tunnelName, String tunnelIp, String tunnelType ) throws NetworkManagerException;
+    public void setupTunnel( int tunnelId, String tunnelIp ) throws NetworkManagerException;
 
     /**
      * Removes tunnel to another peer on management host
      */
-    public void removeTunnel( String tunnelName ) throws NetworkManagerException;
+    public void removeTunnel( int tunnelId ) throws NetworkManagerException;
 
     /**
      * Sets container environment IP and VLAN ID on container
@@ -60,6 +69,13 @@ public interface NetworkManager
     public void removeGateway( int vLanId ) throws NetworkManagerException;
 
     /**
+     * Cleans up network settings left after environment
+     *
+     * @param environmentId - environment id
+     */
+    public void cleanupEnvironmentNetworkSettings( UUID environmentId ) throws NetworkManagerException;
+
+    /**
      * Removes gateway IP on a container
      */
     public void removeGatewayOnContainer( String containerName ) throws NetworkManagerException;
@@ -77,11 +93,62 @@ public interface NetworkManager
     /**
      * Sets up VNI-VLAN mapping on management host
      */
-    public void setupVniVLanMapping( String tunnelName, int vni, int vLanId ) throws NetworkManagerException;
+    public void setupVniVLanMapping( int tunnelId, long vni, int vLanId, UUID environmentId )
+            throws NetworkManagerException;
 
     /**
      * Removes VNI-VLAN mapping on management host
      */
-    public void removeVniVLanMapping( String tunnelName, int vni, int vLanId ) throws NetworkManagerException;
+    public void removeVniVLanMapping( int tunnelId, long vni, int vLanId ) throws NetworkManagerException;
+
+    public Set<VniVlanMapping> getVniVlanMappings() throws NetworkManagerException;
+
+
+    public void reserveVni( Vni vni ) throws NetworkManagerException;
+
+    public Set<Vni> getReservedVnis() throws NetworkManagerException;
+
+    /**
+     * Enables passwordless ssh access between containers
+     *
+     * @param containers - set of {@code ContainerHost}
+     */
+    public void exchangeSshKeys( Set<ContainerHost> containers ) throws NetworkManagerException;
+
+    /**
+     * Adds supplied ssh key to authorized_keys file of given containers
+     *
+     * @param containers- set of {@code ContainerHost}
+     * @param sshKey - ssh key to add
+     */
+    public void addSshKeyToAuthorizedKeys( Set<ContainerHost> containers, String sshKey )
+            throws NetworkManagerException;
+
+    /**
+     * Replaces supplied old ssh key with new ssh key in authorized_keys file of given containers
+     *
+     * @param containers set of {@code ContainerHost}
+     * @param oldSshKey - old ssh key
+     * @param newSshKey - new ssh key
+     */
+    public void replaceSshKeyInAuthorizedKeys( final Set<ContainerHost> containers, final String oldSshKey,
+                                               final String newSshKey ) throws NetworkManagerException;
+
+    /**
+     * Removes supplied ssh key from authorized_keys file of given containers
+     *
+     * @param containers set of {@code ContainerHost}
+     * @param sshKey - ssh key to remove
+     */
+    public void removeSshKeyFromAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
+            throws NetworkManagerException;
+
+    /**
+     * Registers containers in /etc/hosts of each other
+     *
+     * @param containers - set of {@code ContainerHost}
+     * @param domainName - domain name e.g. "intra.lan"
+     */
+    public void registerHosts( Set<ContainerHost> containers, String domainName ) throws NetworkManagerException;
 }
 

@@ -1,114 +1,124 @@
 package org.safehaus.subutai.common.util;
 
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.KeyStore;
 import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.exception.HTTPException;
+import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreData;
+import org.safehaus.subutai.common.security.crypto.keystore.KeyStoreManager;
+import org.safehaus.subutai.common.security.crypto.ssl.SSLManager;
+import org.safehaus.subutai.common.settings.ChannelSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 
 public class RestUtil
 {
+    private static final Logger LOG = LoggerFactory.getLogger( RestUtil.class );
+    private static long defaultReceiveTimeout = 1000 * 60 * 5;
+    private static long defaultConnectionTimeout = 1000 * 60;
+    private static int defaultMaxRetransmits = 3;
 
 
     public static enum RequestType
     {
-        GET, POST
+        GET, DELETE, POST
     }
 
 
-    public String request( RequestType requestType, String url, Map<String, String> params ) throws HTTPException
+    public RestUtil()
     {
-        if ( requestType == RequestType.GET )
-        {
-            return get( url, params );
-        }
-        else
-        {
-            return post( url, params );
-        }
     }
 
 
-    public static String get( String url, Map<String, String> params ) throws HTTPException
+    public RestUtil( final long defaultReceiveTimeout, final long defaultConnectionTimeout, final int maxRetransmits )
     {
+        Preconditions.checkArgument( defaultReceiveTimeout > 0, "Receive timeout must be greater than 0" );
+        Preconditions.checkArgument( defaultConnectionTimeout > 0, "Connection timeout must be greater than 0" );
+
+        setDefaultReceiveTimeout( defaultReceiveTimeout );
+        setDefaultConnectionTimeout( defaultConnectionTimeout );
+        setDefaultMaxRetransmits( maxRetransmits );
+    }
+
+
+    public String request( RequestType requestType, String url, String alias, Map<String, String> params,
+                           Map<String, String> headers ) throws HTTPException
+    {
+
+        Preconditions.checkNotNull( requestType, "Invalid request type" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( url ), "Invalid url" );
+
         WebClient client = null;
         Response response = null;
         try
         {
-            client = WebClient.create( url );
-            if ( params != null )
+            URL urlObject = new URL( url );
+            String port = String.valueOf( urlObject.getPort() );
+            switch ( port )
             {
-                for ( Map.Entry<String, String> entry : params.entrySet() )
-                {
-                    client.query( entry.getKey(), entry.getValue() );
-                }
+                case ChannelSettings.SECURE_PORT_X1:
+                    client = createTrustedWebClient( url );
+                    break;
+                case ChannelSettings.SECURE_PORT_X2:
+                    LOG.debug( String.format( "Request type: %s, %s", requestType, url ) );
+                    client = createTrustedWebClientWithAuth( url, alias );
+                    break;
+                default:
+                    client = createWebClient( url );
+                    break;
             }
-            response = client.get();
-            if ( !NumUtil.isIntBetween( response.getStatus(), 200, 299 ) )
-            {
-                if ( response.hasEntity() )
-                {
-                    throw new HTTPException( response.readEntity( String.class ) );
-                }
-                else
-                {
-                    throw new HTTPException( String.format( "Http status code: %d", response.getStatus() ) );
-                }
-            }
-            else if ( response.hasEntity() )
-            {
-                return response.readEntity( String.class );
-            }
-        }
-        finally
-        {
-            if ( response != null )
-            {
-                try
-                {
-                    response.close();
-                }
-                catch ( Exception ignore )
-                {
-                }
-            }
-            if ( client != null )
-            {
-                try
-                {
-                    client.close();
-                }
-                catch ( Exception ignore )
-                {
-                }
-            }
-        }
-
-        return null;
-    }
-
-
-    public static String post( String url, Map<String, String> params ) throws HTTPException
-    {
-        WebClient client = null;
-        Response response = null;
-        try
-        {
-            client = WebClient.create( url );
             Form form = new Form();
             if ( params != null )
             {
                 for ( Map.Entry<String, String> entry : params.entrySet() )
                 {
-                    form.set( entry.getKey(), entry.getValue() );
+                    if ( requestType == RequestType.POST )
+                    {
+                        form.set( entry.getKey(), entry.getValue() );
+                    }
+                    else
+                    {
+                        client.query( entry.getKey(), entry.getValue() );
+                    }
                 }
             }
-            response = client.form( form );
+            if ( headers != null )
+            {
+                for ( Map.Entry<String, String> entry : headers.entrySet() )
+                {
+                    client.header( entry.getKey(), entry.getValue() );
+                }
+            }
+            //            response = requestType == RequestType.GET ? client.get() : client.form( form );
+            switch ( requestType )
+            {
+                case GET:
+                    response = client.get();
+                    break;
+                case POST:
+                    response = client.form( form );
+                    break;
+                case DELETE:
+                    response = client.delete();
+                    break;
+                default:
+                    throw new HTTPException( String.format( "Unrecognized requestType: %s", requestType.name() ) );
+            }
             if ( !NumUtil.isIntBetween( response.getStatus(), 200, 299 ) )
             {
                 if ( response.hasEntity() )
@@ -124,6 +134,10 @@ public class RestUtil
             {
                 return response.readEntity( String.class );
             }
+        }
+        catch ( MalformedURLException e )
+        {
+            LOG.error( "Error in url path.", e );
         }
         finally
         {
@@ -150,5 +164,100 @@ public class RestUtil
         }
 
         return null;
+    }
+
+
+    public static WebClient createWebClient( String url )
+    {
+        WebClient client = WebClient.create( url );
+        HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
+
+        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+        httpClientPolicy.setConnectionTimeout( defaultConnectionTimeout );
+        httpClientPolicy.setReceiveTimeout( defaultReceiveTimeout );
+        httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
+
+        httpConduit.setClient( httpClientPolicy );
+        return client;
+    }
+
+
+    public static WebClient createTrustedWebClient( String url )
+    {
+        WebClient client = WebClient.create( url );
+        HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
+
+        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+        httpClientPolicy.setConnectionTimeout( defaultConnectionTimeout );
+        httpClientPolicy.setReceiveTimeout( defaultReceiveTimeout );
+        httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
+
+
+        httpConduit.setClient( httpClientPolicy );
+
+        SSLManager sslManager = new SSLManager( null, null, null, null );
+
+        TLSClientParameters tlsClientParameters = new TLSClientParameters();
+        tlsClientParameters.setDisableCNCheck( true );
+        tlsClientParameters.setTrustManagers( sslManager.getClientFullTrustManagers() );
+        httpConduit.setTlsClientParameters( tlsClientParameters );
+
+        return client;
+    }
+
+
+    public static WebClient createTrustedWebClientWithAuth( String url, String alias )
+    {
+        WebClient client = WebClient.create( url );
+        HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
+
+        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+        httpClientPolicy.setConnectionTimeout( defaultConnectionTimeout );
+        httpClientPolicy.setReceiveTimeout( defaultReceiveTimeout );
+        httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
+
+        httpConduit.setClient( httpClientPolicy );
+
+        KeyStoreManager keyStoreManager = new KeyStoreManager();
+        KeyStoreData keyStoreData = new KeyStoreData();
+        keyStoreData.setupKeyStorePx2();
+        keyStoreData.setAlias( alias );
+        KeyStore keyStore = keyStoreManager.load( keyStoreData );
+
+        LOG.debug( String.format( "Getting keyStore with alias: %s for url: %s", alias, url ) );
+        LOG.debug( String.format( "KeyStore: %s", keyStore.toString() ) );
+
+        KeyStoreData trustStoreData = new KeyStoreData();
+        trustStoreData.setupTrustStorePx2();
+        KeyStore trustStore = keyStoreManager.load( trustStoreData );
+
+        SSLManager sslManager = new SSLManager( keyStore, keyStoreData, trustStore, trustStoreData );
+
+        TLSClientParameters tlsClientParameters = new TLSClientParameters();
+        tlsClientParameters.setDisableCNCheck( true );
+        tlsClientParameters.setTrustManagers( sslManager.getClientTrustManagers() );
+        tlsClientParameters.setKeyManagers( sslManager.getClientKeyManagers() );
+        tlsClientParameters.setCertAlias( alias );
+        httpConduit.setTlsClientParameters( tlsClientParameters );
+
+        return client;
+    }
+
+
+    private synchronized static void setDefaultReceiveTimeout( final long timeout )
+    {
+        defaultReceiveTimeout = timeout;
+    }
+
+
+    private synchronized static void setDefaultConnectionTimeout( final long timeout )
+    {
+        defaultConnectionTimeout = timeout;
+    }
+
+
+    private synchronized static void setDefaultMaxRetransmits( final int timeout )
+    {
+        defaultMaxRetransmits = timeout;
     }
 }

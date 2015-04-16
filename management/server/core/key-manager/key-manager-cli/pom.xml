@@ -10,14 +10,26 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>key-manager-cli</artifactId>
-  <name>Subutai Key Manager Cli</name>
-  <description>Subutai Key Manager Cli</description>
+  <name>Subutai Key Manager CLI</name>
+  <description>Subutai Key Manager CLI</description>
   <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>subutai-common</artifactId>
+      <artifactId>key-manager-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-cli-rbac</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>peer-manager-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.karaf.shell</groupId>
+      <artifactId>org.apache.karaf.shell.console</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>

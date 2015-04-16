@@ -1,0 +1,42 @@
+#!/bin/bash
+shopt -s extglob
+if  ls  /var/log/subutai-agent/*-* > /dev/null 2>&1
+then
+        if [ ! -f /var/log/subutai-agent/subutaiagentlogs1.tar.gz ]
+        then
+                tar -zcvf /var/log/subutai-agent/subutaiagentlogs1.tar.gz /var/log/subutai-agent/*-*
+                rm /var/log/subutai-agent/subutaiagentlogs2.tar.gz
+                rm /var/log/subutai-agent/!(subutai-agent.log|agent-fault.log|*.tar.gz)
+        elif [ ! -f /var/log/subutai-agent/subutaiagentlogs2.tar.gz ]
+        then
+                tar -zcvf /var/log/subutai-agent/subutaiagentlogs2.tar.gz /var/log/subutai-agent/*-*
+                rm /var/log/subutai-agent/subutaiagentlogs3.tar.gz
+                rm /var/log/subutai-agent/!(subutai-agent.log|agent-fault.log|*.tar.gz)
+        elif [ ! -f /var/log/subutai-agent/subutaiagentlogs3.tar.gz ]
+        then
+                tar -zcvf /var/log/subutai-agent/subutaiagentlogs3.tar.gz /var/log/subutai-agent/*-*
+                rm /var/log/-agent/subutaiagentlogs4.tar.gz
+                rm /var/log/subutai-agent/!(subutai-agent.log|agent-fault.log|*.tar.gz)
+        elif [ ! -f /var/log/subutai-agent/subutaiagentlogs4.tar.gz ]
+        then
+                tar -zcvf /var/log/subutai-agent/subutaiagentlogs4.tar.gz /var/log/subutai-agent/*-*
+                rm /var/log/subutai-agent/subutaiagentlogs5.tar.gz
+                rm /var/log/subutai-agent/!(subutai-agent.log|agent-fault.log|*.tar.gz)
+        elif [ ! -f /var/log/subutai-agent/subutaiagentlogs5.tar.gz ]
+        then
+                tar -zcvf /var/log/subutai-agent/subutaiagentlogs5.tar.gz /var/log/subutai-agent/*-*
+                rm /var/log/subutai-agent/subutaiagentlogs6.tar.gz
+                rm /var/log/subutai-agent/!(subutai-agent.log|agent-fault.log|*.tar.gz)
+        elif [ ! -f /var/log/subutai-agent/subutaiagentlogs6.tar.gz ]
+        then
+                tar -zcvf /var/log/subutai-agent/subutaiagentlogs6.tar.gz /var/log/subutai-agent/*-*
+                rm /var/log/subutai-agent/subutaiagentlogs7.tar.gz
+                rm /var/log/subutai-agent/!(subutai-agent.log|agent-fault.log|*.tar.gz)
+        elif [ ! -f /var/log/subutai-agent/subutaiagentlogs7.tar.gz ]
+        then
+                tar -zcvf /var/log/subutai-agent/subutaiagentlogs7.tar.gz /var/log/subutai-agent/*-*
+                rm /var/log/subutai-agent/subutaiagentlogs1.tar.gz
+                rm /var/log/subutai-agent/!(subutai-agent.log|agent-fault.log|*.tar.gz)
+        fi
+fi
+

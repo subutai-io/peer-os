@@ -1,13 +1,22 @@
 #!/bin/bash
 
 
-
 function quota_usage {
   echo -----------------------------------------------------------------------
-  echo Usage: List containers and/or temlates.
+  echo Usage: Quota management of containers.
   echo
-  echo "        "subutai \[-qh\] quota \[name_list\] \[quota_type\] \[quota_value\]
-  echo
+  echo "        "subutai \[-qh\] quota container \[resource_type \[-s quota_value\|-m\] \| output_type\]
+  echo "           "resource_types:
+  echo "                             "ram -- quota for memory \(in megabytes\)
+  echo "                             "cpu -- quota for cpu \(in percentage\)
+  echo "                             "cpuset -- quota for cpusets
+  echo "                             "diskHome\|diskOpt\|diskVar\|diskRootfs\] -- quota for disk datasets \(no default units, can be \"none\" or in K\|M\|G\|T\|P\|E\|... \)
+  echo "                             "networkRate -- quota for network rate \(in kbps\)
+  echo "           "output_types:
+  echo "                             "json -- prints all quota related information in json format
+  echo "           "flags:
+  echo "                "s -- set quota for the specified resource_type
+  echo "                "m -- get the maximum quota can be set to the specified container and resource_type in their default units.
   echo -----------------------------------------------------------------------
 }
 
@@ -17,81 +26,156 @@ function quota {
     shift
   fi
 
+  if [[ -z $1 ]]; then
+    quota_usage
+    exit 1;
+  fi
+
+
   local container=$1
-  local resource_parameter=$2
-  local parameter_value=$3
+  local resource_type=$2
+  lxc_assert "$container" "`quota_usage`" > /dev/null
 
-  if [[ -z $container ]]; then
-    echo "Dancing with container with no name. Aborting...";
+  if [[ -z $resource_type ]]; then
+    msg_error "Resource type is not provided. Aborting..."
+    quota_usage
     exit 1;
   fi
 
-  if [[ -z $resource_parameter ]]; then
-    echo "Resource parameter not provided. Aborting..."
-    exit 1;
-  fi
+  local set_quota="false"
+  local get_maximum_available_quota="false"
+  shift
+  shift
+  while getopts ":s:m" opt; do
+    case $opt in
+      s)
+        set_quota="true"
+        quota_value="$OPTARG"
+        ;;
+      m)
+        get_maximum_available_quota="true"
+        ;;
+      \?)
+        msg_error "Unrecognized option -$OPTARG"
+        exit 1
+        ;;
+      :)
+        msg_error "Option -$OPTARG requires an argument." >&2
+        exit 1
+        ;;
+    esac
+  done
 
-  if [ -z $parameter_value ]; then
-    case $resource_parameter in
-      "memory.quota" ) 
-        lxc_get_memory $container 
+  if [ "x$set_quota" == "xtrue" ]; then
+    case $resource_type in
+      "ram" )
+        # If the parameter for ram metric does not have K,M,G letters
+        # then set the default value to M which causes to be tread as megabytes
+        if [ "`is_number $quota_value`" == "true" ]; then
+          local quota_value=$quota_value"M"
+        fi
+        lxc_set_memory $container $quota_value
+        ;;
+      "cpuset" )
+        lxc_set_cpus $container $quota_value
       ;;
-      "cpu.cpus")
-        lxc_get_cpus $container
+      "cpu")
+        lxc_set_cpu_quota $container $quota_value
       ;;
-      "hdd.quota.home")
-        zfs_get_quota $container "home"
+      "diskHome" )
+        fs_set_quota $container "home" $quota_value
       ;;
-      "hdd.quota.var")
-        zfs_get_quota $container "var"
+      "diskVar")
+        fs_set_quota $container "var" $quota_value
       ;;
-      "hdd.quota.opt")
-        zfs_get_quota $container "opt"
+      "diskOpt")
+        fs_set_quota $container "opt" $quota_value
       ;;
-      "hdd.quota.rootfs")
-        zfs_get_quota $container "rootfs"
+      "diskRootfs")
+        fs_set_quota $container "rootfs" $quota_value
       ;;
-      "json")
-        local memory_value=$(lxc_get_memory $container)
-        local memory_value=$( [ -z $memory_value ] &&  echo "none" || echo $memory_value )
-
-        local cpu_value=$(lxc_get_cpus $container)
-        local cpu_value=$( [ -z $cpu_value ] && echo "none" || printf "\"$cpu_value\"" )
-
-        local hdd_home_value=$(zfs_get_quota $container "home")
-        local hdd_var_value=$(zfs_get_quota $container "var")
-        local hdd_opt_value=$(zfs_get_quota $container "opt")
-        local hdd_rootfs_value=$(zfs_get_quota $container "rootfs")
-        printf "{memory.quota=$memory_value,cpu.cpus=$cpu_value,hdd.quota.home=$hdd_home_value, hdd.quota.var=$hdd_var_value, hdd.quota.opt=$hdd_opt_value, hdd.quota.rootfs=$hdd_rootfs_value}"
+      "networkRate")
+        network_set_rate_quota $container $quota_value
       ;;
+      *)
+        msg_error "$resource_type is not a supported type! Aborting.."
+        exit 1
+    esac
+  elif [ "x$get_maximum_available_quota" == "xtrue" ]; then
+    case $resource_type in
+      "ram" )
+        get_total_usable_ram_in_megabytes $container
+        ;;
+      "cpu" )
+        # Maximum cpu quota in percentage is always 100%
+        echo "100"
+        ;;
+      "diskHome" )
+        fs_get_total_usable_quota_readable $container "home"
+      ;;
+      "diskVar")
+        fs_get_total_usable_quota_readable $container "var"
+      ;;
+      "diskOpt")
+        fs_get_total_usable_quota_readable $container "opt"
+      ;;
+      "diskRootfs")
+        fs_get_total_usable_quota_readable $container "rootfs"
+      ;;
+      *)
+        msg_error "$resource_type is not a supported type for maximum available quota! Aborting.."
+        exit 1
     esac
   else
-    case $resource_parameter in
-      "memory.quota" )
-        lxc_set_memory $container $parameter_value
-        ;;
-      "cpu.cpus" )
-        lxc_set_cpus $container $parameter_value
+    case $resource_type in
+      "ram" )
+        lxc_get_memory_in_megabytes $container
       ;;
-      "hdd.quota.home")
-        zfs_set_quota $container "home" $parameter_value
+      "cpuset")
+        lxc_get_cpus $container
       ;;
-      "hdd.quota.var")
-        zfs_set_quota $container "var" $parameter_value
+      "cpu")
+        lxc_get_cpu_quota $container
       ;;
-      "hdd.quota.opt")
-        zfs_set_quota $container "opt" $parameter_value
+      "diskHome")
+        fs_get_quota $container "home"
       ;;
-      "hdd.quota.rootfs")
-        zfs_set_quota $container "rootfs" $parameter_value
+      "diskVar")
+        fs_get_quota $container "var"
       ;;
+      "diskOpt")
+        fs_get_quota $container "opt"
+      ;;
+      "diskRootfs")
+        fs_get_quota $container "rootfs"
+      ;;
+      "networkRate")
+        network_get_rate_quota $container
+      ;;
+      "json")
+        local memory_value=$(lxc_get_memory_in_megabytes $container)
+        local memory_value=$( [ -z $memory_value ] &&  echo "none" || echo $memory_value )
+
+        local cpu_value=$(lxc_get_cpu_quota $container)
+        local cpu_value=$( [ -z $cpu_value ] && echo "none" || printf "\"$cpu_value\"" )
+
+        local hdd_home_value=$(fs_get_quota $container "home")
+        local hdd_var_value=$(fs_get_quota $container "var")
+        local hdd_opt_value=$(fs_get_quota $container "opt")
+        local hdd_rootfs_value=$(fs_get_quota $container "rootfs")
+        local network_rate=$(network_get_rate_quota $container)
+        printf "{ram=$memory_value,cpu=$cpu_value,diskHome=$hdd_home_value, diskVar=$hdd_var_value, diskOpt=$hdd_opt_value, diskRootfs=$hdd_rootfs_value, networkRate=$network_rate}"
+      ;;
+      *)
+        msg_error "$resource_type is not a supported type! Aborting.."
+        exit 1
     esac
   fi
-
 }
 
 
 function quota_description {
-
   echo sets and gets container quotas;
 }
+
+

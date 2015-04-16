@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.metric.impl;
 
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Set;
 import java.util.UUID;
@@ -11,24 +10,19 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
-import javax.sql.DataSource;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.exception.DaoException;
-import org.safehaus.subutai.common.util.DbUtil;
+import org.safehaus.subutai.core.metric.impl.model.Subscriber;
+import org.safehaus.subutai.core.metric.impl.model.SubscriberPK;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.anyVararg;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
@@ -38,10 +32,7 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class MonitorDaoTest
 {
-    @Mock
-    DbUtil dbUtil;
-    @Mock
-    DataSource dataSource;
+
     private final static String SUBSCRIBER_ID = "subscriber";
     private final static UUID ENVIRONMENT_ID = UUID.randomUUID();
 
@@ -53,34 +44,10 @@ public class MonitorDaoTest
     static class MonitorDaoExt extends MonitorDao
     {
 
-        public MonitorDaoExt( final DataSource dataSource ) throws DaoException
-        {
-            super( dataSource );
-        }
-
 
         public MonitorDaoExt( final EntityManagerFactory emf ) throws DaoException
         {
             super( emf );
-        }
-
-
-        @Override
-        protected void setupDb() throws DaoException
-        {
-            //no-op
-        }
-
-
-        public void testSetupDB() throws DaoException
-        {
-            super.setupDb();
-        }
-
-
-        public void setDbUtil( DbUtil dbUtil )
-        {
-            this.dbUtil = dbUtil;
         }
     }
 
@@ -102,10 +69,6 @@ public class MonitorDaoTest
         {
             e.printStackTrace();
         }
-
-
-        when( dbUtil.select( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
-        when( dbUtil.update( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
     }
 
 
@@ -115,14 +78,6 @@ public class MonitorDaoTest
         emf = Persistence.createEntityManagerFactory( "default" );
 
         monitorDao = new MonitorDaoExt( emf );
-        monitorDao.setDbUtil( dbUtil );
-    }
-
-
-    @Test( expected = NullPointerException.class )
-    public void testConstructorShouldFailOnNullDataSource() throws Exception
-    {
-        new MonitorDao( ( DataSource ) null );
     }
 
 
@@ -145,13 +100,12 @@ public class MonitorDaoTest
 
 
     @Test
-    @Ignore
     public void testRemoveSubscription() throws Exception
     {
 
         monitorDao.removeSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
 
-        verify( dbUtil ).update( anyString(), anyVararg() );
+        assertFalse( monitorDao.getEnvironmentSubscribersIds( ENVIRONMENT_ID ).contains( SUBSCRIBER_ID ) );
     }
 
 
@@ -167,11 +121,6 @@ public class MonitorDaoTest
     @Test
     public void testGetEnvironmentSubscribersIds() throws Exception
     {
-        ResultSet resultSet = mock( ResultSet.class );
-        when( dbUtil.select( anyString(), anyVararg() ) ).thenReturn( resultSet );
-        when( resultSet.next() ).thenReturn( true ).thenReturn( false );
-        when( resultSet.getString( anyString() ) ).thenReturn( SUBSCRIBER_ID );
-
         Set<String> subscribersIds = monitorDao.getEnvironmentSubscribersIds( ENVIRONMENT_ID );
 
         assertTrue( subscribersIds.contains( SUBSCRIBER_ID ) );
@@ -188,27 +137,29 @@ public class MonitorDaoTest
 
 
     @Test
-    public void testSetupDb() throws Exception
+    public void testSubscriber() throws Exception
     {
-        monitorDao.testSetupDB();
+        Subscriber subscriber = new Subscriber( ENVIRONMENT_ID.toString(), SUBSCRIBER_ID );
 
-        ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass( String.class );
-
-
-        verify( dbUtil ).update( sqlCaptor.capture() );
-
-        assertEquals( "create table if not exists monitor_subscriptions(environmentId uuid, subscriberId varchar(100), "
-                + " PRIMARY KEY (environmentId, subscriberId));", sqlCaptor.getValue() );
+        assertEquals( ENVIRONMENT_ID, UUID.fromString( subscriber.getEnvironmentId() ) );
+        assertEquals( SUBSCRIBER_ID, subscriber.getSubscriberId() );
     }
 
 
-    @Test( expected = DaoException.class )
-    @Ignore
-    public void testSetupDbException() throws Exception
+    @Test
+    public void testSubscriberPK() throws Exception
     {
+        SubscriberPK subscriberPK = new SubscriberPK();
+        subscriberPK.setSubscriberId( SUBSCRIBER_ID );
+        subscriberPK.setEnvironmentId( ENVIRONMENT_ID.toString() );
 
-        throwDbException();
+        assertEquals( ENVIRONMENT_ID, UUID.fromString( subscriberPK.getEnvironmentId() ) );
+        assertEquals( SUBSCRIBER_ID, subscriberPK.getSubscriberId() );
 
-        monitorDao.testSetupDB();
+        SubscriberPK subscriberPK2 = new SubscriberPK();
+        subscriberPK2.setSubscriberId( SUBSCRIBER_ID );
+        subscriberPK2.setEnvironmentId( ENVIRONMENT_ID.toString() );
+
+        assertEquals( subscriberPK2, subscriberPK );
     }
 }

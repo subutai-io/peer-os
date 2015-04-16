@@ -2,6 +2,8 @@ package org.safehaus.subutai.core.hostregistry.api;
 
 
 import org.junit.Test;
+import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.common.host.HostArchitecture;
 
 
 public class EnumTest

@@ -18,10 +18,14 @@
   </jaxrs:server>
 
   <bean id="peerRestServiceImpl" class="org.safehaus.subutai.core.peer.rest.RestServiceImpl">
-    <property name="peerManager" ref="peerManager" />
+    <argument ref="peerManager" />
+    <property name="sslContextFactory" ref="sslContextFactory" />
   </bean>
 
   <reference id="peerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+
+  <reference id="sslContextFactory" availability="mandatory"
+             interface="org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory" />
 
 </blueprint>

@@ -35,11 +35,12 @@ public:
 	SubutaiLogger();
 	virtual ~SubutaiLogger();
 	string getLocaltime();
-	void writeLog(int,string);
-	bool openLogFile(int,int);
+	void writeLog(int, string);
+	bool openLogFile(int, int);
 	bool openLogFileWithName(string);
 	void closeLogFile();
-	string setLogData(string,string="",string="",string="",string="");
+	string setLogData(string, string = "", string = "", string = "",
+			string = "");
 	int getLogLevel();
 	void setLogLevel(int loglevel);
 private:

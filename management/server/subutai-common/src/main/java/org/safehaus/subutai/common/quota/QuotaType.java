@@ -1,19 +1,15 @@
 package org.safehaus.subutai.common.quota;
 
 
-/**
- * Created by talas on 10/7/14.
- */
-
 public enum QuotaType
 {
-    QUOTA_CPU_CPUS( "cpu.cpus" ),
-    QUOTA_HDD_HOME( "hdd.quota.home" ),
-    QUOTA_HDD_VAR( "hdd.quota.var" ),
-    QUOTA_HDD_OPT( "hdd.quota.opt" ),
-    QUOTA_HDD_ROOTFS( "hdd.quota.rootfs" ),
-    QUOTA_MEMORY_QUOTA( "memory.quota" ),
-    QUOTA_ALL_JSON( "json" );
+    QUOTA_TYPE_CPU( "cpu" ),
+    QUOTA_TYPE_DISK_HOME( DiskPartition.HOME.getPartitionName() ),
+    QUOTA_TYPE_DISK_VAR( DiskPartition.VAR.getPartitionName() ),
+    QUOTA_TYPE_DISK_OPT( DiskPartition.OPT.getPartitionName() ),
+    QUOTA_TYPE_DISK_ROOTFS( DiskPartition.ROOT_FS.getPartitionName() ),
+    QUOTA_TYPE_RAM( "ram" ),
+    QUOTA_TYPE_ALL_JSON( "json" );
 
     private String key;
 
@@ -32,23 +28,37 @@ public enum QuotaType
 
     public static QuotaType getQuotaType( String quotaType )
     {
-        switch ( quotaType )
+        if ( "cpu".equalsIgnoreCase( quotaType ) )
         {
-            case "cpu.cpus":
-                return QUOTA_CPU_CPUS;
-            case "hdd.quota.home":
-                return QUOTA_HDD_HOME;
-            case "hdd.quota.var":
-                return QUOTA_HDD_VAR;
-            case "hdd.quota.opt":
-                return QUOTA_HDD_OPT;
-            case "hdd.quota.rootfs":
-                return QUOTA_HDD_ROOTFS;
-            case "memory.quota":
-                return QUOTA_MEMORY_QUOTA;
-            case "json":
-                return QUOTA_ALL_JSON;
+            return QUOTA_TYPE_CPU;
         }
-        return null;
+        else if ( DiskPartition.HOME.getPartitionName().equalsIgnoreCase( quotaType ) )
+        {
+            return QUOTA_TYPE_DISK_HOME;
+        }
+        else if ( DiskPartition.VAR.getPartitionName().equalsIgnoreCase( quotaType ) )
+        {
+            return QUOTA_TYPE_DISK_VAR;
+        }
+        else if ( DiskPartition.OPT.getPartitionName().equalsIgnoreCase( quotaType ) )
+        {
+            return QUOTA_TYPE_DISK_OPT;
+        }
+        else if ( DiskPartition.ROOT_FS.getPartitionName().equalsIgnoreCase( quotaType ) )
+        {
+            return QUOTA_TYPE_DISK_ROOTFS;
+        }
+        else if ( "ram".equalsIgnoreCase( quotaType ) )
+        {
+            return QUOTA_TYPE_RAM;
+        }
+        else if ( "json".equalsIgnoreCase( quotaType ) )
+        {
+            return QUOTA_TYPE_ALL_JSON;
+        }
+        else
+        {
+            return null;
+        }
     }
 }

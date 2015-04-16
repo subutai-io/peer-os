@@ -44,7 +44,7 @@
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
     </dependency>
-  </dependencies>
+   </dependencies>
 
   <build>
     <plugins>
@@ -61,10 +61,13 @@
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
+            <Import-Package>*</Import-Package>
           </instructions>
         </configuration>
       </plugin>
+
     </plugins>
+
   </build>
 
 </project>

@@ -3,7 +3,7 @@ Section: devel
 Priority: optional
 Maintainer: Subutai
 Build-Depends: debhelper (>= 8.0.0)
-Standards-Version: 3.9.4
+Standards-Version: 3.9.5
 Homepage: http://www.safehaus.org
 
 Package: subutai-cli-management

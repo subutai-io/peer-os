@@ -4,24 +4,50 @@ package org.safehaus.subutai.core.peer.ui;
 import java.io.File;
 
 import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory;
 import org.safehaus.subutai.server.ui.api.PortalModule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.vaadin.ui.Component;
 
 
-/**
- * Created by bahadyr on 8/28/14.
- */
 public class PeerManagerPortalModule implements PortalModule
 {
 
     public static final String MODULE_IMAGE = "peer.png";
     public static final String MODULE_NAME = "Peer";
     private PeerManager peerManager;
-    protected static final Logger LOG = LoggerFactory.getLogger( PeerManagerPortalModule.class );
+    private TemplateRegistry registry;
+    private HostRegistry hostRegistry;
+    private CustomSslContextFactory sslContextFactory;
+    private EnvironmentManager environmentManager;
+
+
+    public void setSslContextFactory( final CustomSslContextFactory sslContextFactory )
+    {
+        this.sslContextFactory = sslContextFactory;
+    }
+
+
+    public CustomSslContextFactory getSslContextFactory()
+    {
+        return sslContextFactory;
+    }
+
+
+    public EnvironmentManager getEnvironmentManager()
+    {
+        return environmentManager;
+    }
+
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
+        this.environmentManager = environmentManager;
+    }
 
 
     public PeerManager getPeerManager()
@@ -30,9 +56,24 @@ public class PeerManagerPortalModule implements PortalModule
     }
 
 
-    public void setPeerManager( final PeerManager peerManager )
+    public TemplateRegistry getRegistry()
+    {
+        return registry;
+    }
+
+
+    public HostRegistry getHostRegistry()
+    {
+        return hostRegistry;
+    }
+
+
+    public PeerManagerPortalModule( final PeerManager peerManager, final TemplateRegistry registry,
+                                    final HostRegistry hostRegistry )
     {
         this.peerManager = peerManager;
+        this.registry = registry;
+        this.hostRegistry = hostRegistry;
     }
 
 

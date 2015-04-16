@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageListener;
 import org.safehaus.subutai.core.messenger.api.Messenger;
@@ -13,7 +14,7 @@ import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.impl.RecipientType;
 
 
-public class MessageRequestListener extends MessageListener
+public class MessageRequestListener extends MessageListener implements Disposable
 {
 
     private PeerManager peerManager;
@@ -28,6 +29,12 @@ public class MessageRequestListener extends MessageListener
         this.peerManager = peerManager;
         this.messenger = messenger;
         this.listeners = listeners;
+    }
+
+
+    public void dispose()
+    {
+        notifier.shutdown();
     }
 
 

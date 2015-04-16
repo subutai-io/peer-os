@@ -49,5 +49,6 @@ public interface Message
      */
     public void setSender( String sender );
 
-    String getPayload();
+
+    public String getPayload();
 }

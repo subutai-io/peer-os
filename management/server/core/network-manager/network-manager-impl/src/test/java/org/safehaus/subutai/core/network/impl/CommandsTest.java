@@ -1,9 +1,15 @@
 package org.safehaus.subutai.core.network.impl;
 
 
+import java.util.UUID;
+
 import org.junit.Test;
+import org.safehaus.subutai.common.peer.ContainerHost;
+
+import com.google.common.collect.Sets;
 
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
 
 
 public class CommandsTest
@@ -18,10 +24,14 @@ public class CommandsTest
     private static final String TUNNEL_TYPE = "tunnel type";
     private static final String GATEWAY_IP = "gateway.ip";
     private static final int VLAN_ID = 100;
+    private static final UUID ENVIRONMENT_ID = UUID.randomUUID();
     private static final String CONTAINER_NAME = "container";
     private static final String PATH_TO_KEY_FILE = "/path/to/key/file";
+    private static final String KEY_TYPE = "key type";
     private static final int NET_MASK = 24;
     private static final int VNI = 100;
+    private static final String KEY = "KEY";
+    private static final String DOMAIN = "domain";
     Commands commands = new Commands();
 
 
@@ -30,7 +40,7 @@ public class CommandsTest
     {
         assertNotNull(
                 commands.getSetupN2NConnectionCommand( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME,
-                        LOCAL_IP, PATH_TO_KEY_FILE ) );
+                        LOCAL_IP, KEY_TYPE, PATH_TO_KEY_FILE ) );
     }
 
 
@@ -121,7 +131,7 @@ public class CommandsTest
     @Test
     public void testGetSetupVniVlanMappingCommand() throws Exception
     {
-        assertNotNull( commands.getSetupVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID ) );
+        assertNotNull( commands.getSetupVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID, ENVIRONMENT_ID ) );
     }
 
 
@@ -129,5 +139,90 @@ public class CommandsTest
     public void testGetRemoveVniVlanMappingCommand() throws Exception
     {
         assertNotNull( commands.getRemoveVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID ) );
+    }
+
+
+    @Test
+    public void testGetCleanupEnvironmentNetworkSettingsCommand() throws Exception
+    {
+        assertNotNull( commands.getCleanupEnvironmentNetworkSettingsCommand( VLAN_ID ) );
+    }
+
+
+    @Test
+    public void testGetListVniVlanMappingsCommand() throws Exception
+    {
+        assertNotNull( commands.getListVniVlanMappingsCommand() );
+    }
+
+
+    @Test
+    public void testReserveVniCommand() throws Exception
+    {
+        assertNotNull( commands.getReserveVniCommand( VNI, VLAN_ID, ENVIRONMENT_ID ) );
+    }
+
+
+    @Test
+    public void testGetListReservedVnisCommand() throws Exception
+    {
+        assertNotNull( commands.getListReservedVnisCommand() );
+    }
+
+
+    @Test
+    public void testGetCreateSSHCommand() throws Exception
+    {
+        assertNotNull( commands.getCreateSSHCommand() );
+    }
+
+
+    @Test
+    public void testGetReadSSHCommand() throws Exception
+    {
+        assertNotNull( commands.getReadSSHCommand() );
+    }
+
+
+    @Test
+    public void testGetWriteSSHCommand() throws Exception
+    {
+        assertNotNull( commands.getWriteSSHCommand( KEY ) );
+    }
+
+
+    @Test
+    public void testGetAppendSshKeyCommand() throws Exception
+    {
+        assertNotNull( commands.getAppendSshKeyCommand( KEY ) );
+    }
+
+
+    @Test
+    public void testGetRemoveSshKeyCommand() throws Exception
+    {
+        assertNotNull( commands.getRemoveSshKeyCommand( KEY ) );
+    }
+
+
+    @Test
+    public void testGetConfigSSHCommand() throws Exception
+    {
+        assertNotNull( commands.getConfigSSHCommand() );
+    }
+
+
+    @Test
+    public void testGetReplaceSshKeyCommand() throws Exception
+    {
+        assertNotNull( commands.getReplaceSshKeyCommand( KEY, KEY ) );
+    }
+
+
+    @Test
+    public void testGetAddIpHostToEtcHostsCommand() throws Exception
+    {
+        ContainerHost containerHost = mock( ContainerHost.class );
+        assertNotNull( commands.getAddIpHostToEtcHostsCommand( DOMAIN, Sets.newHashSet( containerHost ) ) );
     }
 }

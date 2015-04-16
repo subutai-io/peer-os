@@ -6,12 +6,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.protocol.Criteria;
-import org.safehaus.subutai.core.strategy.api.ServerMetric;
+import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
-import org.safehaus.subutai.core.strategy.api.StrategyNotAvailable;
+import org.safehaus.subutai.core.strategy.api.StrategyNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,15 +59,15 @@ public class StrategyManagerImpl implements StrategyManager
 
 
     @Override
-    public Map<ServerMetric, Integer> getPlacementDistribution( List<ServerMetric> serverMetrics, int nodesCount,
-                                                         String strategyId, List<Criteria> criteria )
-            throws StrategyException
+    public Map<ResourceHostMetric, Integer> getPlacementDistribution( List<ResourceHostMetric> serverMetrics,
+                                                                      int nodesCount, String strategyId,
+                                                                      List<Criteria> criteria ) throws StrategyException
     {
         ContainerPlacementStrategy containerPlacementStrategy = findStrategyById( strategyId );
 
         containerPlacementStrategy.calculatePlacement( nodesCount, serverMetrics, criteria );
 
-        Map<ServerMetric, Integer> result = containerPlacementStrategy.getPlacementDistribution();
+        Map<ResourceHostMetric, Integer> result = containerPlacementStrategy.getPlacementDistribution();
         int totalSlots = 0;
 
         for ( int slotCount : result.values() )
@@ -80,18 +80,12 @@ public class StrategyManagerImpl implements StrategyManager
             throw new StrategyException( String.format( "Only %d containers can be created", totalSlots ) );
         }
 
-        if ( totalSlots > nodesCount )
-        {
-            throw new StrategyException(
-                    String.format( "Total count of slots [%d] more than requested [%d].", totalSlots, nodesCount ) );
-        }
-
         return result;
     }
 
 
     @Override
-    public ContainerPlacementStrategy findStrategyById( String strategyId ) throws StrategyNotAvailable
+    public ContainerPlacementStrategy findStrategyById( String strategyId ) throws StrategyNotFoundException
     {
         ContainerPlacementStrategy placementStrategy = null;
         for ( int i = 0; i < placementStrategies.size() && placementStrategy == null; i++ )
@@ -103,7 +97,7 @@ public class StrategyManagerImpl implements StrategyManager
         }
         if ( placementStrategy == null )
         {
-            throw new StrategyNotAvailable(
+            throw new StrategyNotFoundException(
                     String.format( "Container placement strategy [%s] not available.", strategyId ) );
         }
         return placementStrategy;

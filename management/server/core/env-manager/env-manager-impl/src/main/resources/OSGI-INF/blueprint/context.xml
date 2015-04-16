@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint default-activation="eager"
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
+           xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
+            http://www.w3.org/2001/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance
+            http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0">
+
+  <!-- Allow the use of system properties -->
+  <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
+
+  <cm:property-placeholder persistent-id="environment" update-strategy="none">
+    <cm:default-properties>
+      <cm:property name="defaultDomain" value="intra.lan" />
+    </cm:default-properties>
+  </cm:property-placeholder>
+
+  <reference id="templateRegistry" availability="mandatory"
+             interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
+  <reference id="peerManager"
+             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+  <reference id="networkManager"
+             interface="org.safehaus.subutai.core.network.api.NetworkManager" />
+  <reference id="identityManager"
+             interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
+  <reference id="tracker"
+             interface="org.safehaus.subutai.core.tracker.api.Tracker" />
+
+  <!-- ************************************************************************************************* -->
+  <bean id="daoManagerEnv" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager" activation="eager">
+    <jpa:unit unitname="envExtManagerPUnit" property="entityManagerFactory" />
+  </bean>
+  <!-- ************************************************************************************************** -->
+
+  <reference-list id="eventLstnr"
+                  interface="org.safehaus.subutai.core.env.api.EnvironmentEventListener"
+                  availability="optional">
+    <reference-listener ref="environmentManager"
+                        bind-method="registerListener" unbind-method="unregisterListener" />
+  </reference-list>
+
+  <bean id="environmentManager" scope="singleton" init-method="init" destroy-method="dispose"
+        class="org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl">
+    <argument ref="templateRegistry" />
+    <argument ref="peerManager" />
+    <argument ref="networkManager" />
+    <argument ref="daoManagerEnv" />
+    <argument value="${defaultDomain}" />
+    <argument ref="identityManager" />
+    <argument ref="tracker" />
+  </bean>
+
+  <service ref="environmentManager" interface="org.safehaus.subutai.core.env.api.EnvironmentManager" />
+
+</blueprint>

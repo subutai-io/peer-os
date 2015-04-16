@@ -11,13 +11,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.common.environment.Environment;
+import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
-import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.core.metric.impl.ContainerHostMetricImpl;
 import org.safehaus.subutai.core.metric.impl.ResourceHostMetricImpl;
 
@@ -35,7 +36,7 @@ import static org.mockito.Mockito.when;
 /**
  * Test for RestServiceImpl
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith( MockitoJUnitRunner.class )
 public class RestServiceImplTest
 {
     @Mock
@@ -59,14 +60,14 @@ public class RestServiceImplTest
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void testConstructorShouldFailOnNullMonitor() throws Exception
     {
         new RestServiceImpl( null, environmentManager );
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void testConstructorShouldFailOnNullEnvironmentManager() throws Exception
     {
         new RestServiceImpl( monitor, null );
@@ -89,7 +90,7 @@ public class RestServiceImplTest
     @Test
     public void testGetResourceHostMetricsException() throws Exception
     {
-        when( monitor.getResourceHostsMetrics() ).thenThrow( new MonitorException( "" ) );
+        when( monitor.getResourceHostsMetrics() ).thenThrow( new RuntimeException( "" ) );
 
         Response response = restService.getResourceHostsMetrics();
 
@@ -126,7 +127,7 @@ public class RestServiceImplTest
     {
         UUID environmentId = UUID.randomUUID();
         Environment environment = mock( Environment.class );
-        when( environmentManager.getEnvironmentByUUID( environmentId ) ).thenReturn( environment );
+        when( environmentManager.findEnvironment( environmentId ) ).thenReturn( environment );
         when( monitor.getContainerHostsMetrics( environment ) ).thenReturn( Sets.newHashSet( containerHostMetric ) );
 
         Response response = restService.getContainerHostsMetrics( environmentId.toString() );
@@ -142,7 +143,7 @@ public class RestServiceImplTest
     public void testGetContainerHostMetricsWithNullEnvironment() throws Exception
     {
         UUID environmentId = UUID.randomUUID();
-        when( environmentManager.getEnvironmentByUUID( environmentId ) ).thenReturn( null );
+        doThrow( new EnvironmentNotFoundException( null ) ).when( environmentManager ).findEnvironment( environmentId );
 
         Response response = restService.getContainerHostsMetrics( environmentId.toString() );
 
@@ -155,7 +156,7 @@ public class RestServiceImplTest
     {
         UUID environmentId = UUID.randomUUID();
         Environment environment = mock( Environment.class );
-        when( environmentManager.getEnvironmentByUUID( environmentId ) ).thenReturn( environment );
+        when( environmentManager.findEnvironment( environmentId ) ).thenReturn( environment );
         when( monitor.getContainerHostsMetrics( environment ) ).thenThrow( new MonitorException( "" ) );
 
         Response response = restService.getContainerHostsMetrics( environmentId.toString() );

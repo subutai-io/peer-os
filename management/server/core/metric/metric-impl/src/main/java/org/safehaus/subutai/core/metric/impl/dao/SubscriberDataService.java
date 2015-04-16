@@ -18,9 +18,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 
 
-/**
- * Created by talas on 12/12/14.
- */
 public class SubscriberDataService
 {
     private EntityManagerFactory emf;
@@ -43,9 +40,9 @@ public class SubscriberDataService
     }
 
 
-    public void setEmf( final EntityManagerFactory emf )
+    public void setEntityManagerFactory( final EntityManagerFactory emf )
     {
-        Preconditions.checkNotNull( emf, "EntityManagerFactory cannot be null." );
+        Preconditions.checkNotNull( emf, " EntityManagerFactory cannot be null." );
         this.emf = emf;
     }
 

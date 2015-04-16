@@ -1,28 +1,32 @@
 #!/bin/bash
+#management server service script
+#
+#Subutai Management Host main Script
+#
 SUBUTAI_HOME="/opt/subutai-management"
 SUBUTAI_BIN="/opt/subutai-management/bin"
 SUBUTAI_DATA="/opt/subutai-management/data"
 SUBUTAI_PID=$(pgrep -l -f karaf | grep java | awk '{print $1}')
 
-subutaiGetPid(){
-SUBUTAI_PID=$(pgrep -l -f karaf | grep java | awk '{print $1}')
+
+getPid() {
+	SUBUTAI_PID=$(pgrep -l -f karaf | grep java | awk '{print $1}')
 }
 
-case "$1" in
-start)
+do_start() {
         if [ -z "$SUBUTAI_PID" ];
         then
-                sudo rm -rf $SUBUTAI_DATA/*
                 sudo $SUBUTAI_BIN/start
                 echo "Subutai-Management is starting.."
-                sleep 1
-                subutaiGetPid
+                sleep 3
+                getPid
                 echo "Subutai-Management is started..($SUBUTAI_PID)"
         else
                 echo "Subutai-Management is already running..($SUBUTAI_PID)"
         fi
-;;
-stop)
+}
+
+do_stop() {
         if [ -z "$SUBUTAI_PID" ];
         then
                 echo "Subutai-Management is not running now.."
@@ -30,21 +34,34 @@ stop)
                 echo "Subutai-Management is stopping now..($SUBUTAI_PID)"
                 sudo pkill -f karaf
         fi
-        ;;
-restart)
-        echo "Subutai-Management is restarting now.."
-        sudo pkill -f karaf
-        sudo rm -rf $SUBUTAI_DATA/*
-        sudo $SUBUTAI_BIN/start
-        subutaiGetPid
-        echo "Subutai-Management is started..($SUBUTAI_PID)"
-        ;;
-status)
+}
+
+get_status() {
         if [ -z "$SUBUTAI_PID" ];
         then
                 echo "Subutai-Management is not running now.."
         else
                 echo "Subutai-Management is running now..($SUBUTAI_PID)"
         fi
-        ;;
+}
+
+
+case "$1" in
+start)
+        do_start
+;;
+stop)
+        do_stop
+;;
+restart)
+	echo "Subutai-Management is restarting now.."
+        sudo pkill -f karaf
+        sudo $SUBUTAI_BIN/start
+	sleep 3
+        getPid
+        echo "Subutai-Management is started..($SUBUTAI_PID)"
+;;
+status)
+        get_status
+;;
 esac

@@ -2,7 +2,7 @@
 
 . $subutai_lib_base/net_ops
 
-function network_usage {
+function network_usage { 
 echo --------------------------------------------------------------------------
 echo
 echo Usage:   Assign or Modify -due to state of container- Environment IP and VLAN ID of Container
@@ -30,6 +30,7 @@ function network {
   local vlanID="$4"
   local extra="$5"
   local config=/var/lib/lxc/$container/config
+  local gwup=/var/lib/lxc/$container/rootfs/etc/network/if-up.d/upstart
 
   if [ "$1" == "-h" ]
   then
@@ -76,6 +77,8 @@ function network {
        echo "#vlan_id = $vlanID"  >> $config
        # get macaddress_of_container to initialize ovs bridges' name
        macaddress_of_container=`cat $config | grep lxc.network.hwaddr | cut -d "=" -f 2 | tr -d ' '`
+       local gateway="`getgw $ipAddress`"
+       echo "route add default gw $gateway" >> $gwup
        #Remove ':' characters from macaddress to initialize ovs_bridges
        ovs_port_name=`echo $macaddress_of_container | tr -d ':'`
        net_update_networking $container $ovs_port_name $ipAddress $vlanID

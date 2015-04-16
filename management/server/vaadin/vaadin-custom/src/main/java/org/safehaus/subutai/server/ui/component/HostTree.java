@@ -7,16 +7,17 @@ import java.util.Set;
 
 import javax.naming.NamingException;
 
+import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.common.host.HostInfo;
+import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.protocol.Disposable;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
@@ -48,15 +49,17 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
     private final HostRegistry hostRegistry;
     private final Tree tree;
     private HierarchicalContainer container;
-    private Set<HostInfo> presentHosts = Sets.newHashSet();
-    private Set<HostInfo> selectedHosts = Sets.newHashSet();
+    private Set<HostInfo> presentHosts = Sets.newConcurrentHashSet();
+    private Set<HostInfo> selectedHosts = Sets.newConcurrentHashSet();
     private static final String VALUE_PROPERTY = "value";
     private static final String ICON_PROPERTY = "icon";
+    private final boolean hideManagement;
 
 
-    public HostTree( HostRegistry hostRegistry )
+    public HostTree( HostRegistry hostRegistry, boolean hideManagement )
     {
         this.hostRegistry = hostRegistry;
+        this.hideManagement = hideManagement;
 
         setSizeFull();
         setMargin( true );
@@ -115,6 +118,12 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
         addComponent( tree );
 
         hostRegistry.addHostListener( this );
+    }
+
+
+    public Tree getTree()
+    {
+        return tree;
     }
 
 
@@ -184,7 +193,7 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
                     if ( hostInfo instanceof ContainerHostInfo )
                     {
                         ContainerHost containerHost =
-                                peerManager.getLocalPeer().getContainerHostById( hostInfo.getId().toString() );
+                                peerManager.getLocalPeer().getContainerHostById( hostInfo.getId() );
                         if ( containerHost.getTags().contains( tag ) )
                         {
                             matchedContainerNames.add( containerHost.getHostname() );
@@ -220,6 +229,10 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
 
             for ( ResourceHostInfo resourceHostInfo : hosts )
             {
+                if ( hideManagement && resourceHostInfo.getHostname().equalsIgnoreCase( Common.MANAGEMENT_HOSTNAME ) )
+                {
+                    continue;
+                }
                 missingHosts.remove( resourceHostInfo );
                 Item parent = container.getItem( resourceHostInfo.getId() );
                 //host is not yet in the tree

@@ -2,20 +2,27 @@ package org.safehaus.subutai.core.environment.terminal.ui;
 
 
 import java.io.File;
+import java.util.Date;
+import java.util.Set;
+import java.util.UUID;
 
+import org.safehaus.subutai.common.environment.Environment;
+import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.env.api.EnvironmentEventListener;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
 
 
-public class EnvironmentTerminalPortalModule implements PortalModule
+public class EnvironmentTerminalPortalModule implements PortalModule, EnvironmentEventListener
 {
 
     public static final String MODULE_IMAGE = "env_terminal.png";
     public static final String MODULE_NAME = "Environment Terminal";
     private EnvironmentManager environmentManager;
+    private volatile Date updateDate = new Date();
 
 
     public EnvironmentTerminalPortalModule( final EnvironmentManager environmentManager )
@@ -60,7 +67,7 @@ public class EnvironmentTerminalPortalModule implements PortalModule
     @Override
     public Component createComponent()
     {
-        return new TerminalForm( environmentManager );
+        return new TerminalForm( environmentManager, updateDate );
     }
 
 
@@ -68,5 +75,33 @@ public class EnvironmentTerminalPortalModule implements PortalModule
     public Boolean isCorePlugin()
     {
         return true;
+    }
+
+
+    @Override
+    public void onEnvironmentCreated( final Environment environment )
+    {
+        //ignore
+    }
+
+
+    @Override
+    public void onEnvironmentGrown( final Environment environment, final Set<ContainerHost> newContainers )
+    {
+        updateDate.setTime( System.currentTimeMillis() );
+    }
+
+
+    @Override
+    public void onContainerDestroyed( final Environment environment, final UUID containerId )
+    {
+        updateDate.setTime( System.currentTimeMillis() );
+    }
+
+
+    @Override
+    public void onEnvironmentDestroyed( final UUID environmentId )
+    {
+        updateDate.setTime( System.currentTimeMillis() );
     }
 }

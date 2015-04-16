@@ -11,7 +11,8 @@
       <cm:property name="brokerUrl" value="failover:tcp://localhost:61616" />
       <cm:property name="maxBrokerConnections" value="10" />
       <cm:property name="isPersistent" value="true" />
-      <cm:property name="messageTimeout" value="60" />
+      <cm:property name="messageTimeout" value="0" />
+      <cm:property name="idleConnectionTimeout" value="300" />
     </cm:default-properties>
   </cm:property-placeholder>
 
@@ -22,6 +23,7 @@
     <argument value="${maxBrokerConnections}" />
     <argument value="${isPersistent}" />
     <argument value="${messageTimeout}" />
+    <argument value="${idleConnectionTimeout}" />
   </bean>
 
   <service ref="broker" interface="org.safehaus.subutai.core.broker.api.Broker" />

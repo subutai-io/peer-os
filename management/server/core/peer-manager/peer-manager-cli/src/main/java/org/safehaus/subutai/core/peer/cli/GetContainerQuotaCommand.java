@@ -1,23 +1,22 @@
 package org.safehaus.subutai.core.peer.cli;
 
 
+import java.util.UUID;
+
+import org.safehaus.subutai.common.environment.Environment;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.quota.QuotaType;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-/**
- * Created by talas on 12/12/14.
- */
 @Command( scope = "peer", name = "get-quota", description = "gets quota information from peer for container" )
-public class GetContainerQuotaCommand extends OsgiCommandSupport
+public class GetContainerQuotaCommand extends SubutaiShellCommandSupport
 {
     @Argument( index = 0, name = "peer id", multiValued = false, required = true, description = "Id of target peer" )
     private String peerId;
@@ -48,8 +47,10 @@ public class GetContainerQuotaCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
+
+
         Peer peer = peerManager.getPeer( peerId );
-        Environment environment = environmentManager.getEnvironment( environmentId );
+        Environment environment = environmentManager.findEnvironment( UUID.fromString( environmentId ) );
 
         ContainerHost targetContainer = environment.getContainerHostByHostname( containerName );
         if ( targetContainer == null )

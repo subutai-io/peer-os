@@ -19,7 +19,7 @@ initializeVariables() {
   if [ "$mode" == "plugin" ]; then 
     BASE=/var/lib/jenkins/jobs/master.plugin.$productName
     SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo_all_plugins/workspace/$productName-plugin"
-    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName-plugin"
+    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName-subutai-plugin"
 
   else
     productNameUppercase="$(tr '[:lower:]' '[:upper:]' <<< ${productName:0:1})${productName:1}"
@@ -70,13 +70,19 @@ getSourcesToRelevantDirectories() {
 generateDebianPackagePlugins() {
   makeDirectory=$BASE/$fileName
   ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
+  productName=$1
   pushd $makeDirectory
   if [ -d target ]; then
     rm -rf target/
   fi
-  make
-  cp target/*".deb" $TARGET/
-  cp target/*".deb" $ISOPATH/
+  mvn clean install
+  if [ "$productName" = "common" ]; then
+    cp target/*".deb" $TARGET/
+    cp target/*".deb" $ISOPATH/
+  else
+    cp $productName-kar/target/*".deb" $TARGET/
+    #cp $productName-kar/target/*".deb" $ISOPATH/
+  fi
   popd
 }
 
@@ -94,20 +100,6 @@ generateDebianCliPackage() {
   cp subutai-$productName-debian-build/*.deb $TARGET/
   popd
 }
-
-generateDebianPackagePlugins() {
-  makeDirectory=$BASE/$fileName
-  ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
-  pushd $makeDirectory
-  if [ -d target ]; then
-    rm -rf target/
-  fi
-  make
-  cp target/*".deb" $TARGET/
-  cp target/*".deb" $ISOPATH/
-  popd
-}
-
 
 generateDebianPackage() {
   updatePackageContent $1
@@ -216,23 +208,19 @@ generateRepoPackage() {
   #Basic path definitions
   productName=$1
   productVersion=$2
+  archType=amd64
 	
 	#assign version_new
   if [ ! -z $productVersion ]; then
   	version_new=$productVersion 
-	fi
+  fi
 
   SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
   TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName"
-  ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
-
-  SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
-  TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName"
-  PACK="/var/lib/jenkins/Automation/Automation_ISO/mgmt-repo/template-repo-package/"
   ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
 
   #it's template package operation
-  if [[ $productName == *"template"* ]]; then
+  if [[ $productName == *"template"* ]] || [[ $productName == *"plugin"*  ]]; then
     BASE=/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName
   elif [[ $productName == *"cli"* ]]; then
     BASE=/var/lib/jenkins/jobs/master.subutai-$productName/Subutai-$productName
@@ -266,11 +254,15 @@ generateRepoPackage() {
   currentPackage=`ls -lt $TARGET | awk '{ print $9 }' | grep .deb | head -1` 
   echo "CurrentPackageName: $currentPackage"
 
-	if [[ "$currentPackage" == *"template"* ]]; then
-    shortCurrentPackage="$productName""_""$productVersion""_amd64"
+  if [[ "$currentPackage" == *"template"* ]]; then
+    shortCurrentPackage="$productName""_""$productVersion""_$archType"
     purePackageName=$productName
     echo "shortCurrentPackage: $shortCurrentPackage"
-  
+  elif [[ "$currentPackage" == *"plugin"* ]]; then
+    shortCurrentPackage="$productName""_""$version_new""_$archType"
+    purePackageName=$productName
+    echo "shortCurrentPackage: $shortCurrentPackage"
+
   elif [[ "$currentPackage" == *"subutai"* ]]; then
      shortCurrentPackage=`echo "$currentPackage" | awk '{print substr($1,9); }'  | awk '{print substr($0, 0, length($0)-4)}'`
      echo "shortCurrentPackage: $shortCurrentPackage"
@@ -299,7 +291,6 @@ generateRepoPackage() {
 #generate Template repo package structure
 generateTemplateRepo() {
   pushd $BASE
-  local arch="amd64"
   templateName="temp"
 
   #check temp folder does exist or not
@@ -316,11 +307,13 @@ generateTemplateRepo() {
   chmod 755 $BASE/$templateName/DEBIAN/control
   echo "Package: subutai-repo-$purePackageName" >> $BASE/$templateName/DEBIAN/control
   echo "Version: $version_new" >> $BASE/$templateName/DEBIAN/control
-  echo "Architecture: $arch" >> $BASE/$templateName/DEBIAN/control
+  echo "Architecture: $archType" >> $BASE/$templateName/DEBIAN/control
   echo "Maintainer: <subut.ai>" >> $BASE/$templateName/DEBIAN/control
   echo "Priority: optional" >> $BASE/$templateName/DEBIAN/control
   echo "Description: This is subutai repo $purePackageName wrapper package" >> $BASE/$templateName/DEBIAN/control
-
+  echo "Homepage: http://www.safehaus.org" >> $BASE/$templateName/DEBIAN/control
+  echo "Section: devel" >> $BASE/$templateName/DEBIAN/control
+ 
   cp $currentPackage $BASE/$templateName/repo/ksks/amd64/trusty/
   mv $BASE/$templateName/ $BASE/subutai-repo-$shortCurrentPackage
 
@@ -355,6 +348,20 @@ getTemplateVersion() {
   target_template_version=$version_new
 }
 
+#check version of package for the templates which does not have plugin repositories on stash.
+checkVersionForTemplatesWithoutPluginRepositories() {
+  local productName=$1
+  local version_new=$2
+  
+  TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName-subutai-template"
+  deb_name=`ls -lt $TARGET | awk '{ print $9 }' | grep .deb | head -1`
+  if [ -z "$deb_name" ]; then
+     echo "There is no previous package found.. Skipping Version Check"
+     return
+  fi
+  version_prev=$(echo $deb_name | awk -F"_" '{print $2}')
+  comparePrevAndNextVersions $version_new $version_prev
+}
 
 #check version of package based on type
 checkVersion() {
@@ -379,11 +386,10 @@ checkVersion() {
         
   elif [ "$mode" = "plugin" ]; then
 
-    CONTROL="/var/lib/jenkins/jobs/master.get_branch_repo_all_plugins/workspace/$productName-plugin/debian/changelog"
-    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName-plugin"
+    CONTROL="/var/lib/jenkins/jobs/master.get_branch_repo_all_plugins/workspace/$productName-plugin/pom.xml"
+    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName-subutai-plugin"
 
-    version_new=`cat $CONTROL | grep "$productName-subutai-plugin" | awk -F" " '{print $2}'`
-    version_new=`echo ${version_new//[()]/}`
+    version_new=`mvn org.apache.maven.plugins:maven-help-plugin:2.2:evaluate -Dexpression=project.version |grep -Ev '(^\[|Download\w+:)'`
     echo "Version= $version_new"
 
   elif [ "$mode" = "n2n" ]; then
@@ -416,21 +422,28 @@ checkVersion() {
 
   fi
 
-  versionFirst_new=$(echo $version_new | awk -F"." '{print $1}')
-  versionSecond_new=$(echo $version_new | awk -F"." '{print $2}')
-  version_tmp=$(echo $version_new | awk -F"." '{print $3}')
-  versionThird_new=$(echo $version_tmp | awk -F"-" '{print $1}')
-  patch_new=$(echo $version_tmp | awk -F"-" '{print $2}')
-
   deb_name=`ls -lt $TARGET | awk '{ print $9 }' | grep .deb | head -1`
   if [ -z "$deb_name" ]; then
      echo "There is no previous package found.. Skipping Version Check"
      return
   fi
   version_prev=$(echo $deb_name | awk -F"_" '{print $2}')
+  comparePrevAndNextVersions $version_new $version_prev
+}
+
+comparePrevAndNextVersions(){
+  version_new=$1
+  version_prev=$2 
+
+  versionFirst_new=$(echo $version_new | awk -F"." '{print $1}')
+  versionSecond_new=$(echo $version_new | awk -F"." '{print $2}')
+  version_tmp=$(echo $version_new | awk -F"." '{print $3}')
+  versionThird_new=$(echo $version_tmp | awk -F"-" '{print $1}')
+  patch_new=$(echo $version_tmp | awk -F"-" '{print $2}')
+
+  
   versionFirst_prev=$(echo $version_prev | awk -F"." '{print $1}')
   versionSecond_prev=$(echo $version_prev | awk -F"." '{print $2}')
-
   version_tmp_prev=$(echo $version_prev | awk -F"." '{print $3}')
   versionThird_prev=$(echo $version_tmp_prev | awk -F"-" '{print $1}')
   patch_prev=$(echo $version_tmp_prev | awk -F"-" '{print $2}')
@@ -470,20 +483,20 @@ checkVersion() {
   fi
 }
 
-
 #remove a debian package from jenkins peer
 #parameters $1: package name with absolute path $2: jenkins ssh ip address with username  
 removePackagePeerSync() {
   echo "Remove Operation is starting.."
-  removePackageName=$1
-  echo "RemovePackageName= "$removePackageName
+  pathToRepo=$1
+  packageName=$2
+  echo "RemovePackageName= $pathToRepo $packageName"
 
-  if [ ! -z "$removePackageName" ]; then
+  if [ ! -z "$packageName" ]; then
     #removing missing or changed packages in the list
-    echo "Removing $removePackageName from $2"
-    ssh $2 "rm $removePackageName"
-    purePackageName=$(echo $removePackageName | awk -F"/" '{print $6}' | awk -F"_" '{print $1}')
-    ssh $2 "cd /repo/ksks && reprepro remove trusty $purePackageName"
+    echo "Removing $pathToRepo$packageName from $3"
+    ssh $3 "rm $pathToRepo$packageName"
+    purePackageName=$(echo $pathToRepo$packageName | awk -F"/" '{print $6}' | awk -F"_" '{print $1}')
+    ssh $3 "cd /repo/ksks && reprepro remove trusty $purePackageName"
   fi
 }
 
@@ -520,7 +533,7 @@ setRepoOnJenkinsPeer() {
 	
     #remove the latest debian package from jenkins peer
     fullPathOfPckg=$path_to_repo$latestPack
-    removePackagePeerSync $fullPathOfPckg $mgmt_ip_address
+    removePackagePeerSync $path_to_repo "$latestPack" $mgmt_ip_address
     #copy the latest debian packagefrom jenkins to jenkins peer
     scp $pack_path_jenkins/$deb_name $mgmt_ip_address:$path_to_repo
     echo "copying package from $pack_path_jenkins/$deb_name to $mgmt_ip_address:$path_to_repo"
@@ -533,4 +546,6 @@ setRepoOnJenkinsPeer() {
   ssh $mgmt_ip_address "cd /repo/ksks; reprepro includedeb trusty $dependencies"
   echo "reprepro finished."
 }
+
+
 

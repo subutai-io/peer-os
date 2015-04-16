@@ -6,11 +6,12 @@ package org.safehaus.subutai.core.git.api;
  */
 public enum GitFileStatus
 {
-    MODIFIED( "M" ),
-    COPIED( "C" ),
-    RENAMED( "R" ),
     ADDED( "A" ),
+    COPIED( "C" ),
     DELETED( "D" ),
+    MODIFIED( "M" ),
+    RENAMED( "R" ),
+    TYPE_CHANGED( "T" ),
     UNMERGED( "U" ),
     UNVERSIONED( "X" ),
     UNMODIFIED( "" ),

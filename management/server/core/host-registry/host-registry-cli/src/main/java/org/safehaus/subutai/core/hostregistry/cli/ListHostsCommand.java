@@ -6,15 +6,15 @@ import java.util.Set;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
 
 
 @Command( scope = "host", name = "list", description = "List hosts" )
-public class ListHostsCommand extends OsgiCommandSupport
+public class ListHostsCommand extends SubutaiShellCommandSupport
 {
     private final HostRegistry hostRegistry;
 
@@ -30,7 +30,6 @@ public class ListHostsCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-
         Set<ResourceHostInfo> resourceHostsInfo = hostRegistry.getResourceHostsInfo();
 
         for ( ResourceHostInfo resourceHostInfo : resourceHostsInfo )

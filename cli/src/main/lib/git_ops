@@ -63,6 +63,8 @@ function git_add_commit {
   fi
 
   lxc-wait -n $lxc -s RUNNING
+  #add changes
+  lxc-attach -n $lxc -- git add --all :/
   o=`lxc-attach -n $lxc \
     -- git -C / commit -a -m \
     "commit changes for $lxc template" 2>&1 > /dev/null`
@@ -91,7 +93,7 @@ function git_remote_push {
 function git_rename_branch {
   local oldname="$1"
   local newname="$2"
-
+  msg_info "    - renaming branch $oldname to $newname"
   if [ -z "`lxc-info -n $newname | grep RUNNING`" ]; then
     lxc-start -d -n $newname
   fi

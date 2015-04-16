@@ -3,18 +3,19 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
 
-  <persistence-unit name="peerManagerUnit" transaction-type="RESOURCE_LOCAL">
-    <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
+  <persistence-unit name="peerManagerPUnit" transaction-type="RESOURCE_LOCAL">
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/peerManagerDS)
     </non-jta-data-source>
-    <class>org.safehaus.subutai.core.peer.impl.model.HostInterface</class>
-    <class>org.safehaus.subutai.core.peer.impl.model.AbstractSubutaiHost</class>
-    <class>org.safehaus.subutai.core.peer.impl.model.ManagementHostEntity</class>
-    <class>org.safehaus.subutai.core.peer.impl.model.ResourceHostEntity</class>
-    <class>org.safehaus.subutai.core.peer.impl.model.ContainerHostEntity</class>
+    <class>org.safehaus.subutai.core.peer.impl.entity.HostInterface</class>
+    <class>org.safehaus.subutai.core.peer.impl.entity.AbstractSubutaiHost</class>
+    <class>org.safehaus.subutai.core.peer.impl.entity.ManagementHostEntity</class>
+    <class>org.safehaus.subutai.core.peer.impl.entity.ResourceHostEntity</class>
+    <class>org.safehaus.subutai.core.peer.impl.entity.ContainerHostEntity</class>
+    <class>org.safehaus.subutai.core.peer.impl.entity.PeerData</class>
+    <class>org.safehaus.subutai.core.peer.impl.entity.ContainerGroupEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
-      <property name="openjpa.Log" value="DefaultLevel=WARN, Runtime=TRACE, Tool=INFO, SQL=TRACE"/>
+      <property name="openjpa.Log" value="DefaultLevel=WARN, Runtime=TRACE, Tool=INFO, SQL=TRACE" />
       <property name="openjpa.ConnectionFactoryProperties" value="PrintParameters=true" />
       <property name="openjpa.RuntimeUnenhancedClasses" value="supported" />
       <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema" />

@@ -22,6 +22,7 @@ import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.GridLayout;
@@ -42,6 +43,7 @@ public class TerminalForm extends CustomComponent implements Disposable
     private final TextField timeoutTxtFld;
     private final TextField workDirTxtFld;
     private final TextField runAsTxtFld;
+    private final CheckBox daemonChk;
     private final ComboBox requestTypeCombo;
     private final Label indicator;
     private final AtomicInteger taskCount = new AtomicInteger();
@@ -59,7 +61,7 @@ public class TerminalForm extends CustomComponent implements Disposable
 
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
         horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
-        hostTree = new HostTree( hostRegistry );
+        hostTree = new HostTree( hostRegistry, false );
         horizontalSplit.setFirstComponent( hostTree );
 
         GridLayout grid = new GridLayout( 20, 11 );
@@ -110,6 +112,10 @@ public class TerminalForm extends CustomComponent implements Disposable
         controls.addComponent( clearBtn );
         final Button sendBtn = new Button( "Send" );
         controls.addComponent( sendBtn );
+
+        daemonChk = new CheckBox( "Daemon" );
+        controls.addComponent( daemonChk );
+
         indicator = new Label();
         indicator.setId( "terminal_indicator" );
         indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
@@ -168,6 +174,12 @@ public class TerminalForm extends CustomComponent implements Disposable
     }
 
 
+    public CheckBox getDaemonChk()
+    {
+        return daemonChk;
+    }
+
+
     protected HostTree getHostTree()
     {
         return hostTree;
@@ -216,13 +228,20 @@ public class TerminalForm extends CustomComponent implements Disposable
     }
 
 
-    public void addOutput( String output )
+    public void addOutput( final String output )
     {
-        if ( !Strings.isNullOrEmpty( output ) )
+        commandOutputTxtArea.getUI().access( new Runnable()
         {
-            commandOutputTxtArea.setValue( String.format( "%s%s", commandOutputTxtArea.getValue(), output ) );
-            commandOutputTxtArea.setCursorPosition( commandOutputTxtArea.getValue().length() - 1 );
-        }
+            @Override
+            public void run()
+            {
+                if ( !Strings.isNullOrEmpty( output ) )
+                {
+                    commandOutputTxtArea.setValue( String.format( "%s%s", commandOutputTxtArea.getValue(), output ) );
+                    commandOutputTxtArea.setCursorPosition( commandOutputTxtArea.getValue().length() - 1 );
+                }
+            }
+        } );
     }
 
 

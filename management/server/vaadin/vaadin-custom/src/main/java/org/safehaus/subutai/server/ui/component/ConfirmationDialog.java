@@ -9,9 +9,6 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 
-/**
- * Created by daralbaev on 08.06.14.
- */
 public class ConfirmationDialog
 {
     private Window alert;
@@ -34,6 +31,10 @@ public class ConfirmationDialog
         alert.setClosable( false );
 
         cancel = new Button( cancelLabel );
+        if ( "".equalsIgnoreCase( cancelLabel ) )
+        {
+            cancel.setVisible( false );
+        }
         ok = new Button( yesLabel );
     }
 

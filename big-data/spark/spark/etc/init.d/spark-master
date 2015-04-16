@@ -1,88 +1,92 @@
-#!/bin/sh
+#!/bin/bash
 # Starts and stops spark.
 
 sparkVer="spark-1.0.0"
 if [ -d "/var/run/spark" ]; then
-	pidMaster=`ls -alt /var/run/spark/ | grep spark-.*.Master-.*.pid | head -1 | awk -F " " '{print $9}'`
+  pidMaster=`ls -alt /var/run/spark/ | grep spark-.*.Master-.*.pid | head -1 | awk '{print $9}'`
 fi
 
 pidFile=/var/run/spark/$pidMaster
-PIDDIR=/var/run/spark
+pid_dir=/var/run/spark
 sbin=/opt/$sparkVer/sbin
 DESC="Spark Master"
 CMD_PATT="spark"
 . /lib/lsb/init-functions
 
-export SPARK_PID_DIR=$PIDDIR
+export SPARK_PID_DIR=$pid_dir
 
 CMD_PATT="spark"
-is_master_running()
-{
-    if [ -f $pidFile ] && [ "x$pidFile" != "x" ]; then
-        pid=`cat $pidFile`
-        grep -Eq "$CMD_PATT" "/proc/$pid/cmdline" 2>/dev/null && return 1 
+
+check_process(){
+  if [ $# == 1 ]; then
+    role=$1
+  elif [ $# == 2 ]; then
+    pid_file=$1
+    role=$2
+  fi
+  if [ -f $pid_dir/$pid_file ] && [ "x$pid_file" != "x" ]; then
+    pid=`cat $pid_dir/$pid_file`
+    if [ -d "/proc/$pid" ]; then
+      if grep -Eq "$CMD_PATT" "/proc/$pid/cmdline"; then
+        log_success_msg "Spark $role is running (pid:$pid)"
         return 0
+      else
+        log_failure_msg "$role is NOT running"
+        return 1
+      fi
+    else
+       log_failure_msg "$role is NOT running"
     fi
-    return 2
+  else
+    log_success_msg "$role is NOT running"
+    return 0
+  fi
 }
 
+
+kill_service(){
+  pid_file=$1
+  is_running $pid_file
+  stat=$?
+  if [ "$stat" == "1" ]; then
+    start-stop-daemon -K -p "$pid_dir/$pid_file" -R TERM/30/KILL/5 >/dev/null
+  fi
+  if [ -f $pid_dir/$pid_file ];then
+    rm $pid_dir/$pid_file
+  fi
+}
+
+
+is_running(){
+  pid_file_name=$1
+  if [ -f $pid_dir/$pid_file_name ] && [ "x$pid_file_name" != "x" ]; then
+    pid=`cat $pid_dir/$pid_file_name`
+    if grep -Eq "$CMD_PATT" "/proc/$pid/cmdline"; then
+      return 1;
+    fi
+  fi
+  return 0
+}
+
+
 case "$1" in
-start)
-	$sbin/start-master.sh ;;
-stop)
-	is_master_running
-	stat=$?
- 	case "$stat" in
-            0)
-                 echo "Spark Master is NOT running." ;;
-            1)
-	        pidW=`cat $pidFile`
-                echo "Stopping Spark Master with pid $pidW."
-                start-stop-daemon -K -p "$pidFile" -R TERM/30/KILL/5 >/dev/null;;
-	    2)
-		echo "Pid file does not exists in \"/var/run/spark/\" directory." ;;
-            *)
-                echo "Something went wrong" ;;
-        esac ;;
-restart)
-        $0 stop
-        $0 start ;;
-status)
-        is_master_running 
-        stat=$?
-	case "$stat" in 
-        	0)
-	           echo "Spark Master is NOT running." ;;
-		1)
-                   masterPid=`cat $pidFile`
-                   echo "Spark Master is running with pid $masterPid." ;;
-		2) 
-		   echo "Pid file does not exists in \"/var/run/spark/\" directory." ;; 
-		*)
-	           echo "Something went wrong." ;;
-	esac ;;
-kill)
-	is_master_running
-	stat=$?
-	case "$stat" in
-		0)
-		  echo "No Spark Master to kill." 
-                  echo "Removing pidfile : $pidFile." 
-                  rm $pidFile ;;
-
-		1)
-        	  pidW=`cat $pidFile`
-                  echo "Stopping Spark Master with pid $pidW."
-                  start-stop-daemon -K -p "$pidFile" -R TERM/30/KILL/5 >/dev/null
-	          echo "Removing pidfile : $pidFile." 
-		  rm $pidFile ;;
-		2)
-		  echo "Pid file does not exists in \"/var/run/spark/\" directory." ;;
-		*)
-		  echo "Pid file does not exists in \"/var/run/spark/\" directory." ;; 
-	esac ;;
-*)
-        echo "Usage: $0 {start|stop|restart|status|kill}"
-        exit 1
+  start)
+    $sbin/start-master.sh 
+    ;;
+  stop)
+    kill_service $pidMaster
+    ;;
+  restart)
+    $0 stop
+    $0 start 
+    ;;
+  status)
+    check_process $pidMaster "Master"
+    ;;
+  kill)
+    kill_service $pidMaster
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|status|kill}"
+    exit 1
 esac
-

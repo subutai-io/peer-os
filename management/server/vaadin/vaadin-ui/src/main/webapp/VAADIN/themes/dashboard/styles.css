@@ -1172,7 +1172,7 @@
 
 .dashboard .v-caption .v-captiontext
 {
-    color: #ffffff;
+    color: #000000;
     display: inline-block;
     overflow: hidden;
     vertical-align: middle;
@@ -5175,7 +5175,7 @@ body .dashboard.v-app .v-app-loading
 
 .dashboard .v-caption
 {
-    color: #6c737a;
+    color: #ffffff;
     font-size: 13px;
 }
 
@@ -6596,7 +6596,7 @@ body .dashboard.v-app .v-app-loading
 
 .dashboard .v-label
 {
-    color: #ffffff;
+    color: #000000;
 }
 
 .dashboard .v-label-dark

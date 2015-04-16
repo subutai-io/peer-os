@@ -41,35 +41,31 @@
 
 using namespace std;
 
-typedef std::vector<SubutaiContainer>::iterator ContainerIterator;
+typedef std::vector<SubutaiContainer*>::iterator ContainerIterator;
 
 class SubutaiContainerManager {
-    public:
-        SubutaiContainerManager(string , SubutaiLogger*);
-        ~SubutaiContainerManager();
-        vector<SubutaiContainer> findAllContainers();
-        SubutaiContainer* findContainerByName(string );
-        SubutaiContainer* findContainerById(string );
-        vector<SubutaiContainer> getAllContainers();
-        vector<SubutaiContainer> getRunningContainers();
-        vector<SubutaiContainer> getStoppedContainers();
-        vector<SubutaiContainer> getFrozenContainers();
-        void deleteContainerInfo(string);
-        bool isContainerRunning(string );
-        bool isContainerStopped(string );
-        bool isContainerFrozen(string );
-        void updateContainerLists();
-        void write();
-    protected:
+public:
+	SubutaiContainerManager(string, SubutaiLogger*);
+	~SubutaiContainerManager();
+	vector<SubutaiContainer*> findAllContainers();
+	SubutaiContainer* findContainerById(string);
+	vector<SubutaiContainer*> getAllContainers();
+	vector<string> getContainers();
+	bool checkIfTemplate(string, vector<string>, bool);
+	bool checkBrokenLxc();
+	void updateContainerIdListOnStart();
+	void deleteContainerInfo(string);
+	void updateContainerLists();
+	bool isManagerLocked() const;
 
-    private:
-        string                          _lxc_path;
-        SubutaiLogger*                  _logger;
-        vector<SubutaiContainer>        _containers;
-        vector<SubutaiContainer>        _frozenContainers;
-        vector<SubutaiContainer>        _stoppedContainers;
-        vector<SubutaiContainer>        _runningContainers;
-        SubutaiHelper					_helper;
+protected:
+
+private:
+	string _lxc_path;
+	SubutaiLogger* _logger;
+	vector<SubutaiContainer*> _containers;
+	SubutaiHelper _helper;
+	bool managerLocked;
 };
 
 #endif

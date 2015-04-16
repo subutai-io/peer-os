@@ -8,14 +8,13 @@ import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.Request;
+import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.broker.api.Broker;
-import org.safehaus.subutai.core.broker.api.BrokerException;
 import org.safehaus.subutai.core.broker.api.ByteMessageListener;
 import org.safehaus.subutai.core.broker.api.Topic;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
@@ -88,7 +87,7 @@ public class CommandProcessor implements ByteMessageListener
 
             broker.sendTextMessage( targetHost.getId().toString(), command );
         }
-        catch ( BrokerException e )
+        catch ( Exception e )
         {
             remove( request.getCommandId() );
 
@@ -139,7 +138,7 @@ public class CommandProcessor implements ByteMessageListener
             }
             else
             {
-                LOG.warn( "Callback not found for response: %s", response );
+                LOG.warn( String.format( "Callback not found for response: %s", response ) );
             }
         }
         catch ( Exception e )
@@ -177,5 +176,11 @@ public class CommandProcessor implements ByteMessageListener
         Preconditions.checkNotNull( commandId );
 
         commands.remove( commandId );
+    }
+
+
+    protected void dispose()
+    {
+        commands.dispose();
     }
 }

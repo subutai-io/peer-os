@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint default-activation="eager"
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
+           xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
+            http://www.w3.org/2001/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance
+            http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0">
+
+  <!-- ************************************************************************************************* -->
+
+  <bean id="daoManagerChannel" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager" activation="eager">
+    <jpa:unit unitname="channelManagerPUnit" property="entityManagerFactory" />
+  </bean>
+
+  <!-- ************************************************************************************************** -->
+  <reference id="identityManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
+
+  <!-- ************************************************************************************************** -->
+  <reference-list id="busListener" interface="org.apache.cxf.Bus" availability="optional">
+    <reference-listener bind-method="busRegistered">
+      <bean class="org.safehaus.subutai.core.channel.impl.interceptor.CXFBusListener">
+        <property name="channelManager" ref="channelManagerImpl" />
+      </bean>
+    </reference-listener>
+  </reference-list>
+  <!-- ************************************************************************************************** -->
+
+  <bean id="channelManagerImpl" scope="singleton" init-method="init" destroy-method="destroy"
+        class="org.safehaus.subutai.core.channel.impl.ChannelManagerImpl">
+    <property name="daoManager" ref="daoManagerChannel" />
+    <property name="identityManager" ref="identityManager" />
+  </bean>
+
+  <service ref="channelManagerImpl"
+           interface="org.safehaus.subutai.core.channel.api.ChannelManager" />
+
+</blueprint>

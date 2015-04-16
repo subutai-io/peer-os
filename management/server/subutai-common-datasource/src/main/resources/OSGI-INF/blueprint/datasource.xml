@@ -3,6 +3,52 @@
 
            xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd"
     >
+  <!--
+  <bean id="securityManagerJDBC" class="org.apache.derby.jdbc.EmbeddedXADataSource">
+    <property name="databaseName" value="subutai" />
+    <property name="createDatabase" value="create" />
+  </bean>
+
+    <service ref="dataSource" interface="javax.sql.DataSource">
+        <service-properties>
+            <entry key="osgi.jndi.service.name" value="jdbc/test"/>
+        </service-properties>
+    </service>
+
+    <service ref="dataSource" interface="javax.sql.XADataSource">
+        <service-properties>
+            <entry key="osgi.jndi.service.name" value="jdbc/testxa"/>
+        </service-properties>
+    </service>-->
+  <!-- *********************Channel Manager ************************ -->
+
+  <bean id="channelManagerJDBC" class="org.h2.jdbcx.JdbcDataSource" activation="eager">
+    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/channelManagerDb" />
+    <property name="user" value="sa" />
+    <property name="password" value="" />
+  </bean>
+
+  <service interface="javax.sql.DataSource" ref="channelManagerJDBC" activation="eager">
+    <service-properties>
+      <entry key="osgi.jndi.service.name" value="openjpa/channelManagerDS" />
+    </service-properties>
+  </service>
+
+  <!-- *********************Security Manager ************************ -->
+
+  <bean id="securityManagerJDBC" class="org.h2.jdbcx.JdbcDataSource" activation="eager">
+    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/securityDb" />
+    <property name="user" value="sa" />
+    <property name="password" value="" />
+  </bean>
+
+  <service interface="javax.sql.DataSource" ref="securityManagerJDBC" activation="eager">
+    <service-properties>
+      <entry key="osgi.jndi.service.name" value="openjpa/securityManagerDS" />
+    </service-properties>
+  </service>
+
+  <!-- *********************Environment Manager ************************ -->
 
   <bean id="envManagerJDBC" class="org.h2.jdbcx.JdbcDataSource">
     <property name="URL" value="jdbc:h2:/var/lib/subutai/db/environmentDb" />
@@ -15,18 +61,35 @@
       <entry key="osgi.jndi.service.name" value="openjpa/envManagerDS" />
     </service-properties>
   </service>
+  <!-- *********************Environment Manager 2************************ -->
 
-  <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
+  <bean id="envManagerJDBC2" class="org.h2.jdbcx.JdbcDataSource">
+    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/environmentDb2" />
+    <property name="user" value="sa" />
+    <property name="password" value="" />
+  </bean>
+
+  <service interface="javax.sql.DataSource" ref="envManagerJDBC2">
+    <service-properties>
+      <entry key="osgi.jndi.service.name" value="openjpa/envManagerDS2" />
+    </service-properties>
+  </service>
+
+  <!-- ********************* DataSource Common Service ************************ -->
+
+  <bean id="commonServiceJDBC" class="org.h2.jdbcx.JdbcDataSource">
     <property name="URL" value="jdbc:h2:/var/lib/subutai/db/commonDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
 
-  <service interface="javax.sql.DataSource" ref="dataSource">
+  <service interface="javax.sql.DataSource" ref="commonServiceJDBC">
     <service-properties>
       <entry key="osgi.jndi.service.name" value="openjpa/commonService" />
     </service-properties>
   </service>
+
+  <!-- ********************* Peer Manager ************************ -->
 
   <bean id="peerManagerJDBC" class="org.h2.jdbcx.JdbcDataSource">
     <property name="URL" value="jdbc:h2:/var/lib/subutai/db/peerManagerDb" />
@@ -39,6 +102,8 @@
       <entry key="osgi.jndi.service.name" value="openjpa/peerManagerDS" />
     </service-properties>
   </service>
+
+  <!-- ********************* Messenger ************************ -->
 
   <bean id="messengerJDBC" class="org.h2.jdbcx.JdbcDataSource">
     <property name="URL" value="jdbc:h2:/var/lib/subutai/db/messengerDb" />
@@ -78,6 +143,7 @@
 
   <!--Plugins DataSource-->
   <bean id="pluginsJDBC" class="org.h2.jdbcx.JdbcDataSource">
+    <!--<property name="URL" value="jdbc:h2:/var/lib/subutai/db/plugins/pluginsDb;AUTO_SERVER=true" />-->
     <property name="URL" value="jdbc:h2:/var/lib/subutai/db/plugins/pluginsDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />

@@ -1,11 +1,11 @@
 package org.safehaus.subutai.core.registry.cli;
 
 
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
 
@@ -14,7 +14,7 @@ import com.google.common.base.Preconditions;
  * CLI for TemplateRegistryManager.unregisterTemplate command
  */
 @Command( scope = "registry", name = "unregister-template", description = "Unregister template" )
-public class UnregisterTemplateCommand extends OsgiCommandSupport
+public class UnregisterTemplateCommand extends SubutaiShellCommandSupport
 {
     @Argument( index = 0, name = "template name", required = true, multiValued = false,
             description = "template name" )

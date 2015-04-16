@@ -5,6 +5,41 @@
 # functions.
 # ==========================================================================
 
+function net_bridge_blocker {
+  local brIP=`ip -o addr | awk '!/^[0-9]*: ?lo|link\/ether/ {print $2" "$4}' \\
+        | grep br- |egrep -v "\:|br-int"`
+  local a=0
+  local b=0
+  declare -A pairs
+  for i in $brIP
+  do
+    pairs[$a,$b]="$i"
+    b=$((b+1))
+    if [ $b -eq 2 ]; then
+      a=$((a+1))
+      b=0
+    fi
+  done
+
+  local array_size=${#pairs[@]}
+  array_size=$((array_size/2))
+
+  for (( i=0;i<$array_size;i++ ))
+  do
+    for (( j=0;j<$array_size;j++ ))
+    do
+      if [ $j -eq $i ]; then continue;fi
+      subutai management_network -f ${pairs[$i,0]} "priority=2500 \
+           ,dl_type=0x800,nw_src=${pairs[$j,1]},action=drop"
+      grep -q -e \
+      '-f '${pairs[$i,0]}' "priority=2500,dl_type=0x800,nw_src='${pairs[$j,1]}',action=drop"' \
+      /etc/init.d/service-interface \
+      || sed -i '/Re-init OVS flows/i \subutai management_network -f '${pairs[$i,0]}' "priority=2500,dl_type=0x800,nw_src='${pairs[$j,1]}',action=drop"' \
+      /etc/init.d/service-interface
+    done
+  done
+}
+
 function net_check_tunnelPortName {
   local tunnelPortName="$1"
   local list=$(ovs-vsctl list-ports br-tun)

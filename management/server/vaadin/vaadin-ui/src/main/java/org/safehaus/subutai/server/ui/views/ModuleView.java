@@ -10,9 +10,6 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Image;
 
 
-/**
- * Created by talas on 9/16/14.
- */
 public class ModuleView extends CssLayout
 {
 
@@ -37,10 +34,7 @@ public class ModuleView extends CssLayout
             @Override
             public void layoutClick( LayoutEvents.LayoutClickEvent layoutClickEvent )
             {
-                if ( mClickListener != null )
-                {
-                    mClickListener.OnModuleClick( mModule );
-                }
+                addModuleTab();
             }
         } );
 
@@ -48,6 +42,15 @@ public class ModuleView extends CssLayout
         image.setWidth( 90, Unit.PERCENTAGE );
         image.setDescription( module.getName() );
         addComponent( image );
+    }
+
+
+    public void addModuleTab()
+    {
+        if ( mClickListener != null )
+        {
+            mClickListener.OnModuleClick( mModule );
+        }
     }
 
 

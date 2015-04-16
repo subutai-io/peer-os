@@ -4,24 +4,23 @@ package org.safehaus.subutai.core.peer.cli;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
  *
  */
 @Command( scope = "peer", name = "import-template" )
-public class ImportTemplateCommand extends OsgiCommandSupport
+public class ImportTemplateCommand extends SubutaiShellCommandSupport
 {
 
     private PeerManager peerManager;
 
-    //    private PeerCommandDispatcher peerCommandDispatcher;
 
     private TemplateRegistry templateRegistry;
 
@@ -43,12 +42,6 @@ public class ImportTemplateCommand extends OsgiCommandSupport
         this.peerManager = peerManager;
     }
 
-    //
-    //    public void setPeerCommandDispatcher( final PeerCommandDispatcher peerCommandDispatcher )
-    //    {
-    //        this.peerCommandDispatcher = peerCommandDispatcher;
-    //    }
-
 
     public void setTemplateRegistry( final TemplateRegistry templateRegistry )
     {
@@ -59,7 +52,6 @@ public class ImportTemplateCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        //System.out.println( "Start..." );
         Template template = templateRegistry.getTemplate( templateName );
         if ( template != null )
         {
@@ -67,7 +59,6 @@ public class ImportTemplateCommand extends OsgiCommandSupport
             return -1;
         }
 
-        //        peerManager.peers();
 
         template = peerManager.getPeer( UUID.fromString( peerId ) ).getTemplate( templateName );
         if ( template != null )

@@ -1,0 +1,122 @@
+#!/bin/bash
+
+
+function unregister_usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Unregisters the template debian pkg from the site template registry
+  echo
+  echo "        "subutai unregister template
+  echo
+  echo -----------------------------------------------------------------------
+}
+
+
+# Plan for unregistering a template
+# -----------------------------------------------------------------------------
+# (1) perform sanity checks first
+#     - master cannot be unregistered
+#     - template should not exist
+#     - template shoud have been registered
+#     - template should not have child templates registered
+#     - template should not be being used by other FAI machines
+# (2) Unregister the template
+
+function unregister {
+  if [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
+    msg_error "Unregister cannot be used in SUBUTAI_OFFLINE_MODE! Aborting..."
+    exit 1
+  fi
+
+  if [ "`is_system_locked`" == "true" ]
+  then
+     msg_error "System locked by a subutai process"
+     exit 1
+  fi
+
+  local template="$1"
+
+  # ----------------------------------------------------------------------------
+  # (1) perform some sanity checks
+  # ----------------------------------------------------------------------------
+ 
+  if [ $template == "master" ]; then
+    msg_error "master template cannot be unregistered"
+    exit 1
+  fi
+
+  lxc_assert_no $template
+  fs_assert_nods lxc/$template
+
+  if [ "`are_containers_readable $template`" == "true" ]
+  then
+    msg_error "Template $template is being used by a subutai process"
+    exit 1
+  fi
+
+  lock_container_write $template
+  if [ $? != 0 ]; then 
+    msg_error "Template $template cannot be locked!"
+    exit 1
+  fi
+
+  # check to make sure container is registered as a template
+  if [ "`is_registered $template`" == "false" ]; then
+    msg_error "Template \"$template\" is NOT registered. Aborting ..."
+    unlock_container_write $container
+    if [ $? != 0 ]; then 
+      msg_error "Container(s) cannot be unlocked!"
+      exit 1
+    fi
+    exit 1
+  else
+    msg_info "    - check passed: \"$template\" is registered"
+  fi
+
+  # check to make sure no child templates registered
+  if [ "`has_child_templates_registered $template`" == "true" ]; then
+    msg_error "There are child templates registered of template \"$template\". Aborting ..."
+    unlock_container_write $container
+    if [ $? != 0 ]; then
+      msg_error "Container(s) cannot be unlocked!"
+      exit 1
+    fi
+    exit 1
+  else
+    msg_info "    - check passed: no child templates of \"$template\" registered"
+  fi
+
+  # check to make sure template is not being used by other FAI machines
+  if [ "`is_template_in_use $template`" == "true" ]; then
+    msg_error "Template \"$template\" is in use. Aborting ..."
+    unlock_container_write $container
+    if [ $? != 0 ]; then
+      msg_error "Container(s) cannot be unlocked!"
+      exit 1
+    fi
+    exit 1
+  else
+    msg_info "    - check passed: \"$template\" is not in use"
+  fi
+
+  # ----------------------------------------------------------------------------
+  # (2) Unregister the template
+  # ----------------------------------------------------------------------------
+  
+  #TODO 
+  #git remove operatioons will not used until PGP Keu authentication impelemented for users  
+  #git_delete_branch $template
+  delete_n_unregister $template 
+
+  unlock_container_write $template
+  if [ $? != 0 ]; then 
+    msg_error "Template $template cannot be unlocked!"
+    exit 1
+  fi
+}
+
+
+function unregister_description {
+  echo unregisters the template from the site registry
+}
+
+

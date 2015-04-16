@@ -1,15 +1,16 @@
 package org.safehaus.subutai.common.protocol.impl;
 
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
+import org.safehaus.subutai.common.datatypes.TemplateVersion;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.protocol.api.TemplateService;
@@ -49,10 +50,34 @@ public class TemplateServiceImpl implements TemplateService
         try
         {
             entityManager = entityManagerFactory.createEntityManager();
-            entityManager.getTransaction().begin();
-            savedTemplate = entityManager.merge( template );
-            entityManager.flush();
-            entityManager.getTransaction().commit();
+
+            if ( template.getParentTemplateName() != null && !template.getParentTemplateName()
+                                                                      .equals( template.getTemplateName() ) )
+            {
+                Template parent = getTemplate( template.getParentTemplateName(), template.getLxcArch() );
+                //                parent.addChildren( Arrays.asList( template ) );
+                //                saveTemplate( parent );
+                if ( parent != null )
+                {
+                    entityManager.getTransaction().begin();
+                    savedTemplate = entityManager.merge( template );
+                    entityManager.flush();
+                    entityManager.getTransaction().commit();
+                    parent.addChildren( Arrays.asList( template ) );
+                    saveTemplate( parent );
+                }
+                else
+                {
+                    throw new Exception( "Parent template is null: " + template.getParentTemplateName() );
+                }
+            }
+            else
+            {
+                entityManager.getTransaction().begin();
+                savedTemplate = entityManager.merge( template );
+                entityManager.flush();
+                entityManager.getTransaction().commit();
+            }
         }
         catch ( Exception ex )
         {
@@ -131,25 +156,34 @@ public class TemplateServiceImpl implements TemplateService
     @Override
     public Template getTemplate( String templateName, String lxcArch ) throws DaoException
     {
-        EntityManager entityManager;
+        EntityManager entityManager = null;
+        Template template = null;
         try
         {
-            Template template;
             entityManager = entityManagerFactory.createEntityManager();
-            Query query = entityManager.createNamedQuery( Template.QUERY_GET_TEMPLATE_BY_NAME_ARCH );
+            TypedQuery<Template> query = entityManager.createQuery(
+                    "SELECT t FROM Template t WHERE t.pk.templateName = :templateName AND t.pk.lxcArch = :lxcArch",
+                    Template.class );
             query.setParameter( "templateName", templateName );
             query.setParameter( "lxcArch", lxcArch );
-            template = ( Template ) query.getSingleResult();
+            List<Template> templates = query.getResultList();
+            if ( !templates.isEmpty() )
+            {
+                template = templates.iterator().next();
+            }
 
             return template;
-        }
-        catch ( NoResultException | NonUniqueResultException e )
-        {
-            return null;
         }
         catch ( Exception ex )
         {
             throw new DaoException( ex );
+        }
+        finally
+        {
+            if ( entityManager != null )
+            {
+                entityManager.close();
+            }
         }
     }
 
@@ -165,31 +199,98 @@ public class TemplateServiceImpl implements TemplateService
      * @return {@code Template}
      */
     @Override
-    public Template getTemplate( String templateName, String lxcArch, String md5sum, String templateVersion )
+    public Template getTemplate( String templateName, String lxcArch, String md5sum, TemplateVersion templateVersion )
             throws DaoException
     {
-        EntityManager entityManager;
-        try
-        {
-            Template template;
-            entityManager = entityManagerFactory.createEntityManager();
-            Query query = entityManager.createNamedQuery( Template.QUERY_GET_TEMPLATE_BY_NAME_ARCH_MD5_VERSION );
-            query.setParameter( "templateName", templateName );
-            query.setParameter( "lxcArch", lxcArch );
-            query.setParameter( "md5sum", md5sum );
-            query.setParameter( "templateVersion", templateVersion );
-            template = ( Template ) query.getSingleResult();
+        return getTemplate( templateName, lxcArch );
+        //TODO this method is temporarily replaced by another one till we find a solution with templates versions
+        // Don't delete these
+        //        EntityManager entityManager = null;
+        //        Template template = null;
+        //        try
+        //        {
+        //            entityManager = entityManagerFactory.createEntityManager();
+        //            TypedQuery<Template> query = entityManager
+        //                    .createNamedQuery( Template.QUERY_GET_TEMPLATE_BY_NAME_ARCH_MD5_VERSION, Template.class );
+        //            query.setParameter( "templateName", templateName );
+        //            query.setParameter( "lxcArch", lxcArch );
+        //            query.setParameter( "md5sum", md5sum );
+        //            query.setParameter( "templateVersion", templateVersion );
+        //
+        //            List<Template> templates = query.getResultList();
+        //            if ( templates.isEmpty() )
+        //            {
+        //                template = templates.get( 0 );
+        //            }
+        //
+        //            return template;
+        //        }
+        //        catch ( NoResultException | NonUniqueResultException e )
+        //        {
+        //            return null;
+        //        }
+        //        catch ( Exception ex )
+        //        {
+        //            throw new DaoException( ex );
+        //        }
+        //        finally
+        //        {
+        //            if ( entityManager != null )
+        //            {
+        //                entityManager.close();
+        //            }
+        //        }
+    }
 
-            return template;
-        }
-        catch ( NoResultException | NonUniqueResultException e )
-        {
-            return null;
-        }
-        catch ( Exception ex )
-        {
-            throw new DaoException( ex );
-        }
+
+    /**
+     * Returns template by name
+     *
+     * @param templateName - template name
+     * @param lxcArch -- lxc arch of template
+     * @param templateVersion -- lxc templateVersion of template
+     *
+     * @return {@code Template}
+     */
+    @Override
+    public Template getTemplate( String templateName, TemplateVersion templateVersion, String lxcArch )
+            throws DaoException
+    {
+        return getTemplate( templateName, lxcArch );
+        //TODO this method is temporarily replaced by another one till we find a solution with templates versions
+        // Don't delete these
+        //        EntityManager entityManager = null;
+        //        Template template = null;
+        //        try
+        //        {
+        //            entityManager = entityManagerFactory.createEntityManager();
+        //            TypedQuery<Template> query = entityManager.createQuery(
+        //                    "SELECT t FROM Template t WHERE t.pk.templateName = :templateName AND t.pk.lxcArch =
+        // :lxcArch AND"
+        //                            + " t.pk"
+        //                            + ".templateVersion = :templateVersion", Template.class );
+        //            query.setParameter( "templateName", templateName );
+        //            query.setParameter( "lxcArch", lxcArch );
+        //            query.setParameter( "templateVersion", templateVersion.toString() );
+        //            List<Template> templates = query.getResultList();
+        //            if ( !templates.isEmpty() )
+        //            {
+        //                template = templates.get( 0 );
+        //            }
+        //
+        //            return template;
+        //        }
+        //        catch ( Exception ex )
+        //        {
+        //            throw new DaoException( ex );
+        //        }
+        //        finally
+        //        {
+        //            if ( entityManager != null )
+        //            {
+        //                entityManager.close();
+        //            }
+        //        }
     }
 
 
@@ -242,5 +343,42 @@ public class TemplateServiceImpl implements TemplateService
         {
             throw new DaoException( ex );
         }
+    }
+
+
+    /**
+     * Returns child templates of supplied parent
+     *
+     * @param parentTemplateName - name of parent template
+     * @param lxcArch - lxc arch of template
+     *
+     * @return {@code List<Template>}
+     */
+    @Override
+    public List<Template> getChildTemplates( String parentTemplateName, TemplateVersion templateVersion,
+                                             String lxcArch ) throws DaoException
+    {
+        try
+        {
+            Template template = this.getTemplate( parentTemplateName, templateVersion, lxcArch );
+            if ( template != null )
+            {
+                return template.getChildren();
+            }
+            else
+            {
+                return Collections.emptyList();
+            }
+        }
+        catch ( Exception ex )
+        {
+            throw new DaoException( ex );
+        }
+    }
+
+
+    public EntityManagerFactory getEntityManagerFactory()
+    {
+        return entityManagerFactory;
     }
 }

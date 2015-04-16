@@ -11,20 +11,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
-import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
 
 
-/**
- * Created by timur on 11/5/14.
- */
 @Ignore
 @RunWith( MockitoJUnitRunner.class )
 public class LocalPeerImplTest
@@ -53,12 +52,17 @@ public class LocalPeerImplTest
 
     @Mock
     HostRegistry hostRegistry;
+    @Mock
+    Monitor monitor;
+
+    @Mock
+    IdentityManager identityManager;
 
 
     @Before
     public void setup()
     {
-        peerManager = new PeerManagerImpl( dataSource, messenger );
+        peerManager = new PeerManagerImpl( messenger );
         //        peerManager.init();
     }
 
@@ -67,8 +71,8 @@ public class LocalPeerImplTest
     public void testBindHostShouldFailOnNotExistenceHost() throws PeerException
     {
         LocalPeerImpl localPeer =
-                new LocalPeerImpl( peerManager, templateRegistry, peerDAO, quotaManager, strategyManager, null,
-                        commandExecutor, hostRegistry );
+                new LocalPeerImpl( peerManager, templateRegistry, quotaManager, strategyManager, null, commandExecutor,
+                        hostRegistry, monitor, identityManager);
 
         localPeer.bindHost( UUID.randomUUID().toString() );
     }

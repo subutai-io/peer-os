@@ -1,9 +1,14 @@
 package org.safehaus.subutai.core.peer.api;
 
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Host;
+import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.protocol.Template;
 
 
 /**
@@ -37,9 +42,12 @@ public interface LocalPeer extends Peer
 
     public ResourceHost getResourceHostByName( String hostname ) throws HostNotFoundException;
 
+    public ResourceHost getResourceHostById( UUID hostId ) throws HostNotFoundException;
+
     public ResourceHost getResourceHostByContainerName( String containerName ) throws HostNotFoundException;
 
-    public ContainerHost getContainerHostImpl( HostKey hostKey );
+    public ResourceHost getResourceHostByContainerId( UUID hostId ) throws HostNotFoundException;
+
 
     /**
      * Returns implementation of ContainerHost interface.
@@ -54,34 +62,51 @@ public interface LocalPeer extends Peer
      *
      * @param hostId ID of the container
      */
-    public ContainerHost getContainerHostById( String hostId ) throws HostNotFoundException;
-
-    <T extends Host> T bindHost( T host ) throws HostNotFoundException;
+    public ContainerHost getContainerHostById( UUID hostId ) throws HostNotFoundException;
 
     public ManagementHost getManagementHost() throws HostNotFoundException;
 
     public Set<ResourceHost> getResourceHosts();
 
+    public void cleanDb();
+
+    public ContainerHost createContainer( final ResourceHost resourceHost, final Template template,
+                                          final String containerName ) throws PeerException;
+
+
     /**
-     * Returns the templates list
+     * Returns container group by container id
+     *
+     * @param containerId - id of container
+     *
+     * @return - {@code ContainerGroup}
+     *
+     * @throws ContainerGroupNotFoundException - thrown if container is created not as a part of environment
      */
-    public List<String> getTemplates();
+    public ContainerGroup findContainerGroupByContainerId( UUID containerId ) throws ContainerGroupNotFoundException;
 
-    void init();
+    /**
+     * Returns container group by environment id
+     *
+     * @param environmentId - id of environment
+     *
+     * @return - {@code ContainerGroup}
+     *
+     * @throws ContainerGroupNotFoundException - thrown if group is not found
+     */
+    public ContainerGroup findContainerGroupByEnvironmentId( UUID environmentId )
+            throws ContainerGroupNotFoundException;
 
-    void shutdown();
+    /**
+     * Returns set of container groups by owner id
+     *
+     * @param ownerId - id of owner
+     *
+     * @return - set of {@code ContainerGroup}
+     */
+    public Set<ContainerGroup> findContainerGroupsByOwnerId( UUID ownerId );
 
-    public void clean();
+    //networking
 
-    public ContainerHost createContainer( String hostName, String templateName, String cloneName, UUID envId )
-            throws PeerException;
-
-    public List<HostTask> getTasks();
-
-    public String getFreeHostName( String prefix );
-
-
-    //    Agent waitForAgent( String containerName, int timeout );
-
-    //    public void onPeerEvent( PeerEvent event );
+    public int setupTunnels( Set<String> peerIps, UUID environmentId ) throws PeerException;
 }

@@ -23,18 +23,26 @@ package org.safehaus.subutai.server.ui;
 import java.util.HashMap;
 import java.util.Locale;
 
+import javax.naming.NamingException;
+import javax.servlet.http.Cookie;
+
+import org.safehaus.subutai.common.security.NullSubutaiLoginContext;
+import org.safehaus.subutai.common.security.SubutaiLoginContext;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
+import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.server.ui.util.HelpManager;
 import org.safehaus.subutai.server.ui.util.HelpOverlay;
+import org.safehaus.subutai.server.ui.util.SubutaiVaadinUtils;
 import org.safehaus.subutai.server.ui.views.CoreModulesView;
+import org.safehaus.subutai.server.ui.views.LoginView;
 import org.safehaus.subutai.server.ui.views.ModulesView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
-import com.vaadin.event.ShortcutAction;
-import com.vaadin.event.ShortcutListener;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -42,8 +50,7 @@ import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Alignment;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
@@ -54,8 +61,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.PasswordField;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
@@ -64,7 +69,7 @@ import com.vaadin.ui.VerticalLayout;
 @SuppressWarnings( "serial" )
 @Title( "Subutai" )
 
-public class MainUI extends UI
+public class MainUI extends UI implements ViewChangeListener
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( MainUI.class.getName() );
@@ -73,11 +78,12 @@ public class MainUI extends UI
     private CssLayout root = new CssLayout();
     private CssLayout menu = new CssLayout();
     private CssLayout content = new CssLayout();
-    private VerticalLayout loginLayout;
+    //    private VerticalLayout loginLayout;
     private HelpManager helpManager;
     private Navigator nav;
+    Label username;
 
-    private String username = "administrator";
+    //    private String username = "administrator";
 
     private HashMap<String, Button> viewNameToMenuButton = new HashMap<>();
     private HashMap<String, View> routes = new HashMap<String, View>()
@@ -106,7 +112,7 @@ public class MainUI extends UI
     {
         setInstance( this );
         helpManager = new HelpManager( this );
-        VaadinService.getCurrentRequest().getWrappedSession().setAttribute( "username", username );
+        //        VaadinService.getCurrentRequest().getWrappedSession().setAttribute( "username", username );
 
         setLocale( Locale.US );
 
@@ -124,130 +130,81 @@ public class MainUI extends UI
         // For synchronization issue
         setPollInterval( Common.REFRESH_UI_SEC * 340 );
 
-        buildLoginView( false );
+        buildMainView();
+        //        buildLoginView( false );
     }
 
 
-    private void buildLoginView( boolean exit )
+    public Label getUsername()
     {
-        if ( exit )
-        {
-            root.removeAllComponents();
-        }
+        return username;
+    }
+
+
+    @Override
+    public boolean beforeViewChange( final ViewChangeListener.ViewChangeEvent event )
+    {
         helpManager.closeAll();
-        HelpOverlay w = helpManager.addOverlay( "Welcome to the Subutai",
-                "<p>No username or password is required, just click the ‘Sign In’ button to continue.</p>", "login" );
-        w.center();
-        addWindow( w );
+        SubutaiLoginContext loginContext = SubutaiVaadinUtils.getSubutaiLoginContext();
+        LOG.debug( String.format( "Current subutai login context: %s", loginContext ) );
+        LOG.debug( String.format( "View: %s", event.getViewName() ) );
 
-        addStyleName( "login" );
+        boolean isAuthenticated = false;
 
-        loginLayout = new VerticalLayout();
-        loginLayout.setSizeFull();
-        loginLayout.addStyleName( "login-layout" );
-        root.addComponent( loginLayout );
-
-        final CssLayout loginPanel = new CssLayout();
-        loginPanel.addStyleName( "login-panel" );
-
-        HorizontalLayout labels = new HorizontalLayout();
-        labels.setWidth( "100%" );
-        labels.setMargin( true );
-        labels.addStyleName( "labels" );
-        loginPanel.addComponent( labels );
-
-        Label welcome = new Label( "Welcome" );
-        welcome.setSizeUndefined();
-        welcome.addStyleName( "h4" );
-        labels.addComponent( welcome );
-        labels.setComponentAlignment( welcome, Alignment.MIDDLE_LEFT );
-
-        Label title = new Label( "Subutai" );
-        title.setSizeUndefined();
-        title.addStyleName( "h2" );
-        title.addStyleName( "light" );
-        labels.addComponent( title );
-        labels.setComponentAlignment( title, Alignment.MIDDLE_RIGHT );
-
-        HorizontalLayout fields = new HorizontalLayout();
-        fields.setSpacing( true );
-        fields.setMargin( true );
-        fields.addStyleName( "fields" );
-
-        final TextField username = new TextField( "Username" );
-        username.focus();
-        fields.addComponent( username );
-
-        final PasswordField password = new PasswordField( "Password" );
-        fields.addComponent( password );
-
-        final Button signin = new Button( "Sign In" );
-        signin.addStyleName( "default" );
-        fields.addComponent( signin );
-        fields.setComponentAlignment( signin, Alignment.BOTTOM_LEFT );
-
-        final ShortcutListener enter = new ShortcutListener( "Sign In", ShortcutAction.KeyCode.ENTER, null )
+        if ( !( loginContext instanceof NullSubutaiLoginContext ) )
         {
-            @Override
-            public void handleAction( Object sender, Object target )
+            try
             {
-                signin.click();
+                IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+                isAuthenticated = identityManager.isAuthenticated();
             }
-        };
+            catch ( NamingException e )
+            {
+                LOG.error( e.toString(), e );
+            }
+        }
 
-        signin.addClickListener( new Button.ClickListener()
+        if ( isAuthenticated && event.getViewName().equals( "" ) )
         {
-            @Override
-            public void buttonClick( Button.ClickEvent event )
-            {
-                if ( username.getValue() != null && username.getValue().equals( "" ) && password.getValue() != null
-                        && password.getValue().equals( "" ) )
-                {
-                    signin.removeShortcutListener( enter );
-                    buildMainView();
-                }
-                else
-                {
-                    if ( loginPanel.getComponentCount() > 2 )
-                    {
-                        // Remove the previous error message
-                        loginPanel.removeComponent( loginPanel.getComponent( 2 ) );
-                    }
-                    // Add new error message
-                    Label error = new Label( "Wrong username or password. <span>Hint: try empty values</span>",
-                            ContentMode.HTML );
-                    error.addStyleName( "error" );
-                    error.setSizeUndefined();
-                    error.addStyleName( "light" );
-                    // Add animation
-                    error.addStyleName( "v-animate-reveal" );
-                    loginPanel.addComponent( error );
-                    username.focus();
-                }
-            }
-        } );
+            event.getNavigator().navigateTo( "/core" );
+            return false;
+        }
 
-        signin.addShortcutListener( enter );
+        if ( !isAuthenticated && !event.getViewName().equals( "/login" ) )
+        {
+            HelpOverlay w = helpManager.addOverlay( "Welcome to the Subutai",
+                    "<p>No username or password is required, just click the ‘Sign In’ button to continue.</p>",
+                    "login" );
+            w.center();
+            getUI().addWindow( w );
+            event.getNavigator().navigateTo( "/login" );
+            return false;
+        }
+        return true;
+    }
 
-        loginPanel.addComponent( fields );
 
-        loginLayout.addComponent( loginPanel );
-        loginLayout.setComponentAlignment( loginPanel, Alignment.MIDDLE_CENTER );
+    @Override
+    public void afterViewChange( final ViewChangeListener.ViewChangeEvent event )
+    {
+        View newView = event.getNewView();
+        helpManager.showHelpFor( newView );
     }
 
 
     private void buildMainView()
     {
         nav = new Navigator( this, content );
-
+        nav.addViewChangeListener( this );
+        nav.addView( "/login", new LoginView( this, helpManager ) );
         for ( String route : routes.keySet() )
         {
             nav.addView( route, routes.get( route ) );
         }
 
         helpManager.closeAll();
-        removeStyleName( "login" );
-        root.removeComponent( loginLayout );
+        //        removeStyleName( "login" );
+        //        root.removeComponent( loginLayout );
 
         root.addComponent( new HorizontalLayout()
         {
@@ -285,9 +242,29 @@ public class MainUI extends UI
                                 Image profilePic = new Image( null, new ThemeResource( "img/profile-pic.png" ) );
                                 profilePic.setWidth( "34px" );
                                 addComponent( profilePic );
-                                Label userName = new Label( username );
-                                userName.setSizeUndefined();
-                                addComponent( userName );
+                                username = new Label( "unknown" );
+                                username.setSizeUndefined();
+                                addComponent( username );
+
+                                try
+                                {
+                                    IdentityManager identityManager =
+                                            ServiceLocator.getServiceNoCache( IdentityManager.class );
+
+                                    if ( identityManager != null )
+                                    {
+                                        User user = identityManager.getUser();
+
+                                        if ( user != null )
+                                        {
+                                            username.setValue( user.getUsername() );
+                                        }
+                                    }
+                                }
+                                catch ( Exception e )
+                                {
+                                    LOG.error( e.toString(), e );
+                                }
 
                                 MenuBar.Command cmd = new MenuBar.Command()
                                 {
@@ -315,7 +292,32 @@ public class MainUI extends UI
                                     @Override
                                     public void buttonClick( Button.ClickEvent event )
                                     {
-                                        buildLoginView( true );
+
+                                        try
+                                        {
+                                            IdentityManager identityManager =
+                                                    ServiceLocator.getServiceNoCache( IdentityManager.class );
+                                            identityManager.logout(
+                                                    SubutaiVaadinUtils.getSubutaiLoginContext().getSessionId() );
+
+                                            VaadinService.getCurrentRequest().getWrappedSession().removeAttribute(
+                                                    SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME );
+                                            Cookie removeCookie =
+                                                    new Cookie( SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME, null );
+                                            removeCookie.setMaxAge( 0 );
+                                            VaadinService.getCurrentResponse().addCookie( removeCookie );
+                                            VaadinSession.getCurrent().close();
+                                        }
+                                        catch ( NamingException e )
+                                        {
+                                            LOG.error( e.toString(), e );
+                                        }
+
+                                        String contextPath = VaadinService.getCurrentRequest().getContextPath();
+                                        getUI().getPage().setLocation( contextPath );
+                                        LOG.trace( "VaadinSession.close() called" );
+                                        //                                        getSession().close();
+                                        //                                        buildLoginView( true );
                                     }
                                 } );
                             }
@@ -336,6 +338,7 @@ public class MainUI extends UI
         {
             Button b =
                     new NativeButton( view.substring( 0, 1 ).toUpperCase() + view.substring( 1 ).replace( '-', ' ' ) );
+            b.setId( view.substring( 0, 1 ).toUpperCase() + view.substring( 1 ).replace( '-', ' ' ) );
             b.addStyleName( "icon-" + view );
             b.addClickListener( new Button.ClickListener()
             {
@@ -371,28 +374,31 @@ public class MainUI extends UI
         else
         {
             nav.navigateTo( f );
-            helpManager.showHelpFor( routes.get( f ) );
-            viewNameToMenuButton.get( f ).addStyleName( "selected" );
+            if ( !f.equals( "/login" ) )
+            {
+                helpManager.showHelpFor( routes.get( f ) );
+                viewNameToMenuButton.get( f ).addStyleName( "selected" );
+            }
         }
 
-        nav.addViewChangeListener( new ViewChangeListener()
-        {
-
-            @Override
-            public boolean beforeViewChange( ViewChangeListener.ViewChangeEvent event )
-            {
-                helpManager.closeAll();
-                return true;
-            }
-
-
-            @Override
-            public void afterViewChange( ViewChangeListener.ViewChangeEvent event )
-            {
-                View newView = event.getNewView();
-                helpManager.showHelpFor( newView );
-            }
-        } );
+        //        nav.addViewChangeListener( new ViewChangeListener()
+        //        {
+        //
+        //            @Override
+        //            public boolean beforeViewChange( ViewChangeListener.ViewChangeEvent event )
+        //            {
+        //                helpManager.closeAll();
+        //                return true;
+        //            }
+        //
+        //
+        //            @Override
+        //            public void afterViewChange( ViewChangeListener.ViewChangeEvent event )
+        //            {
+        //                View newView = event.getNewView();
+        //                helpManager.showHelpFor( newView );
+        //            }
+        //        } );
     }
 
 

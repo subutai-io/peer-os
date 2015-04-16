@@ -7,7 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.safehaus.subutai.common.protocol.api.DataService;
-import org.safehaus.subutai.core.peer.impl.model.ContainerHostEntity;
+import org.safehaus.subutai.core.peer.impl.entity.ContainerHostEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,12 +25,10 @@ public class ContainerHostDataService implements DataService<String, ContainerHo
         this.emf = entityManagerFactory;
     }
 
-
     public void setEntityManagerFactory( final EntityManagerFactory emf )
     {
         this.emf = emf;
     }
-
 
     @Override
     public ContainerHostEntity find( final String id )

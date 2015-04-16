@@ -11,9 +11,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.common.host.HostArchitecture;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
-import org.safehaus.subutai.core.hostregistry.api.HostArchitecture;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.hostregistry.impl.ResourceHostInfoImpl;
@@ -32,7 +33,6 @@ public class RestServiceImplTest
     private static final String HOST_HOSTNAME = "host";
     private static final UUID HOST_ID = UUID.randomUUID();
     private static final String HOST_IP = "127.0.0.2";
-    private static final String HOST_INTERFACE = "eth0";
     private static final String HOST_MAC_ADDRESS = "0c:8b:fd:c0:ea:fe";
     private static final String CONTAINER_HOSTNAME = "container";
     private static final UUID CONTAINER_ID = UUID.randomUUID();
@@ -47,9 +47,9 @@ public class RestServiceImplTest
                             "\"interfaces\" : [{ \"interfaceName\":\"%s\", \"ip\":\"%s\",\"mac\":\"%s\"}], "
                             + "\"containers\": [{ \"hostname\":\"%s\", \"id\":\"%s\", " +
                             "\"interfaces\" : [{ \"interfaceName\":\"%s\", \"ip\":\"%s\",\"mac\":\"%s\"}], " +
-                            "\"status\":\"%s\" , \"arch\":\"%s\"}]}", HOST_HOSTNAME, HOST_ID, ARCH, HOST_INTERFACE,
-                    HOST_IP, HOST_MAC_ADDRESS, CONTAINER_HOSTNAME, CONTAINER_ID, CONTAINER_INTERFACE, CONTAINER_IP,
-                    CONTAINER_MAC_ADDRESS, CONTAINER_STATUS, ARCH );
+                            "\"status\":\"%s\" , \"arch\":\"%s\"}]}", HOST_HOSTNAME, HOST_ID, ARCH,
+                    Common.DEFAULT_CONTAINER_INTERFACE, HOST_IP, HOST_MAC_ADDRESS, CONTAINER_HOSTNAME, CONTAINER_ID,
+                    CONTAINER_INTERFACE, CONTAINER_IP, CONTAINER_MAC_ADDRESS, CONTAINER_STATUS, ARCH );
 
     @Mock
     HostRegistry hostRegistry;

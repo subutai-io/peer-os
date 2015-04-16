@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.metric.impl;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 
 import com.google.common.base.Preconditions;
 
@@ -20,4 +20,15 @@ public class ResourceHostMetricImpl extends ResourceHostMetric
 
         this.peerId = peerId;
     }
+
+
+    protected void setHostId( final UUID hostId )
+    {
+
+        Preconditions.checkNotNull( host, "Invalid host id" );
+
+        this.hostId = hostId;
+    }
+
+
 }

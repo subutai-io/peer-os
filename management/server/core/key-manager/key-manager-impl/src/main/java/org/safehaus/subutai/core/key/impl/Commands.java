@@ -12,13 +12,25 @@ import com.google.common.collect.Lists;
 public class Commands
 {
 
-    private static final String KEY_MANAGER_BINDING = "subutai key_manager";
+    private static final String KEY_MANAGER_BINDING = ". /etc/profile && subutai keymanager";
 
 
     public RequestBuilder getGenerateKeyCommand( String realName, String email )
     {
         return new RequestBuilder( KEY_MANAGER_BINDING )
                 .withCmdArgs( Lists.newArrayList( "generate", realName, email ) ).withTimeout( 90 );
+    }
+
+
+    public RequestBuilder getGenerateCertificateCommand( String keyId )
+    {
+        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "generate_cert", keyId ) );
+    }
+
+
+    public RequestBuilder getGenerateSubKeyCommand( String keyId )
+    {
+        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "generate_subkey", keyId ) );
     }
 
 
@@ -65,14 +77,32 @@ public class Commands
     }
 
 
+    public RequestBuilder getGenerateRevocationKeyCommand( String keyId )
+    {
+        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "generate_revkey", keyId ) );
+    }
+
+
+    public RequestBuilder getRevokeKeyCommand( String keyId )
+    {
+        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "revkey", keyId ) );
+    }
+
+
+    public RequestBuilder getRevokeSubKeyCommand( String keyId )
+    {
+        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "rev_subkey", keyId ) );
+    }
+
+
     public RequestBuilder getDeleteKeyCommand( String keyId )
     {
         return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "delete", keyId ) );
     }
 
 
-    public RequestBuilder getRevokeKeyCommand( String keyId )
+    public RequestBuilder getDeleteSubKeyCommand( String keyId )
     {
-        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "revoke", keyId ) );
+        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "del_subkey", keyId ) );
     }
 }

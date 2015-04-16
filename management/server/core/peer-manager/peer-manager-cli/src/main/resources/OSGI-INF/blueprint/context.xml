@@ -63,6 +63,7 @@
     <command name="peer/hosts">
       <action class="org.safehaus.subutai.core.peer.cli.HostsCommand">
         <property name="peerManager" ref="peerManager" />
+        <property name="identityManager" ref="identityManager" />
       </action>
     </command>
   </command-bundle>
@@ -92,13 +93,6 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="peer/tasks">
-      <action class="org.safehaus.subutai.core.peer.cli.TaskCommand">
-        <property name="peerManager" ref="peerManager" />
-      </action>
-    </command>
-  </command-bundle>
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="peer/tag-container">
       <action class="org.safehaus.subutai.core.peer.cli.TagCommand">
         <property name="peerManager" ref="peerManager" />
@@ -106,12 +100,28 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/get-reserved-vni">
+      <action class="org.safehaus.subutai.core.peer.cli.GetReservedVnisCommand">
+        <property name="peerManager" ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/jetty">
+      <action class="org.safehaus.subutai.core.peer.cli.JettyCommand">
+      </action>
+    </command>
+  </command-bundle>
+
   <reference id="peerManager" availability="mandatory" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+  <reference id="identityManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
+
   <reference id="templateRegistry" availability="mandatory"
              interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
   <reference id="environmentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
-  <!--<reference id="peerCommandDispatcher" availability="mandatory"
-             interface="org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher" />-->
+             interface="org.safehaus.subutai.core.env.api.EnvironmentManager" />
 
 </blueprint>

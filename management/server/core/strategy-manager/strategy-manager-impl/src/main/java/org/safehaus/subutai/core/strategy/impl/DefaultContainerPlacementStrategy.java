@@ -1,32 +1,29 @@
 package org.safehaus.subutai.core.strategy.impl;
 
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.core.strategy.api.AbstractContainerPlacementStrategy;
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.protocol.Criteria;
-import org.safehaus.subutai.core.strategy.api.ServerMetric;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.util.UnitUtil;
+import org.safehaus.subutai.core.strategy.api.AbstractContainerPlacementStrategy;
+
+import com.google.common.collect.Maps;
 
 
 /**
  * This is a default container placement strategy. According to metrics and limits calculates number of containers that
- * each connected physical host can accommodate
+ * each connected resource host can accommodate
  */
 public class DefaultContainerPlacementStrategy extends AbstractContainerPlacementStrategy
 {
-    public static final String DEFAULT_NODE_TYPE = "default";
-    private static final Logger LOG = LoggerFactory.getLogger( DefaultContainerPlacementStrategy.class );
     private static final double MIN_HDD_LXC_MB = 5 * 1024;
     private static final double MIN_HDD_IN_RESERVE_MB = 20 * 1024;
-    private static final double MIN_RAM_LXC_MB = 512;          // 1G
-    private static final double MIN_RAM_IN_RESERVE_MB = 1024;   // 1G
-    private static final double MIN_CPU_LXC_PERCENT = 5;           // 5%
-    private static final double MIN_CPU_IN_RESERVE_PERCENT = 10;    // 10%
+    private static final double MIN_RAM_LXC_MB = 512;
+    private static final double MIN_RAM_IN_RESERVE_MB = 1024;
+    private UnitUtil unitUtil = new UnitUtil();
 
 
     @Override
@@ -44,22 +41,20 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
 
 
     /**
-     * This method calculates placement of lxcs on physical servers. Code should check passed server metrics to figure
-     * out strategy for lxc placement This is done by calling addPlacementInfo method.This method calculates on which
-     * physical server to places lxc, the number of lxcs to place and their type
-     *
-     * @param serverMetrics - map where key is a physical agent and value is a metric
+     * This method calculates placement of containers across resource hosts. Code should check passed server metrics to
+     * figure out strategy for container placement This is done by calling addPlacementInfo method.This method
+     * calculates on which resource host to places containers, number of containers to place and their type
      */
     @Override
-    public void calculatePlacement( int nodesCount, List<ServerMetric> serverMetrics, List<Criteria> criteria )
+    public void calculatePlacement( int nodesCount, List<ResourceHostMetric> serverMetrics, List<Criteria> criteria )
     {
 
-        Map<ServerMetric, Integer> serversWithSlots = calculateSlots( nodesCount, serverMetrics );
+        Map<ResourceHostMetric, Integer> serversWithSlots = calculateSlots( nodesCount, serverMetrics );
 
         if ( !serversWithSlots.isEmpty() )
         {
             int numOfAvailableLxcSlots = 0;
-            for ( Map.Entry<ServerMetric, Integer> srv : serversWithSlots.entrySet() )
+            for ( Map.Entry<ResourceHostMetric, Integer> srv : serversWithSlots.entrySet() )
             {
                 numOfAvailableLxcSlots += srv.getValue();
             }
@@ -69,11 +64,11 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
 
                 for ( int i = 0; i < nodesCount; i++ )
                 {
-                    Map<ServerMetric, Integer> sortedBestServers =
+                    Map<ResourceHostMetric, Integer> sortedBestServers =
                             CollectionUtil.sortMapByValueDesc( serversWithSlots );
 
-                    Map.Entry<ServerMetric, Integer> entry = sortedBestServers.entrySet().iterator().next();
-                    ServerMetric physicalNode = entry.getKey();
+                    Map.Entry<ResourceHostMetric, Integer> entry = sortedBestServers.entrySet().iterator().next();
+                    ResourceHostMetric physicalNode = entry.getKey();
                     Integer numOfLxcSlots = entry.getValue();
                     serversWithSlots.put( physicalNode, numOfLxcSlots - 1 );
 
@@ -94,29 +89,26 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
 
 
     /**
-     * Optional method to implement if placement uses simple logic to calculate lxc slots on a physical server
+     * Optional method to implement if placement uses simple logic to calculate container slots on a resource host
      *
-     * @param serverMetrics - metrics of all connected physical servers
+     * @param serverMetrics - metrics of all connected resource hosts
      *
-     * @return map where key is a physical agent and value is a number of lxcs this physical server can accommodate
+     * @return map where key is a resource host metric and value is a number of containers this resource host can
+     * accommodate
      */
     @Override
-    public Map<ServerMetric, Integer> calculateSlots( int nodesCount, List<ServerMetric> serverMetrics )
+    public Map<ResourceHostMetric, Integer> calculateSlots( int nodesCount, List<ResourceHostMetric> serverMetrics )
     {
-        Map<ServerMetric, Integer> serverSlots = new HashMap<>();
+        Map<ResourceHostMetric, Integer> serverSlots = Maps.newHashMap();
 
-        if ( serverMetrics != null && !serverMetrics.isEmpty() )
+        if ( !CollectionUtil.isCollectionEmpty( serverMetrics ) )
         {
-            for ( ServerMetric metric : serverMetrics )
+            for ( ResourceHostMetric metric : serverMetrics )
             {
-                //                ServerMetric metric = entry.getValue();
-                LOG.debug( metric.toString() );
-                int numOfLxcByRam = ( int ) ( ( metric.getFreeRamMb() - MIN_RAM_IN_RESERVE_MB ) / MIN_RAM_LXC_MB );
-                int numOfLxcByHdd = ( int ) ( ( metric.getFreeHddMb() - MIN_HDD_IN_RESERVE_MB ) / MIN_HDD_LXC_MB );
-                int numOfLxcByCpu = ( int ) (
-                        ( ( 100 - metric.getCpuLoadPercent() ) - ( MIN_CPU_IN_RESERVE_PERCENT / metric
-                                .getNumOfProcessors() ) ) / ( MIN_CPU_LXC_PERCENT / metric.getNumOfProcessors() ) );
-                LOG.debug( numOfLxcByRam + " | " + numOfLxcByHdd + " | " + numOfLxcByCpu );
+                int numOfLxcByRam = ( int ) ( ( getBytesInMb( metric.getAvailableRam() ) - MIN_RAM_IN_RESERVE_MB )
+                        / MIN_RAM_LXC_MB );
+                int numOfLxcByHdd = ( int ) ( ( getBytesInMb( metric.getAvailableDiskVar() ) - MIN_HDD_IN_RESERVE_MB )
+                        / MIN_HDD_LXC_MB );
 
                 if ( numOfLxcByHdd > 0 && numOfLxcByRam > 0 )
                 {
@@ -126,5 +118,11 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
             }
         }
         return serverSlots;
+    }
+
+
+    private double getBytesInMb( double bytes )
+    {
+        return unitUtil.convert( bytes, UnitUtil.Unit.B, UnitUtil.Unit.MB );
     }
 }

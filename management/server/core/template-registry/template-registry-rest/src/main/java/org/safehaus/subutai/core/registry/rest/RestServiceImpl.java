@@ -16,6 +16,7 @@ import java.util.Set;
 
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.datatypes.TemplateVersion;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.FileUtil;
@@ -24,7 +25,6 @@ import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.registry.api.TemplateTree;
 import org.safehaus.subutai.core.repository.api.RepositoryException;
 import org.safehaus.subutai.core.repository.api.RepositoryManager;
 import org.slf4j.Logger;
@@ -74,65 +74,6 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response downloadTemplate( final String templateName, final String templateDownloadToken )
-    {
-        try
-        {
-            //check template download token
-            if ( !templateRegistry.checkTemplateDownloadToken( templateDownloadToken ) )
-            {
-                return Response.status( Response.Status.FORBIDDEN ).entity( "Invalid template download token" ).build();
-            }
-
-            String packageName = String.format( "%s-subutai-template", templateName );
-            String fullPackageName = repositoryManager.getFullPackageName( packageName );
-            String fullPackagePath =
-                    String.format( "%s%s%s", Common.APT_REPO_PATH, Common.APT_REPO_AMD64_PACKAGES_SUBPATH,
-                            fullPackageName );
-
-            File packageFile = new File( fullPackagePath );
-
-            if ( packageFile.exists() )
-            {
-                if ( packageFile.isFile() )
-                {
-                    return Response.ok( packageFile ).header( "Content-Disposition",
-                            String.format( "attachment; filename=%s", fullPackageName ) ).build();
-                }
-                else
-                {
-                    return Response.status( Response.Status.BAD_REQUEST ).entity( "File is directory" ).build();
-                }
-            }
-            else
-            {
-                return Response.status( Response.Status.NOT_FOUND ).build();
-            }
-        }
-        catch ( RepositoryException e )
-        {
-            LOG.error( "Error in downloadTemplate", e );
-            return Response.serverError().entity( e ).build();
-        }
-    }
-
-
-    @Override
-    public Response getTemplate( final String templateName )
-    {
-        Template template = templateRegistry.getTemplate( templateName );
-        if ( template != null )
-        {
-            return Response.ok().entity( GSON.toJson( template ) ).build();
-        }
-        else
-        {
-            return Response.status( Response.Status.NOT_FOUND ).build();
-        }
-    }
-
-
-    @Override
     public Response registerTemplate( final String configFilePath, final String packagesFilePath, final String md5sum )
     {
         try
@@ -140,7 +81,6 @@ public class RestServiceImpl implements RestService
 
             templateRegistry.registerTemplate( FileUtil.readFile( configFilePath, Charset.defaultCharset() ),
                     FileUtil.readFile( packagesFilePath, Charset.defaultCharset() ), md5sum );
-
             return Response.ok().build();
         }
         catch ( IOException | RegistryException | RuntimeException e )
@@ -258,11 +198,101 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response getTemplateTree()
+    {
+        List<Template> templates = templateRegistry.getTemplateTree();
+
+        if ( templates.size() > 0 )
+        {
+            return Response.ok().entity( GSON.toJson( templates ) ).build();
+        }
+
+        return Response.status( Response.Status.NOT_FOUND ).build();
+    }
+
+
+    @Override
+    public Response downloadTemplate( final String templateName, final String templateVersion,
+                                      final String templateDownloadToken )
+    {
+        try
+        {
+            //check template download token
+            if ( !templateRegistry.checkTemplateDownloadToken( templateDownloadToken ) )
+            {
+                return Response.status( Response.Status.FORBIDDEN ).entity( "Invalid template download token" ).build();
+            }
+
+            //            cassandra-subutai-template_2.1.0_amd64.deb
+            String packageName = String.format( "%s-subutai-template_%s_%s.deb", templateName, templateVersion,
+                    Common.DEFAULT_LXC_ARCH );
+            String fullPackageName = repositoryManager.getFullPackageName( packageName );
+            String fullPackagePath =
+                    String.format( "%s%s%s", Common.APT_REPO_PATH, Common.APT_REPO_AMD64_PACKAGES_SUBPATH,
+                            fullPackageName );
+
+            File packageFile = new File( fullPackagePath );
+
+            if ( packageFile.exists() )
+            {
+                if ( packageFile.isFile() )
+                {
+                    return Response.ok( packageFile ).header( "Content-Disposition",
+                            String.format( "attachment; filename=%s", fullPackageName ) ).build();
+                }
+                else
+                {
+                    return Response.status( Response.Status.BAD_REQUEST ).entity( "File is directory" ).build();
+                }
+            }
+            else
+            {
+                return Response.status( Response.Status.NOT_FOUND ).build();
+            }
+        }
+        catch ( RepositoryException e )
+        {
+            LOG.error( "Error in downloadTemplate", e );
+            return Response.serverError().entity( e ).build();
+        }
+    }
+
+
+    @Override
+    public Response getTemplate( final String templateName )
+    {
+        return getTemplate( templateName, Common.DEFAULT_TEMPLATE_VERSION );
+    }
+
+
+    @Override
+    public Response getTemplate( final String templateName, final String templateVersion )
+    {
+        Template template = templateRegistry.getTemplate( templateName, new TemplateVersion( templateVersion ) );
+        if ( template != null )
+        {
+            return Response.ok().entity( GSON.toJson( template ) ).build();
+        }
+        else
+        {
+            return Response.status( Response.Status.NOT_FOUND ).build();
+        }
+    }
+
+
+    @Override
     public Response unregisterTemplate( final String templateName )
+    {
+        return unregisterTemplate( templateName, Common.DEFAULT_TEMPLATE_VERSION );
+    }
+
+
+    @Override
+    public Response unregisterTemplate( final String templateName, final String templateVersion )
     {
 
         //check if template exists
-        if ( templateRegistry.getTemplate( templateName ) == null )
+        if ( templateRegistry.getTemplate( templateName, new TemplateVersion( templateVersion ) ) == null )
         {
             return Response.status( Response.Status.NOT_FOUND ).build();
         }
@@ -270,7 +300,8 @@ public class RestServiceImpl implements RestService
         //unregister template from registry
         try
         {
-            templateRegistry.unregisterTemplate( templateName );
+            templateRegistry.unregisterTemplate( templateName, new TemplateVersion( templateVersion ),
+                    Common.DEFAULT_LXC_ARCH );
 
             return Response.ok().build();
         }
@@ -288,15 +319,22 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response removeTemplate( final String templateName )
+    public Response removeTemplate( final String templateName, final String templateVersion )
     {
-        Response response = unregisterTemplate( templateName );
+        Template targetTemplate = templateRegistry.getTemplate( templateName, new TemplateVersion( templateVersion ) );
+        Response response = unregisterTemplate( targetTemplate.getTemplateName(),
+                targetTemplate.getTemplateVersion().getTemplateVersion() );
 
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             try
             {
-                String packageName = String.format( "%s-subutai-template", templateName );
+                //TODO this temporarily is disabled as template version problem will still exist.
+                //                String packageName = String.format( "%s-subutai-template_%s_%s.deb", targetTemplate
+                // .getTemplateName(),
+                //                        targetTemplate.getTemplateVersion().getTemplateVersion(), Common
+                // .DEFAULT_LXC_ARCH );
+                String packageName = String.format( "%s-subutai-template", targetTemplate.getTemplateName() );
                 String fullPackageName = repositoryManager.getFullPackageName( packageName );
                 repositoryManager.removePackageByName( fullPackageName );
                 return Response.ok().build();
@@ -315,9 +353,10 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getTemplate( final String templateName, final String lxcArch )
+    public Response getTemplate( final String templateName, final String templateVersion, final String lxcArch )
     {
-        Template template = templateRegistry.getTemplate( templateName, lxcArch );
+        Template template =
+                templateRegistry.getTemplate( templateName, new TemplateVersion( templateVersion ), lxcArch );
         if ( template != null )
         {
             return Response.ok().entity( GSON.toJson( template ) ).build();
@@ -332,7 +371,16 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getParentTemplate( final String childTemplateName )
     {
-        Template template = templateRegistry.getParentTemplate( childTemplateName );
+        return getParentTemplate( childTemplateName, Common.DEFAULT_TEMPLATE_VERSION );
+    }
+
+
+    @Override
+    public Response getParentTemplate( final String childTemplateName, final String templateVersion )
+    {
+        Template template = templateRegistry
+                .getParentTemplate( childTemplateName, new TemplateVersion( templateVersion ),
+                        Common.DEFAULT_LXC_ARCH );
         if ( template != null )
         {
             return Response.ok().entity( GSON.toJson( template ) ).build();
@@ -345,9 +393,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getParentTemplate( final String childTemplateName, final String lxcArch )
+    public Response getParentTemplate( final String childTemplateName, final String templateVersion,
+                                       final String lxcArch )
     {
-        Template template = templateRegistry.getParentTemplate( childTemplateName, lxcArch );
+        Template template = templateRegistry
+                .getParentTemplate( childTemplateName, new TemplateVersion( templateVersion ), lxcArch );
         if ( template != null )
         {
             return Response.ok().entity( GSON.toJson( template ) ).build();
@@ -362,8 +412,16 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getParentTemplates( final String childTemplateName )
     {
+        return getParentTemplates( childTemplateName, Common.DEFAULT_TEMPLATE_VERSION );
+    }
+
+
+    @Override
+    public Response getParentTemplates( final String childTemplateName, final String templateVersion )
+    {
         List<String> parents = new ArrayList<>();
-        for ( Template template : templateRegistry.getParentTemplates( childTemplateName ) )
+        for ( Template template : templateRegistry
+                .getParentTemplates( childTemplateName, new TemplateVersion( templateVersion ) ) )
         {
             parents.add( template.getTemplateName() );
         }
@@ -380,10 +438,12 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getParentTemplates( final String childTemplateName, final String lxcArch )
+    public Response getParentTemplates( final String childTemplateName, final String templateVersion,
+                                        final String lxcArch )
     {
         List<String> parents = new ArrayList<>();
-        for ( Template template : templateRegistry.getParentTemplates( childTemplateName, lxcArch ) )
+        for ( Template template : templateRegistry
+                .getParentTemplates( childTemplateName, new TemplateVersion( templateVersion ), lxcArch ) )
         {
             parents.add( template.getTemplateName() );
         }
@@ -401,8 +461,16 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getChildTemplates( final String parentTemplateName )
     {
+        return getChildTemplates( parentTemplateName, Common.DEFAULT_TEMPLATE_VERSION );
+    }
+
+
+    @Override
+    public Response getChildTemplates( final String parentTemplateName, final String templateVersion )
+    {
         List<String> children = new ArrayList<>();
-        for ( Template template : templateRegistry.getChildTemplates( parentTemplateName ) )
+        for ( Template template : templateRegistry
+                .getChildTemplates( parentTemplateName, new TemplateVersion( templateVersion ) ) )
         {
             children.add( template.getTemplateName() );
         }
@@ -418,10 +486,12 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getChildTemplates( final String parentTemplateName, final String lxcArch )
+    public Response getChildTemplates( final String parentTemplateName, final String templateVersion,
+                                       final String lxcArch )
     {
         List<String> children = new ArrayList<>();
-        for ( Template template : templateRegistry.getChildTemplates( parentTemplateName, lxcArch ) )
+        for ( Template template : templateRegistry
+                .getChildTemplates( parentTemplateName, new TemplateVersion( templateVersion ), lxcArch ) )
         {
             children.add( template.getTemplateName() );
         }
@@ -437,29 +507,12 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getTemplateTree()
-    {
-        TemplateTree tree = templateRegistry.getTemplateTree();
-        List<Template> uberTemplates = tree.getRootTemplates();
-        if ( uberTemplates != null )
-        {
-            for ( Template template : uberTemplates )
-            {
-                addChildren( tree, template );
-            }
-            return Response.ok().entity( GSON.toJson( uberTemplates ) ).build();
-        }
-
-        return Response.status( Response.Status.NOT_FOUND ).build();
-    }
-
-
-    @Override
-    public Response isTemplateInUse( final String templateName )
+    public Response isTemplateInUse( final String templateName, final String templateVersion )
     {
         try
         {
-            return Response.ok().entity( JsonUtil.toJson( "RESULT", templateRegistry.isTemplateInUse( templateName ) ) )
+            return Response.ok().entity( JsonUtil.toJson( "RESULT",
+                    templateRegistry.isTemplateInUse( templateName, new TemplateVersion( templateVersion ) ) ) )
                            .build();
         }
         catch ( RegistryException e )
@@ -471,12 +524,14 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setTemplateInUse( final String faiHostname, final String templateName, final String isInUse )
+    public Response setTemplateInUse( final String faiHostname, final String templateName, final String templateVersion,
+                                      final String isInUse )
     {
         try
         {
 
-            templateRegistry.updateTemplateUsage( faiHostname, templateName, Boolean.parseBoolean( isInUse ) );
+            templateRegistry.updateTemplateUsage( faiHostname, templateName, new TemplateVersion( templateVersion ),
+                    Boolean.parseBoolean( isInUse ) );
 
             return Response.ok().build();
         }
@@ -554,20 +609,6 @@ public class RestServiceImpl implements RestService
         else
         {
             return Response.status( Response.Status.NOT_FOUND ).build();
-        }
-    }
-
-
-    private void addChildren( TemplateTree tree, Template currentTemplate )
-    {
-        List<Template> children = tree.getChildrenTemplates( currentTemplate );
-        if ( !( children == null || children.isEmpty() ) )
-        {
-            currentTemplate.addChildren( children );
-            for ( Template child : children )
-            {
-                addChildren( tree, child );
-            }
         }
     }
 }

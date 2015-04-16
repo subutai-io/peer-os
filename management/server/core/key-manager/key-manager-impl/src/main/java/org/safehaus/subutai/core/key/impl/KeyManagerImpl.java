@@ -8,15 +8,13 @@ import java.util.regex.Pattern;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.CommandUtil;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.key.api.KeyInfo;
 import org.safehaus.subutai.core.key.api.KeyManager;
 import org.safehaus.subutai.core.key.api.KeyManagerException;
-import org.safehaus.subutai.core.peer.api.CommandUtil;
-import org.safehaus.subutai.core.peer.api.HostNotFoundException;
-import org.safehaus.subutai.core.peer.api.ManagementHost;
-import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import org.apache.commons.validator.routines.EmailValidator;
 
@@ -30,37 +28,15 @@ import com.google.common.collect.Sets;
  */
 public class KeyManagerImpl implements KeyManager
 {
-    private final PeerManager peerManager;
     protected Commands commands = new Commands();
     protected CommandUtil commandUtil = new CommandUtil();
 
 
-    public KeyManagerImpl( final PeerManager peerManager )
-    {
-        Preconditions.checkNotNull( peerManager );
-
-        this.peerManager = peerManager;
-    }
-
-
-    protected ManagementHost getManagementHost() throws KeyManagerException
+    protected String execute( RequestBuilder requestBuilder, Host host ) throws KeyManagerException
     {
         try
         {
-            return peerManager.getLocalPeer().getManagementHost();
-        }
-        catch ( HostNotFoundException e )
-        {
-            throw new KeyManagerException( e );
-        }
-    }
-
-
-    protected String execute( RequestBuilder requestBuilder ) throws KeyManagerException
-    {
-        try
-        {
-            CommandResult result = commandUtil.execute( requestBuilder, getManagementHost() );
+            CommandResult result = commandUtil.execute( requestBuilder, host );
             return result.getStdOut();
         }
         catch ( CommandException e )
@@ -82,7 +58,7 @@ public class KeyManagerImpl implements KeyManager
         for ( String line : lines )
         {
             //skip headers
-            if ( i > 0 )
+            if ( i > 1 )
             {
                 Matcher keyMatcher = keyPattern.matcher( line );
                 if ( keyMatcher.find() )
@@ -118,12 +94,13 @@ public class KeyManagerImpl implements KeyManager
 
 
     @Override
-    public KeyInfo generateKey( final String realName, final String email ) throws KeyManagerException
+    public KeyInfo generateKey( final Host host, final String realName, final String email ) throws KeyManagerException
     {
+        Preconditions.checkNotNull( host, "Invalid host" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( realName ), "Invalid real name" );
         Preconditions.checkArgument( EmailValidator.getInstance().isValid( email ), "Invalid email" );
 
-        String output = execute( commands.getGenerateKeyCommand( realName, email ) );
+        String output = execute( commands.getGenerateKeyCommand( realName, email ), host );
 
         Set<KeyInfo> keyInfoSet = parseKeysFromOutput( output );
         if ( !keyInfoSet.isEmpty() )
@@ -139,58 +116,75 @@ public class KeyManagerImpl implements KeyManager
 
 
     @Override
-    public String readKey( final String keyId ) throws KeyManagerException
+    public String getCertificate( final Host host, final String keyId ) throws KeyManagerException
     {
+        Preconditions.checkNotNull( host, "Invalid host" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
 
-        return execute( commands.getReadKeyCommand( keyId ) );
+        return execute( commands.getGenerateCertificateCommand( keyId ), host );
     }
 
 
     @Override
-    public String readSshKey( final String keyId ) throws KeyManagerException
+    public String readKey( final Host host, final String keyId ) throws KeyManagerException
     {
+        Preconditions.checkNotNull( host, "Invalid host" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
 
-        return execute( commands.getReadSshKeyCommand( keyId ) );
+        return execute( commands.getReadKeyCommand( keyId ), host );
     }
 
 
     @Override
-    public void signFileWithKey( final String keyId, final String filePath ) throws KeyManagerException
+    public String readSshKey( final Host host, final String keyId ) throws KeyManagerException
     {
+        Preconditions.checkNotNull( host, "Invalid host" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
+
+        return execute( commands.getReadSshKeyCommand( keyId ), host );
+    }
+
+
+    @Override
+    public void signFileWithKey( final Host host, final String keyId, final String filePath ) throws KeyManagerException
+    {
+        Preconditions.checkNotNull( host, "Invalid host" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( filePath ), "Invalid file path" );
 
-        execute( commands.getSignCommand( keyId, filePath ) );
+        execute( commands.getSignCommand( keyId, filePath ), host );
     }
 
 
     @Override
-    public void signKeyWithKey( final String signerKeyId, final String signedKeyId ) throws KeyManagerException
+    public void signKeyWithKey( final Host host, final String signerKeyId, final String signedKeyId )
+            throws KeyManagerException
     {
+        Preconditions.checkNotNull( host, "Invalid host" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( signerKeyId ), "Invalid signer key id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( signedKeyId ), "Invalid signed key id" );
 
-        execute( commands.getSignKeyCommand( signerKeyId, signedKeyId ) );
+        execute( commands.getSignKeyCommand( signerKeyId, signedKeyId ), host );
     }
 
 
     @Override
-    public void sendKeyToHub( final String keyId ) throws KeyManagerException
+    public void sendRevocationKeyToPublicKeyServer( final Host host, final String keyId ) throws KeyManagerException
     {
+        Preconditions.checkNotNull( host, "Invalid host" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
 
-        execute( commands.getSendKeyCommand( keyId ) );
+        execute( commands.getSendKeyCommand( keyId ), host );
     }
 
 
     @Override
-    public KeyInfo getKey( final String keyId ) throws KeyManagerException
+    public KeyInfo getKey( final Host host, final String keyId ) throws KeyManagerException
     {
+        Preconditions.checkNotNull( host, "Invalid host" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
 
-        String output = execute( commands.getListKeyCommand( keyId ) );
+        String output = execute( commands.getListKeyCommand( keyId ), host );
 
         Set<KeyInfo> keyInfoSet = parseKeysFromOutput( output );
         if ( !keyInfoSet.isEmpty() )
@@ -205,28 +199,85 @@ public class KeyManagerImpl implements KeyManager
 
 
     @Override
-    public Set<KeyInfo> getKeys() throws KeyManagerException
+    public Set<KeyInfo> getKeys( final Host host ) throws KeyManagerException
     {
-        String output = execute( commands.getListKeysCommand() );
+        Preconditions.checkNotNull( host, "Invalid host" );
+
+        String output = execute( commands.getListKeysCommand(), host );
 
         return parseKeysFromOutput( output );
     }
 
 
     @Override
-    public void deleteKey( final String keyId ) throws KeyManagerException
+    public void deleteKey( final Host host, final String keyId ) throws KeyManagerException
     {
+        Preconditions.checkNotNull( host, "Invalid host" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
 
-        execute( commands.getDeleteKeyCommand( keyId ) );
+        execute( commands.getDeleteKeyCommand( keyId ), host );
     }
 
 
     @Override
-    public void revokeKey( final String keyId ) throws KeyManagerException
+    public void generateRevocationKey( final Host host, final String keyId ) throws KeyManagerException
     {
+        Preconditions.checkNotNull( host, "Invalid host" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
 
-        execute( commands.getRevokeKeyCommand( keyId ) );
+        execute( commands.getGenerateRevocationKeyCommand( keyId ), host );
+    }
+
+
+    @Override
+    public void revokeKey( final Host host, final String keyId ) throws KeyManagerException
+    {
+        Preconditions.checkNotNull( host, "Invalid host" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
+
+        execute( commands.getRevokeKeyCommand( keyId ), host );
+    }
+
+
+    @Override
+    public String generateSubKey( final Host host, final String keyId ) throws KeyManagerException
+    {
+        Preconditions.checkNotNull( host, "Invalid host" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
+
+        String output = execute( commands.getGenerateSubKeyCommand( keyId ), host );
+
+        String regex = "(\\w+)$";
+        Pattern pattern = Pattern.compile( regex );
+        Matcher m = pattern.matcher( output );
+
+        if ( m.find() )
+        {
+            return m.group( 1 );
+        }
+        else
+        {
+            throw new KeyManagerException( String.format( "Sub key id not found in command output:%n%s", output ) );
+        }
+    }
+
+
+    @Override
+    public void deleteSubKey( final Host host, final String keyId ) throws KeyManagerException
+    {
+        Preconditions.checkNotNull( host, "Invalid host" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
+
+        execute( commands.getDeleteSubKeyCommand( keyId ), host );
+    }
+
+
+    @Override
+    public void revokeSubKey( final Host host, final String keyId ) throws KeyManagerException
+    {
+        Preconditions.checkNotNull( host, "Invalid host" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
+
+        execute( commands.getRevokeSubKeyCommand( keyId ), host );
     }
 }

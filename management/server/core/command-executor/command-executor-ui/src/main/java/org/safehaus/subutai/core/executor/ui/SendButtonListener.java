@@ -10,14 +10,14 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.command.RequestType;
 import org.safehaus.subutai.common.command.Response;
+import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.NumUtil;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.slf4j.Logger;
@@ -143,6 +143,11 @@ public class SendButtonListener implements Button.ClickListener, CommandCallback
             int timeout = Integer.valueOf( form.getTimeoutTxtFld().getValue() );
             requestBuilder.withTimeout( timeout );
 
+            if ( form.getDaemonChk().getValue() )
+            {
+                requestBuilder.daemon();
+            }
+
             execute( requestBuilder, hosts );
         }
     }
@@ -169,7 +174,20 @@ public class SendButtonListener implements Button.ClickListener, CommandCallback
             return false;
         }
 
+        if ( form.getRequestTypeCombo().getValue() == RequestType.PS_REQUEST )
+        {
+            Set<HostInfo> hosts = form.getHostTree().getSelectedHosts();
 
+            for ( HostInfo hostInfo : hosts )
+            {
+                if ( hostInfo instanceof ContainerHostInfo )
+                {
+                    form.addOutput( String.format(
+                            "You could not send PS_REQUEST to container host. Please select only resource hosts.%n" ) );
+                    return false;
+                }
+            }
+        }
         return true;
     }
 
@@ -239,7 +257,7 @@ public class SendButtonListener implements Button.ClickListener, CommandCallback
         }
         if ( commandResult.hasCompleted() )
         {
-            if ( response.getExitCode() != 0 )
+            if ( response.getExitCode() != null )
             {
                 out.append( "Exit code: " ).append( response.getExitCode() ).append( String.format( "%n%n" ) );
             }

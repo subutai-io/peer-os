@@ -9,11 +9,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.safehaus.subutai.common.datatypes.TemplateVersion;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.protocol.api.TemplateService;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.registry.api.RegistryException;
-import org.safehaus.subutai.core.registry.api.TemplateTree;
 
 import com.google.common.collect.Lists;
 
@@ -136,7 +137,7 @@ public class TemplateRegistryImplTest
     @Test
     public void testUnregisterTemplate() throws Exception
     {
-        when( templateService.getTemplate( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH ) )
+        when( templateService.getTemplate( TestUtils.TEMPLATE_NAME,new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), TestUtils.LXC_ARCH ) )
                 .thenReturn( TestUtils.getParentTemplate() );
 
 
@@ -213,7 +214,7 @@ public class TemplateRegistryImplTest
     @Test
     public void testGetChildTemplates() throws Exception
     {
-        when( templateService.getChildTemplates( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH ) )
+        when( templateService.getChildTemplates( TestUtils.TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), TestUtils.LXC_ARCH ) )
                 .thenReturn( Lists.newArrayList( TestUtils.getChildTemplate() ) );
 
         List<Template> children = templateRegistry.getChildTemplates( TestUtils.TEMPLATE_NAME );
@@ -239,7 +240,7 @@ public class TemplateRegistryImplTest
     {
         when( templateService.getTemplate( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH ) )
                 .thenReturn( TestUtils.getParentTemplate() );
-        when( templateService.getTemplate( TestUtils.CHILD_TEMPLATE_NAME, TestUtils.LXC_ARCH ) )
+        when( templateService.getTemplate( TestUtils.CHILD_TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), TestUtils.LXC_ARCH ) )
                 .thenReturn( TestUtils.getChildTemplate() );
 
         Template template = templateRegistry.getParentTemplate( TestUtils.CHILD_TEMPLATE_NAME );
@@ -260,15 +261,13 @@ public class TemplateRegistryImplTest
     @Test
     public void testGetTemplateTree() throws Exception
     {
-        List<Template> allTemplates = Lists.newArrayList( TestUtils.getParentTemplate(), TestUtils.getChildTemplate() );
+        List<Template> allTemplates = Lists.newArrayList( TestUtils.getParentTemplate() );
         when( templateService.getAllTemplates() ).thenReturn( allTemplates );
 
-        TemplateTree templateTree = templateRegistry.getTemplateTree();
+        List<Template> templateTree = templateRegistry.getTemplateTree();
 
-        assertTrue( templateTree.getChildrenTemplates( TestUtils.getParentTemplate() )
-                                .contains( TestUtils.getChildTemplate() ) );
-        assertTrue( templateTree.getRootTemplates().contains( TestUtils.getParentTemplate() ) );
-        assertEquals( TestUtils.getParentTemplate(), templateTree.getParentTemplate( TestUtils.getChildTemplate() ) );
+        assertTrue( templateTree.contains( TestUtils.getParentTemplate() ) );
+        assertEquals( TestUtils.getParentTemplate(), templateTree.get( 0 ) );
     }
 
 
@@ -277,9 +276,9 @@ public class TemplateRegistryImplTest
     {
         when( templateService.getAllTemplates() ).thenReturn( Collections.<Template>emptyList() );
 
-        TemplateTree templateTree = templateRegistry.getTemplateTree();
+        List<Template> templateTree = templateRegistry.getTemplateTree();
 
-        assertNull( templateTree.getRootTemplates() );
+        assertEquals( Collections.emptyList(), templateTree );
     }
 
 
@@ -288,7 +287,7 @@ public class TemplateRegistryImplTest
     {
         when( templateService.getTemplate( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH ) )
                 .thenReturn( TestUtils.getParentTemplate() );
-        when( templateService.getTemplate( TestUtils.CHILD_TEMPLATE_NAME, TestUtils.LXC_ARCH ) )
+        when( templateService.getTemplate( TestUtils.CHILD_TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), TestUtils.LXC_ARCH ) )
                 .thenReturn( TestUtils.getChildTemplate() );
 
         List<Template> templates = templateRegistry.getParentTemplates( TestUtils.CHILD_TEMPLATE_NAME );
@@ -325,7 +324,8 @@ public class TemplateRegistryImplTest
     public void testUpdateTemplateUsage() throws Exception
     {
         Template template = TestUtils.getParentTemplate();
-        when( templateService.getTemplate( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH ) ).thenReturn( template );
+        when( templateService.getTemplate( TestUtils.TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), TestUtils.LXC_ARCH ) ).thenReturn(
+                template );
 
         templateRegistry.updateTemplateUsage( "hostname", TestUtils.TEMPLATE_NAME, true );
 
@@ -361,7 +361,7 @@ public class TemplateRegistryImplTest
     public void testIsTemplateInUse() throws Exception
     {
         Template template = TestUtils.getParentTemplate();
-        when( templateService.getTemplate( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH ) ).thenReturn( template );
+        when( templateService.getTemplate( TestUtils.TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), TestUtils.LXC_ARCH ) ).thenReturn( template );
 
         template.setInUseOnFAI( "hostname", true );
 
@@ -393,7 +393,7 @@ public class TemplateRegistryImplTest
     public void testRegisterTemplate2Exception() throws Exception
     {
         Mockito.doThrow( new DaoException( "" ) ).when( templateService )
-               .saveTemplate( TestUtils.getChildTemplate() );
+               .saveTemplate( any(Template.class) );
 
         templateRegistry.registerTemplate( TestUtils.getChildTemplate() );
     }

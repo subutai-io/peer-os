@@ -26,43 +26,40 @@
 
 using namespace std;
 
-
 /**
  *  \details   This method designed for Typically conversion from integer to string.
  */
-string SubutaiHelper::toString(int intcont)
-{		//integer to string conversion
-    ostringstream dummy;
-    dummy << intcont;
-    return dummy.str();
+string SubutaiHelper::toString(int intcont) {	//integer to string conversion
+	ostringstream dummy;
+	dummy << intcont;
+	return dummy.str();
 }
-
 
 /*
  * \details split string by delimeter
  *
  */
-vector<string> SubutaiHelper::runAndSplit(char* cmd, char* type, char* delimeter)
-{
-	return splitResult(execCommand(cmd,type), delimeter);
+vector<string> SubutaiHelper::runAndSplit(char* cmd, char* type,
+		char* delimeter) {
+	return splitResult(execCommand(cmd, type), delimeter);
 }
-
 
 /*
  * \details execute a terminal command. type = r, w, rw
  *
  */
 string SubutaiHelper::execCommand(char* cmd, char* type) {
-    FILE* pipe = popen(cmd, type);
-    if (!pipe) return "ERROR";
-    char buffer[128];
-    string result = "";
-    while(!feof(pipe)) {
-        if(fgets(buffer, 128, pipe) != NULL)
-            result += buffer;
-    }
-    pclose(pipe);
-    return result;
+	FILE* pipe = popen(cmd, type);
+	if (!pipe)
+		return "ERROR";
+	char buffer[128];
+	string result = "";
+	while (!feof(pipe)) {
+		if (fgets(buffer, 128, pipe) != NULL)
+			result += buffer;
+	}
+	pclose(pipe);
+	return result;
 }
 
 /*
@@ -70,14 +67,66 @@ string SubutaiHelper::execCommand(char* cmd, char* type) {
  *
  */
 vector<string> SubutaiHelper::splitResult(string list, char* delimeter) {
-    vector<string> tokens;
-    size_t pos = 0;
-    std::string token;
-    while ((pos = list.find(delimeter)) != std::string::npos) {
-        token = list.substr(0, pos);
-        if(pos != 0) tokens.push_back(token);
-        list.erase(0, pos + 1);
-    }
-    if(list.size()>0) tokens.push_back(list);
-    return tokens;
+	vector<string> tokens;
+	size_t pos = 0;
+	std::string token;
+	while ((pos = list.find(delimeter)) != std::string::npos) {
+		token = list.substr(0, pos);
+		if (pos != 0)
+		{
+			tokens.push_back(token);
+		}
+		list.erase(0, pos + 1);
+	}
+	if (list.size() > 0)
+	{
+		tokens.push_back(list);
+	}
+
+	return tokens;
+}
+
+void SubutaiHelper::writeToFile(string& path, string& input) {
+	fstream file;	//opening commandQueue.txt
+	file.open(path.c_str(), fstream::in | fstream::out | fstream::app);
+	cout << "write msg to command queue: " << input << endl;
+	file << input;
+	file.close();
+}
+
+string& SubutaiHelper::readFromFile(string& path) {
+	string input, str;
+	ifstream file(path.c_str());
+	if (file.peek() != ifstream::traits_type::eof()) {
+		ofstream file_tmp("/etc/subutai-agent/tmp.txt");
+		input = "";
+		getline(file, str);
+		input = str;
+		while (getline(file, str)) {
+			file_tmp << str << endl;
+		}
+		file_tmp.close();
+		rename("/etc/subutai-agent/tmp.txt", path.c_str());
+	}
+	return input;
+}
+
+void SubutaiHelper::removeFromFile(string& path, string sub_string) {
+	string input, str;
+	ifstream file(path.c_str());
+	if (file.peek() != ifstream::traits_type::eof()) {
+		ofstream file_tmp("/etc/subutai-agent/tmp.txt");
+		while (getline(file, str)) {
+			size_t found = str.find(sub_string);
+			if (found == std::string::npos) {
+				file_tmp << str << endl;
+			}
+			else
+			{
+				cout << "remove message from cmd queue: " << str << endl;
+			}
+		}
+		file_tmp.close();
+		rename("/etc/subutai-agent/tmp.txt", path.c_str());
+	}
 }

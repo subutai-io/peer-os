@@ -5,16 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.safehaus.subutai.core.strategy.api.AbstractContainerPlacementStrategy;
+import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.protocol.Criteria;
-import org.safehaus.subutai.core.strategy.api.ServerMetric;
+import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.core.strategy.api.AbstractContainerPlacementStrategy;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 
 
 public class RoundRobinStrategy extends AbstractContainerPlacementStrategy
 {
-
-    public static final String DEFAULT_NODE_TYPE = "default";
 
 
     @Override
@@ -32,22 +31,24 @@ public class RoundRobinStrategy extends AbstractContainerPlacementStrategy
 
 
     @Override
-    public void calculatePlacement( int nodesCount, List<ServerMetric> serverMetrics, List<Criteria> criteria )
+    public void calculatePlacement( int nodesCount, List<ResourceHostMetric> serverMetrics, List<Criteria> criteria )
             throws StrategyException
     {
-        if ( serverMetrics == null || serverMetrics.isEmpty() )
+        if ( CollectionUtil.isCollectionEmpty( serverMetrics ) )
         {
             return;
         }
 
-        List<ServerMetric> sortedMetrics = sortServers( serverMetrics );
+        setDistributionCriteria( criteria );
+
+        List<ResourceHostMetric> sortedMetrics = sortServers( serverMetrics );
 
 
         // distribute required nodes among servers in round-robin fashion
-        Map<ServerMetric, Integer> slots = new HashMap<>();
+        Map<ResourceHostMetric, Integer> slots = new HashMap<>();
         for ( int i = 0; i < nodesCount; i++ )
         {
-            ServerMetric best = sortedMetrics.get( i % sortedMetrics.size() );
+            ResourceHostMetric best = sortedMetrics.get( i % sortedMetrics.size() );
             if ( slots.containsKey( best ) )
             {
                 slots.put( best, slots.get( best ) + 1 );
@@ -58,8 +59,7 @@ public class RoundRobinStrategy extends AbstractContainerPlacementStrategy
             }
         }
         // add node distribution counts
-        clearPlacementInfo();
-        for ( Map.Entry<ServerMetric, Integer> e : slots.entrySet() )
+        for ( Map.Entry<ResourceHostMetric, Integer> e : slots.entrySet() )
         {
             addPlacementInfo( e.getKey(), DEFAULT_NODE_TYPE, e.getValue() );
         }

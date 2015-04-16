@@ -2,7 +2,6 @@ package org.safehaus.subutai.core.tracker.impl.dao;
 
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -15,17 +14,15 @@ import javax.persistence.TypedQuery;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.impl.TrackerOperationImpl;
 import org.safehaus.subutai.core.tracker.impl.TrackerOperationViewImpl;
-import org.safehaus.subutai.core.tracker.impl.model.TrackerOperationEntity;
+import org.safehaus.subutai.core.tracker.impl.entity.TrackerOperationEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 
-/**
- * Created by talas on 12/7/14.
- */
 public class TrackerOperationDataService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( TrackerOperationDataService.class );
@@ -43,7 +40,7 @@ public class TrackerOperationDataService
 
     public List<TrackerOperationEntity> getAll()
     {
-        List<TrackerOperationEntity> result = new ArrayList<>();
+        List<TrackerOperationEntity> result = Lists.newArrayList();
         EntityManager em = emf.createEntityManager();
         try
         {
@@ -79,12 +76,17 @@ public class TrackerOperationDataService
         {
             em.getTransaction().begin();
 
-            TypedQuery<TrackerOperationEntity> query = em.createQuery(
-                    "SELECT to FROM TrackerOperationEntity to WHERE to.source = :source AND to.operationTrackId = "
-                            + ":operationTrackId", TrackerOperationEntity.class );
+            TypedQuery<TrackerOperationEntity> query =
+                    em.createNamedQuery( TrackerOperationEntity.QUERY_GET_OPERATION, TrackerOperationEntity.class );
             query.setParameter( "source", source );
             query.setParameter( "operationTrackId", operationTrackId.toString() );
-            result = query.getSingleResult();
+
+            List<TrackerOperationEntity> operations = query.getResultList();
+
+            if ( operations != null && operations.size() > 0 )
+            {
+                result = operations.get( 0 );
+            }
 
             em.getTransaction().commit();
         }
@@ -163,7 +165,7 @@ public class TrackerOperationDataService
                                                             final int limit ) throws SQLException
     {
         source = source.toUpperCase();
-        List<TrackerOperationView> result = new ArrayList<>();
+        List<TrackerOperationView> result = Lists.newArrayList();
         EntityManager em = emf.createEntityManager();
         try
         {
@@ -203,7 +205,7 @@ public class TrackerOperationDataService
 
     public List<String> getTrackerOperationSources() throws SQLException
     {
-        List<String> result = new ArrayList<>();
+        List<String> result = Lists.newArrayList();
         EntityManager em = emf.createEntityManager();
         try
         {
@@ -211,7 +213,7 @@ public class TrackerOperationDataService
 
             TypedQuery<String> query =
                     em.createQuery( "select distinct to.source from TrackerOperationEntity to", String.class );
-            result = query.getResultList();
+            result.addAll( query.getResultList() );
 
             em.getTransaction().commit();
         }

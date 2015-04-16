@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.network.impl;
 
 
 import java.util.Set;
+import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,26 +12,35 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.network.Vni;
+import org.safehaus.subutai.common.network.VniVlanMapping;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.network.api.ContainerInfo;
 import org.safehaus.subutai.core.network.api.N2NConnection;
+import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.network.api.Tunnel;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
-import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
+
+import com.google.common.collect.Sets;
 
 import junit.framework.TestCase;
 
 import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 import static junit.framework.TestCase.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -42,17 +52,18 @@ import static org.mockito.Mockito.when;
 public class NetworkManagerImplTest
 {
 
-    private static final String SUPER_NODE_IP = "super.node.ip";
+    private static final String SUPER_NODE_IP = "123.123.123.123";
     private static final int SUPER_NODE_PORT = 1234;
     private static final String INTERFACE_NAME = "interface name";
     private static final String COMMUNITY_NAME = "community name";
-    private static final String LOCAL_IP = "local.ip";
-    private static final String TUNNEL_NAME = "tunnel name";
+    private static final String LOCAL_IP = "127.0.0.1";
+    private static final String TUNNEL_NAME = "tunnel1";
+    private static final int TUNNEL_ID = 1;
     private static final String TUNNEL_IP = "tunnel.ip";
-    private static final String TUNNEL_TYPE = "tunnel type";
     private static final String GATEWAY_IP = "gateway.ip";
     private static final int VLAN_ID = 100;
     private static final int VNI = 100;
+    private static final UUID ENVIRONMENT_ID = UUID.randomUUID();
     private static final String CONTAINER_NAME = "container";
     private static final int NET_MASK = 24;
     private static final String CONTAINER_IP_OUTPUT =
@@ -63,7 +74,14 @@ public class NetworkManagerImplTest
     private static final String LIST_TUNNELS_OUTPUT = "List of Tunnels\n" + "--------\n" + "tunnel1-10.2.1.3";
     private static final String LIST_N2N_OUTPUT = "LocalPeerIP ServerIP Port LocalInterface Community\n"
             + "10.1.2.3    212.167.154.154 5000    com community1 ";
+    private static final String KEY_TYPE = "key type";
     private static final String PATH_TO_KEY_FILE = "/path/to/key/file";
+    private static final String RESERVED_VNIS_OUTPUT = String.format( "%s,%s,%s", VNI, VLAN_ID, ENVIRONMENT_ID );
+    private static final String VNI_VLAN_MAPPING_OUTPUT =
+            String.format( "%s,%s,%s,%s", TUNNEL_NAME, VNI, VLAN_ID, ENVIRONMENT_ID );
+    private static final String SSH_KEY = "SSH-KEY";
+    private static final String DOMAIN = "domain";
+    private static final String IP = "127.0.0.1";
 
     @Mock
     PeerManager peerManager;
@@ -81,7 +99,14 @@ public class NetworkManagerImplTest
     Commands commands;
     @Mock
     RequestBuilder requestBuilder;
+    @Mock
+    SshManager sshManager;
+    @Mock
+    HostManager hostManager;
 
+    private NetworkManagerImpl spyNetworkManager;
+
+    private Set<ContainerHost> containers;
 
     private NetworkManagerImpl networkManager;
 
@@ -94,11 +119,15 @@ public class NetworkManagerImplTest
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
         when( localPeer.getManagementHost() ).thenReturn( managementHost );
         when( localPeer.getContainerHostByName( anyString() ) ).thenReturn( containerHost );
-        when( localPeer.getResourceHostByName( anyString() ) ).thenReturn( resourceHost );
+        when( localPeer.getResourceHostByContainerName( anyString() ) ).thenReturn( resourceHost );
         when( managementHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
         when( containerHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
         when( commandResult.hasSucceeded() ).thenReturn( true );
+        containers = Sets.newHashSet( containerHost );
+        spyNetworkManager = spy( networkManager );
+        doReturn( sshManager ).when( spyNetworkManager ).getSshManager( containers );
+        doReturn( hostManager ).when( spyNetworkManager ).getHostManager( containers, DOMAIN );
     }
 
 
@@ -112,13 +141,14 @@ public class NetworkManagerImplTest
     @Test
     public void testSetupN2NConnection() throws Exception
     {
-        networkManager.setupN2NConnection( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME, LOCAL_IP,
-                PATH_TO_KEY_FILE );
+        networkManager
+                .setupN2NConnection( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME, LOCAL_IP, KEY_TYPE,
+                        PATH_TO_KEY_FILE );
 
         verify( localPeer ).getManagementHost();
         verify( commands )
                 .getSetupN2NConnectionCommand( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME, LOCAL_IP,
-                        PATH_TO_KEY_FILE );
+                        KEY_TYPE, PATH_TO_KEY_FILE );
         verify( managementHost ).execute( any( RequestBuilder.class ) );
     }
 
@@ -137,10 +167,10 @@ public class NetworkManagerImplTest
     @Test
     public void testSetupTunnel() throws Exception
     {
-        networkManager.setupTunnel( TUNNEL_NAME, TUNNEL_IP, TUNNEL_TYPE );
+        networkManager.setupTunnel( TUNNEL_ID, TUNNEL_IP );
 
         verify( localPeer ).getManagementHost();
-        verify( commands ).getSetupTunnelCommand( TUNNEL_NAME, TUNNEL_IP, TUNNEL_TYPE );
+        verify( commands ).getSetupTunnelCommand( TUNNEL_NAME, TUNNEL_IP, NetworkManager.TUNNEL_TYPE );
         verify( managementHost ).execute( any( RequestBuilder.class ) );
     }
 
@@ -148,7 +178,7 @@ public class NetworkManagerImplTest
     @Test
     public void testRemoveTunnel() throws Exception
     {
-        networkManager.removeTunnel( TUNNEL_NAME );
+        networkManager.removeTunnel( TUNNEL_ID );
 
         verify( localPeer ).getManagementHost();
         verify( commands ).getRemoveTunnelCommand( TUNNEL_NAME );
@@ -205,12 +235,24 @@ public class NetworkManagerImplTest
 
 
     @Test
+    public void testCleanupEnvironmentNetworkSettings() throws Exception
+    {
+        when( commandResult.getStdOut() ).thenReturn( RESERVED_VNIS_OUTPUT );
+
+        networkManager.cleanupEnvironmentNetworkSettings( ENVIRONMENT_ID );
+
+        verify( commands ).getCleanupEnvironmentNetworkSettingsCommand( VLAN_ID );
+        verify( managementHost, atLeastOnce() ).execute( any( RequestBuilder.class ) );
+    }
+
+
+    @Test
     public void testSetContainerIp() throws Exception
     {
         networkManager.setContainerIp( CONTAINER_NAME, LOCAL_IP, NET_MASK, VLAN_ID );
 
         verify( localPeer ).getContainerHostByName( CONTAINER_NAME );
-        verify( localPeer ).getResourceHostByName( anyString() );
+        verify( localPeer ).getResourceHostByContainerName( anyString() );
         verify( commands ).getSetContainerIpCommand( CONTAINER_NAME, LOCAL_IP, NET_MASK, VLAN_ID );
         verify( resourceHost ).execute( any( RequestBuilder.class ) );
     }
@@ -222,7 +264,7 @@ public class NetworkManagerImplTest
         networkManager.removeContainerIp( CONTAINER_NAME );
 
         verify( localPeer ).getContainerHostByName( CONTAINER_NAME );
-        verify( localPeer ).getResourceHostByName( anyString() );
+        verify( localPeer ).getResourceHostByContainerName( anyString() );
         verify( commands ).getRemoveContainerIpCommand( CONTAINER_NAME );
         verify( resourceHost ).execute( any( RequestBuilder.class ) );
     }
@@ -237,7 +279,7 @@ public class NetworkManagerImplTest
 
         assertNotNull( containerInfo );
         verify( localPeer ).getContainerHostByName( CONTAINER_NAME );
-        verify( localPeer ).getResourceHostByName( anyString() );
+        verify( localPeer ).getResourceHostByContainerName( anyString() );
         verify( commands ).getShowContainerIpCommand( CONTAINER_NAME );
 
 
@@ -281,10 +323,10 @@ public class NetworkManagerImplTest
     public void testSetupVniVLanMapping() throws Exception
     {
 
-        networkManager.setupVniVLanMapping( TUNNEL_NAME, VNI, VLAN_ID );
+        networkManager.setupVniVLanMapping( TUNNEL_ID, VNI, VLAN_ID, ENVIRONMENT_ID );
 
         verify( localPeer ).getManagementHost();
-        verify( commands ).getSetupVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID );
+        verify( commands ).getSetupVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID, ENVIRONMENT_ID );
         verify( managementHost ).execute( any( RequestBuilder.class ) );
     }
 
@@ -293,7 +335,7 @@ public class NetworkManagerImplTest
     public void testRemoveVniVLanMapping() throws Exception
     {
 
-        networkManager.removeVniVLanMapping( TUNNEL_NAME, VNI, VLAN_ID );
+        networkManager.removeVniVLanMapping( TUNNEL_ID, VNI, VLAN_ID );
 
         verify( localPeer ).getManagementHost();
         verify( commands ).getRemoveVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID );
@@ -330,7 +372,7 @@ public class NetworkManagerImplTest
     public void testGetResourceHost() throws Exception
     {
 
-        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).getResourceHostByName( anyString() );
+        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).getResourceHostByContainerName( anyString() );
 
         networkManager.getResourceHost( CONTAINER_NAME );
     }
@@ -342,5 +384,99 @@ public class NetworkManagerImplTest
         doThrow( new HostNotFoundException( "" ) ).when( localPeer ).getContainerHostByName( anyString() );
 
         networkManager.getContainerHost( CONTAINER_NAME );
+    }
+
+
+    @Test
+    public void testReserveVni() throws Exception
+    {
+        networkManager.reserveVni( new Vni( VNI, VLAN_ID, ENVIRONMENT_ID ) );
+
+        verify( managementHost ).execute( any( RequestBuilder.class ) );
+    }
+
+
+    @Test
+    public void testGetReservedVnis() throws Exception
+    {
+        when( commandResult.getStdOut() ).thenReturn( RESERVED_VNIS_OUTPUT );
+
+        Set<Vni> vnis = networkManager.getReservedVnis();
+
+        assertTrue( vnis.contains( new Vni( VNI, VLAN_ID, ENVIRONMENT_ID ) ) );
+    }
+
+
+    @Test
+    public void testGetVniVlanMappings() throws Exception
+    {
+        when( commandResult.getStdOut() ).thenReturn( VNI_VLAN_MAPPING_OUTPUT );
+
+
+        Set<VniVlanMapping> mappings = networkManager.getVniVlanMappings();
+
+        assertTrue( mappings.contains( new VniVlanMapping( TUNNEL_ID, VNI, VLAN_ID, ENVIRONMENT_ID ) ) );
+    }
+
+
+    @Test
+    public void testExchangeSshKeys() throws Exception
+    {
+        spyNetworkManager.exchangeSshKeys( containers );
+
+        verify( sshManager ).execute();
+    }
+
+
+    @Test
+    public void testAddSshKeyToAuthorizedKeys() throws Exception
+    {
+
+        spyNetworkManager.addSshKeyToAuthorizedKeys( containers, SSH_KEY );
+
+        verify( sshManager ).appendSshKey( SSH_KEY );
+    }
+
+
+    @Test
+    public void testReplaceSshKeyInAuthorizedKeys() throws Exception
+    {
+        spyNetworkManager.replaceSshKeyInAuthorizedKeys( containers, SSH_KEY, SSH_KEY );
+
+        verify( sshManager ).replaceSshKey( SSH_KEY, SSH_KEY );
+    }
+
+
+    @Test
+    public void testRemoveSshKeyFromAuthorizedKeys() throws Exception
+    {
+        spyNetworkManager.removeSshKeyFromAuthorizedKeys( containers, SSH_KEY );
+
+        verify( sshManager ).removeSshKey( SSH_KEY );
+    }
+
+
+    @Test
+    public void testRegisterHosts() throws Exception
+    {
+
+        spyNetworkManager.registerHosts( containers, DOMAIN );
+
+        verify( hostManager ).execute();
+    }
+
+
+    @Test
+    public void testGetHostManager() throws Exception
+    {
+        assertNotNull( networkManager.getHostManager( containers, DOMAIN ) );
+    }
+
+
+    @Test
+    public void testGetSshManager() throws Exception
+    {
+
+        assertNotNull( networkManager.getSshManager( containers ) );
     }
 }

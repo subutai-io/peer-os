@@ -7,9 +7,9 @@ import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
+import javax.jms.TopicSubscriber;
 
 import org.safehaus.subutai.core.broker.api.Broker;
 import org.safehaus.subutai.core.broker.api.BrokerException;
@@ -36,23 +36,26 @@ public class BrokerImpl implements Broker
 
     protected MessageRoutingListener messageRouter;
     protected PooledConnectionFactory pool;
-    private String brokerUrl;
-    private int maxBrokerConnections;
-    private boolean isPersistent;
-    private int messageTimeout;
+    private final String brokerUrl;
+    private final int maxBrokerConnections;
+    private final boolean isPersistent;
+    private final int messageTimeout;
+    private final int idleConnectionTimeout;
 
 
     public BrokerImpl( final String brokerUrl, final int maxBrokerConnections, final boolean isPersistent,
-                       final int messageTimeout )
+                       final int messageTimeout, final int idleConnectionTimeout )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( brokerUrl ), "Invalid broker URL" );
         Preconditions.checkArgument( maxBrokerConnections > 0, "Max broker connections number must be greater than 0" );
-        Preconditions.checkArgument( messageTimeout > 0, "Message timeout must be greater than 0" );
+        Preconditions.checkArgument( messageTimeout >= 0, "Message timeout must be greater than or equal to 0" );
+        Preconditions.checkArgument( idleConnectionTimeout > 0, "Idle connection timeout must be greater than 0" );
 
         this.brokerUrl = brokerUrl;
         this.maxBrokerConnections = maxBrokerConnections;
         this.isPersistent = isPersistent;
         this.messageTimeout = messageTimeout;
+        this.idleConnectionTimeout = idleConnectionTimeout;
         this.messageRouter = new MessageRoutingListener();
     }
 
@@ -108,8 +111,12 @@ public class BrokerImpl implements Broker
 
     public void init() throws BrokerException
     {
-        setupConnectionPool();
-        setupRouter();
+        ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory( brokerUrl );
+        amqFactory.setWatchTopicAdvisories( false );
+        amqFactory.setCheckForDuplicates( true );
+
+        setupConnectionPool( amqFactory );
+        setupRouter( amqFactory );
     }
 
 
@@ -122,18 +129,20 @@ public class BrokerImpl implements Broker
     }
 
 
-    protected void setupRouter() throws BrokerException
+    protected void setupRouter( ActiveMQConnectionFactory amqFactory ) throws BrokerException
     {
         try
         {
             for ( Topic topic : Topic.values() )
             {
-                Connection connection = pool.createConnection();
+                Connection connection = amqFactory.createConnection();
+                connection.setClientID( String.format( "%s-subutai-client", topic.name() ) );
                 connection.start();
-                Session session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
-                Destination topicDestination = session.createTopic( topic.name() );
-                MessageConsumer consumer = session.createConsumer( topicDestination );
-                consumer.setMessageListener( messageRouter );
+                Session session = connection.createSession( false, Session.CLIENT_ACKNOWLEDGE );
+                javax.jms.Topic topicDestination = session.createTopic( topic.name() );
+                TopicSubscriber topicSubscriber = session.createDurableSubscriber( topicDestination,
+                        String.format( "%s-subutai-subscriber", topic.name() ) );
+                topicSubscriber.setMessageListener( messageRouter );
             }
         }
         catch ( JMSException e )
@@ -144,25 +153,28 @@ public class BrokerImpl implements Broker
     }
 
 
-    private void setupConnectionPool()
+    private void setupConnectionPool( ActiveMQConnectionFactory amqFactory )
     {
-        ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory( brokerUrl );
-        amqFactory.setCheckForDuplicates( true );
         pool = new PooledConnectionFactory( amqFactory );
-        pool.setMaxConnections( maxBrokerConnections + Topic.values().length );
+        pool.setMaxConnections( maxBrokerConnections );
+        pool.setIdleTimeout( idleConnectionTimeout * 1000 );
         pool.start();
     }
 
 
     private void sendMessage( String topic, Object message ) throws BrokerException
     {
+        Connection connection = null;
+        Session session = null;
+        MessageProducer producer = null;
+
         try
         {
-            Connection connection = pool.createConnection();
+            connection = pool.createConnection();
             connection.start();
-            Session session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
+            session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
             Destination destination = session.createTopic( topic );
-            MessageProducer producer = session.createProducer( destination );
+            producer = session.createProducer( destination );
             producer.setDeliveryMode( isPersistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT );
             producer.setTimeToLive( messageTimeout * 1000 );
 
@@ -179,15 +191,49 @@ public class BrokerImpl implements Broker
             }
 
             producer.send( msg );
-
-            producer.close();
-            session.close();
-            connection.close();
         }
-        catch ( JMSException e )
+        catch ( Exception e )
         {
             LOG.error( "Error in sendMessage", e );
             throw new BrokerException( e );
+        }
+        finally
+        {
+            if ( producer != null )
+            {
+                try
+                {
+                    producer.close();
+                }
+                catch ( JMSException e )
+                {
+                    //ignore
+                }
+            }
+
+            if ( session != null )
+            {
+                try
+                {
+                    session.close();
+                }
+                catch ( JMSException e )
+                {
+                    //ignore
+                }
+            }
+
+            if ( connection != null )
+            {
+                try
+                {
+                    connection.close();
+                }
+                catch ( JMSException e )
+                {
+                    //ignore
+                }
+            }
         }
     }
 }

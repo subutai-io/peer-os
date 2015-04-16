@@ -1,0 +1,402 @@
+#!/bin/bash
+
+function key_manager_usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Key manager wrapper
+  echo
+  echo "  "subutai keymanager generate real_name email
+  echo "  "subutai keymanager generate_subkey key_id
+  echo "  "subutai keymanager export \<--ssh, --ssl\> key_id 
+  echo "  "subutai keymanager list
+  echo "  "subutai keymanager list key_id
+  echo "  "subutai keymanager revoke_subkey subkey_id
+  echo "  "subutai keymanager del_subkey subkey_id
+  echo "  "subutai keymanager sign_key \<-l\> signer_key_id key_id_to_be_signed
+  echo -----------------------------------------------------------------------
+}
+
+
+function keymanager {
+  subcommand=$1
+  if [[ -z "$subcommand" ]]; then
+    key_manager_usage
+  fi
+  shift
+  
+  $subcommand "$@"
+}
+
+
+# FIXME: We are using $no-protection flag to force gpg 
+# agent not to ask passphrase while creating key pair.
+# Starting from GnuPG 2.1.0 %no-ask-passphrase flag is
+# not operational, that is why we used $no-protection flag.
+#
+# https://www.gnupg.org/documentation/manuals/gnupg/Unattended-GPG-key-generation.html
+#
+# generates the key
+# parameters:
+#   1) real name 
+#   2) email  
+generate(){
+  if [ ! $# == 2 ];then
+    msg_error "missing arguments"
+    key_manager_usage
+    exit 1
+  fi
+  realName=$1
+  email=$2
+  assert_email_validity $email
+  #create key generation script
+  scriptName=".key_$RANDOM"
+  cat >$scriptName<<EOF
+    #%echo Generating a Subutai Environment key
+    Key-Type: RSA
+    Key-Length: 2048
+    Subkey-Type: RSA
+    Subkey-Length: 2048
+    Subkey-Usage: encrypt sign auth
+    Name-Real: $realName
+    Name-Comment: subutai environment key
+    Name-Email: $email
+    Expire-Date: 1y
+    %no-protection
+    %commit
+    #%echo DONE
+EOF
+    gpg2 --batch --gen-key $scriptName
+    rm $scriptName
+    list `get_last_key_id_in_keyring`
+}
+
+
+# FIXME: We can enable user to enter key size and expiration date.
+# generates unattented subkey 
+#
+# NOTE:Could not disable passphrase asking feature of gpg agent, 
+# but I could enter empty passphrase while creating subkeys.
+# gpg-agent does not ask for passphrase while signing files or keys, 
+# if the passphrase of subkey is "empty string". Emply string for 
+# passphrase practically enables us to create unattented GPG subkeys.
+# This method just creates subkeys for master key pair that are 
+# generated unattendedly.
+#  
+#   type : RSA
+#   size : 2048
+#   expiry : 2 years
+#   passphrase : empty
+generate_subkey(){
+  key_id=$1
+  assert_key_exists $key_id
+  if [ -z `is_subkey $key_id` ]; then
+    key_id=`get_pubkey_of_subkey $key_id`    
+  fi
+  msg_info "generating subkey for $key_id"
+  echo -e "ADDKEY\n6\n2048\n2y\n\n\nsave\n" | gpg2 --pinentry-mode loopback \
+                                              --command-fd 0 --status-fd --verbose \
+                                              --no-tty --edit-key $key_id > /dev/null 2>&1
+  new_key_id=`gpg2 --list-keys | sed -n '/'$key_id'/,/^$/p' | grep "." | tail -1 | cut -d "/" -f2 | cut -d " " -f1`
+  msg_ok "subkey is generated. Id of genereated subkey is $new_key_id"
+}
+
+
+# if no parameter supplied, lists all keys in summarized format
+# else just lists the given key both in summarizeds and detailed format
+# parameters:
+#   1) key id (optional)
+list(){
+  params=`getopt -o te -n "$0" -- "$@"`
+  if [ $? -ne 0 ];then
+      echo "invalid option"
+      exit 1
+  fi
+  eval set -- "$params"
+  switches=""
+  while true ; do
+    case "$1" in
+      -t)
+        switches=$switches" -t"
+        shift
+        ;;
+      -e)
+        switches=$switches" -e"
+        shift 
+        ;;
+      --) 
+        shift
+        break 
+        ;;
+      *) 
+        echo "Internal error!" 
+        exit 1 
+        ;;
+    esac
+  done
+  key_id=$1
+  if [ -z $key_id ];then
+    list_all $switches
+    return
+  fi
+  assert_key_exists $key_id
+  IFS=' ' read -a array <<< $key_id
+  print_keys $switches array[@]
+  printf "\n"
+  gpg2 --list-keys $key_id
+}
+
+
+# Deletes subkey which are generated unattentedly
+# parameters
+#   1) key_id
+del_subkey(){
+  key_id=$1
+  number=`find_key_id_index $key_id`
+  msg_info "removing subkey $key_id"
+  echo -e "key $number\ndelkey\ny\nsave\n" | gpg2 --pinentry-mode loopback --command-fd 0 \
+                                                  --no-tty --status-fd --verbose \
+                                                  --edit-key $key_id > /dev/null 2>&1
+  msg_ok "subkey $key_id deleted!"
+}
+
+
+# Revokes the subkey which are generated unattentedly
+# Note: After revoking subkeys, they are not listed
+# with "gpg2 -k" command, which may change result of 
+# find_key_id_index fuction and let it misbehave. 
+# That's why after revoking subkey, I delete that subkey
+# in order to overcome this pitfall. 
+# parameters
+#   1) key_id
+revoke_subkey(){
+  key_id=$1
+  if [[ -z `is_subkey $key_id` ]]; then
+    number=`find_key_id_index $key_id`
+  else
+    msg_error "$key_id does not belong to a subkey"
+    exit 1
+  fi
+  msg_info "revoking subkey $key_id"
+  echo -e "key $number\nrevkey\ny\n0\n\ny\nsave\n" | gpg2 --pinentry-mode loopback --command-fd 0 \
+                                                          --no-tty  --status-fd --verbose \
+                                                          --edit-key $key_id > /dev/null 2>&1
+  del_subkey_with_index $number $key_id
+  msg_ok "subkey $key_id revoked!"
+}
+
+
+# Key deletion is not recommended since documents signed
+# with deleted keys could not be decrypted anymore.
+# 
+# Deletes the key
+# parameters
+#   1) key_id
+delete(){
+  key_id=$1
+  assert_key_exists $key_id
+  fp=`get_fingerprint $key_id`
+  # remove keys from the secret keyring
+  gpg2 --batch --no-tty --yes --delete-secret-key $fp
+
+  # remove keys from the public keyring
+  gpg2 --batch --no-tty --yes --delete-key $fp
+}
+
+
+# exports public part of key pair
+# parameters
+#   1) key id 
+export(){
+  if [ $# == 2 ]; then
+    if [ "$1" == "-ssh" ] || [ "$1" == "--ssh" ];then
+      key_id=$2
+      export_key_compatible_with_authorized_key_file $key_id
+      return
+    elif [  "$1" == "-ssl" ] || [ "$1" == "--ssl" ];then
+      key_id=$2
+      generate_cert $key_id
+      return
+    fi
+    msg_error "invalid switch. Available switches: \"--ssh, --ssl\""
+    exit 1
+  fi
+  key_id=$1
+  if [ -z $key_id ];then
+    msg_error "Missing key id"
+    exit 1
+  fi
+  assert_key_exists $key_id
+  gpg2 --armor --export $key_id 
+}
+
+
+# signs the file
+# parameters:
+#   1) key to be used while signing
+#   2) key path to be signed
+sign(){
+  if [ $# == 1 ]; then
+    file=$1
+  elif [ $# == 2 ]; then
+    key_id=$1
+    assert_key_exists $key_id
+    file=$2
+  fi
+
+  if [ -z $file ]; then
+    msg_error "missing file to be signed !"
+    exit 1
+  fi
+  if [ -z $key_id ]; then
+    signer=`gpg2 --list-keys | grep pub | cut -d "/" -f2 | awk 'NR == 2' | awk '{print $1}'`
+    if [ -z $signer ]; then
+      msg_error "There is no key in keyring"
+      exit 1
+    fi
+    msg_info "signing with key id : $signer"  
+    gpg2 --sign $file
+  else
+    msg_info "signing with key id : " $key_id
+    gpg2 --sign -u $key_id $file
+  fi
+}
+
+
+# signs the key
+# There are four type of verification level that can be 
+# specified while signing keys: 
+#   (0) I will not answer. (default)
+#   (1) I have not checked at all.
+#   (2) I have done casual checking.
+#   (3) I have done very careful checking.
+# 
+# And sing_key function has an optional <-l> switch to 
+# specify these levels.
+#   e.g.: subutai keymanager sign_key -l 2 <signer_key> <key_id_to_be_signed>
+# parameters:
+#  1) signer key
+#  2) key to be signed
+sign_key(){
+  params=`getopt -o l:  --long level: -n '$0' -- "$@"`
+  eval set -- "$params"
+  sing_level=0
+  # extract options and their arguments into variables.
+  while true ; do
+    case "$1" in
+      -l | --level)
+        case "$2" in
+          0 | 1 | 2 | 3 )
+	    sign_level="$2"
+	    ;;
+ 	  *)
+            msg_error "invalid switch arguments!"
+            echo " Available arguments that can be used with \"-l\""
+            echo "  (0) I will not answer. (default)"
+	    echo "  (1) I have not checked at all."
+	    echo "  (2) I have done casual checking."
+	    echo "  (3) I have done very careful checking."
+	    exit 1
+            ;;
+        esac 
+        shift 3
+        break
+        ;;
+      --)
+        shift;
+        break
+        ;;
+      *)
+        echo "Invalid switch!" 
+        exit 1
+        ;;
+    esac
+  done
+
+  if [[ $# < 2 ]]; then
+    msg_error "missing arguments"
+    key_manager_usage
+    exit 1
+  fi
+
+  signer=$1
+  assert_key_exists_private_key_ring $signer
+  key_to_be_signed=$2
+  assert_key_exists $key_to_be_signed
+ 
+  if [[ "true" == `is_signed $signer $key_to_be_signed` ]]; then
+    msg_info "key $key_to_be_signed is already signed by $signer"
+  else
+    msg_ok "signing key $key_to_be_signed with key $signer"
+    echo -e "$sign_level\ny\n" | gpg2 -u $signer --yes --sign-key \
+                            --no-tty --command-fd 0  \
+                            --ask-cert-level $key_to_be_signed >> /dev/null 2>&1
+  fi
+}
+
+
+# sends the key to keyserver
+# parameters:
+#   1) key id
+#   2) key_server -optional ( default management keyserver )
+send(){
+  params=`getopt -o s:  --long server: -n '$0' -- "$@"`
+  eval set -- "$params"
+  local keyserver="$SUBUTAI_REST_IP"
+  # extract options and their arguments into variables.
+  while true ; do
+    case "$1" in
+      -s | --server)
+         keyserver="$2"
+         shift 3
+         break
+         ;;
+      --)
+        shift;
+        break
+        ;;
+      *)
+        echo "Invalid switch!" 
+        exit 1
+        ;;
+    esac
+  done
+  key_id=$1
+  assert_key_exists $key_id
+  gpg2 --keyserver $keyserver --send-keys $key_id # > /dev/null 2>&1
+}
+
+
+# receives the key from keyserver 
+# parameters:
+#   1) key id
+#   2) key_server -optional ( default management key server )
+receive(){
+  params=`getopt -o s:  --long server: -n '$0' -- "$@"`
+  eval set -- "$params"
+  local keyserver="$SUBUTAI_REST_IP"
+  # extract options and their arguments into variables.
+  while true ; do
+    case "$1" in
+      -s | --server)
+         keyserver="$2"
+         shift 3
+         break
+         ;;
+      --)
+        shift;
+        break
+        ;;
+      *)
+        echo "Invalid switch!" 
+        exit 1
+        ;;
+    esac
+  done
+  key_id=$1
+  msg_info "receiving key from $keyserver"
+  gpg2 --keyserver gw.intra.lan --recv-keys $key_id # > /dev/null 2&1
+}
+
+
+function keymanager_description {
+  echo "gpg2 wrapper for subutai management application"
+}

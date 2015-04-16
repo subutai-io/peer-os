@@ -12,17 +12,14 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 
 
-/**
- * Created by bahadyr on 9/25/14.
- */
+
 @Ignore
 @RunWith(MockitoJUnitRunner.class)
 public class PeerManagerImplTest
 {
 
     PeerManagerImpl peerManager;
-    @Mock
-    DataSource dataSource;
+
     @Mock
     Messenger messenger;
 
@@ -30,7 +27,7 @@ public class PeerManagerImplTest
     @Before
     public void setUp() throws Exception
     {
-        peerManager = new PeerManagerImpl( dataSource, messenger );
+        peerManager = new PeerManagerImpl( messenger );
     }
 
 

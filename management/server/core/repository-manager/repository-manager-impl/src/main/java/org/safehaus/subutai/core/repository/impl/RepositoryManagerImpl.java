@@ -8,10 +8,11 @@ import java.util.regex.Pattern;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.CommandUtil;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
-import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.repository.api.PackageInfo;
 import org.safehaus.subutai.core.repository.api.RepositoryException;
@@ -32,6 +33,7 @@ public class RepositoryManagerImpl implements RepositoryManager
 
     private final PeerManager peerManager;
     protected Commands commands = new Commands();
+    protected CommandUtil commandUtil = new CommandUtil();
 
 
     public RepositoryManagerImpl( final PeerManager peerManager )
@@ -42,39 +44,13 @@ public class RepositoryManagerImpl implements RepositoryManager
     }
 
 
-    protected CommandResult executeCommand( RequestBuilder requestBuilder ) throws RepositoryException
-    {
-        try
-        {
-            ManagementHost managementHost = peerManager.getLocalPeer().getManagementHost();
-            CommandResult result = managementHost.execute( requestBuilder );
-            if ( !result.hasSucceeded() )
-            {
-                if ( result.hasCompleted() )
-                {
-                    throw new RepositoryException( result.getStdErr() );
-                }
-                else
-                {
-                    throw new RepositoryException( "Command timed out" );
-                }
-            }
-
-            return result;
-        }
-        catch ( PeerException | CommandException e )
-        {
-            throw new RepositoryException( e );
-        }
-    }
-
-
     @Override
     public void addPackageByPath( final String pathToPackage ) throws RepositoryException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( pathToPackage ), "Invalid package path" );
 
         executeCommand( commands.getAddPackageCommand( pathToPackage ) );
+        executeUpdateRepoCommand();
     }
 
 
@@ -84,6 +60,7 @@ public class RepositoryManagerImpl implements RepositoryManager
         Preconditions.checkArgument( !Strings.isNullOrEmpty( packageName ), INVALID_PACKAGE_NAME );
 
         executeCommand( commands.getRemovePackageCommand( packageName ) );
+        executeUpdateRepoCommand();
     }
 
 
@@ -156,6 +133,73 @@ public class RepositoryManagerImpl implements RepositoryManager
             throw new RepositoryException(
                     String.format( "Could not obtain full name by short name %s from:%n%s", shortPackageName,
                             packageInfo ) );
+        }
+    }
+
+
+    protected ManagementHost getManagementHost() throws HostNotFoundException
+    {
+        return peerManager.getLocalPeer().getManagementHost();
+    }
+
+
+    protected CommandResult executeCommand( RequestBuilder requestBuilder ) throws RepositoryException
+    {
+        try
+        {
+            return commandUtil.execute( requestBuilder, getManagementHost() );
+        }
+        catch ( HostNotFoundException | CommandException e )
+        {
+            throw new RepositoryException( e );
+        }
+    }
+
+
+    protected CommandResult executeUpdateRepoCommand() throws RepositoryException
+    {
+        try
+        {
+            ManagementHost managementHost = getManagementHost();
+            CommandResult result = managementHost.execute( commands.getUpdateRepoCommand() );
+            if ( !result.hasCompleted() )
+            {
+                throw new RepositoryException( "Command timed out" );
+            }
+
+            return result;
+        }
+        catch ( HostNotFoundException | CommandException e )
+        {
+            throw new RepositoryException( e );
+        }
+    }
+
+
+    @Override
+    public void addAptSource( final String hostname, final String ip ) throws RepositoryException
+    {
+        try
+        {
+            commandUtil.execute( commands.getAddAptSourceCommand( hostname, ip ), getManagementHost() );
+        }
+        catch ( HostNotFoundException | CommandException e )
+        {
+            throw new RepositoryException( "Could not add remote host as apt source", e );
+        }
+    }
+
+
+    @Override
+    public void removeAptSource( final String ip ) throws RepositoryException
+    {
+        try
+        {
+            commandUtil.execute( commands.getRemoveAptSourceCommand( ip ), getManagementHost() );
+        }
+        catch ( HostNotFoundException | CommandException e )
+        {
+            throw new RepositoryException( "Could not add remote host as apt source", e );
         }
     }
 }

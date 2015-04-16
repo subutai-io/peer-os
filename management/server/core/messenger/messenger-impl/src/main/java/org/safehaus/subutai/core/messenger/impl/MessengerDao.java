@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.messenger.impl;
 
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -9,9 +8,8 @@ import java.util.UUID;
 
 import javax.persistence.EntityManagerFactory;
 
-import org.safehaus.subutai.common.util.DbUtil;
 import org.safehaus.subutai.core.messenger.impl.dao.MessageDataService;
-import org.safehaus.subutai.core.messenger.impl.model.MessageEntity;
+import org.safehaus.subutai.core.messenger.impl.entity.MessageEntity;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -25,8 +23,7 @@ public class MessengerDao
     private static final int WIDENING_INTERVAL_SEC = 5;
     private static final int MESSAGE_LIMIT_PER_PEER = 10;
 
-    protected DbUtil dbUtil;
-    private MessageDataService messageDataService;
+    protected MessageDataService messageDataService;
 
 
     public MessengerDao( EntityManagerFactory entityManagerFactory )
@@ -53,7 +50,7 @@ public class MessengerDao
         for ( final String targetPeer : targetPeers )
         {
             List<MessageEntity> messages =
-                    messageDataService.getSelectMessages( targetPeer, WIDENING_INTERVAL_SEC, MESSAGE_LIMIT_PER_PEER );
+                    messageDataService.getMessages( targetPeer, WIDENING_INTERVAL_SEC, MESSAGE_LIMIT_PER_PEER );
 
             Set<Envelope> envelopes = new HashSet<>();
             envelopes.addAll( buildEnvelopes( messages ) );
@@ -64,9 +61,9 @@ public class MessengerDao
     }
 
 
-    private List<Envelope> buildEnvelopes( final List<MessageEntity> messages )
+    protected Set<Envelope> buildEnvelopes( final List<MessageEntity> messages )
     {
-        List<Envelope> result = new ArrayList<>();
+        Set<Envelope> result = Sets.newHashSet();
         for ( final MessageEntity message : messages )
         {
             Envelope envelope = new Envelope( message );
@@ -98,6 +95,10 @@ public class MessengerDao
     public Envelope getEnvelope( UUID messageId )
     {
         MessageEntity messageEntity = messageDataService.find( messageId.toString() );
-        return new Envelope( messageEntity);
+        if ( messageEntity == null )
+        {
+            return null;
+        }
+        return new Envelope( messageEntity );
     }
 }

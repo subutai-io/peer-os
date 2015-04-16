@@ -4,10 +4,22 @@
 
   <reference id="peerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+  <reference id="templateRegistry" availability="mandatory"
+             interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
+  <reference id="hostRegistry" availability="mandatory"
+             interface="org.safehaus.subutai.core.hostregistry.api.HostRegistry" />
+  <reference id="sslContextFactory" availability="mandatory"
+             interface="org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory" />
+  <reference id="environmentManager" availability="optional"
+             interface="org.safehaus.subutai.core.env.api.EnvironmentManager" />
 
   <bean id="module" scope="singleton" class="org.safehaus.subutai.core.peer.ui.PeerManagerPortalModule"
         init-method="init" destroy-method="destroy">
-    <property name="peerManager" ref="peerManager" />
+    <argument ref="peerManager" />
+    <argument ref="templateRegistry" />
+    <argument ref="hostRegistry" />
+    <property name="sslContextFactory" ref="sslContextFactory" />
+    <property name="environmentManager" ref="environmentManager" />
   </bean>
 
   <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule">

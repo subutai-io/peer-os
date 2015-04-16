@@ -9,8 +9,9 @@ import static org.junit.Assert.assertEquals;
 public class TunnelImplTest
 {
 
-    private static final String TUNNEL_NAME = "tunnel name";
+    private static final String TUNNEL_NAME = "tunnel1";
     private static final String TUNNEL_IP = "tunnel ip";
+    private static final long TUNNEL_ID = 1;
 
 
     @Test
@@ -20,5 +21,6 @@ public class TunnelImplTest
 
         assertEquals( TUNNEL_NAME, tunnel.getTunnelName() );
         assertEquals( TUNNEL_IP, tunnel.getTunnelIp() );
+        assertEquals( TUNNEL_ID, tunnel.getTunnelId() );
     }
 }

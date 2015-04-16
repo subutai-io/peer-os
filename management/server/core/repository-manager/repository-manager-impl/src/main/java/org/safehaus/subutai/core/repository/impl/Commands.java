@@ -47,4 +47,29 @@ public class Commands
     {
         return new RequestBuilder( String.format( "subutai package_manager info %s", packageName ) );
     }
+
+
+    public RequestBuilder getUpdateRepoCommand()
+    {
+        return new RequestBuilder( "apt-get update" ).withTimeout( 120 );
+    }
+
+
+    public RequestBuilder getAddAptSourceCommand( String hostname, String ip )
+    {
+        return new RequestBuilder( String.format( "sed '/^path_map.*$/ s/$/ ; %s %s/' apt-cacher.conf > apt-cacher.conf"
+                        + ".new && mv apt-cacher.conf.new apt-cacher.conf && /etc/init.d/apt-cacher reload", hostname,
+                ( "http://" + ip + "/ksks" ).replace( ".", "\\." ).replace( "/", "\\/" ) ) )
+                .withCwd( "/etc/apt-cacher/" );
+    }
+
+
+    public RequestBuilder getRemoveAptSourceCommand( String ip )
+    {
+        return new RequestBuilder(
+                String.format( "sed -e 's,;\\s*[a-f0-9]\\{8\\}-[a-f0-9]\\{4\\}-[a-f0-9]\\{4\\}-[a-f0-9]\\{4" +
+                                "\\}-[a-f0-9]\\{12\\}\\s*http:\\/\\/%s/ksks\\s*,,g' apt-cacher.conf > apt-cacher.conf"
+                                + ".new && mv apt-cacher.conf.new apt-cacher.conf && /etc/init.d/apt-cacher reload",
+                        ip.replace( ".", "\\." ) ) ).withCwd( "/etc/apt-cacher/" );
+    }
 }
