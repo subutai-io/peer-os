@@ -361,19 +361,14 @@ public class EnvironmentImpl implements Environment, Serializable
 
         final EnvironmentImpl that = ( EnvironmentImpl ) o;
 
-        if ( getId() != null ? !getId().equals( that.getId() ) : that.getId() != null )
-        {
-            return false;
-        }
-
-        return true;
+        return getId().equals( that.getId() );
     }
 
 
     @Override
     public int hashCode()
     {
-        return getId() != null ? getId().hashCode() : 0;
+        return getId().hashCode();
     }
 
 
