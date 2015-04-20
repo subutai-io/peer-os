@@ -37,11 +37,6 @@ public class HostInterface implements Interface, Serializable
     private AbstractSubutaiHost host;
 
 
-    private HostInterface()
-    {
-    }
-
-
     public HostInterface( final Interface s )
     {
         this.interfaceName = s.getInterfaceName();
