@@ -52,6 +52,9 @@ public class ContainerGroupEntity implements ContainerGroup
     }
 
 
+    protected ContainerGroupEntity() {}
+
+
     @Override
     public UUID getEnvironmentId()
     {

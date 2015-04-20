@@ -67,6 +67,11 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     private LocalPeer localPeer;
 
 
+    protected ContainerHostEntity()
+    {
+    }
+
+
     public void setLocalPeer( final LocalPeer localPeer )
     {
         this.localPeer = localPeer;

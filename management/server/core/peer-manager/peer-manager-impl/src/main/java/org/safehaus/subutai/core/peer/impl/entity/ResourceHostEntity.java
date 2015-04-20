@@ -64,18 +64,18 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     Set<ContainerHost> containersHosts = Sets.newHashSet();
 
     @Transient
-    private ExecutorService singleThreadExecutorService = Executors.newSingleThreadExecutor();
+    protected ExecutorService singleThreadExecutorService = Executors.newSingleThreadExecutor();
     @Transient
     private Monitor monitor;
     @Transient
-    CommandUtil commandUtil = new CommandUtil();
+    protected CommandUtil commandUtil = new CommandUtil();
     @Transient
-    TemplateRegistry registry;
+    protected TemplateRegistry registry;
     @Transient
-    HostRegistry hostRegistry;
+    protected HostRegistry hostRegistry;
 
 
-    public ResourceHostEntity()
+    protected ResourceHostEntity()
     {
     }
 
