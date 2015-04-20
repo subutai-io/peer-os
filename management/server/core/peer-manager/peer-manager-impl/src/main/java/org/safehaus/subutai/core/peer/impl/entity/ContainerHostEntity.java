@@ -35,8 +35,6 @@ import org.safehaus.subutai.core.peer.api.ContainerGroup;
 import org.safehaus.subutai.core.peer.api.ContainerGroupNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -50,7 +48,6 @@ import com.google.common.base.Strings;
 @Access( AccessType.FIELD )
 public class ContainerHostEntity extends AbstractSubutaiHost implements ContainerHost
 {
-    private static final Logger LOG = LoggerFactory.getLogger( ContainerHostEntity.class );
 
     @ManyToOne( targetEntity = ResourceHostEntity.class )
     @JoinColumn( name = "parent_id" )
@@ -68,11 +65,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     @Transient
     private LocalPeer localPeer;
-
-
-    protected ContainerHostEntity()
-    {
-    }
 
 
     public void setLocalPeer( final LocalPeer localPeer )
@@ -93,12 +85,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    public String getNodeGroupName()
-    {
-        throw new UnsupportedOperationException();
-    }
-
-
     public String getEnvironmentId()
     {
         try
@@ -111,12 +97,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         {
             return null;
         }
-    }
-
-
-    public String getTemplateName()
-    {
-        throw new UnsupportedOperationException();
     }
 
 
@@ -198,11 +178,24 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
+    //unsupported START
+    public String getNodeGroupName()
+    {
+        throw new UnsupportedOperationException();
+    }
+
+
+    public String getTemplateName()
+    {
+        throw new UnsupportedOperationException();
+    }
+
+
     public Template getTemplate() throws PeerException
     {
-        Peer peer = getPeer();
-        return peer.getTemplate( getTemplateName() );
+        throw new UnsupportedOperationException();
     }
+    //unsupported END
 
 
     public void dispose() throws PeerException
@@ -233,8 +226,8 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     {
         super.updateHostInfo( hostInfo );
 
-        ContainerHostInfo conatinerHostInfo = ( ContainerHostInfo ) hostInfo;
-        this.state = conatinerHostInfo.getStatus();
+        ContainerHostInfo containerHostInfo = ( ContainerHostInfo ) hostInfo;
+        this.state = containerHostInfo.getStatus();
     }
 
 
@@ -264,6 +257,13 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public void setRamQuota( final int ramInMb ) throws PeerException
     {
         getPeer().setRamQuota( this, ramInMb );
+    }
+
+
+    @Override
+    public void setRamQuota( final RamQuota ramQuota ) throws PeerException
+    {
+        getPeer().setRamQuota( this, ramQuota );
     }
 
 
@@ -313,13 +313,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public void setDiskQuota( final DiskQuota diskQuota ) throws PeerException
     {
         getPeer().setDiskQuota( this, diskQuota );
-    }
-
-
-    @Override
-    public void setRamQuota( final RamQuota ramQuota ) throws PeerException
-    {
-        getPeer().setRamQuota( this, ramQuota );
     }
 
 
