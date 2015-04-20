@@ -60,9 +60,9 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     String name = "Subutai Management Host";
 
     @Transient
-    private ExecutorService singleThreadExecutorService = SubutaiExecutors.newSingleThreadExecutor();
+    protected ExecutorService singleThreadExecutorService = SubutaiExecutors.newSingleThreadExecutor();
     @Transient
-    private ServiceLocator serviceLocator = new ServiceLocator();
+    protected ServiceLocator serviceLocator = new ServiceLocator();
 
 
     protected ManagementHostEntity()
@@ -234,7 +234,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    private Set<Tunnel> listTunnels() throws PeerException
+    protected Set<Tunnel> listTunnels() throws PeerException
     {
         try
         {
@@ -454,7 +454,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    private Vni findVniByEnvironmentId( UUID environmentId ) throws PeerException
+    protected Vni findVniByEnvironmentId( UUID environmentId ) throws PeerException
     {
         //check if vni is already reserved
         for ( Vni aVni : getReservedVnis() )
@@ -469,7 +469,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    private void setupVniVlanMapping( final int tunnelId, final long vni, final int vlanId, final UUID environmentId )
+    protected void setupVniVlanMapping( final int tunnelId, final long vni, final int vlanId, final UUID environmentId )
             throws PeerException
     {
         try
