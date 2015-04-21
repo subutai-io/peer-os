@@ -4,8 +4,11 @@ package org.safehaus.subutai.core.peer.impl.entity;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+
+import javax.naming.NamingException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,9 +33,12 @@ import org.safehaus.subutai.core.repository.api.RepositoryManager;
 import com.google.common.collect.Sets;
 
 import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNull;
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.fail;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
@@ -93,7 +99,7 @@ public class ManagementHostEntityTest
         managementHostEntity.singleThreadExecutorService = singleThreadExecutorService;
         managementHostEntity.serviceLocator = serviceLocator;
         managementHostEntity.init();
-        when( singleThreadExecutorService.submit( callable ) ).thenReturn( future );
+        when( singleThreadExecutorService.submit( any( Callable.class ) ) ).thenReturn( future );
         when( serviceLocator.getService( RepositoryManager.class ) ).thenReturn( repositoryManager );
         when( serviceLocator.getService( NetworkManager.class ) ).thenReturn( networkManager );
     }
@@ -153,26 +159,133 @@ public class ManagementHostEntityTest
 
 
     @Test
-    public void testAddGateway() throws Exception
+    public void testCreateGateway() throws Exception
     {
-        //TODO
+        managementHostEntity.createGateway( IP, VLAN );
 
+        verify( future ).get();
+
+        doThrow( new InterruptedException() ).when( future ).get();
+
+        try
+        {
+            managementHostEntity.createGateway( IP, VLAN );
+            fail( "Expected PeerException" );
+        }
+        catch ( PeerException e )
+        {
+        }
+
+        doThrow( new ExecutionException( null ) ).when( future ).get();
+
+        try
+        {
+            managementHostEntity.createGateway( IP, VLAN );
+            fail( "Expected PeerException" );
+        }
+        catch ( PeerException e )
+        {
+        }
+
+        doThrow( new ExecutionException( new PeerException( "" ) ) ).when( future ).get();
+
+        try
+        {
+            managementHostEntity.createGateway( IP, VLAN );
+            fail( "Expected PeerException" );
+        }
+        catch ( PeerException e )
+        {
+        }
     }
 
 
     @Test
     public void testReserveVni() throws Exception
     {
-        //TODO
+        Vni vni = mock( Vni.class );
+        when( future.get() ).thenReturn( new Integer( VLAN ) );
 
+        managementHostEntity.reserveVni( vni );
+
+        verify( future ).get();
+
+        doThrow( new InterruptedException() ).when( future ).get();
+
+        try
+        {
+            managementHostEntity.reserveVni( vni );
+            fail( "Expected PeerException" );
+        }
+        catch ( PeerException e )
+        {
+        }
+
+        doThrow( new ExecutionException( null ) ).when( future ).get();
+
+        try
+        {
+            managementHostEntity.reserveVni( vni );
+            fail( "Expected PeerException" );
+        }
+        catch ( PeerException e )
+        {
+        }
+
+        doThrow( new ExecutionException( new PeerException( "" ) ) ).when( future ).get();
+
+        try
+        {
+            managementHostEntity.reserveVni( vni );
+            fail( "Expected PeerException" );
+        }
+        catch ( PeerException e )
+        {
+        }
     }
 
 
     @Test
     public void testSetupTunnels() throws Exception
     {
-        //TODO
+        when( future.get() ).thenReturn( new Integer( VLAN ) );
 
+        managementHostEntity.setupTunnels( Sets.newHashSet( IP ), ENV_ID );
+
+        verify( future ).get();
+
+        doThrow( new InterruptedException() ).when( future ).get();
+
+        try
+        {
+            managementHostEntity.setupTunnels( Sets.newHashSet( IP ), ENV_ID );
+            fail( "Expected PeerException" );
+        }
+        catch ( PeerException e )
+        {
+        }
+
+        doThrow( new ExecutionException( null ) ).when( future ).get();
+
+        try
+        {
+            managementHostEntity.setupTunnels( Sets.newHashSet( IP ), ENV_ID );
+            fail( "Expected PeerException" );
+        }
+        catch ( PeerException e )
+        {
+        }
+
+        doThrow( new ExecutionException( new PeerException( "" ) ) ).when( future ).get();
+
+        try
+        {
+            managementHostEntity.setupTunnels( Sets.newHashSet( IP ), ENV_ID );
+            fail( "Expected PeerException" );
+        }
+        catch ( PeerException e )
+        {
+        }
     }
 
 
@@ -260,8 +373,10 @@ public class ManagementHostEntityTest
 
 
     @Test
-    public void testFindEnvironmentById() throws Exception
+    public void testFindVniByEnvironmentById() throws Exception
     {
+
+        assertNull( managementHostEntity.findVniByEnvironmentId( ENV_ID ) );
 
         Vni vni = mock( Vni.class );
         when( vni.getEnvironmentId() ).thenReturn( ENV_ID );
@@ -339,6 +454,28 @@ public class ManagementHostEntityTest
         int newVlanId = managementHostEntity.findAvailableVlanId();
 
         assertEquals( ( VLAN + 1 ), newVlanId );
+    }
+
+
+    @Test( expected = PeerException.class )
+    public void testGetNetworkManager() throws Exception
+    {
+        assertEquals( networkManager, managementHostEntity.getNetworkManager() );
+
+        doThrow( new NamingException() ).when( serviceLocator ).getService( any( Class.class ) );
+
+        managementHostEntity.getNetworkManager();
+    }
+
+
+    @Test( expected = PeerException.class )
+    public void testGetRepositoryManager() throws Exception
+    {
+        assertEquals( repositoryManager, managementHostEntity.getRepositoryManager() );
+
+        doThrow( new NamingException() ).when( serviceLocator ).getService( any( Class.class ) );
+
+        managementHostEntity.getRepositoryManager();
     }
 }
 

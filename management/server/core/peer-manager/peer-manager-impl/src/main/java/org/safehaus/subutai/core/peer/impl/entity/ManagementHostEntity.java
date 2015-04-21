@@ -39,6 +39,9 @@ import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.network.api.Tunnel;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
+import org.safehaus.subutai.core.peer.impl.tasks.CreateGatewayTask;
+import org.safehaus.subutai.core.peer.impl.tasks.ReserveVniTask;
+import org.safehaus.subutai.core.peer.impl.tasks.SetupTunnelsTask;
 import org.safehaus.subutai.core.repository.api.RepositoryException;
 import org.safehaus.subutai.core.repository.api.RepositoryManager;
 
@@ -137,67 +140,6 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     {
         byte[] encoded = Files.readAllBytes( Paths.get( path ) );
         return new String( encoded, Charset.defaultCharset() );
-    }
-
-
-    @Override
-    public void createGateway( final String gatewayIp, final int vlan ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( gatewayIp ) && gatewayIp.matches( Common.IP_REGEX ),
-                "Invalid gateway IP" );
-        Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
-                String.format( "VLAN must be in the range from %d to %d", Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
-
-        //need to execute sequentially since other parallel executions can take the same gateway
-        //TODO extract task to separate class
-        Future<Boolean> future = queueSequentialTask( new Callable<Boolean>()
-        {
-            @Override
-            public Boolean call() throws Exception
-            {
-
-                Gateway newGateway = new Gateway( vlan, gatewayIp );
-
-                try
-                {
-                    Set<Gateway> existingGateways = getGateways();
-                    for ( Gateway gateway : existingGateways )
-                    {
-                        if ( gateway.equals( newGateway ) )
-                        {
-                            return false;
-                        }
-                    }
-
-                    getNetworkManager().setupGateway( gatewayIp, vlan );
-
-                    return true;
-                }
-                catch ( NetworkManagerException e )
-                {
-                    throw new PeerException(
-                            String.format( "Error creating gateway tap device with IP %s and VLAN %d", gatewayIp,
-                                    vlan ), e );
-                }
-            }
-        } );
-
-        try
-        {
-            future.get();
-        }
-        catch ( InterruptedException e )
-        {
-            throw new PeerException( e );
-        }
-        catch ( ExecutionException e )
-        {
-            if ( e.getCause() instanceof PeerException )
-            {
-                throw ( PeerException ) e.getCause();
-            }
-            throw new PeerException( "Error creating gateway", e.getCause() );
-        }
     }
 
 
@@ -331,35 +273,43 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
+    public void createGateway( final String gatewayIp, final int vlan ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( gatewayIp ) && gatewayIp.matches( Common.IP_REGEX ),
+                "Invalid gateway IP" );
+        Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
+                String.format( "VLAN must be in the range from %d to %d", Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+
+        //need to execute sequentially since other parallel executions can take the same gateway
+        Future<Boolean> future =
+                queueSequentialTask( new CreateGatewayTask( gatewayIp, vlan, getNetworkManager(), this ) );
+
+        try
+        {
+            future.get();
+        }
+        catch ( InterruptedException e )
+        {
+            throw new PeerException( e );
+        }
+        catch ( ExecutionException e )
+        {
+            if ( e.getCause() instanceof PeerException )
+            {
+                throw ( PeerException ) e.getCause();
+            }
+            throw new PeerException( "Error creating gateway", e.getCause() );
+        }
+    }
+
+
+    @Override
     public int reserveVni( final Vni vni ) throws PeerException
     {
         Preconditions.checkNotNull( vni, "Invalid vni" );
 
         //need to execute sequentially since other parallel executions can take the same VNI
-        //TODO extract task to separate class
-        Future<Integer> future = queueSequentialTask( new Callable<Integer>()
-        {
-            @Override
-            public Integer call() throws Exception
-            {
-
-                //check if vni is already reserved
-                Vni existingVni = findVniByEnvironmentId( vni.getEnvironmentId() );
-                if ( existingVni != null )
-                {
-                    return existingVni.getVlan();
-                }
-
-                //figure out available vlan
-                int vlan = findAvailableVlanId();
-
-                //reserve vni & vlan for environment
-
-                getNetworkManager().reserveVni( new Vni( vni.getVni(), vlan, vni.getEnvironmentId() ) );
-
-                return vlan;
-            }
-        } );
+        Future<Integer> future = queueSequentialTask( new ReserveVniTask( getNetworkManager(), vni, this ) );
 
         try
         {
@@ -387,53 +337,8 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         //need to execute sequentially since other parallel executions can setup the same tunnel
-        //TODO extract task to separate class
-        Future<Integer> future = queueSequentialTask( new Callable<Integer>()
-        {
-            @Override
-            public Integer call() throws Exception
-            {
-
-                NetworkManager networkManager = getNetworkManager();
-
-                //fail if vni is not reserved
-                Vni environmentVni = findVniByEnvironmentId( environmentId );
-
-                if ( environmentVni == null )
-                {
-                    throw new PeerException(
-                            String.format( "Error setting up tunnels: No reserved vni found for environment %s",
-                                    environmentId ) );
-                }
-
-
-                //setup tunnels to each remote peer
-                Set<Tunnel> tunnels = networkManager.listTunnels();
-
-                //remove local IP, just in case
-                peerIps.remove( getIpByInterfaceName( Common.MANAGEMENT_HOST_EXTERNAL_IP_INTERFACE ) );
-
-                for ( String peerIp : peerIps )
-                {
-                    int tunnelId = findTunnel( peerIp, tunnels );
-                    //tunnel not found, create new one
-                    if ( tunnelId == -1 )
-                    {
-                        //calculate tunnel id
-                        tunnelId = calculateNextTunnelId( tunnels );
-
-                        //create tunnel
-                        networkManager.setupTunnel( tunnelId, peerIp );
-                    }
-
-                    //create vni-vlan mapping
-                    setupVniVlanMapping( tunnelId, environmentVni.getVni(), environmentVni.getVlan(),
-                            environmentVni.getEnvironmentId() );
-                }
-
-                return environmentVni.getVlan();
-            }
-        } );
+        Future<Integer> future =
+                queueSequentialTask( new SetupTunnelsTask( getNetworkManager(), this, environmentId, peerIps ) );
 
         try
         {
@@ -454,7 +359,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    protected Vni findVniByEnvironmentId( UUID environmentId ) throws PeerException
+    public Vni findVniByEnvironmentId( UUID environmentId ) throws PeerException
     {
         //check if vni is already reserved
         for ( Vni aVni : getReservedVnis() )
@@ -469,7 +374,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    protected void setupVniVlanMapping( final int tunnelId, final long vni, final int vlanId, final UUID environmentId )
+    public void setupVniVlanMapping( final int tunnelId, final long vni, final int vlanId, final UUID environmentId )
             throws PeerException
     {
         try
@@ -493,7 +398,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    protected int findTunnel( String peerIp, Set<Tunnel> tunnels )
+    public int findTunnel( String peerIp, Set<Tunnel> tunnels )
     {
         for ( Tunnel tunnel : tunnels )
         {
@@ -507,7 +412,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    protected int calculateNextTunnelId( Set<Tunnel> tunnels )
+    public int calculateNextTunnelId( Set<Tunnel> tunnels )
     {
         int maxTunnelId = 0;
         for ( Tunnel tunnel : tunnels )
@@ -522,7 +427,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    protected int findAvailableVlanId() throws PeerException
+    public int findAvailableVlanId() throws PeerException
     {
         SortedSet<Integer> takenIds = Sets.newTreeSet();
 
