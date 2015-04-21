@@ -25,10 +25,6 @@ public class ManagementHostDataService implements DataService<String, Management
         this.emf = entityManagerFactory;
     }
 
-    public void setEntityManagerFactory( final EntityManagerFactory emf )
-    {
-        this.emf = emf;
-    }
 
     @Override
     public ManagementHostEntity find( final String id )

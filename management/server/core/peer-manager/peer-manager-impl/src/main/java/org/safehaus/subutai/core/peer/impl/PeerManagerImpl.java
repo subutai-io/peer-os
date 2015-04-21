@@ -64,6 +64,7 @@ public class PeerManagerImpl implements PeerManager
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class.getName() );
     private static final String SOURCE_REMOTE_PEER = "PEER_REMOTE";
     private static final String SOURCE_LOCAL_PEER = "PEER_LOCAL";
+    //TODO extract id to setting
     private static final String PEER_ID_PATH = "/var/lib/subutai/id";
     private static final String PEER_ID_FILE = "peer_id";
     private PeerDAO peerDAO;

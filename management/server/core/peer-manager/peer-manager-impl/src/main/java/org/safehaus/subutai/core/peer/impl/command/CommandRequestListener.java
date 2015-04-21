@@ -48,31 +48,11 @@ public class CommandRequestListener extends RequestListener
         {
             try
             {
-                final Peer sourcePeer = peerManager.getPeer( payload.getSourcePeerId() );
+                Peer sourcePeer = peerManager.getPeer( payload.getSourcePeerId() );
                 Host host = localPeer.bindHost( commandRequest.getHostId() );
 
-                localPeer.executeAsync( commandRequest.getRequestBuilder(), host, new CommandCallback()
-                {
-                    @Override
-                    public void onResponse( final Response response, final CommandResult commandResult )
-                    {
-                        try
-                        {
-                            Map<String, String> headers = Maps.newHashMap();
-                            headers.put( Common.ENVIRONMENT_ID_HEADER_NAME,
-                                    commandRequest.getEnvironmentId().toString() );
-                            sourcePeer.sendRequest(
-                                    new CommandResponse( commandRequest.getRequestId(), new ResponseImpl( response ),
-                                            new CommandResultImpl( commandResult ) ),
-                                    RecipientType.COMMAND_RESPONSE.name(), Timeouts.COMMAND_REQUEST_MESSAGE_TIMEOUT,
-                                    headers );
-                        }
-                        catch ( PeerException e )
-                        {
-                            LOG.error( "Error in onMessage", e );
-                        }
-                    }
-                } );
+                localPeer.executeAsync( commandRequest.getRequestBuilder(), host,
+                        new CommandRequestCallback( commandRequest, sourcePeer ) );
             }
             catch ( CommandException e )
             {
@@ -85,5 +65,38 @@ public class CommandRequestListener extends RequestListener
         }
 
         return null;
+    }
+
+
+    protected static class CommandRequestCallback implements CommandCallback
+    {
+        private final CommandRequest commandRequest;
+        private final Peer sourcePeer;
+
+
+        public CommandRequestCallback( final CommandRequest commandRequest, final Peer sourcePeer )
+        {
+            this.commandRequest = commandRequest;
+            this.sourcePeer = sourcePeer;
+        }
+
+
+        @Override
+        public void onResponse( final Response response, final CommandResult commandResult )
+        {
+            try
+            {
+                Map<String, String> headers = Maps.newHashMap();
+                headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, commandRequest.getEnvironmentId().toString() );
+                sourcePeer.sendRequest(
+                        new CommandResponse( commandRequest.getRequestId(), new ResponseImpl( response ),
+                                new CommandResultImpl( commandResult ) ), RecipientType.COMMAND_RESPONSE.name(),
+                        Timeouts.COMMAND_REQUEST_MESSAGE_TIMEOUT, headers );
+            }
+            catch ( PeerException e )
+            {
+                LOG.error( "Error in onMessage", e );
+            }
+        }
     }
 }
