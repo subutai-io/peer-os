@@ -21,7 +21,7 @@ public class CommandResponseListener extends RequestListener implements Disposab
     private static final Logger LOG = LoggerFactory.getLogger( CommandResponseListener.class.getName() );
 
 
-    private ExpiringCache<UUID, CommandCallback> callbacks;
+    protected ExpiringCache<UUID, CommandCallback> callbacks;
 
 
     public CommandResponseListener()
@@ -42,17 +42,7 @@ public class CommandResponseListener extends RequestListener implements Disposab
         if ( callback != null )
         {
             callbacks.put( commandId, callback, timeout * 1000 + Timeouts.COMMAND_REQUEST_MESSAGE_TIMEOUT * 2 * 1000,
-                    new EntryExpiryCallback<CommandCallback>()
-                    {
-                        @Override
-                        public void onEntryExpiry( final CommandCallback entry )
-                        {
-                            if ( semaphore != null )
-                            {
-                                semaphore.release();
-                            }
-                        }
-                    } );
+                    new CommandResponseExpiryCallback( semaphore ) );
         }
     }
 
@@ -77,5 +67,28 @@ public class CommandResponseListener extends RequestListener implements Disposab
             LOG.warn( "Null response" );
         }
         return null;
+    }
+
+
+    protected static class CommandResponseExpiryCallback implements EntryExpiryCallback<CommandCallback>
+    {
+
+        private final Semaphore semaphore;
+
+
+        public CommandResponseExpiryCallback( final Semaphore semaphore )
+        {
+            this.semaphore = semaphore;
+        }
+
+
+        @Override
+        public void onEntryExpiry( final CommandCallback entry )
+        {
+            if ( semaphore != null )
+            {
+                semaphore.release();
+            }
+        }
     }
 }

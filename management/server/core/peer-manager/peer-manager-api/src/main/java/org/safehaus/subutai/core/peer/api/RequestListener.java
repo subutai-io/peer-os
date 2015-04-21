@@ -18,7 +18,7 @@ public abstract class RequestListener
     }
 
 
-    public final String getRecipient()
+    public String getRecipient()
     {
         return recipient;
     }

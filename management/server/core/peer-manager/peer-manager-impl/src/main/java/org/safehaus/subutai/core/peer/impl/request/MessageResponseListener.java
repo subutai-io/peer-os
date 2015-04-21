@@ -24,8 +24,8 @@ public class MessageResponseListener extends MessageListener implements Disposab
     private static final Logger LOG = LoggerFactory.getLogger( MessageResponseListener.class.getName() );
 
     private Messenger messenger;
-    private Map<UUID, Semaphore> semaphoreMap = new ConcurrentHashMap<>();
-    private ExpiringCache<UUID, MessageResponse> responses = new ExpiringCache<>();
+    protected Map<UUID, Semaphore> semaphoreMap = new ConcurrentHashMap<>();
+    protected ExpiringCache<UUID, MessageResponse> responses = new ExpiringCache<>();
 
 
     public MessageResponseListener( Messenger messenger )

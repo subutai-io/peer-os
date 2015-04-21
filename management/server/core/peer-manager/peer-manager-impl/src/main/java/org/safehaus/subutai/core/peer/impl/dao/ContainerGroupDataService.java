@@ -26,12 +26,6 @@ public class ContainerGroupDataService implements DataService<String, ContainerG
     }
 
 
-    public void setEntityManagerFactory( final EntityManagerFactory emf )
-    {
-        this.emf = emf;
-    }
-
-
     @Override
     public ContainerGroupEntity find( final String id )
     {
