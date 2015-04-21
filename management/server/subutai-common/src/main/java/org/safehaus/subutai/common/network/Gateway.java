@@ -40,11 +40,11 @@ public class Gateway
 
         final Gateway gateway = ( Gateway ) o;
 
-        if ( vlan != gateway.vlan )
+        if ( vlan != gateway.getVlan() )
         {
             return false;
         }
-        if ( ip != null ? !ip.equals( gateway.ip ) : gateway.ip != null )
+        if ( ip != null ? !ip.equals( gateway.getIp() ) : gateway.getIp() != null )
         {
             return false;
         }

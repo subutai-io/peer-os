@@ -40,7 +40,7 @@ public class CreateGatewayTask implements Callable<Boolean>
             Set<Gateway> existingGateways = managementHost.getGateways();
             for ( Gateway gateway : existingGateways )
             {
-                if ( gateway.equals( newGateway ) )
+                if ( newGateway.equals( gateway ) )
                 {
                     return false;
                 }
