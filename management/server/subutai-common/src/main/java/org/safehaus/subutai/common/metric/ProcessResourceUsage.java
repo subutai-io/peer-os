@@ -4,7 +4,7 @@ package org.safehaus.subutai.common.metric;
 /**
  * Resource usage of a process
  */
-public final class ProcessResourceUsage
+public class ProcessResourceUsage
 {
     private String host;
     private double usedCpu;

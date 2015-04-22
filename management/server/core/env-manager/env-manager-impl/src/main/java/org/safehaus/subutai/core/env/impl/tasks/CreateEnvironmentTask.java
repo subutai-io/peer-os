@@ -34,8 +34,8 @@ public class CreateEnvironmentTask implements Runnable
     private final Topology topology;
     private final ResultHolder<EnvironmentCreationException> resultHolder;
     private final TrackerOperation op;
-    private final Semaphore semaphore;
-    private ExceptionUtil exceptionUtil = new ExceptionUtil();
+    protected Semaphore semaphore;
+    protected ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
     public CreateEnvironmentTask( final LocalPeer localPeer, final EnvironmentManagerImpl environmentManager,

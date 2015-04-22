@@ -23,14 +23,14 @@ import com.google.gson.GsonBuilder;
 
 
 /**
- * PluginDAO is used to manage cluster configuration information in database
+ * PeerDao is used to manage peer hosts metadata in database
  */
 public class PeerDAO
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( PeerDAO.class.getName() );
-    private Gson gson;
     private DaoManager daoManager;
+    protected Gson gson;
 
 
     public PeerDAO( final DaoManager daoManager ) throws SQLException

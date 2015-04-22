@@ -20,7 +20,7 @@ public class MessageRequestListener extends MessageListener implements Disposabl
     private PeerManager peerManager;
     private Messenger messenger;
     private Set<RequestListener> listeners;
-    private ExecutorService notifier = Executors.newCachedThreadPool();
+    protected ExecutorService notifier = Executors.newCachedThreadPool();
 
 
     public MessageRequestListener( PeerManager peerManager, Messenger messenger, Set<RequestListener> listeners )

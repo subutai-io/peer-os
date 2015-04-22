@@ -18,7 +18,7 @@ public class DestroyContainerTask implements Callable
 
     private final ResourceHost resourceHost;
     private final String hostname;
-    private CommandUtil commandUtil = new CommandUtil();
+    protected CommandUtil commandUtil = new CommandUtil();
 
 
     public DestroyContainerTask( final ResourceHost resourceHost, final String hostname )

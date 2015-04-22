@@ -9,18 +9,11 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.apache.karaf.shell.commands.Command;
 
 
-
 @Command( scope = "peer", name = "id" )
 public class GetIdCommand extends SubutaiShellCommandSupport
 {
 
     private PeerManager peerManager;
-
-
-    public PeerManager getPeerManager()
-    {
-        return peerManager;
-    }
 
 
     public void setPeerManager( final PeerManager peerManager )

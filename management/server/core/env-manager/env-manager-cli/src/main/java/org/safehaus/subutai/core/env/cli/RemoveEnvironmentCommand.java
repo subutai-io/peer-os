@@ -21,7 +21,7 @@ public class RemoveEnvironmentCommand extends SubutaiShellCommandSupport
 {
     @Argument( name = "envId", description = "Environment id",
             index = 0, multiValued = false, required = true )
-    private String environmentId;
+    String environmentId;
 
     private final EnvironmentManager environmentManager;
 

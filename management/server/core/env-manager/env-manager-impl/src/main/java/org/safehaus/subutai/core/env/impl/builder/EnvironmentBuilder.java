@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,7 +39,7 @@ public class EnvironmentBuilder
     private final TemplateRegistry templateRegistry;
     private final PeerManager peerManager;
     private final String defaultDomain;
-    private ExceptionUtil exceptionUtil = new ExceptionUtil();
+    protected ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
     public EnvironmentBuilder( final TemplateRegistry templateRegistry, final PeerManager peerManager,
@@ -88,9 +89,6 @@ public class EnvironmentBuilder
         }
 
 
-
-
-
         //collect all existing and new peers
         Set<Peer> allPeers = Sets.newHashSet( placement.keySet() );
 
@@ -127,10 +125,9 @@ public class EnvironmentBuilder
 
         int currentLastUsedIpIndex = environment.getLastUsedIpIndex();
 
-        ExecutorService taskExecutor = Executors.newFixedThreadPool( placement.size() );
+        ExecutorService taskExecutor = getExecutor( placement.size() );
 
-        CompletionService<Set<NodeGroupBuildResult>> taskCompletionService =
-                new ExecutorCompletionService<>( taskExecutor );
+        CompletionService<Set<NodeGroupBuildResult>> taskCompletionService = getCompletionService( taskExecutor );
 
         //submit parallel environment part creation tasks across peers
         for ( Map.Entry<Peer, Set<NodeGroup>> peerPlacement : placement.entrySet() )
@@ -183,5 +180,17 @@ public class EnvironmentBuilder
             throw new EnvironmentBuildException(
                     String.format( "There were errors during container creation:  %s", errors ), null );
         }
+    }
+
+
+    protected ExecutorService getExecutor( int numOfThreads )
+    {
+        return Executors.newFixedThreadPool( numOfThreads );
+    }
+
+
+    protected CompletionService<Set<NodeGroupBuildResult>> getCompletionService( Executor executor )
+    {
+        return new ExecutorCompletionService<>( executor );
     }
 }

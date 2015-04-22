@@ -46,7 +46,7 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
     private final String defaultDomain;
     private final Set<Peer> allPeers;
     private final int ipAddressOffset;
-    private ExceptionUtil exceptionUtil = new ExceptionUtil();
+    protected ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
     public NodeGroupBuilder( final EnvironmentImpl environment, final TemplateRegistry templateRegistry,
@@ -103,10 +103,10 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
             requiredTemplates.add( t.getRemoteClone( sourcePeerId ) );
         }
 
-        if ( requiredTemplates.isEmpty() )
-        {
-            throw new NodeGroupBuildException( "Could not fetch template information", null );
-        }
+        //        if ( requiredTemplates.isEmpty() )
+        //        {
+        //            throw new NodeGroupBuildException( "Could not fetch template information", null );
+        //        }
 
         return requiredTemplates;
     }

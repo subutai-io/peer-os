@@ -32,7 +32,8 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
     /**
      * {@value environmentId} target environment id to grow
      * <p>{@code required = true}</p>
-     */ private String environmentId;
+     */
+            String environmentId;
 
 
     @Argument( name = "templateName", description = "Template name",
@@ -40,7 +41,8 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
     /**
      * {@value templateName} template to clone for new environment container host
      * <p>{@code required = true}</p>
-     */ private String templateName;
+     */
+            String templateName;
 
 
     @Argument( name = "numberOfContainers", description = "Number of containers",
@@ -48,7 +50,8 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
     /**
      * {@value numberOfContainers} number of containers to add to environment
      * <p>{@code required = true}</p>
-     */ private int numberOfContainers;
+     */
+            int numberOfContainers;
 
 
     @Argument( name = "async", description = "asynchronous build",
@@ -56,7 +59,8 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
     /**
      * {@value async} grow environment asynchronously
      * <p>{@code required = false}, {@code default = false}</p>
-     */ private boolean async = false;
+     */
+            boolean async = false;
 
     private final EnvironmentManager environmentManager;
     private final PeerManager peerManager;

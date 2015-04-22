@@ -26,21 +26,24 @@ public class DestroyContainerCommand extends SubutaiShellCommandSupport
     /**
      * {@value containerIdStr} target environment container host to destroy
      * {@code required = true}
-     */ private String containerIdStr;
+     */
+            String containerIdStr;
 
     @Argument( name = "async", description = "asynchronous destruction",
             index = 1, multiValued = false, required = false )
     /**
      * {@value async} destroy environment asynchronously
      * <p> {@code required = false}, {@code default false} </p>
-     */ private boolean async = false;
+     */
+            boolean async = false;
 
     @Argument( name = "force", description = "force metadata removal",
             index = 2, multiValued = false, required = false )
     /**
      * {@value forceMetadataRemoval} force remove stored info about environment
      * <p> {@code required = false}, {@code default false} </p>
-     */ private boolean forceMetadataRemoval = false;
+     */
+            boolean forceMetadataRemoval = false;
 
     private final EnvironmentManager environmentManager;
 

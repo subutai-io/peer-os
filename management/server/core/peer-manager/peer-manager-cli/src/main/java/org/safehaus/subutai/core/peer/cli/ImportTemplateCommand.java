@@ -25,16 +25,10 @@ public class ImportTemplateCommand extends SubutaiShellCommandSupport
     private TemplateRegistry templateRegistry;
 
     @Argument( index = 0, name = "peerId", multiValued = false, description = "Remote Peer UUID" )
-    private String peerId;
+    protected String peerId;
 
     @Argument( index = 1, name = "templateName", multiValued = false, description = "Remote template name" )
     private String templateName;
-
-
-    public PeerManager getPeerManager()
-    {
-        return peerManager;
-    }
 
 
     public void setPeerManager( final PeerManager peerManager )

@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
-import com.google.gson.JsonSyntaxException;
 
 
 public class RestServiceImpl implements RestService
@@ -131,10 +130,6 @@ public class RestServiceImpl implements RestService
                     {
                         throw new EnvironmentCreationException( "Invalid node group name" );
                     }
-                    //                    else if ( Strings.isNullOrEmpty( nodeGroup.getDomainName() ) )
-                    //                    {
-                    //                        throw new EnvironmentCreationException( "Invalid domain name" );
-                    //                    }
                     else if ( nodeGroup.getNumberOfContainers() <= 0 )
                     {
                         throw new EnvironmentCreationException( "Invalid number of containers" );
@@ -326,7 +321,7 @@ public class RestServiceImpl implements RestService
             topologyJson = JsonUtil.fromJson( topologyJsonString, TopologyJson.class );
             checkTopology( topologyJson );
         }
-        catch ( JsonSyntaxException | NullPointerException | EnvironmentCreationException e )
+        catch ( Exception e )
         {
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
                            .build();

@@ -44,7 +44,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
-            result = em.find( EnvironmentImpl.class, id );
+                result = em.find( EnvironmentImpl.class, id );
         }
         catch ( Exception e )
         {

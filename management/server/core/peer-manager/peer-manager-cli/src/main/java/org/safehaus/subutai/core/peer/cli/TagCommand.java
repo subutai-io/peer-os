@@ -22,7 +22,7 @@ public class TagCommand extends SubutaiShellCommandSupport
     private String containerName;
 
     @Argument( index = 1, name = "tag", multiValued = false, required = false, description = "tag" )
-    private String tag;
+    protected String tag;
 
 
     public void setPeerManager( final PeerManager peerManager )
