@@ -68,7 +68,7 @@ public interface RestService
     @Path( "trust_request" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response processTrustRequest( @FormParam( "peer" ) String peer,
-                                         @FormParam( "root_cert_px2" ) String root_cert_px2 );
+                                         @FormParam( "rootCertPx2" ) String rootCertPx2 );
 
     @POST
     @Path( "trust_response" )
