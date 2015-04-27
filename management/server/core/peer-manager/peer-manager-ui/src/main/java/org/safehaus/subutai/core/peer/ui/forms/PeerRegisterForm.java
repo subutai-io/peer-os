@@ -536,46 +536,53 @@ public class PeerRegisterForm extends CustomComponent
             @Override
             public void run()
             {
-                String baseUrl =
-                        String.format( "https://%s:%s/cxf", remotePeerInfo.getIp(), ChannelSettings.SECURE_PORT_X1 );
-                WebClient client = RestUtil.createTrustedWebClient( baseUrl );// WebClient.create( baseUrl );
-                try
-                {
-                    Response response = client.path( "peer/remove" ).type( MediaType.APPLICATION_JSON )
-                                              .accept( MediaType.APPLICATION_JSON ).query( "rejectedPeerId",
-                                    gson.toJson( peerToUnregister.getId().toString() ) ).delete();
-                    if ( response.getStatus() == Response.Status.NO_CONTENT.getStatusCode() )
-                    {
-                        LOG.info( response.toString() );
-                        Notification.show( String.format( "Request sent to %s!", remotePeerInfo.getName() ) );
-                        getUI().access( new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                peersTable.removeItem( remotePeerInfo.getId() );
-                            }
-                        } );
-
-                        module.getPeerManager().unregister( remotePeerInfo.getId().toString() );
-                    }
-                    else
-                    {
-                        LOG.warn( "Response for registering peer: " + response.toString() );
-                        Notification.show( "Failed to remove remote peer", Notification.Type.WARNING_MESSAGE );
-                    }
-                }
-                catch ( PeerException e )
-                {
-                    LOG.error( "Error sending remove peer request", e );
-                    Notification.show( "Error sending remove peer request", Notification.Type.WARNING_MESSAGE );
-                }
-                if ( updateViewListener != null )
-                {
-                    updateViewListener.updateViewCallback();
-                }
+                removeMeFromRemoteRequest( peerToUnregister, remotePeerInfo, updateViewListener );
             }
         } ).start();
+    }
+
+
+    private void removeMeFromRemoteRequest( final PeerInfo peerToUnregister, final PeerInfo remotePeerInfo,
+                                            final PeerManageActionsComponent.PeerManageUpdateViewListener
+                                                    updateViewListener )
+    {
+        String baseUrl = String.format( "https://%s:%s/cxf", remotePeerInfo.getIp(), ChannelSettings.SECURE_PORT_X1 );
+        WebClient client = RestUtil.createTrustedWebClient( baseUrl );// WebClient.create( baseUrl );
+        try
+        {
+            Response response =
+                    client.path( "peer/remove" ).type( MediaType.APPLICATION_JSON ).accept( MediaType.APPLICATION_JSON )
+                          .query( "rejectedPeerId", gson.toJson( peerToUnregister.getId().toString() ) ).delete();
+            if ( response.getStatus() == Response.Status.NO_CONTENT.getStatusCode() )
+            {
+                LOG.info( response.toString() );
+                Notification.show( String.format( "Request sent to %s!", remotePeerInfo.getName() ) );
+                getUI().access( new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        peersTable.removeItem( remotePeerInfo.getId() );
+                    }
+                } );
+
+                module.getPeerManager().unregister( remotePeerInfo.getId().toString() );
+            }
+            else
+            {
+                LOG.warn( "Response for registering peer: " + response.toString() );
+                Notification.show( "Failed to remove remote peer", Notification.Type.WARNING_MESSAGE );
+            }
+        }
+        catch ( PeerException e )
+        {
+            LOG.error( "Error sending remove peer request", e );
+            Notification.show( "Error sending remove peer request", Notification.Type.WARNING_MESSAGE );
+        }
+        if ( updateViewListener != null )
+        {
+            updateViewListener.updateViewCallback();
+        }
     }
 
 
