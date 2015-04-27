@@ -6,7 +6,6 @@ import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -122,7 +121,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private PeerManager peerManager;
     private TemplateRegistry templateRegistry;
     private ManagementHost managementHost;
-    private Set<ResourceHost> resourceHosts = Sets.newHashSet();
+    private final Set<ResourceHost> resourceHosts = Sets.newHashSet();
     private CommandExecutor commandExecutor;
     private StrategyManager strategyManager;
     private QuotaManager quotaManager;
@@ -162,7 +161,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         managementHostDataService = new ManagementHostDataService( peerManager.getEntityManagerFactory() );
         Collection allManagementHostEntity = managementHostDataService.getAll();
-        if ( allManagementHostEntity != null && allManagementHostEntity.size() > 0 )
+        if ( allManagementHostEntity != null && !allManagementHostEntity.isEmpty() )
         {
             managementHost = ( ManagementHost ) allManagementHostEntity.iterator().next();
             ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
@@ -170,7 +169,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         resourceHostDataService = new ResourceHostDataService( peerManager.getEntityManagerFactory() );
-        resourceHosts = Sets.newHashSet();
+        resourceHosts.clear();
         synchronized ( resourceHosts )
         {
             resourceHosts.addAll( resourceHostDataService.getAll() );
@@ -328,75 +327,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             managementHost.createGateway( cidr.getInfo().getLowAddress(), vlan );
         }
 
+        registerRemoteTemplates( request );
 
-        //try to register remote templates with local registry
-        try
-        {
-            for ( Template t : request.getTemplates() )
-            {
-                if ( t.isRemote() )
-                {
-                    tryToRegister( t );
-                }
-            }
-        }
-        catch ( RegistryException e )
-        {
-            throw new PeerException( e );
-        }
+        Map<ResourceHost, Set<String>> containerDistribution = distributeContainersToResourceHosts( request );
 
-
-        //collect resource host metrics  & prepare templates on each of them
-        List<ResourceHostMetric> serverMetricMap = new ArrayList<>();
-        for ( ResourceHost resourceHost : getResourceHosts() )
-        {
-            //take connected resource hosts for container creation
-            //and prepare needed templates
-            if ( resourceHost.isConnected() )
-            {
-                try
-                {
-                    serverMetricMap.add( resourceHost.getHostMetric() );
-                    //                    resourceHost.prepareTemplates( request.getTemplates() );
-                }
-                catch ( ResourceHostException e )
-                {
-                    throw new PeerException( e );
-                }
-            }
-        }
-
-        //calculate placement strategy
-        Map<ResourceHostMetric, Integer> slots;
-        try
-        {
-            slots = strategyManager.getPlacementDistribution( serverMetricMap, request.getNumberOfContainers(),
-                    request.getStrategyId(), request.getCriteria() );
-        }
-        catch ( StrategyException e )
-        {
-            throw new PeerException( e );
-        }
-
-
-        //distribute new containers' names across selected resource hosts
-        Map<ResourceHost, Set<String>> containerDistribution = Maps.newHashMap();
         String templateName = request.getTemplates().get( request.getTemplates().size() - 1 ).getTemplateName();
-
-        for ( Map.Entry<ResourceHostMetric, Integer> e : slots.entrySet() )
-        {
-            Set<String> hostCloneNames = new HashSet<>();
-            for ( int i = 0; i < e.getValue(); i++ )
-            {
-                String newContainerName = StringUtil
-                        .trimToSize( String.format( "%s%s", templateName, UUID.randomUUID() ).replace( "-", "" ),
-                                Common.MAX_CONTAINER_NAME_LEN );
-                hostCloneNames.add( newContainerName );
-            }
-            ResourceHost resourceHost = getResourceHostByName( e.getKey().getHost() );
-            containerDistribution.put( resourceHost, hostCloneNames );
-        }
-
 
         String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
         String[] allAddresses = cidr.getInfo().getAllAddresses();
@@ -424,6 +359,89 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         }
 
+        return processRequestCompletion( taskFutures, executorService, request );
+    }
+
+
+    private void registerRemoteTemplates( final CreateContainerGroupRequest request ) throws PeerException
+    {
+        //try to register remote templates with local registry
+        try
+        {
+            for ( Template t : request.getTemplates() )
+            {
+                if ( t.isRemote() )
+                {
+                    tryToRegister( t );
+                }
+            }
+        }
+        catch ( RegistryException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    private Map<ResourceHost, Set<String>> distributeContainersToResourceHosts(
+            final CreateContainerGroupRequest request ) throws PeerException
+    {
+        //collect resource host metrics  & prepare templates on each of them
+        List<ResourceHostMetric> serverMetricMap = Lists.newArrayList();
+        for ( ResourceHost resourceHost : getResourceHosts() )
+        {
+            //take connected resource hosts for container creation
+            //and prepare needed templates
+            if ( resourceHost.isConnected() )
+            {
+                try
+                {
+                    serverMetricMap.add( resourceHost.getHostMetric() );
+                }
+                catch ( ResourceHostException e )
+                {
+                    throw new PeerException( e );
+                }
+            }
+        }
+
+        //calculate placement strategy
+        Map<ResourceHostMetric, Integer> slots;
+        try
+        {
+            slots = strategyManager.getPlacementDistribution( serverMetricMap, request.getNumberOfContainers(),
+                    request.getStrategyId(), request.getCriteria() );
+        }
+        catch ( StrategyException e )
+        {
+            throw new PeerException( e );
+        }
+
+        //distribute new containers' names across selected resource hosts
+        Map<ResourceHost, Set<String>> containerDistribution = Maps.newHashMap();
+        String templateName = request.getTemplates().get( request.getTemplates().size() - 1 ).getTemplateName();
+
+        for ( Map.Entry<ResourceHostMetric, Integer> e : slots.entrySet() )
+        {
+            Set<String> hostCloneNames = new HashSet<>();
+            for ( int i = 0; i < e.getValue(); i++ )
+            {
+                String newContainerName = StringUtil
+                        .trimToSize( String.format( "%s%s", templateName, UUID.randomUUID() ).replace( "-", "" ),
+                                Common.MAX_CONTAINER_NAME_LEN );
+                hostCloneNames.add( newContainerName );
+            }
+            ResourceHost resourceHost = getResourceHostByName( e.getKey().getHost() );
+            containerDistribution.put( resourceHost, hostCloneNames );
+        }
+        return containerDistribution;
+    }
+
+
+    private Set<HostInfoModel> processRequestCompletion( final List<Future<ContainerHost>> taskFutures,
+                                                         final ExecutorService executorService,
+                                                         final CreateContainerGroupRequest request )
+    {
         Set<HostInfoModel> result = Sets.newHashSet();
         Set<ContainerHost> newContainers = Sets.newHashSet();
 
@@ -482,9 +500,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 containerGroup.setContainerIds( containerIds );
 
                 containerGroupDataService.persist( containerGroup );
+
+                LOG.error( "Error creating container group #createContainerGroup", e );
             }
         }
-
         return result;
     }
 
@@ -575,7 +594,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 return resourceHost.getContainerHostByName( hostname );
             }
-            catch ( HostNotFoundException e )
+            catch ( HostNotFoundException ignore )
             {
                 //ignore
             }
@@ -694,7 +713,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 {
                     return resourceHost.getContainerHostById( hostId );
                 }
-                catch ( HostNotFoundException e )
+                catch ( HostNotFoundException ignore )
                 {
                     //ignore
                 }
@@ -727,7 +746,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( ResourceHostException e )
         {
-            //            containerHost.setState( ContainerState.UNKNOWN );
             throw new PeerException( String.format( "Could not start LXC container [%s]", e.toString() ) );
         }
         catch ( Exception e )
@@ -777,17 +795,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             if ( containerIds.isEmpty() )
             {
-                containerGroupDataService.remove( containerGroup.getEnvironmentId().toString() );
-
-                //cleanup environment network settings
-                try
-                {
-                    getManagementHost().cleanupEnvironmentNetworkSettings( containerGroup.getEnvironmentId() );
-                }
-                catch ( PeerException e )
-                {
-                    LOG.error( "Error cleaning up environment network configuration", exceptionUtil.getRootCause( e ) );
-                }
+                cleanupEnvironmentNetworkSettings( containerGroup );
             }
             else
             {
@@ -805,6 +813,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         catch ( ContainerGroupNotFoundException e )
         {
             LOG.error( "Could not find container group", e );
+        }
+    }
+
+
+    private void cleanupEnvironmentNetworkSettings( final ContainerGroupEntity containerGroup )
+    {
+        containerGroupDataService.remove( containerGroup.getEnvironmentId().toString() );
+
+        //cleanup environment network settings
+        try
+        {
+            getManagementHost().cleanupEnvironmentNetworkSettings( containerGroup.getEnvironmentId() );
+        }
+        catch ( PeerException e )
+        {
+            LOG.error( "Error cleaning up environment network configuration", exceptionUtil.getRootCause( e ) );
         }
     }
 
@@ -847,6 +871,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( PeerException | HostDisconnectedException e )
         {
+            LOG.error( "Error checking host connected status #isConnected", e );
             return false;
         }
     }
@@ -1153,6 +1178,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
             catch ( HostNotFoundException e )
             {
+                LOG.warn( "Host not found in #onHeartbeat", e );
                 host = new ResourceHostEntity( getId().toString(), resourceHostInfo );
                 host.init();
                 resourceHostDataService.persist( ( ResourceHostEntity ) host );
@@ -1181,7 +1207,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 containerHost = resourceHost.getContainerHostById( containerHostInfo.getId() );
             }
-            catch ( HostNotFoundException e )
+            catch ( HostNotFoundException ignore )
             {
                 //ignore
             }
@@ -1509,9 +1535,26 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             catch ( HostNotFoundException e )
             {
                 errors.add( e );
+                LOG.error( "error destroying environment containers #destroyEnvironmentContainers", e );
             }
         }
 
+        destroyContainers( containerHosts, destroyedContainersIds, errors, containerGroup );
+
+        String exception = null;
+
+        if ( !errors.isEmpty() )
+        {
+            exception = String.format( "There were errors while destroying containers: %s", errors );
+        }
+
+        return new ContainersDestructionResultImpl( getId(), destroyedContainersIds, exception );
+    }
+
+
+    private void destroyContainers( final Set<ContainerHost> containerHosts, final Set<UUID> destroyedContainersIds,
+                                    final Set<Throwable> errors, final ContainerGroup containerGroup )
+    {
         if ( !containerHosts.isEmpty() )
         {
             List<Future<UUID>> taskFutures = Lists.newArrayList();
@@ -1542,7 +1585,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 try
                 {
-                    getManagementHost().cleanupEnvironmentNetworkSettings( environmentId );
+                    getManagementHost().cleanupEnvironmentNetworkSettings( containerGroup.getEnvironmentId() );
                 }
                 catch ( PeerException e )
                 {
@@ -1550,15 +1593,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 }
             }
         }
-
-        String exception = null;
-
-        if ( !errors.isEmpty() )
-        {
-            exception = String.format( "There were errors while destroying containers: %s", errors );
-        }
-
-        return new ContainersDestructionResultImpl( getId(), destroyedContainersIds, exception );
     }
 
 
@@ -1606,13 +1640,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 keyStoreData.setAlias( alias );
 
-                //        keyStoreManager.getEntries(  )
-
                 keyStoreManager.importCertificateHEXString( keyStore, keyStoreData );
                 //***********************************************************************
                 LOG.debug( String.format( "Importing new certificate to trustStore with alias: %s", alias ) );
                 this.sslContextFactory.reloadTrustStore();
-                //        new Thread( new RestartCoreServlet( 4 ) ).start();
             }
         }
         catch ( KeyStoreException e )
@@ -1729,7 +1760,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
 
             //***********************************************************************
-            //            new Thread( new RestartCoreServlet() ).start();
             sslContextFactory.reloadTrustStore();
         }
         catch ( KeyStoreException e )
@@ -1737,9 +1767,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             LOG.error( "Error removing environment certificate.", e );
         }
     }
-
-
-    ;
 
 
     @Override
