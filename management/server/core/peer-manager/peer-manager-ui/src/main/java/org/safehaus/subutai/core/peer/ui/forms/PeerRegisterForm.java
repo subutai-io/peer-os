@@ -387,7 +387,7 @@ public class PeerRegisterForm extends CustomComponent
         }
         else
         {
-            unregisterPeer( peerToUnregister, remotePeerInfo, updateViewListener );
+            unregisterPeerRequestThread( peerToUnregister, remotePeerInfo, updateViewListener );
         }
     }
 
@@ -444,81 +444,87 @@ public class PeerRegisterForm extends CustomComponent
     }
 
 
-    private void unregisterPeer( final PeerInfo peerToUnregister, final PeerInfo remotePeerInfo,
-                                 final PeerManageActionsComponent.PeerManageUpdateViewListener updateViewListener )
+    private void unregisterPeerRequestThread( final PeerInfo peerToUnregister, final PeerInfo remotePeerInfo,
+                                              final PeerManageActionsComponent.PeerManageUpdateViewListener
+                                                      updateViewListener )
     {
         new Thread( new Runnable()
         {
             @Override
             public void run()
             {
-                String baseUrl =
-                        String.format( "https://%s:%s/cxf", remotePeerInfo.getIp(), ChannelSettings.SECURE_PORT_X2 );
-                WebClient client = RestUtil.createTrustedWebClientWithAuth( baseUrl,
-                        SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS );// WebClient.create( baseUrl );
-                try
-                {
-                    Response response = client.path( "peer/unregister" ).type( MediaType.APPLICATION_JSON )
-                                              .accept( MediaType.APPLICATION_JSON )
-                                              .query( "peerId", gson.toJson( peerToUnregister.getId().toString() ) )
-                                              .delete();
-                    if ( response.getStatus() == Response.Status.OK.getStatusCode() )
-                    {
-                        LOG.info( response.toString() );
-                        Notification.show( String.format( "Request sent to %s!", remotePeerInfo.getName() ) );
-                        //************ Delete Trust SSL Cert **************************************
-                        KeyStore keyStore;
-                        KeyStoreData keyStoreData;
-                        KeyStoreManager keyStoreManager;
-
-                        keyStoreData = new KeyStoreData();
-                        keyStoreData.setupTrustStorePx2();
-                        keyStoreData.setAlias( remotePeerInfo.getId().toString() );
-
-                        keyStoreManager = new KeyStoreManager();
-                        keyStore = keyStoreManager.load( keyStoreData );
-
-                        keyStoreManager.deleteEntry( keyStore, keyStoreData );
-                        //***********************************************************************
-
-                        module.getSslContextFactory().reloadTrustStore();
-                        //            new Thread( new RestartCoreServlet() ).start();
-
-
-                        module.getPeerManager().unregister( remotePeerInfo.getId().toString() );
-
-                        getUI().access( new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                peersTable.removeItem( remotePeerInfo.getId() );
-                            }
-                        } );
-                    }
-                    else
-                    {
-                        LOG.warn( "Failed to unregister remote peer " + String.valueOf( response.getStatus() ) );
-                        Notification.show( "Failed to unregister remote peer " + String.valueOf( response.getStatus() ),
-                                Notification.Type.WARNING_MESSAGE );
-                    }
-                }
-                catch ( PeerException e )
-                {
-                    LOG.error( "Error in unregister peer", e );
-                }
-                catch ( Exception e )
-                {
-                    LOG.error( "Error sending unregister request to remote peer.", e );
-                    Notification.show( "Error sending unregister request to remote peer.",
-                            Notification.Type.WARNING_MESSAGE );
-                }
-                if ( updateViewListener != null )
-                {
-                    updateViewListener.updateViewCallback();
-                }
+                unregisterPeerRequest( remotePeerInfo, peerToUnregister, updateViewListener );
             }
         } ).start();
+    }
+
+
+    private void unregisterPeerRequest( final PeerInfo remotePeerInfo, final PeerInfo peerToUnregister,
+                                        final PeerManageActionsComponent.PeerManageUpdateViewListener
+                                                updateViewListener )
+    {
+        String baseUrl = String.format( "https://%s:%s/cxf", remotePeerInfo.getIp(), ChannelSettings.SECURE_PORT_X2 );
+        WebClient client = RestUtil.createTrustedWebClientWithAuth( baseUrl,
+                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS );// WebClient.create( baseUrl );
+        try
+        {
+            Response response = client.path( "peer/unregister" ).type( MediaType.APPLICATION_JSON )
+                                      .accept( MediaType.APPLICATION_JSON )
+                                      .query( "peerId", gson.toJson( peerToUnregister.getId().toString() ) ).delete();
+            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+            {
+                LOG.info( response.toString() );
+                Notification.show( String.format( "Request sent to %s!", remotePeerInfo.getName() ) );
+                //************ Delete Trust SSL Cert **************************************
+                KeyStore keyStore;
+                KeyStoreData keyStoreData;
+                KeyStoreManager keyStoreManager;
+
+                keyStoreData = new KeyStoreData();
+                keyStoreData.setupTrustStorePx2();
+                keyStoreData.setAlias( remotePeerInfo.getId().toString() );
+
+                keyStoreManager = new KeyStoreManager();
+                keyStore = keyStoreManager.load( keyStoreData );
+
+                keyStoreManager.deleteEntry( keyStore, keyStoreData );
+                //***********************************************************************
+
+                module.getSslContextFactory().reloadTrustStore();
+                //            new Thread( new RestartCoreServlet() ).start();
+
+
+                module.getPeerManager().unregister( remotePeerInfo.getId().toString() );
+
+                getUI().access( new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        peersTable.removeItem( remotePeerInfo.getId() );
+                    }
+                } );
+            }
+            else
+            {
+                LOG.warn( "Failed to unregister remote peer " + String.valueOf( response.getStatus() ) );
+                Notification.show( "Failed to unregister remote peer " + String.valueOf( response.getStatus() ),
+                        Notification.Type.WARNING_MESSAGE );
+            }
+        }
+        catch ( PeerException e )
+        {
+            LOG.error( "Error in unregister peer", e );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error sending unregister request to remote peer.", e );
+            Notification.show( "Error sending unregister request to remote peer.", Notification.Type.WARNING_MESSAGE );
+        }
+        if ( updateViewListener != null )
+        {
+            updateViewListener.updateViewCallback();
+        }
     }
 
 
@@ -601,7 +607,7 @@ public class PeerRegisterForm extends CustomComponent
 
                 String baseUrl =
                         String.format( "https://%s:%s/cxf", remotePeer.getIp(), ChannelSettings.SECURE_PORT_X1 );
-                WebClient client = RestUtil.createTrustedWebClient( baseUrl );//WebClient.create( baseUrl );
+                WebClient client = RestUtil.createTrustedWebClient( baseUrl );
                 client.type( MediaType.APPLICATION_FORM_URLENCODED ).accept( MediaType.APPLICATION_JSON );
 
                 Form form = new Form();
@@ -631,7 +637,6 @@ public class PeerRegisterForm extends CustomComponent
                         //***********************************************************************
 
                         module.getSslContextFactory().reloadTrustStore();
-                        //            new Thread( new RestartCoreServlet() ).start();
 
                         remotePeer.setStatus( PeerStatus.APPROVED );
 
