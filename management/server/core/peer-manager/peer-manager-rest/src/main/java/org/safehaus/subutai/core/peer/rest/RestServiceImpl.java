@@ -122,7 +122,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response processTrustRequest( String peer, String root_cert_px2 )
+    public Response processTrustRequest( String peer, String rootCertPx2 )
     {
         try
         {
@@ -130,6 +130,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error processing trust request #processTrustRequest", e );
             return Response.status( Response.Status.NOT_FOUND ).entity( e.toString() ).build();
         }
     }
@@ -144,6 +145,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error processing trust response #processTrustResponse" );
             return Response.status( Response.Status.NOT_FOUND ).entity( e.toString() ).build();
         }
     }
@@ -170,6 +172,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error processing register request #processRegisterRequest", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -264,6 +267,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception pe )
         {
+            LOGGER.error( "Error unregistering peer #unregisterPeer", pe );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( pe.toString() ).build();
         }
     }
@@ -291,6 +295,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( PeerException e )
         {
+            LOGGER.error( "Error removing registration request #removeRegistrationRequest", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
         }
     }
@@ -353,7 +358,7 @@ public class RestServiceImpl implements RestService
         PeerInfo remotePeer = peerManager.getPeerInfo( uuid );
         PeerInfo peerToUpdateOnRemote = peerManager.getLocalPeerInfo();
 
-        if(remotePeer.getStatus() != PeerStatus.REQUESTED )
+        if ( remotePeer.getStatus() != PeerStatus.REQUESTED )
         {
             return Response.serverError().entity( "*********** Access denied *************" ).build();
         }
@@ -421,6 +426,7 @@ public class RestServiceImpl implements RestService
             }
             catch ( Exception e )
             {
+                LOGGER.error( "Error approving peer registration request #approveForRegistrationRequest", e );
                 return Response.serverError().entity( e.toString() ).build();
             }
         }
@@ -451,6 +457,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error setting quota #setQuota", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -468,6 +475,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error getting quota #getQuota", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -485,6 +493,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error getting quota info #getQuotaInfo", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -514,6 +523,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error destroying container #destroyContainer", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -534,6 +544,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error starting container #startContainer", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -554,6 +565,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error stopping cotnainer #stopContainer", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -570,6 +582,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error getting container status #isContainerConnected", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -587,6 +600,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error getting container state #getContainerState", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -603,6 +617,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error getting template #getTemplate", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -623,6 +638,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error getting available ram quota #getAvailableRamQuota", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -640,6 +656,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error getting available cpu quota #getAvailableCpuQuota", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -660,6 +677,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error getting available disk quota #getAvailableDiskQuota", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -677,6 +695,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error getting processing resource usage #getProcessResourceUsage", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -693,6 +712,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error getting ram quota #getRamQuota", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -709,6 +729,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error getting ram quota info #getRamQuotaInfo", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -725,6 +746,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error setting ram quota #setRamQuota", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -741,6 +763,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error getting cpu quota #getCpuQuota", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -757,6 +780,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error getting cpu quota info #getCpuQuotaInfo", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -773,6 +797,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error setting cpu quota #setCpuQuota", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -789,6 +814,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error getting cpu set #getCpuSet", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -808,6 +834,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error setting cpu set #setCpuSet", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -827,6 +854,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error getting disk quota #getDiskQuota", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -846,6 +874,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error setting ram quota #setRamQuota", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -865,6 +894,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error setting disk quota #setDiskQuota", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -881,6 +911,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error setting default gateway #setDefaultGateway", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -898,6 +929,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error getting container host info by id #getContainerHostInfoById", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -913,6 +945,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error getting reserved vnis #getReservedVnis", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -928,6 +961,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error getting gateways #getGateways", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -944,6 +978,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Error reserving vni #reserveVni", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -960,6 +995,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( PeerException e )
         {
+            LOGGER.error( "Error importing environment certificate #importEnvironmentCert", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -976,6 +1012,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( PeerException e )
         {
+            LOGGER.error( "Error exporting environment certificate #exportEnvironmentCert", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -993,6 +1030,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( PeerException e )
         {
+            LOGGER.error( "Error removing environment certificate #removeEnvironmentCert", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.getMessage() ).build();
         }
     }
