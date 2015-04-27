@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.jaas.boot.principal.RolePrincipal;
 import org.apache.karaf.jaas.boot.principal.UserPrincipal;
-import org.apache.karaf.jaas.config.JaasRealm;
 import org.apache.karaf.jaas.modules.AbstractKarafLoginModule;
 
 
@@ -39,17 +38,10 @@ public class ShiroLoginModule extends AbstractKarafLoginModule
     public void initialize( Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
                             Map<String, ?> options )
     {
+        // just for importing JaasRealm
         super.initialize( subject, callbackHandler, options );
 
         LOGGER.info( "Initializing shiro login module." );
-
-
-        // just for importing JaasRealm
-        Object o = subject;
-        if ( o instanceof JaasRealm )
-        {
-            // empty
-        }
     }
 
 
