@@ -42,6 +42,24 @@ public class SetQuota extends SubutaiShellCommandSupport
     }
 
 
+    public void setContainerName( final String containerName )
+    {
+        this.containerName = containerName;
+    }
+
+
+    public void setQuotaType( final String quotaType )
+    {
+        this.quotaType = quotaType;
+    }
+
+
+    public void setQuotaValue( final String quotaValue )
+    {
+        this.quotaValue = quotaValue;
+    }
+
+
     @Override
     protected Object doExecute() throws Exception
     {

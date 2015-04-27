@@ -4,10 +4,16 @@ package org.safehaus.subutai.common.quota;
 import com.google.common.base.Preconditions;
 
 
+@Deprecated
 public class MemoryQuotaInfo extends QuotaInfo
 {
     private DiskQuotaUnit quotaUnit;
     private double memoryQuotaValue;
+
+
+    public MemoryQuotaInfo()
+    {
+    }
 
 
     public MemoryQuotaInfo( final DiskQuotaUnit quotaUnit, final Double memoryQuotaValue )

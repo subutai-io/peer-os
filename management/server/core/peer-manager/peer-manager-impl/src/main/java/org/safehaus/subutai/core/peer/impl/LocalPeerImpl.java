@@ -94,7 +94,7 @@ import org.safehaus.subutai.core.peer.impl.entity.ManagementHostEntity;
 import org.safehaus.subutai.core.peer.impl.entity.ResourceHostEntity;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory;
+import org.safehaus.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.safehaus.subutai.core.strategy.api.StrategyNotFoundException;
@@ -137,7 +137,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private CommandUtil commandUtil = new CommandUtil();
     private ExceptionUtil exceptionUtil = new ExceptionUtil();
 
-    private CustomSslContextFactory sslContextFactory;
+    private SubutaiSslContextFactory sslContextFactory;
 
 
     public LocalPeerImpl( PeerManager peerManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
@@ -1777,13 +1777,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    public void setSslContextFactory( final CustomSslContextFactory sslContextFactory )
+    public void setSslContextFactory( final SubutaiSslContextFactory sslContextFactory )
     {
         this.sslContextFactory = sslContextFactory;
     }
 
 
-    public CustomSslContextFactory getSslContextFactory()
+    public SubutaiSslContextFactory getSslContextFactory()
     {
         return sslContextFactory;
     }

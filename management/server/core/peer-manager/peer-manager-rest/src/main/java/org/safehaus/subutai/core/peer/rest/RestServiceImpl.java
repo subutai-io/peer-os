@@ -33,7 +33,7 @@ import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory;
+import org.safehaus.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +51,7 @@ public class RestServiceImpl implements RestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
     private PeerManager peerManager;
-    private CustomSslContextFactory sslContextFactory;
+    private SubutaiSslContextFactory sslContextFactory;
 
 
     public RestServiceImpl( final PeerManager peerManager )
@@ -60,7 +60,7 @@ public class RestServiceImpl implements RestService
     }
 
 
-    public void setSslContextFactory( final CustomSslContextFactory sslContextFactory )
+    public void setSslContextFactory( final SubutaiSslContextFactory sslContextFactory )
     {
         this.sslContextFactory = sslContextFactory;
     }

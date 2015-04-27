@@ -9,6 +9,6 @@
   </command-bundle>
 
   <reference id="sslContextManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory" />
+             interface="org.safehaus.subutai.core.ssl.manager.api.SubutaiSslContextFactory" />
 
 </blueprint>
