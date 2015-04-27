@@ -43,7 +43,7 @@ public class FileDiffModalView extends Window
 
     private String formattedStringWithStyles( String input )
     {
-        String result = "";
+        StringBuilder result = new StringBuilder( "" );
         String parsedString[] = input.split( "\n" );
         boolean append = false;
         for ( int i = 0; i < parsedString.length; i++ )
@@ -160,7 +160,7 @@ public class FileDiffModalView extends Window
                             str = str.length() > 0 ? " " + str.substring( 1 ) : str;
                             lineFormat += "<pre>" + str + "</pre>";
                             lineFormat += "</div>";
-                            result += lineFormat;
+                            result.append( lineFormat );
                         }
                         if ( !( i == parsedString.length - 1 ) )
                         {
@@ -176,7 +176,7 @@ public class FileDiffModalView extends Window
                             str = str.length() > 0 ? " " + str.substring( 1 ) : str;
                             lineFormat += "<pre>" + str + "</pre>";
                             lineFormat += "</div>";
-                            result += lineFormat;
+                            result.append( lineFormat );
                         }
                         if ( !( i == parsedString.length - 1 ) )
                         {
@@ -194,7 +194,7 @@ public class FileDiffModalView extends Window
                     lineFormat += "\">";
                     lineFormat += "<pre>" + str + "</pre>";
                     lineFormat += "</div>";
-                    result += lineFormat;
+                    result.append( lineFormat );
                 }
                 else if ( !"\\ No newline at end of file".equals( str ) )
                 {
@@ -202,15 +202,15 @@ public class FileDiffModalView extends Window
                     lineFormat += "\">";
                     lineFormat += "<pre>" + str + "</pre>";
                     lineFormat += "</div>";
-                    result += lineFormat;
+                    result.append( lineFormat );
                 }
             }
         }
         if ( !append )
         {
             int inx = input.indexOf( "Binary" );
-            result += "<pre>" + input.substring( inx > 0 ? inx : 0 ) + "</pre>";
+            result.append( "<pre>" + input.substring( inx > 0 ? inx : 0 ) + "</pre>" );
         }
-        return result;
+        return result.toString();
     }
 }
