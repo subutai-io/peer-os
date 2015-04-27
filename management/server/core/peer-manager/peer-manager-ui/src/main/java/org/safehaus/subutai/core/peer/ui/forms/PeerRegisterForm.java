@@ -311,20 +311,7 @@ public class PeerRegisterForm extends CustomComponent
                 PeerInfo remotePeerInfo = JsonUtil.from( responseString, new TypeToken<PeerInfo>()
                 {
                 }.getType() );
-                if ( remotePeerInfo != null )
-                {
-                    remotePeerInfo.setStatus( PeerStatus.REQUEST_SENT );
-                    try
-                    {
-                        module.getPeerManager().register( remotePeerInfo );
-                    }
-                    catch ( PeerException e )
-                    {
-                        Notification
-                                .show( "Couldn't register peer. " + e.getMessage(), Notification.Type.WARNING_MESSAGE );
-                        LOG.error( "Couldn't register peer", e );
-                    }
-                }
+                registerPeer( remotePeerInfo );
             }
             else if ( response.getStatus() == Response.Status.CONFLICT.getStatusCode() )
             {
@@ -341,6 +328,24 @@ public class PeerRegisterForm extends CustomComponent
         {
             Notification.show( "Please check peer address for correctness", Notification.Type.WARNING_MESSAGE );
             LOG.error( "error sending request", e );
+        }
+    }
+
+
+    private void registerPeer( final PeerInfo remotePeerInfo )
+    {
+        if ( remotePeerInfo != null )
+        {
+            remotePeerInfo.setStatus( PeerStatus.REQUEST_SENT );
+            try
+            {
+                module.getPeerManager().register( remotePeerInfo );
+            }
+            catch ( PeerException e )
+            {
+                Notification.show( "Couldn't register peer. " + e.getMessage(), Notification.Type.WARNING_MESSAGE );
+                LOG.error( "Couldn't register peer", e );
+            }
         }
     }
 
