@@ -11,7 +11,7 @@ import com.google.common.base.Strings;
 /**
  * RAM quota
  */
-public class RamQuota extends QuotaInfo
+public class RamQuota extends MemoryQuotaInfo
 {
     private static final String QUOTA_REGEX = "(\\d+)(K|M|G)?";
     private static final Pattern QUOTA_PATTERN = Pattern.compile( QUOTA_REGEX );

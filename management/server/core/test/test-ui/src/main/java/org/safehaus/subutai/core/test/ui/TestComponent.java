@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.test.ui;
 
 
-import org.safehaus.subutai.core.jetty.fragment.TestSslContextFactory;
 import org.safehaus.subutai.core.test.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,16 +54,6 @@ public class TestComponent extends CustomComponent
             }
         } );
 
-        Button ssBtn = new Button( "Ssl" );
-        ssBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( final Button.ClickEvent event )
-            {
-                TestSslContextFactory.DO_IT();
-            }
-        } );
-
         Button execBtn = new Button( "Exec" );
         execBtn.addClickListener( new Button.ClickListener()
         {
@@ -82,7 +71,6 @@ public class TestComponent extends CustomComponent
         layout.addComponent( logBtn );
         layout.addComponent( showBtn );
         layout.addComponent( loginWithTokenBtn );
-        layout.addComponent( ssBtn );
         layout.addComponent( execBtn );
 
 
