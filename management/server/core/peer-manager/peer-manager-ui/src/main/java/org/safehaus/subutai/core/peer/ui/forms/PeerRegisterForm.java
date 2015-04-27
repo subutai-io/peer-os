@@ -286,56 +286,62 @@ public class PeerRegisterForm extends CustomComponent
             @Override
             public void run()
             {
-                String baseUrl = String.format( "https://%s:%s/cxf", ip, ChannelSettings.SECURE_PORT_X1 );
-                WebClient client = RestUtil.createTrustedWebClient( baseUrl );//WebClient.create( baseUrl );
-                client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
-                Form form = new Form();
-                form.set( "peer", gson.toJson( peerToRegister ) );
-
-                try
-                {
-                    Response response = client.path( "peer/register" ).form( form );
-                    if ( response.getStatus() == Response.Status.OK.getStatusCode() )
-                    {
-                        Notification.show( String.format( "Request sent to %s!", ip ) );
-                        String responseString = response.readEntity( String.class );
-                        LOG.info( response.toString() );
-                        PeerInfo remotePeerInfo = JsonUtil.from( responseString, new TypeToken<PeerInfo>()
-                        {
-                        }.getType() );
-                        if ( remotePeerInfo != null )
-                        {
-                            remotePeerInfo.setStatus( PeerStatus.REQUEST_SENT );
-                            try
-                            {
-                                module.getPeerManager().register( remotePeerInfo );
-                            }
-                            catch ( PeerException e )
-                            {
-                                Notification.show( "Couldn't register peer. " + e.getMessage(),
-                                        Notification.Type.WARNING_MESSAGE );
-                                LOG.error( "Couldn't register peer", e );
-                            }
-                        }
-                    }
-                    else if ( response.getStatus() == Response.Status.CONFLICT.getStatusCode() )
-                    {
-                        String reason = response.readEntity( String.class );
-                        Notification.show( reason, Notification.Type.WARNING_MESSAGE );
-                        LOG.warn( reason );
-                    }
-                    else
-                    {
-                        LOG.warn( "Response for registering peer: " + response.toString() );
-                    }
-                }
-                catch ( Exception e )
-                {
-                    Notification.show( "Please check peer address for correctness", Notification.Type.WARNING_MESSAGE );
-                    LOG.error( "error sending request", e );
-                }
+                registrationRequest( peerToRegister, ip );
             }
         } ).start();
+    }
+
+
+    private void registrationRequest( final PeerInfo peerToRegister, final String ip )
+    {
+        String baseUrl = String.format( "https://%s:%s/cxf", ip, ChannelSettings.SECURE_PORT_X1 );
+        WebClient client = RestUtil.createTrustedWebClient( baseUrl );
+        client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
+        Form form = new Form();
+        form.set( "peer", gson.toJson( peerToRegister ) );
+
+        try
+        {
+            Response response = client.path( "peer/register" ).form( form );
+            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+            {
+                Notification.show( String.format( "Request sent to %s!", ip ) );
+                String responseString = response.readEntity( String.class );
+                LOG.info( response.toString() );
+                PeerInfo remotePeerInfo = JsonUtil.from( responseString, new TypeToken<PeerInfo>()
+                {
+                }.getType() );
+                if ( remotePeerInfo != null )
+                {
+                    remotePeerInfo.setStatus( PeerStatus.REQUEST_SENT );
+                    try
+                    {
+                        module.getPeerManager().register( remotePeerInfo );
+                    }
+                    catch ( PeerException e )
+                    {
+                        Notification
+                                .show( "Couldn't register peer. " + e.getMessage(), Notification.Type.WARNING_MESSAGE );
+                        LOG.error( "Couldn't register peer", e );
+                    }
+                }
+            }
+            else if ( response.getStatus() == Response.Status.CONFLICT.getStatusCode() )
+            {
+                String reason = response.readEntity( String.class );
+                Notification.show( reason, Notification.Type.WARNING_MESSAGE );
+                LOG.warn( reason );
+            }
+            else
+            {
+                LOG.warn( "Response for registering peer: " + response.toString() );
+            }
+        }
+        catch ( Exception e )
+        {
+            Notification.show( "Please check peer address for correctness", Notification.Type.WARNING_MESSAGE );
+            LOG.error( "error sending request", e );
+        }
     }
 
 
