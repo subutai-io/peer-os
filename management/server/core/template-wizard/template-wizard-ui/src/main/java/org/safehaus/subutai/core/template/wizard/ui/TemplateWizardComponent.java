@@ -119,8 +119,15 @@ public class TemplateWizardComponent extends CustomComponent
             {
                 BeanItem beanItem = ( BeanItem ) parentTemplateComboBox.getItem( parentTemplateComboBox.getValue() );
                 Template template = ( Template ) beanItem.getBean();
+                TrackerOperation trackerOperation = portalModule.getTracker()
+                                                                .createTrackerOperation( portalModule.getId(),
+                                                                        portalModule.getName() );
+                BeanItem resourceHostItem =
+                        ( BeanItem ) resourceHostComboBox.getItem( resourceHostComboBox.getValue() );
+                final ResourceHost resourceHost = ( ResourceHost ) resourceHostItem.getBean();
                 portalModule.getTemplateWizard()
-                            .createContainerHost( newTemplateName.getValue(), template.getTemplateName() );
+                            .createContainerHost( newTemplateName.getValue(), template.getTemplateName(),
+                                    resourceHost.getId(), trackerOperation );
             }
         } );
 
@@ -130,7 +137,14 @@ public class TemplateWizardComponent extends CustomComponent
             public void buttonClick( final Button.ClickEvent event )
             {
                 String products[] = commandsCollection.getValue().split( "\n" );
-                portalModule.getTemplateWizard().installProducts( Lists.newArrayList( products ) );
+                TrackerOperation trackerOperation = portalModule.getTracker()
+                                                                .createTrackerOperation( portalModule.getId(),
+                                                                        portalModule.getName() );
+                BeanItem resourceHostItem =
+                        ( BeanItem ) resourceHostComboBox.getItem( resourceHostComboBox.getValue() );
+                final ResourceHost resourceHost = ( ResourceHost ) resourceHostItem.getBean();
+                portalModule.getTemplateWizard()
+                            .installProducts( Lists.newArrayList( products ), resourceHost.getId(), trackerOperation );
             }
         } );
 
@@ -140,6 +154,7 @@ public class TemplateWizardComponent extends CustomComponent
         verticalLayout.addComponent( commandsCollection );
         verticalLayout.addComponent( createTemplateButton );
         verticalLayout.addComponent( createContainerHost );
+        verticalLayout.addComponent( installProducts );
 
         setCompositionRoot( verticalLayout );
     }
