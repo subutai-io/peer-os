@@ -355,6 +355,46 @@ public class PeerRegisterForm extends CustomComponent
                                                  updateViewListener )
     {
         int relationExists = 0;
+        relationExists = checkEnvironmentExistence( remotePeerInfo );
+
+        relationExists = isRemotePeerContainersHost( remotePeerInfo );
+
+        if ( relationExists != 0 )
+        {
+            String msg = "";
+            switch ( relationExists )
+            {
+                case 1:
+                    msg = "Please destroy all cross peer environments, before you proceed!!!";
+                    break;
+                case 2:
+                    msg = "You cannot unregister Peer, because you are a carrier of Peer's resources!!!"
+                            + " Contact with Peer to migrate all his data.";
+                    break;
+                default:
+                    msg = "Cannot break peer relationship.";
+            }
+            ConfirmationDialog alert = new ConfirmationDialog( msg, "Ok", "" );
+            alert.getOk().addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
+                }
+            } );
+
+            getUI().addWindow( alert.getAlert() );
+        }
+        else
+        {
+            unregisterPeer( peerToUnregister, remotePeerInfo, updateViewListener );
+        }
+    }
+
+
+    private int checkEnvironmentExistence( final PeerInfo remotePeerInfo )
+    {
+        int relationExists = 0;
         for ( final Iterator<Environment> itEnv = module.getEnvironmentManager().getEnvironments().iterator();
               itEnv.hasNext() && relationExists == 0; )
         {
@@ -369,7 +409,13 @@ public class PeerRegisterForm extends CustomComponent
                 }
             }
         }
+        return relationExists;
+    }
 
+
+    private int isRemotePeerContainersHost( final PeerInfo remotePeerInfo )
+    {
+        int relationExists = 0;
         for ( final Iterator<ResourceHost> itResource =
               module.getPeerManager().getLocalPeer().getResourceHosts().iterator();
               itResource.hasNext() && relationExists == 0; )
@@ -391,40 +437,10 @@ public class PeerRegisterForm extends CustomComponent
                 }
                 catch ( ContainerGroupNotFoundException ignore )
                 {
-                    //                    LOG.debug( "Couldn't get container group by container id", ignore );
                 }
             }
         }
-
-        if ( relationExists != 0 )
-        {
-            String msg = "";
-            switch ( relationExists )
-            {
-                case 1:
-                    msg = "Please destroy all cross peer environments, before you proceed!!!";
-                    break;
-                case 2:
-                    msg = "You cannot unregister Peer, because you are a carrier of Peer's resources!!!"
-                            + " Contact with Peer to migrate all his data.";
-                    break;
-            }
-            ConfirmationDialog alert = new ConfirmationDialog( msg, "Ok", "" );
-            alert.getOk().addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( Button.ClickEvent clickEvent )
-                {
-                    //                    unregisterPeer( peerToUnregister, remotePeerInfo );
-                }
-            } );
-
-            getUI().addWindow( alert.getAlert() );
-        }
-        else
-        {
-            unregisterPeer( peerToUnregister, remotePeerInfo, updateViewListener );
-        }
+        return relationExists;
     }
 
 
