@@ -14,7 +14,7 @@ public class ChannelSettings
     public static final String SECURE_PORT_X3 = "8545";
 
 
-    public static String[] URL_ACCESS_PX1 = {
+    public static final String[] URL_ACCESS_PX1 = {
             // All  Services
             "/{*}",
             "/cxf/peer/register", "/cxf/peer/register/{$}",
@@ -26,7 +26,7 @@ public class ChannelSettings
             "/cxf/peer/approve/{$}"
     };
 
-    public static String[] URL_ACCESS_PX2 = {
+    public static final String[] URL_ACCESS_PX2 = {
 
             "/cxf/peer/",
             "/cxf/peer/getlist",
@@ -276,23 +276,23 @@ public class ChannelSettings
 
     };
 
-    public static String[] URL_ACCESS_PX3 = {
+    public static final String[] URL_ACCESS_PX3 = {
             ""
     };
 
 
-    public static String[] URL_ACCESS_SPECIAL_PORT_PX1 = {
+    public static final String[] URL_ACCESS_SPECIAL_PORT_PX1 = {
             ""
     };
 
 
-    public static short checkURLArray( String uri, String[] URL_ACCESS_ARRAY )
+    public static short checkURLArray( String uri, String[] urlAccessArray )
     {
         short status = 0;
 
-        for ( int x = 0; x < URL_ACCESS_ARRAY.length; x++ )
+        for ( final String aUrlAccess : urlAccessArray )
         {
-            if(checkURL( uri, URL_ACCESS_ARRAY[x] ) == 1)
+            if ( checkURL( uri, aUrlAccess ) == 1 )
             {
                 status = 1;
                 break;
@@ -303,34 +303,34 @@ public class ChannelSettings
     }
 
 
-    public static short checkURL( String uri, String URL_ACCESS )
+    public static short checkURL( String uri, String urlAccess )
     {
         short status = 0;
 
         String subURI[] = uri.split( "/" );
-        int subURIsize = subURI.length;
-        String subURL_ACCESS[] = URL_ACCESS.split( "/" );
+        int subURISize = subURI.length;
+        String subURLAccess[] = urlAccess.split( "/" );
 
-        if ( subURIsize == subURL_ACCESS.length )
+        if ( subURISize == subURLAccess.length )
         {
             int st = 0;
 
-            for ( int i = 0; i < subURIsize; i++ )
+            for ( int i = 0; i < subURISize; i++ )
             {
-                if ( subURL_ACCESS[i].equals( "{$}" ) )
+                if ( "{$}".equals( subURLAccess[i] ) )
                 {
                     st++;
                 }
                 else
                 {
-                    if ( subURI[i].equals( subURL_ACCESS[i] ) )
+                    if ( subURI[i].equals( subURLAccess[i] ) )
                     {
                         st++;
                     }
                 }
             }
 
-            if ( st == subURIsize )
+            if ( st == subURISize )
             {
                 status = 1;
             }

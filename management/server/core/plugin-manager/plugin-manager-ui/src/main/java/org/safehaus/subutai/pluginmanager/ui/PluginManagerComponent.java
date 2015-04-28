@@ -75,6 +75,7 @@ public class PluginManagerComponent extends CustomComponent
         controlsContent.setSpacing( true );
 
         getListPluginsButton( controlsContent );
+        //TODO this is needed for further developments
         //getListInstalledPluginsButton( controlsContent );
         //getListAvailablePluginsButton( controlsContent );
         //getMarketPlaceButton( controlsContent );
@@ -258,7 +259,7 @@ public class PluginManagerComponent extends CustomComponent
             }, null );
             List<Object> itemIds = new ArrayList<>( pluginsTable.getItemIds() );
             int count = itemIds.size();
-            Object itemId = itemIds.get( count - 1 );
+            //Object itemId = itemIds.get( count - 1 );
 
             //addClickListenerToRemoveButton( removeButton, p.getPluginName(), itemId, availableOperations );
             //addClickListenetToUpgradeButton( upgradeButton, p.getPluginName() );
@@ -292,7 +293,7 @@ public class PluginManagerComponent extends CustomComponent
             pluginsTable.addItem( new Object[] { p, availableOperations }, null );
 
             List<Object> itemIds = new ArrayList<>( pluginsTable.getItemIds() );
-            if ( itemIds.size() == 0 )
+            if ( itemIds.isEmpty() )
             {
                 com.vaadin.ui.Notification.show( "There is no available plugins in repo to be installed" );
                 return;
@@ -337,7 +338,7 @@ public class PluginManagerComponent extends CustomComponent
             }, null );
 
             List<Object> itemIds = new ArrayList<>( pluginsTable.getItemIds() );
-            if ( itemIds.size() == 0 )
+            if ( itemIds.isEmpty() )
             {
                 com.vaadin.ui.Notification.show( "There is no available plugins in repo to be installed" );
                 return;
@@ -359,7 +360,33 @@ public class PluginManagerComponent extends CustomComponent
                                                   final Object itemId, final HorizontalLayout availableOperations,
                                                   final Button removeButton )
     {
-        installButton.addClickListener( new Button.ClickListener()
+        final Button.ClickListener okListener = new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+
+                UUID trackID = pluginManager.installPlugin( pluginName );
+
+                ProgressWindow window =
+                        new ProgressWindow( executorService, tracker, trackID, pluginManager.getProductKey() );
+                window.getWindow().addCloseListener( new Window.CloseListener()
+                {
+                    @Override
+                    public void windowClose( Window.CloseEvent closeEvent )
+                    {
+                        if ( pluginManager.operationSuccessful( OperationType.INSTALL ) )
+                        {
+                            availableOperations.removeComponent( installButton );
+                            availableOperations.addComponent( removeButton );
+                        }
+                        pluginsTable.setEnabled( true );
+                    }
+                } );
+                contentRoot.getUI().addWindow( window.getWindow() );
+            }
+        };
+        Button.ClickListener installListener = new Button.ClickListener()
         {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
@@ -369,32 +396,8 @@ public class PluginManagerComponent extends CustomComponent
                 ConfirmationDialog alert =
                         new ConfirmationDialog( String.format( "Do you want to install the %s plugin?", pluginName ),
                                 "Yes", "No" );
-                alert.getOk().addClickListener( new Button.ClickListener()
-                {
-                    @Override
-                    public void buttonClick( Button.ClickEvent clickEvent )
-                    {
+                alert.getOk().addClickListener( okListener );
 
-                        UUID trackID = pluginManager.installPlugin( pluginName );
-
-                        ProgressWindow window =
-                                new ProgressWindow( executorService, tracker, trackID, pluginManager.getProductKey() );
-                        window.getWindow().addCloseListener( new Window.CloseListener()
-                        {
-                            @Override
-                            public void windowClose( Window.CloseEvent closeEvent )
-                            {
-                                if ( pluginManager.operationSuccessful( OperationType.INSTALL ) )
-                                {
-                                    availableOperations.removeComponent( installButton );
-                                    availableOperations.addComponent( removeButton );
-                                }
-                                pluginsTable.setEnabled( true );
-                            }
-                        } );
-                        contentRoot.getUI().addWindow( window.getWindow() );
-                    }
-                } );
                 alert.getCancel().addClickListener( new Button.ClickListener()
                 {
                     @Override
@@ -405,7 +408,8 @@ public class PluginManagerComponent extends CustomComponent
                 } );
                 contentRoot.getUI().addWindow( alert.getAlert() );
             }
-        } );
+        };
+        installButton.addClickListener( installListener );
     }
 
 
@@ -451,7 +455,33 @@ public class PluginManagerComponent extends CustomComponent
                                                  final Object itemId, final HorizontalLayout availableOperations,
                                                  final Button installButton )
     {
-        removeButton.addClickListener( new Button.ClickListener()
+        final Button.ClickListener okListener = new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+
+                UUID trackID = pluginManager.removePlugin( pluginName );
+
+                ProgressWindow window =
+                        new ProgressWindow( executorService, tracker, trackID, pluginManager.getProductKey() );
+                window.getWindow().addCloseListener( new Window.CloseListener()
+                {
+                    @Override
+                    public void windowClose( Window.CloseEvent closeEvent )
+                    {
+                        if ( pluginManager.operationSuccessful( OperationType.REMOVE ) )
+                        {
+                            availableOperations.removeComponent( removeButton );
+                            availableOperations.addComponent( installButton );
+                        }
+                        pluginsTable.setEnabled( true );
+                    }
+                } );
+                contentRoot.getUI().addWindow( window.getWindow() );
+            }
+        };
+        Button.ClickListener removeListener = new Button.ClickListener()
         {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
@@ -461,32 +491,7 @@ public class PluginManagerComponent extends CustomComponent
                 ConfirmationDialog alert =
                         new ConfirmationDialog( String.format( "Do you want to remove the %s plugin?", pluginName ),
                                 "Yes", "No" );
-                alert.getOk().addClickListener( new Button.ClickListener()
-                {
-                    @Override
-                    public void buttonClick( Button.ClickEvent clickEvent )
-                    {
-
-                        UUID trackID = pluginManager.removePlugin( pluginName );
-
-                        ProgressWindow window =
-                                new ProgressWindow( executorService, tracker, trackID, pluginManager.getProductKey() );
-                        window.getWindow().addCloseListener( new Window.CloseListener()
-                        {
-                            @Override
-                            public void windowClose( Window.CloseEvent closeEvent )
-                            {
-                                if ( pluginManager.operationSuccessful( OperationType.REMOVE ) )
-                                {
-                                    availableOperations.removeComponent( removeButton );
-                                    availableOperations.addComponent( installButton );
-                                }
-                                pluginsTable.setEnabled( true );
-                            }
-                        } );
-                        contentRoot.getUI().addWindow( window.getWindow() );
-                    }
-                } );
+                alert.getOk().addClickListener( okListener );
                 alert.getCancel().addClickListener( new Button.ClickListener()
                 {
                     @Override
@@ -497,7 +502,8 @@ public class PluginManagerComponent extends CustomComponent
                 } );
                 contentRoot.getUI().addWindow( alert.getAlert() );
             }
-        } );
+        };
+        removeButton.addClickListener( removeListener );
     }
 
 

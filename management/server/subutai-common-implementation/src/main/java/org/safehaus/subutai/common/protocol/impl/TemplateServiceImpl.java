@@ -55,8 +55,6 @@ public class TemplateServiceImpl implements TemplateService
                                                                       .equals( template.getTemplateName() ) )
             {
                 Template parent = getTemplate( template.getParentTemplateName(), template.getLxcArch() );
-                //                parent.addChildren( Arrays.asList( template ) );
-                //                saveTemplate( parent );
                 if ( parent != null )
                 {
                     entityManager.getTransaction().begin();
@@ -68,7 +66,7 @@ public class TemplateServiceImpl implements TemplateService
                 }
                 else
                 {
-                    throw new Exception( "Parent template is null: " + template.getParentTemplateName() );
+                    throw new DaoException( "Parent template is null: " + template.getParentTemplateName() );
                 }
             }
             else
@@ -82,12 +80,9 @@ public class TemplateServiceImpl implements TemplateService
         catch ( Exception ex )
         {
             LOGGER.warn( "Exception thrown in saveTemplate: ", ex );
-            if ( entityManager != null )
+            if ( entityManager != null && entityManager.getTransaction().isActive() )
             {
-                if ( entityManager.getTransaction().isActive() )
-                {
-                    entityManager.getTransaction().rollback();
-                }
+                entityManager.getTransaction().rollback();
             }
             throw new DaoException( ex );
         }
@@ -126,12 +121,9 @@ public class TemplateServiceImpl implements TemplateService
         {
 
             LOGGER.error( "Exception deleting template : %s", template.getTemplateName() );
-            if ( entityManager != null )
+            if ( entityManager != null && entityManager.getTransaction().isActive() )
             {
-                if ( entityManager.getTransaction().isActive() )
-                {
-                    entityManager.getTransaction().rollback();
-                }
+                entityManager.getTransaction().rollback();
             }
             throw new DaoException( ex );
         }

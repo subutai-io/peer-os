@@ -27,6 +27,7 @@ import org.safehaus.subutai.core.template.wizard.api.InstallationPhase;
 import com.google.common.collect.Lists;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -264,27 +265,31 @@ public class TemplateWizardManagerImplTest
     @Test
     public void testGetPeerManager() throws Exception
     {
-
+        wizardManager.setPeerManager( peerManager );
+        assertEquals( peerManager, wizardManager.getPeerManager() );
     }
 
 
     @Test
     public void testSetPeerManager() throws Exception
     {
-
+        wizardManager.setPeerManager( null );
+        assertNotEquals( peerManager, wizardManager.getPeerManager() );
     }
 
 
     @Test
     public void testGetTemplateRegistry() throws Exception
     {
-
+        wizardManager.setTemplateRegistry( templateRegistry );
+        assertEquals( templateRegistry, wizardManager.getTemplateRegistry() );
     }
 
 
     @Test
     public void testSetTemplateRegistry() throws Exception
     {
-
+        wizardManager.setTemplateRegistry( null );
+        assertNotEquals( templateRegistry, wizardManager.getTemplateRegistry() );
     }
 }

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.AbstractExecutorService;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -27,271 +28,39 @@ import org.slf4j.MDC;
 public class SubutaiExecutors
 {
 
+    private SubutaiExecutors()
+    {
+    }
+
+
     public static ExecutorService newFixedThreadPool( int nThreads )
     {
-        return new ThreadPoolExecutor( nThreads, nThreads, 0L, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<Runnable>() )
-        {
-            private Map<String, String> parentContext;
-            private Map<String, String> currentContext;
-
-
-            @Override
-            public Future<?> submit( final Runnable task )
-            {
-                parentContext = MDC.getCopyOfContextMap();
-                return super.submit( task );
-            }
-
-
-            @Override
-            public <T> Future<T> submit( final Runnable task, final T result )
-            {
-                parentContext = MDC.getCopyOfContextMap();
-                return super.submit( task, result );
-            }
-
-
-            @Override
-            public <T> Future<T> submit( final Callable<T> task )
-            {
-                parentContext = MDC.getCopyOfContextMap();
-                return super.submit( task );
-            }
-
-
-            @Override
-            public void execute( final Runnable command )
-            {
-                parentContext = MDC.getCopyOfContextMap();
-                super.execute( command );
-            }
-
-
-            @Override
-            protected void beforeExecute( final Thread t, final Runnable r )
-            {
-                if ( parentContext != null )
-                {
-                    currentContext = MDC.getCopyOfContextMap();
-                    MDC.setContextMap( parentContext );
-                }
-                super.beforeExecute( t, r );
-            }
-
-
-            @Override
-            protected void afterExecute( final Runnable r, final Throwable t )
-            {
-                if ( parentContext != null )
-                {
-                    MDC.setContextMap( currentContext );
-                }
-                super.afterExecute( r, t );
-            }
-        };
+        return new SubutaiThreadPoolExecutor( nThreads, nThreads, 0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<Runnable>() );
     }
 
 
     public static ExecutorService newCachedThreadPool()
     {
-        return new ThreadPoolExecutor( 0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>() )
-        {
-            private Map<String, String> parentContext;
-            private Map<String, String> currentContext;
-
-
-            @Override
-            public Future<?> submit( final Runnable task )
-            {
-                parentContext = MDC.getCopyOfContextMap();
-                return super.submit( task );
-            }
-
-
-            @Override
-            public <T> Future<T> submit( final Runnable task, final T result )
-            {
-                parentContext = MDC.getCopyOfContextMap();
-                return super.submit( task, result );
-            }
-
-
-            @Override
-            public <T> Future<T> submit( final Callable<T> task )
-            {
-                parentContext = MDC.getCopyOfContextMap();
-                return super.submit( task );
-            }
-
-
-            @Override
-            public void execute( final Runnable command )
-            {
-                parentContext = MDC.getCopyOfContextMap();
-                super.execute( command );
-            }
-
-
-            @Override
-            protected void beforeExecute( final Thread t, final Runnable r )
-            {
-                if ( parentContext != null )
-                {
-                    currentContext = MDC.getCopyOfContextMap();
-                    MDC.setContextMap( parentContext );
-                }
-                super.beforeExecute( t, r );
-            }
-
-
-            @Override
-            protected void afterExecute( final Runnable r, final Throwable t )
-            {
-                if ( parentContext != null )
-                {
-                    MDC.setContextMap( currentContext );
-                }
-                super.afterExecute( r, t );
-            }
-        };
+        return new SubutaiThreadPoolExecutor( 0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS,
+                new SynchronousQueue<Runnable>() );
     }
 
 
     public static ScheduledExecutorService newSingleThreadScheduledExecutor()
     {
-        return new DelegatedScheduledExecutorService( new ScheduledThreadPoolExecutor( 1 )
-        {
-            private Map<String, String> parentContext;
-            private Map<String, String> currentContext;
-
-
-            @Override
-            public Future<?> submit( final Runnable task )
-            {
-                parentContext = MDC.getCopyOfContextMap();
-                return super.submit( task );
-            }
-
-
-            @Override
-            public <T> Future<T> submit( final Runnable task, final T result )
-            {
-                parentContext = MDC.getCopyOfContextMap();
-                return super.submit( task, result );
-            }
-
-
-            @Override
-            public <T> Future<T> submit( final Callable<T> task )
-            {
-                parentContext = MDC.getCopyOfContextMap();
-                return super.submit( task );
-            }
-
-
-            @Override
-            public void execute( final Runnable command )
-            {
-                parentContext = MDC.getCopyOfContextMap();
-                super.execute( command );
-            }
-
-
-            @Override
-            protected void beforeExecute( final Thread t, final Runnable r )
-            {
-                if ( parentContext != null )
-                {
-                    currentContext = MDC.getCopyOfContextMap();
-                    MDC.setContextMap( parentContext );
-                }
-                super.beforeExecute( t, r );
-            }
-
-
-            @Override
-            protected void afterExecute( final Runnable r, final Throwable t )
-            {
-                if ( parentContext != null )
-                {
-                    MDC.setContextMap( currentContext );
-                }
-                super.afterExecute( r, t );
-            }
-        } );
+        return new DelegatedScheduledExecutorService( new SubutaiScheduledThreadPoolExecutor( 1 ) );
     }
 
 
     public static ExecutorService newSingleThreadExecutor()
     {
         return new FinalizableDelegatedExecutorService(
-                new ThreadPoolExecutor( 1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>() )
-                {
-                    private Map<String, String> parentContext;
-                    private Map<String, String> currentContext;
-
-
-                    @Override
-                    public Future<?> submit( final Runnable task )
-                    {
-                        parentContext = MDC.getCopyOfContextMap();
-                        return super.submit( task );
-                    }
-
-
-                    @Override
-                    public <T> Future<T> submit( final Runnable task, final T result )
-                    {
-                        parentContext = MDC.getCopyOfContextMap();
-                        return super.submit( task, result );
-                    }
-
-
-                    @Override
-                    public <T> Future<T> submit( final Callable<T> task )
-                    {
-                        parentContext = MDC.getCopyOfContextMap();
-                        return super.submit( task );
-                    }
-
-
-                    @Override
-                    public void execute( final Runnable command )
-                    {
-                        parentContext = MDC.getCopyOfContextMap();
-                        super.execute( command );
-                    }
-
-
-                    @Override
-                    protected void beforeExecute( final Thread t, final Runnable r )
-                    {
-                        if ( parentContext != null )
-                        {
-                            currentContext = MDC.getCopyOfContextMap();
-                            MDC.setContextMap( parentContext );
-                        }
-                        super.beforeExecute( t, r );
-                    }
-
-
-                    @Override
-                    protected void afterExecute( final Runnable r, final Throwable t )
-                    {
-                        if ( parentContext != null )
-                        {
-                            MDC.setContextMap( currentContext );
-                        }
-                        super.afterExecute( r, t );
-                    }
-                } );
+                new SubutaiThreadPoolExecutor( 1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>() ) );
     }
 
 
     //helpers
-
-
     static class FinalizableDelegatedExecutorService extends DelegatedExecutorService
     {
         FinalizableDelegatedExecutorService( ExecutorService executor )
@@ -357,22 +126,40 @@ public class SubutaiExecutors
         private final ExecutorService e;
 
 
-        DelegatedExecutorService( ExecutorService executor ) { e = executor; }
+        DelegatedExecutorService( ExecutorService executor )
+        {
+            e = executor;
+        }
 
 
-        public void execute( Runnable command ) { e.execute( command ); }
+        public void execute( Runnable command )
+        {
+            e.execute( command );
+        }
 
 
-        public void shutdown() { e.shutdown(); }
+        public void shutdown()
+        {
+            e.shutdown();
+        }
 
 
-        public List<Runnable> shutdownNow() { return e.shutdownNow(); }
+        public List<Runnable> shutdownNow()
+        {
+            return e.shutdownNow();
+        }
 
 
-        public boolean isShutdown() { return e.isShutdown(); }
+        public boolean isShutdown()
+        {
+            return e.isShutdown();
+        }
 
 
-        public boolean isTerminated() { return e.isTerminated(); }
+        public boolean isTerminated()
+        {
+            return e.isTerminated();
+        }
 
 
         public boolean awaitTermination( long timeout, TimeUnit unit ) throws InterruptedException
@@ -423,6 +210,143 @@ public class SubutaiExecutors
                 throws InterruptedException, ExecutionException, TimeoutException
         {
             return e.invokeAny( tasks, timeout, unit );
+        }
+    }
+
+
+    private static class SubutaiThreadPoolExecutor extends ThreadPoolExecutor
+    {
+        private Map<String, String> parentContext;
+        private Map<String, String> currentContext;
+
+
+        public SubutaiThreadPoolExecutor( final int corePoolSize, final int maximumPoolSize, final long keepAliveTime,
+                                          final TimeUnit unit, final BlockingQueue<Runnable> workQueue )
+        {
+            super( corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue );
+        }
+
+
+        @Override
+        public Future<?> submit( final Runnable task )
+        {
+            parentContext = MDC.getCopyOfContextMap();
+            return super.submit( task );
+        }
+
+
+        @Override
+        public <T> Future<T> submit( final Runnable task, final T result )
+        {
+            parentContext = MDC.getCopyOfContextMap();
+            return super.submit( task, result );
+        }
+
+
+        @Override
+        public <T> Future<T> submit( final Callable<T> task )
+        {
+            parentContext = MDC.getCopyOfContextMap();
+            return super.submit( task );
+        }
+
+
+        @Override
+        public void execute( final Runnable command )
+        {
+            parentContext = MDC.getCopyOfContextMap();
+            super.execute( command );
+        }
+
+
+        @Override
+        protected void beforeExecute( final Thread t, final Runnable r )
+        {
+            if ( parentContext != null )
+            {
+                currentContext = MDC.getCopyOfContextMap();
+                MDC.setContextMap( parentContext );
+            }
+            super.beforeExecute( t, r );
+        }
+
+
+        @Override
+        protected void afterExecute( final Runnable r, final Throwable t )
+        {
+            if ( parentContext != null )
+            {
+                MDC.setContextMap( currentContext );
+            }
+            super.afterExecute( r, t );
+        }
+    }
+
+
+    private static class SubutaiScheduledThreadPoolExecutor extends ScheduledThreadPoolExecutor
+    {
+        private Map<String, String> parentContext;
+        private Map<String, String> currentContext;
+
+
+        public SubutaiScheduledThreadPoolExecutor( final int corePoolSize )
+        {
+            super( corePoolSize );
+        }
+
+
+        @Override
+        public Future<?> submit( final Runnable task )
+        {
+            parentContext = MDC.getCopyOfContextMap();
+            return super.submit( task );
+        }
+
+
+        @Override
+        public <T> Future<T> submit( final Runnable task, final T result )
+        {
+            parentContext = MDC.getCopyOfContextMap();
+            return super.submit( task, result );
+        }
+
+
+        @Override
+        public <T> Future<T> submit( final Callable<T> task )
+        {
+            parentContext = MDC.getCopyOfContextMap();
+            return super.submit( task );
+        }
+
+
+        @Override
+        public void execute( final Runnable command )
+        {
+            parentContext = MDC.getCopyOfContextMap();
+            super.execute( command );
+        }
+
+
+        @Override
+        protected void beforeExecute( final Thread t, final Runnable r )
+        {
+            if ( parentContext != null )
+            {
+                currentContext = MDC.getCopyOfContextMap();
+                MDC.setContextMap( parentContext );
+            }
+            super.beforeExecute( t, r );
+        }
+
+
+        @Override
+        protected void afterExecute( final Runnable r, final Throwable t )
+        {
+            if ( parentContext != null )
+            {
+                MDC.setContextMap( currentContext );
+            }
+            super.afterExecute( r, t );
         }
     }
 }
