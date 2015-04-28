@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.template.wizard.impl;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.safehaus.subutai.core.template.wizard.api.PhaseLifecycle;
+import org.safehaus.subutai.core.template.wizard.api.exception.TemplateWizardException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,31 +20,30 @@ public abstract class AbstractPhaseLifecycle implements PhaseLifecycle
     public static final String STOPPING = "STOPPING";
     public static final String RUNNING = "RUNNING";
 
-    private final Object _lock = new Object();
-    private final int __FAILED = -1, __STOPPED = 0, __STARTING = 1, __STARTED = 2, __STOPPING = 3;
-    private volatile int _state = __STOPPED;
+    private final Object lock = new Object();
+    private final int FAILED_CODE = -1, STOPPED_CODE = 0, STARTING_CODE = 1, STARTED_CODE = 2, STOPPING_CODE = 3;
+    private volatile int state = STOPPED_CODE;
 
-    protected final CopyOnWriteArrayList<PhaseLifecycle.Listener> _listeners =
-            new CopyOnWriteArrayList<PhaseLifecycle.Listener>();
+    protected final CopyOnWriteArrayList<PhaseLifecycle.Listener> _listeners = new CopyOnWriteArrayList<>();
 
 
-    protected void doStart() throws Exception
+    protected void doStart() throws TemplateWizardException
     {
     }
 
 
-    protected void doStop() throws Exception
+    protected void doStop() throws TemplateWizardException
     {
     }
 
 
-    public final void start() throws Exception
+    public final void start() throws TemplateWizardException
     {
-        synchronized ( _lock )
+        synchronized ( lock )
         {
             try
             {
-                if ( _state == __STARTED || _state == __STARTING )
+                if ( state == STARTED_CODE || state == STARTING_CODE )
                 {
                     return;
                 }
@@ -51,7 +51,7 @@ public abstract class AbstractPhaseLifecycle implements PhaseLifecycle
                 doStart();
                 setStarted();
             }
-            catch ( Exception | Error e )
+            catch ( Exception e )
             {
                 setFailed( e );
                 throw e;
@@ -60,13 +60,13 @@ public abstract class AbstractPhaseLifecycle implements PhaseLifecycle
     }
 
 
-    public final void stop() throws Exception
+    public final void stop() throws TemplateWizardException
     {
-        synchronized ( _lock )
+        synchronized ( lock )
         {
             try
             {
-                if ( _state == __STOPPING || _state == __STOPPED )
+                if ( state == STOPPING_CODE || state == STOPPED_CODE )
                 {
                     return;
                 }
@@ -74,10 +74,10 @@ public abstract class AbstractPhaseLifecycle implements PhaseLifecycle
                 doStop();
                 setStopped();
             }
-            catch ( Exception | Error e )
+            catch ( Exception e )
             {
                 setFailed( e );
-                throw e;
+                throw new TemplateWizardException( e );
             }
         }
     }
@@ -85,39 +85,39 @@ public abstract class AbstractPhaseLifecycle implements PhaseLifecycle
 
     public boolean isRunning()
     {
-        final int state = _state;
+        final int state = this.state;
 
-        return state == __STARTED || state == __STARTING;
+        return state == STARTED_CODE || state == STARTING_CODE;
     }
 
 
     public boolean isStarted()
     {
-        return _state == __STARTED;
+        return state == STARTED_CODE;
     }
 
 
     public boolean isStarting()
     {
-        return _state == __STARTING;
+        return state == STARTING_CODE;
     }
 
 
     public boolean isStopping()
     {
-        return _state == __STOPPING;
+        return state == STOPPING_CODE;
     }
 
 
     public boolean isStopped()
     {
-        return _state == __STOPPED;
+        return state == STOPPED_CODE;
     }
 
 
     public boolean isFailed()
     {
-        return _state == __FAILED;
+        return state == FAILED_CODE;
     }
 
 
@@ -135,20 +135,21 @@ public abstract class AbstractPhaseLifecycle implements PhaseLifecycle
 
     public String getState()
     {
-        switch ( _state )
+        switch ( state )
         {
-            case __FAILED:
+            case FAILED_CODE:
                 return FAILED;
-            case __STARTING:
+            case STARTING_CODE:
                 return STARTING;
-            case __STARTED:
+            case STARTED_CODE:
                 return STARTED;
-            case __STOPPING:
+            case STOPPING_CODE:
                 return STOPPING;
-            case __STOPPED:
+            case STOPPED_CODE:
                 return STOPPED;
+            default:
+                return null;
         }
-        return null;
     }
 
 
@@ -176,7 +177,7 @@ public abstract class AbstractPhaseLifecycle implements PhaseLifecycle
 
     private void setStarted()
     {
-        _state = __STARTED;
+        state = STARTED_CODE;
         LOG.debug( STARTED + " {}", this );
         for ( Listener listener : _listeners )
         {
@@ -188,7 +189,7 @@ public abstract class AbstractPhaseLifecycle implements PhaseLifecycle
     private void setStarting()
     {
         LOG.debug( "starting {}", this );
-        _state = __STARTING;
+        state = STARTING_CODE;
         for ( Listener listener : _listeners )
         {
             listener.lifeCycleStarting( this );
@@ -199,7 +200,7 @@ public abstract class AbstractPhaseLifecycle implements PhaseLifecycle
     private void setStopping()
     {
         LOG.debug( "stopping {}", this );
-        _state = __STOPPING;
+        state = STOPPING_CODE;
         for ( Listener listener : _listeners )
         {
             listener.lifeCycleStopping( this );
@@ -209,7 +210,7 @@ public abstract class AbstractPhaseLifecycle implements PhaseLifecycle
 
     private void setStopped()
     {
-        _state = __STOPPED;
+        state = STOPPED_CODE;
         LOG.debug( "{} {}", STOPPED, this );
         for ( Listener listener : _listeners )
         {
@@ -220,7 +221,7 @@ public abstract class AbstractPhaseLifecycle implements PhaseLifecycle
 
     private void setFailed( Throwable th )
     {
-        _state = __FAILED;
+        state = FAILED_CODE;
         LOG.warn( FAILED + " " + this + ": " + th, th );
         for ( Listener listener : _listeners )
         {

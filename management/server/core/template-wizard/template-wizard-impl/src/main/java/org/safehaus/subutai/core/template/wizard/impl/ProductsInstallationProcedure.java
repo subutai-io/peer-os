@@ -3,10 +3,12 @@ package org.safehaus.subutai.core.template.wizard.impl;
 
 import java.util.List;
 
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.CommandUtil;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.peer.Host;
+import org.safehaus.subutai.core.template.wizard.api.exception.TemplateWizardException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +37,7 @@ public class ProductsInstallationProcedure extends AbstractPhaseLifecycle
 
 
     @Override
-    protected void doStart() throws Exception
+    protected void doStart() throws TemplateWizardException
     {
         if ( isStopped() )
         {
@@ -46,7 +48,7 @@ public class ProductsInstallationProcedure extends AbstractPhaseLifecycle
     }
 
 
-    private void installProducts() throws Exception
+    private void installProducts() throws TemplateWizardException
     {
         List<ProductInstallationProcess> installationProcessList = Lists.newArrayList();
         for ( final String product : products )
@@ -87,7 +89,7 @@ public class ProductsInstallationProcedure extends AbstractPhaseLifecycle
 
 
         @Override
-        protected void doStart() throws Exception
+        protected void doStart() throws TemplateWizardException
         {
             if ( isStopped() )
             {
@@ -95,7 +97,14 @@ public class ProductsInstallationProcedure extends AbstractPhaseLifecycle
                 RequestBuilder requestBuilder =
                         new RequestBuilder( String.format( "apt-get --force-yes --yes install -f %s", productName ) );
                 requestBuilder.withTimeout( 90 );
-                commandResult = targetHost.execute( requestBuilder );
+                try
+                {
+                    commandResult = targetHost.execute( requestBuilder );
+                }
+                catch ( CommandException e )
+                {
+                    throw new TemplateWizardException( e );
+                }
                 stop();
             }
         }
