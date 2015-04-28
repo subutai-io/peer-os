@@ -8,6 +8,8 @@ import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.RamQuota;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -19,49 +21,14 @@ import com.vaadin.ui.VerticalLayout;
 
 public class ContainerHostQuotaForm extends VerticalLayout
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger( ContainerHostQuotaForm.class );
 
-
-    private TextField ramQuotaTextField = new TextField( "RAM Quota" )
-    {
-        {
-            setBuffered( true );
-        }
-    };
-
-    private TextField cpuQuotaTextField = new TextField( "CPU Quota" )
-    {
-        {
-            setBuffered( true );
-        }
-    };
-
-    private TextField diskHomeTextField = new TextField( "Home directory quota" )
-    {
-        {
-            setBuffered( true );
-        }
-    };
-
-    private TextField diskRootfsTextField = new TextField( "Rootfs directory quota" )
-    {
-        {
-            setBuffered( true );
-        }
-    };
-
-    private TextField diskVarTextField = new TextField( "Var directory quota" )
-    {
-        {
-            setBuffered( true );
-        }
-    };
-
-    private TextField diskOptTextField = new TextField( "Opt directory quota" )
-    {
-        {
-            setBuffered( true );
-        }
-    };
+    private final TextField ramQuotaTextField;
+    private final TextField cpuQuotaTextField;
+    private final TextField diskHomeTextField;
+    private final TextField diskRootfsTextField;
+    private final TextField diskVarTextField;
+    private final TextField diskOptTextField;
 
     private Button updateChanges = new Button( "Update changes" );
 
@@ -87,6 +54,24 @@ public class ContainerHostQuotaForm extends VerticalLayout
     public ContainerHostQuotaForm( Component parent )
     {
         this.parent = parent;
+        ramQuotaTextField = new TextField( "RAM Quota" );
+        ramQuotaTextField.setBuffered( true );
+
+        cpuQuotaTextField = new TextField( "CPU Quota" );
+        cpuQuotaTextField.setBuffered( true );
+
+        diskHomeTextField = new TextField( "Home directory quota" );
+        diskHomeTextField.setBuffered( true );
+
+        diskRootfsTextField = new TextField( "Rootfs directory quota" );
+        diskRootfsTextField.setBuffered( true );
+
+        diskVarTextField = new TextField( "Var directory quota" );
+        diskVarTextField.setBuffered( true );
+
+        diskOptTextField = new TextField( "Opt directory quota" );
+        diskOptTextField.setBuffered( true );
+
         init();
     }
 
@@ -127,6 +112,7 @@ public class ContainerHostQuotaForm extends VerticalLayout
         {
             Notification.show( String.format( "Error getting quota: %s", e.getMessage() ),
                     Notification.Type.ERROR_MESSAGE );
+            LOGGER.error( "Couldn't get container quota", e );
         }
     }
 
@@ -152,14 +138,13 @@ public class ContainerHostQuotaForm extends VerticalLayout
                 final DiskQuota newOptDiskQuota = DiskQuota.parse( DiskPartition.OPT, diskOptTextField.getValue() );
                 final DiskQuota newVarDiskQuota = DiskQuota.parse( DiskPartition.VAR, diskVarTextField.getValue() );
 
-                executorService.submit( new Runnable()
+                Runnable runnable = new Runnable()
                 {
                     @Override
                     public void run()
                     {
                         try
                         {
-
                             if ( newRamQuota != prevRamQuota )
                             {
                                 containerHost.setRamQuota( newRamQuota );
@@ -202,6 +187,7 @@ public class ContainerHostQuotaForm extends VerticalLayout
                         {
                             Notification.show( String.format( "Error setting quota: %s", e.getMessage() ),
                                     Notification.Type.ERROR_MESSAGE );
+                            LOGGER.error( "Couldn't set container quota", e );
                         }
                         finally
                         {
@@ -209,7 +195,8 @@ public class ContainerHostQuotaForm extends VerticalLayout
                             updateChanges.setEnabled( true );
                         }
                     }
-                } );
+                };
+                executorService.submit( runnable );
             }
             catch ( Exception e )
             {
@@ -217,6 +204,7 @@ public class ContainerHostQuotaForm extends VerticalLayout
                 parent.setEnabled( true );
                 Notification.show( String.format( "Error setting quota: %s", e.getMessage() ),
                         Notification.Type.ERROR_MESSAGE );
+                LOGGER.error( "Error setting quota", e );
             }
         }
     };

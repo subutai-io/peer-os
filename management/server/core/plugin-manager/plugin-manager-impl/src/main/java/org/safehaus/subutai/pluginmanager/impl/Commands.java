@@ -6,24 +6,23 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 
 public class Commands
 {
-    public static String PACKAGE_POSTFIX = "-subutai-plugin";
+    public static final String PACKAGE_POSTFIX = "-subutai-plugin";
 
-    public static String PACKAGE_POSTFIX_WITHOUT_DASH = "subutai-plugin";
+    public static final String PACKAGE_POSTFIX_WITHOUT_DASH = "subutai-plugin";
 
-    public static String INSTALL_COMMAND = "apt-get --force-yes --assume-yes install ";
+    public static final String INSTALL_COMMAND = "apt-get --force-yes --assume-yes install ";
 
-    public static String PURGE_COMMAND = "apt-get --force-yes --assume-yes purge ";
+    public static final String PURGE_COMMAND = "apt-get --force-yes --assume-yes purge ";
 
-    public static String UPGRADE_COMMAND = "apt-get --force-yes --assume-yes upgrade ";
+    public static final String UPGRADE_COMMAND = "apt-get --force-yes --assume-yes upgrade ";
 
-    public static String CHECK_COMMAND = "dpkg -l | grep '^ii' | grep " + PACKAGE_POSTFIX_WITHOUT_DASH;
+    public static final String CHECK_COMMAND = "dpkg -l | grep '^ii' | grep " + PACKAGE_POSTFIX_WITHOUT_DASH;
 
 
     public String makePackageName( String pluginName )
     {
-        String packageName = pluginName + PACKAGE_POSTFIX;
 
-        return packageName;
+        return pluginName + PACKAGE_POSTFIX;
     }
 
 
@@ -68,7 +67,6 @@ public class Commands
 
     public RequestBuilder makeIsInstalledCommand( String pluginName )
     {
-        //return new RequestBuilder( String.format( "dpkg-query -W %s-%s | grep -v repo", pluginName,PACKAGE_POSTFIX_WITHOUT_DASH ) );
         return new RequestBuilder( String.format( "dpkg -s %s-%s", pluginName,PACKAGE_POSTFIX_WITHOUT_DASH ) );
     }
 }
