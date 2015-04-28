@@ -72,6 +72,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOG.error( "Error validating parameters #createEnvironment", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
                            .build();
         }
@@ -98,6 +99,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( EnvironmentCreationException e )
         {
+            LOG.error( "Error creating environment #createEnvironment", e );
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
     }
@@ -114,40 +116,47 @@ public class RestServiceImpl implements RestService
         {
             for ( Map.Entry<UUID, Set<NodeGroup>> placementKey : topologyJson.getNodeGroupPlacement().entrySet() )
             {
-                UUID peerId = placementKey.getKey();
-                Set<NodeGroup> nodeGroups = placementKey.getValue();
-                if ( peerId == null )
-                {
-                    throw new EnvironmentCreationException( "Invalid peer id" );
-                }
-                else if ( peerManager.getPeer( peerId ) == null )
-                {
-                    throw new EnvironmentCreationException( String.format( "Peer %s not found", peerId ) );
-                }
-                for ( NodeGroup nodeGroup : nodeGroups )
-                {
-                    if ( Strings.isNullOrEmpty( nodeGroup.getName() ) )
-                    {
-                        throw new EnvironmentCreationException( "Invalid node group name" );
-                    }
-                    else if ( nodeGroup.getNumberOfContainers() <= 0 )
-                    {
-                        throw new EnvironmentCreationException( "Invalid number of containers" );
-                    }
-                    else if ( Strings.isNullOrEmpty( nodeGroup.getTemplateName() ) )
-                    {
-                        throw new EnvironmentCreationException( "Invalid templateName" );
-                    }
-                    else if ( templateRegistry.getTemplate( nodeGroup.getTemplateName() ) == null )
-                    {
-                        throw new EnvironmentCreationException(
-                                String.format( "Template %s does not exist", nodeGroup.getTemplateName() ) );
-                    }
-                    else if ( nodeGroup.getContainerPlacementStrategy() == null )
-                    {
-                        throw new EnvironmentCreationException( "Invalid node container placement strategy" );
-                    }
-                }
+                checkNodeGroup( placementKey );
+            }
+        }
+    }
+
+
+    private void checkNodeGroup( final Map.Entry<UUID, Set<NodeGroup>> placementKey )
+            throws EnvironmentCreationException
+    {
+        UUID peerId = placementKey.getKey();
+        Set<NodeGroup> nodeGroups = placementKey.getValue();
+        if ( peerId == null )
+        {
+            throw new EnvironmentCreationException( "Invalid peer id" );
+        }
+        else if ( peerManager.getPeer( peerId ) == null )
+        {
+            throw new EnvironmentCreationException( String.format( "Peer %s not found", peerId ) );
+        }
+        for ( NodeGroup nodeGroup : nodeGroups )
+        {
+            if ( Strings.isNullOrEmpty( nodeGroup.getName() ) )
+            {
+                throw new EnvironmentCreationException( "Invalid node group name" );
+            }
+            else if ( nodeGroup.getNumberOfContainers() <= 0 )
+            {
+                throw new EnvironmentCreationException( "Invalid number of containers" );
+            }
+            else if ( Strings.isNullOrEmpty( nodeGroup.getTemplateName() ) )
+            {
+                throw new EnvironmentCreationException( "Invalid templateName" );
+            }
+            else if ( templateRegistry.getTemplate( nodeGroup.getTemplateName() ) == null )
+            {
+                throw new EnvironmentCreationException(
+                        String.format( "Template %s does not exist", nodeGroup.getTemplateName() ) );
+            }
+            else if ( nodeGroup.getContainerPlacementStrategy() == null )
+            {
+                throw new EnvironmentCreationException( "Invalid node container placement strategy" );
             }
         }
     }
@@ -222,6 +231,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( EnvironmentNotFoundException e )
         {
+            LOG.warn( "Error getting environment by id", envId );
             return Response.status( Response.Status.NOT_FOUND ).build();
         }
     }
@@ -246,10 +256,12 @@ public class RestServiceImpl implements RestService
         }
         catch ( EnvironmentNotFoundException e )
         {
+            LOG.warn( "Error getting environment by id {}", envId );
             return Response.status( Response.Status.NOT_FOUND ).build();
         }
         catch ( EnvironmentDestructionException e )
         {
+            LOG.error( "Error destroying environment #destroyEnvironment", e );
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
     }
@@ -279,6 +291,7 @@ public class RestServiceImpl implements RestService
             }
             catch ( ContainerHostNotFoundException | EnvironmentNotFoundException | EnvironmentModificationException e )
             {
+                LOG.error( "Error destroying container #destroyContainer", e );
                 return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
             }
         }
@@ -307,7 +320,6 @@ public class RestServiceImpl implements RestService
     @Override
     public Response growEnvironment( final String environmentId, final String topologyJsonString )
     {
-
         if ( !UUIDUtil.isStringAUuid( environmentId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
@@ -323,6 +335,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOG.error( "Error validating topology #growEnvironment", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
                            .build();
         }
@@ -331,16 +344,7 @@ public class RestServiceImpl implements RestService
         {
             UUID envId = UUID.fromString( environmentId );
 
-            Topology topology = new Topology();
-
-            for ( Map.Entry<UUID, Set<NodeGroup>> placementEntry : topologyJson.getNodeGroupPlacement().entrySet() )
-            {
-                Peer peer = peerManager.getPeer( placementEntry.getKey() );
-                for ( NodeGroup nodeGroup : placementEntry.getValue() )
-                {
-                    topology.addNodeGroupPlacement( peer, nodeGroup );
-                }
-            }
+            Topology topology = buildTopology( topologyJson );
 
             Set<ContainerHost> newContainers = environmentManager.growEnvironment( envId, topology, false );
 
@@ -348,12 +352,29 @@ public class RestServiceImpl implements RestService
         }
         catch ( EnvironmentNotFoundException e )
         {
+            LOG.warn( "Error looking for environment by id {}", environmentId );
             return Response.status( Response.Status.NOT_FOUND ).build();
         }
         catch ( EnvironmentModificationException e )
         {
+            LOG.error( "Error modifying environment #growEnvironment", e );
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
+    }
+
+
+    private Topology buildTopology( final TopologyJson topologyJson )
+    {
+        Topology topology = new Topology();
+        for ( Map.Entry<UUID, Set<NodeGroup>> placementEntry : topologyJson.getNodeGroupPlacement().entrySet() )
+        {
+            Peer peer = peerManager.getPeer( placementEntry.getKey() );
+            for ( NodeGroup nodeGroup : placementEntry.getValue() )
+            {
+                topology.addNodeGroupPlacement( peer, nodeGroup );
+            }
+        }
+        return topology;
     }
 
 
@@ -380,6 +401,7 @@ public class RestServiceImpl implements RestService
             }
             catch ( ContainerHostNotFoundException | PeerException e )
             {
+                LOG.error( "Error getting container state", e );
                 return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
             }
         }
@@ -413,6 +435,7 @@ public class RestServiceImpl implements RestService
             }
             catch ( ContainerHostNotFoundException | PeerException e )
             {
+                LOG.error( "Exception starting container host", e );
                 return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
             }
         }
@@ -446,6 +469,7 @@ public class RestServiceImpl implements RestService
             }
             catch ( ContainerHostNotFoundException | PeerException e )
             {
+                LOG.error( "Exception stopping container host", e );
                 return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
             }
         }
@@ -478,10 +502,12 @@ public class RestServiceImpl implements RestService
         }
         catch ( EnvironmentNotFoundException e )
         {
+            LOG.warn( "Environment not found by id {}", envId );
             return Response.status( Response.Status.NOT_FOUND ).build();
         }
         catch ( EnvironmentModificationException e )
         {
+            LOG.error( "Environment modification failed", e );
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
     }
@@ -506,10 +532,12 @@ public class RestServiceImpl implements RestService
         }
         catch ( EnvironmentNotFoundException e )
         {
+            LOG.warn( "Exception getting environment by id {}", envId );
             return Response.status( Response.Status.NOT_FOUND ).build();
         }
         catch ( EnvironmentModificationException e )
         {
+            LOG.error( "Error modifying environment", e );
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
     }
