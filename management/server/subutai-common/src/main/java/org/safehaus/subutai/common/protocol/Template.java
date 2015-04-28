@@ -31,8 +31,6 @@ import com.google.gson.annotations.Expose;
  * Template represents template entry in registry
  */
 @Entity( name = "Template" )
-//@IdClass( TemplatePK.class )
-//@Table(name = "Template")
 @NamedQueries( value = {
         @NamedQuery( name = "Template.getAll", query = "SELECT t FROM Template t" ),
         @NamedQuery( name = "Template.getTemplateByNameArch",
@@ -46,7 +44,6 @@ import com.google.gson.annotations.Expose;
 @XmlRootElement( name = "" )
 public class Template
 {
-
     public static final String ARCH_AMD64 = "amd64";
     public static final String ARCH_I386 = "i386";
 
@@ -63,7 +60,6 @@ public class Template
     //name of parent template
     @Expose
     private String parentTemplateName;
-
 
     //lxc container name
     @Expose
@@ -85,16 +81,9 @@ public class Template
     @Expose
     private String subutaiGitUuid;
 
-    @Lob
     //contents of packages manifest file
+    @Lob
     private String packagesManifest;
-
-    //    @ManyToOne( optional = true )
-    //    @JoinColumns( {
-    //            @JoinColumn( name = "parentTemplate" ), @JoinColumn( name = "parentLxcArch" )
-    //    } )
-    //    private Template parentTemplate;
-
 
     //children of template, this property is calculated upon need and is null by default (see REST API for calculation)
     @Expose
@@ -126,6 +115,18 @@ public class Template
     }
 
 
+    /**
+     * @param lxcArch - lxcArch
+     * @param lxcUtsname - lxcUtsname
+     * @param subutaiConfigPath - subutaiConfigPath
+     * @param subutaiParent - subutaiParent
+     * @param subutaiGitBranch - subutaiGitBranch
+     * @param subutaiGitUuid - subutaiGitUuid
+     * @param packagesManifest - packagesManifest
+     * @param md5sum - md5sum
+     *
+     * @deprecated (since versioning was introduced, pass additional template version)
+     */
     @Deprecated
     public Template( final String lxcArch, final String lxcUtsname, final String subutaiConfigPath,
                      final String subutaiParent, final String subutaiGitBranch, final String subutaiGitUuid,
@@ -143,9 +144,6 @@ public class Template
         Preconditions.checkArgument( !Strings.isNullOrEmpty( md5sum ), "Missing md5sum" );
 
         this.pk = new TemplatePK( lxcUtsname, lxcArch, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), md5sum );
-        //        this.templateName = lxcUtsname;
-        //        this.lxcArch = lxcArch;
-        //        this.pk = new TemplatePK( lxcUtsname, lxcArch );
         this.lxcUtsname = lxcUtsname;
         this.subutaiConfigPath = subutaiConfigPath;
         this.subutaiParent = subutaiParent;
@@ -153,9 +151,7 @@ public class Template
         this.subutaiGitUuid = subutaiGitUuid;
         this.packagesManifest = packagesManifest;
         this.parentTemplateName = subutaiParent;
-        //        this.md5sum = md5sum;
 
-        //        if ( pk.getTemplateName().equalsIgnoreCase( parentTemplateName ) )
         if ( this.pk.getTemplateName().equalsIgnoreCase( parentTemplateName ) )
         {
             parentTemplateName = null;
@@ -180,21 +176,15 @@ public class Template
         Preconditions.checkNotNull( templateVersion, "Missing templateVersion" );
 
         this.pk = new TemplatePK( lxcUtsname, lxcArch, templateVersion, md5sum );
-        //        this.templateName = lxcUtsname;
-        //        this.lxcArch = lxcArch;
-        //        this.pk = new TemplatePK( lxcUtsname, lxcArch );
         this.lxcUtsname = lxcUtsname;
         this.subutaiConfigPath = subutaiConfigPath;
         this.subutaiParent = subutaiParent;
         this.subutaiGitBranch = subutaiGitBranch;
         this.subutaiGitUuid = subutaiGitUuid;
         this.parentTemplateName = subutaiParent;
-        //        this.md5sum = md5sum;
-        //        this.templateVersion = templateVersion;
         this.packagesManifest = packagesManifest;
 
 
-        //        if ( pk.getTemplateName().equalsIgnoreCase( parentTemplateName ) )
         if ( this.pk.getTemplateName().equalsIgnoreCase( parentTemplateName ) )
         {
             parentTemplateName = null;
