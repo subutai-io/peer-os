@@ -1,27 +1,25 @@
 /**
- * NovaForge(TM) is a web-based forge offering a Collaborative Development and
- * Project Management Environment.
+ * NovaForge(TM) is a web-based forge offering a Collaborative Development and Project Management Environment.
  *
  * Copyright (C) 2007-2012  BULL SAS
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see
+ * http://www.gnu.org/licenses/.
  */
 package org.safehaus.subutai.server.ui;
 
 
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.naming.NamingException;
 import javax.servlet.http.Cookie;
@@ -41,6 +39,7 @@ import org.safehaus.subutai.server.ui.views.ModulesView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableMap;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.navigator.Navigator;
@@ -73,37 +72,29 @@ public class MainUI extends UI implements ViewChangeListener
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( MainUI.class.getName() );
-    private static final ThreadLocal<MainUI> threadLocal = new ThreadLocal<>();
+    private static final ThreadLocal<MainUI> THREAD_LOCAL = new ThreadLocal<>();
 
     private CssLayout root = new CssLayout();
     private CssLayout menu = new CssLayout();
     private CssLayout content = new CssLayout();
-    //    private VerticalLayout loginLayout;
     private HelpManager helpManager;
     private Navigator nav;
     Label username;
 
-    //    private String username = "administrator";
-
-    private HashMap<String, Button> viewNameToMenuButton = new HashMap<>();
-    private HashMap<String, View> routes = new HashMap<String, View>()
-    {
-        {
-            put( "/core", new CoreModulesView() );
-            put( "/modules", new ModulesView() );
-        }
-    };
+    private Map<String, Button> viewNameToMenuButton = new HashMap<>();
+    private Map<String, View> routes = ImmutableMap.<String, View>builder().put( "/core", new CoreModulesView() )
+                                                   .put( "/modules", new ModulesView() ).build();
 
 
     public static MainUI getInstance()
     {
-        return threadLocal.get();
+        return THREAD_LOCAL.get();
     }
 
 
     private static void setInstance( MainUI application )
     {
-        threadLocal.set( application );
+        THREAD_LOCAL.set( application );
     }
 
 
@@ -112,7 +103,6 @@ public class MainUI extends UI implements ViewChangeListener
     {
         setInstance( this );
         helpManager = new HelpManager( this );
-        //        VaadinService.getCurrentRequest().getWrappedSession().setAttribute( "username", username );
 
         setLocale( Locale.US );
 
@@ -131,7 +121,6 @@ public class MainUI extends UI implements ViewChangeListener
         setPollInterval( Common.REFRESH_UI_SEC * 340 );
 
         buildMainView();
-        //        buildLoginView( false );
     }
 
 
@@ -156,7 +145,7 @@ public class MainUI extends UI implements ViewChangeListener
             try
             {
                 IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-                isAuthenticated = identityManager.isAuthenticated();
+                isAuthenticated = identityManager != null && identityManager.isAuthenticated();
             }
             catch ( NamingException e )
             {
@@ -164,13 +153,13 @@ public class MainUI extends UI implements ViewChangeListener
             }
         }
 
-        if ( isAuthenticated && event.getViewName().equals( "" ) )
+        if ( isAuthenticated && "".equals( event.getViewName() ) )
         {
             event.getNavigator().navigateTo( "/core" );
             return false;
         }
 
-        if ( !isAuthenticated && !event.getViewName().equals( "/login" ) )
+        if ( !isAuthenticated && !"/login".equals( event.getViewName() ) )
         {
             HelpOverlay w = helpManager.addOverlay( "Welcome to the Subutai",
                     "<p>No username or password is required, just click the ‘Sign In’ button to continue.</p>",
@@ -203,169 +192,45 @@ public class MainUI extends UI implements ViewChangeListener
         }
 
         helpManager.closeAll();
-        //        removeStyleName( "login" );
-        //        root.removeComponent( loginLayout );
 
-        root.addComponent( new HorizontalLayout()
-        {
-            {
-                setSizeFull();
-                addStyleName( "main-view" );
-                addComponent( new VerticalLayout()
-                {
-                    // Sidebar
-                    {
-                        addStyleName( "sidebar" );
-                        setWidth( 140, Unit.PIXELS );
-                        setHeight( "100%" );
-
-                        // Branding element
-                        addComponent( new CssLayout()
-                        {
-                            {
-                                addStyleName( "branding" );
-                                setHeight( 140, Unit.PIXELS );
-                                addComponent( new Image( null, new ThemeResource( "img/subutai.png" ) ) );
-                            }
-                        } );
-
-                        // Main menu
-                        addComponent( menu );
-                        setExpandRatio( menu, 1 );
-
-                        // User menu
-                        addComponent( new VerticalLayout()
-                        {
-                            {
-                                setSizeUndefined();
-                                addStyleName( "user" );
-                                Image profilePic = new Image( null, new ThemeResource( "img/profile-pic.png" ) );
-                                profilePic.setWidth( "34px" );
-                                addComponent( profilePic );
-                                username = new Label( "unknown" );
-                                username.setSizeUndefined();
-                                addComponent( username );
-
-                                try
-                                {
-                                    IdentityManager identityManager =
-                                            ServiceLocator.getServiceNoCache( IdentityManager.class );
-
-                                    if ( identityManager != null )
-                                    {
-                                        User user = identityManager.getUser();
-
-                                        if ( user != null )
-                                        {
-                                            username.setValue( user.getUsername() );
-                                        }
-                                    }
-                                }
-                                catch ( Exception e )
-                                {
-                                    LOG.error( e.toString(), e );
-                                }
-
-                                MenuBar.Command cmd = new MenuBar.Command()
-                                {
-                                    @Override
-                                    public void menuSelected( MenuBar.MenuItem selectedItem )
-                                    {
-                                        Notification.show( "Not implemented in this demo" );
-                                    }
-                                };
-                                MenuBar settings = new MenuBar();
-                                MenuBar.MenuItem settingsMenu = settings.addItem( "", null );
-                                settingsMenu.setStyleName( "icon-cog" );
-                                settingsMenu.addItem( "Settings", cmd );
-                                settingsMenu.addItem( "Preferences", cmd );
-                                settingsMenu.addSeparator();
-                                settingsMenu.addItem( "My Account", cmd );
-                                addComponent( settings );
-
-                                Button exit = new NativeButton( "Exit" );
-                                exit.addStyleName( "icon-cancel" );
-                                exit.setDescription( "Sign Out" );
-                                addComponent( exit );
-                                exit.addClickListener( new Button.ClickListener()
-                                {
-                                    @Override
-                                    public void buttonClick( Button.ClickEvent event )
-                                    {
-
-                                        try
-                                        {
-                                            IdentityManager identityManager =
-                                                    ServiceLocator.getServiceNoCache( IdentityManager.class );
-                                            identityManager.logout(
-                                                    SubutaiVaadinUtils.getSubutaiLoginContext().getSessionId() );
-
-                                            VaadinService.getCurrentRequest().getWrappedSession().removeAttribute(
-                                                    SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME );
-                                            Cookie removeCookie =
-                                                    new Cookie( SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME, null );
-                                            removeCookie.setMaxAge( 0 );
-                                            VaadinService.getCurrentResponse().addCookie( removeCookie );
-                                            VaadinSession.getCurrent().close();
-                                        }
-                                        catch ( NamingException e )
-                                        {
-                                            LOG.error( e.toString(), e );
-                                        }
-
-                                        String contextPath = VaadinService.getCurrentRequest().getContextPath();
-                                        getUI().getPage().setLocation( contextPath );
-                                        LOG.trace( "VaadinSession.close() called" );
-                                        //                                        getSession().close();
-                                        //                                        buildLoginView( true );
-                                    }
-                                } );
-                            }
-                        } );
-                    }
-                } );
-                // Content
-                addComponent( content );
-                content.setSizeFull();
-                content.addStyleName( "view-content" );
-                setExpandRatio( content, 1 );
-            }
-        } );
+        root.addComponent( buildMainLayout() );
 
         menu.removeAllComponents();
 
         for ( final String view : new String[] { "core", "modules" } )
         {
-            Button b =
-                    new NativeButton( view.substring( 0, 1 ).toUpperCase() + view.substring( 1 ).replace( '-', ' ' ) );
-            b.setId( view.substring( 0, 1 ).toUpperCase() + view.substring( 1 ).replace( '-', ' ' ) );
-            b.addStyleName( "icon-" + view );
-            b.addClickListener( new Button.ClickListener()
+            Button.ClickListener navButtonListener = new Button.ClickListener()
             {
                 @Override
                 public void buttonClick( Button.ClickEvent event )
                 {
                     clearMenuSelection();
                     event.getButton().addStyleName( "selected" );
-                    if ( !nav.getState().equals( "/" + view ) )
+                    String selectedButton = "/" + view;
+                    if ( !selectedButton.equals( nav.getState() ) )
                     {
                         nav.navigateTo( "/" + view );
                     }
                 }
-            } );
+            };
+            Button navButton =
+                    new NativeButton( view.substring( 0, 1 ).toUpperCase() + view.substring( 1 ).replace( '-', ' ' ) );
+            navButton.setId( view.substring( 0, 1 ).toUpperCase() + view.substring( 1 ).replace( '-', ' ' ) );
+            navButton.addStyleName( "icon-" + view );
+            navButton.addClickListener( navButtonListener );
 
-            menu.addComponent( b );
-            viewNameToMenuButton.put( "/" + view, b );
+            menu.addComponent( navButton );
+            viewNameToMenuButton.put( "/" + view, navButton );
         }
         menu.addStyleName( "menu" );
         menu.setHeight( "100%" );
 
-        String f = Page.getCurrent().getUriFragment();
-        if ( f != null && f.startsWith( "!" ) )
+        String currentFragment = Page.getCurrent().getUriFragment();
+        if ( currentFragment != null && currentFragment.startsWith( "!" ) )
         {
-            f = f.substring( 1 );
+            currentFragment = currentFragment.substring( 1 );
         }
-        if ( f == null || f.equals( "" ) || f.equals( "/" ) )
+        if ( currentFragment == null || "".equals( currentFragment ) || "/".equals( currentFragment ) )
         {
             nav.navigateTo( "/modules" );
             menu.getComponent( 0 ).addStyleName( "selected" );
@@ -373,32 +238,130 @@ public class MainUI extends UI implements ViewChangeListener
         }
         else
         {
-            nav.navigateTo( f );
-            if ( !f.equals( "/login" ) )
+            nav.navigateTo( currentFragment );
+            if ( !"/login".equals( currentFragment ) )
             {
-                helpManager.showHelpFor( routes.get( f ) );
-                viewNameToMenuButton.get( f ).addStyleName( "selected" );
+                helpManager.showHelpFor( routes.get( currentFragment ) );
+                viewNameToMenuButton.get( currentFragment ).addStyleName( "selected" );
             }
         }
+    }
 
-        //        nav.addViewChangeListener( new ViewChangeListener()
-        //        {
-        //
-        //            @Override
-        //            public boolean beforeViewChange( ViewChangeListener.ViewChangeEvent event )
-        //            {
-        //                helpManager.closeAll();
-        //                return true;
-        //            }
-        //
-        //
-        //            @Override
-        //            public void afterViewChange( ViewChangeListener.ViewChangeEvent event )
-        //            {
-        //                View newView = event.getNewView();
-        //                helpManager.showHelpFor( newView );
-        //            }
-        //        } );
+
+    private HorizontalLayout buildMainLayout()
+    {
+        CssLayout brandingLayout = new CssLayout();
+        brandingLayout.addStyleName( "branding" );
+        brandingLayout.setHeight( 140, Unit.PIXELS );
+        brandingLayout.addComponent( new Image( null, new ThemeResource( "img/subutai.png" ) ) );
+
+        VerticalLayout userLayout = new VerticalLayout();
+        userLayout.setSizeUndefined();
+        userLayout.addStyleName( "user" );
+
+        Image profilePic = new Image( null, new ThemeResource( "img/profile-pic.png" ) );
+        profilePic.setWidth( "34px" );
+        userLayout.addComponent( profilePic );
+
+        username = new Label( "unknown" );
+        username.setSizeUndefined();
+        userLayout.addComponent( username );
+
+        try
+        {
+            IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+
+            if ( identityManager != null )
+            {
+                User user = identityManager.getUser();
+
+                if ( user != null )
+                {
+                    username.setValue( user.getUsername() );
+                }
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error getting username #buildMainLayout", e );
+        }
+
+        MenuBar.Command cmd = new MenuBar.Command()
+        {
+            @Override
+            public void menuSelected( MenuBar.MenuItem selectedItem )
+            {
+                Notification.show( "Not implemented in this demo" );
+            }
+        };
+
+        MenuBar settings = new MenuBar();
+        MenuBar.MenuItem settingsMenu = settings.addItem( "", null );
+        settingsMenu.setStyleName( "icon-cog" );
+        settingsMenu.addItem( "Settings", cmd );
+        settingsMenu.addItem( "Preferences", cmd );
+        settingsMenu.addSeparator();
+        settingsMenu.addItem( "My Account", cmd );
+        userLayout.addComponent( settings );
+
+        Button.ClickListener exitListener = new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent event )
+            {
+
+                try
+                {
+                    IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+                    if ( identityManager != null )
+                    {
+                        identityManager.logout( SubutaiVaadinUtils.getSubutaiLoginContext().getSessionId() );
+                    }
+
+                    VaadinService.getCurrentRequest().getWrappedSession()
+                                 .removeAttribute( SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME );
+                    Cookie removeCookie = new Cookie( SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME, null );
+                    removeCookie.setMaxAge( 0 );
+                    VaadinService.getCurrentResponse().addCookie( removeCookie );
+                    VaadinSession.getCurrent().close();
+                }
+                catch ( NamingException e )
+                {
+                    LOG.error( e.toString(), e );
+                }
+
+                String contextPath = VaadinService.getCurrentRequest().getContextPath();
+                getUI().getPage().setLocation( contextPath );
+                LOG.trace( "VaadinSession.close() called" );
+            }
+        };
+
+        Button exit = new NativeButton( "Exit" );
+        exit.addStyleName( "icon-cancel" );
+        exit.setDescription( "Sign Out" );
+        userLayout.addComponent( exit );
+
+        exit.addClickListener( exitListener );
+
+        VerticalLayout sidebarLayout = new VerticalLayout();
+        sidebarLayout.addStyleName( "sidebar" );
+        sidebarLayout.setWidth( 140, Unit.PIXELS );
+        sidebarLayout.setHeight( "100%" );
+        sidebarLayout.addComponent( brandingLayout );
+        sidebarLayout.addComponent( menu );
+        sidebarLayout.setExpandRatio( menu, 1 );
+        sidebarLayout.addComponent( userLayout );
+
+        HorizontalLayout mainLayout = new HorizontalLayout();
+        mainLayout.setSizeFull();
+        mainLayout.addStyleName( "main-view" );
+        mainLayout.addComponent( sidebarLayout );
+        mainLayout.addComponent( content );
+        content.setSizeFull();
+        content.addStyleName( "view-content" );
+        mainLayout.setExpandRatio( content, 1 );
+
+        return mainLayout;
     }
 
 
