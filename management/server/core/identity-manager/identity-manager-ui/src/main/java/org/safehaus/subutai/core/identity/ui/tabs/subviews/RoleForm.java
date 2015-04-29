@@ -21,6 +21,7 @@ import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.BeanItem;
+import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -34,91 +35,20 @@ import com.vaadin.ui.themes.Reindeer;
 public class RoleForm extends VerticalLayout
 {
 
-    TabCallback<BeanItem<Role>> callback;
-
+    private TabCallback<BeanItem<Role>> callback;
     private static final Logger LOGGER = LoggerFactory.getLogger( RoleForm.class );
-
     private BeanFieldGroup<Role> permissionFieldGroup = new BeanFieldGroup<>( Role.class );
-
     private boolean newValue;
-    private TextField name = new TextField()
-    {
-        {
-            setInputPrompt( "Role name" );
-            setEnabled( false );
-            setRequired( true );
-        }
-    };
 
-    Button removeButton = new Button( "Remove role", new Button.ClickListener()
-    {
-        @Override
-        public void buttonClick( final Button.ClickEvent event )
-        {
-            permissionFieldGroup.discard();
-            if ( callback != null )
-            {
-                callback.removeOperation( permissionFieldGroup.getItemDataSource(), newValue );
-            }
-        }
-    } );
+    private static final String REST_ENDPOINT_KEY = "restEndpoint";
+    private static final String COMMAND_PROP_KEY = "command";
 
-
-    private TwinColSelect restEndpointsSelector = new TwinColSelect( "Accessible rest endpoints" )
-    {
-        {
-            setItemCaptionMode( ItemCaptionMode.PROPERTY );
-            setItemCaptionPropertyId( "restEndpoint" );
-            setWidth( 600, Unit.PIXELS );
-            setImmediate( true );
-            setSpacing( true );
-            setRequired( true );
-            setNullSelectionAllowed( false );
-        }
-    };
-
-
-    private TwinColSelect permissionsSelector = new TwinColSelect( "System Permissions" )
-    {
-        {
-            setItemCaptionMode( ItemCaptionMode.PROPERTY );
-            setItemCaptionPropertyId( "name" );
-            setWidth( 400, Unit.PIXELS );
-            setImmediate( true );
-            setSpacing( true );
-            setRequired( true );
-            setVisible( false );
-            setNullSelectionAllowed( false );
-        }
-    };
-
-
-    private TwinColSelect modulesSelector = new TwinColSelect( "Accessible modules" )
-    {
-        {
-            setItemCaptionMode( ItemCaptionMode.PROPERTY );
-            setItemCaptionPropertyId( "moduleName" );
-            setWidth( 400, Unit.PIXELS );
-            setImmediate( true );
-            setSpacing( true );
-            setRequired( false );
-            setNullSelectionAllowed( true );
-        }
-    };
-
-
-    private TwinColSelect commandsSelector = new TwinColSelect( "Accessible cli commands" )
-    {
-        {
-            setItemCaptionMode( ItemCaptionMode.PROPERTY );
-            setItemCaptionPropertyId( "command" );
-            setWidth( 500, Unit.PIXELS );
-            setImmediate( true );
-            setSpacing( true );
-            setRequired( false );
-            setNullSelectionAllowed( true );
-        }
-    };
+    private TextField name;
+    private Button removeButton;
+    private TwinColSelect restEndpointsSelector;
+    private TwinColSelect permissionsSelector;
+    private TwinColSelect modulesSelector;
+    private TwinColSelect commandsSelector;
 
 
     public RoleForm( TabCallback<BeanItem<Role>> callback, Set<Permission> permissions,
@@ -140,16 +70,16 @@ public class RoleForm extends VerticalLayout
 
         BeanContainer<String, RestEndpointScope> restEndpointsContainer =
                 new BeanContainer<>( RestEndpointScope.class );
-        restEndpointsContainer.setBeanIdProperty( "restEndpoint" );
+        restEndpointsContainer.setBeanIdProperty( REST_ENDPOINT_KEY );
         restEndpointsContainer.addAll( allRestEndpoints );
         restEndpointsSelector.setContainerDataSource( restEndpointsContainer );
-        restEndpointsSelector.setItemCaptionPropertyId( "restEndpoint" );
+        restEndpointsSelector.setItemCaptionPropertyId( REST_ENDPOINT_KEY );
 
         BeanContainer<String, CliCommand> cliCommandBeanContainer = new BeanContainer<>( CliCommand.class );
-        cliCommandBeanContainer.setBeanIdProperty( "command" );
+        cliCommandBeanContainer.setBeanIdProperty( COMMAND_PROP_KEY );
         cliCommandBeanContainer.addAll( allCliCommands );
         commandsSelector.setContainerDataSource( cliCommandBeanContainer );
-        commandsSelector.setItemCaptionPropertyId( "command" );
+        commandsSelector.setItemCaptionPropertyId( COMMAND_PROP_KEY );
 
         this.callback = callback;
     }
@@ -157,6 +87,31 @@ public class RoleForm extends VerticalLayout
 
     private void init()
     {
+        initControls();
+        // When OK button is clicked, commit the form to the bean
+        Button.ClickListener saveListener = new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
+            {
+                saveRoleOperation();
+            }
+        };
+
+        Button.ClickListener cancelListener = new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
+            {
+                permissionFieldGroup.discard();
+                RoleForm.this.setVisible( false );
+                if ( callback != null )
+                {
+                    callback.cancelOperation();
+                }
+            }
+        };
+
         final Button saveButton = new Button( "Save role", saveListener );
         final Button cancelButton = new Button( "Cancel", cancelListener );
         saveButton.setStyleName( Reindeer.BUTTON_DEFAULT );
@@ -179,13 +134,87 @@ public class RoleForm extends VerticalLayout
     }
 
 
+    private void initControls()
+    {
+        name = new TextField();
+        name.setInputPrompt( "Role name" );
+        name.setEnabled( false );
+        name.setRequired( true );
+
+        removeButton = new Button( "Remove role", new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
+            {
+                permissionFieldGroup.discard();
+                if ( callback != null )
+                {
+                    callback.removeOperation( permissionFieldGroup.getItemDataSource(), newValue );
+                }
+            }
+        } );
+
+        restEndpointsSelector = new TwinColSelect( "Accessible rest endpoints" )
+        {
+            {
+                setSpacing( true );
+            }
+        };
+        restEndpointsSelector.setItemCaptionMode( AbstractSelect.ItemCaptionMode.PROPERTY );
+        restEndpointsSelector.setItemCaptionPropertyId( REST_ENDPOINT_KEY );
+        restEndpointsSelector.setWidth( 600, Unit.PIXELS );
+        restEndpointsSelector.setImmediate( true );
+        restEndpointsSelector.setRequired( true );
+        restEndpointsSelector.setNullSelectionAllowed( false );
+
+        permissionsSelector = new TwinColSelect( "System Permissions" )
+        {
+            {
+                setSpacing( true );
+            }
+        };
+        permissionsSelector.setItemCaptionMode( AbstractSelect.ItemCaptionMode.PROPERTY );
+        permissionsSelector.setItemCaptionPropertyId( "name" );
+        permissionsSelector.setWidth( 400, Unit.PIXELS );
+        permissionsSelector.setImmediate( true );
+        permissionsSelector.setRequired( true );
+        permissionsSelector.setVisible( false );
+        permissionsSelector.setNullSelectionAllowed( false );
+
+        modulesSelector = new TwinColSelect( "Accessible modules" )
+        {
+            {
+                setSpacing( true );
+            }
+        };
+        modulesSelector.setItemCaptionMode( AbstractSelect.ItemCaptionMode.PROPERTY );
+        modulesSelector.setItemCaptionPropertyId( "moduleName" );
+        modulesSelector.setWidth( 400, Unit.PIXELS );
+        modulesSelector.setImmediate( true );
+        modulesSelector.setRequired( false );
+        modulesSelector.setNullSelectionAllowed( true );
+
+        commandsSelector = new TwinColSelect( "Accessible cli commands" )
+        {
+            {
+                setSpacing( true );
+            }
+        };
+        commandsSelector.setItemCaptionMode( AbstractSelect.ItemCaptionMode.PROPERTY );
+        commandsSelector.setItemCaptionPropertyId( COMMAND_PROP_KEY );
+        commandsSelector.setWidth( 500, Unit.PIXELS );
+        commandsSelector.setImmediate( true );
+        commandsSelector.setRequired( false );
+        commandsSelector.setNullSelectionAllowed( true );
+    }
+
+
     public void setRole( final BeanItem<Role> role, boolean newValue )
     {
         this.newValue = newValue;
         if ( role != null )
         {
             permissionFieldGroup.setItemDataSource( role );
-
             permissionFieldGroup.bind( name, "name" );
 
             // Pre-select role permissions
@@ -234,77 +263,58 @@ public class RoleForm extends VerticalLayout
     }
 
 
-    // When OK button is clicked, commit the form to the bean
-    private Button.ClickListener saveListener = new Button.ClickListener()
+    private void saveRoleOperation()
     {
-        @Override
-        public void buttonClick( final Button.ClickEvent event )
+        // New items have to be added to the container
+        // Commit the addition
+        try
         {
-            // New items have to be added to the container
-            // Commit the addition
-            try
-            {
-                permissionFieldGroup.commit();
-                if ( callback != null )
-                {
-                    // Set selected permissions for role
-                    Collection<String> selectedPermissions = ( Collection<String> ) permissionsSelector.getValue();
-                    Role role = permissionFieldGroup.getItemDataSource().getBean();
-                    for ( final String permissionId : selectedPermissions )
-                    {
-                        BeanItem beanItem = ( BeanItem ) permissionsSelector.getItem( permissionId );
-                        role.addPermission( ( Permission ) beanItem.getBean() );
-                    }
-
-                    role.clearPortalModules();
-                    Collection<String> selectedModuleNames = ( Collection<String> ) modulesSelector.getValue();
-                    for ( final String moduleName : selectedModuleNames )
-                    {
-                        BeanItem beanItem = ( BeanItem ) modulesSelector.getItem( moduleName );
-                        role.addPortalModule( ( PortalModuleScope ) beanItem.getBean() );
-                    }
-
-
-                    role.clearRestEndpointScopes();
-                    Collection<String> selectedRestEndpoints = ( Collection<String> ) restEndpointsSelector.getValue();
-                    for ( final String moduleName : selectedRestEndpoints )
-                    {
-                        BeanItem beanItem = ( BeanItem ) restEndpointsSelector.getItem( moduleName );
-                        role.addRestEndpointScope( ( RestEndpointScope ) beanItem.getBean() );
-                    }
-
-                    role.setCliCommands( Collections.<CliCommand>emptyList() );
-                    Collection<String> selectedCommands = ( Collection<String> ) commandsSelector.getValue();
-                    for ( final String command : selectedCommands )
-                    {
-                        BeanItem beanItem = ( BeanItem ) commandsSelector.getItem( command );
-                        role.addCliCommand( ( CliCommand ) beanItem.getBean() );
-                    }
-
-                    callback.saveOperation( permissionFieldGroup.getItemDataSource(), newValue );
-                    Notification.show( "Successfully saved." );
-                }
-            }
-            catch ( FieldGroup.CommitException e )
-            {
-                LOGGER.error( "Error commit role fieldGroup changes", e );
-                Notification.show( "Verify for fields correctness", Notification.Type.WARNING_MESSAGE );
-            }
-        }
-    };
-
-
-    private Button.ClickListener cancelListener = new Button.ClickListener()
-    {
-        @Override
-        public void buttonClick( final Button.ClickEvent event )
-        {
-            permissionFieldGroup.discard();
-            RoleForm.this.setVisible( false );
+            permissionFieldGroup.commit();
             if ( callback != null )
             {
-                callback.cancelOperation();
+                // Set selected permissions for role
+                Collection<String> selectedPermissions = ( Collection<String> ) permissionsSelector.getValue();
+                Role role = permissionFieldGroup.getItemDataSource().getBean();
+                for ( final String permissionId : selectedPermissions )
+                {
+                    BeanItem beanItem = ( BeanItem ) permissionsSelector.getItem( permissionId );
+                    role.addPermission( ( Permission ) beanItem.getBean() );
+                }
+
+                role.clearPortalModules();
+                Collection<String> selectedModuleNames = ( Collection<String> ) modulesSelector.getValue();
+                for ( final String moduleName : selectedModuleNames )
+                {
+                    BeanItem beanItem = ( BeanItem ) modulesSelector.getItem( moduleName );
+                    role.addPortalModule( ( PortalModuleScope ) beanItem.getBean() );
+                }
+
+
+                role.clearRestEndpointScopes();
+                Collection<String> selectedRestEndpoints = ( Collection<String> ) restEndpointsSelector.getValue();
+                for ( final String moduleName : selectedRestEndpoints )
+                {
+                    BeanItem beanItem = ( BeanItem ) restEndpointsSelector.getItem( moduleName );
+                    role.addRestEndpointScope( ( RestEndpointScope ) beanItem.getBean() );
+                }
+
+                role.setCliCommands( Collections.<CliCommand>emptyList() );
+                Collection<String> selectedCommands = ( Collection<String> ) commandsSelector.getValue();
+                for ( final String command : selectedCommands )
+                {
+                    BeanItem beanItem = ( BeanItem ) commandsSelector.getItem( command );
+                    role.addCliCommand( ( CliCommand ) beanItem.getBean() );
+                }
+
+                callback.saveOperation( permissionFieldGroup.getItemDataSource(), newValue );
+                Notification.show( "Successfully saved." );
             }
         }
-    };
+        catch ( FieldGroup.CommitException e )
+        {
+            LOGGER.error( "Error commit role fieldGroup changes", e );
+            Notification.show( "Verify for fields correctness", Notification.Type.WARNING_MESSAGE );
+        }
+    }
+
 }
