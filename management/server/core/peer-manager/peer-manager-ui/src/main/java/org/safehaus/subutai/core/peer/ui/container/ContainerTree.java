@@ -51,6 +51,12 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
         setMargin( true );
 
         tree = new Tree( "List of nodes" );
+        initView( hostRegistry );
+    }
+
+
+    private void initView( final HostRegistry hostRegistry )
+    {
         container = new HierarchicalContainer();
         container.addContainerProperty( "value", Host.class, null );
         container.addContainerProperty( "icon", Resource.class, new ThemeResource( "img/lxc/physical.png" ) );
@@ -64,7 +70,6 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
             public String generateDescription( Component source, Object itemId, Object propertyId )
             {
                 String description = "";
-
                 Item item = tree.getItem( itemId );
                 if ( item != null )
                 {
@@ -95,9 +100,7 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                 if ( event.getProperty().getValue() instanceof Set )
                 {
                     Tree t = ( Tree ) event.getProperty();
-
                     Set<Host> selectedList = new HashSet<>();
-
                     for ( Object o : ( Iterable<?> ) t.getValue() )
                     {
                         if ( tree.getItem( o ).getItemProperty( "value" ).getValue() != null )
@@ -106,32 +109,29 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                             selectedList.add( host );
                         }
                     }
-
                     selectedHosts = selectedList;
                 }
             }
         } );
         addComponent( tree );
 
-        final ContainerTree THIS = this;
+        final ContainerTree currentTree = this;
         addAttachListener( new AttachListener()
         {
             @Override
             public void attach( final AttachEvent event )
             {
-                hostRegistry.addHostListener( THIS );
+                hostRegistry.addHostListener( currentTree );
             }
         } );
-
         addDetachListener( new DetachListener()
         {
             @Override
             public void detach( final DetachEvent event )
             {
-                hostRegistry.removeHostListener( THIS );
+                hostRegistry.removeHostListener( currentTree );
             }
         } );
-
         try
         {
             if ( localPeer.getManagementHost() != null )
@@ -141,14 +141,13 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
         }
         catch ( PeerException ignore )
         {
-
+            LOG.warn( "Error accessing management host" );
         }
     }
 
 
     public HierarchicalContainer getNodeContainer()
     {
-
         try
         {
             ManagementHost managementHost = localPeer.getManagementHost();
@@ -164,64 +163,10 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                             String.format( localPeer.getPeerInfo().getName(), localPeer.getPeerInfo().getId() ) );
                 }
             }
-
             for ( ResourceHost rh : localPeer.getResourceHosts() )
             {
-                Item resourceHostItem = container.getItem( rh.getId() );
-
-                if ( resourceHostItem == null )
-                {
-                    resourceHostItem = container.addItem( rh.getId() );
-                }
-
-                tree.setItemCaption( rh.getId(), rh.getHostname() );
-                resourceHostItem.getItemProperty( "value" ).setValue( rh );
-                if ( managementHostItem != null )
-                {
-                    container.setParent( rh.getId(), managementHost.getId() );
-                }
-
-                if ( rh.getContainerHosts().size() > 0 )
-                {
-                    container.setChildrenAllowed( rh.getId(), true );
-
-                    for ( ContainerHost ch : rh.getContainerHosts() )
-                    {
-
-                        Item containerHostItem = container.getItem( ch.getId() );
-                        if ( containerHostItem == null )
-                        {
-                            containerHostItem = container.addItem( ch.getId() );
-                            container.setChildrenAllowed( ch.getId(), false );
-                        }
-
-                        tree.setItemCaption( ch.getId(), ch.getHostname() );
-                        containerHostItem.getItemProperty( "value" ).setValue( ch );
-                        container.setParent( ch.getId(), rh.getId() );
-                    }
-                }
-                else
-                {
-                    container.setChildrenAllowed( rh.getId(), false );
-                }
-
-                // removing destroyed containers
-
-                Collection children = container.getChildren( rh.getId() );
-                if ( children != null )
-                {
-                    Set<Object> ids = Sets.newConcurrentHashSet( children );
-                    for ( final Object id : ids )
-                    {
-                        Item item = container.getItem( id );
-                        ContainerHost containerHost = ( ContainerHost ) item.getItemProperty( "value" ).getValue();
-                        if ( !rh.getContainerHosts().contains( containerHost ) )
-                        {
-                            container.removeItem( item );
-                            tree.removeItem( id );
-                        }
-                    }
-                }
+                fillTreeWithItems( rh, managementHost );
+                removeDestroyedItemsFromTree( rh );
             }
 
             for ( Object itemObj : container.getItemIds() )
@@ -248,6 +193,64 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
 
 
         return container;
+    }
+
+
+    private void fillTreeWithItems( final ResourceHost rh, final ManagementHost managementHost )
+    {
+        Item resourceHostItem = container.getItem( rh.getId() );
+
+        if ( resourceHostItem == null )
+        {
+            resourceHostItem = container.addItem( rh.getId() );
+        }
+        tree.setItemCaption( rh.getId(), rh.getHostname() );
+        resourceHostItem.getItemProperty( "value" ).setValue( rh );
+        if ( managementHostItem != null )
+        {
+            container.setParent( rh.getId(), managementHost.getId() );
+        }
+        if ( rh.getContainerHosts().size() > 0 )
+        {
+            container.setChildrenAllowed( rh.getId(), true );
+            for ( ContainerHost ch : rh.getContainerHosts() )
+            {
+                Item containerHostItem = container.getItem( ch.getId() );
+                if ( containerHostItem == null )
+                {
+                    containerHostItem = container.addItem( ch.getId() );
+                    container.setChildrenAllowed( ch.getId(), false );
+                }
+                tree.setItemCaption( ch.getId(), ch.getHostname() );
+                containerHostItem.getItemProperty( "value" ).setValue( ch );
+                container.setParent( ch.getId(), rh.getId() );
+            }
+        }
+        else
+        {
+            container.setChildrenAllowed( rh.getId(), false );
+        }
+    }
+
+
+    private void removeDestroyedItemsFromTree( final ResourceHost rh )
+    {
+        // removing destroyed containers
+        Collection children = container.getChildren( rh.getId() );
+        if ( children != null )
+        {
+            Set<Object> ids = Sets.newConcurrentHashSet( children );
+            for ( final Object id : ids )
+            {
+                Item item = container.getItem( id );
+                ContainerHost containerHost = ( ContainerHost ) item.getItemProperty( "value" ).getValue();
+                if ( !rh.getContainerHosts().contains( containerHost ) )
+                {
+                    container.removeItem( item );
+                    tree.removeItem( id );
+                }
+            }
+        }
     }
 
 
