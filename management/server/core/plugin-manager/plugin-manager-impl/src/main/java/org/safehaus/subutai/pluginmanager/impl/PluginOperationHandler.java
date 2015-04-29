@@ -7,17 +7,20 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.pluginmanager.api.OperationType;
 import org.safehaus.subutai.pluginmanager.api.PluginManagerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class PluginOperationHandler implements Runnable
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger( PluginOperationHandler.class );
     private PluginManagerImpl manager;
     private ManagerHelper managerHelper;
     private String pluginName;
     private OperationType operationType;
     private TrackerOperation trackerOperation;
-    public static boolean isInstallSuccessful = false;
-    public static boolean isRemoveSuccessful = false;
+    private static boolean isInstallSuccessful = false;
+    private static boolean isRemoveSuccessful = false;
 
 
     public PluginOperationHandler( PluginManagerImpl manager, ManagerHelper managerHelper, String pluginName,
@@ -52,6 +55,8 @@ public class PluginOperationHandler implements Runnable
             case UPGRADE:
                 upgradePlugin();
                 break;
+            default:
+                break;
         }
     }
 
@@ -70,6 +75,7 @@ public class PluginOperationHandler implements Runnable
         }
         catch ( PluginManagerException e )
         {
+            LOGGER.warn( "Warning remove operation failed", e );
             setIsRemoveSuccessful( false );
             trackerOperation.addLogFailed( String.format( "%s, Removing operation is failed...", e.getMessage() ) );
             return;
@@ -98,6 +104,7 @@ public class PluginOperationHandler implements Runnable
         }
         catch ( PluginManagerException e )
         {
+            LOGGER.warn( "Warning failed in install operation", e );
             setIsInstallSuccessful( false );
             trackerOperation.addLogFailed( String.format( "%s, Installing operation is failed...", e.getMessage() ) );
             return;
@@ -110,12 +117,13 @@ public class PluginOperationHandler implements Runnable
 
     private void upgradePlugin()
     {
-        String result = null;
+        //        String result = null;
         trackerOperation.addLog( "Upgrading plugin.." );
         RequestBuilder command = manager.getCommands().makeUpgradeCommand( pluginName );
         try
         {
-            result = managerHelper.execute( command );
+            managerHelper.execute( command );
+            //result = managerHelper.execute( command );
             /*if( result.equals( "fail" ))
             {
                 throw new PluginManagerException( "Operation is failed" );
@@ -123,20 +131,33 @@ public class PluginOperationHandler implements Runnable
         }
         catch ( PluginManagerException e )
         {
+            LOGGER.warn( "Warning upgrade operation failed", e );
             trackerOperation.addLogFailed( String.format( "%s, Upgrade operation is failed...", e.getMessage() ) );
         }
         trackerOperation.addLogDone( "Plugin is upgraded successfully." );
     }
 
 
-    private synchronized static void setIsInstallSuccessful( final boolean state )
+    private static synchronized void setIsInstallSuccessful( final boolean state )
     {
         isInstallSuccessful = state;
     }
 
 
-    private synchronized static void setIsRemoveSuccessful( final boolean state )
+    private static synchronized void setIsRemoveSuccessful( final boolean state )
     {
         isRemoveSuccessful = state;
+    }
+
+
+    public static boolean isRemoveSuccessful()
+    {
+        return isRemoveSuccessful;
+    }
+
+
+    public static boolean isInstallSuccessful()
+    {
+        return isInstallSuccessful;
     }
 }
