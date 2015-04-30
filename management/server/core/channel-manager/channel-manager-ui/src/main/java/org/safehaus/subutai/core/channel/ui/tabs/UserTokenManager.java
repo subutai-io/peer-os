@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 import com.vaadin.server.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
@@ -25,7 +26,6 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import com.vaadin.data.Property;
 
 public class UserTokenManager extends Panel
 {
@@ -42,7 +42,6 @@ public class UserTokenManager extends Panel
 
     private GridLayout installationControls;
     private HorizontalLayout rangeButtons;
-    private HorizontalLayout editButtons;
     private TextField ipRangeStartTxtFld;
     private TextField ipRangeEndTxtFld;
     private TextField validityPeriodTxtFld;
@@ -94,13 +93,13 @@ public class UserTokenManager extends Panel
 
         tokenNameTxtFld = new TextField( "Enter token name" );
         tokenNameTxtFld.setId( "Token" );
-        tokenNameTxtFld.setInputPrompt( "Token name" );
+        tokenNameTxtFld.setInputPrompt( TOKEN_NAME );
         tokenNameTxtFld.setRequired( true );
         tokenNameTxtFld.setReadOnly( false );
         tokenNameTxtFld.setWidth( 280, Unit.PIXELS );
 
-        statusTxtFld = new TextField( "Status" );
-        statusTxtFld.setId( "Status" );
+        statusTxtFld = new TextField( STATUS );
+        statusTxtFld.setId( STATUS );
         statusTxtFld.setReadOnly( false );
         statusTxtFld.setRequired( false );
 
@@ -143,9 +142,9 @@ public class UserTokenManager extends Panel
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-                User user = ( User ) event.getProperty().getValue();
-                userName = user.getUsername();
-                userId = user.getId();
+                User selectedUser = ( User ) event.getProperty().getValue();
+                userName = selectedUser.getUsername();
+                userId = selectedUser.getId();
             }
         } );
         //----------------------------------------------------------------------------------------------
@@ -188,7 +187,7 @@ public class UserTokenManager extends Panel
 
         editTokenTxtFld = new TextField( "Enter token name" );
         editTokenTxtFld.setId( "EditToken" );
-        editTokenTxtFld.setInputPrompt( "Token name" );
+        editTokenTxtFld.setInputPrompt( TOKEN_NAME );
         editTokenTxtFld.setRequired( true );
         editTokenTxtFld.setReadOnly( false );
         editTokenTxtFld.setWidth( 280, Unit.PIXELS );
@@ -204,10 +203,10 @@ public class UserTokenManager extends Panel
         // Define two columns for the built-in container
         tokenTable.addContainerProperty( "User Name", String.class, null );
         tokenTable.addContainerProperty( "Token Name", String.class, null );
-        tokenTable.addContainerProperty( "Ip range", String.class, null );
+        tokenTable.addContainerProperty( IP_RANGE, String.class, null );
         tokenTable.addContainerProperty( "TTL", String.class, null );
-        tokenTable.addContainerProperty( "Create date", String.class, null );
-        tokenTable.addContainerProperty( "Status", String.class, null );
+        tokenTable.addContainerProperty( CREATE_DATE, String.class, null );
+        tokenTable.addContainerProperty( STATUS, String.class, null );
         tokenTable.addContainerProperty( "Token", String.class, null );
         tokenTable.addContainerProperty( "Edit", Button.class, null );
         tokenTable.addContainerProperty( "Delete", Button.class, null );
@@ -222,18 +221,10 @@ public class UserTokenManager extends Panel
 
         //--------------------------------------------------------------------------------
 
-
-        // Add a few other rows using shorthand addItem()
-        //tokenTable.addItem( new Object[] { "testUser", "asd", "asd", "asd", "asd", "asd", editBtn, removeBtn }, 1 );
-
-
         // Show exactly the currently contained rows (items)
         tokenTable.setPageLength( tokenTable.size() );
 
-
         // listener for edit button
-
-
         init();
     }
 
@@ -263,14 +254,13 @@ public class UserTokenManager extends Panel
         installationControls.addComponent( rangeButtons );
         installationControls.addComponent( generateTokenBtn );
         installationControls.addComponent( tokenTable );
-        //        installationControls.addComponent( userCombo );
         setContent( installationControls );
     }
 
 
     private void setValues( IUserChannelToken userChannelToken )
     {
-
+        //ignore
     }
 
 
@@ -315,9 +305,9 @@ public class UserTokenManager extends Panel
 
                 Item rowItem = tokenTable.getItem( userChannelToken );
                 Property property1 = rowItem.getItemProperty( "Token Name" );
-                Property property2 = rowItem.getItemProperty("Ip range");
+                Property property2 = rowItem.getItemProperty( IP_RANGE );
                 Property property3 = rowItem.getItemProperty("TTL");
-                Property property4 = rowItem.getItemProperty("Create date");
+                Property property4 = rowItem.getItemProperty( CREATE_DATE );
 
                 property1.setValue(userChannelToken.getTokenName());
                 property2.setValue(userChannelToken.getIpRangeStart()+"-"+userChannelToken.getIpRangeEnd());
@@ -328,8 +318,6 @@ public class UserTokenManager extends Panel
             }
         } );
 
-        //                subWindow.setHeight("500px");
-        //                subWindow.setWidth( "800px" );
         subWindow.center();
         subWindow.setModal( true );
         subWindow.setImmediate( true );

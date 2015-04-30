@@ -87,15 +87,15 @@ public class PeerManagerImpl implements PeerManager
     private SubutaiSslContextFactory sslContextFactory;
 
 
-    public void setSslContextFactory( final SubutaiSslContextFactory sslContextFactory )
-    {
-        this.sslContextFactory = sslContextFactory;
-    }
-
-
     public PeerManagerImpl( final Messenger messenger )
     {
         this.messenger = messenger;
+    }
+
+
+    public void setSslContextFactory( final SubutaiSslContextFactory sslContextFactory )
+    {
+        this.sslContextFactory = sslContextFactory;
     }
 
 
@@ -146,67 +146,10 @@ public class PeerManagerImpl implements PeerManager
         {
             LOG.error( e.getMessage(), e );
         }
-
         List<PeerInfo> result = peerDAO.getInfo( SOURCE_LOCAL_PEER, PeerInfo.class );
         if ( result.isEmpty() )
         {
-
-            //obtain id from fs
-            File scriptsDirectory = new File( PEER_ID_PATH );
-            scriptsDirectory.mkdirs();
-
-            Path peerIdFilePath = Paths.get( PEER_ID_PATH, PEER_ID_FILE );
-
-            File peerIdFile = peerIdFilePath.toFile();
-
-            UUID peerId;
-
-            try
-            {
-                if ( !peerIdFile.exists() )
-                {
-                    //generate new id and save to fs
-                    peerId = UUID.randomUUID();
-                    FileUtils.writeStringToFile( peerIdFile, peerId.toString() );
-                }
-                else
-                {
-                    //read id from file
-                    peerId = UUID.fromString( FileUtils.readFileToString( peerIdFile ) );
-                }
-            }
-            catch ( Exception e )
-            {
-                throw new PeerInitializationError( "Failed to obtain peer id file", e );
-            }
-
-
-            peerInfo = new PeerInfo();
-            peerInfo.setId( peerId );
-            peerInfo.setName( "Local Subutai server" );
-            //TODO get ownerId from persistent storage
-            peerInfo.setOwnerId( UUID.randomUUID() );
-
-            try
-            {
-                Enumeration<InetAddress> addressEnumeration =
-                        NetworkInterface.getByName( Common.MANAGEMENT_HOST_EXTERNAL_IP_INTERFACE ).getInetAddresses();
-                while ( addressEnumeration.hasMoreElements() )
-                {
-                    InetAddress address = addressEnumeration.nextElement();
-                    if ( ( address instanceof Inet4Address ) )
-                    {
-                        peerInfo.setIp( address.getHostAddress() );
-                    }
-                }
-            }
-            catch ( SocketException e )
-            {
-                LOG.error( "Error getting network interfaces", e );
-            }
-            peerInfo.setName( String.format( "Peer on %s", peerInfo.getIp() ) );
-
-            peerDAO.saveInfo( SOURCE_LOCAL_PEER, peerInfo.getId().toString(), peerInfo );
+            initPeerInfo();
         }
         else
         {
@@ -234,6 +177,73 @@ public class PeerManagerImpl implements PeerManager
         addRequestListener( new DestroyEnvironmentContainersRequestListener( localPeer ) );
         //add echo listener
         addRequestListener( new EchoRequestListener() );
+    }
+
+
+    private void initPeerInfo()
+    {
+        //obtain id from fs
+        File scriptsDirectory = new File( PEER_ID_PATH );
+        if ( !scriptsDirectory.exists() )
+        {
+            boolean created = scriptsDirectory.mkdirs();
+            if ( created )
+            {
+                LOG.info( "Peer id directory created" );
+            }
+        }
+        Path peerIdFilePath = Paths.get( PEER_ID_PATH, PEER_ID_FILE );
+        File peerIdFile = peerIdFilePath.toFile();
+        UUID peerId;
+        try
+        {
+            if ( !peerIdFile.exists() )
+            {
+                //generate new id and save to fs
+                peerId = UUID.randomUUID();
+                FileUtils.writeStringToFile( peerIdFile, peerId.toString() );
+            }
+            else
+            {
+                //read id from file
+                peerId = UUID.fromString( FileUtils.readFileToString( peerIdFile ) );
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new PeerInitializationError( "Failed to obtain peer id file", e );
+        }
+        peerInfo = new PeerInfo();
+        peerInfo.setId( peerId );
+        peerInfo.setName( "Local Subutai server" );
+        //TODO get ownerId from persistent storage
+        peerInfo.setOwnerId( UUID.randomUUID() );
+        setPeerIp();
+        peerInfo.setName( String.format( "Peer on %s", peerInfo.getIp() ) );
+
+        peerDAO.saveInfo( SOURCE_LOCAL_PEER, peerInfo.getId().toString(), peerInfo );
+    }
+
+
+    private void setPeerIp()
+    {
+        try
+        {
+            Enumeration<InetAddress> addressEnumeration =
+                    NetworkInterface.getByName( Common.MANAGEMENT_HOST_EXTERNAL_IP_INTERFACE ).getInetAddresses();
+            while ( addressEnumeration.hasMoreElements() )
+            {
+                InetAddress address = addressEnumeration.nextElement();
+                if ( address instanceof Inet4Address )
+                {
+                    peerInfo.setIp( address.getHostAddress() );
+                }
+            }
+        }
+        catch ( SocketException e )
+        {
+            LOG.error( "Error getting network interfaces", e );
+        }
     }
 
 
@@ -277,14 +287,14 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public boolean trustRequest( final UUID peerId, final String root_server_px1 ) throws PeerException
+    public boolean trustRequest( final UUID peerId, final String rootCertPx1 ) throws PeerException
     {
         return false;
     }
 
 
     @Override
-    public boolean trustResponse( final UUID peerId, final String root_server_px1, final short status )
+    public boolean trustResponse( final UUID peerId, final String rootCertPx1, final short status )
             throws PeerException
     {
         return false;

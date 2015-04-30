@@ -15,6 +15,7 @@ import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
@@ -87,82 +88,7 @@ public class TopologyWindow extends Window
             @Override
             public void buttonClick( final Button.ClickEvent event )
             {
-                Map<Peer, Set<NodeGroup>> placements = getPlacements();
-
-                if ( placements == null )
-                {
-                    Notification.show( "Failed to obtain topology", Notification.Type.ERROR_MESSAGE );
-                }
-                else if ( grow && envCombo.getValue() == null )
-                {
-                    Notification.show( "Please, select environment to grow" );
-                }
-                else if ( !grow && Strings.isNullOrEmpty( subnetTxt.getValue() ) )
-                {
-                    Notification.show( "Please, enter subnet CIDR" );
-                }
-                else
-                {
-
-                    Topology topology = new Topology();
-
-                    for ( Map.Entry<Peer, Set<NodeGroup>> placement : placements.entrySet() )
-                    {
-                        for ( NodeGroup nodeGroup : placement.getValue() )
-                        {
-                            topology.addNodeGroupPlacement( placement.getKey(), nodeGroup );
-                        }
-                    }
-
-                    try
-                    {
-                        if ( grow )
-                        {
-                            Environment environment = ( Environment ) envCombo.getValue();
-                            environmentManager.growEnvironment( environment.getId(), topology, true );
-                            Notification.show( "Environment growth started" );
-                        }
-                        else
-                        {
-                            //check availability of subnet
-                            Map<Peer, Set<Gateway>> usedGateways =
-                                    getUsedGateways( topology.getNodeGroupPlacement().keySet() );
-
-                            SubnetUtils subnetUtils = new SubnetUtils( subnetTxt.getValue() );
-                            String environmentGatewayIp = subnetUtils.getInfo().getLowAddress();
-
-                            for ( Map.Entry<Peer, Set<Gateway>> peerGateways : usedGateways.entrySet() )
-                            {
-                                Peer peer = peerGateways.getKey();
-                                Set<Gateway> gateways = peerGateways.getValue();
-                                for ( Gateway gateway : gateways )
-                                {
-                                    if ( gateway.getIp().equals( environmentGatewayIp ) )
-                                    {
-                                        throw new EnvironmentManagerException(
-                                                String.format( "Subnet %s is already used on peer %s",
-                                                        environmentGatewayIp, peer.getName() ), null );
-                                    }
-                                }
-                            }
-
-                            environmentManager.createEnvironment(
-                                    String.format( "%s-%s", blueprint.getName(), UUID.randomUUID() ), topology,
-                                    subnetTxt.getValue(), null, true );
-                            Notification.show( "Environment creation started" );
-                        }
-
-                        close();
-                    }
-                    catch ( Exception e )
-                    {
-                        Notification.show( String.format( "Failed to %s environment: %s", grow ? "grow" : "create",
-                                        ExceptionUtils.getRootCauseMessage( e ) ), Notification.Type.ERROR_MESSAGE );
-                    }
-
-
-
-                }
+                buildProcessTrigger( environmentManager, grow );
             }
         } );
 
@@ -193,6 +119,94 @@ public class TopologyWindow extends Window
         content.setComponentAlignment( buildBtn, Alignment.TOP_RIGHT );
 
         setContent( content );
+    }
+
+
+    private void buildProcessTrigger( final EnvironmentManager environmentManager, final boolean grow )
+    {
+        Map<Peer, Set<NodeGroup>> placements = getPlacements();
+
+        if ( placements == null )
+        {
+            Notification.show( "Failed to obtain topology", Notification.Type.ERROR_MESSAGE );
+        }
+        else if ( grow && envCombo.getValue() == null )
+        {
+            Notification.show( "Please, select environment to grow" );
+        }
+        else if ( !grow && Strings.isNullOrEmpty( subnetTxt.getValue() ) )
+        {
+            Notification.show( "Please, enter subnet CIDR" );
+        }
+        else
+        {
+            Topology topology = new Topology();
+            constructTopology( topology, placements );
+
+            try
+            {
+                if ( grow )
+                {
+                    Environment environment = ( Environment ) envCombo.getValue();
+                    environmentManager.growEnvironment( environment.getId(), topology, true );
+                    Notification.show( "Environment growth started" );
+                }
+                else
+                {
+                    checkPickedSubnetValidity( topology, environmentManager );
+                }
+
+                close();
+            }
+            catch ( Exception e )
+            {
+                Notification.show( String.format( "Failed to %s environment: %s", grow ? "grow" : "create",
+                        ExceptionUtils.getRootCauseMessage( e ) ), Notification.Type.ERROR_MESSAGE );
+            }
+        }
+    }
+
+
+    private void constructTopology( final Topology topology, final Map<Peer, Set<NodeGroup>> placements )
+    {
+        for ( Map.Entry<Peer, Set<NodeGroup>> placement : placements.entrySet() )
+        {
+            for ( NodeGroup nodeGroup : placement.getValue() )
+            {
+                topology.addNodeGroupPlacement( placement.getKey(), nodeGroup );
+            }
+        }
+    }
+
+
+    private void checkPickedSubnetValidity( final Topology topology, final EnvironmentManager environmentManager )
+            throws EnvironmentManagerException, PeerException, EnvironmentCreationException
+    {
+        //check availability of subnet
+        Map<Peer, Set<Gateway>> usedGateways = getUsedGateways( topology.getNodeGroupPlacement().keySet() );
+
+        SubnetUtils subnetUtils = new SubnetUtils( subnetTxt.getValue() );
+        String environmentGatewayIp = subnetUtils.getInfo().getLowAddress();
+
+        for ( Map.Entry<Peer, Set<Gateway>> peerGateways : usedGateways.entrySet() )
+        {
+            Peer peer = peerGateways.getKey();
+            Set<Gateway> gateways = peerGateways.getValue();
+            for ( Gateway gateway : gateways )
+            {
+                if ( gateway.getIp().equals( environmentGatewayIp ) )
+                {
+                    throw new EnvironmentManagerException(
+                            String.format( "Subnet %s is already used on peer %s", environmentGatewayIp,
+                                    peer.getName() ), null );
+                }
+            }
+        }
+
+        environmentManager
+                .createEnvironment( String.format( "%s-%s", blueprint.getName(), UUID.randomUUID() ), topology,
+                        subnetTxt.getValue(), null, true );
+        Notification.show( "Environment creation started" );
     }
 
 

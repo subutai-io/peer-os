@@ -116,7 +116,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 {
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
-    private static final long HOST_INACTIVE_TIME = 5 * 1000 * 60; // 5 min
+    // 5 min
+    private static final long HOST_INACTIVE_TIME = 5 * 1000 * 60;
+
     private static final int WAIT_CONTAINER_CONNECTION_SEC = 300;
     private PeerManager peerManager;
     private TemplateRegistry templateRegistry;
@@ -266,9 +268,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public ContainerHost createContainer( final ResourceHost resourceHost, final Template template,
                                           final String containerName ) throws PeerException
     {
-        Preconditions.checkNotNull( resourceHost, "Invalid resource host" );
-        Preconditions.checkNotNull( template, "Invalid template" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerName ), "Invalid container name" );
+        Preconditions.checkNotNull( resourceHost, "Resource host is null value" );
+        Preconditions.checkNotNull( template, "Pass valid template object" );
+        Preconditions
+                .checkArgument( !Strings.isNullOrEmpty( containerName ), "Cannot create container with null name" );
 
         getResourceHostByName( resourceHost.getHostname() );
 
@@ -294,7 +297,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public Set<HostInfoModel> createContainerGroup( final CreateContainerGroupRequest request ) throws PeerException
     {
 
-        Preconditions.checkNotNull( request, "Invalid request" );
+        Preconditions.checkNotNull( request, "Container create request shouldn't be null" );
 
         //check if strategy exists
         try
@@ -512,7 +515,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public ContainerGroup findContainerGroupByContainerId( final UUID containerId )
             throws ContainerGroupNotFoundException
     {
-        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkNotNull( containerId, "Container is always null with null container id" );
 
         List<ContainerGroupEntity> containerGroups = ( List<ContainerGroupEntity> ) containerGroupDataService.getAll();
 
@@ -535,7 +538,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public ContainerGroup findContainerGroupByEnvironmentId( final UUID environmentId )
             throws ContainerGroupNotFoundException
     {
-        Preconditions.checkNotNull( environmentId, "Invalid container id" );
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         List<ContainerGroupEntity> containerGroups = ( List<ContainerGroupEntity> ) containerGroupDataService.getAll();
 
@@ -554,7 +557,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public Set<ContainerGroup> findContainerGroupsByOwnerId( final UUID ownerId )
     {
-        Preconditions.checkNotNull( ownerId, "Invalid owner id" );
+        Preconditions.checkNotNull( ownerId, "Specify valid owner" );
 
         Set<ContainerGroup> result = Sets.newHashSet();
 
@@ -586,7 +589,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public ContainerHost getContainerHostByName( String hostname ) throws HostNotFoundException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid container hostname" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Container hostname shouldn't be null" );
 
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
@@ -607,7 +610,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public ContainerHost getContainerHostById( final UUID hostId ) throws HostNotFoundException
     {
-        Preconditions.checkNotNull( hostId, "Invalid container id" );
+        Preconditions.checkNotNull( hostId, "Invalid container host id" );
 
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
@@ -654,7 +657,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public ResourceHost getResourceHostById( final UUID hostId ) throws HostNotFoundException
     {
-        Preconditions.checkNotNull( hostId, "Invalid resource host id" );
+        Preconditions.checkNotNull( hostId, "Resource host id is null" );
 
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
@@ -681,7 +684,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public ResourceHost getResourceHostByContainerId( final UUID hostId ) throws HostNotFoundException
     {
-        Preconditions.checkNotNull( hostId, "Invalid container id" );
+        Preconditions.checkNotNull( hostId, "Container host id is invalid" );
 
         ContainerHost c = getContainerHostById( hostId );
         ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) c;
@@ -692,7 +695,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public Host bindHost( String id ) throws HostNotFoundException
     {
-        Preconditions.checkArgument( UUIDUtil.isStringAUuid( id ), "Invalid host id" );
+        Preconditions.checkArgument( UUIDUtil.isStringAUuid( id ), "Does container host id be null?" );
 
         UUID hostId = UUID.fromString( id );
 
@@ -727,7 +730,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public Host bindHost( UUID id ) throws HostNotFoundException
     {
-        Preconditions.checkNotNull( id, "Invalid host id" );
+        Preconditions.checkNotNull( id, "Host id is null" );
 
         return bindHost( id.toString() );
     }
@@ -736,7 +739,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public void startContainer( final ContainerHost host ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Container host is null" );
+        Preconditions.checkNotNull( host, "Check container host object" );
 
         ContainerHostEntity containerHost = ( ContainerHostEntity ) bindHost( host.getId() );
         ResourceHost resourceHost = containerHost.getParent();
@@ -758,7 +761,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public void stopContainer( final ContainerHost host ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Container host is null" );
+        Preconditions.checkNotNull( host, "Cannot operate on null container host" );
 
         ContainerHostEntity containerHost = ( ContainerHostEntity ) bindHost( host.getHostId() );
         ResourceHost resourceHost = containerHost.getParent();
@@ -776,7 +779,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public void destroyContainer( final ContainerHost host ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Container host is null" );
+        Preconditions.checkNotNull( host, "Container host is already null" );
 
         try
         {
@@ -856,7 +859,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public boolean isConnected( final Host host )
     {
-        Preconditions.checkNotNull( host, "Container host is null" );
+        Preconditions.checkNotNull( host, "Host is null, nothig to do here" );
 
         try
         {
@@ -1744,18 +1747,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             List<String> aliasList = Collections.list( trustStore.aliases() );
             for ( final String alias : aliasList )
             {
-                String parseId[] = alias.split( "_" );
+                String[] parseId = alias.split( "_" );
                 LOG.info( String.format( "Parsing alias: %s", alias ) );
-                if ( parseId.length == 2 )
+                UUID envIdFromAlias = parseId.length == 2 ? UUID.fromString( parseId[2] ) : null;
+                if ( envIdFromAlias != null && envIdFromAlias.equals( environmentId ) )
                 {
-                    UUID envIdFromAlias = UUID.fromString( parseId[2] );
-                    if ( envIdFromAlias.equals( environmentId ) )
-                    {
-                        LOG.debug( String.format( "Removing environment certificate with alias: %s", alias ) );
-                        storeData.setAlias( alias );
-                        KeyStore keyStoreToRemove = trustStoreManager.load( storeData );
-                        trustStoreManager.deleteEntry( keyStoreToRemove, storeData );
-                    }
+                    LOG.debug( String.format( "Removing environment certificate with alias: %s", alias ) );
+                    storeData.setAlias( alias );
+                    KeyStore keyStoreToRemove = trustStoreManager.load( storeData );
+                    trustStoreManager.deleteEntry( keyStoreToRemove, storeData );
                 }
             }
 
@@ -1765,6 +1765,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         catch ( KeyStoreException e )
         {
             LOG.error( "Error removing environment certificate.", e );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error in #removeEnvironmentCertificateFromStore", e );
         }
     }
 

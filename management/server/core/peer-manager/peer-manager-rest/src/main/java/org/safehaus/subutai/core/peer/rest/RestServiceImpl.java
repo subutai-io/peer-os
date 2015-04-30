@@ -137,7 +137,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response processTrustResponse( String peer, String root_cert_px2, short status )
+    public Response processTrustResponse( String peer, String rootCertPx2, short status )
     {
         try
         {
@@ -182,7 +182,7 @@ public class RestServiceImpl implements RestService
     public Response sendRegistrationRequest( final String peerIp )
     {
         String baseUrl = String.format( "https://%s:%s/cxf", peerIp, ChannelSettings.SECURE_PORT_X1 );
-        WebClient client = RestUtil.createTrustedWebClient( baseUrl );//WebClient.create( baseUrl );
+        WebClient client = RestUtil.createTrustedWebClient( baseUrl );
         client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
         Form form = new Form();
         form.set( "peer", JsonUtil.toJson( peerManager.getLocalPeerInfo() ) );
@@ -192,24 +192,7 @@ public class RestServiceImpl implements RestService
             Response response = client.path( "peer/register" ).form( form );
             if ( response.getStatus() == Response.Status.OK.getStatusCode() )
             {
-                String responseString = response.readEntity( String.class );
-                LOGGER.info( response.toString() );
-                PeerInfo remotePeerInfo = JsonUtil.from( responseString, new TypeToken<PeerInfo>()
-                {
-                }.getType() );
-                if ( remotePeerInfo != null )
-                {
-                    remotePeerInfo.setStatus( PeerStatus.REQUEST_SENT );
-                    try
-                    {
-                        peerManager.register( remotePeerInfo );
-                    }
-                    catch ( PeerException e )
-                    {
-                        LOGGER.error( "Couldn't register peer", e );
-                    }
-                }
-                return Response.ok().build();
+                return registerPeerCert( response );
             }
             else if ( response.getStatus() == Response.Status.CONFLICT.getStatusCode() )
             {
@@ -228,6 +211,29 @@ public class RestServiceImpl implements RestService
             LOGGER.error( "error sending request", e );
             return Response.serverError().entity( e.toString() ).build();
         }
+    }
+
+
+    private Response registerPeerCert( final Response response )
+    {
+        String responseString = response.readEntity( String.class );
+        LOGGER.info( response.toString() );
+        PeerInfo remotePeerInfo = JsonUtil.from( responseString, new TypeToken<PeerInfo>()
+        {
+        }.getType() );
+        if ( remotePeerInfo != null )
+        {
+            remotePeerInfo.setStatus( PeerStatus.REQUEST_SENT );
+            try
+            {
+                peerManager.register( remotePeerInfo );
+            }
+            catch ( PeerException e )
+            {
+                LOGGER.error( "Couldn't register peer", e );
+            }
+        }
+        return Response.ok().build();
     }
 
 
@@ -255,7 +261,6 @@ public class RestServiceImpl implements RestService
                 keyStoreManager.deleteEntry( keyStore, keyStoreData );
                 //***********************************************************************
 
-                //                new Thread( new RestartCoreServlet() ).start();
                 sslContextFactory.reloadTrustStore();
 
                 return Response.ok( "Successfully unregistered peer: " + peerId ).build();
@@ -302,7 +307,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response approveForRegistrationRequest( final String approvedPeer, final String root_cert_px2 )
+    public Response approveForRegistrationRequest( final String approvedPeer, final String rootCertPx2 )
     {
         PeerInfo p = JsonUtil.fromJson( approvedPeer, PeerInfo.class );
         p.setStatus( PeerStatus.APPROVED );
@@ -315,7 +320,7 @@ public class RestServiceImpl implements RestService
 
         keyStoreData = new KeyStoreData();
         keyStoreData.setupTrustStorePx2();
-        keyStoreData.setHEXCert( root_cert_px2 );
+        keyStoreData.setHEXCert( rootCertPx2 );
         keyStoreData.setAlias( p.getId().toString() );
 
         keyStoreManager = new KeyStoreManager();
@@ -326,7 +331,6 @@ public class RestServiceImpl implements RestService
         //***********************************************************************
 
         //************ Send Trust SSL Cert **************************************
-
         KeyStore myKeyStore;
         KeyStoreData myKeyStoreData;
         KeyStoreManager myKeyStoreManager;
@@ -337,16 +341,12 @@ public class RestServiceImpl implements RestService
         myKeyStoreManager = new KeyStoreManager();
         myKeyStore = myKeyStoreManager.load( myKeyStoreData );
 
-        String HEXCert = myKeyStoreManager.exportCertificateHEXString( myKeyStore, myKeyStoreData );
-
-
+        String hexCert = myKeyStoreManager.exportCertificateHEXString( myKeyStore, myKeyStoreData );
         //***********************************************************************
 
         sslContextFactory.reloadTrustStore();
-        //        new Thread( new RestartCoreServlet() ).start();
 
-
-        return Response.ok( HEXCert ).build();
+        return Response.ok( hexCert ).build();
     }
 
 
@@ -364,9 +364,7 @@ public class RestServiceImpl implements RestService
         }
         else
         {
-
             //************ Send Trust SSL Cert **************************************
-
             KeyStore keyStore;
             KeyStoreData keyStoreData;
             KeyStoreManager keyStoreManager;
@@ -378,11 +376,10 @@ public class RestServiceImpl implements RestService
             keyStore = keyStoreManager.load( keyStoreData );
 
             String cert = keyStoreManager.exportCertificateHEXString( keyStore, keyStoreData );
-
             //***********************************************************************
 
             String baseUrl = String.format( "https://%s:%s/cxf", remotePeer.getIp(), ChannelSettings.SECURE_PORT_X1 );
-            WebClient client = RestUtil.createTrustedWebClient( baseUrl );//WebClient.create( baseUrl );
+            WebClient client = RestUtil.createTrustedWebClient( baseUrl );
             client.type( MediaType.APPLICATION_FORM_URLENCODED ).accept( MediaType.APPLICATION_JSON );
 
             Form form = new Form();
@@ -434,7 +431,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response updatePeer( String peer, String root_cert_px1 )
+    public Response updatePeer( String peer, String rootCertPx2 )
     {
         PeerInfo p = JsonUtil.fromJson( peer, PeerInfo.class );
         p.setIp( getRequestIp() );

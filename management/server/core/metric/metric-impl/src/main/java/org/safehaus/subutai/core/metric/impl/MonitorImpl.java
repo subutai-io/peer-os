@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonSyntaxException;
@@ -249,29 +250,35 @@ public class MonitorImpl implements Monitor
 
             //obtain environment containers
             Set<UUID> containerIds = containerGroup.getContainerIds();
-
-            for ( UUID containerId : containerIds )
-            {
-                try
-                {  //get container's resource host
-                    ResourceHost resourceHost = localPeer.getResourceHostByContainerId( containerId );
-
-                    //get metric
-
-                    addLocalContainerHostMetric( environmentId, resourceHost,
-                            resourceHost.getContainerHostById( containerId ), metrics );
-                }
-                catch ( HostNotFoundException e )
-                {
-                    LOG.error( String.format( "Host not found by id %s", containerId ), e );
-                }
-            }
+            retrieveContainerHostMetrics( containerIds, localPeer, environmentId, metrics );
         }
         catch ( ContainerGroupNotFoundException e )
         {
             LOG.error( "Error obtaining local container metrics", e );
         }
         return metrics;
+    }
+
+
+    private void retrieveContainerHostMetrics( final Set<UUID> containerIds, final LocalPeer localPeer,
+                                               final UUID environmentId, Set<ContainerHostMetricImpl> metrics )
+    {
+        for ( UUID containerId : containerIds )
+        {
+            try
+            {
+                //get container's resource host
+                ResourceHost resourceHost = localPeer.getResourceHostByContainerId( containerId );
+
+                //get metric
+                addLocalContainerHostMetric( environmentId, resourceHost,
+                        resourceHost.getContainerHostById( containerId ), metrics );
+            }
+            catch ( HostNotFoundException e )
+            {
+                LOG.error( String.format( "Host not found by id %s", containerId ), e );
+            }
+        }
     }
 
 
@@ -362,7 +369,7 @@ public class MonitorImpl implements Monitor
             }
             else
             {
-                LOG.error( String.format( "Error getting metrics from %s: %s", resourceHost.getHostname(),
+                LOG.error( String.format( "Error getting metrics from resource host %s: %s", resourceHost.getHostname(),
                         result.getStdErr() ) );
             }
         }
@@ -736,10 +743,14 @@ public class MonitorImpl implements Monitor
                 notifyListener( metric, subscriberId );
             }
         }
+        catch ( MonitorException e )
+        {
+            throw e;
+        }
         catch ( Exception e )
         {
             LOG.error( "Error in notifyOnAlert", e );
-            throw e instanceof MonitorException ? ( MonitorException ) e : new MonitorException( e );
+            throw new MonitorException( e );
         }
     }
 
@@ -807,49 +818,57 @@ public class MonitorImpl implements Monitor
         catch ( CommandException e )
         {
             LOG.error( "Could not run command successfully! Error: {}", e );
-            return null;
+            return Lists.newArrayList();
         }
         catch ( HostNotFoundException e )
         {
             LOG.error( "Could not find resource host of host {}!", host.getHostname() );
-            return null;
+            return Lists.newArrayList();
         }
         if ( result.hasSucceeded() )
         {
-            String lines[] = result.getStdOut().split( "\\r?\\n" );
-            int timestamp;
-            double value;
-            for ( String line : lines )
-            {
-                int seperatorIndex = line.indexOf( ":" );
-                timestamp = Integer.parseInt( line.substring( 0, seperatorIndex ) );
-                value = Double.parseDouble( line.substring( seperatorIndex + 1 ).trim() );
-                switch ( metricType )
-                {
-                    case RAM:
-                    case DISK_HOME:
-                    case DISK_OPT:
-                    case DISK_ROOTFS:
-                    case DISK_VAR:
-                        // Convert it from byte to megabyte
-                        value = value / ( 1024 * 1024 );
-                        break;
-                    case CPU:
-                        // Convert it from nanoseconds to seconds
-                        value = value / ( 1000000000 );
-                        break;
-                    default:
-                        break;
-                }
-                metrics.add( new HistoricalMetric( host, metricType, timestamp, value ) );
-            }
+            processHistoricalMetricOutput( result.getStdOut(), metricType, metrics, host );
         }
         else
         {
-            LOG.error( String.format( "Error getting metrics from %s: %s", host.getHostname(), result.getStdErr() ) );
+            LOG.error( String.format( "Error getting historical metrics from %s: %s", host.getHostname(),
+                    result.getStdErr() ) );
         }
 
         return metrics;
+    }
+
+
+    private void processHistoricalMetricOutput( final String stdOut, final MetricType metricType,
+                                                final List<HistoricalMetric> metrics, final Host host )
+    {
+        String[] lines = stdOut.split( "\\r?\\n" );
+        int timestamp;
+        double value;
+        for ( String line : lines )
+        {
+            int seperatorIndex = line.indexOf( ":" );
+            timestamp = Integer.parseInt( line.substring( 0, seperatorIndex ) );
+            value = Double.parseDouble( line.substring( seperatorIndex + 1 ).trim() );
+            switch ( metricType )
+            {
+                case RAM:
+                case DISK_HOME:
+                case DISK_OPT:
+                case DISK_ROOTFS:
+                case DISK_VAR:
+                    // Convert it from byte to megabyte
+                    value = value / ( 1024 * 1024 );
+                    break;
+                case CPU:
+                    // Convert it from nanoseconds to seconds
+                    value = value / ( 1000000000 );
+                    break;
+                default:
+                    break;
+            }
+            metrics.add( new HistoricalMetric( host, metricType, timestamp, value ) );
+        }
     }
 
 
@@ -868,7 +887,7 @@ public class MonitorImpl implements Monitor
             }
             catch ( Exception e )
             {
-                continue;
+                //ignore
             }
         }
 

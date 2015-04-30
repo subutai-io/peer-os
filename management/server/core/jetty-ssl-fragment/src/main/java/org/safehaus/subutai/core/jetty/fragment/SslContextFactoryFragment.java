@@ -20,6 +20,13 @@ public class SslContextFactoryFragment extends SslContextFactory
     private String _trustStorePassword = "subutai";
 
 
+    public SslContextFactoryFragment()
+    {
+        super();
+        singleton = this;
+    }
+
+
     public static SslContextFactoryFragment getSingleton()
     {
         return singleton;
@@ -50,7 +57,7 @@ public class SslContextFactoryFragment extends SslContextFactory
     {
         try
         {
-            LOG.debug( String.format( "Reloading ssl context factory" ) );
+            LOG.debug( "Reloading ssl context factory" );
             setCustomStart( true );
             doStop();
             setCustomStart( false );
