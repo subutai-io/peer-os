@@ -29,7 +29,11 @@ public class SubutaiSslContextFactoryImpl implements SubutaiSslContextFactory
     @Override
     public void reloadTrustStore()
     {
-        SslContextFactoryFragment.getSingleton().reloadStores();
+        SslContextFactoryFragment fragment = SslContextFactoryFragment.getSingleton();
+        if ( fragment != null )
+        {
+            fragment.reloadStores();
+        }
     }
 
 

@@ -1766,6 +1766,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             LOG.error( "Error removing environment certificate.", e );
         }
+        catch ( Exception e )
+        {
+            LOG.error( "Error in #removeEnvironmentCertificateFromStore", e );
+        }
     }
 
 
