@@ -156,33 +156,7 @@ public class Cloner extends VerticalLayout
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                //clear completed
-                for ( Object rowId : lxcTable.getItemIds() )
-                {
-                    Item row = lxcTable.getItem( rowId );
-                    if ( row != null )
-                    {
-                        Embedded statusIcon = ( Embedded ) ( row.getItemProperty( STATUS_LABEL ).getValue() );
-                        if ( statusIcon != null )
-                        {
-                            String statusSource = ( ( ThemeResource ) statusIcon.getSource() ).getResourceId();
-                            if ( ( OK_ICON_SOURCE.equals( statusSource ) || ERROR_ICON_SOURCE.equals( statusSource ) ) )
-                            {
-                                lxcTable.removeItem( rowId );
-                            }
-                        }
-                    }
-                }
-                //clear empty parents
-                for ( Object rowId : lxcTable.getItemIds() )
-                {
-                    Item row = lxcTable.getItem( rowId );
-                    if ( row != null && row.getItemProperty( PHYSICAL_HOST_LABEL ).getValue() != null && (
-                            lxcTable.getChildren( rowId ) == null || lxcTable.getChildren( rowId ).isEmpty() ) )
-                    {
-                        lxcTable.removeItem( rowId );
-                    }
-                }
+                clearFieldsData();
             }
         };
 
@@ -224,37 +198,7 @@ public class Cloner extends VerticalLayout
         {
             public void valueChange( Property.ValueChangeEvent event )
             {
-                criteriaLayout.removeAllComponents();
-                ContainerPlacementStrategy st = ( ContainerPlacementStrategy ) event.getProperty().getValue();
-
-                BeanItemContainer<CriteriaDef> criteriaBeans = criteriaBeansMap.get( st );
-
-                final Table criteriaTable = new Table( "Strategy criteria", criteriaBeans );
-                criteriaTable.setColumnHeaders( "ID", "Name", "Value" );
-                criteriaTable.setPageLength( 5 );
-
-                criteriaTable.setSelectable( false );
-
-                criteriaTable.setImmediate( true );
-                criteriaTable.setTableFieldFactory( new TableFieldFactory()
-                {
-                    @Override
-                    public Field<?> createField( Container container, Object itemId, Object propertyId,
-                                                 Component component )
-                    {
-
-                        if ( "value".equals( propertyId.toString() ) )
-                        {
-                            return new CheckBox();
-                        }
-                        return null;
-                    }
-                } );
-
-                criteriaTable.setEditable( true );
-
-                criteriaLayout.addComponent( criteriaTable );
-                criteriaLayout.setVisible( st.hasCriteria() );
+                comboBoxChangedEventTrigger( event );
             }
         };
 
@@ -273,6 +217,78 @@ public class Cloner extends VerticalLayout
         topContent.addComponent( strategy );
         topContent.setComponentAlignment( indicator, Alignment.MIDDLE_CENTER );
         return topContent;
+    }
+
+
+    private void comboBoxChangedEventTrigger( final Property.ValueChangeEvent event )
+    {
+        criteriaLayout.removeAllComponents();
+        ContainerPlacementStrategy st = ( ContainerPlacementStrategy ) event.getProperty().getValue();
+
+        BeanItemContainer<CriteriaDef> criteriaBeans = criteriaBeansMap.get( st );
+
+        final Table criteriaTable = new Table( "Strategy criteria", criteriaBeans );
+        criteriaTable.setColumnHeaders( "ID", "Name", "Value" );
+        criteriaTable.setPageLength( 5 );
+
+        criteriaTable.setSelectable( false );
+
+        criteriaTable.setImmediate( true );
+        criteriaTable.setTableFieldFactory( new TableFieldFactory()
+        {
+            @Override
+            public Field<?> createField( Container container, Object itemId, Object propertyId, Component component )
+            {
+
+                if ( "value".equals( propertyId.toString() ) )
+                {
+                    return new CheckBox();
+                }
+                return null;
+            }
+        } );
+
+        criteriaTable.setEditable( true );
+
+        criteriaLayout.addComponent( criteriaTable );
+        criteriaLayout.setVisible( st.hasCriteria() );
+    }
+
+
+    private void clearFieldsData()
+    {
+        clearCompletedRows();
+
+        //clear empty parents
+        for ( Object rowId : lxcTable.getItemIds() )
+        {
+            Item row = lxcTable.getItem( rowId );
+            if ( row != null && row.getItemProperty( PHYSICAL_HOST_LABEL ).getValue() != null &&
+                    ( lxcTable.getChildren( rowId ) == null || lxcTable.getChildren( rowId ).isEmpty() ) )
+            {
+                lxcTable.removeItem( rowId );
+            }
+        }
+    }
+
+
+    private void clearCompletedRows()
+    {
+        //clear completed
+        for ( Object rowId : lxcTable.getItemIds() )
+        {
+            Item row = lxcTable.getItem( rowId );
+            if ( row != null )
+            {
+                Embedded statusIcon = ( Embedded ) ( row.getItemProperty( STATUS_LABEL ).getValue() );
+                String statusSource =
+                        statusIcon != null ? ( ( ThemeResource ) statusIcon.getSource() ).getResourceId() : "";
+                if ( OK_ICON_SOURCE.equals( statusSource ) || ERROR_ICON_SOURCE.equals( statusSource ) )
+                {
+                    lxcTable.removeItem( rowId );
+                }
+            }
+        }
     }
 
 
@@ -391,24 +407,7 @@ public class Cloner extends VerticalLayout
             }
         }
 
-        List<ResourceHostMetric> serverMetrics = new ArrayList<>();
-
-        for ( Host host : localPeer.getResourceHosts() )
-        {
-            if ( host instanceof ResourceHost )
-            {
-                ResourceHost rh = ( ResourceHost ) host;
-                try
-                {
-                    serverMetrics.add( rh.getHostMetric() );
-                }
-                catch ( ResourceHostException e )
-                {
-                    show( e.toString() );
-                    LOG.warn( "Error getting host metrics #processCloneByStrategy", e );
-                }
-            }
-        }
+        List<ResourceHostMetric> serverMetrics = fillInServerMetrics();
         Map<ResourceHostMetric, Integer> bestServers;
         try
         {
@@ -443,6 +442,30 @@ public class Cloner extends VerticalLayout
     }
 
 
+    private List<ResourceHostMetric> fillInServerMetrics()
+    {
+        List<ResourceHostMetric> serverMetrics = new ArrayList<>();
+
+        for ( Host host : localPeer.getResourceHosts() )
+        {
+            if ( host instanceof ResourceHost )
+            {
+                ResourceHost rh = ( ResourceHost ) host;
+                try
+                {
+                    serverMetrics.add( rh.getHostMetric() );
+                }
+                catch ( ResourceHostException e )
+                {
+                    show( e.toString() );
+                    LOG.warn( "Error getting host metrics #processCloneByStrategy", e );
+                }
+            }
+        }
+        return serverMetrics;
+    }
+
+
     private void show( String msg )
     {
         Notification.show( msg );
@@ -462,11 +485,10 @@ public class Cloner extends VerticalLayout
             lxcTable.setCollapsed( host.getHostname(), false );
             for ( String lxc : entry.getValue() )
             {
-                //                Embedded progressIcon = new Embedded("", new ThemeResource(LOAD_ICON_SOURCE));
                 if ( lxcTable.getItem( lxc ) == null )
                 {
                     lxcTable.addItem( new Object[] {
-                            null, lxc, null /*progressIcon*/
+                            null, lxc, null
                     }, lxc );
 
                     lxcTable.setParent( lxc, host.getHostname() );
@@ -499,41 +521,47 @@ public class Cloner extends VerticalLayout
             @Override
             public void run()
             {
-                Item row = lxcTable.getItem( hostname );
-                if ( row != null )
-                {
-                    Property p = row.getItemProperty( "Status" );
-                    if ( CloneResultType.START.equals( resultType ) )
-                    {
-                        p.setValue( new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) ) );
-                    }
-                    else if ( CloneResultType.SUCCESS.equals( resultType ) )
-                    {
-                        p.setValue( new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) ) );
-                        countProcessed.decrementAndGet();
-                    }
-                    else if ( CloneResultType.FAIL.equals( resultType ) )
-                    {
-                        p.setValue( new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) ) );
-                        countProcessed.decrementAndGet();
-                        errorProcessed.incrementAndGet();
-                    }
-                }
-
-                if ( countProcessed.intValue() == 0 )
-                {
-                    indicator.setVisible( false );
-                    if ( errorProcessed.intValue() == 0 )
-                    {
-                        show( "Cloning containers finished successfully." );
-                    }
-                    else
-                    {
-                        show( "Not all containers successfully created." );
-                    }
-                }
+                showUpNotification( hostname, resultType );
             }
         };
         getUI().access( runnable );
+    }
+
+
+    private void showUpNotification( final String hostname, final CloneResultType resultType )
+    {
+        Item row = lxcTable.getItem( hostname );
+        if ( row != null )
+        {
+            Property p = row.getItemProperty( "Status" );
+            if ( CloneResultType.START.equals( resultType ) )
+            {
+                p.setValue( new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) ) );
+            }
+            else if ( CloneResultType.SUCCESS.equals( resultType ) )
+            {
+                p.setValue( new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) ) );
+                countProcessed.decrementAndGet();
+            }
+            else if ( CloneResultType.FAIL.equals( resultType ) )
+            {
+                p.setValue( new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) ) );
+                countProcessed.decrementAndGet();
+                errorProcessed.incrementAndGet();
+            }
+        }
+
+        if ( countProcessed.intValue() == 0 )
+        {
+            indicator.setVisible( false );
+            if ( errorProcessed.intValue() == 0 )
+            {
+                show( "Cloning containers finished successfully." );
+            }
+            else
+            {
+                show( "Not all containers successfully created." );
+            }
+        }
     }
 }

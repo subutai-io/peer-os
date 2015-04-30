@@ -63,7 +63,7 @@ public final class EnvironmentTree extends ConcurrentComponent
     {
 
         this.environmentManager = environmentManager;
-        this.updateDate = updateDate;
+        this.updateDate = new Date( updateDate.getTime() );
 
         setSizeFull();
         setMargin( true );
@@ -85,7 +85,6 @@ public final class EnvironmentTree extends ConcurrentComponent
                 refreshContainers();
             }
         };
-
         envCombo.addValueChangeListener( listener );
 
         tree = new Tree( "List of containers" );
@@ -93,12 +92,10 @@ public final class EnvironmentTree extends ConcurrentComponent
         tree.setItemIconPropertyId( ICON_PROPERTY );
         tree.setItemDescriptionGenerator( new AbstractSelect.ItemDescriptionGenerator()
         {
-
             @Override
             public String generateDescription( Component source, Object itemId, Object propertyId )
             {
                 String description = "";
-
                 Item item = tree.getItem( itemId );
                 if ( item != null && item.getItemProperty( VALUE_PROPERTY ) != null )
                 {
@@ -109,7 +106,6 @@ public final class EnvironmentTree extends ConcurrentComponent
                                 + "Agent ID: " + ec.getId();
                     }
                 }
-
                 return description;
             }
         } );
@@ -120,13 +116,10 @@ public final class EnvironmentTree extends ConcurrentComponent
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-
                 if ( event.getProperty().getValue() instanceof Set )
                 {
                     Tree t = ( Tree ) event.getProperty();
-
                     Set<ContainerHost> selectedList = new HashSet<>();
-
                     for ( Object o : ( Iterable<?> ) t.getValue() )
                     {
                         if ( tree.getItem( o ) != null && tree.getItem( o ).getItemProperty( VALUE_PROPERTY ) != null
@@ -137,19 +130,16 @@ public final class EnvironmentTree extends ConcurrentComponent
                             selectedList.add( containerHost );
                         }
                     }
-
                     selectedContainers = selectedList;
                 }
             }
         } );
         GridLayout grid = new GridLayout( 1, 3 );
-
         grid.addComponent( new Label( "Environments:" ), 0, 0 );
         grid.addComponent( envCombo, 0, 1 );
         grid.addComponent( tree, 0, 2 );
 
         addComponent( grid );
-
         addDetachListener( new DetachListener()
         {
             @Override
@@ -158,7 +148,6 @@ public final class EnvironmentTree extends ConcurrentComponent
                 scheduler.shutdown();
             }
         } );
-
         addAttachListener( new AttachListener()
         {
             @Override
@@ -235,12 +224,11 @@ public final class EnvironmentTree extends ConcurrentComponent
     }
 
 
-    class MyCustomFilter implements Container.Filter
+    private static class MyCustomFilter implements Container.Filter
     {
 
         private String propertyId;
         private Set<String> containerNames;
-
 
         public MyCustomFilter( final String propertyId, final Set<String> containerNames )
         {
@@ -250,7 +238,7 @@ public final class EnvironmentTree extends ConcurrentComponent
 
 
         @Override
-        public boolean passesFilter( final Object itemId, final Item item ) throws UnsupportedOperationException
+        public boolean passesFilter( final Object itemId, final Item item )
         {
             Property p = item.getItemProperty( propertyId );
 
@@ -283,43 +271,49 @@ public final class EnvironmentTree extends ConcurrentComponent
 
             if ( !Strings.isNullOrEmpty( tag ) )
             {
-
-                try
-                {
-                    Set<String> matchedContainerNames = Sets.newHashSet();
-
-                    Environment env = environmentManager.findEnvironment( environment.getId() );
-
-                    for ( ContainerHost ec : env.getContainerHosts() )
-                    {
-
-                        if ( ec.getTags().contains( tag ) )
-                        {
-                            matchedContainerNames.add( ec.getHostname() );
-                        }
-                    }
-
-                    container.addContainerFilter( new MyCustomFilter( VALUE_PROPERTY, matchedContainerNames ) );
-
-                    for ( ContainerHost ec : environment.getContainerHosts() )
-                    {
-                        if ( !matchedContainerNames.contains( ec.getHostname() ) )
-                        {
-                            String peerId = ec.getPeerId();
-                            String itemId = peerId + ":" + ec.getId();
-                            tree.unselect( itemId );
-                        }
-                    }
-                }
-                catch ( EnvironmentNotFoundException e )
-                {
-                    Notification.show( e.getMessage() );
-                }
+                filterContainers( tag );
             }
         }
         else
         {
             Notification.show( "Select environment" );
+        }
+    }
+
+
+    private void filterContainers( final String tag )
+    {
+        try
+        {
+            Set<String> matchedContainerNames = Sets.newHashSet();
+
+            Environment env = environmentManager.findEnvironment( environment.getId() );
+
+            for ( ContainerHost ec : env.getContainerHosts() )
+            {
+
+                if ( ec.getTags().contains( tag ) )
+                {
+                    matchedContainerNames.add( ec.getHostname() );
+                }
+            }
+
+            container.addContainerFilter( new MyCustomFilter( VALUE_PROPERTY, matchedContainerNames ) );
+
+            for ( ContainerHost ec : environment.getContainerHosts() )
+            {
+                if ( !matchedContainerNames.contains( ec.getHostname() ) )
+                {
+                    String peerId = ec.getPeerId();
+                    String itemId = peerId + ":" + ec.getId();
+                    tree.unselect( itemId );
+                }
+            }
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            LOG.warn( "Error retrieving environment" );
+            Notification.show( e.getMessage() );
         }
     }
 
@@ -340,46 +334,7 @@ public final class EnvironmentTree extends ConcurrentComponent
                 Environment env = environmentManager.findEnvironment( environment.getId() );
 
                 Set<String> presentItems = Sets.newHashSet();
-                for ( ContainerHost ec : env.getContainerHosts() )
-                {
-                    String peerId = ec.getPeerId();
-                    String itemId = peerId + ":" + ec.getId();
-                    presentItems.add( peerId );
-                    presentItems.add( itemId );
-
-                    Item peer = container.getItem( peerId );
-
-                    if ( peer == null )
-                    {
-                        peer = container.addItem( peerId );
-                    }
-                    if ( peer != null )
-                    {
-                        container.setChildrenAllowed( peerId, true );
-
-                        tree.setItemCaption( peerId, ec.getPeer().getName() );
-
-                        peer.getItemProperty( VALUE_PROPERTY ).setValue( null );
-
-                        Item item = container.getItem( itemId );
-
-                        if ( item == null )
-                        {
-                            item = container.addItem( itemId );
-                        }
-
-                        if ( item != null )
-                        {
-                            container.setParent( itemId, peerId );
-                            container.setChildrenAllowed( itemId, false );
-                            tree.setItemCaption( itemId, ec.getHostname() );
-                            item.getItemProperty( VALUE_PROPERTY ).setValue( ec );
-
-                            item.getItemProperty( ICON_PROPERTY ).setValue( new ThemeResource(
-                                    ec.isConnected() ? "img/lxc/virtual.png" : "img/lxc/virtual_offline.png" ) );
-                        }
-                    }
-                }
+                fillWithEnvironmentContainers( env, presentItems );
 
                 Set<String> allItemsIds = Sets.newHashSet();
                 allItemsIds.addAll( ( Collection<String> ) container.getItemIds() );
@@ -403,9 +358,55 @@ public final class EnvironmentTree extends ConcurrentComponent
             }
             catch ( EnvironmentNotFoundException e )
             {
+                LOG.warn( "Error looking for an environment" );
                 environment = null;
                 envCombo.setValue( null );
                 tree.removeAllItems();
+            }
+        }
+    }
+
+
+    private void fillWithEnvironmentContainers( final Environment env, final Set<String> presentItems )
+    {
+        for ( ContainerHost ec : env.getContainerHosts() )
+        {
+            String peerId = ec.getPeerId();
+            String itemId = peerId + ":" + ec.getId();
+            presentItems.add( peerId );
+            presentItems.add( itemId );
+
+            Item peer = container.getItem( peerId );
+
+            if ( peer == null )
+            {
+                peer = container.addItem( peerId );
+            }
+            if ( peer != null )
+            {
+                container.setChildrenAllowed( peerId, true );
+
+                tree.setItemCaption( peerId, ec.getPeer().getName() );
+
+                peer.getItemProperty( VALUE_PROPERTY ).setValue( null );
+
+                Item item = container.getItem( itemId );
+
+                if ( item == null )
+                {
+                    item = container.addItem( itemId );
+                }
+
+                if ( item != null )
+                {
+                    container.setParent( itemId, peerId );
+                    container.setChildrenAllowed( itemId, false );
+                    tree.setItemCaption( itemId, ec.getHostname() );
+                    item.getItemProperty( VALUE_PROPERTY ).setValue( ec );
+
+                    item.getItemProperty( ICON_PROPERTY ).setValue( new ThemeResource(
+                            ec.isConnected() ? "img/lxc/virtual.png" : "img/lxc/virtual_offline.png" ) );
+                }
             }
         }
     }

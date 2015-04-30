@@ -2,7 +2,6 @@ package org.safehaus.subutai.core.env.ui.forms;
 
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -106,16 +105,13 @@ public class ContainersWindow extends Window
 
     private void updateContainersTable()
     {
-
         containersTable.removeAllItems();
-
         for ( final ContainerHost containerHost : environment.getContainerHosts() )
         {
             final Button startBtn = new Button( "Start" );
             final Button tagsBtn = new Button( "Tags" );
             final Button stopBtn = new Button( "Stop" );
             final Button destroyBtn = new Button( "Destroy" );
-
             tagsBtn.addClickListener( new Button.ClickListener()
             {
                 @Override
@@ -124,135 +120,128 @@ public class ContainersWindow extends Window
                     getUI().addWindow( new TagsWindow( containerHost, peerManager.getLocalPeer() ) );
                 }
             } );
-
+            final Runnable startRunnable = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        containerHost.start();
+                    }
+                    catch ( PeerException e )
+                    {
+                        String msg = String.format( "Error starting container %s: %s", containerHost.getHostname(), e );
+                        Notification.show( msg, Notification.Type.ERROR_MESSAGE );
+                    }
+                    finally
+                    {
+                        enableTable();
+                    }
+                }
+            };
             startBtn.addClickListener( new Button.ClickListener()
             {
                 @Override
                 public void buttonClick( final Button.ClickEvent event )
                 {
-
                     disableTable();
-
-                    taskExecutor.submit( new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            try
-                            {
-
-                                containerHost.start();
-                            }
-                            catch ( PeerException e )
-                            {
-                                Notification.show( String.format( "Error starting container %s: %s",
-                                                containerHost.getHostname(), e ), Notification.Type.ERROR_MESSAGE );
-                            }
-                            finally
-                            {
-                                enableTable();
-                            }
-                        }
-                    } );
+                    taskExecutor.submit( startRunnable );
                 }
             } );
-
+            final Runnable stopRunnable = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        containerHost.stop();
+                    }
+                    catch ( PeerException e )
+                    {
+                        String msg = String.format( "Error stopping container %s: %s", containerHost.getHostname(), e );
+                        Notification.show( msg, Notification.Type.ERROR_MESSAGE );
+                    }
+                    finally
+                    {
+                        enableTable();
+                    }
+                }
+            };
             stopBtn.addClickListener( new Button.ClickListener()
             {
                 @Override
                 public void buttonClick( final Button.ClickEvent event )
                 {
-
                     disableTable();
-
-                    taskExecutor.submit( new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            try
-                            {
-                                containerHost.stop();
-                            }
-                            catch ( PeerException e )
-                            {
-                                Notification.show( String.format( "Error stopping container %s: %s",
-                                                containerHost.getHostname(), e ),
-
-                                        Notification.Type.ERROR_MESSAGE );
-                            }
-                            finally
-                            {
-                                enableTable();
-                            }
-                        }
-                    } );
+                    taskExecutor.submit( stopRunnable );
                 }
             } );
-
             destroyBtn.addClickListener( new Button.ClickListener()
             {
                 @Override
                 public void buttonClick( final Button.ClickEvent event )
                 {
-                    ConfirmationDialog alert =
-                            new ConfirmationDialog( "Do you really want to destroy this container?", "Yes", "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener()
-                    {
-                        @Override
-                        public void buttonClick( Button.ClickEvent clickEvent )
-                        {
-                            disableTable();
-
-                            taskExecutor.submit( new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {
-
-                                    try
-                                    {
-                                        containerHost.dispose();
-
-                                        try
-                                        {
-                                            environment = environmentManager.findEnvironment( environment.getId() );
-                                        }
-                                        catch ( EnvironmentNotFoundException e )
-                                        {
-                                            close();
-                                        }
-                                    }
-                                    catch ( PeerException e )
-                                    {
-                                        Notification.show( String.format( "Error destroying container %s: %s",
-                                                containerHost.getHostname(), e ), Notification.Type.ERROR_MESSAGE );
-                                    }
-                                    finally
-                                    {
-                                        enableTable();
-                                    }
-                                }
-                            } );
-                        }
-                    } );
-
-                    getUI().addWindow( alert.getAlert() );
+                    destroyOperation( containerHost );
                 }
             } );
-
             containersTable.addItem( new Object[] {
                     containerHost.getId().toString(), containerHost.getTemplateName(), containerHost.getHostname(),
                     containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ), tagsBtn, startBtn,
                     stopBtn, destroyBtn
             }, null );
-
             boolean isContainerConnected = containerHost.isConnected();
             startBtn.setEnabled( !isContainerConnected );
             stopBtn.setEnabled( isContainerConnected );
         }
 
         containersTable.refreshRowCache();
+    }
+
+
+    private void destroyOperation( final ContainerHost containerHost )
+    {
+        ConfirmationDialog alert =
+                new ConfirmationDialog( "Do you really want to destroy this container?", "Yes", "No" );
+        final Runnable runnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    containerHost.dispose();
+                    try
+                    {
+                        environment = environmentManager.findEnvironment( environment.getId() );
+                    }
+                    catch ( EnvironmentNotFoundException e )
+                    {
+                        close();
+                    }
+                }
+                catch ( PeerException e )
+                {
+                    String msg = String.format( "Error destroying container %s: %s", containerHost.getHostname(), e );
+                    Notification.show( msg, Notification.Type.ERROR_MESSAGE );
+                }
+                finally
+                {
+                    enableTable();
+                }
+            }
+        };
+        alert.getOk().addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                disableTable();
+                taskExecutor.submit( runnable );
+            }
+        } );
+        getUI().addWindow( alert.getAlert() );
     }
 
 
@@ -269,7 +258,6 @@ public class ContainersWindow extends Window
     private void disableTable()
     {
         containersTable.setEnabled( false );
-
         Notification.show( "Please, wait..." );
     }
 

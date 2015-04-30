@@ -74,7 +74,7 @@ public interface RestService
     @Path( "trust_response" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response processTrustResponse( @FormParam( "peer" ) String peer,
-                                          @FormParam( "root_cert_px2" ) String root_cert_px2,
+                                          @FormParam( "root_cert_px2" ) String rootCertPx2,
                                           @FormParam( "status" ) short status );
 
     //TODO move all registration process operations to peerManager and remove duplicated code pieces from
@@ -113,7 +113,7 @@ public interface RestService
     @Path( "approve" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response approveForRegistrationRequest( @FormParam( "approvedPeer" ) String approvedPeer,
-                                                   @FormParam( "root_cert_px2" ) String root_cert_px2 );
+                                                   @FormParam( "root_cert_px2" ) String rootCertPx2 );
 
 
     @PUT
@@ -125,7 +125,7 @@ public interface RestService
     @PUT
     @Path( "update" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response updatePeer( @FormParam( "peer" ) String peer, @FormParam( "root_cert_px2" ) String root_cert_px2 );
+    public Response updatePeer( @FormParam( "peer" ) String peer, @FormParam( "root_cert_px2" ) String rootCertPx2 );
 
     //*************** Peer Registration Handshake REST - END ***************************
 
