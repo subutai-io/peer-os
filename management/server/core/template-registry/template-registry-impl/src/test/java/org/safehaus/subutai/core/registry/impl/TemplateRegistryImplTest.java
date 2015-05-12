@@ -493,6 +493,6 @@ public class TemplateRegistryImplTest
         myList.add( gitChangedFile );
         when( gitManager.diffBranches( anyString(), anyString(), anyString() ) ).thenReturn( myList );
 
-        templateRegistry.getChangedFileVersions( "testBranchA", "testBranchB", gitChangedFile );
+        templateRegistry.getFileDiff( "testBranchA", "testBranchB", gitChangedFile );
     }
 }

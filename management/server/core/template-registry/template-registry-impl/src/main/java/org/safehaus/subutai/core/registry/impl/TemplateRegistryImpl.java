@@ -888,7 +888,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
 
 
     @Override
-    public String getChangedFileVersions( String branchA, String branchB, GitChangedFile file )
+    public String getFileDiff( String branchA, String branchB, GitChangedFile file )
     {
         try
         {

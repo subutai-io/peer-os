@@ -303,6 +303,11 @@ public interface TemplateRegistry
      */
     public List<GitChangedFile> getChangedFiles( Template templateA, Template templateB ) throws RegistryException;
 
+    /**
+     * Returns changes in the file between two branches
+     */
+    public String getFileDiff( String branchA, String branchB, GitChangedFile file );
+
 
     /**
      * Returns template download token, with which a template package can be downloaded from registry REST endpoint
@@ -312,6 +317,7 @@ public interface TemplateRegistry
      *
      * @return - template download token
      */
+    @Deprecated
     public String getTemplateDownloadToken( int timeout );
 
     /**
@@ -321,10 +327,10 @@ public interface TemplateRegistry
      *
      * @return - {@code Boolean}
      */
+    @Deprecated
     public boolean checkTemplateDownloadToken( String token );
 
-    public String getChangedFileVersions( String branchA, String branchB, GitChangedFile file );
 
-
+    @Deprecated
     public List<Template> getTemplateTree();
 }
