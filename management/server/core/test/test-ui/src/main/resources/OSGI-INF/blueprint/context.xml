@@ -3,11 +3,7 @@
     default-activation="eager"
     xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <reference id="test" availability="mandatory"
-             interface="org.safehaus.subutai.core.test.api.Test" />
-
   <bean id="module" scope="singleton" class="org.safehaus.subutai.core.test.ui.TestPortalModule">
-    <argument ref="test" />
   </bean>
 
   <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />

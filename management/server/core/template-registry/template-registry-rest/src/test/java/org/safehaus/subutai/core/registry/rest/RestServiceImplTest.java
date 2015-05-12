@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.registry.rest;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
@@ -11,13 +12,22 @@ import javax.ws.rs.core.Response;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.datatypes.TemplateVersion;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
+import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import org.safehaus.subutai.core.repository.api.RepositoryException;
 import org.safehaus.subutai.core.repository.api.RepositoryManager;
+
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -26,6 +36,8 @@ import com.google.gson.reflect.TypeToken;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -34,6 +46,7 @@ import static org.mockito.Mockito.when;
 /**
  * Test or RestServiceImpl
  */
+@RunWith( MockitoJUnitRunner.class )
 public class RestServiceImplTest
 {
     private static final String ARCH = "arch";
@@ -51,6 +64,17 @@ public class RestServiceImplTest
     private List<Template> templates;
 
     private static final String TEMPLATE_NAME = "master";
+
+    @Mock
+    Attachment attachment;
+    @Mock
+    org.apache.cxf.jaxrs.ext.multipart.ContentDisposition contentDisposition;
+    @Mock
+    InputStream inputStream;
+    @Mock
+    LocalPeer localPeer;
+    @Mock
+    ManagementHost managementHost;
 
     @Before
     public void setupClasses() throws IOException
@@ -406,5 +430,47 @@ public class RestServiceImplTest
         Response response = restService.listTemplatesPlain();
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
         verify( templateRegistry ).getAllTemplates( Common.DEFAULT_LXC_ARCH );
+    }
+
+    @Test
+    public void testRemoveTemplate() throws RepositoryException
+    {
+        when( templateRegistry.getTemplate( anyString(), any(TemplateVersion.class) ) ).thenReturn( template );
+
+        Response response = restService.removeTemplate( "testTemplateName", "555" );
+        assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
+        verify( repositoryManager).removePackageByName( anyString() );
+    }
+
+
+    @Test
+    public void testDownloadTemplateStatusForbidden()
+    {
+        Response response = restService.downloadTemplate( "testTemplateName", "testTemplateVersion", "testTemplateDT" );
+        assertEquals( Response.Status.FORBIDDEN.getStatusCode(), response.getStatus() );
+    }
+
+
+    @Test
+    public void testDownloadTemplateStatusNotFound() throws RepositoryException
+    {
+        when( templateRegistry.checkTemplateDownloadToken( anyString() ) ).thenReturn( true );
+
+        Response response = restService.downloadTemplate( "testTemplateName", "testTemplateVersion", "testTemplateDT" );
+        assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getStatus() );
+    }
+
+
+    @Test
+    public void testImportTemplate() throws HostNotFoundException
+    {
+        when( attachment.getContentDisposition() ).thenReturn( contentDisposition );
+        when( contentDisposition.getParameter( anyString() ) ).thenReturn( "test" );
+        when( attachment.getObject( InputStream.class ) ).thenReturn( inputStream );
+        when( peerManager.getLocalPeer() ).thenReturn( localPeer );
+        when( localPeer.getManagementHost() ).thenReturn( managementHost );
+
+        Response response = restService.importTemplate( attachment, "testConfigDir" );
+        assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
     }
 }

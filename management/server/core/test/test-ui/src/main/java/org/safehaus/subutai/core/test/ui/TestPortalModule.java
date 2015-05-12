@@ -18,11 +18,9 @@ public class TestPortalModule implements PortalModule
     public static final String MODULE_NAME = "Test";
     private final Test test;
 
-
     public TestPortalModule( final Test test )
     {
         Preconditions.checkNotNull( test, "Test is null" );
-
         this.test = test;
     }
 
@@ -51,7 +49,6 @@ public class TestPortalModule implements PortalModule
     @Override
     public Component createComponent()
     {
-
         return new TestComponent( test );
     }
 

@@ -1,28 +1,37 @@
 package org.safehaus.subutai.core.registry.impl;
 
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.datatypes.TemplateVersion;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.protocol.api.TemplateService;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.core.git.api.GitChangedFile;
+import org.safehaus.subutai.core.git.api.GitException;
+import org.safehaus.subutai.core.git.api.GitManager;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 
 import com.google.common.collect.Lists;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -32,12 +41,20 @@ import static org.mockito.Mockito.when;
 /**
  * Test for TemplateRegistryImpl
  */
+@RunWith( MockitoJUnitRunner.class )
 public class TemplateRegistryImplTest
 {
-
     private TemplateRegistryImpl templateRegistry;
     private TemplateService templateService;
 
+    @Mock
+    TemplateVersion templateVersion;
+    @Mock
+    Template template;
+    @Mock
+    GitManager gitManager;
+    @Mock
+    GitChangedFile gitChangedFile;
 
     @Before
     public void setUp() throws Exception
@@ -45,6 +62,7 @@ public class TemplateRegistryImplTest
         templateRegistry = new TemplateRegistryImpl();
         templateService = mock( TemplateService.class );
         templateRegistry.setTemplateService( templateService );
+        templateRegistry.setGitManager( gitManager );
     }
 
 
@@ -137,8 +155,9 @@ public class TemplateRegistryImplTest
     @Test
     public void testUnregisterTemplate() throws Exception
     {
-        when( templateService.getTemplate( TestUtils.TEMPLATE_NAME,new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), TestUtils.LXC_ARCH ) )
-                .thenReturn( TestUtils.getParentTemplate() );
+        when( templateService
+                .getTemplate( TestUtils.TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ),
+                        TestUtils.LXC_ARCH ) ).thenReturn( TestUtils.getParentTemplate() );
 
 
         templateRegistry.unregisterTemplate( TestUtils.TEMPLATE_NAME );
@@ -214,8 +233,9 @@ public class TemplateRegistryImplTest
     @Test
     public void testGetChildTemplates() throws Exception
     {
-        when( templateService.getChildTemplates( TestUtils.TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), TestUtils.LXC_ARCH ) )
-                .thenReturn( Lists.newArrayList( TestUtils.getChildTemplate() ) );
+        when( templateService
+                .getChildTemplates( TestUtils.TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ),
+                        TestUtils.LXC_ARCH ) ).thenReturn( Lists.newArrayList( TestUtils.getChildTemplate() ) );
 
         List<Template> children = templateRegistry.getChildTemplates( TestUtils.TEMPLATE_NAME );
 
@@ -240,8 +260,9 @@ public class TemplateRegistryImplTest
     {
         when( templateService.getTemplate( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH ) )
                 .thenReturn( TestUtils.getParentTemplate() );
-        when( templateService.getTemplate( TestUtils.CHILD_TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), TestUtils.LXC_ARCH ) )
-                .thenReturn( TestUtils.getChildTemplate() );
+        when( templateService
+                .getTemplate( TestUtils.CHILD_TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ),
+                        TestUtils.LXC_ARCH ) ).thenReturn( TestUtils.getChildTemplate() );
 
         Template template = templateRegistry.getParentTemplate( TestUtils.CHILD_TEMPLATE_NAME );
 
@@ -287,8 +308,9 @@ public class TemplateRegistryImplTest
     {
         when( templateService.getTemplate( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH ) )
                 .thenReturn( TestUtils.getParentTemplate() );
-        when( templateService.getTemplate( TestUtils.CHILD_TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), TestUtils.LXC_ARCH ) )
-                .thenReturn( TestUtils.getChildTemplate() );
+        when( templateService
+                .getTemplate( TestUtils.CHILD_TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ),
+                        TestUtils.LXC_ARCH ) ).thenReturn( TestUtils.getChildTemplate() );
 
         List<Template> templates = templateRegistry.getParentTemplates( TestUtils.CHILD_TEMPLATE_NAME );
 
@@ -324,8 +346,9 @@ public class TemplateRegistryImplTest
     public void testUpdateTemplateUsage() throws Exception
     {
         Template template = TestUtils.getParentTemplate();
-        when( templateService.getTemplate( TestUtils.TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), TestUtils.LXC_ARCH ) ).thenReturn(
-                template );
+        when( templateService
+                .getTemplate( TestUtils.TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ),
+                        TestUtils.LXC_ARCH ) ).thenReturn( template );
 
         templateRegistry.updateTemplateUsage( "hostname", TestUtils.TEMPLATE_NAME, true );
 
@@ -361,7 +384,9 @@ public class TemplateRegistryImplTest
     public void testIsTemplateInUse() throws Exception
     {
         Template template = TestUtils.getParentTemplate();
-        when( templateService.getTemplate( TestUtils.TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), TestUtils.LXC_ARCH ) ).thenReturn( template );
+        when( templateService
+                .getTemplate( TestUtils.TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ),
+                        TestUtils.LXC_ARCH ) ).thenReturn( template );
 
         template.setInUseOnFAI( "hostname", true );
 
@@ -392,9 +417,82 @@ public class TemplateRegistryImplTest
     @Test( expected = RegistryException.class )
     public void testRegisterTemplate2Exception() throws Exception
     {
-        Mockito.doThrow( new DaoException( "" ) ).when( templateService )
-               .saveTemplate( any(Template.class) );
+        Mockito.doThrow( new DaoException( "" ) ).when( templateService ).saveTemplate( any( Template.class ) );
 
         templateRegistry.registerTemplate( TestUtils.getChildTemplate() );
+    }
+
+
+    @Test
+    public void testGetTemplate2() throws DaoException
+    {
+        when( templateService.getTemplate( anyString(), anyString(), anyString(), any( TemplateVersion.class ) ) )
+                .thenReturn( template );
+
+        templateRegistry.getTemplate( "testTmplName", "testLxcArch", "testMd5Sum", templateVersion );
+        assertNotNull( templateRegistry.getTemplate( "testTmplName", "testLxcArch", "testMd5Sum", templateVersion ) );
+    }
+
+
+    @Test
+    public void testGetGitManager()
+    {
+        templateRegistry.getGitManager();
+    }
+
+
+    @Test
+    public void testInit() throws DaoException
+    {
+        List<Template> myList = new ArrayList<>(  );
+        myList.add( template );
+        when( templateService.getAllTemplates() ).thenReturn( myList );
+
+        templateRegistry.init();
+        verify( templateService ).getAllTemplates();
+    }
+
+
+    @Test
+    public void testDispose()
+    {
+        templateRegistry.dispose();
+    }
+
+
+    @Test
+    public void testGetTemplateDownloadToken()
+    {
+        templateRegistry.getTemplateDownloadToken( 5 );
+    }
+
+
+    @Test
+    public void testCheckTemplateDownloadToken()
+    {
+        templateRegistry.checkTemplateDownloadToken( "test" );
+    }
+
+
+    @Test
+    public void testGetChangedFiles() throws RegistryException, GitException
+    {
+        List<GitChangedFile> myList = new ArrayList<>(  );
+        myList.add( gitChangedFile );
+        when( template.getTemplateName() ).thenReturn( "test" );
+        when( gitManager.diffBranches( anyString(), anyString(), anyString() ) ).thenReturn( myList );
+
+        templateRegistry.getChangedFiles( template, template );
+    }
+
+
+    @Test
+    public void testGetChangedFileVersions() throws GitException
+    {
+        List<GitChangedFile> myList = new ArrayList<>(  );
+        myList.add( gitChangedFile );
+        when( gitManager.diffBranches( anyString(), anyString(), anyString() ) ).thenReturn( myList );
+
+        templateRegistry.getChangedFileVersions( "testBranchA", "testBranchB", gitChangedFile );
     }
 }
