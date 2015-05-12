@@ -44,7 +44,7 @@ public class CLISettings
 
             put( "repo", Sets.newHashSet( "add", "remove", "extract", "extract-files", "list", "info" ) );
 
-            put( "ssl-context", Sets.newHashSet( "ssl-context" ) );
+            put( "ssl-context", Sets.newHashSet( "ssl-context", "jetty" ) );
 
             put( "test", Sets.newHashSet( "exec" ) );
 

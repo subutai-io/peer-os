@@ -26,12 +26,6 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
     }
 
 
-    public void setEntityManagerFactory( final EntityManagerFactory emf )
-    {
-        this.emf = emf;
-    }
-
-
     @Override
     public ResourceHostEntity find( final String id )
     {

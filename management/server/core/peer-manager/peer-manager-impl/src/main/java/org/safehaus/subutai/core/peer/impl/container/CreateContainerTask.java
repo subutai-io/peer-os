@@ -34,7 +34,7 @@ public class CreateContainerTask implements Callable<ContainerHost>
     private final int vlan;
     private final String gateway;
     private final int timeoutSec;
-    private CommandUtil commandUtil = new CommandUtil();
+    protected CommandUtil commandUtil = new CommandUtil();
 
 
     public CreateContainerTask( final ResourceHost resourceHost, final Template template, final String hostname,
@@ -103,7 +103,8 @@ public class CreateContainerTask implements Callable<ContainerHost>
         return containerHost;
     }
 
-    private void prepareTemplate( final Template template ) throws ResourceHostException
+
+    protected void prepareTemplate( final Template template ) throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
 
@@ -121,14 +122,16 @@ public class CreateContainerTask implements Callable<ContainerHost>
         importTemplate( template );
         if ( !isTemplateExists( template ) )
         {
-            LOG.debug( String.format( "Could not prepare template %s on %s.", template.getTemplateName(), resourceHost.getHostname() ) );
+            LOG.debug( String.format( "Could not prepare template %s on %s.", template.getTemplateName(),
+                    resourceHost.getHostname() ) );
             throw new ResourceHostException(
-                    String.format( "Could not prepare template %s on %s", template.getTemplateName(), resourceHost.getHostname() ) );
+                    String.format( "Could not prepare template %s on %s", template.getTemplateName(),
+                            resourceHost.getHostname() ) );
         }
     }
 
 
-    private boolean isTemplateExists( final Template template ) throws ResourceHostException
+    protected boolean isTemplateExists( final Template template ) throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
 
@@ -141,11 +144,13 @@ public class CreateContainerTask implements Callable<ContainerHost>
                 String[] lines = commandresult.getStdOut().split( "\n" );
                 if ( lines.length == 3 && lines[2].startsWith( template.getTemplateName() ) )
                 {
-                    LOG.debug( String.format( "Template %s exists on %s.", template.getTemplateName(), resourceHost.getHostname() ) );
+                    LOG.debug( String.format( "Template %s exists on %s.", template.getTemplateName(),
+                            resourceHost.getHostname() ) );
                     return true;
                 }
             }
-            LOG.warn( String.format( "Template %s does not exists on %s.", template.getTemplateName(), resourceHost.getHostname() ) );
+            LOG.warn( String.format( "Template %s does not exists on %s.", template.getTemplateName(),
+                    resourceHost.getHostname() ) );
             return false;
         }
         catch ( CommandException ce )
@@ -156,7 +161,7 @@ public class CreateContainerTask implements Callable<ContainerHost>
     }
 
 
-    private void importTemplate( final Template template ) throws ResourceHostException
+    protected void importTemplate( final Template template ) throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
 
@@ -175,7 +180,7 @@ public class CreateContainerTask implements Callable<ContainerHost>
     }
 
 
-    private void updateRepository( final Template template ) throws ResourceHostException
+    protected void updateRepository( final Template template ) throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
 
@@ -183,21 +188,22 @@ public class CreateContainerTask implements Callable<ContainerHost>
         {
             try
             {
-                LOG.debug( String.format( "Adding remote repository %s to %s...", template.getPeerId(), resourceHost.getHostname() ) );
+                LOG.debug( String.format( "Adding remote repository %s to %s...", template.getPeerId(),
+                        resourceHost.getHostname() ) );
                 CommandResult commandResult = resourceHost.execute( new RequestBuilder( String.format(
                         "echo \"deb http://gw.intra.lan:9999/%1$s trusty main\" > /etc/apt/sources.list"
                                 + ".d/%1$s.list ", template.getPeerId().toString() ) ) );
                 if ( !commandResult.hasSucceeded() )
                 {
-                    LOG.warn( String.format( "Could not add repository %s to %s.", template.getPeerId(), resourceHost.getHostname() ),
-                            commandResult );
+                    LOG.warn( String.format( "Could not add repository %s to %s.", template.getPeerId(),
+                            resourceHost.getHostname() ), commandResult );
                 }
                 LOG.debug( String.format( "Updating repository index on %s...", resourceHost.getHostname() ) );
                 commandResult = resourceHost.execute( new RequestBuilder( "apt-get update" ).withTimeout( 300 ) );
                 if ( !commandResult.hasSucceeded() )
                 {
-                    LOG.warn( String.format( "Could not update repository %s on %s.", template.getPeerId(), resourceHost.getHostname() ),
-                            commandResult );
+                    LOG.warn( String.format( "Could not update repository %s on %s.", template.getPeerId(),
+                            resourceHost.getHostname() ), commandResult );
                 }
             }
             catch ( CommandException ce )

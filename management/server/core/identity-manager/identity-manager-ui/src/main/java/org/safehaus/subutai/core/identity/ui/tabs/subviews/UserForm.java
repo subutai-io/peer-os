@@ -20,6 +20,7 @@ import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.validator.AbstractStringValidator;
 import com.vaadin.data.validator.EmailValidator;
+import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -45,84 +46,13 @@ public class UserForm extends VerticalLayout
 
     private boolean newValue;
 
-    Button removeButton = new Button( "Delete user", new Button.ClickListener()
-    {
-        @Override
-        public void buttonClick( final Button.ClickEvent event )
-        {
-            userFieldGroup.discard();
-            if ( callback != null )
-            {
-                callback.removeOperation( userFieldGroup.getItemDataSource(), newValue );
-            }
-        }
-    } );
-
-    private TextField username = new TextField( "Username" )
-    {
-        {
-            setRequired( true );
-            setInputPrompt( "Username" );
-            setRequiredError( "Please enter username." );
-            setEnabled( false );
-        }
-    };
-
-    private TextField fullName = new TextField( "Full name" )
-    {
-        {
-            setRequired( true );
-            setInputPrompt( "Full name" );
-            setRequiredError( "Please enter full name." );
-        }
-    };
-
-    private TextField email = new TextField( "Email" )
-    {
-        {
-            setRequired( true );
-            setRequiredError( "Please enter e-mail address." );
-            setInputPrompt( "Email" );
-            addValidator( new EmailValidator( "Incorrect email format!!!" ) );
-        }
-    };
-
-    private PasswordField password = new PasswordField( "Password" )
-    {
-        {
-            setRequired( true );
-            setRequiredError( "Please enter password." );
-            setInputPrompt( "Password" );
-            addValidator( new AbstractStringValidator( "Passwords do not match." )
-            {
-                @Override
-                protected boolean isValidValue( final String value )
-                {
-                    return value.equals( confirmPassword.getValue() );
-                }
-            } );
-        }
-    };
-
-
-    private PasswordField confirmPassword = new PasswordField( "Confirm password" )
-    {
-        {
-            setRequired( true );
-            setRequiredError( "Please enter password confirm." );
-            setInputPrompt( "Confirm password" );
-        }
-    };
-
-
-    private TwinColSelect rolesSelector = new TwinColSelect( "User roles" )
-    {
-        {
-            setItemCaptionMode( ItemCaptionMode.PROPERTY );
-            setItemCaptionPropertyId( "name" );
-            setSpacing( true );
-        }
-    };
+    private Button removeButton;
+    private TextField username;
+    private TextField fullName;
+    private TextField email;
+    private PasswordField password;
+    private PasswordField confirmPassword;
+    private TwinColSelect rolesSelector;
     private final BeanContainer<String, Role> permissionsContainer;
 
 
@@ -142,6 +72,58 @@ public class UserForm extends VerticalLayout
 
     private void init()
     {
+        initControls();
+        // When OK button is clicked, commit the form to the bean
+        Button.ClickListener saveListener = new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
+            {
+                // New items have to be added to the container
+                // Commit the addition
+                try
+                {
+                    userFieldGroup.commit();
+                    Collection<String> selectedRoleNames = ( Collection<String> ) rolesSelector.getValue();
+                    if ( selectedRoleNames.isEmpty() )
+                    {
+                        Notification.show( "Please select at least one role." );
+                        return;
+                    }
+                    if ( callback != null )
+                    {
+                        User user = userFieldGroup.getItemDataSource().getBean();
+                        user.removeAllRoles();
+                        for ( final String roleName : selectedRoleNames )
+                        {
+                            BeanItem beanItem = ( BeanItem ) rolesSelector.getItem( roleName );
+                            user.addRole( ( Role ) beanItem.getBean() );
+                        }
+                        callback.saveOperation( userFieldGroup.getItemDataSource(), newValue );
+                        Notification.show( "Successfully saved." );
+                    }
+                }
+                catch ( FieldGroup.CommitException e )
+                {
+                    ErrorUtils.showComponentErrors( userFieldGroup.getFields() );
+                }
+            }
+        };
+
+        Button.ClickListener cancelListener = new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
+            {
+                userFieldGroup.discard();
+                UserForm.this.setVisible( false );
+                if ( callback != null )
+                {
+                    callback.cancelOperation();
+                }
+            }
+        };
+
         final Button saveButton = new Button( "Save user", saveListener );
         final Button cancelButton = new Button( "Cancel", cancelListener );
         saveButton.setStyleName( Reindeer.BUTTON_DEFAULT );
@@ -155,6 +137,69 @@ public class UserForm extends VerticalLayout
         addComponents( form, buttons );
 
         setSpacing( true );
+    }
+
+
+    private void initControls()
+    {
+        removeButton = new Button( "Delete user", new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
+            {
+                userFieldGroup.discard();
+                if ( callback != null )
+                {
+                    callback.removeOperation( userFieldGroup.getItemDataSource(), newValue );
+                }
+            }
+        } );
+
+        username = new TextField( "Username" );
+        username.setRequired( true );
+        username.setInputPrompt( "Username" );
+        username.setRequiredError( "Please enter username." );
+        username.setEnabled( false );
+
+        fullName = new TextField( "Full name" );
+        fullName.setRequired( true );
+        fullName.setInputPrompt( "Full name" );
+        fullName.setRequiredError( "Please enter full name." );
+
+        email = new TextField( "Email" );
+        email.setRequired( true );
+        email.setRequiredError( "Please enter e-mail address." );
+        email.setInputPrompt( "Email" );
+        email.addValidator( new EmailValidator( "Incorrect email format!!!" ) );
+
+        password = new PasswordField( "Password" );
+        password.setRequired( true );
+        password.setRequiredError( "Please enter password." );
+        password.setInputPrompt( "Password" );
+        password.addValidator( new AbstractStringValidator( "Passwords do not match." )
+        {
+            @Override
+            protected boolean isValidValue( final String value )
+            {
+                return value.equals( confirmPassword.getValue() );
+            }
+        } );
+
+
+        confirmPassword = new PasswordField( "Confirm password" );
+        confirmPassword.setRequired( true );
+        confirmPassword.setRequiredError( "Please enter password confirm." );
+        confirmPassword.setInputPrompt( "Confirm password" );
+
+
+        rolesSelector = new TwinColSelect( "User roles" )
+        {
+            {
+                setSpacing( true );
+            }
+        };
+        rolesSelector.setItemCaptionMode( AbstractSelect.ItemCaptionMode.PROPERTY );
+        rolesSelector.setItemCaptionPropertyId( "name" );
     }
 
 
@@ -200,61 +245,4 @@ public class UserForm extends VerticalLayout
             }
         }
     }
-
-
-    // When OK button is clicked, commit the form to the bean
-    private Button.ClickListener saveListener = new Button.ClickListener()
-    {
-        @Override
-        public void buttonClick( final Button.ClickEvent event )
-        {
-            // New items have to be added to the container
-            // Commit the addition
-            try
-            {
-                userFieldGroup.commit();
-
-                Collection<String> selectedRoleNames = ( Collection<String> ) rolesSelector.getValue();
-                if ( selectedRoleNames.size() < 1 )
-                {
-                    Notification.show( "Please select at least one role." );
-                    return;
-                }
-
-                if ( callback != null )
-                {
-                    User user = userFieldGroup.getItemDataSource().getBean();
-                    user.removeAllRoles();
-
-                    for ( final String roleName : selectedRoleNames )
-                    {
-                        BeanItem beanItem = ( BeanItem ) rolesSelector.getItem( roleName );
-                        user.addRole( ( Role ) beanItem.getBean() );
-                    }
-
-                    callback.saveOperation( userFieldGroup.getItemDataSource(), newValue );
-                    Notification.show( "Successfully saved." );
-                }
-            }
-            catch ( FieldGroup.CommitException e )
-            {
-                ErrorUtils.showComponentErrors( userFieldGroup.getFields() );
-            }
-        }
-    };
-
-
-    private Button.ClickListener cancelListener = new Button.ClickListener()
-    {
-        @Override
-        public void buttonClick( final Button.ClickEvent event )
-        {
-            userFieldGroup.discard();
-            UserForm.this.setVisible( false );
-            if ( callback != null )
-            {
-                callback.cancelOperation();
-            }
-        }
-    };
 }

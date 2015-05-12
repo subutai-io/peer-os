@@ -5,8 +5,9 @@ import java.util.Objects;
 import java.util.UUID;
 
 
-@SuppressWarnings("unused")
-public class PeerPolicy {
+@SuppressWarnings( "unused" )
+public class PeerPolicy
+{
 
     private UUID remotePeerId;
     private int diskUsagePercentageLimit;
@@ -17,102 +18,132 @@ public class PeerPolicy {
     private int containerCountLimit;
 
 
-    public PeerPolicy( UUID remotePeerId ) {
+    public PeerPolicy( UUID remotePeerId )
+    {
         this.remotePeerId = remotePeerId;
     }
 
 
-    public int getDiskUsagePercentageLimit() {
+    public int getDiskUsagePercentageLimit()
+    {
         return diskUsagePercentageLimit;
     }
 
 
-    public int getCpuUsagePercentageLimit() {
+    public int getCpuUsagePercentageLimit()
+    {
         return cpuUsagePercentageLimit;
     }
 
 
-    public int getContainerCountLimit() {
+    public int getContainerCountLimit()
+    {
         return containerCountLimit;
     }
 
 
-    public int getMemoryUsagePercentageLimit() {
+    public int getMemoryUsagePercentageLimit()
+    {
         return memoryUsagePercentageLimit;
     }
 
 
-    public int getNetworkUsagePercentageLimit() {
+    public int getNetworkUsagePercentageLimit()
+    {
         return networkUsagePercentageLimit;
     }
 
 
-    public int getEnvironmentCountLimit() {
+    public int getEnvironmentCountLimit()
+    {
         return environmentCountLimit;
     }
 
 
-    public void setContainerCountLimit( int containerCountLimit ) {
-        if ( containerCountLimit < 0 ) {
-            containerCountLimit = 0;
+    public void setContainerCountLimit( int containerCountLimit )
+    {
+        int cCountLimit = containerCountLimit;
+        if ( cCountLimit < 0 )
+        {
+            cCountLimit = 0;
         }
-        this.containerCountLimit = containerCountLimit;
+        this.containerCountLimit = cCountLimit;
     }
 
 
-    public void setCpuUsagePercentageLimit( int cpuUsagePercentageLimit ) {
-        if ( cpuUsagePercentageLimit > 100 ) {
-            cpuUsagePercentageLimit = 100;
+    public void setCpuUsagePercentageLimit( int cpuUsagePercentageLimit )
+    {
+        int cpuPercentageLimit = cpuUsagePercentageLimit;
+        if ( cpuPercentageLimit > 100 )
+        {
+            cpuPercentageLimit = 100;
         }
-        else if ( cpuUsagePercentageLimit < 0 ) {
-            cpuUsagePercentageLimit = 0;
+        else if ( cpuPercentageLimit < 0 )
+        {
+            cpuPercentageLimit = 0;
         }
-        this.cpuUsagePercentageLimit = cpuUsagePercentageLimit;
+        this.cpuUsagePercentageLimit = cpuPercentageLimit;
     }
 
 
-    public void setDiskUsagePercentageLimit( int diskUsagePercentageLimit ) {
-        if ( diskUsagePercentageLimit > 100 ) {
-            diskUsagePercentageLimit = 100;
+    public void setDiskUsagePercentageLimit( int diskUsagePercentageLimit )
+    {
+        int diskPercentageLimit = diskUsagePercentageLimit;
+        if ( diskPercentageLimit > 100 )
+        {
+            diskPercentageLimit = 100;
         }
-        else if ( diskUsagePercentageLimit < 0 ) {
-            diskUsagePercentageLimit = 0;
+        else if ( diskPercentageLimit < 0 )
+        {
+            diskPercentageLimit = 0;
         }
-        this.diskUsagePercentageLimit = diskUsagePercentageLimit;
+        this.diskUsagePercentageLimit = diskPercentageLimit;
     }
 
 
-    public void setMemoryUsagePercentageLimit( int memoryUsagePercentageLimit ) {
-        if ( memoryUsagePercentageLimit > 100 ) {
-            memoryUsagePercentageLimit = 100;
+    public void setMemoryUsagePercentageLimit( int memoryUsagePercentageLimit )
+    {
+        int memoryPercentageLimit = memoryUsagePercentageLimit;
+        if ( memoryPercentageLimit > 100 )
+        {
+            memoryPercentageLimit = 100;
         }
-        else if ( memoryUsagePercentageLimit < 0 ) {
-            memoryUsagePercentageLimit = 0;
+        else if ( memoryPercentageLimit < 0 )
+        {
+            memoryPercentageLimit = 0;
         }
-        this.memoryUsagePercentageLimit = memoryUsagePercentageLimit;
+        this.memoryUsagePercentageLimit = memoryPercentageLimit;
     }
 
 
-    public void setNetworkUsagePercentageLimit( int networkUsagePercentageLimit ) {
-        if ( networkUsagePercentageLimit > 100 ) {
-            networkUsagePercentageLimit = 100;
+    public void setNetworkUsagePercentageLimit( int networkUsagePercentageLimit )
+    {
+        int networkPercentageLimit = networkUsagePercentageLimit;
+        if ( networkPercentageLimit > 100 )
+        {
+            networkPercentageLimit = 100;
         }
-        else if ( networkUsagePercentageLimit < 0 ) {
-            networkUsagePercentageLimit = 0;
+        else if ( networkPercentageLimit < 0 )
+        {
+            networkPercentageLimit = 0;
         }
-        this.networkUsagePercentageLimit = networkUsagePercentageLimit;
+        this.networkUsagePercentageLimit = networkPercentageLimit;
     }
 
 
-    public void setEnvironmentCountLimit( int environmentCountLimit ) {
-        if ( environmentCountLimit < 0 ) {
-            environmentCountLimit = 0;
+    public void setEnvironmentCountLimit( int environmentCountLimit )
+    {
+        int eCountLimit = environmentCountLimit;
+        if ( eCountLimit < 0 )
+        {
+            eCountLimit = 0;
         }
-        this.environmentCountLimit = environmentCountLimit;
+        this.environmentCountLimit = eCountLimit;
     }
 
 
-    public UUID getRemotePeerId() {
+    public UUID getRemotePeerId()
+    {
         return remotePeerId;
     }
 

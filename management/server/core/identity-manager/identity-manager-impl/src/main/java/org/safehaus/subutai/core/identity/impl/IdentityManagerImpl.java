@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.identity.impl;
 
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -55,9 +56,7 @@ import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListener;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
-import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.apache.shiro.util.SimpleByteSource;
 
 import com.google.common.collect.Lists;
@@ -167,26 +166,8 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
             for ( Role role : roles )
             {
                 Set<RestEndpointScope> restEndpointScopeList = role.getAccessibleRestEndpoints();
+                status = checkRestEndpointScope( restURL, restEndpointScopeList, status );
 
-                if ( restEndpointScopeList != null )
-                {
-                    for ( RestEndpointScope restEndpointScope : restEndpointScopeList )
-                    {
-                        if ( restEndpointScope.getRestEndpoint().contains( "{*}" ) )
-                        {
-                            status = 1;
-                            break;
-                        }
-                        else
-                        {
-                            if ( ChannelSettings.checkURL( restURL, restEndpointScope.getRestEndpoint() ) == 1 )
-                            {
-                                status = 1;
-                                break;
-                            }
-                        }
-                    }
-                }
                 if ( status == 1 )
                 {
                     break;
@@ -194,6 +175,24 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
             }
         }
 
+        return status;
+    }
+
+
+    private short checkRestEndpointScope( final String restURL, final Set<RestEndpointScope> restEndpointScopeList,
+                                          final short status )
+    {
+        if ( restEndpointScopeList != null )
+        {
+            for ( RestEndpointScope restEndpointScope : restEndpointScopeList )
+            {
+                if ( restEndpointScope.getRestEndpoint().contains( "{*}" )
+                        || ChannelSettings.checkURL( restURL, restEndpointScope.getRestEndpoint() ) == 1 )
+                {
+                    return 1;
+                }
+            }
+        }
         return status;
     }
 
@@ -209,9 +208,36 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         }
         LOG.info( String.format( "User not found. Adding new user: [%s] ", username ) );
         RoleEntity adminRole = roleDataService.find( "admin" );
-        if ( adminRole == null )
+        adminRole = initAdminRole( adminRole );
+
+        RoleEntity managerRole = roleDataService.find( "manager" );
+        if ( managerRole == null )
         {
-            adminRole = new RoleEntity();
+            managerRole = new RoleEntity();
+            managerRole.setName( "manager" );
+            roleDataService.update( managerRole );
+        }
+
+        String password = "secret";
+        String salt = getSimpleSalt( username );
+        user = new UserEntity();
+        user.setUsername( username );
+        user.setFullname( "Full name of: " + username );
+        user.setEmail( username + "@subutai.at" );
+        user.setPassword( saltedHash( password, new SimpleByteSource( salt ).getBytes() ) );
+        user.setSalt( salt );
+        user.addRole( adminRole );
+        user.addRole( managerRole );
+        userDataService.update( user );
+        LOG.debug( String.format( "User: %s", user.getId() ) );
+    }
+
+
+    private RoleEntity initAdminRole( final RoleEntity adminRolePersisted )
+    {
+        if ( adminRolePersisted == null )
+        {
+            RoleEntity adminRole = new RoleEntity();
             adminRole.setName( "admin" );
 
             for ( final String uri : ChannelSettings.URL_ACCESS_PX1 )
@@ -259,29 +285,9 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
             }
 
             roleDataService.update( adminRole );
+            return adminRole;
         }
-
-        RoleEntity managerRole = roleDataService.find( "manager" );
-        if ( managerRole == null )
-        {
-            managerRole = new RoleEntity();
-            managerRole.setName( "manager" );
-            roleDataService.update( managerRole );
-        }
-
-
-        String password = "secret";
-        String salt = getSimpleSalt( username );
-        user = new UserEntity();
-        user.setUsername( username );
-        user.setFullname( "Full name of: " + username );
-        user.setEmail( username + "@subutai.at" );
-        user.setPassword( saltedHash( password, new SimpleByteSource( salt ).getBytes() ) );
-        user.setSalt( salt );
-        user.addRole( adminRole );
-        user.addRole( managerRole );
-        userDataService.update( user );
-        LOG.debug( String.format( "User: %s", user.getId() ) );
+        return adminRolePersisted;
     }
 
 
@@ -292,28 +298,10 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     }
 
 
-    private void logActiveSessions()
-    {
-        LOG.debug( "Active sessions:" );
-        DefaultSecurityManager defaultSecurityManager = securityManager;
-        DefaultSessionManager sm = ( DefaultSessionManager ) defaultSecurityManager.getSessionManager();
-        for ( Session session : sm.getSessionDAO().getActiveSessions() )
-        {
-            SimplePrincipalCollection p =
-                    ( SimplePrincipalCollection ) session.getAttribute( DefaultSubjectContext.PRINCIPALS_SESSION_KEY );
-
-            LOG.debug( String.format( "%s %s", session.getId(), p ) );
-        }
-    }
-
-
     @Override
     public User getUser()
     {
-        //        logActiveSessions();
-
         SubutaiLoginContext loginContext = getSubutaiLoginContext();
-        //        LOG.debug( String.format( "Login context: [%s] ", loginContext ) );
 
         if ( loginContext instanceof NullSubutaiLoginContext )
         {
@@ -363,6 +351,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         }
         catch ( UnknownSessionException e )
         {
+            LOG.warn( "Exception getting session #login", e );
             subject = new Subject.Builder().buildSubject();
             subject.login( usernamePasswordToken );
             session = subject.getSession( true );
@@ -524,19 +513,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         user.setEmail( email );
         user.setFullname( fullname );
         user.setSalt( salt );
-        user.setPassword( saltedHash( password, salt.getBytes() ) );
-
-        //        try
-        //        {
-        //            Host host = managementHost;
-        //            KeyInfo keyInfo = keyManager.generateKey( host, fullname, email );
-        //            user.setKey( keyInfo.getPublicKeyId() );
-        //            LOG.debug( String.format( "%s", keyInfo.toString() ) );
-        //        }
-        //        catch ( KeyManagerException e )
-        //        {
-        //            LOG.error( e.toString(), e );
-        //        }
+        user.setPassword( saltedHash( password, salt.getBytes( Charset.forName( "UTF-8" ) ) ) );
 
         userDataService.persist( user );
         return user.getId() != null;
@@ -585,63 +562,13 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         if ( isPasswordChanged( user ) )
         {
             user.setSalt( getSimpleSalt( user.getUsername() ) );
-            user.setPassword( saltedHash( user.getPassword(), ( ( UserEntity ) user ).getSalt().getBytes() ) );
+            user.setPassword( saltedHash( user.getPassword(),
+                    ( ( UserEntity ) user ).getSalt().getBytes( Charset.forName( "UTF-8" ) ) ) );
         }
-
-        //        if ( user.getId() == null )
-        //        {
-        //            generateKey( user );
-        //        }
 
         userDataService.update( user );
         return true;
     }
-
-    //
-    //    private void generateKey( final User user )
-    //    {
-    //
-    //        Host host = null;
-    //        long threshold = System.currentTimeMillis() + 1000 * 60;
-    //        do
-    //        {
-    //            try
-    //            {
-    //                host = managementHost;
-    //            }
-    //            catch ( HostNotFoundException ignore )
-    //            {
-    //            }
-    //            try
-    //            {
-    //                LOG.debug( String.format( "Waiting for management host...[%s]", host == null ? "OFF" : "ON" ) );
-    //                Thread.sleep( 1000 );
-    //            }
-    //            catch ( InterruptedException ignore )
-    //            {
-    //            }
-    //        }
-    //        while ( host == null && threshold > System.currentTimeMillis() );
-    //
-    //        if ( host != null )
-    //        {
-    //            KeyInfo keyInfo = null;
-    //            try
-    //            {
-    //                keyInfo = keyManager.generateKey( host, user.getUsername(), user.getEmail() );
-    //                user.setKey( keyInfo.getPublicKeyId() );
-    //                LOG.debug( String.format( "%s", keyInfo.toString() ) );
-    //            }
-    //            catch ( KeyManagerException e )
-    //            {
-    //                LOG.error( e.toString(), e );
-    //            }
-    //        }
-    //        else
-    //        {
-    //            LOG.warn( "Management host not available on generating keys." );
-    //        }
-    //    }
 
 
     private boolean isPasswordChanged( final User user )
@@ -836,13 +763,13 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
     @Override
     public void afterExecute( final CommandSession commandSession, final CharSequence charSequence, final Exception e )
     {
-
+        //ignore
     }
 
 
     @Override
     public void afterExecute( final CommandSession commandSession, final CharSequence charSequence, final Object o )
     {
-
+        //ignore
     }
 }

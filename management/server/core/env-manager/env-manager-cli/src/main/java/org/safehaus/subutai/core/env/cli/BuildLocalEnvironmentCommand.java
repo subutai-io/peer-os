@@ -28,7 +28,8 @@ public class BuildLocalEnvironmentCommand extends SubutaiShellCommandSupport
     /**
      * {@value templateName} template to clone for environment hosts
      * {@code required = true}
-     */ private String templateName;
+     */
+            String templateName;
 
 
     @Argument( name = "numberOfContainers", description = "Number of containers",
@@ -36,20 +37,23 @@ public class BuildLocalEnvironmentCommand extends SubutaiShellCommandSupport
     /**
      * {@value numberOfContainers }number of container hosts to create in environment
      * {@code required = true}
-     */ private int numberOfContainers;
+     */
+            int numberOfContainers;
     @Argument( name = "subnetCidr", description = "Subnet in CIDR notation",
             index = 2, multiValued = false, required = true )
     /**
      * {@value subnetCidr } Subnet in CIDR notation
      * {@code required = true}
-     */ private String subnetCidr;
+     */
+            String subnetCidr;
 
     @Argument( name = "async", description = "asynchronous build",
             index = 3, multiValued = false, required = false )
     /**
      * {@value async} Create environment asynchronously
      * {@code async = false}
-     */ private boolean async = false;
+     */
+            boolean async = false;
 
     private final EnvironmentManager environmentManager;
     private final PeerManager peerManager;

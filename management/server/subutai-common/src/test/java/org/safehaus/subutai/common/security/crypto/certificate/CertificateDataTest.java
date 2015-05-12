@@ -51,16 +51,4 @@ public class CertificateDataTest
         ocsp.resolveOid( "OCSP" );
         ocsp.resolveOid( "1.3.6.1.5.5.7.48.1" );
     }
-
-
-    @Test
-    public void testEnumAttributeType()
-    {
-        AttributeTypeType ocsp = AttributeTypeType.COMMON_NAME;
-        ocsp.friendly();
-        ocsp.oid();
-        ocsp.resolveOid( "OCSP" );
-        ocsp.resolveOid( "2.5.4.3" );
-    }
-
 }

@@ -7,7 +7,7 @@ package org.safehaus.subutai.core.peer.api;
 
 
 /**
- * Possible states of container
+ * Possible states of container TODO remove this enum and use  ContainerHostState
  */
 public enum ContainerState
 {

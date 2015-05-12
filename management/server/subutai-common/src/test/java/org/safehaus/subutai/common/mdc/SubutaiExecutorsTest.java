@@ -3,7 +3,6 @@ package org.safehaus.subutai.common.mdc;
 
 import java.util.concurrent.Callable;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -20,19 +19,13 @@ public class SubutaiExecutorsTest
     @Mock
     Callable callable;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        subutaiExecutors = new SubutaiExecutors();
-    }
-
 
     @Test
     public void testNewFixedThreadPool() throws Exception
     {
-        subutaiExecutors.newFixedThreadPool( 2 ).submit( runnable );
-        subutaiExecutors.newFixedThreadPool( 2 ).submit( runnable, "test" );
-        subutaiExecutors.newFixedThreadPool( 2 ).submit( callable );
+        SubutaiExecutors.newFixedThreadPool( 2 ).submit( runnable );
+        SubutaiExecutors.newFixedThreadPool( 2 ).submit( runnable, "test" );
+        SubutaiExecutors.newFixedThreadPool( 2 ).submit( callable );
 
     }
 
@@ -40,26 +33,26 @@ public class SubutaiExecutorsTest
     @Test
     public void testNewCachedThreadPool() throws Exception
     {
-        subutaiExecutors.newCachedThreadPool().submit( runnable );
-        subutaiExecutors.newCachedThreadPool().submit( runnable, callable );
-        subutaiExecutors.newCachedThreadPool().submit( callable );
+        SubutaiExecutors.newCachedThreadPool().submit( runnable );
+        SubutaiExecutors.newCachedThreadPool().submit( runnable, callable );
+        SubutaiExecutors.newCachedThreadPool().submit( callable );
     }
 
 
     @Test
     public void testNewSingleThreadScheduledExecutor() throws Exception
     {
-        subutaiExecutors.newSingleThreadScheduledExecutor().submit( runnable );
-        subutaiExecutors.newSingleThreadScheduledExecutor().submit( runnable, callable );
-        subutaiExecutors.newSingleThreadScheduledExecutor().submit( callable );
+        SubutaiExecutors.newSingleThreadScheduledExecutor().submit( runnable );
+        SubutaiExecutors.newSingleThreadScheduledExecutor().submit( runnable, callable );
+        SubutaiExecutors.newSingleThreadScheduledExecutor().submit( callable );
     }
 
 
     @Test
     public void testNewSingleThreadExecutor() throws Exception
     {
-        subutaiExecutors.newSingleThreadExecutor().submit( runnable );
-        subutaiExecutors.newSingleThreadExecutor().submit( runnable, callable );
-        subutaiExecutors.newSingleThreadExecutor().submit( callable );
+        SubutaiExecutors.newSingleThreadExecutor().submit( runnable );
+        SubutaiExecutors.newSingleThreadExecutor().submit( runnable, callable );
+        SubutaiExecutors.newSingleThreadExecutor().submit( callable );
     }
 }

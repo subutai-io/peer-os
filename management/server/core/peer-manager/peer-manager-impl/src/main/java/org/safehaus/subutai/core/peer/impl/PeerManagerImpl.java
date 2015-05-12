@@ -25,14 +25,10 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
-import org.safehaus.subutai.core.key.api.KeyInfo;
 import org.safehaus.subutai.core.key.api.KeyManager;
-import org.safehaus.subutai.core.key.api.KeyManagerException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.metric.api.Monitor;
-import org.safehaus.subutai.core.peer.api.EnvironmentContext;
-import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -46,7 +42,7 @@ import org.safehaus.subutai.core.peer.impl.entity.ManagementHostEntity;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequestListener;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory;
+import org.safehaus.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +51,8 @@ import org.apache.commons.io.FileUtils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
+//import org.safehaus.subutai.core.peer.api.EnvironmentContext;
 
 
 /**
@@ -66,6 +64,7 @@ public class PeerManagerImpl implements PeerManager
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class.getName() );
     private static final String SOURCE_REMOTE_PEER = "PEER_REMOTE";
     private static final String SOURCE_LOCAL_PEER = "PEER_LOCAL";
+    //TODO extract id to setting
     private static final String PEER_ID_PATH = "/var/lib/subutai/id";
     private static final String PEER_ID_FILE = "peer_id";
     private PeerDAO peerDAO;
@@ -85,18 +84,18 @@ public class PeerManagerImpl implements PeerManager
     private DaoManager daoManager;
     private KeyManager keyManager;
     private IdentityManager identityManager;
-    private CustomSslContextFactory sslContextFactory;
-
-
-    public void setSslContextFactory( final CustomSslContextFactory sslContextFactory )
-    {
-        this.sslContextFactory = sslContextFactory;
-    }
+    private SubutaiSslContextFactory sslContextFactory;
 
 
     public PeerManagerImpl( final Messenger messenger )
     {
         this.messenger = messenger;
+    }
+
+
+    public void setSslContextFactory( final SubutaiSslContextFactory sslContextFactory )
+    {
+        this.sslContextFactory = sslContextFactory;
     }
 
 
@@ -131,25 +130,6 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public EnvironmentContext prepareEnvironment( final UUID environmentId, String email )
-    {
-        EnvironmentContext environmentContext = new EnvironmentContext();
-        try
-        {
-            ManagementHost managementHost = localPeer.getManagementHost();
-            KeyInfo keyInfo = keyManager.generateKey( managementHost, environmentId.toString(), email );
-            keyInfo.getPublicKeyId();
-            String gpgPublicKey = keyManager.readKey( managementHost, keyInfo.getPublicKeyId() );
-        }
-        catch ( KeyManagerException | HostNotFoundException e )
-        {
-            LOG.error( e.toString(), e );
-        }
-        return null;
-    }
-
-
-    @Override
     public EntityManagerFactory getEntityManagerFactory()
     {
         return daoManager.getEntityManagerFactory();
@@ -166,67 +146,10 @@ public class PeerManagerImpl implements PeerManager
         {
             LOG.error( e.getMessage(), e );
         }
-
         List<PeerInfo> result = peerDAO.getInfo( SOURCE_LOCAL_PEER, PeerInfo.class );
         if ( result.isEmpty() )
         {
-
-            //obtain id from fs
-            File scriptsDirectory = new File( PEER_ID_PATH );
-            scriptsDirectory.mkdirs();
-
-            Path peerIdFilePath = Paths.get( PEER_ID_PATH, PEER_ID_FILE );
-
-            File peerIdFile = peerIdFilePath.toFile();
-
-            UUID peerId;
-
-            try
-            {
-                if ( !peerIdFile.exists() )
-                {
-                    //generate new id and save to fs
-                    peerId = UUID.randomUUID();
-                    FileUtils.writeStringToFile( peerIdFile, peerId.toString() );
-                }
-                else
-                {
-                    //read id from file
-                    peerId = UUID.fromString( FileUtils.readFileToString( peerIdFile ) );
-                }
-            }
-            catch ( Exception e )
-            {
-                throw new PeerInitializationError( "Failed to obtain peer id file", e );
-            }
-
-
-            peerInfo = new PeerInfo();
-            peerInfo.setId( peerId );
-            peerInfo.setName( "Local Subutai server" );
-            //TODO get ownerId from persistent storage
-            peerInfo.setOwnerId( UUID.randomUUID() );
-
-            try
-            {
-                Enumeration<InetAddress> addressEnumeration =
-                        NetworkInterface.getByName( Common.MANAGEMENT_HOST_EXTERNAL_IP_INTERFACE ).getInetAddresses();
-                while ( addressEnumeration.hasMoreElements() )
-                {
-                    InetAddress address = addressEnumeration.nextElement();
-                    if ( ( address instanceof Inet4Address ) )
-                    {
-                        peerInfo.setIp( address.getHostAddress() );
-                    }
-                }
-            }
-            catch ( SocketException e )
-            {
-                LOG.error( "Error getting network interfaces", e );
-            }
-            peerInfo.setName( String.format( "Peer on %s", peerInfo.getIp() ) );
-
-            peerDAO.saveInfo( SOURCE_LOCAL_PEER, peerInfo.getId().toString(), peerInfo );
+            initPeerInfo();
         }
         else
         {
@@ -254,6 +177,73 @@ public class PeerManagerImpl implements PeerManager
         addRequestListener( new DestroyEnvironmentContainersRequestListener( localPeer ) );
         //add echo listener
         addRequestListener( new EchoRequestListener() );
+    }
+
+
+    private void initPeerInfo()
+    {
+        //obtain id from fs
+        File scriptsDirectory = new File( PEER_ID_PATH );
+        if ( !scriptsDirectory.exists() )
+        {
+            boolean created = scriptsDirectory.mkdirs();
+            if ( created )
+            {
+                LOG.info( "Peer id directory created" );
+            }
+        }
+        Path peerIdFilePath = Paths.get( PEER_ID_PATH, PEER_ID_FILE );
+        File peerIdFile = peerIdFilePath.toFile();
+        UUID peerId;
+        try
+        {
+            if ( !peerIdFile.exists() )
+            {
+                //generate new id and save to fs
+                peerId = UUID.randomUUID();
+                FileUtils.writeStringToFile( peerIdFile, peerId.toString() );
+            }
+            else
+            {
+                //read id from file
+                peerId = UUID.fromString( FileUtils.readFileToString( peerIdFile ) );
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new PeerInitializationError( "Failed to obtain peer id file", e );
+        }
+        peerInfo = new PeerInfo();
+        peerInfo.setId( peerId );
+        peerInfo.setName( "Local Subutai server" );
+        //TODO get ownerId from persistent storage
+        peerInfo.setOwnerId( UUID.randomUUID() );
+        setPeerIp();
+        peerInfo.setName( String.format( "Peer on %s", peerInfo.getIp() ) );
+
+        peerDAO.saveInfo( SOURCE_LOCAL_PEER, peerInfo.getId().toString(), peerInfo );
+    }
+
+
+    private void setPeerIp()
+    {
+        try
+        {
+            Enumeration<InetAddress> addressEnumeration =
+                    NetworkInterface.getByName( Common.MANAGEMENT_HOST_EXTERNAL_IP_INTERFACE ).getInetAddresses();
+            while ( addressEnumeration.hasMoreElements() )
+            {
+                InetAddress address = addressEnumeration.nextElement();
+                if ( address instanceof Inet4Address )
+                {
+                    peerInfo.setIp( address.getHostAddress() );
+                }
+            }
+        }
+        catch ( SocketException e )
+        {
+            LOG.error( "Error getting network interfaces", e );
+        }
     }
 
 
@@ -297,14 +287,14 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public boolean trustRequest( final UUID peerId, final String root_server_px1 ) throws PeerException
+    public boolean trustRequest( final UUID peerId, final String rootCertPx1 ) throws PeerException
     {
         return false;
     }
 
 
     @Override
-    public boolean trustResponse( final UUID peerId, final String root_server_px1, final short status )
+    public boolean trustResponse( final UUID peerId, final String rootCertPx1, final short status )
             throws PeerException
     {
         return false;

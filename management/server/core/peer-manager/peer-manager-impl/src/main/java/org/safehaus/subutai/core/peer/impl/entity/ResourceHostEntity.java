@@ -56,33 +56,29 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 {
     private static final int CONNECT_TIMEOUT = 300;
 
-    protected static final Logger LOG = LoggerFactory.getLogger( ResourceHostEntity.class );
+    private static final Logger LOG = LoggerFactory.getLogger( ResourceHostEntity.class );
     private static final Pattern LXC_STATE_PATTERN = Pattern.compile( "State:(\\s*)(.*)" );
+    private static final String PRECONDITION_CONTAINER_IS_NULL_MSG = "Container host is null";
+    private static final String CONTAINER_EXCEPTION_MSG_FORMAT = "Container with name %s does not exist";
 
     @OneToMany( mappedBy = "parent", fetch = FetchType.EAGER,
             targetEntity = ContainerHostEntity.class )
-    Set<ContainerHost> containersHosts = Sets.newHashSet();
+    final Set<ContainerHost> containersHosts = Sets.newHashSet();
 
     @Transient
-    private ExecutorService singleThreadExecutorService = Executors.newSingleThreadExecutor();
+    protected ExecutorService singleThreadExecutorService = Executors.newSingleThreadExecutor();
     @Transient
     private Monitor monitor;
     @Transient
-    CommandUtil commandUtil = new CommandUtil();
+    protected CommandUtil commandUtil = new CommandUtil();
     @Transient
-    TemplateRegistry registry;
+    protected TemplateRegistry registry;
     @Transient
-    HostRegistry hostRegistry;
+    protected HostRegistry hostRegistry;
 
 
-    public ResourceHostEntity()
+    protected ResourceHostEntity()
     {
-    }
-
-
-    public void dispose()
-    {
-        singleThreadExecutorService.shutdown();
     }
 
 
@@ -98,10 +94,16 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
+    public void dispose()
+    {
+        singleThreadExecutorService.shutdown();
+    }
+
+
     @Override
     public ContainerState getContainerHostState( final ContainerHost containerHost ) throws ResourceHostException
     {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
 
         try
         {
@@ -110,7 +112,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         catch ( HostNotFoundException e )
         {
             throw new ResourceHostException(
-                    String.format( "Container with name %s does not exist", containerHost.getHostname() ) );
+                    String.format( CONTAINER_EXCEPTION_MSG_FORMAT, containerHost.getHostname() ), e );
         }
 
 
@@ -166,7 +168,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     public void startContainerHost( final ContainerHost containerHost ) throws ResourceHostException
     {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
 
         try
         {
@@ -175,7 +177,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         catch ( HostNotFoundException e )
         {
             throw new ResourceHostException(
-                    String.format( "Container with name %s does not exist", containerHost.getHostname() ) );
+                    String.format( CONTAINER_EXCEPTION_MSG_FORMAT, containerHost.getHostname() ), e );
         }
 
         RequestBuilder requestBuilder =
@@ -190,6 +192,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             throw new ResourceHostException( "Error on starting container", e );
         }
 
+        poolContainerAvailability( containerHost );
+    }
+
+
+    private void poolContainerAvailability( final ContainerHost containerHost ) throws ResourceHostException
+    {
         //wait container connection
         long ts = System.currentTimeMillis();
         while ( System.currentTimeMillis() - ts < CONNECT_TIMEOUT * 1000 && !containerHost.isConnected() )
@@ -214,7 +222,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     public void stopContainerHost( final ContainerHost containerHost ) throws ResourceHostException
     {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
 
         try
         {
@@ -223,7 +231,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         catch ( HostNotFoundException e )
         {
             throw new ResourceHostException(
-                    String.format( "Container with name %s does not exist", containerHost.getHostname() ) );
+                    String.format( CONTAINER_EXCEPTION_MSG_FORMAT, containerHost.getHostname() ), e );
         }
 
         RequestBuilder requestBuilder =
@@ -244,7 +252,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public void destroyContainerHost( final ContainerHost containerHost ) throws ResourceHostException
     {
 
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
 
         try
         {
@@ -253,7 +261,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         catch ( HostNotFoundException e )
         {
             throw new ResourceHostException(
-                    String.format( "Container with name %s does not exist", containerHost.getHostname() ) );
+                    String.format( CONTAINER_EXCEPTION_MSG_FORMAT, containerHost.getHostname() ), e );
         }
 
         Future future = queueSequentialTask( new DestroyContainerTask( this, containerHost.getHostname() ) );
@@ -290,7 +298,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     public void removeContainerHost( final ContainerHost containerHost )
     {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
 
         if ( getContainerHosts().contains( containerHost ) )
         {
@@ -340,6 +348,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         catch ( HostNotFoundException e )
         {
+            LOG.warn( "Error getting container host by name: " + hostname, e );
             //ignore
         }
 

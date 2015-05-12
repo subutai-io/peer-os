@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.peer.Host;
@@ -21,6 +20,7 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
@@ -30,6 +30,8 @@ import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
 import org.safehaus.subutai.core.strategy.api.CriteriaDef;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -62,31 +64,31 @@ import com.vaadin.ui.VerticalLayout;
 @SuppressWarnings( "serial" )
 public class Cloner extends VerticalLayout
 {
-    private static final Logger LOG = Logger.getLogger( Cloner.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( Cloner.class.getName() );
 
     private final ContainerTree containerTree;
     private final LocalPeer localPeer;
-    private final TextField textFieldLxcName;
-    private final Slider slider;
-    private final ComboBox strategy;
-    private final ComboBox templateCombo;
-    private final Label indicator;
-    private final TreeTable lxcTable;
-    private final HorizontalLayout criteriaLayout;
+    private TextField textFieldLxcName;
+    private Slider slider;
+    private ComboBox strategy;
+    private ComboBox templateCombo;
+    private Label indicator;
+    private TreeTable lxcTable;
+    private HorizontalLayout criteriaLayout;
     private final StrategyManager strategyManager;
 
-    private final String physicalHostLabel = "Physical Host";
-    private final String statusLabel = "Status";
-    private final String okIconSource = "img/ok.png";
-    private final String errorIconSource = "img/cancel.png";
-    private final String loadIconSource = "img/spinner.gif";
-    private static final String hostValidatorRegex =
+    private static final String PHYSICAL_HOST_LABEL = "Physical Host";
+    private static final String STATUS_LABEL = "Status";
+    private static final String OK_ICON_SOURCE = "img/ok.png";
+    private static final String ERROR_ICON_SOURCE = "img/cancel.png";
+    private static final String LOAD_ICON_SOURCE = "img/spinner.gif";
+    private static final String HOST_VALIDATOR_REGEX =
             "^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,"
                     + "61}[0-9A-Za-z])?)*\\.?$";
-    AtomicInteger countProcessed = null;
-    AtomicInteger errorProcessed = null;
-    Map<ContainerPlacementStrategy, BeanItemContainer<CriteriaDef>> criteriaBeansMap = new HashMap<>();
-    List<ContainerPlacementStrategy> placementStrategies;
+    private AtomicInteger countProcessed = null;
+    private AtomicInteger errorProcessed = null;
+    private Map<ContainerPlacementStrategy, BeanItemContainer<CriteriaDef>> criteriaBeansMap = new HashMap<>();
+    private List<ContainerPlacementStrategy> placementStrategies;
 
 
     public Cloner( TemplateRegistry registry, LocalPeer localPeer, StrategyManager strategyManager,
@@ -112,6 +114,17 @@ public class Cloner extends VerticalLayout
                 new BeanItemContainer<>( ContainerPlacementStrategy.class );
         container.addAll( placementStrategies );
 
+
+        addComponent( buildMainView( registry, container ) );
+        addComponent( criteriaLayout );
+        lxcTable = createLxcTable( "Containers list", 500 );
+        addComponent( lxcTable );
+    }
+
+
+    private GridLayout buildMainView( final TemplateRegistry registry,
+                                      final BeanItemContainer<ContainerPlacementStrategy> container )
+    {
         textFieldLxcName = new TextField();
         slider = new Slider();
         slider.setMin( 1 );
@@ -133,45 +146,23 @@ public class Cloner extends VerticalLayout
                 catch ( PeerException e )
                 {
                     show( e.toString() );
+                    LOG.warn( "Error in cloning task #buildMainView", e );
                 }
             }
         } );
 
-        Button clearBtn = new Button( "Clear" );
-        clearBtn.addStyleName( "default" );
-        clearBtn.addClickListener( new Button.ClickListener()
+        Button.ClickListener clearBtnListener = new Button.ClickListener()
         {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                //clear completed
-                for ( Object rowId : lxcTable.getItemIds() )
-                {
-                    Item row = lxcTable.getItem( rowId );
-                    if ( row != null )
-                    {
-                        Embedded statusIcon = ( Embedded ) ( row.getItemProperty( statusLabel ).getValue() );
-                        if ( statusIcon != null && (
-                                okIconSource.equals( ( ( ThemeResource ) statusIcon.getSource() ).getResourceId() )
-                                        || errorIconSource
-                                        .equals( ( ( ThemeResource ) statusIcon.getSource() ).getResourceId() ) ) )
-                        {
-                            lxcTable.removeItem( rowId );
-                        }
-                    }
-                }
-                //clear empty parents
-                for ( Object rowId : lxcTable.getItemIds() )
-                {
-                    Item row = lxcTable.getItem( rowId );
-                    if ( row != null && row.getItemProperty( physicalHostLabel ).getValue() != null && (
-                            lxcTable.getChildren( rowId ) == null || lxcTable.getChildren( rowId ).isEmpty() ) )
-                    {
-                        lxcTable.removeItem( rowId );
-                    }
-                }
+                clearFieldsData();
             }
-        } );
+        };
+
+        Button clearBtn = new Button( "Clear" );
+        clearBtn.addStyleName( "default" );
+        clearBtn.addClickListener( clearBtnListener );
 
         indicator = new Label();
         indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
@@ -207,37 +198,7 @@ public class Cloner extends VerticalLayout
         {
             public void valueChange( Property.ValueChangeEvent event )
             {
-                criteriaLayout.removeAllComponents();
-                ContainerPlacementStrategy st = ( ContainerPlacementStrategy ) event.getProperty().getValue();
-
-                BeanItemContainer<CriteriaDef> criteriaBeans = criteriaBeansMap.get( st );
-
-                final Table criteriaTable = new Table( "Strategy criteria", criteriaBeans );
-                criteriaTable.setColumnHeaders( "ID", "Name", "Value" );
-                criteriaTable.setPageLength( 5 );
-
-                criteriaTable.setSelectable( false );
-
-                criteriaTable.setImmediate( true );
-                criteriaTable.setTableFieldFactory( new TableFieldFactory()
-                {
-                    @Override
-                    public Field<?> createField( Container container, Object itemId, Object propertyId,
-                                                 Component component )
-                    {
-
-                        if ( propertyId.toString().equals( "value" ) )
-                        {
-                            return new CheckBox();
-                        }
-                        return null;
-                    }
-                } );
-
-                criteriaTable.setEditable( true );
-
-                criteriaLayout.addComponent( criteriaTable );
-                criteriaLayout.setVisible( st.hasCriteria() );
+                comboBoxChangedEventTrigger( event );
             }
         };
 
@@ -255,40 +216,89 @@ public class Cloner extends VerticalLayout
         topContent.addComponent( new Label( "Clone strategy" ) );
         topContent.addComponent( strategy );
         topContent.setComponentAlignment( indicator, Alignment.MIDDLE_CENTER );
-        addComponent( topContent );
-        addComponent( criteriaLayout );
-        lxcTable = createLxcTable( "Containers list", 500 );
-        addComponent( lxcTable );
+        return topContent;
+    }
+
+
+    private void comboBoxChangedEventTrigger( final Property.ValueChangeEvent event )
+    {
+        criteriaLayout.removeAllComponents();
+        ContainerPlacementStrategy st = ( ContainerPlacementStrategy ) event.getProperty().getValue();
+
+        BeanItemContainer<CriteriaDef> criteriaBeans = criteriaBeansMap.get( st );
+
+        final Table criteriaTable = new Table( "Strategy criteria", criteriaBeans );
+        criteriaTable.setColumnHeaders( "ID", "Name", "Value" );
+        criteriaTable.setPageLength( 5 );
+
+        criteriaTable.setSelectable( false );
+
+        criteriaTable.setImmediate( true );
+        criteriaTable.setTableFieldFactory( new TableFieldFactory()
+        {
+            @Override
+            public Field<?> createField( Container container, Object itemId, Object propertyId, Component component )
+            {
+
+                if ( "value".equals( propertyId.toString() ) )
+                {
+                    return new CheckBox();
+                }
+                return null;
+            }
+        } );
+
+        criteriaTable.setEditable( true );
+
+        criteriaLayout.addComponent( criteriaTable );
+        criteriaLayout.setVisible( st.hasCriteria() );
+    }
+
+
+    private void clearFieldsData()
+    {
+        clearCompletedRows();
+
+        //clear empty parents
+        for ( Object rowId : lxcTable.getItemIds() )
+        {
+            Item row = lxcTable.getItem( rowId );
+            if ( row != null && row.getItemProperty( PHYSICAL_HOST_LABEL ).getValue() != null &&
+                    ( lxcTable.getChildren( rowId ) == null || lxcTable.getChildren( rowId ).isEmpty() ) )
+            {
+                lxcTable.removeItem( rowId );
+            }
+        }
+    }
+
+
+    private void clearCompletedRows()
+    {
+        //clear completed
+        for ( Object rowId : lxcTable.getItemIds() )
+        {
+            Item row = lxcTable.getItem( rowId );
+            if ( row != null )
+            {
+                Embedded statusIcon = ( Embedded ) ( row.getItemProperty( STATUS_LABEL ).getValue() );
+                String statusSource =
+                        statusIcon != null ? ( ( ThemeResource ) statusIcon.getSource() ).getResourceId() : "";
+                if ( OK_ICON_SOURCE.equals( statusSource ) || ERROR_ICON_SOURCE.equals( statusSource ) )
+                {
+                    lxcTable.removeItem( rowId );
+                }
+            }
+        }
     }
 
 
     private void startCloneTask() throws PeerException
     {
+        if ( !assertFields() )
+        {
+            return;
+        }
         final String productName = textFieldLxcName.getValue().trim();
-
-        if ( Strings.isNullOrEmpty( productName ) )
-        {
-            show( "Please specify product name" );
-            return;
-        }
-
-        if ( !Strings.isNullOrEmpty( productName ) && !productName.matches( hostValidatorRegex ) )
-        {
-            show( "Please, use only letters, digits, dots and hyphens in product name" );
-            return;
-        }
-
-        if ( strategy.getValue() == null )
-        {
-            show( "Please specify placement strategy" );
-            return;
-        }
-
-        if ( templateCombo.getValue() == null )
-        {
-            show( "Please select a template" );
-            return;
-        }
 
         Set<Host> resourceHosts = Sets.newHashSet( containerTree.getSelectedHosts() );
 
@@ -304,78 +314,14 @@ public class Cloner extends VerticalLayout
 
         final Map<ResourceHost, List<String>> resourceHostFamilies = new HashMap<>();
         final double count = slider.getValue();
-        List<CriteriaDef> criteria = new ArrayList<>();
         if ( resourceHosts.isEmpty() )
-        { // process cloning by selected strategy
-
-            if ( placementStrategies == null || placementStrategies.isEmpty() )
-            {
-                show( "There is no placement strategy." );
-                return;
-            }
-            ContainerPlacementStrategy selectedStrategy =
-                    placementStrategies.get( placementStrategies.indexOf( strategy.getValue() ) );
-            if ( selectedStrategy.hasCriteria() )
-            {
-                BeanItemContainer<CriteriaDef> beans = criteriaBeansMap.get( selectedStrategy );
-                criteria = Lists.newArrayList( beans.getItemIds() );
-                for ( CriteriaDef c : criteria )
-                {
-                    LOG.info( String.format( "%s %s %s", c.getId(), c.getTitle(), c.getValue() ) );
-                }
-            }
-
-            List<ResourceHostMetric> serverMetrics = new ArrayList<>();
-
-            for ( Host host : localPeer.getResourceHosts() )
-            {
-                if ( host instanceof ResourceHost )
-                {
-                    ResourceHost rh = ( ResourceHost ) host;
-                    try
-                    {
-                        serverMetrics.add( rh.getHostMetric() );
-                    }
-                    catch ( ResourceHostException e )
-                    {
-                        show( e.toString() );
-                    }
-                }
-            }
-            Map<ResourceHostMetric, Integer> bestServers;
-            try
-            {
-                List<Criteria> cl = new ArrayList<>();
-                for ( CriteriaDef c : criteria )
-                {
-                    cl.add( c );
-                }
-                bestServers = strategyManager
-                        .getPlacementDistribution( serverMetrics, ( int ) count, selectedStrategy.getId(), cl );
-            }
-            catch ( StrategyException e )
-            {
-                show( e.toString() );
-                return;
-            }
-            Map<ResourceHostMetric, Integer> sortedBestServers = CollectionUtil.sortMapByValueDesc( bestServers );
-
-            for ( final Map.Entry<ResourceHostMetric, Integer> entry : sortedBestServers.entrySet() )
-            {
-                ResourceHost rh = localPeer.getResourceHostByName( entry.getKey().getHost() );
-                List<String> lxcHostNames = new ArrayList<>();
-                for ( int i = 0; i < entry.getValue(); i++ )
-                {
-                    lxcHostNames.add( StringUtil.trimToSize(
-                            String.format( "%s%d%s", productName, lxcHostNames.size() + 1,
-                                    UUIDUtil.generateTimeBasedUUID().toString().replace( "-", "" ) ),
-                            Common.MAX_CONTAINER_NAME_LEN ) );
-                }
-                resourceHostFamilies.put( rh, lxcHostNames );
-            }
+        {
+            // process cloning by selected strategy
+            processCloneByStrategy( count, productName, resourceHostFamilies );
         }
         else
-        { // process cloning in selected hosts
+        {
+            // process cloning in selected hosts
             for ( Host resourceHost : resourceHosts )
             {
                 List<String> lxcHostNames = new ArrayList<>();
@@ -408,6 +354,118 @@ public class Cloner extends VerticalLayout
     }
 
 
+    private boolean assertFields()
+    {
+        final String productName = textFieldLxcName.getValue().trim();
+
+        if ( Strings.isNullOrEmpty( productName ) )
+        {
+            show( "Please specify product name" );
+            return false;
+        }
+
+        if ( !Strings.isNullOrEmpty( productName ) && !productName.matches( HOST_VALIDATOR_REGEX ) )
+        {
+            show( "Please, use only letters, digits, dots and hyphens in product name" );
+            return false;
+        }
+
+        if ( strategy.getValue() == null )
+        {
+            show( "Please specify placement strategy" );
+            return false;
+        }
+
+        if ( templateCombo.getValue() == null )
+        {
+            show( "Please select a template" );
+            return false;
+        }
+        return true;
+    }
+
+
+    private void processCloneByStrategy( final double count, final String productName,
+                                         final Map<ResourceHost, List<String>> resourceHostFamilies )
+            throws HostNotFoundException
+    {
+        List<CriteriaDef> criteria = new ArrayList<>();
+        if ( placementStrategies == null || placementStrategies.isEmpty() )
+        {
+            show( "There is no placement strategy." );
+            return;
+        }
+        ContainerPlacementStrategy selectedStrategy =
+                placementStrategies.get( placementStrategies.indexOf( strategy.getValue() ) );
+        if ( selectedStrategy.hasCriteria() )
+        {
+            BeanItemContainer<CriteriaDef> beans = criteriaBeansMap.get( selectedStrategy );
+            criteria = Lists.newArrayList( beans.getItemIds() );
+            for ( CriteriaDef c : criteria )
+            {
+                LOG.info( String.format( "%s %s %s", c.getId(), c.getTitle(), c.getValue() ) );
+            }
+        }
+
+        List<ResourceHostMetric> serverMetrics = fillInServerMetrics();
+        Map<ResourceHostMetric, Integer> bestServers;
+        try
+        {
+            List<Criteria> cl = new ArrayList<>();
+            for ( CriteriaDef c : criteria )
+            {
+                cl.add( c );
+            }
+            bestServers = strategyManager
+                    .getPlacementDistribution( serverMetrics, ( int ) count, selectedStrategy.getId(), cl );
+        }
+        catch ( StrategyException e )
+        {
+            show( e.toString() );
+            LOG.warn( "Error distributing containers across resource hosts #processCloneByStrategy", e );
+            return;
+        }
+        Map<ResourceHostMetric, Integer> sortedBestServers = CollectionUtil.sortMapByValueDesc( bestServers );
+
+        for ( final Map.Entry<ResourceHostMetric, Integer> entry : sortedBestServers.entrySet() )
+        {
+            ResourceHost rh = localPeer.getResourceHostByName( entry.getKey().getHost() );
+            List<String> lxcHostNames = new ArrayList<>();
+            for ( int i = 0; i < entry.getValue(); i++ )
+            {
+                lxcHostNames.add( StringUtil.trimToSize( String.format( "%s%d%s", productName, lxcHostNames.size() + 1,
+                                UUIDUtil.generateTimeBasedUUID().toString().replace( "-", "" ) ),
+                        Common.MAX_CONTAINER_NAME_LEN ) );
+            }
+            resourceHostFamilies.put( rh, lxcHostNames );
+        }
+    }
+
+
+    private List<ResourceHostMetric> fillInServerMetrics()
+    {
+        List<ResourceHostMetric> serverMetrics = new ArrayList<>();
+
+        for ( Host host : localPeer.getResourceHosts() )
+        {
+            if ( host instanceof ResourceHost )
+            {
+                ResourceHost rh = ( ResourceHost ) host;
+                try
+                {
+                    serverMetrics.add( rh.getHostMetric() );
+                }
+                catch ( ResourceHostException e )
+                {
+                    show( e.toString() );
+                    LOG.warn( "Error getting host metrics #processCloneByStrategy", e );
+                }
+            }
+        }
+        return serverMetrics;
+    }
+
+
     private void show( String msg )
     {
         Notification.show( msg );
@@ -427,11 +485,10 @@ public class Cloner extends VerticalLayout
             lxcTable.setCollapsed( host.getHostname(), false );
             for ( String lxc : entry.getValue() )
             {
-                //                Embedded progressIcon = new Embedded("", new ThemeResource(loadIconSource));
                 if ( lxcTable.getItem( lxc ) == null )
                 {
                     lxcTable.addItem( new Object[] {
-                            null, lxc, null /*progressIcon*/
+                            null, lxc, null
                     }, lxc );
 
                     lxcTable.setParent( lxc, host.getHostname() );
@@ -445,9 +502,9 @@ public class Cloner extends VerticalLayout
     private TreeTable createLxcTable( String caption, int size )
     {
         TreeTable table = new TreeTable( caption );
-        table.addContainerProperty( physicalHostLabel, String.class, null );
+        table.addContainerProperty( PHYSICAL_HOST_LABEL, String.class, null );
         table.addContainerProperty( "Lxc Host", String.class, null );
-        table.addContainerProperty( statusLabel, Embedded.class, null );
+        table.addContainerProperty( STATUS_LABEL, Embedded.class, null );
         table.setWidth( 100, Unit.PERCENTAGE );
         table.setHeight( size, Unit.PIXELS );
         table.setPageLength( 10 );
@@ -459,45 +516,52 @@ public class Cloner extends VerticalLayout
 
     protected void updateContainerStatus( final String hostname, final CloneResultType resultType )
     {
-        getUI().access( new Runnable()
+        Runnable runnable = new Runnable()
         {
             @Override
             public void run()
             {
-                Item row = lxcTable.getItem( hostname );
-                if ( row != null )
-                {
-                    Property p = row.getItemProperty( "Status" );
-                    if ( CloneResultType.START.equals( resultType ) )
-                    {
-                        p.setValue( new Embedded( "", new ThemeResource( loadIconSource ) ) );
-                    }
-                    else if ( CloneResultType.SUCCESS.equals( resultType ) )
-                    {
-                        p.setValue( new Embedded( "", new ThemeResource( okIconSource ) ) );
-                        countProcessed.decrementAndGet();
-                    }
-                    else if ( CloneResultType.FAIL.equals( resultType ) )
-                    {
-                        p.setValue( new Embedded( "", new ThemeResource( errorIconSource ) ) );
-                        countProcessed.decrementAndGet();
-                        errorProcessed.incrementAndGet();
-                    }
-                }
-
-                if ( countProcessed.intValue() == 0 )
-                {
-                    indicator.setVisible( false );
-                    if ( errorProcessed.intValue() == 0 )
-                    {
-                        show( "Cloning containers finished successfully." );
-                    }
-                    else
-                    {
-                        show( "Not all containers successfully created." );
-                    }
-                }
+                showUpNotification( hostname, resultType );
             }
-        } );
+        };
+        getUI().access( runnable );
+    }
+
+
+    private void showUpNotification( final String hostname, final CloneResultType resultType )
+    {
+        Item row = lxcTable.getItem( hostname );
+        if ( row != null )
+        {
+            Property p = row.getItemProperty( "Status" );
+            if ( CloneResultType.START.equals( resultType ) )
+            {
+                p.setValue( new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) ) );
+            }
+            else if ( CloneResultType.SUCCESS.equals( resultType ) )
+            {
+                p.setValue( new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) ) );
+                countProcessed.decrementAndGet();
+            }
+            else if ( CloneResultType.FAIL.equals( resultType ) )
+            {
+                p.setValue( new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) ) );
+                countProcessed.decrementAndGet();
+                errorProcessed.incrementAndGet();
+            }
+        }
+
+        if ( countProcessed.intValue() == 0 )
+        {
+            indicator.setVisible( false );
+            if ( errorProcessed.intValue() == 0 )
+            {
+                show( "Cloning containers finished successfully." );
+            }
+            else
+            {
+                show( "Not all containers successfully created." );
+            }
+        }
     }
 }

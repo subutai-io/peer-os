@@ -179,31 +179,6 @@ public abstract class AbstractSubutaiHost implements Host
 
 
     @Override
-    public boolean equals( final Object o )
-    {
-        if ( this == o )
-        {
-            return true;
-        }
-        if ( o == null || getClass() != o.getClass() )
-        {
-            return false;
-        }
-
-        final AbstractSubutaiHost that = ( AbstractSubutaiHost ) o;
-
-        return hostId.equals( that.hostId );
-    }
-
-
-    @Override
-    public int hashCode()
-    {
-        return hostId != null ? hostId.hashCode() : 0;
-    }
-
-
-    @Override
     public Set<Interface> getNetInterfaces()
     {
         return this.interfaces;
@@ -269,6 +244,31 @@ public abstract class AbstractSubutaiHost implements Host
     public HostArchitecture getHostArchitecture()
     {
         return this.hostArchitecture;
+    }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( o == null || getClass() != o.getClass() )
+        {
+            return false;
+        }
+
+        final AbstractSubutaiHost that = ( AbstractSubutaiHost ) o;
+
+        return getHostId().equals( that.getHostId() );
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return hostId != null ? hostId.hashCode() : 0;
     }
 
 

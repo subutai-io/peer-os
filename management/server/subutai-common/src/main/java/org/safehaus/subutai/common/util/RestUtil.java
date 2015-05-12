@@ -33,7 +33,6 @@ public class RestUtil
     private static long defaultConnectionTimeout = 1000 * 60;
     private static int defaultMaxRetransmits = 3;
 
-
     public static enum RequestType
     {
         GET, DELETE, POST
@@ -59,66 +58,12 @@ public class RestUtil
     public String request( RequestType requestType, String url, String alias, Map<String, String> params,
                            Map<String, String> headers ) throws HTTPException
     {
-
         Preconditions.checkNotNull( requestType, "Invalid request type" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( url ), "Invalid url" );
-
-        WebClient client = null;
         Response response = null;
         try
         {
-            URL urlObject = new URL( url );
-            String port = String.valueOf( urlObject.getPort() );
-            switch ( port )
-            {
-                case ChannelSettings.SECURE_PORT_X1:
-                    client = createTrustedWebClient( url );
-                    break;
-                case ChannelSettings.SECURE_PORT_X2:
-                    LOG.debug( String.format( "Request type: %s, %s", requestType, url ) );
-                    client = createTrustedWebClientWithAuth( url, alias );
-                    break;
-                default:
-                    client = createWebClient( url );
-                    break;
-            }
-            Form form = new Form();
-            if ( params != null )
-            {
-                for ( Map.Entry<String, String> entry : params.entrySet() )
-                {
-                    if ( requestType == RequestType.POST )
-                    {
-                        form.set( entry.getKey(), entry.getValue() );
-                    }
-                    else
-                    {
-                        client.query( entry.getKey(), entry.getValue() );
-                    }
-                }
-            }
-            if ( headers != null )
-            {
-                for ( Map.Entry<String, String> entry : headers.entrySet() )
-                {
-                    client.header( entry.getKey(), entry.getValue() );
-                }
-            }
-            //            response = requestType == RequestType.GET ? client.get() : client.form( form );
-            switch ( requestType )
-            {
-                case GET:
-                    response = client.get();
-                    break;
-                case POST:
-                    response = client.form( form );
-                    break;
-                case DELETE:
-                    response = client.delete();
-                    break;
-                default:
-                    throw new HTTPException( String.format( "Unrecognized requestType: %s", requestType.name() ) );
-            }
+            response = executeClientAndGetResponse( url, requestType, alias, params, headers );
             if ( !NumUtil.isIntBetween( response.getStatus(), 200, 299 ) )
             {
                 if ( response.hasEntity() )
@@ -149,8 +94,53 @@ public class RestUtil
                 }
                 catch ( Exception ignore )
                 {
+                    //ignore
+                    LOG.warn( "Error closing response object", ignore );
                 }
             }
+        }
+        return null;
+    }
+
+
+    private Response executeClientAndGetResponse( final String url, final RequestType requestType, final String alias,
+                                                  final Map<String, String> params, final Map<String, String> headers )
+            throws MalformedURLException, HTTPException
+    {
+        WebClient client = null;
+        try
+        {
+            URL urlObject = new URL( url );
+            String port = String.valueOf( urlObject.getPort() );
+            switch ( port )
+            {
+                case ChannelSettings.SECURE_PORT_X1:
+                    client = createTrustedWebClient( url );
+                    break;
+                case ChannelSettings.SECURE_PORT_X2:
+                    LOG.debug( String.format( "Request type: %s, %s", requestType, url ) );
+                    client = createTrustedWebClientWithAuth( url, alias );
+                    break;
+                default:
+                    client = createWebClient( url );
+                    break;
+            }
+            Form form = new Form();
+            constructClientParams( params, requestType, form, client, headers );
+            switch ( requestType )
+            {
+                case GET:
+                    return client.get();
+                case POST:
+                    return client.form( form );
+                case DELETE:
+                    return client.delete();
+                default:
+                    throw new HTTPException( String.format( "Unrecognized requestType: %s", requestType.name() ) );
+            }
+        }
+        finally
+        {
             if ( client != null )
             {
                 try
@@ -159,11 +149,38 @@ public class RestUtil
                 }
                 catch ( Exception ignore )
                 {
+                    //ignore
+                    LOG.warn( "Error disposing web client", ignore );
                 }
             }
         }
+    }
 
-        return null;
+
+    private void constructClientParams( final Map<String, String> params, final RequestType requestType,
+                                        final Form form, final WebClient client, final Map<String, String> headers )
+    {
+        if ( params != null )
+        {
+            for ( Map.Entry<String, String> entry : params.entrySet() )
+            {
+                if ( requestType == RequestType.POST )
+                {
+                    form.set( entry.getKey(), entry.getValue() );
+                }
+                else
+                {
+                    client.query( entry.getKey(), entry.getValue() );
+                }
+            }
+        }
+        if ( headers != null )
+        {
+            for ( Map.Entry<String, String> entry : headers.entrySet() )
+            {
+                client.header( entry.getKey(), entry.getValue() );
+            }
+        }
     }
 
 
@@ -244,19 +261,19 @@ public class RestUtil
     }
 
 
-    private synchronized static void setDefaultReceiveTimeout( final long timeout )
+    private static synchronized void setDefaultReceiveTimeout( final long timeout )
     {
         defaultReceiveTimeout = timeout;
     }
 
 
-    private synchronized static void setDefaultConnectionTimeout( final long timeout )
+    private static synchronized void setDefaultConnectionTimeout( final long timeout )
     {
         defaultConnectionTimeout = timeout;
     }
 
 
-    private synchronized static void setDefaultMaxRetransmits( final int timeout )
+    private static synchronized void setDefaultMaxRetransmits( final int timeout )
     {
         defaultMaxRetransmits = timeout;
     }

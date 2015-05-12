@@ -2,7 +2,6 @@ package org.safehaus.subutai.core.peer.cli;
 
 
 import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -36,20 +35,9 @@ public class StopLxcCommand extends SubutaiShellCommandSupport
 
         ContainerHost host = localPeer.getContainerHostByName( hostname );
 
-        if ( host == null )
-        {
-            System.out.println( "Container not found." );
-        }
+        localPeer.stopContainer( host );
+        System.out.println( "Container stopped successfully" );
 
-        try
-        {
-            localPeer.stopContainer( host );
-            System.out.println( "Container stopped successfully" );
-        }
-        catch ( PeerException e )
-        {
-            System.out.println( "Could not stop container. Error occurred: " + e.toString() );
-        }
         return null;
     }
 }

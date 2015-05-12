@@ -11,18 +11,11 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.apache.karaf.shell.commands.Command;
 
 
-
-@Command(scope = "peer", name = "ls")
+@Command( scope = "peer", name = "ls" )
 public class ListCommand extends SubutaiShellCommandSupport
 {
 
     private PeerManager peerManager;
-
-
-    public PeerManager getPeerManager()
-    {
-        return peerManager;
-    }
 
 
     public void setPeerManager( final PeerManager peerManager )
@@ -49,7 +42,7 @@ public class ListCommand extends SubutaiShellCommandSupport
             }
             catch ( PeerException pe )
             {
-                peerStatus += " "+pe.toString();
+                peerStatus += " " + pe.getMessage();
             }
             System.out.println(
                     peer.getId() + " " + peer.getPeerInfo().getIp() + " " + peer.getName() + " " + peerStatus );

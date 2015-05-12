@@ -42,4 +42,34 @@ public class CpuQuotaInfo extends QuotaInfo
     {
         return QuotaType.QUOTA_TYPE_CPU;
     }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof CpuQuotaInfo ) )
+        {
+            return false;
+        }
+
+        final CpuQuotaInfo that = ( CpuQuotaInfo ) o;
+
+        if ( percentage != that.percentage )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return percentage;
+    }
 }

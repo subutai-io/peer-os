@@ -28,7 +28,8 @@ public class ViewEnvironmentCommand extends SubutaiShellCommandSupport
     /**
      * {@value environmentId} environment id to view info about
      * <p>{@code required = true}</p>
-     */ private String environmentId;
+     */
+            String environmentId;
 
     private final EnvironmentManager environmentManager;
 

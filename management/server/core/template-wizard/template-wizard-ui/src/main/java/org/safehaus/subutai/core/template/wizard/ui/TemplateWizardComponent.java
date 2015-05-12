@@ -6,9 +6,11 @@ import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
 
 import com.google.common.collect.Lists;
 import com.vaadin.data.Validator;
@@ -44,16 +46,73 @@ public class TemplateWizardComponent extends CustomComponent
 
     public TemplateWizardComponent( final TemplateWizardPortalModule portalModule )
     {
-        setHeight( 100, Sizeable.Unit.PERCENTAGE );
-
         localPeer = portalModule.getPeerManager().getLocalPeer();
         this.portalModule = portalModule;
+
+        initMainView();
+    }
+
+
+    private void initMainView()
+    {
+        setHeight( 100, Sizeable.Unit.PERCENTAGE );
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing( true );
         verticalLayout.setMargin( new MarginInfo( 10 ) );
-        //        verticalLayout.setSizeFull();
 
+        initializeControls();
+
+        Button createContainerHost = new Button( "New container host", new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
+            {
+                BeanItem beanItem = ( BeanItem ) parentTemplateComboBox.getItem( parentTemplateComboBox.getValue() );
+                Template template = ( Template ) beanItem.getBean();
+                Tracker tracker = portalModule.getTracker();
+                TrackerOperation trackerOperation =
+                        tracker.createTrackerOperation( portalModule.getId(), portalModule.getName() );
+                BeanItem resourceHostItem =
+                        ( BeanItem ) resourceHostComboBox.getItem( resourceHostComboBox.getValue() );
+                final ResourceHost resourceHost = ( ResourceHost ) resourceHostItem.getBean();
+                portalModule.getTemplateWizard()
+                            .createContainerHost( newTemplateName.getValue(), template.getTemplateName(),
+                                    resourceHost.getId(), trackerOperation );
+            }
+        } );
+
+        Button installProducts = new Button( "Install Products", new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
+            {
+                String[] products = commandsCollection.getValue().split( "\n" );
+                Tracker tracker = portalModule.getTracker();
+                TrackerOperation trackerOperation =
+                        tracker.createTrackerOperation( portalModule.getId(), portalModule.getName() );
+                BeanItem resourceHostItem =
+                        ( BeanItem ) resourceHostComboBox.getItem( resourceHostComboBox.getValue() );
+                final ResourceHost resourceHost = ( ResourceHost ) resourceHostItem.getBean();
+                portalModule.getTemplateWizard()
+                            .installProducts( Lists.newArrayList( products ), resourceHost.getId(), trackerOperation );
+            }
+        } );
+
+        verticalLayout.addComponent( parentTemplateComboBox );
+        verticalLayout.addComponent( resourceHostComboBox );
+        verticalLayout.addComponent( newTemplateName );
+        verticalLayout.addComponent( commandsCollection );
+        verticalLayout.addComponent( createTemplateButton );
+        verticalLayout.addComponent( createContainerHost );
+        verticalLayout.addComponent( installProducts );
+
+        setCompositionRoot( verticalLayout );
+    }
+
+
+    private void initializeControls()
+    {
         BeanContainer<String, Template> templateBeanContainer = new BeanContainer<>( Template.class );
         templateBeanContainer.setBeanIdProperty( "md5sum" );
         templateBeanContainer.addAll( portalModule.getTemplateRegistry().getAllTemplates() );
@@ -100,8 +159,7 @@ public class TemplateWizardComponent extends CustomComponent
                         }
                         catch ( HostNotFoundException ignore )
                         {
-                            //                            LOGGER.debug( Marker.ANY_MARKER, "Couldn't get container
-                            // host by name", e );
+                            LOGGER.debug( Marker.ANY_MARKER, "Couldn't get container host by name", ignore );
                         }
                         return true;
                     }
@@ -110,113 +168,89 @@ public class TemplateWizardComponent extends CustomComponent
         commandsCollection = new TextArea( "Input commands for template configuration." );
         commandsCollection.setWidth( "40%" );
 
+        final Button.ClickListener createTemplateListener = new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
+            {
+                createTemplate();
+            }
+        };
         createTemplateButton = new Button( "Create template", createTemplateListener );
-
-        Button createContainerHost = new Button( "New container host", new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( final Button.ClickEvent event )
-            {
-                BeanItem beanItem = ( BeanItem ) parentTemplateComboBox.getItem( parentTemplateComboBox.getValue() );
-                Template template = ( Template ) beanItem.getBean();
-                portalModule.getTemplateWizard()
-                            .createContainerHost( newTemplateName.getValue(), template.getTemplateName() );
-            }
-        } );
-
-        Button installProducts = new Button( "Install Products", new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( final Button.ClickEvent event )
-            {
-                String products[] = commandsCollection.getValue().split( "\n" );
-                portalModule.getTemplateWizard().installProducts( Lists.newArrayList( products ) );
-            }
-        } );
-
-        verticalLayout.addComponent( parentTemplateComboBox );
-        verticalLayout.addComponent( resourceHostComboBox );
-        verticalLayout.addComponent( newTemplateName );
-        verticalLayout.addComponent( commandsCollection );
-        verticalLayout.addComponent( createTemplateButton );
-        verticalLayout.addComponent( createContainerHost );
-
-        setCompositionRoot( verticalLayout );
     }
 
 
-    private Button.ClickListener createTemplateListener = new Button.ClickListener()
+    private void createTemplate()
     {
-        @Override
-        public void buttonClick( final Button.ClickEvent event )
+        if ( parentTemplateComboBox.getValue() == null )
         {
-            if ( parentTemplateComboBox.getValue() == null )
-            {
-                Notification.show( "Please select parent template." );
-                return;
-            }
-
-            if ( resourceHostComboBox.getValue() == null )
-            {
-                Notification.show( "Please select resource host." );
-                return;
-            }
-
-            try
-            {
-                newTemplateName.validate();
-            }
-            catch ( Validator.InvalidValueException e )
-            {
-                Notification.show( e.getMessage() );
-                return;
-            }
-
-            BeanItem resourceHostItem = ( BeanItem ) resourceHostComboBox.getItem( resourceHostComboBox.getValue() );
-            final ResourceHost resourceHost = ( ResourceHost ) resourceHostItem.getBean();
-            if ( resourceHost != null )
-            {
-                final TrackerOperation trackerOperation = portalModule.getTracker()
-                                                                      .createTrackerOperation( "TemplateWizard",
-                                                                              "Started template creation." );
-
-                final ProgressWindow progressWindow =
-                        new ProgressWindow( portalModule.getExecutor(), portalModule.getTracker(),
-                                trackerOperation.getId(), "TemplateWizard" );
-                progressWindow.getWindow().addCloseListener( new Window.CloseListener()
-                {
-                    @Override
-                    public void windowClose( final Window.CloseEvent e )
-                    {
-
-                        parentTemplateComboBox.select( null );
-                        resourceHostComboBox.select( null );
-                        newTemplateName.setValue( "" );
-                        commandsCollection.setValue( "" );
-                    }
-                } );
-
-                final FieldEvents.FocusListener focusListener = new FieldEvents.FocusListener()
-                {
-                    @Override
-                    public void focus( final FieldEvents.FocusEvent event )
-                    {
-                        progressWindow.getWindow().removeFocusListener( this );
-                        BeanItem beanItem =
-                                ( BeanItem ) parentTemplateComboBox.getItem( parentTemplateComboBox.getValue() );
-                        Template template = ( Template ) beanItem.getBean();
-                        String products[] = commandsCollection.getValue().split( "\n" );
-                        portalModule.getTemplateWizard()
-                                    .createTemplate( newTemplateName.getValue(), template.getTemplateName(),
-                                            Lists.newArrayList( "" ), Lists.newArrayList( products ),
-                                            Lists.newArrayList( "" ), resourceHost.getId(), trackerOperation );
-                        //                        initTemplateCreationProcess( trackerOperation, resourceHost );
-                    }
-                };
-                progressWindow.getWindow().addFocusListener( focusListener );
-                getUI().addWindow( progressWindow.getWindow() );
-                progressWindow.getWindow().focus();
-            }
+            Notification.show( "Please select parent template." );
+            return;
         }
-    };
+
+        if ( resourceHostComboBox.getValue() == null )
+        {
+            Notification.show( "Please select resource host." );
+            return;
+        }
+
+        try
+        {
+            newTemplateName.validate();
+        }
+        catch ( Validator.InvalidValueException e )
+        {
+            Notification.show( e.getMessage() );
+            LOGGER.warn( "Input validation failed" );
+            return;
+        }
+
+        BeanItem resourceHostItem = ( BeanItem ) resourceHostComboBox.getItem( resourceHostComboBox.getValue() );
+        final ResourceHost resourceHost = ( ResourceHost ) resourceHostItem.getBean();
+        if ( resourceHost != null )
+        {
+            createContainerHostForTemplate( resourceHost );
+        }
+    }
+
+
+    private void createContainerHostForTemplate( final ResourceHost resourceHost )
+    {
+        final TrackerOperation trackerOperation =
+                portalModule.getTracker().createTrackerOperation( "TemplateWizard", "Started template creation." );
+
+        final ProgressWindow progressWindow =
+                new ProgressWindow( portalModule.getExecutor(), portalModule.getTracker(), trackerOperation.getId(),
+                        "TemplateWizard" );
+        progressWindow.getWindow().addCloseListener( new Window.CloseListener()
+        {
+            @Override
+            public void windowClose( final Window.CloseEvent e )
+            {
+
+                parentTemplateComboBox.select( null );
+                resourceHostComboBox.select( null );
+                newTemplateName.setValue( "" );
+                commandsCollection.setValue( "" );
+            }
+        } );
+
+        final FieldEvents.FocusListener focusListener = new FieldEvents.FocusListener()
+        {
+            @Override
+            public void focus( final FieldEvents.FocusEvent event )
+            {
+                progressWindow.getWindow().removeFocusListener( this );
+                BeanItem beanItem = ( BeanItem ) parentTemplateComboBox.getItem( parentTemplateComboBox.getValue() );
+                Template template = ( Template ) beanItem.getBean();
+                String[] products = commandsCollection.getValue().split( "\n" );
+                portalModule.getTemplateWizard().createTemplate( newTemplateName.getValue(), template.getTemplateName(),
+                        Lists.newArrayList( "" ), Lists.newArrayList( products ), Lists.newArrayList( "" ),
+                        resourceHost.getId(), trackerOperation );
+            }
+        };
+        progressWindow.getWindow().addFocusListener( focusListener );
+        getUI().addWindow( progressWindow.getWindow() );
+        progressWindow.getWindow().focus();
+    }
 }

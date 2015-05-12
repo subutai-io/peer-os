@@ -43,7 +43,7 @@ public class FileDiffModalView extends Window
 
     private String formattedStringWithStyles( String input )
     {
-        String result = "";
+        StringBuilder result = new StringBuilder( "" );
         String parsedString[] = input.split( "\n" );
         boolean append = false;
         for ( int i = 0; i < parsedString.length; i++ )
@@ -61,91 +61,13 @@ public class FileDiffModalView extends Window
             }
             if ( append )
             {
-                //TODO correctly format output git diff string for showing precise changes
-                //do not delete these comments
-                //                List<String> aChanges = new ArrayList<>();
-                //                List<String> aChangesDuplicate = new ArrayList<>();
-                //                for (; i < parsedString.length && parsedString[i].startsWith( "-" ); i++ )
-                //                {
-                //                    str = parsedString[i];
-                //                    String temp = str.replace( ".", "\\." );
-                //                    temp = temp.replace( "?", "\\?" );
-                //                    temp = temp.replace( "+", "\\+" );
-                //                    temp = temp.replace( "*", "\\*" );
-                //                    temp = temp.replace( "^", "\\^" );
-                //                    temp = temp.replace( "$", "\\$" );
-                //                    temp = temp.replace( "\\", "\\\\" );
-                //                    temp = temp.replace( "(", "\\(" );
-                //                    temp = temp.replace( ")", "\\)" );
-                //                    temp = temp.replace( "[", "\\[" );
-                //                    temp = temp.replace( "]", "\\]" );
-                //                    temp = temp.replace( "{", "\\{" );
-                //                    temp = temp.replace( "}", "\\}" );
-                //                    temp = temp.replace( "|", "\\|" );
-                //
-                //                    String tokens [] = temp.split( "[(\\s|\t)]" );
-                //                    temp = "(";
-                //                    for ( int j = 0; j < tokens.length; j++ )
-                //                    {
-                //                        String token = tokens[j];
-                //                        if ( j == tokens.length - 1 )
-                //                        {
-                //                            temp += token;
-                //                        }
-                //                        else
-                //                        {
-                //                            temp += token + " | ";
-                //                        }
-                //                    }
-                //                    temp += ")";
-                //
-                //                    aChanges.add( temp.length() > 0 ? " " + temp.substring( 1 ) : temp );
-                //                    aChangesDuplicate.add( str.length() > 0 ? " " + str.substring( 1 ) : str );
-                //                }
-                //                List<String> bChanges = new ArrayList<>();
-                //                for (; i < parsedString.length && parsedString[i].startsWith( "+" ); i++ )
-                //                {
-                //                    str = parsedString[i];
-                //                    //                    String temp = str.replace( ".", "\\." );
-                //                    //                    temp = temp.replace( "?", "\\?" );
-                //                    //                    temp = temp.replace( "+", "\\+" );
-                //                    //                    temp = temp.replace( "*", "\\*" );
-                //                    //                    temp = temp.replace( "^", "\\^" );
-                //                    //                    temp = temp.replace( "$", "\\$" );
-                //                    //                    temp = temp.replace( "\\", "\\\\" );
-                //                    //                    temp = temp.replace( "(", "\\(" );
-                //                    //                    temp = temp.replace( ")", "\\)" );
-                //                    //                    temp = temp.replace( "[", "\\[" );
-                //                    //                    temp = temp.replace( "]", "\\]" );
-                //                    //                    temp = temp.replace( "{", "\\{" );
-                //                    //                    temp = temp.replace( "}", "\\}" );
-                //                    //                    temp = temp.replace( "|", "\\|" );
-                //                    bChanges.add( str.length() > 0 ? " " + str.substring( 1 ) : str );
-                //                }
-                //
-                //                for ( int j = 0; j < aChanges.size(); j++ )
-                //                {
-                //                    String aChange = aChanges.get( j );
-                //                    Pattern p = Pattern.compile( "[" + aChange + "]" );
-                //                    for ( final String bChange : bChanges )
-                //                    {
-                //                        String lineFormat = "<div style=\"background-color: ";
-                //                        Matcher matcher = p.matcher( bChange );
-                //                        if ( matcher.find() )
-                //                        {
-                //                            lineFormat += "#dfd;";
-                //                        }
-                //                    }
-                //                }
-
-
                 if ( str.startsWith( "-" ) )
                 {
-
                     boolean aDeleted = true;
                     int j = i;
-                    for (; j < parsedString.length && parsedString[j].startsWith( "-" ); j++ )
+                    while ( j < parsedString.length && parsedString[j].startsWith( "-" ) )
                     {
+                        j++;
                     }
                     if ( j < parsedString.length && parsedString[j].startsWith( "+" ) )
                     {
@@ -160,7 +82,7 @@ public class FileDiffModalView extends Window
                             str = str.length() > 0 ? " " + str.substring( 1 ) : str;
                             lineFormat += "<pre>" + str + "</pre>";
                             lineFormat += "</div>";
-                            result += lineFormat;
+                            result.append( lineFormat );
                         }
                         if ( !( i == parsedString.length - 1 ) )
                         {
@@ -176,7 +98,7 @@ public class FileDiffModalView extends Window
                             str = str.length() > 0 ? " " + str.substring( 1 ) : str;
                             lineFormat += "<pre>" + str + "</pre>";
                             lineFormat += "</div>";
-                            result += lineFormat;
+                            result.append( lineFormat );
                         }
                         if ( !( i == parsedString.length - 1 ) )
                         {
@@ -194,7 +116,7 @@ public class FileDiffModalView extends Window
                     lineFormat += "\">";
                     lineFormat += "<pre>" + str + "</pre>";
                     lineFormat += "</div>";
-                    result += lineFormat;
+                    result.append( lineFormat );
                 }
                 else if ( !"\\ No newline at end of file".equals( str ) )
                 {
@@ -202,15 +124,15 @@ public class FileDiffModalView extends Window
                     lineFormat += "\">";
                     lineFormat += "<pre>" + str + "</pre>";
                     lineFormat += "</div>";
-                    result += lineFormat;
+                    result.append( lineFormat );
                 }
             }
         }
         if ( !append )
         {
             int inx = input.indexOf( "Binary" );
-            result += "<pre>" + input.substring( inx > 0 ? inx : 0 ) + "</pre>";
+            result.append( "<pre>" ).append( input.substring( inx > 0 ? inx : 0 ) ).append( "</pre>" );
         }
-        return result;
+        return result.toString();
     }
 }

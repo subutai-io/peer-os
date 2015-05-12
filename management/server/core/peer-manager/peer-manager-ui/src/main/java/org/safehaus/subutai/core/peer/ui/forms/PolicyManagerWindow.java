@@ -77,7 +77,7 @@ public class PolicyManagerWindow extends Window
 
     private List<HorizontalLayout> generateRulesByPolicy( final PeerPolicy peerPolicy )
     {
-        List<HorizontalLayout> policyRules = new ArrayList<>();
+        List<HorizontalLayout> rules = new ArrayList<>();
         Class<?> peerPolicyClass;
         try
         {
@@ -86,7 +86,7 @@ public class PolicyManagerWindow extends Window
         catch ( ClassNotFoundException e )
         {
             LOG.error( "Error retrieving class for PeerPolicy", e );
-            return policyRules;
+            return rules;
         }
         Field[] fields = peerPolicyClass.getDeclaredFields();
 
@@ -110,9 +110,9 @@ public class PolicyManagerWindow extends Window
                 textField.setValue( value.toString() );
             }
             rule.addComponent( textField );
-            policyRules.add( rule );
+            rules.add( rule );
         }
-        return policyRules;
+        return rules;
     }
 
 
@@ -135,22 +135,19 @@ public class PolicyManagerWindow extends Window
         for ( Method method : clazz.getMethods() )
         {
             if ( ( method.getName().startsWith( "get" ) ) && ( method.getName().length() == ( field.getName().length()
-                    + 3 ) ) )
+                    + 3 ) ) && method.getName().toLowerCase().endsWith( field.getName().toLowerCase() ) )
             {
-                if ( method.getName().toLowerCase().endsWith( field.getName().toLowerCase() ) )
+                try
                 {
-                    try
-                    {
-                        return method.invoke( object );
-                    }
-                    catch ( IllegalAccessException e )
-                    {
-                        LOG.error( "Could not determine method IllegalAccessException: " + method.getName() );
-                    }
-                    catch ( InvocationTargetException e )
-                    {
-                        LOG.error( "Could not determine method InvocationTargetException: " + method.getName() );
-                    }
+                    return method.invoke( object );
+                }
+                catch ( IllegalAccessException e )
+                {
+                    LOG.error( "Could not determine method IllegalAccessException: " + method.getName() );
+                }
+                catch ( InvocationTargetException e )
+                {
+                    LOG.error( "Could not determine method InvocationTargetException: " + method.getName() );
                 }
             }
         }
@@ -164,22 +161,19 @@ public class PolicyManagerWindow extends Window
         for ( Method method : clazz.getMethods() )
         {
             if ( ( method.getName().startsWith( "set" ) ) && ( method.getName().length() == ( field.getName().length()
-                    + 3 ) ) )
+                    + 3 ) ) && method.getName().toLowerCase().endsWith( field.getName().toLowerCase() ) )
             {
-                if ( method.getName().toLowerCase().endsWith( field.getName().toLowerCase() ) )
+                try
                 {
-                    try
-                    {
-                        method.invoke( object, value );
-                    }
-                    catch ( IllegalAccessException e )
-                    {
-                        LOG.error( "Could not determine method IllegalAccessException: " + method.getName() );
-                    }
-                    catch ( InvocationTargetException e )
-                    {
-                        LOG.error( "Could not determine method InvocationTargetException: " + method.getName() );
-                    }
+                    method.invoke( object, value );
+                }
+                catch ( IllegalAccessException e )
+                {
+                    LOG.error( "Could not determine method IllegalAccessException: " + method.getName() );
+                }
+                catch ( InvocationTargetException e )
+                {
+                    LOG.error( "Could not determine method InvocationTargetException: " + method.getName() );
                 }
             }
         }
@@ -209,69 +203,74 @@ public class PolicyManagerWindow extends Window
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-
-                Class<?> peerPolicyClass = null;
-                try
-                {
-                    peerPolicyClass = Class.forName( PeerPolicy.class.getCanonicalName() );
-                }
-                catch ( ClassNotFoundException e )
-                {
-                    LOG.error( "Error getting PeerPolicy class object", e );
-                    return;
-                }
-                Field[] fields = peerPolicyClass.getDeclaredFields();
-
-                for ( HorizontalLayout ruleLayout : policyRules )
-                {
-                    TextField inputField = ( TextField ) ruleLayout.getComponent( 0 );
-                    if ( inputField.getValue().isEmpty() )
-                    {
-                        continue;
-                    }
-                    String value = inputField.getValue();
-                    for ( Field field : fields )
-                    {
-                        if ( field.getName().equals( inputField.getId() ) )
-                        {
-                            try
-                            {
-                                runSetter( field, peerPolicy, Integer.valueOf( value ) );
-                            }
-                            catch ( Exception e )
-                            {
-                                Notification.show( value + " is not an appropriate value for " + field.getName()
-                                        + "! It should be \"" + field.getType().getSimpleName() + "\" type." );
-                                return;
-                            }
-                            break;
-                        }
-                    }
-                }
-
-                localPeerInfo.setPeerPolicy( peerPolicy );
-                boolean success = peerManager.update( localPeerInfo );
-                if ( success )
-                {
-                    close();
-                }
-                else
-                {
-                    Notification.show( "Failed to update policy!" );
-                }
+                savePolicyAction();
             }
         } );
         return saveButton;
     }
 
 
-    private synchronized static void setWindowCaption( String caption )
+    private void savePolicyAction()
+    {
+        Class<?> peerPolicyClass = null;
+        try
+        {
+            peerPolicyClass = Class.forName( PeerPolicy.class.getCanonicalName() );
+        }
+        catch ( ClassNotFoundException e )
+        {
+            LOG.error( "Error getting PeerPolicy class object", e );
+            return;
+        }
+        Field[] fields = peerPolicyClass.getDeclaredFields();
+
+        for ( HorizontalLayout ruleLayout : policyRules )
+        {
+            TextField inputField = ( TextField ) ruleLayout.getComponent( 0 );
+            if ( inputField.getValue().isEmpty() )
+            {
+                continue;
+            }
+            String value = inputField.getValue();
+            for ( Field field : fields )
+            {
+                if ( field.getName().equals( inputField.getId() ) )
+                {
+                    try
+                    {
+                        runSetter( field, peerPolicy, Integer.valueOf( value ) );
+                    }
+                    catch ( Exception e )
+                    {
+                        Notification.show( value + " is not an appropriate value for " + field.getName()
+                                + "! It should be \"" + field.getType().getSimpleName() + "\" type." );
+                        return;
+                    }
+                    break;
+                }
+            }
+        }
+
+        localPeerInfo.setPeerPolicy( peerPolicy );
+        boolean success = peerManager.update( localPeerInfo );
+        if ( success )
+        {
+            close();
+        }
+        else
+        {
+            Notification.show( "Failed to update policy!" );
+        }
+    }
+
+
+    private static synchronized void setWindowCaption( String caption )
     {
         WINDOW_CAPTION = caption;
     }
 
 
-    private synchronized static String getWindowCaption()
+    private static synchronized String getWindowCaption()
     {
         return WINDOW_CAPTION;
     }

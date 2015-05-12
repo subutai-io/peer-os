@@ -239,10 +239,10 @@ public class PluginManagerImpl implements PluginManager
         switch ( operationType )
         {
             case INSTALL:
-                result = PluginOperationHandler.isInstallSuccessful;
+                result = PluginOperationHandler.isInstallSuccessful();
                 break;
             case REMOVE:
-                result = PluginOperationHandler.isRemoveSuccessful;
+                result = PluginOperationHandler.isRemoveSuccessful();
                 break;
         }
         return result;

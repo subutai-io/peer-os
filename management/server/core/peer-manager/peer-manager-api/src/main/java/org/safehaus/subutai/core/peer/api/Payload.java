@@ -10,7 +10,7 @@ import com.google.common.base.Strings;
 
 public class Payload
 {
-    private String request;
+    protected String request;
     private UUID sourcePeerId;
 
 

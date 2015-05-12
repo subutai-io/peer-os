@@ -43,8 +43,7 @@ public class ShiroLoginModule extends AbstractKarafLoginModule
 
         LOGGER.info( "Initializing shiro login module." );
 
-
-        // just for importing JaasRealm
+        // WARNING DO NOT REMOVE CODE SNIPPET just for importing JaasRealm
         Object o = subject;
         if ( o instanceof JaasRealm )
         {

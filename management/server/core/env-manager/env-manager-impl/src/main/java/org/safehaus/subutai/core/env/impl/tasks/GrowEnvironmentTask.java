@@ -39,8 +39,8 @@ public class GrowEnvironmentTask implements Runnable
     private final ResultHolder<EnvironmentModificationException> resultHolder;
     private final Set<ContainerHost> newContainers;
     private final TrackerOperation op;
-    private final Semaphore semaphore;
-    private ExceptionUtil exceptionUtil = new ExceptionUtil();
+    protected Semaphore semaphore;
+    protected ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
     public GrowEnvironmentTask( final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,

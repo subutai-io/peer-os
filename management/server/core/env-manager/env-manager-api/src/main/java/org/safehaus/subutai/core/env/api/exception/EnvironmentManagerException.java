@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.env.api.exception;
 
 
 /**
- * Thrown if error occurred in environment maanger
+ * Thrown if general error occurred in environment manager
  */
 public class EnvironmentManagerException extends Exception
 {

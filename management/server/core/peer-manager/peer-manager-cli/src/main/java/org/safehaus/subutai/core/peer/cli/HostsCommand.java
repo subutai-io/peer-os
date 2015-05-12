@@ -14,8 +14,6 @@ import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.shell.commands.Command;
 
@@ -23,7 +21,6 @@ import org.apache.karaf.shell.commands.Command;
 @Command( scope = "peer", name = "hosts" )
 public class HostsCommand extends SubutaiShellCommandSupport
 {
-    private static Logger log = LoggerFactory.getLogger( HostsCommand.class );
     DateFormat fmt = new SimpleDateFormat( "dd.MM.yy HH:mm:ss.SS" );
     private PeerManager peerManager;
     private IdentityManager identityManager;
@@ -72,7 +69,7 @@ public class HostsCommand extends SubutaiShellCommandSupport
     }
 
 
-    private void print( Host host, String padding ) throws PeerException
+    protected void print( Host host, String padding ) throws PeerException
     {
         String lastHeartbeat = fmt.format( host.getLastHeartbeat() );
         String containerInfo =
