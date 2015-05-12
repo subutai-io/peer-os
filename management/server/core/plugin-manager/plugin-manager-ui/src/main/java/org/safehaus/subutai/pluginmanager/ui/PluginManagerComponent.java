@@ -274,7 +274,9 @@ public class PluginManagerComponent extends CustomComponent
         for ( String p : pluginManager.getAvailablePluginNames() )
         {
             final Button installButton = new Button( INSTALL_BUTTON_CAPTION );
+            installButton.setId( "InstallButton" );
             final Button removeButton = new Button( REMOVE_BUTTON_CAPTION );
+            removeButton.setId( "RemoveButton" );
             isInstalled = pluginManager.isInstalled( p );
             final HorizontalLayout availableOperations = new HorizontalLayout();
             addStyleName( installButton, removeButton, availableOperations );

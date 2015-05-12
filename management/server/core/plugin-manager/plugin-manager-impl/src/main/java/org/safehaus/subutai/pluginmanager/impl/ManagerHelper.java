@@ -25,25 +25,24 @@ public class ManagerHelper
 {
     private final PeerManager peerManager;
     private CommandUtil commandUtil;
-
     private static final String INFO_JSON = String.format(
             "[{\"type\":\"plugin\", \"pluginName\":\"lucene\", \"version\":\"2.0.5\", \"rating\":\"5\" }, " +
                     "{\"type\":\"plugin\", \"pluginName\":\"hipi\", \"version\":\"2.0.4\", \"rating\":\"6\" }," +
                     " {\"type\":\"plugin\", \"pluginName\":\"hadoop\", \"version\":\"2.0.4\", \"rating\":\"6\" }," +
                     "{\"type\":\"plugin\", \"pluginName\":\"presto\", \"version\":\"2.1.1\", \"rating\":\"8\" }," +
                     "{\"type\":\"plugin\", \"pluginName\":\"spark\", \"version\":\"2.0.4\", \"rating\":\"1\" }," +
-                    "{\"type\":\"plugin\", \"pluginName\":\"shark\", \"version\":\"2.0.4\", \"rating\":\"9\" }]" +
-                    "{\"type\":\"plugin\", \"pluginName\":\"accumulo\", \"version\":\"2.0.4\", \"rating\":\"9\" }]"+
-                    "{\"type\":\"plugin\", \"pluginName\":\"flume\", \"version\":\"2.0.4\", \"rating\":\"9\" }]" +
-                    "{\"type\":\"plugin\", \"pluginName\":\"pig\", \"version\":\"2.0.4\", \"rating\":\"9\" }]" +
-                    "{\"type\":\"plugin\", \"pluginName\":\"nutch\", \"version\":\"2.0.4\", \"rating\":\"9\" }]"+
-                    "{\"type\":\"plugin\", \"pluginName\":\"elasticsearch\", \"version\":\"2.0.4\", \"rating\":\"9\" }]"+
-                    "{\"type\":\"plugin\", \"pluginName\":\"zookeeper\", \"version\":\"2.0.4\", \"rating\":\"9\" }]"+
-                    "{\"type\":\"plugin\", \"pluginName\":\"sqoop\", \"version\":\"2.0.4\", \"rating\":\"9\" }]" +
-                    "{\"type\":\"plugin\", \"pluginName\":\"storm\", \"version\":\"2.0.4\", \"rating\":\"9\" }]" +
-                    "{\"type\":\"plugin\", \"pluginName\":\"hbase\", \"version\":\"2.0.4\", \"rating\":\"9\" }]" +
-                    "{\"type\":\"plugin\", \"pluginName\":\"hive\", \"version\":\"2.0.4\", \"rating\":\"9\" }]" +
-                    "{\"type\":\"plugin\", \"pluginName\":\"lucene\", \"version\":\"2.0.4\", \"rating\":\"9\" }]" +
+                    "{\"type\":\"plugin\", \"pluginName\":\"shark\", \"version\":\"2.0.4\", \"rating\":\"9\" }," +
+                    "{\"type\":\"plugin\", \"pluginName\":\"accumulo\", \"version\":\"2.0.4\", \"rating\":\"9\" },"+
+                    "{\"type\":\"plugin\", \"pluginName\":\"flume\", \"version\":\"2.0.4\", \"rating\":\"9\" }," +
+                    "{\"type\":\"plugin\", \"pluginName\":\"pig\", \"version\":\"2.0.4\", \"rating\":\"9\" }," +
+                    "{\"type\":\"plugin\", \"pluginName\":\"nutch\", \"version\":\"2.0.4\", \"rating\":\"9\" },"+
+                    "{\"type\":\"plugin\", \"pluginName\":\"elasticsearch\", \"version\":\"2.0.4\", \"rating\":\"9\" },"+
+                    "{\"type\":\"plugin\", \"pluginName\":\"zookeeper\", \"version\":\"2.0.4\", \"rating\":\"9\" },"+
+                    "{\"type\":\"plugin\", \"pluginName\":\"sqoop\", \"version\":\"2.0.4\", \"rating\":\"9\" }," +
+                    "{\"type\":\"plugin\", \"pluginName\":\"storm\", \"version\":\"2.0.4\", \"rating\":\"9\" }," +
+                    "{\"type\":\"plugin\", \"pluginName\":\"hbase\", \"version\":\"2.0.4\", \"rating\":\"9\" }," +
+                    "{\"type\":\"plugin\", \"pluginName\":\"hive\", \"version\":\"2.0.4\", \"rating\":\"9\" }," +
+                    "{\"type\":\"plugin\", \"pluginName\":\"lucene\", \"version\":\"2.0.4\", \"rating\":\"9\" }," +
                     "{\"type\":\"plugin\", \"pluginName\":\"mahout\", \"version\":\"2.0.4\", \"rating\":\"9\" }]" );
 
 

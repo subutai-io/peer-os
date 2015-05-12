@@ -187,7 +187,7 @@ public class CommandUtil
             {
                 Future<HostCommandResult> result = taskCompletionService.take();
                 HostCommandResult hostCommandResult = result.get();
-                resultMap.put( hostCommandResult.getHost(), hostCommandResult.commandResult );
+                resultMap.put( hostCommandResult.getHost(), hostCommandResult.getCommandResult() );
             }
             catch ( ExecutionException | InterruptedException e )
             {

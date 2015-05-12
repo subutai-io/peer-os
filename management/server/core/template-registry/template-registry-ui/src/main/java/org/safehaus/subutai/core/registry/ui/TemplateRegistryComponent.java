@@ -88,6 +88,7 @@ public class TemplateRegistryComponent extends CustomComponent
             setContainerDataSource( templatesBeanContainer );
             setTextInputAllowed( false );
             setRequired( true );
+            setId( "TemplateA" );
         }
     };
 
@@ -101,6 +102,7 @@ public class TemplateRegistryComponent extends CustomComponent
             setContainerDataSource( templatesBeanContainer );
             setTextInputAllowed( false );
             setRequired( true );
+            setId( "TemplateB" );
         }
     };
 
@@ -203,6 +205,7 @@ public class TemplateRegistryComponent extends CustomComponent
         // Tree View
 
         templateTree = new Tree( "Templates" );
+        templateTree.setId( "Templates" );
         templateTree.setContainerDataSource( container );
         templateTree.setItemCaptionMode( AbstractSelect.ItemCaptionMode.PROPERTY );
         templateTree.setItemCaptionPropertyId( CAPTION );
