@@ -25,7 +25,6 @@ public interface QuotaManager
      * Set Quota for container specified with parameters passed containerName - the target container to set quota on,
      * QuotaInfo - about quota information containing quota key and value in preformatted string values
      */
-    @Deprecated
     public void setQuota( String containerName, QuotaInfo quota ) throws QuotaException;
 
     /**
