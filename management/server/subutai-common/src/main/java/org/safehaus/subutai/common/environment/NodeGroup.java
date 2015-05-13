@@ -19,7 +19,7 @@ public class NodeGroup
     private int hostsGroupId;
     private PlacementStrategy containerPlacementStrategy;
 
-
+    //TODO fix all clients and then remove this ctr
     @Deprecated
     public NodeGroup( final String name, final String templateName, final String domainName,
                       final int numberOfContainers, final int sshGroupId, final int hostsGroupId,
