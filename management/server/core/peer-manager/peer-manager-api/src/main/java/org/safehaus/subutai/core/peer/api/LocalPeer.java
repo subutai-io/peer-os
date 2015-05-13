@@ -40,12 +40,24 @@ public interface LocalPeer extends Peer
      * @param hostname name of the resource host
      */
 
+    /**
+     * Returns resource host instance by its hostname
+     */
     public ResourceHost getResourceHostByName( String hostname ) throws HostNotFoundException;
 
+    /**
+     * Returns resource host instance by its id
+     */
     public ResourceHost getResourceHostById( UUID hostId ) throws HostNotFoundException;
 
+    /**
+     * Returns resource host instance by hostname of its container
+     */
     public ResourceHost getResourceHostByContainerName( String containerName ) throws HostNotFoundException;
 
+    /**
+     * Returns resource host instance by id ot its container
+     */
     public ResourceHost getResourceHostByContainerId( UUID hostId ) throws HostNotFoundException;
 
 
@@ -64,12 +76,25 @@ public interface LocalPeer extends Peer
      */
     public ContainerHost getContainerHostById( UUID hostId ) throws HostNotFoundException;
 
+    /**
+     * Returns instance of management host
+     */
     public ManagementHost getManagementHost() throws HostNotFoundException;
 
+    /**
+     * Returns all local peer's resource hosts
+     */
     public Set<ResourceHost> getResourceHosts();
 
     public void cleanDb();
 
+    /**
+     * Creates container on the local peer
+     *
+     * @param resourceHost - target resource host where to host container
+     * @param template - source template from which to clone container
+     * @param containerName - container name
+     */
     public ContainerHost createContainer( final ResourceHost resourceHost, final Template template,
                                           final String containerName ) throws PeerException;
 
@@ -108,5 +133,8 @@ public interface LocalPeer extends Peer
 
     //networking
 
+    /**
+     * Sets up tunnels on the local peer to the specified remote peers
+     */
     public int setupTunnels( Set<String> peerIps, UUID environmentId ) throws PeerException;
 }
