@@ -17,7 +17,7 @@ public interface PeerManager
 
     boolean update( PeerInfo peerInfo );
 
-    public List<PeerInfo> peers();
+    public List<PeerInfo> getPeerInfos();
 
     public PeerInfo getLocalPeerInfo();
 

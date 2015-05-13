@@ -338,7 +338,7 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public List<PeerInfo> peers()
+    public List<PeerInfo> getPeerInfos()
     {
         return peerDAO.getInfo( SOURCE_REMOTE_PEER, PeerInfo.class );
     }

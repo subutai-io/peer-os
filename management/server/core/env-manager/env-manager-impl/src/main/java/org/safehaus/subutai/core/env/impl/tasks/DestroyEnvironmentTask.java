@@ -32,7 +32,7 @@ import com.google.common.collect.Sets;
 
 
 /**
- * Destroys Environment with all values carried with it. Destroys all container hosts across peers if any.
+ * Destroys Environment with all values carried with it. Destroys all container hosts across getPeerInfos if any.
  *
  * @see org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl
  * @see org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl

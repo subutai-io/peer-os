@@ -85,7 +85,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getRegisteredPeers()
     {
-        return Response.ok( JsonUtil.toJson( peerManager.peers() ) ).build();
+        return Response.ok( JsonUtil.toJson( peerManager.getPeerInfos() ) ).build();
     }
 
 
