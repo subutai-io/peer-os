@@ -13,11 +13,6 @@ import org.safehaus.subutai.common.peer.PeerInfo;
 
 public interface PeerManager
 {
-
-    boolean trustRequest( UUID peerId, String root_server_px1 ) throws PeerException;
-
-    boolean trustResponse( UUID peerId, String root_server_px1, short status ) throws PeerException;
-
     boolean register( PeerInfo peerInfo ) throws PeerException;
 
     boolean update( PeerInfo peerInfo );
