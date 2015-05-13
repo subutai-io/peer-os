@@ -19,8 +19,6 @@ import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
-import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
-import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.quota.RamQuota;
@@ -32,42 +30,102 @@ import org.safehaus.subutai.common.quota.RamQuota;
 public interface Peer
 {
 
+    /**
+     * Returns id of peer
+     */
     public UUID getId();
 
+    /**
+     * Returns name of peer
+     */
     public String getName();
 
+    /**
+     * Returns owner id of peer
+     */
     public UUID getOwnerId();
 
+    /**
+     * Returns metadata object of peer
+     */
     public PeerInfo getPeerInfo();
 
+    /**
+     * Creates container group on the peer
+     *
+     * @param request - container creation request
+     *
+     * @return - set of metadaobjects of created containers
+     */
     public Set<HostInfoModel> createContainerGroup( CreateContainerGroupRequest request ) throws PeerException;
 
+    /**
+     * Start container on the peer
+     */
     public void startContainer( ContainerHost containerHost ) throws PeerException;
 
+    /**
+     * Stops container on the peer
+     */
     public void stopContainer( ContainerHost containerHost ) throws PeerException;
 
+    /**
+     * Destroys container on the peer
+     */
     public void destroyContainer( ContainerHost containerHost ) throws PeerException;
 
+    /**
+     * Sets default gateway for the container
+     */
     public void setDefaultGateway( ContainerHost host, String gatewayIp ) throws PeerException;
 
 
+    /**
+     * Returns true of the host is connected, false otherwise
+     */
     public boolean isConnected( Host host );
 
 
+    /**
+     * Executes command on the container
+     *
+     * @param requestBuilder - command
+     * @param host - target host
+     */
     public CommandResult execute( RequestBuilder requestBuilder, Host host ) throws CommandException;
 
+    /**
+     * Executes command on the container
+     *
+     * @param requestBuilder - command
+     * @param host - target host
+     * @param callback - callback to trigger on each response chunk to the command
+     */
     public CommandResult execute( RequestBuilder requestBuilder, Host host, CommandCallback callback )
             throws CommandException;
 
+    /**
+     * Executes command on the container asynchronously
+     *
+     * @param requestBuilder - command
+     * @param host - target host
+     * @param callback - callback to trigger on each response chunk to the command
+     */
     public void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
             throws CommandException;
 
+    /**
+     * Executes command on the container asynchronously
+     *
+     * @param requestBuilder - command
+     * @param host - target host
+     */
     public void executeAsync( final RequestBuilder requestBuilder, final Host host ) throws CommandException;
 
+    /**
+     * Returns true if this a local peer, false otherwise
+     */
     public boolean isLocal();
-
-    public PeerQuotaInfo getQuota( ContainerHost host, QuotaType quotaType ) throws PeerException;
-
 
     /**
      * Get quota for enum specified
@@ -79,23 +137,63 @@ public interface Peer
      */
     public QuotaInfo getQuotaInfo( ContainerHost host, QuotaType quotaType ) throws PeerException;
 
-
+    /**
+     * Sets quota on the container
+     *
+     * @param host - target container
+     * @param quotaInfo - quota to set
+     */
     public void setQuota( ContainerHost host, QuotaInfo quotaInfo ) throws PeerException;
 
+    /**
+     * Returns tempalte by name
+     */
     public Template getTemplate( String templateName ) throws PeerException;
 
+    /**
+     * Returns true of the peer is reachable online, false otherwise
+     */
     public boolean isOnline() throws PeerException;
 
+    /**
+     * Sends message to the peer
+     *
+     * @param request - message
+     * @param recipient - recipient
+     * @param requestTimeout - message timeout
+     * @param responseType -  type of response to return
+     * @param responseTimeout - response timeout
+     * @param headers - map of http headers to pass with message
+     *
+     * @return - response from the recipient
+     */
     public <T, V> V sendRequest( T request, String recipient, int requestTimeout, Class<V> responseType,
                                  int responseTimeout, Map<String, String> headers ) throws PeerException;
 
+    /**
+     * Sends message to the peer
+     *
+     * @param request - message
+     * @param recipient - recipient
+     * @param requestTimeout - message timeout
+     * @param headers - map of http headers to pass with message
+     */
     public <T> void sendRequest( T request, String recipient, int requestTimeout, Map<String, String> headers )
             throws PeerException;
 
+    /**
+     * Returns state of container
+     */
     public ContainerHostState getContainerHostState( ContainerHost host ) throws PeerException;
 
     //******** Quota functions ***********
 
+    /**
+     * Returns resource usage of process on container by its PID
+     *
+     * @param host - target container
+     * @param processPid - pid of process
+     */
     public ProcessResourceUsage getProcessResourceUsage( ContainerHost host, int processPid ) throws PeerException;
 
     /**
@@ -143,7 +241,7 @@ public interface Peer
      *
      * @return - MemoryQuotaInfo with quota details
      */
-    public MemoryQuotaInfo getRamQuotaInfo( ContainerHost host ) throws PeerException;
+    public RamQuota getRamQuotaInfo( ContainerHost host ) throws PeerException;
 
 
     /**
@@ -239,10 +337,19 @@ public interface Peer
 
     //networking
 
+    /**
+     * Returns all existing gateways of the peer
+     */
     public Set<Gateway> getGateways() throws PeerException;
 
+    /**
+     * Reserves VNI on the peer
+     */
     public int reserveVni( Vni vni ) throws PeerException;
 
+    /**
+     * Returns all reserved vnis on the peer
+     */
     public Set<Vni> getReservedVnis() throws PeerException;
 
     /**

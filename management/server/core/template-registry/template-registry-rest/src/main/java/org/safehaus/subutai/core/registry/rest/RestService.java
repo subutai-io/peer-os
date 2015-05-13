@@ -34,12 +34,6 @@ public interface RestService
 
 
     @GET
-    @Path( "templates/tree" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getTemplateTree();
-
-
-    @GET
     @Path( "templates" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response listTemplates();
@@ -60,14 +54,6 @@ public interface RestService
     @Path( "templates/arch/{lxcArch}/plain-list" )
     @Produces( { MediaType.TEXT_PLAIN } )
     public Response listTemplatesPlain( @PathParam( "lxcArch" ) String lxcArch );
-
-
-    @GET
-    @Path( "templates/{templateName}/{templateVersion}/download/{token}" )
-    @Produces( { MediaType.APPLICATION_OCTET_STREAM } )
-    public Response downloadTemplate( @PathParam( "templateName" ) String templateName,
-                                      @PathParam( "templateVersion" ) String templateVersion,
-                                      @PathParam( "token" ) String templateDownloadToken );
 
 
     @GET

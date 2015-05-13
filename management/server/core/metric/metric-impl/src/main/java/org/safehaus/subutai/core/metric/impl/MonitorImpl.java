@@ -119,7 +119,7 @@ public class MonitorImpl implements Monitor
 
         Set<Peer> peers = Sets.newHashSet();
 
-        //determine container peers
+        //determine container getPeerInfos
         for ( ContainerHost containerHost : containerHosts )
         {
             try
@@ -133,7 +133,7 @@ public class MonitorImpl implements Monitor
             }
         }
 
-        //send metric requests to target peers
+        //send metric requests to target getPeerInfos
         for ( Peer peer : peers )
         {
             if ( peer.isLocal() )

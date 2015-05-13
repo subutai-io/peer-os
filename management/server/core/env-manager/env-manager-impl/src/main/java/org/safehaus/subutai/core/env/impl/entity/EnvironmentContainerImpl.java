@@ -41,10 +41,6 @@ import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
-import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
-import org.safehaus.subutai.common.quota.PeerQuotaInfo;
-import org.safehaus.subutai.common.quota.QuotaInfo;
-import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.quota.RamQuota;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 
@@ -438,7 +434,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
 
     @Override
-    public MemoryQuotaInfo getRamQuotaInfo() throws PeerException
+    public RamQuota getRamQuotaInfo() throws PeerException
     {
         return getPeer().getRamQuotaInfo( this );
     }
@@ -537,23 +533,6 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
         throw new UnsupportedOperationException( "Unsupported operation." );
     }
 
-
-    public PeerQuotaInfo getQuota( QuotaType quotaType ) throws PeerException
-    {
-        throw new UnsupportedOperationException( "Unsupported operation." );
-    }
-
-
-    public QuotaInfo getQuotaInfo( QuotaType quotaType ) throws PeerException
-    {
-        throw new UnsupportedOperationException( "Unsupported operation." );
-    }
-
-
-    public void setQuota( QuotaInfo quota ) throws PeerException
-    {
-        throw new UnsupportedOperationException( "Unsupported operation." );
-    }
 
     //unsupported END
 

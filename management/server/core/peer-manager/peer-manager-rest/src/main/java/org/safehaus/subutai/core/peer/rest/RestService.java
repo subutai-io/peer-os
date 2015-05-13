@@ -132,22 +132,6 @@ public interface RestService
 
     //*********** Environment Specific REST - BEGIN ***************
 
-    @POST
-    @Path( "container/quota" )
-    Response setQuota( @FormParam( "containerId" ) String containerId, @FormParam( "quotaInfo" ) String quotaInfo );
-
-    @GET
-    @Path( "container/quota" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response getQuota( @QueryParam( "containerId" ) String containerId, @QueryParam( "quotaType" ) String quotaType );
-
-
-    @GET
-    @Path( "container/quota/info" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response getQuotaInfo( @QueryParam( "containerId" ) String containerId,
-                           @QueryParam( "quotaType" ) String quotaType );
-
 
     @POST
     @Path( "container/destroy" )

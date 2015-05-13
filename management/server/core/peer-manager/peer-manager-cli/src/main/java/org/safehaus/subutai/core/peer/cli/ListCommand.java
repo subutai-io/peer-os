@@ -28,7 +28,7 @@ public class ListCommand extends SubutaiShellCommandSupport
     protected Object doExecute() throws Exception
     {
         List<Peer> list = peerManager.getPeers();
-        System.out.println( "Found " + list.size() + " registered peers" );
+        System.out.println( "Found " + list.size() + " registered getPeerInfos" );
         for ( Peer peer : list )
         {
             String peerStatus = "OFFLINE";

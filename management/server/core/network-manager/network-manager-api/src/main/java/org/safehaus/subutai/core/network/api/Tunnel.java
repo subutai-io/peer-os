@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.network.api;
 
 
 /**
- * Represents tunnel between peers
+ * Represents tunnel between getPeerInfos
  */
 public interface Tunnel
 {

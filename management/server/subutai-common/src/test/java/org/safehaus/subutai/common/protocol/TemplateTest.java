@@ -22,7 +22,6 @@ import static org.mockito.Mockito.when;
 public class TemplateTest
 {
     private Template template;
-    private Template template2;
     private Template template3;
 
     @Mock
@@ -43,8 +42,6 @@ public class TemplateTest
         template3 = new Template( "testLxcArch", "test", "testSubutaiConfigPath", "testSubutaiParent",
                 "testSubutaiGitBranch", "testSubutaiGitUuid", "testPackagesManifest", "testMad5Sum", templateVersion );
 
-        template2 = new Template( "testLxcArch", "testSubutaiParent", "testSubutaiConfigPath", "testSubutaiParent",
-                "testSubutaiGitBranch", "testSubutaiGitUuid", "testPackagesManifest", "testMad5Sum" );
 
         template.setPk( templatePK );
         template.setProducts( mySet );

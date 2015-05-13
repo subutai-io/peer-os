@@ -16,7 +16,6 @@ import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.DiskQuotaUnit;
-import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.quota.RamQuota;
@@ -171,13 +170,6 @@ public class QuotaManagerImplTest
     }
 
 
-    @Test( expected = UnsupportedOperationException.class )
-    public void testGetQuota() throws Exception
-    {
-        quotaManager.getQuota( containerName, QuotaType.QUOTA_TYPE_RAM );
-    }
-
-
     @Test
     public void testGetRamQuota() throws Exception
     {
@@ -189,8 +181,8 @@ public class QuotaManagerImplTest
     @Test
     public void testGetRamQuotaInfo() throws Exception
     {
-        MemoryQuotaInfo memoryQuotaInfo = quotaManager.getRamQuotaInfo( uuid );
-        assertEquals( ramQuota.getRamQuotaValue(), ( int ) memoryQuotaInfo.getMemoryQuota() );
+        RamQuota memoryQuotaInfo = quotaManager.getRamQuotaInfo( uuid );
+        assertEquals( ramQuota.getRamQuotaValue(), ( int ) memoryQuotaInfo.getRamQuotaValue() );
     }
 
 
@@ -262,7 +254,7 @@ public class QuotaManagerImplTest
     public void testSetRamQuota1() throws Exception
     {
         quotaManager.setRamQuota( uuid, ramQuota );
-        assertEquals( ramQuota.getRamQuotaValue(), ( int ) quotaManager.getRamQuotaInfo( uuid ).getMemoryQuota() );
+        assertEquals( ramQuota.getRamQuotaValue(), ( int ) quotaManager.getRamQuotaInfo( uuid ).getRamQuotaValue() );
     }
 
 

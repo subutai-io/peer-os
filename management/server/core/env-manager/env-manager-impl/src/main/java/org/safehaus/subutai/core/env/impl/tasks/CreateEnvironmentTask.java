@@ -101,7 +101,7 @@ public class CreateEnvironmentTask implements Runnable
             //setup gateway on mgmt host
             localPeer.getManagementHost().createGateway( environmentGatewayIp, vlan );
 
-            //reserve VNI on remote peers
+            //reserve VNI on remote getPeerInfos
             allPeers.remove( localPeer );
 
             for ( Peer peer : allPeers )

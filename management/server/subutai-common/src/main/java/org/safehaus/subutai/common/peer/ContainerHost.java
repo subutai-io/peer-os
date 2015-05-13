@@ -9,10 +9,6 @@ import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
-import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
-import org.safehaus.subutai.common.quota.PeerQuotaInfo;
-import org.safehaus.subutai.common.quota.QuotaInfo;
-import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.quota.RamQuota;
 
 
@@ -21,21 +17,6 @@ import org.safehaus.subutai.common.quota.RamQuota;
  */
 public interface ContainerHost extends Host
 {
-    @Deprecated
-    public PeerQuotaInfo getQuota( QuotaType quotaType ) throws PeerException;
-
-    /**
-     * Get quotaInfo for specified type
-     *
-     * @param quotaType - Simple Enum indicating quota type
-     *
-     * @return - Abstract class for quota, each quota extends this class
-     */
-    public QuotaInfo getQuotaInfo( QuotaType quotaType ) throws PeerException;
-
-    @Deprecated
-    public void setQuota( QuotaInfo quota ) throws PeerException;
-
     public String getEnvironmentId();
 
     public String getNodeGroupName();
@@ -86,7 +67,7 @@ public interface ContainerHost extends Host
      *
      * @return - MemoryQuotaInfo carries ram quota specific info
      */
-    public MemoryQuotaInfo getRamQuotaInfo() throws PeerException;
+    public RamQuota getRamQuotaInfo() throws PeerException;
 
 
     /**

@@ -7,8 +7,6 @@ import java.util.UUID;
 import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
-import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
-import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
@@ -25,14 +23,7 @@ public interface QuotaManager
      * Set Quota for container specified with parameters passed containerName - the target container to set quota on,
      * QuotaInfo - about quota information containing quota key and value in preformatted string values
      */
-    @Deprecated
     public void setQuota( String containerName, QuotaInfo quota ) throws QuotaException;
-
-    /**
-     * Get specified quota of container
-     */
-    @Deprecated
-    public PeerQuotaInfo getQuota( String containerName, QuotaType quotaType ) throws QuotaException;
 
 
     /**
@@ -63,7 +54,7 @@ public interface QuotaManager
      *
      * @return - quota object
      */
-    public MemoryQuotaInfo getRamQuotaInfo( UUID containerId ) throws QuotaException;
+    public RamQuota getRamQuotaInfo( UUID containerId ) throws QuotaException;
 
 
     /**

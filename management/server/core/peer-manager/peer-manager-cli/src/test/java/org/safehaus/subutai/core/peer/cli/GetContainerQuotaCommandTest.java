@@ -59,7 +59,7 @@ public class GetContainerQuotaCommandTest extends SystemOutRedirectTest
     {
         command.doExecute();
 
-        verify( peer ).getQuota( containerHost, QuotaType.QUOTA_TYPE_CPU );
+        verify( peer ).getQuotaInfo( containerHost, QuotaType.QUOTA_TYPE_CPU );
 
         when( environment.getContainerHostByHostname( anyString() ) ).thenReturn( null );
 

@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.registry.rest;
 
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -194,67 +193,6 @@ public class RestServiceImpl implements RestService
         //all ok
         LOG.info( "Template package successfully imported." );
         return Response.ok().build();
-    }
-
-
-    @Override
-    public Response getTemplateTree()
-    {
-        List<Template> templates = templateRegistry.getTemplateTree();
-
-        if ( templates.size() > 0 )
-        {
-            return Response.ok().entity( GSON.toJson( templates ) ).build();
-        }
-
-        return Response.status( Response.Status.NOT_FOUND ).build();
-    }
-
-
-    @Override
-    public Response downloadTemplate( final String templateName, final String templateVersion,
-                                      final String templateDownloadToken )
-    {
-        try
-        {
-            //check template download token
-            if ( !templateRegistry.checkTemplateDownloadToken( templateDownloadToken ) )
-            {
-                return Response.status( Response.Status.FORBIDDEN ).entity( "Invalid template download token" ).build();
-            }
-
-            //            cassandra-subutai-template_2.1.0_amd64.deb
-            String packageName = String.format( "%s-subutai-template_%s_%s.deb", templateName, templateVersion,
-                    Common.DEFAULT_LXC_ARCH );
-            String fullPackageName = repositoryManager.getFullPackageName( packageName );
-            String fullPackagePath =
-                    String.format( "%s%s%s", Common.APT_REPO_PATH, Common.APT_REPO_AMD64_PACKAGES_SUBPATH,
-                            fullPackageName );
-
-            File packageFile = new File( fullPackagePath );
-
-            if ( packageFile.exists() )
-            {
-                if ( packageFile.isFile() )
-                {
-                    return Response.ok( packageFile ).header( "Content-Disposition",
-                            String.format( "attachment; filename=%s", fullPackageName ) ).build();
-                }
-                else
-                {
-                    return Response.status( Response.Status.BAD_REQUEST ).entity( "File is directory" ).build();
-                }
-            }
-            else
-            {
-                return Response.status( Response.Status.NOT_FOUND ).build();
-            }
-        }
-        catch ( RepositoryException e )
-        {
-            LOG.error( "Error in downloadTemplate", e );
-            return Response.serverError().entity( e ).build();
-        }
     }
 
 

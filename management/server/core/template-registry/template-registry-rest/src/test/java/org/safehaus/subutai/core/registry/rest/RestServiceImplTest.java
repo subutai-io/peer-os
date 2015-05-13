@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
@@ -75,6 +74,7 @@ public class RestServiceImplTest
     LocalPeer localPeer;
     @Mock
     ManagementHost managementHost;
+
 
     @Before
     public void setupClasses() throws IOException
@@ -232,8 +232,7 @@ public class RestServiceImplTest
         Response response = restService.getParentTemplates( TEMPLATE_NAME );
 
         Type templateType = new TypeToken<List<String>>()
-        {
-        }.getType();
+        {}.getType();
 
         List<String> templateNames = GSON.fromJson( String.valueOf( response.getEntity() ), templateType );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
@@ -251,8 +250,7 @@ public class RestServiceImplTest
                 .getParentTemplates( TEMPLATE_NAME, Common.DEFAULT_TEMPLATE_VERSION, Common.DEFAULT_LXC_ARCH );
 
         Type templateType = new TypeToken<List<String>>()
-        {
-        }.getType();
+        {}.getType();
 
         List<String> templateNames = GSON.fromJson( String.valueOf( response.getEntity() ), templateType );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
@@ -269,8 +267,7 @@ public class RestServiceImplTest
         Response response = restService.getChildTemplates( TEMPLATE_NAME );
 
         Type templateType = new TypeToken<List<String>>()
-        {
-        }.getType();
+        {}.getType();
 
         List<String> templateNames = GSON.fromJson( String.valueOf( response.getEntity() ), templateType );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
@@ -287,8 +284,7 @@ public class RestServiceImplTest
         Response response = restService.getChildTemplates( TEMPLATE_NAME, Common.DEFAULT_TEMPLATE_VERSION, ARCH );
 
         Type templateType = new TypeToken<List<String>>()
-        {
-        }.getType();
+        {}.getType();
 
         List<String> templateNames = GSON.fromJson( String.valueOf( response.getEntity() ), templateType );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
@@ -306,30 +302,11 @@ public class RestServiceImplTest
                 .getParentTemplates( TEMPLATE_NAME, Common.DEFAULT_TEMPLATE_VERSION, Common.DEFAULT_LXC_ARCH );
 
         Type templateType = new TypeToken<List<String>>()
-        {
-        }.getType();
+        {}.getType();
 
         List<String> templateNames = GSON.fromJson( String.valueOf( response.getEntity() ), templateType );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
         assertArrayEquals( Lists.newArrayList( TEMPLATE_NAME ).toArray(), templateNames.toArray() );
-    }
-
-
-    @Test
-    public void shouldReturnListOfTemplatesOnGetTemplateTree() throws IOException
-    {
-        when( templateRegistry.getTemplateTree() ).thenReturn( Arrays.asList( TestUtils.getParentTemplate() ) );
-
-        Type templateType = new TypeToken<List<Template>>()
-        {
-        }.getType();
-
-        Response response = restService.getTemplateTree();
-
-        List<Template> responseTemplates = GSON.fromJson( String.valueOf( response.getEntity() ), templateType );
-
-        assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
-        assertArrayEquals( templates.toArray(), responseTemplates.toArray() );
     }
 
 
@@ -388,8 +365,7 @@ public class RestServiceImplTest
         when( templateRegistry.getAllTemplates() ).thenReturn( templates );
         Response response = restService.listTemplates();
         Type templateListType = new TypeToken<List<String>>()
-        {
-        }.getType();
+        {}.getType();
         List<String> responseTemplates = GSON.fromJson( String.valueOf( response.getEntity() ), templateListType );
 
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
@@ -404,8 +380,7 @@ public class RestServiceImplTest
         Response response = restService.listTemplates( Common.DEFAULT_LXC_ARCH );
 
         Type templatesType = new TypeToken<List<String>>()
-        {
-        }.getType();
+        {}.getType();
         List<String> templateNames = GSON.fromJson( String.valueOf( response.getEntity() ), templatesType );
 
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
@@ -432,32 +407,15 @@ public class RestServiceImplTest
         verify( templateRegistry ).getAllTemplates( Common.DEFAULT_LXC_ARCH );
     }
 
+
     @Test
     public void testRemoveTemplate() throws RepositoryException
     {
-        when( templateRegistry.getTemplate( anyString(), any(TemplateVersion.class) ) ).thenReturn( template );
+        when( templateRegistry.getTemplate( anyString(), any( TemplateVersion.class ) ) ).thenReturn( template );
 
         Response response = restService.removeTemplate( "testTemplateName", "555" );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
-        verify( repositoryManager).removePackageByName( anyString() );
-    }
-
-
-    @Test
-    public void testDownloadTemplateStatusForbidden()
-    {
-        Response response = restService.downloadTemplate( "testTemplateName", "testTemplateVersion", "testTemplateDT" );
-        assertEquals( Response.Status.FORBIDDEN.getStatusCode(), response.getStatus() );
-    }
-
-
-    @Test
-    public void testDownloadTemplateStatusNotFound() throws RepositoryException
-    {
-        when( templateRegistry.checkTemplateDownloadToken( anyString() ) ).thenReturn( true );
-
-        Response response = restService.downloadTemplate( "testTemplateName", "testTemplateVersion", "testTemplateDT" );
-        assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getStatus() );
+        verify( repositoryManager ).removePackageByName( anyString() );
     }
 
 

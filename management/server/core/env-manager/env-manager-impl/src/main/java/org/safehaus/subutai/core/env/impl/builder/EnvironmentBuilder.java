@@ -31,7 +31,7 @@ import com.google.common.collect.Sets;
 
 
 /**
- * Builds node groups across peers
+ * Builds node groups across getPeerInfos
  */
 public class EnvironmentBuilder
 {
@@ -89,7 +89,7 @@ public class EnvironmentBuilder
         }
 
 
-        //collect all existing and new peers
+        //collect all existing and new getPeerInfos
         Set<Peer> allPeers = Sets.newHashSet( placement.keySet() );
 
         for ( Peer aPeer : environment.getPeers() )
@@ -97,7 +97,7 @@ public class EnvironmentBuilder
             allPeers.add( aPeer );
         }
 
-        //setup tunnels to all participating peers on local peer in case local peer is not included as provider peer
+        //setup tunnels to all participating getPeerInfos on local peer in case local peer is not included as provider peer
         LocalPeer localPeer = peerManager.getLocalPeer();
 
         Set<String> peerIps = Sets.newHashSet();
@@ -110,7 +110,7 @@ public class EnvironmentBuilder
             }
         }
 
-        //setup tunnels to all remote peers
+        //setup tunnels to all remote getPeerInfos
         if ( !peerIps.isEmpty() )
         {
             try
@@ -119,7 +119,7 @@ public class EnvironmentBuilder
             }
             catch ( PeerException e )
             {
-                throw new EnvironmentBuildException( "Error setting up tunnels to remote peers", e );
+                throw new EnvironmentBuildException( "Error setting up tunnels to remote getPeerInfos", e );
             }
         }
 
@@ -129,7 +129,7 @@ public class EnvironmentBuilder
 
         CompletionService<Set<NodeGroupBuildResult>> taskCompletionService = getCompletionService( taskExecutor );
 
-        //submit parallel environment part creation tasks across peers
+        //submit parallel environment part creation tasks across getPeerInfos
         for ( Map.Entry<Peer, Set<NodeGroup>> peerPlacement : placement.entrySet() )
         {
             taskCompletionService.submit(

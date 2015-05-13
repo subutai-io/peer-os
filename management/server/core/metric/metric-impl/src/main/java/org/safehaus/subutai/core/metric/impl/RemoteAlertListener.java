@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * Listens to alerts from remote peers
+ * Listens to alerts from remote getPeerInfos
  */
 public class RemoteAlertListener extends RequestListener
 {

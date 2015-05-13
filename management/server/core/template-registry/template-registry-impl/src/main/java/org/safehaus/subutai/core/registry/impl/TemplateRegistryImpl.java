@@ -18,7 +18,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -868,27 +867,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
 
 
     @Override
-    public String getTemplateDownloadToken( final int timeout )
-    {
-        Preconditions.checkArgument( timeout > 0, "Timeout must be greater than 0" );
-
-        String templateDownloadToken = UUID.randomUUID().toString();
-        templateDownloadTokens.put( templateDownloadToken, false, timeout * 1000 );
-        return templateDownloadToken;
-    }
-
-
-    @Override
-    public boolean checkTemplateDownloadToken( final String token )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( token ), "Invalid token" );
-
-        return templateDownloadTokens.get( token ) != null;
-    }
-
-
-    @Override
-    public String getChangedFileVersions( String branchA, String branchB, GitChangedFile file )
+    public String getFileDiff( String branchA, String branchB, GitChangedFile file )
     {
         try
         {

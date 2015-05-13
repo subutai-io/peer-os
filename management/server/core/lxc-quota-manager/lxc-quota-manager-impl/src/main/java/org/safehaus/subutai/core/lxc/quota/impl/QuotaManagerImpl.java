@@ -16,12 +16,11 @@ import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.DiskQuotaUnit;
-import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
-import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.quota.RamQuota;
+import org.safehaus.subutai.common.quota.RamQuotaUnit;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
@@ -75,13 +74,6 @@ public class QuotaManagerImpl implements QuotaManager
 
 
     @Override
-    public PeerQuotaInfo getQuota( String containerName, QuotaType quotaType ) throws QuotaException
-    {
-        throw new UnsupportedOperationException( "This method is depricated refer to docs for appropriate method." );
-    }
-
-
-    @Override
     public int getRamQuota( final UUID containerId ) throws QuotaException
     {
         Preconditions.checkNotNull( containerId );
@@ -96,7 +88,7 @@ public class QuotaManagerImpl implements QuotaManager
 
 
     @Override
-    public MemoryQuotaInfo getRamQuotaInfo( final UUID containerId ) throws QuotaException
+    public RamQuota getRamQuotaInfo( final UUID containerId ) throws QuotaException
     {
         Preconditions.checkNotNull( containerId );
 
@@ -105,8 +97,7 @@ public class QuotaManagerImpl implements QuotaManager
         CommandResult result = executeOnContainersResourceHost( containerId,
                 commands.getReadRamQuotaCommand( containerHost.getHostname() ) );
 
-        return new MemoryQuotaInfo( DiskQuotaUnit.MB,
-                Double.parseDouble( result.getStdOut().replace( "M", "" ).trim() ) );
+        return new RamQuota( RamQuotaUnit.MB, Integer.parseInt( result.getStdOut().replace( "M", "" ).trim() ) );
     }
 
 

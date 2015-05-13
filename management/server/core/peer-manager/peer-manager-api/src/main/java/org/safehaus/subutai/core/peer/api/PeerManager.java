@@ -13,29 +13,54 @@ import org.safehaus.subutai.common.peer.PeerInfo;
 
 public interface PeerManager
 {
-
-    boolean trustRequest( UUID peerId, String root_server_px1 ) throws PeerException;
-
-    boolean trustResponse( UUID peerId, String root_server_px1, short status ) throws PeerException;
-
+    /**
+     * Registers remote peer
+     */
     boolean register( PeerInfo peerInfo ) throws PeerException;
 
+    /**
+     * Updates peer metadata
+     */
     boolean update( PeerInfo peerInfo );
 
-    public List<PeerInfo> peers();
+    /**
+     * Returns all registered peers metadata objects
+     */
+    public List<PeerInfo> getPeerInfos();
 
+    /**
+     * Returns local peer's metadata
+     */
     public PeerInfo getLocalPeerInfo();
 
+    /**
+     * Returns peer metadata by peer id
+     */
     public PeerInfo getPeerInfo( UUID uuid );
 
+    /**
+     * Unregisters peer
+     */
     boolean unregister( String uuid ) throws PeerException;
 
+    /**
+     * Returns peer instance by peer id
+     */
     public Peer getPeer( UUID peerId );
 
+    /**
+     * Returns peer instance by peer id
+     */
     public Peer getPeer( String peerId );
 
+    /**
+     * Returns all peer instances
+     */
     public List<Peer> getPeers();
 
+    /**
+     * Returns local peer instance
+     */
     public LocalPeer getLocalPeer();
 
     public void addRequestListener( RequestListener listener );

@@ -56,6 +56,7 @@ public class TemplateRegistryImplTest
     @Mock
     GitChangedFile gitChangedFile;
 
+
     @Before
     public void setUp() throws Exception
     {
@@ -444,7 +445,7 @@ public class TemplateRegistryImplTest
     @Test
     public void testInit() throws DaoException
     {
-        List<Template> myList = new ArrayList<>(  );
+        List<Template> myList = new ArrayList<>();
         myList.add( template );
         when( templateService.getAllTemplates() ).thenReturn( myList );
 
@@ -461,23 +462,9 @@ public class TemplateRegistryImplTest
 
 
     @Test
-    public void testGetTemplateDownloadToken()
-    {
-        templateRegistry.getTemplateDownloadToken( 5 );
-    }
-
-
-    @Test
-    public void testCheckTemplateDownloadToken()
-    {
-        templateRegistry.checkTemplateDownloadToken( "test" );
-    }
-
-
-    @Test
     public void testGetChangedFiles() throws RegistryException, GitException
     {
-        List<GitChangedFile> myList = new ArrayList<>(  );
+        List<GitChangedFile> myList = new ArrayList<>();
         myList.add( gitChangedFile );
         when( template.getTemplateName() ).thenReturn( "test" );
         when( gitManager.diffBranches( anyString(), anyString(), anyString() ) ).thenReturn( myList );
@@ -489,10 +476,10 @@ public class TemplateRegistryImplTest
     @Test
     public void testGetChangedFileVersions() throws GitException
     {
-        List<GitChangedFile> myList = new ArrayList<>(  );
+        List<GitChangedFile> myList = new ArrayList<>();
         myList.add( gitChangedFile );
         when( gitManager.diffBranches( anyString(), anyString(), anyString() ) ).thenReturn( myList );
 
-        templateRegistry.getChangedFileVersions( "testBranchA", "testBranchB", gitChangedFile );
+        templateRegistry.getFileDiff( "testBranchA", "testBranchB", gitChangedFile );
     }
 }
