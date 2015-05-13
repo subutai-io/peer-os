@@ -44,14 +44,6 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="registry/list-template-tree">
-      <action class="org.safehaus.subutai.core.registry.cli.ListTemplateTreeCommand">
-        <argument ref="templateRegistry" />
-      </action>
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="registry/list-templates">
       <action class="org.safehaus.subutai.core.registry.cli.ListTemplatesCommand">
         <argument ref="templateRegistry" />

@@ -20,7 +20,6 @@ import javax.persistence.OneToMany;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.safehaus.subutai.common.datatypes.TemplateVersion;
-import org.safehaus.subutai.common.settings.Common;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -112,50 +111,6 @@ public class Template
 
     public Template()
     {
-    }
-
-
-    /**
-     * @param lxcArch - lxcArch
-     * @param lxcUtsname - lxcUtsname
-     * @param subutaiConfigPath - subutaiConfigPath
-     * @param subutaiParent - subutaiParent
-     * @param subutaiGitBranch - subutaiGitBranch
-     * @param subutaiGitUuid - subutaiGitUuid
-     * @param packagesManifest - packagesManifest
-     * @param md5sum - md5sum
-     *
-     * @deprecated (since versioning was introduced, pass additional template version)
-     */
-    @Deprecated
-    public Template( final String lxcArch, final String lxcUtsname, final String subutaiConfigPath,
-                     final String subutaiParent, final String subutaiGitBranch, final String subutaiGitUuid,
-                     final String packagesManifest, final String md5sum )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcUtsname ), "Missing lxc.utsname parameter" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "Missing lxc.arch parameter" );
-        Preconditions
-                .checkArgument( !Strings.isNullOrEmpty( subutaiConfigPath ), "Missing subutai.config.path parameter" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( subutaiParent ), "Missing subutai.parent parameter" );
-        Preconditions
-                .checkArgument( !Strings.isNullOrEmpty( subutaiGitBranch ), "Missing subutai.git.branch parameter" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( subutaiGitUuid ), "Missing subutai.git.uuid parameter" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( packagesManifest ), "Missing packages manifest" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( md5sum ), "Missing md5sum" );
-
-        this.pk = new TemplatePK( lxcUtsname, lxcArch, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), md5sum );
-        this.lxcUtsname = lxcUtsname;
-        this.subutaiConfigPath = subutaiConfigPath;
-        this.subutaiParent = subutaiParent;
-        this.subutaiGitBranch = subutaiGitBranch;
-        this.subutaiGitUuid = subutaiGitUuid;
-        this.packagesManifest = packagesManifest;
-        this.parentTemplateName = subutaiParent;
-
-        if ( this.pk.getTemplateName().equalsIgnoreCase( parentTemplateName ) )
-        {
-            parentTemplateName = null;
-        }
     }
 
 

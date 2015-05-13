@@ -16,8 +16,6 @@ import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
-import org.safehaus.subutai.common.quota.QuotaInfo;
-import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.quota.RamQuota;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.peer.api.ContainerGroup;
@@ -177,39 +175,6 @@ public class ContainerHostEntityTest
         containerHostEntity.setParent( resourceHost );
 
         assertEquals( resourceHost, containerHostEntity.getParent() );
-    }
-
-
-    @Test
-    public void testSetQuota() throws Exception
-    {
-        QuotaInfo quotaInfo = mock( QuotaInfo.class );
-
-        containerHostEntity.setQuota( quotaInfo );
-
-        verify( peer ).setQuota( containerHostEntity, quotaInfo );
-    }
-
-
-    @Test
-    public void testGetQuota() throws Exception
-    {
-        QuotaType quotaType = QuotaType.QUOTA_TYPE_CPU;
-
-        containerHostEntity.getQuota( quotaType );
-
-        verify( peer ).getQuota( containerHostEntity, quotaType );
-    }
-
-
-    @Test
-    public void testGetQuotaInfo() throws Exception
-    {
-        QuotaType quotaType = QuotaType.QUOTA_TYPE_CPU;
-
-        containerHostEntity.getQuotaInfo( quotaType );
-
-        verify( peer ).getQuotaInfo( containerHostEntity, quotaType );
     }
 
 

@@ -41,8 +41,6 @@ import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
-import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
-import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
@@ -846,8 +844,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
-                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder(
+                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
+                    bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -883,21 +882,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private boolean isTimedOut( long lastHeartbeat, long timeoutInMillis )
     {
         return ( System.currentTimeMillis() - lastHeartbeat ) > timeoutInMillis;
-    }
-
-
-    @Override
-    public PeerQuotaInfo getQuota( ContainerHost host, final QuotaType quota ) throws PeerException
-    {
-        try
-        {
-            Host c = bindHost( host.getHostId() );
-            return quotaManager.getQuota( c.getHostname(), quota );
-        }
-        catch ( QuotaException e )
-        {
-            throw new PeerException( e );
-        }
     }
 
 
@@ -1294,7 +1278,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public MemoryQuotaInfo getRamQuotaInfo( final ContainerHost host ) throws PeerException
+    public RamQuota getRamQuotaInfo( final ContainerHost host ) throws PeerException
     {
         Preconditions.checkNotNull( host, "Invalid container host" );
 

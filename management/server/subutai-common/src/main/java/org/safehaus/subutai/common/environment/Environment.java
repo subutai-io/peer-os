@@ -85,7 +85,6 @@ public interface Environment
 
     /**
      * Returns pees which host any container(s) from this environment
-     * @return
      */
     public Set<Peer> getPeers();
 
@@ -104,21 +103,22 @@ public interface Environment
 
     /**
      * Searches container by its id withing this environment
+     *
      * @param id - id of container to find
+     *
      * @return - found container host
-     * @throws ContainerHostNotFoundException
      */
 
     public ContainerHost getContainerHostById( UUID id ) throws ContainerHostNotFoundException;
 
     /**
      * Searches container by its hostname withing this environment
+     *
      * @param hostname - hostname of container to find
+     *
      * @return - found container host
-     * @throws ContainerHostNotFoundException
      */
     public ContainerHost getContainerHostByHostname( String hostname ) throws ContainerHostNotFoundException;
 
-    @Deprecated
     public Set<ContainerHost> getContainerHostsByIds( Set<UUID> ids ) throws ContainerHostNotFoundException;
 }

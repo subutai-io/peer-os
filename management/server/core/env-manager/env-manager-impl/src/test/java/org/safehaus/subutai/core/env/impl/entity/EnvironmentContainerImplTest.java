@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.env.impl.entity;
 
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,12 +22,9 @@ import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.QuotaInfo;
-import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.quota.RamQuota;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.impl.TestUtil;
-
-import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Sets;
 
@@ -493,27 +489,6 @@ public class EnvironmentContainerImplTest
 
 
     @Test( expected = UnsupportedOperationException.class )
-    public void testGetQuota() throws Exception
-    {
-        environmentContainer.getQuota( QuotaType.QUOTA_TYPE_CPU );
-    }
-
-
-    @Test( expected = UnsupportedOperationException.class )
-    public void testGetQuotaInfo() throws Exception
-    {
-        environmentContainer.getQuotaInfo( QuotaType.QUOTA_TYPE_CPU );
-    }
-
-
-    @Test( expected = UnsupportedOperationException.class )
-    public void testSetQuota() throws Exception
-    {
-        environmentContainer.setQuota( quotaInfo );
-    }
-
-
-    @Test( expected = UnsupportedOperationException.class )
     public void testGetLastHeartBeat() throws Exception
     {
         environmentContainer.getLastHeartbeat();
@@ -552,7 +527,4 @@ public class EnvironmentContainerImplTest
 
         assertThat( toString, containsString( TestUtil.CONTAINER_ID.toString() ) );
     }
-
-
-
 }

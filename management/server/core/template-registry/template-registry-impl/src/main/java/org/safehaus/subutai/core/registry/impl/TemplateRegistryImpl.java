@@ -18,7 +18,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -864,26 +863,6 @@ public class TemplateRegistryImpl implements TemplateRegistry
     public void dispose()
     {
         templateDownloadTokens.dispose();
-    }
-
-
-    @Override
-    public String getTemplateDownloadToken( final int timeout )
-    {
-        Preconditions.checkArgument( timeout > 0, "Timeout must be greater than 0" );
-
-        String templateDownloadToken = UUID.randomUUID().toString();
-        templateDownloadTokens.put( templateDownloadToken, false, timeout * 1000 );
-        return templateDownloadToken;
-    }
-
-
-    @Override
-    public boolean checkTemplateDownloadToken( final String token )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( token ), "Invalid token" );
-
-        return templateDownloadTokens.get( token ) != null;
     }
 
 

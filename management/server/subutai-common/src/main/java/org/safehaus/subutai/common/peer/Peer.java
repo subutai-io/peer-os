@@ -19,8 +19,6 @@ import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
-import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
-import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.quota.RamQuota;
@@ -128,9 +126,6 @@ public interface Peer
      * Returns true if this a local peer, false otherwise
      */
     public boolean isLocal();
-
-    public PeerQuotaInfo getQuota( ContainerHost host, QuotaType quotaType ) throws PeerException;
-
 
     /**
      * Get quota for enum specified
@@ -246,7 +241,7 @@ public interface Peer
      *
      * @return - MemoryQuotaInfo with quota details
      */
-    public MemoryQuotaInfo getRamQuotaInfo( ContainerHost host ) throws PeerException;
+    public RamQuota getRamQuotaInfo( ContainerHost host ) throws PeerException;
 
 
     /**

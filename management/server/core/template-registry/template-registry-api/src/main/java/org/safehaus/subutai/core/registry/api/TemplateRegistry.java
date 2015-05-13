@@ -307,30 +307,4 @@ public interface TemplateRegistry
      * Returns changes in the file between two branches
      */
     public String getFileDiff( String branchA, String branchB, GitChangedFile file );
-
-
-    /**
-     * Returns template download token, with which a template package can be downloaded from registry REST endpoint
-     * within the specified timeout
-     *
-     * @param timeout - timeout of template download token in seconds
-     *
-     * @return - template download token
-     */
-    @Deprecated
-    public String getTemplateDownloadToken( int timeout );
-
-    /**
-     * Returns true if token is valid or false if token is expired or does not exist
-     *
-     * @param token -template download token
-     *
-     * @return - {@code Boolean}
-     */
-    @Deprecated
-    public boolean checkTemplateDownloadToken( String token );
-
-
-    @Deprecated
-    public List<Template> getTemplateTree();
 }
