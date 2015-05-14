@@ -8,7 +8,10 @@
              interface="org.safehaus.subutai.core.hostregistry.api.HostRegistry" />
 
   <bean id="commandProcessor" class="org.safehaus.subutai.core.executor.impl.CommandProcessor"
-        destroy-method="dispose" />
+        destroy-method="dispose">
+    <argument ref="broker" />
+    <argument ref="hostRegistry" />
+  </bean>
 
   <bean id="executor"
         class="org.safehaus.subutai.core.executor.impl.CommandExecutorImpl"

@@ -19,7 +19,6 @@ import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.broker.api.Broker;
-import org.safehaus.subutai.core.broker.api.BrokerException;
 import org.safehaus.subutai.core.broker.api.Topic;
 import org.safehaus.subutai.core.filetracker.api.ConfigPointListener;
 import org.safehaus.subutai.core.filetracker.api.FileTrackerException;
@@ -78,7 +77,7 @@ public class FileTrackerImplTest
     @Before
     public void setUp() throws Exception
     {
-        fileTracker = new FileTrackerImpl( broker, peerManager );
+        fileTracker = new FileTrackerImpl( peerManager );
         fileTracker.notifier = notifier;
         fileTracker.commandUtil = commandUtil;
         fileTracker.jsonUtil = jsonUtil;
@@ -100,39 +99,10 @@ public class FileTrackerImplTest
     {
         try
         {
-            new FileTrackerImpl( null, peerManager );
+            new FileTrackerImpl( null );
             fail( "Expected NullPointerException" );
         }
         catch ( NullPointerException e )
-        {
-        }
-        try
-        {
-            new FileTrackerImpl( broker, null );
-            fail( "Expected NullPointerException" );
-        }
-        catch ( NullPointerException e )
-        {
-        }
-    }
-
-
-    @Test
-    public void testInit() throws Exception
-    {
-        fileTracker.init();
-
-        verify( broker ).addByteMessageListener( fileTracker );
-
-
-        doThrow( new BrokerException( "" ) ).when( broker ).addByteMessageListener( fileTracker );
-
-        try
-        {
-            fileTracker.init();
-            fail( "Expected FileTrackerException" );
-        }
-        catch ( FileTrackerException e )
         {
         }
     }
@@ -143,7 +113,6 @@ public class FileTrackerImplTest
     {
         fileTracker.destroy();
 
-        verify( broker ).removeMessageListener( fileTracker );
         verify( notifier ).shutdown();
     }
 
