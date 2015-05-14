@@ -231,14 +231,17 @@ public class SendButtonListener implements Button.ClickListener, CommandCallback
     public void onResponse( final Response response, final CommandResult commandResult )
     {
 
-        displayResponse( getHostById( response.getId() ), response, commandResult );
-        if ( commandResult.hasCompleted() || commandResult.hasTimedOut() )
+        if ( form.isAttached() )
         {
-            form.getTaskCount().decrementAndGet();
-
-            if ( form.getTaskCount().get() == 0 )
+            displayResponse( getHostById( response.getId() ), response, commandResult );
+            if ( commandResult.hasCompleted() || commandResult.hasTimedOut() )
             {
-                form.getIndicator().setVisible( false );
+                form.getTaskCount().decrementAndGet();
+
+                if ( form.getTaskCount().get() == 0 )
+                {
+                    form.getIndicator().setVisible( false );
+                }
             }
         }
     }

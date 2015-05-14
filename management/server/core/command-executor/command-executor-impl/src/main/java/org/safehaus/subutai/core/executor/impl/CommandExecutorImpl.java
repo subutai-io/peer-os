@@ -8,12 +8,7 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.Request;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.core.broker.api.Broker;
-import org.safehaus.subutai.core.broker.api.BrokerException;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
-import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 
@@ -23,19 +18,15 @@ import com.google.common.base.Preconditions;
  */
 public class CommandExecutorImpl implements CommandExecutor
 {
-    private static final Logger LOG = LoggerFactory.getLogger( CommandExecutorImpl.class.getName() );
 
-    private final Broker broker;
     protected CommandProcessor commandProcessor;
 
 
-    public CommandExecutorImpl( final Broker broker, final HostRegistry hostRegistry )
+    public CommandExecutorImpl( CommandProcessor commandProcessor )
     {
-        Preconditions.checkNotNull( broker );
-        Preconditions.checkNotNull( hostRegistry );
+        Preconditions.checkNotNull( commandProcessor );
 
-        this.broker = broker;
-        this.commandProcessor = new CommandProcessor( broker, hostRegistry );
+        this.commandProcessor = commandProcessor;
     }
 
 
@@ -78,26 +69,5 @@ public class CommandExecutorImpl implements CommandExecutor
         Preconditions.checkNotNull( requestBuilder, "Invalid callback" );
 
         commandProcessor.execute( requestBuilder.build( hostId ), callback );
-    }
-
-
-    public void init() throws CommandExecutorException
-    {
-        try
-        {
-            broker.addByteMessageListener( commandProcessor );
-        }
-        catch ( BrokerException e )
-        {
-            LOG.error( "Error in init", e );
-            throw new CommandExecutorException( e );
-        }
-    }
-
-
-    public void dispose()
-    {
-        broker.removeMessageListener( commandProcessor );
-        commandProcessor.dispose();
     }
 }

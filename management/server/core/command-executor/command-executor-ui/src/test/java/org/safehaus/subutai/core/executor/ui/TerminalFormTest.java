@@ -67,6 +67,7 @@ public class TerminalFormTest
     public void testAddOutput() throws Exception
     {
         terminalForm.commandOutputTxtArea = commandOutputTxtArea;
+        when( commandOutputTxtArea.isAttached() ).thenReturn( true );
 
         terminalForm.addOutput( OUTPUT );
 
