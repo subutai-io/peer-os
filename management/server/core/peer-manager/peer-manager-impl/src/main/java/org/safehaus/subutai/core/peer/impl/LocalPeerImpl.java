@@ -133,20 +133,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private static final int WAIT_CONTAINER_CONNECTION_SEC = 300;
     private DaoManager daoManager;
     private TemplateRegistry templateRegistry;
-    private ManagementHost managementHost;
-    private final Set<ResourceHost> resourceHosts = Sets.newHashSet();
+    protected ManagementHost managementHost;
+    protected Set<ResourceHost> resourceHosts = Sets.newHashSet();
     private CommandExecutor commandExecutor;
     private StrategyManager strategyManager;
     private QuotaManager quotaManager;
     private Monitor monitor;
-    private ManagementHostDataService managementHostDataService;
-    private ResourceHostDataService resourceHostDataService;
-    private ContainerHostDataService containerHostDataService;
-    private ContainerGroupDataService containerGroupDataService;
+    protected ManagementHostDataService managementHostDataService;
+    protected ResourceHostDataService resourceHostDataService;
+    protected ContainerHostDataService containerHostDataService;
+    protected ContainerGroupDataService containerGroupDataService;
     private HostRegistry hostRegistry;
-    private CommandUtil commandUtil = new CommandUtil();
-    private ExceptionUtil exceptionUtil = new ExceptionUtil();
-    private Set<RequestListener> requestListeners = Sets.newHashSet();
+    protected CommandUtil commandUtil = new CommandUtil();
+    protected ExceptionUtil exceptionUtil = new ExceptionUtil();
+    protected Set<RequestListener> requestListeners = Sets.newHashSet();
     private PeerInfo peerInfo;
     private SubutaiSslContextFactory subutaiSslContextFactory;
 
@@ -185,7 +185,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 peerInfo = result.get( 0 );
             }
 
-            managementHostDataService = new ManagementHostDataService( daoManager.getEntityManagerFactory() );
+            managementHostDataService = getManagementHostDataService();
             Collection allManagementHostEntity = managementHostDataService.getAll();
             if ( allManagementHostEntity != null && !allManagementHostEntity.isEmpty() )
             {
@@ -194,7 +194,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 managementHost.init();
             }
 
-            resourceHostDataService = new ResourceHostDataService( daoManager.getEntityManagerFactory() );
+            resourceHostDataService = getResourceHostDataService();
             resourceHosts.clear();
             synchronized ( resourceHosts )
             {
@@ -209,9 +209,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 setContainersTransientFields( resourceHost.getContainerHosts() );
             }
-
-
-            hostRegistry.addHostListener( this );
         }
         catch ( Exception e )
         {
@@ -220,7 +217,19 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    private void initPeerInfo( PeerDAO peerDAO )
+    protected ManagementHostDataService getManagementHostDataService()
+    {
+        return new ManagementHostDataService( daoManager.getEntityManagerFactory() );
+    }
+
+
+    protected ResourceHostDataService getResourceHostDataService()
+    {
+        return new ResourceHostDataService( daoManager.getEntityManagerFactory() );
+    }
+
+
+    protected void initPeerInfo( PeerDAO peerDAO )
     {
         //obtain id from fs
         File scriptsDirectory = new File( PEER_ID_PATH );
@@ -389,6 +398,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    protected ExecutorService getFixedExecutor( int numOfThreads )
+    {
+        return Executors.newFixedThreadPool( numOfThreads );
+    }
+
+
     @Override
     public Set<HostInfoModel> createContainerGroup( final CreateContainerGroupRequest request ) throws PeerException
     {
@@ -438,7 +453,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         int currentIpAddressOffset = 0;
 
         List<Future<ContainerHost>> taskFutures = Lists.newArrayList();
-        ExecutorService executorService = Executors.newFixedThreadPool( request.getNumberOfContainers() );
+        ExecutorService executorService = getFixedExecutor( request.getNumberOfContainers() );
 
         //create containers in parallel on each resource host
         for ( Map.Entry<ResourceHost, Set<String>> resourceHostDistribution : containerDistribution.entrySet() )
@@ -462,7 +477,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    private void registerRemoteTemplates( final CreateContainerGroupRequest request ) throws PeerException
+    protected void registerRemoteTemplates( final CreateContainerGroupRequest request ) throws PeerException
     {
         //try to register remote templates with local registry
         try
@@ -482,7 +497,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    private Map<ResourceHost, Set<String>> distributeContainersToResourceHosts(
+    protected Map<ResourceHost, Set<String>> distributeContainersToResourceHosts(
             final CreateContainerGroupRequest request ) throws PeerException
     {
         //collect resource host metrics  & prepare templates on each of them
@@ -537,7 +552,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    private Set<HostInfoModel> processRequestCompletion( final List<Future<ContainerHost>> taskFutures,
+    protected Set<HostInfoModel> processRequestCompletion( final List<Future<ContainerHost>> taskFutures,
                                                          final ExecutorService executorService,
                                                          final CreateContainerGroupRequest request )
     {
@@ -916,7 +931,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    private void cleanupEnvironmentNetworkSettings( final ContainerGroupEntity containerGroup )
+    protected void cleanupEnvironmentNetworkSettings( final ContainerGroupEntity containerGroup )
     {
         containerGroupDataService.remove( containerGroup.getEnvironmentId().toString() );
 
@@ -1195,7 +1210,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    private <T, V> V sendRequestInternal( final T request, final String recipient, final Class<V> responseType )
+    protected  <T, V> V sendRequestInternal( final T request, final String recipient, final Class<V> responseType )
             throws PeerException
     {
         Preconditions.checkNotNull( request, "Invalid request" );
@@ -1277,7 +1292,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    private void saveResourceHostContainers( ResourceHost resourceHost, Set<ContainerHostInfo> containerHostInfos )
+    protected void saveResourceHostContainers( ResourceHost resourceHost, Set<ContainerHostInfo> containerHostInfos )
     {
         //todo put updating host fields logic to updateHostInfo method
         Set<ContainerHost> oldHosts = resourceHost.getContainerHosts();
@@ -1643,7 +1658,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         if ( !containerHosts.isEmpty() )
         {
             List<Future<UUID>> taskFutures = Lists.newArrayList();
-            ExecutorService executorService = Executors.newFixedThreadPool( containerHosts.size() );
+            ExecutorService executorService = getFixedExecutor( containerHosts.size() );
 
             for ( ContainerHost containerHost : containerHosts )
             {

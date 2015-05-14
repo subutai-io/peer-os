@@ -40,6 +40,6 @@ public class OutputJsonTest
 
         topology.setNodeGroupPlacement( placement );
 
-        System.out.println( JsonUtil.to( topology ) );
+        System.out.println( JsonUtil.toJson( topology ) );
     }
 }

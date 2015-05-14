@@ -56,4 +56,6 @@
     <argument ref="daoManagerPeer" />
   </bean>
 
+  <service ref="localPeer" interface="org.safehaus.subutai.core.hostregistry.api.HostListener" />
+
 </blueprint>

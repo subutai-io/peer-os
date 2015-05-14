@@ -316,7 +316,7 @@ public class PeerRegisterForm extends CustomComponent
                 Notification.show( String.format( "Request sent to %s!", ip ) );
                 String responseString = response.readEntity( String.class );
                 LOG.info( response.toString() );
-                PeerInfo remotePeerInfo = JsonUtil.from( responseString, new TypeToken<PeerInfo>()
+                PeerInfo remotePeerInfo = JsonUtil.fromJson( responseString, new TypeToken<PeerInfo>()
                 {
                 }.getType() );
                 registerPeer( remotePeerInfo );

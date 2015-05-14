@@ -18,6 +18,13 @@
     <argument value="${hostExpiration}" />
   </bean>
 
+  <reference-list id="hostLstnr"
+                  interface="org.safehaus.subutai.core.hostregistry.api.HostListener"
+                  availability="optional">
+    <reference-listener ref="hostRegistry"
+                        bind-method="addHostListener" unbind-method="removeHostListener" />
+  </reference-list>
+
   <bean id="heartbeatListener" class="org.safehaus.subutai.core.hostregistry.impl.HeartBeatListener" scope="singleton">
     <argument ref="hostRegistry" />
   </bean>

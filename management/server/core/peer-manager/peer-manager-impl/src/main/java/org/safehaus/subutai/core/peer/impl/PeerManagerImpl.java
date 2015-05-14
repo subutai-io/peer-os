@@ -38,12 +38,12 @@ public class PeerManagerImpl implements PeerManager
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class.getName() );
 
 
-    private PeerDAO peerDAO;
-    private LocalPeer localPeer;
-    private Messenger messenger;
-    private CommandResponseListener commandResponseListener;
-    private MessageResponseListener messageResponseListener;
-    private MessageRequestListener messageRequestListener;
+    protected PeerDAO peerDAO;
+    protected LocalPeer localPeer;
+    protected Messenger messenger;
+    protected CommandResponseListener commandResponseListener;
+    protected MessageResponseListener messageResponseListener;
+    protected MessageRequestListener messageRequestListener;
 
     private DaoManager daoManager;
 

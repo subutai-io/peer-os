@@ -49,7 +49,7 @@ public class JsonUtil
     }
 
 
-    public static <T> T from( String value, Type type )
+    public <T> T from( String value, Type type )
     {
 
         return GSON.fromJson( value, type );
@@ -73,7 +73,7 @@ public class JsonUtil
     }
 
 
-    public static <T> String to( T value )
+    public <T> String to( T value )
     {
 
         return GSON.toJson( value );
