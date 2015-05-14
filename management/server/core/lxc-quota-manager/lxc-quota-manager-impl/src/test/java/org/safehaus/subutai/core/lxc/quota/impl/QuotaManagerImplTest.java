@@ -331,13 +331,9 @@ public class QuotaManagerImplTest
     }
 
 
-    //TODO Remove deprecated MemoryQuotaInfo and replace with RamQuota
     @Test
-    //    @Ignore
     public void testGetQuotaInfoRam() throws Exception
     {
         quotaManager.getQuotaInfo( uuid, QuotaType.QUOTA_TYPE_RAM );
-        //        assertEquals( ramQuota.getQuotaValue(),
-        //                quotaManager.getQuotaInfo( uuid, QuotaType.QUOTA_TYPE_RAM ).getQuotaValue() );
     }
 }
