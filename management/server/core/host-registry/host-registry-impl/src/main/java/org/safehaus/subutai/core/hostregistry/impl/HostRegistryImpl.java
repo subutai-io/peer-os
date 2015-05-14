@@ -10,16 +10,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.safehaus.subutai.common.host.HostInfo;
-import org.safehaus.subutai.core.broker.api.Broker;
-import org.safehaus.subutai.core.broker.api.BrokerException;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistryException;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -33,28 +29,21 @@ import com.google.common.collect.Sets;
  */
 public class HostRegistryImpl implements HostRegistry
 {
-    private static final Logger LOG = LoggerFactory.getLogger( HostRegistryImpl.class.getName() );
     private static final String HOST_NOT_CONNECTED_MSG = "Host %s is not connected";
     //timeout after which host expires in seconds
     private final int hostExpiration;
 
-    private final Broker broker;
-
     protected Set<HostListener> hostListeners =
             Collections.newSetFromMap( new ConcurrentHashMap<HostListener, Boolean>() );
     protected ExecutorService notifier = Executors.newCachedThreadPool();
-    protected HeartBeatListener heartBeatListener;
     protected Cache<UUID, ResourceHostInfo> hosts;
 
 
-    public HostRegistryImpl( final Broker broker, final int hostExpiration )
+    public HostRegistryImpl( final int hostExpiration )
     {
-        Preconditions.checkNotNull( broker, "Broker is null" );
         Preconditions.checkArgument( hostExpiration > 0, "Host expiration timeout must be greater than 0" );
 
-        this.broker = broker;
         this.hostExpiration = hostExpiration;
-        this.heartBeatListener = new HeartBeatListener( this );
     }
 
 
@@ -222,25 +211,14 @@ public class HostRegistryImpl implements HostRegistry
 
     public void init() throws HostRegistryException
     {
-        try
-        {
-            broker.addByteMessageListener( heartBeatListener );
-
-            hosts = CacheBuilder.newBuilder().
-                    expireAfterWrite( hostExpiration, TimeUnit.SECONDS ).
-                                        build();
-        }
-        catch ( BrokerException e )
-        {
-            LOG.error( "Error in init", e );
-            throw new HostRegistryException( e );
-        }
+        hosts = CacheBuilder.newBuilder().
+                expireAfterWrite( hostExpiration, TimeUnit.SECONDS ).
+                                    build();
     }
 
 
     public void dispose()
     {
-        broker.removeMessageListener( heartBeatListener );
         hosts.invalidateAll();
         notifier.shutdown();
     }

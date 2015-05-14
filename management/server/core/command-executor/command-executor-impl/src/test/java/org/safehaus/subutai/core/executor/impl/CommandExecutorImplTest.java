@@ -47,8 +47,8 @@ public class CommandExecutorImplTest
     @Before
     public void setUp() throws Exception
     {
-        commandExecutor = new CommandExecutorImpl( broker, hostRegistry );
-        commandExecutor.commandProcessor = commandProcessor;
+        commandExecutor = new CommandExecutorImpl( commandProcessor );
+//        commandExecutor.commandProcessor = commandProcessor;
         when( requestBuilder.build( HOST_ID ) ).thenReturn( request );
     }
 
@@ -58,50 +58,50 @@ public class CommandExecutorImplTest
     {
         try
         {
-            new CommandExecutorImpl( null, hostRegistry );
+            new CommandExecutorImpl( null );
             fail( "Expected NullPointerException" );
         }
         catch ( NullPointerException e )
         {
         }
-        try
-        {
-            new CommandExecutorImpl( broker, null );
-            fail( "Expected NullPointerException" );
-        }
-        catch ( NullPointerException e )
-        {
-        }
+//        try
+//        {
+//            new CommandExecutorImpl( broker, null );
+//            fail( "Expected NullPointerException" );
+//        }
+//        catch ( NullPointerException e )
+//        {
+//        }
     }
 
 
-    @Test
-    public void testInit() throws Exception
-    {
-        commandExecutor.init();
+//    @Test
+//    public void testInit() throws Exception
+//    {
+//        commandExecutor.init();
+//
+//        verify( broker ).addByteMessageListener( commandProcessor );
+//
+//        doThrow( new BrokerException( "" ) ).when( broker ).addByteMessageListener( commandProcessor );
+//
+//        try
+//        {
+//            commandExecutor.init();
+//            fail( "Expected CommandExecutorException" );
+//        }
+//        catch ( CommandExecutorException e )
+//        {
+//        }
+//    }
 
-        verify( broker ).addByteMessageListener( commandProcessor );
 
-        doThrow( new BrokerException( "" ) ).when( broker ).addByteMessageListener( commandProcessor );
-
-        try
-        {
-            commandExecutor.init();
-            fail( "Expected CommandExecutorException" );
-        }
-        catch ( CommandExecutorException e )
-        {
-        }
-    }
-
-
-    @Test
-    public void testDispose() throws Exception
-    {
-        commandExecutor.dispose();
-
-        verify( broker ).removeMessageListener( commandProcessor );
-    }
+//    @Test
+//    public void testDispose() throws Exception
+//    {
+//        commandExecutor.dispose();
+//
+//        verify( broker ).removeMessageListener( commandProcessor );
+//    }
 
 
     @Test

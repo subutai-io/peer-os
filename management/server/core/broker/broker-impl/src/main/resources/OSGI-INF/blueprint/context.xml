@@ -26,6 +26,20 @@
     <argument value="${idleConnectionTimeout}" />
   </bean>
 
+  <reference-list id="byteMessageLstnr"
+                  interface="org.safehaus.subutai.core.broker.api.ByteMessageListener"
+                  availability="optional">
+    <reference-listener ref="broker"
+                        bind-method="addByteMessageListener" unbind-method="removeMessageListener" />
+  </reference-list>
+
+  <reference-list id="textMessageLstnr"
+                  interface="org.safehaus.subutai.core.broker.api.TextMessageListener"
+                  availability="optional">
+    <reference-listener ref="broker"
+                        bind-method="addTextMessageListener" unbind-method="removeMessageListener" />
+  </reference-list>
+
   <service ref="broker" interface="org.safehaus.subutai.core.broker.api.Broker" />
 
 </blueprint>

@@ -17,8 +17,6 @@ import org.safehaus.subutai.common.command.Response;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.broker.api.Broker;
-import org.safehaus.subutai.core.broker.api.BrokerException;
 import org.safehaus.subutai.core.broker.api.ByteMessageListener;
 import org.safehaus.subutai.core.broker.api.Topic;
 import org.safehaus.subutai.core.filetracker.api.ConfigPointListener;
@@ -40,7 +38,6 @@ public class FileTrackerImpl implements FileTracker, ByteMessageListener
 
     protected Set<ConfigPointListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<ConfigPointListener, Boolean>() );
-    private final Broker broker;
     private final PeerManager peerManager;
 
     protected JsonUtil jsonUtil = new JsonUtil();
@@ -48,37 +45,20 @@ public class FileTrackerImpl implements FileTracker, ByteMessageListener
     protected ExecutorService notifier = Executors.newCachedThreadPool();
 
 
-    public FileTrackerImpl( final Broker broker, final PeerManager peerManager )
+    public FileTrackerImpl( final PeerManager peerManager )
     {
-        Preconditions.checkNotNull( broker );
         Preconditions.checkNotNull( peerManager );
 
-        this.broker = broker;
         this.peerManager = peerManager;
-    }
-
-
-    public void init() throws FileTrackerException
-    {
-        try
-        {
-            broker.addByteMessageListener( this );
-        }
-        catch ( BrokerException e )
-        {
-            throw new FileTrackerException( e );
-        }
     }
 
 
     public void destroy()
     {
-        broker.removeMessageListener( this );
         notifier.shutdown();
     }
 
 
-    @Override
     public void addListener( ConfigPointListener listener )
     {
         Preconditions.checkNotNull( listener );
@@ -87,7 +67,6 @@ public class FileTrackerImpl implements FileTracker, ByteMessageListener
     }
 
 
-    @Override
     public void removeListener( ConfigPointListener listener )
     {
         Preconditions.checkNotNull( listener );

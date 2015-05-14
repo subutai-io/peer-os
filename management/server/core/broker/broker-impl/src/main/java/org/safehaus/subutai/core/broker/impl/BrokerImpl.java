@@ -80,7 +80,6 @@ public class BrokerImpl implements Broker
     }
 
 
-    @Override
     public void addByteMessageListener( final ByteMessageListener listener ) throws BrokerException
     {
         Preconditions.checkNotNull( listener );
@@ -90,7 +89,6 @@ public class BrokerImpl implements Broker
     }
 
 
-    @Override
     public void addTextMessageListener( final TextMessageListener listener ) throws BrokerException
     {
         Preconditions.checkNotNull( listener );
@@ -100,7 +98,6 @@ public class BrokerImpl implements Broker
     }
 
 
-    @Override
     public void removeMessageListener( final MessageListener listener )
     {
         Preconditions.checkNotNull( listener );

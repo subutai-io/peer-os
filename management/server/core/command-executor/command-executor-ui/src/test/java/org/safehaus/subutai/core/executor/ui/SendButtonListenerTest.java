@@ -272,6 +272,7 @@ public class SendButtonListenerTest
         when( hostRegistry.getHostInfoById( ID ) ).thenReturn( hostInfo );
         when( commandResult.hasCompleted() ).thenReturn( true );
         when( terminalForm.getTaskCount() ).thenReturn( new AtomicInteger( 1 ) );
+        when( terminalForm.isAttached() ).thenReturn( true );
 
         listener.onResponse( response, commandResult );
 

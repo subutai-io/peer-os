@@ -1,14 +1,20 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <reference id="broker" availability="mandatory"
-             interface="org.safehaus.subutai.core.broker.api.Broker" />
   <reference id="peerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
   <bean id="fileTracker" class="org.safehaus.subutai.core.filetracker.impl.FileTrackerImpl"
-        init-method="init" destroy-method="destroy" scope="singleton">
-    <argument ref="broker" />
+        destroy-method="destroy" scope="singleton">
     <argument ref="peerManager" />
   </bean>
+
+  <reference-list id="cfgPointLstnr"
+                  interface="org.safehaus.subutai.core.filetracker.api.ConfigPointListener"
+                  availability="optional">
+    <reference-listener ref="fileTracker"
+                        bind-method="addListener" unbind-method="removeListener" />
+  </reference-list>
+
+  <service ref="fileTracker" interface="org.safehaus.subutai.core.broker.api.ByteMessageListener" />
 
 </blueprint>
