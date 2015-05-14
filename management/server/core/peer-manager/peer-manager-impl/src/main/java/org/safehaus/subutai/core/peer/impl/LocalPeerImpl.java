@@ -298,8 +298,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     public void dispose()
     {
-        hostRegistry.removeHostListener( this );
-
         if ( managementHost != null )
         {
             ( ( Disposable ) managementHost ).dispose();
@@ -553,8 +551,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     protected Set<HostInfoModel> processRequestCompletion( final List<Future<ContainerHost>> taskFutures,
-                                                         final ExecutorService executorService,
-                                                         final CreateContainerGroupRequest request )
+                                                           final ExecutorService executorService,
+                                                           final CreateContainerGroupRequest request )
     {
         Set<HostInfoModel> result = Sets.newHashSet();
         Set<ContainerHost> newContainers = Sets.newHashSet();
@@ -1210,7 +1208,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected  <T, V> V sendRequestInternal( final T request, final String recipient, final Class<V> responseType )
+    protected <T, V> V sendRequestInternal( final T request, final String recipient, final Class<V> responseType )
             throws PeerException
     {
         Preconditions.checkNotNull( request, "Invalid request" );
