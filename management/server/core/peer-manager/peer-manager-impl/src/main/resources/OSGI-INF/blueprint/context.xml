@@ -36,18 +36,24 @@
   <reference id="sslContextFactory" availability="mandatory"
              interface="org.safehaus.subutai.core.ssl.manager.api.SubutaiSslContextFactory" />
 
+  <bean id="localPeer" class="org.safehaus.subutai.core.peer.impl.LocalPeerImpl" init-method="init"
+        destroy-method="dispose" scope="singleton" activation="eager">
+    <argument ref="daoManagerPeer" />
+    <argument ref="templateRegistry" />
+    <argument ref="quotaManager" />
+    <argument ref="strategyManager" />
+    <argument ref="commandExecutor" />
+    <argument ref="hostRegistry" />
+    <argument ref="monitor" />
+    <argument ref="sslContextFactory" />
+
+  </bean>
+
   <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
         class="org.safehaus.subutai.core.peer.impl.PeerManagerImpl">
-    <property name="templateRegistry" ref="templateRegistry" />
-    <property name="hostRegistry" ref="hostRegistry" />
-    <property name="strategyManager" ref="strategyManager" />
-    <property name="quotaManager" ref="quotaManager" />
-    <property name="monitor" ref="monitor" />
-    <property name="commandExecutor" ref="commandExecutor" />
-    <property name="daoManager" ref="daoManagerPeer" />
-    <property name="identityManager" ref="identityManager" />
-    <property name="sslContextFactory" ref="sslContextFactory" />
     <argument ref="messenger" />
+    <argument ref="localPeer" />
+    <argument ref="daoManagerPeer" />
   </bean>
 
 </blueprint>

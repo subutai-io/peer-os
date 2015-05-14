@@ -137,4 +137,11 @@ public interface LocalPeer extends Peer
      * Sets up tunnels on the local peer to the specified remote peers
      */
     public int setupTunnels( Set<String> peerIps, UUID environmentId ) throws PeerException;
+
+
+    public void addRequestListener( RequestListener listener );
+
+    public void removeRequestListener( RequestListener listener );
+
+    public Set<RequestListener> getRequestListeners();
 }

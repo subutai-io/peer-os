@@ -1,6 +1,13 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
+import java.io.File;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
@@ -8,6 +15,7 @@ import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +31,7 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.CommandUtil;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.host.HostInfo;
@@ -63,7 +72,6 @@ import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
-import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
@@ -83,6 +91,7 @@ import org.safehaus.subutai.core.peer.impl.container.DestroyContainerWrapperTask
 import org.safehaus.subutai.core.peer.impl.dao.ContainerGroupDataService;
 import org.safehaus.subutai.core.peer.impl.dao.ContainerHostDataService;
 import org.safehaus.subutai.core.peer.impl.dao.ManagementHostDataService;
+import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.peer.impl.dao.ResourceHostDataService;
 import org.safehaus.subutai.core.peer.impl.entity.AbstractSubutaiHost;
 import org.safehaus.subutai.core.peer.impl.entity.ContainerGroupEntity;
@@ -98,6 +107,7 @@ import org.safehaus.subutai.core.strategy.api.StrategyNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
@@ -112,13 +122,16 @@ import com.google.common.collect.Sets;
  */
 public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 {
+    //TODO extract id to setting
+    private static final String PEER_ID_PATH = "/var/lib/subutai/id";
+    private static final String PEER_ID_FILE = "peer_id";
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
     // 5 min
     private static final long HOST_INACTIVE_TIME = 5 * 1000 * 60;
 
     private static final int WAIT_CONTAINER_CONNECTION_SEC = 300;
-    private PeerManager peerManager;
+    private DaoManager daoManager;
     private TemplateRegistry templateRegistry;
     private ManagementHost managementHost;
     private final Set<ResourceHost> resourceHosts = Sets.newHashSet();
@@ -126,77 +139,150 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private StrategyManager strategyManager;
     private QuotaManager quotaManager;
     private Monitor monitor;
-    private IdentityManager identityManager;
     private ManagementHostDataService managementHostDataService;
     private ResourceHostDataService resourceHostDataService;
     private ContainerHostDataService containerHostDataService;
     private ContainerGroupDataService containerGroupDataService;
     private HostRegistry hostRegistry;
-    private Set<RequestListener> requestListeners;
     private CommandUtil commandUtil = new CommandUtil();
     private ExceptionUtil exceptionUtil = new ExceptionUtil();
+    private Set<RequestListener> requestListeners = Sets.newHashSet();
+    private PeerInfo peerInfo;
+    private SubutaiSslContextFactory subutaiSslContextFactory;
 
-    private SubutaiSslContextFactory sslContextFactory;
 
-
-    public LocalPeerImpl( PeerManager peerManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
-                          StrategyManager strategyManager, Set<RequestListener> requestListeners,
-                          CommandExecutor commandExecutor, HostRegistry hostRegistry, Monitor monitor,
-                          IdentityManager identityManager )
+    public LocalPeerImpl( DaoManager daoManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
+                          StrategyManager strategyManager, CommandExecutor commandExecutor, HostRegistry hostRegistry,
+                          Monitor monitor, SubutaiSslContextFactory subutaiSslContextFactory )
 
     {
         this.strategyManager = strategyManager;
-        this.peerManager = peerManager;
+        this.daoManager = daoManager;
         this.templateRegistry = templateRegistry;
         this.quotaManager = quotaManager;
         this.monitor = monitor;
-        this.requestListeners = requestListeners;
         this.commandExecutor = commandExecutor;
         this.hostRegistry = hostRegistry;
-        this.identityManager = identityManager;
+        this.subutaiSslContextFactory = subutaiSslContextFactory;
     }
 
 
     public void init()
     {
-        managementHostDataService = new ManagementHostDataService( peerManager.getEntityManagerFactory() );
-        Collection allManagementHostEntity = managementHostDataService.getAll();
-        if ( allManagementHostEntity != null && !allManagementHostEntity.isEmpty() )
+        PeerDAO peerDAO;
+        try
         {
-            managementHost = ( ManagementHost ) allManagementHostEntity.iterator().next();
-            ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
-            managementHost.init();
-        }
+            peerDAO = new PeerDAO( daoManager );
 
-        resourceHostDataService = new ResourceHostDataService( peerManager.getEntityManagerFactory() );
-        resourceHosts.clear();
-        synchronized ( resourceHosts )
+
+            List<PeerInfo> result = peerDAO.getInfo( PeerManager.SOURCE_LOCAL_PEER, PeerInfo.class );
+            if ( result.isEmpty() )
+            {
+                initPeerInfo( peerDAO );
+            }
+            else
+            {
+                peerInfo = result.get( 0 );
+            }
+
+            managementHostDataService = new ManagementHostDataService( daoManager.getEntityManagerFactory() );
+            Collection allManagementHostEntity = managementHostDataService.getAll();
+            if ( allManagementHostEntity != null && !allManagementHostEntity.isEmpty() )
+            {
+                managementHost = ( ManagementHost ) allManagementHostEntity.iterator().next();
+                ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
+                managementHost.init();
+            }
+
+            resourceHostDataService = new ResourceHostDataService( daoManager.getEntityManagerFactory() );
+            resourceHosts.clear();
+            synchronized ( resourceHosts )
+            {
+                resourceHosts.addAll( resourceHostDataService.getAll() );
+            }
+            containerHostDataService = new ContainerHostDataService( daoManager.getEntityManagerFactory() );
+            containerGroupDataService = new ContainerGroupDataService( daoManager.getEntityManagerFactory() );
+
+            setResourceHostTransientFields( getResourceHosts() );
+            for ( ResourceHost resourceHost : getResourceHosts() )
+            {
+
+                setContainersTransientFields( resourceHost.getContainerHosts() );
+            }
+
+
+            hostRegistry.addHostListener( this );
+        }
+        catch ( Exception e )
         {
-            resourceHosts.addAll( resourceHostDataService.getAll() );
+            throw new PeerInitializationError( "Failed to init Local Peer", e );
         }
-        containerHostDataService = new ContainerHostDataService( peerManager.getEntityManagerFactory() );
-        containerGroupDataService = new ContainerGroupDataService( peerManager.getEntityManagerFactory() );
-
-        setResourceHostTransientFields( getResourceHosts() );
-        for ( ResourceHost resourceHost : getResourceHosts() )
-        {
-
-            setContainersTransientFields( resourceHost.getContainerHosts() );
-        }
-
-
-        hostRegistry.addHostListener( this );
     }
 
 
-    private void setResourceHostTransientFields( Set<ResourceHost> resourceHosts )
+    private void initPeerInfo( PeerDAO peerDAO )
     {
-        for ( ResourceHost resourceHost : resourceHosts )
+        //obtain id from fs
+        File scriptsDirectory = new File( PEER_ID_PATH );
+        if ( !scriptsDirectory.exists() )
         {
-            ( ( AbstractSubutaiHost ) resourceHost ).setPeer( this );
-            ( ( ResourceHostEntity ) resourceHost ).setRegistry( templateRegistry );
-            ( ( ResourceHostEntity ) resourceHost ).setMonitor( monitor );
-            ( ( ResourceHostEntity ) resourceHost ).setHostRegistry( hostRegistry );
+            boolean created = scriptsDirectory.mkdirs();
+            if ( created )
+            {
+                LOG.info( "Peer id directory created" );
+            }
+        }
+        Path peerIdFilePath = Paths.get( PEER_ID_PATH, PEER_ID_FILE );
+        File peerIdFile = peerIdFilePath.toFile();
+        UUID peerId;
+        try
+        {
+            if ( !peerIdFile.exists() )
+            {
+                //generate new id and save to fs
+                peerId = UUID.randomUUID();
+                FileUtils.writeStringToFile( peerIdFile, peerId.toString() );
+            }
+            else
+            {
+                //read id from file
+                peerId = UUID.fromString( FileUtils.readFileToString( peerIdFile ) );
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new PeerInitializationError( "Failed to obtain peer id file", e );
+        }
+        peerInfo = new PeerInfo();
+        peerInfo.setId( peerId );
+        peerInfo.setName( "Local Subutai server" );
+        //TODO get ownerId from persistent storage
+        peerInfo.setOwnerId( UUID.randomUUID() );
+        setPeerIp();
+        peerInfo.setName( String.format( "Peer on %s", peerInfo.getIp() ) );
+
+        peerDAO.saveInfo( PeerManager.SOURCE_LOCAL_PEER, peerInfo.getId().toString(), peerInfo );
+    }
+
+
+    private void setPeerIp()
+    {
+        try
+        {
+            Enumeration<InetAddress> addressEnumeration =
+                    NetworkInterface.getByName( Common.MANAGEMENT_HOST_EXTERNAL_IP_INTERFACE ).getInetAddresses();
+            while ( addressEnumeration.hasMoreElements() )
+            {
+                InetAddress address = addressEnumeration.nextElement();
+                if ( address instanceof Inet4Address )
+                {
+                    peerInfo.setIp( address.getHostAddress() );
+                }
+            }
+        }
+        catch ( SocketException e )
+        {
+            LOG.error( "Error getting network interfaces", e );
         }
     }
 
@@ -217,31 +303,43 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    private void setResourceHostTransientFields( Set<ResourceHost> resourceHosts )
+    {
+        for ( ResourceHost resourceHost : resourceHosts )
+        {
+            ( ( AbstractSubutaiHost ) resourceHost ).setPeer( this );
+            ( ( ResourceHostEntity ) resourceHost ).setRegistry( templateRegistry );
+            ( ( ResourceHostEntity ) resourceHost ).setMonitor( monitor );
+            ( ( ResourceHostEntity ) resourceHost ).setHostRegistry( hostRegistry );
+        }
+    }
+
+
     @Override
     public UUID getId()
     {
-        return peerManager.getLocalPeerInfo().getId();
+        return getPeerInfo().getId();
     }
 
 
     @Override
     public String getName()
     {
-        return peerManager.getLocalPeerInfo().getName();
+        return getPeerInfo().getName();
     }
 
 
     @Override
     public UUID getOwnerId()
     {
-        return peerManager.getLocalPeerInfo().getOwnerId();
+        return getPeerInfo().getOwnerId();
     }
 
 
     @Override
     public PeerInfo getPeerInfo()
     {
-        return peerManager.getLocalPeerInfo();
+        return peerInfo;
     }
 
 
@@ -1630,7 +1728,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 keyStoreManager.importCertificateHEXString( keyStore, keyStoreData );
                 //***********************************************************************
                 LOG.debug( String.format( "Importing new certificate to trustStore with alias: %s", alias ) );
-                this.sslContextFactory.reloadTrustStore();
+                this.subutaiSslContextFactory.reloadTrustStore();
             }
         }
         catch ( KeyStoreException e )
@@ -1651,8 +1749,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public String exportEnvironmentCertificate( final UUID environmentId ) throws PeerException
     {
-        String alias = String.format( "env_%s_%s", peerManager.getLocalPeer().getPeerInfo().getId().toString(),
-                environmentId.toString() );
+        String alias = String.format( "env_%s_%s", getPeerInfo().getId().toString(), environmentId.toString() );
 
         KeyStoreData environmentKeyStoreData = new KeyStoreData();
         environmentKeyStoreData.setupKeyStorePx2();
@@ -1682,7 +1779,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 keyStoreManager.saveX509Certificate( keyStore, environmentKeyStoreData, cert, keyPair );
 
-                sslContextFactory.reloadKeyStore();
+                subutaiSslContextFactory.reloadKeyStore();
                 LOG.debug( String.format( "Saving new certificate to keyStore with alias: %s", alias ) );
             }
         }
@@ -1744,7 +1841,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
 
             //***********************************************************************
-            sslContextFactory.reloadTrustStore();
+            subutaiSslContextFactory.reloadTrustStore();
         }
         catch ( KeyStoreException e )
         {
@@ -1764,6 +1861,31 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         return managementHost.setupTunnels( peerIps, environmentId );
+    }
+
+
+    @Override
+    public void addRequestListener( final RequestListener listener )
+    {
+        Preconditions.checkNotNull( listener );
+
+        requestListeners.add( listener );
+    }
+
+
+    @Override
+    public void removeRequestListener( final RequestListener listener )
+    {
+        Preconditions.checkNotNull( listener );
+
+        requestListeners.remove( listener );
+    }
+
+
+    @Override
+    public Set<RequestListener> getRequestListeners()
+    {
+        return Collections.unmodifiableSet( requestListeners );
     }
 
 
@@ -1789,18 +1911,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public int hashCode()
     {
         return getId().hashCode();
-    }
-
-
-    public void setSslContextFactory( final SubutaiSslContextFactory sslContextFactory )
-    {
-        this.sslContextFactory = sslContextFactory;
-    }
-
-
-    public SubutaiSslContextFactory getSslContextFactory()
-    {
-        return sslContextFactory;
     }
 }
 

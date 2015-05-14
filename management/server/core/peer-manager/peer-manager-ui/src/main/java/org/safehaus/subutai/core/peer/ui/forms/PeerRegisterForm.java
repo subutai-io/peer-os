@@ -167,7 +167,7 @@ public class PeerRegisterForm extends CustomComponent
     private Button createShowPeersButton()
     {
         showPeersButton = new Button();
-        showPeersButton.setCaption( "Show getPeerInfos" );
+        showPeersButton.setCaption( "Show peers" );
         showPeersButton.setImmediate( false );
         showPeersButton.setWidth( "-1px" );
         showPeersButton.setHeight( "-1px" );
