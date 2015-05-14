@@ -12,16 +12,18 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
-  <reference id="broker" availability="mandatory"
-             interface="org.safehaus.subutai.core.broker.api.Broker" />
-
-  <bean id="containerRegistry"
+  <bean id="hostRegistry"
         class="org.safehaus.subutai.core.hostregistry.impl.HostRegistryImpl"
         init-method="init" destroy-method="dispose" scope="singleton" activation="eager">
-    <argument ref="broker" />
     <argument value="${hostExpiration}" />
   </bean>
 
-  <service ref="containerRegistry" interface="org.safehaus.subutai.core.hostregistry.api.HostRegistry" />
+  <bean id="heartbeatListener" class="org.safehaus.subutai.core.hostregistry.impl.HeartBeatListener" scope="singleton">
+    <argument ref="hostRegistry" />
+  </bean>
+
+  <service ref="hostRegistry" interface="org.safehaus.subutai.core.hostregistry.api.HostRegistry" />
+
+  <service ref="heartbeatListener" interface="org.safehaus.subutai.core.broker.api.ByteMessageListener" />
 
 </blueprint>

@@ -12,13 +12,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.core.broker.api.Broker;
-import org.safehaus.subutai.core.broker.api.BrokerException;
-import org.safehaus.subutai.core.broker.api.ByteMessageListener;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
-import org.safehaus.subutai.core.hostregistry.api.HostRegistryException;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 
 import com.google.common.cache.Cache;
@@ -28,9 +24,7 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.fail;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -46,9 +40,6 @@ public class HostRegistryImplTest
     private static final String CONTAINER_HOSTNAME = "container";
     private static final String DUMMY_HOSTNAME = "dummy";
     private static final int HOST_EXPIRATION = 30;
-
-    @Mock
-    Broker broker;
 
     @Mock
     Set<HostListener> hostListeners;
@@ -80,10 +71,9 @@ public class HostRegistryImplTest
     @Before
     public void setUp() throws Exception
     {
-        registry = new HostRegistryImpl( broker, HOST_EXPIRATION );
+        registry = new HostRegistryImpl( HOST_EXPIRATION );
         registry.hostListeners = hostListeners;
         registry.notifier = notifier;
-        registry.heartBeatListener = heartBeatListener;
         registry.hosts = hosts;
         when( hosts.asMap() ).thenReturn( map );
         when( map.values() ).thenReturn( Sets.newHashSet( resourceHostInfo ) );
@@ -99,17 +89,10 @@ public class HostRegistryImplTest
     }
 
 
-    @Test( expected = NullPointerException.class )
+    @Test( expected = IllegalArgumentException.class )
     public void testConstructor() throws Exception
     {
-        new HostRegistryImpl( null, HOST_EXPIRATION );
-    }
-
-
-    @Test( expected = IllegalArgumentException.class )
-    public void testConstructor2() throws Exception
-    {
-        new HostRegistryImpl( broker, 0 );
+        new HostRegistryImpl( 0 );
     }
 
 
@@ -135,7 +118,7 @@ public class HostRegistryImplTest
     public void testGetHostInfoById() throws Exception
     {
 
-        assertNotNull(registry.getHostInfoById( CONTAINER_ID ));
+        assertNotNull( registry.getHostInfoById( CONTAINER_ID ) );
         assertNotNull( registry.getHostInfoById( HOST_ID ) );
 
         try
@@ -273,31 +256,10 @@ public class HostRegistryImplTest
 
 
     @Test
-    public void testInit() throws Exception
-    {
-        registry.init();
-
-        verify( broker ).addByteMessageListener( heartBeatListener );
-
-
-        doThrow( new BrokerException( "" ) ).when( broker ).addByteMessageListener( any( ByteMessageListener.class ) );
-        try
-        {
-            registry.init();
-            fail( "Expected ContainerRegistryException" );
-        }
-        catch ( HostRegistryException e )
-        {
-        }
-    }
-
-
-    @Test
     public void testDispose() throws Exception
     {
         registry.dispose();
 
-        verify( broker ).removeMessageListener( heartBeatListener );
         verify( hosts ).invalidateAll();
     }
 }
