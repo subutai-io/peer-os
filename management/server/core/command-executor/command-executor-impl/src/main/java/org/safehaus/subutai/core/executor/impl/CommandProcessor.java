@@ -179,7 +179,7 @@ public class CommandProcessor implements ByteMessageListener
     }
 
 
-    protected void dispose()
+    public void dispose()
     {
         commands.dispose();
     }
