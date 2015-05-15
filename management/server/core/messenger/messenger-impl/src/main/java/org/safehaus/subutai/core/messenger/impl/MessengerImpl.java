@@ -40,7 +40,6 @@ public class MessengerImpl implements Messenger, MessageProcessor
     protected final Set<MessageListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<MessageListener, Boolean>() );
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
-    //    private PeerManager peerManager;
     protected MessengerDao messengerDao;
     protected MessageSender messageSender;
     private DaoManager daoManager;
@@ -48,7 +47,6 @@ public class MessengerImpl implements Messenger, MessageProcessor
 
     public void init() throws MessengerException
     {
-        //        Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( daoManager );
 
         try
@@ -71,12 +69,6 @@ public class MessengerImpl implements Messenger, MessageProcessor
         messageSender.dispose();
         notificationExecutor.shutdown();
     }
-
-
-    //    public void setPeerManager( final PeerManager peerManager )
-    //    {
-    //        this.peerManager = peerManager;
-    //    }
 
 
     public void setDaoManager( final DaoManager daoManager )
