@@ -77,7 +77,8 @@ public class RemotePeerImpl implements RemotePeer
     protected final Messenger messenger;
     private final CommandResponseListener commandResponseListener;
     private final MessageResponseListener messageResponseListener;
-    private final RestUtil restUtil = new RestUtil();
+    protected RestUtil restUtil = new RestUtil();
+    protected JsonUtil jsonUtil = new JsonUtil();
     private String baseUrl;
 
 
@@ -223,7 +224,7 @@ public class RemotePeerImpl implements RemotePeer
         {
             String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, null );
 
-            return JsonUtil.fromJson( response, Template.class );
+            return jsonUtil.from( response, Template.class );
         }
         catch ( Exception e )
         {
@@ -356,7 +357,7 @@ public class RemotePeerImpl implements RemotePeer
         {
             String alias =
                     String.format( "env_%s_%s", localPeer.getId(), headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
-            return JsonUtil.fromJson( post( path, alias, params, headers ), Boolean.class );
+            return jsonUtil.from( post( path, alias, params, headers ), Boolean.class );
         }
         catch ( Exception e )
         {
@@ -388,7 +389,7 @@ public class RemotePeerImpl implements RemotePeer
                     String.format( "env_%s_%s", localPeer.getId(), headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
-            return JsonUtil.fromJson( response, new TypeToken<ProcessResourceUsage>()
+            return jsonUtil.from( response, new TypeToken<ProcessResourceUsage>()
             {}.getType() );
         }
         catch ( Exception e )
@@ -417,7 +418,7 @@ public class RemotePeerImpl implements RemotePeer
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
-            return JsonUtil.fromJson( response, ContainerHostState.class );
+            return jsonUtil.from( response, ContainerHostState.class );
         }
         catch ( Exception e )
         {
@@ -445,7 +446,7 @@ public class RemotePeerImpl implements RemotePeer
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
-            return JsonUtil.fromJson( response, Integer.class );
+            return jsonUtil.from( response, Integer.class );
         }
         catch ( Exception e )
         {
@@ -473,7 +474,7 @@ public class RemotePeerImpl implements RemotePeer
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
-            return JsonUtil.fromJson( response, RamQuota.class );
+            return jsonUtil.from( response, RamQuota.class );
         }
         catch ( Exception e )
         {
@@ -528,7 +529,7 @@ public class RemotePeerImpl implements RemotePeer
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
-            return JsonUtil.fromJson( response, Integer.class );
+            return jsonUtil.from( response, Integer.class );
         }
         catch ( Exception e )
         {
@@ -556,7 +557,7 @@ public class RemotePeerImpl implements RemotePeer
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
-            return JsonUtil.fromJson( response, CpuQuotaInfo.class );
+            return jsonUtil.from( response, CpuQuotaInfo.class );
         }
         catch ( Exception e )
         {
@@ -611,7 +612,7 @@ public class RemotePeerImpl implements RemotePeer
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
-            return JsonUtil.fromJson( response, new TypeToken<Set<Integer>>()
+            return jsonUtil.from( response, new TypeToken<Set<Integer>>()
             {}.getType() );
         }
         catch ( Exception e )
@@ -631,7 +632,7 @@ public class RemotePeerImpl implements RemotePeer
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId().toString() );
-        params.put( "cpuset", JsonUtil.toJson( cpuSet ) );
+        params.put( "cpuset", jsonUtil.to( cpuSet ) );
 
         Map<String, String> headers = Maps.newHashMap();
         headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
@@ -659,7 +660,7 @@ public class RemotePeerImpl implements RemotePeer
         Map<String, String> params = Maps.newHashMap();
 
         params.put( "containerId", host.getId().toString() );
-        params.put( "diskPartition", JsonUtil.toJson( diskPartition ) );
+        params.put( "diskPartition", jsonUtil.to( diskPartition ) );
 
         Map<String, String> headers = Maps.newHashMap();
         headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
@@ -670,7 +671,7 @@ public class RemotePeerImpl implements RemotePeer
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
-            return JsonUtil.fromJson( response, new TypeToken<DiskQuota>()
+            return jsonUtil.from( response, new TypeToken<DiskQuota>()
             {}.getType() );
         }
         catch ( Exception e )
@@ -690,7 +691,7 @@ public class RemotePeerImpl implements RemotePeer
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId().toString() );
-        params.put( "diskQuota", JsonUtil.toJson( diskQuota ) );
+        params.put( "diskQuota", jsonUtil.to( diskQuota ) );
 
         Map<String, String> headers = Maps.newHashMap();
         headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
@@ -717,7 +718,7 @@ public class RemotePeerImpl implements RemotePeer
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId().toString() );
-        params.put( "ramQuota", JsonUtil.toJson( ramQuota ) );
+        params.put( "ramQuota", jsonUtil.to( ramQuota ) );
 
         Map<String, String> headers = Maps.newHashMap();
         headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
@@ -753,7 +754,7 @@ public class RemotePeerImpl implements RemotePeer
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
-            return JsonUtil.fromJson( response, Integer.class );
+            return jsonUtil.from( response, Integer.class );
         }
         catch ( Exception e )
         {
@@ -781,7 +782,7 @@ public class RemotePeerImpl implements RemotePeer
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
-            return JsonUtil.fromJson( response, Integer.class );
+            return jsonUtil.from( response, Integer.class );
         }
         catch ( Exception e )
         {
@@ -801,7 +802,7 @@ public class RemotePeerImpl implements RemotePeer
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId().toString() );
-        params.put( "diskPartition", JsonUtil.toJson( diskPartition ) );
+        params.put( "diskPartition", jsonUtil.to( diskPartition ) );
 
         Map<String, String> headers = Maps.newHashMap();
         headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
@@ -812,7 +813,7 @@ public class RemotePeerImpl implements RemotePeer
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
-            return JsonUtil.fromJson( response, new TypeToken<DiskQuota>()
+            return jsonUtil.from( response, new TypeToken<DiskQuota>()
             {}.getType() );
         }
         catch ( Exception e )
@@ -832,7 +833,7 @@ public class RemotePeerImpl implements RemotePeer
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId().toString() );
-        params.put( "quotaType", JsonUtil.toJson( quotaType ) );
+        params.put( "quotaType", jsonUtil.to( quotaType ) );
 
         Map<String, String> headers = Maps.newHashMap();
         headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
@@ -843,7 +844,7 @@ public class RemotePeerImpl implements RemotePeer
                     headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
             String response = get( path, alias, params, headers );
 
-            return JsonUtil.fromJson( response, new TypeToken<QuotaInfo>()
+            return jsonUtil.from( response, new TypeToken<QuotaInfo>()
             {}.getType() );
         }
         catch ( Exception e )
@@ -864,7 +865,7 @@ public class RemotePeerImpl implements RemotePeer
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId().toString() );
-        params.put( "quotaInfo", JsonUtil.toJson( quotaInfo ) );
+        params.put( "quotaInfo", jsonUtil.to( quotaInfo ) );
 
         Map<String, String> headers = Maps.newHashMap();
         headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, host.getEnvironmentId() );
@@ -898,7 +899,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( requestBuilder, "Invalid request" );
         Preconditions.checkNotNull( host, "Invalid host" );
 
-        BlockingCommandCallback blockingCommandCallback = new BlockingCommandCallback( callback );
+        BlockingCommandCallback blockingCommandCallback = getBlockingCommandCallback( callback );
 
         executeAsync( requestBuilder, host, blockingCommandCallback, blockingCommandCallback.getCompletionSemaphore() );
 
@@ -910,6 +911,12 @@ public class RemotePeerImpl implements RemotePeer
         }
 
         return commandResult;
+    }
+
+
+    protected BlockingCommandCallback getBlockingCommandCallback( CommandCallback callback )
+    {
+        return new BlockingCommandCallback( callback );
     }
 
 
@@ -928,8 +935,8 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    private void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback,
-                               Semaphore semaphore ) throws CommandException
+    protected void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback,
+                                 Semaphore semaphore ) throws CommandException
     {
         Preconditions.checkNotNull( requestBuilder, "Invalid request" );
         Preconditions.checkNotNull( host, "Invalid host" );
@@ -1006,8 +1013,8 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    private <T> MessageRequest sendRequestInternal( final T request, final String recipient, final int requestTimeout,
-                                                    final Map<String, String> headers ) throws PeerException
+    protected <T> MessageRequest sendRequestInternal( final T request, final String recipient, final int requestTimeout,
+                                                      final Map<String, String> headers ) throws PeerException
     {
         Preconditions.checkNotNull( request, "Invalid request" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
@@ -1100,7 +1107,7 @@ public class RemotePeerImpl implements RemotePeer
 
             Map<String, String> params = Maps.newHashMap();
 
-            params.put( "vni", JsonUtil.to( vni ) );
+            params.put( "vni", jsonUtil.to( vni ) );
 
             String response = post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
 
@@ -1212,7 +1219,7 @@ public class RemotePeerImpl implements RemotePeer
             String environmentRequestAlias = String.format( "env_%s_%s", localPeer.getId().toString(), envId );
 
             Map<String, String> params = Maps.newHashMap();
-            params.put( "environmentId", JsonUtil.toJson( environmentId ) );
+            params.put( "environmentId", jsonUtil.to( environmentId ) );
 
             Map<String, String> headers = Maps.newHashMap();
             headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, envId );
@@ -1238,9 +1245,9 @@ public class RemotePeerImpl implements RemotePeer
         {
             Map<String, String> params = Maps.newHashMap();
 
-            params.put( "containerId", JsonUtil.to( containerHostId ) );
+            params.put( "containerId", jsonUtil.to( containerHostId ) );
             String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, null );
-            return JsonUtil.fromJson( response, HostInfoModel.class );
+            return jsonUtil.from( response, HostInfoModel.class );
         }
         catch ( Exception e )
         {
@@ -1257,7 +1264,7 @@ public class RemotePeerImpl implements RemotePeer
         {
             String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, null );
 
-            return JsonUtil.fromJson( response, new TypeToken<Set<Gateway>>()
+            return jsonUtil.from( response, new TypeToken<Set<Gateway>>()
             {}.getType() );
         }
         catch ( Exception e )
@@ -1276,7 +1283,7 @@ public class RemotePeerImpl implements RemotePeer
         {
             String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, null );
 
-            return JsonUtil.fromJson( response, new TypeToken<Set<Vni>>()
+            return jsonUtil.from( response, new TypeToken<Set<Vni>>()
             {}.getType() );
         }
         catch ( Exception e )

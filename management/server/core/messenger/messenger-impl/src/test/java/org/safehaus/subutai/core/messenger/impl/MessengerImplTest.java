@@ -32,8 +32,10 @@ import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -79,12 +81,12 @@ public class MessengerImplTest
         when( entityManagerFactory.createEntityManager() ).thenReturn( entityManager );
         when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
 
-        messenger = new MessengerImpl();
+        messenger =spy( new MessengerImpl());
         messenger.messageSender = messageSender;
         messenger.notificationExecutor = notificationExecutor;
         messenger.messengerDao = messengerDao;
         messenger.setDaoManager( daoManager );
-        messenger.setPeerManager( peerManager );
+       doReturn( peerManager ). when( messenger).getPeerManager() ;
 
         when( localPeer.getId() ).thenReturn( LOCAL_PEER_ID );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );

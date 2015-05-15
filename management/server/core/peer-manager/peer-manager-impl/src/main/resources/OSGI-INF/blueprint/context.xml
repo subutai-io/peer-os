@@ -2,7 +2,6 @@
 <blueprint default-activation="eager"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
-
     >
 
   <!-- ***************************************************************** -->
@@ -10,8 +9,6 @@
     <jpa:unit unitname="peerManagerPUnit" property="entityManagerFactory" />
   </bean>
   <!-- ***************************************************************** -->
-
-  <service ref="peerManager" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
   <reference id="messenger" availability="mandatory"
              interface="org.safehaus.subutai.core.messenger.api.Messenger" />
@@ -36,18 +33,44 @@
   <reference id="sslContextFactory" availability="mandatory"
              interface="org.safehaus.subutai.core.ssl.manager.api.SubutaiSslContextFactory" />
 
-  <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
-        class="org.safehaus.subutai.core.peer.impl.PeerManagerImpl">
-    <property name="templateRegistry" ref="templateRegistry" />
-    <property name="hostRegistry" ref="hostRegistry" />
-    <property name="strategyManager" ref="strategyManager" />
-    <property name="quotaManager" ref="quotaManager" />
-    <property name="monitor" ref="monitor" />
-    <property name="commandExecutor" ref="commandExecutor" />
-    <property name="daoManager" ref="daoManagerPeer" />
-    <property name="identityManager" ref="identityManager" />
-    <property name="sslContextFactory" ref="sslContextFactory" />
+  <bean id="localPeer" class="org.safehaus.subutai.core.peer.impl.LocalPeerImpl" init-method="init"
+        destroy-method="dispose" scope="singleton" activation="eager">
+    <argument ref="daoManagerPeer" />
+    <argument ref="templateRegistry" />
+    <argument ref="quotaManager" />
+    <argument ref="strategyManager" />
+    <argument ref="commandExecutor" />
+    <argument ref="hostRegistry" />
+    <argument ref="monitor" />
+    <argument ref="sslContextFactory" />
+
+  </bean>
+
+  <bean id="messageResponseListener" class="org.safehaus.subutai.core.peer.impl.request.MessageResponseListener"
+        destroy-method="dispose" scope="singleton" activation="eager">
     <argument ref="messenger" />
   </bean>
+
+  <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
+        class="org.safehaus.subutai.core.peer.impl.PeerManagerImpl">
+    <argument ref="messenger" />
+    <argument ref="localPeer" />
+    <argument ref="daoManagerPeer" />
+    <argument ref="messageResponseListener" />
+  </bean>
+
+  <bean id="messageRequestListener" class="org.safehaus.subutai.core.peer.impl.request.MessageRequestListener"
+        destroy-method="dispose" scope="singleton" activation="eager">
+    <argument ref="peerManager" />
+    <argument ref="messenger" />
+  </bean>
+
+  <service ref="localPeer" interface="org.safehaus.subutai.core.hostregistry.api.HostListener" />
+
+  <service ref="messageResponseListener" interface="org.safehaus.subutai.core.messenger.api.MessageListener" />
+
+  <service ref="peerManager" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+
+  <service ref="messageRequestListener" interface="org.safehaus.subutai.core.messenger.api.MessageListener" />
 
 </blueprint>

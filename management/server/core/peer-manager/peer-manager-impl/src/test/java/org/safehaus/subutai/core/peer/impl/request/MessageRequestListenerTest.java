@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.Messenger;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 
@@ -36,6 +37,8 @@ public class MessageRequestListenerTest
     Message message;
     @Mock
     MessageRequest messageRequest;
+    @Mock
+    LocalPeer localPeer;
 
     MessageRequestListener listener;
 
@@ -43,10 +46,12 @@ public class MessageRequestListenerTest
     @Before
     public void setUp() throws Exception
     {
-        listener = new MessageRequestListener( peerManager, messenger, Sets.newHashSet( requestListener ) );
+        listener = new MessageRequestListener( peerManager, messenger );
         listener.notifier = notifier;
         when( requestListener.getRecipient() ).thenReturn( RECIPIENT );
         when( messageRequest.getRecipient() ).thenReturn( RECIPIENT );
+        when( peerManager.getLocalPeer() ).thenReturn( localPeer );
+        when( localPeer.getRequestListeners() ).thenReturn( Sets.newHashSet( requestListener ) );
         when( message.getPayload( MessageRequest.class ) ).thenReturn( messageRequest );
     }
 

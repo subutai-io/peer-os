@@ -215,7 +215,7 @@ public class RestServiceImpl implements RestService
     {
         String responseString = response.readEntity( String.class );
         LOGGER.info( response.toString() );
-        PeerInfo remotePeerInfo = JsonUtil.from( responseString, new TypeToken<PeerInfo>()
+        PeerInfo remotePeerInfo = JsonUtil.fromJson( responseString, new TypeToken<PeerInfo>()
         {}.getType() );
         if ( remotePeerInfo != null )
         {
@@ -609,7 +609,7 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             return Response.ok( JsonUtil.toJson( localPeer.getContainerHostById( UUID.fromString( containerId ) )
                                                           .getAvailableDiskQuota(
-                                                                  JsonUtil.<DiskPartition>from( diskPartition,
+                                                                  JsonUtil.<DiskPartition>fromJson( diskPartition,
                                                                           new TypeToken<DiskPartition>()
                                                                           {}.getType() ) ) ) ).build();
         }
@@ -784,7 +784,7 @@ public class RestServiceImpl implements RestService
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
             return Response.ok( JsonUtil.toJson( localPeer.getContainerHostById( UUID.fromString( containerId ) )
-                                                          .getDiskQuota( JsonUtil.<DiskPartition>from( diskPartition,
+                                                          .getDiskQuota( JsonUtil.<DiskPartition>fromJson( diskPartition,
                                                                   new TypeToken<DiskPartition>()
                                                                   {}.getType() ) ) ) ).build();
         }

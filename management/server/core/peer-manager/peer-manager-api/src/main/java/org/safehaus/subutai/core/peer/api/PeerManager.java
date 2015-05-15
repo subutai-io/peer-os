@@ -4,8 +4,6 @@ package org.safehaus.subutai.core.peer.api;
 import java.util.List;
 import java.util.UUID;
 
-import javax.persistence.EntityManagerFactory;
-
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
@@ -13,6 +11,9 @@ import org.safehaus.subutai.common.peer.PeerInfo;
 
 public interface PeerManager
 {
+    public static final String SOURCE_REMOTE_PEER = "PEER_REMOTE";
+    public static final String SOURCE_LOCAL_PEER = "PEER_LOCAL";
+
     /**
      * Registers remote peer
      */
@@ -66,6 +67,4 @@ public interface PeerManager
     public void addRequestListener( RequestListener listener );
 
     public void removeRequestListener( RequestListener listener );
-
-    public EntityManagerFactory getEntityManagerFactory();
 }

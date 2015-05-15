@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.util.RestUtil;
-import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,6 @@ import com.google.common.collect.Maps;
 public class MessageSender
 {
     public static final int SLEEP_BETWEEN_ITERATIONS_SEC = 1;
-    private final PeerManager peerManager;
     private final MessengerDao messengerDao;
     private final MessengerImpl messenger;
 
@@ -41,10 +39,8 @@ public class MessageSender
     protected CompletionService<Boolean> completer = new ExecutorCompletionService<>( restExecutor );
 
 
-    public MessageSender( final PeerManager peerManager, final MessengerDao messengerDao,
-                          final MessengerImpl messenger )
+    public MessageSender( final MessengerDao messengerDao, final MessengerImpl messenger )
     {
-        this.peerManager = peerManager;
         this.messengerDao = messengerDao;
         this.messenger = messenger;
         this.restUtil = new RestUtil();
@@ -123,7 +119,7 @@ public class MessageSender
         //try to send messages in parallel - one thread per peer
         for ( Map.Entry<UUID, Set<Envelope>> envelopsPerPeer : peerEnvelopesMap.entrySet() )
         {
-            Peer targetPeer = peerManager.getPeer( envelopsPerPeer.getKey() );
+            Peer targetPeer = messenger.getPeerManager().getPeer( envelopsPerPeer.getKey() );
             if ( targetPeer.isLocal() )
             {
                 completer.submit( new LocalPeerMessageSender( messenger, messengerDao, envelopsPerPeer.getValue() ) );
@@ -132,7 +128,7 @@ public class MessageSender
             {
                 completer.submit(
                         new RemotePeerMessageSender( restUtil, messengerDao, targetPeer, envelopsPerPeer.getValue(),
-                                peerManager.getLocalPeerInfo().getId() ) );
+                                messenger.getPeerManager().getLocalPeerInfo().getId() ) );
             }
         }
 
