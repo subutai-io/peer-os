@@ -103,12 +103,10 @@ public class PeerManagerImplTest
     @Before
     public void setUp() throws Exception
     {
-        peerManager = spy( new PeerManagerImpl( messenger, localPeer, daoManager ) );
+        peerManager = spy( new PeerManagerImpl( messenger, localPeer, daoManager , messageResponseListener) );
 
 
         peerManager.commandResponseListener = commandResponseListener;
-        peerManager.messageRequestListener = messageRequestListener;
-        peerManager.messageResponseListener = messageResponseListener;
         peerManager.localPeer = localPeer;
         peerManager.peerDAO = peerDAO;
 

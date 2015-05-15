@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.peer.impl.request;
 
 
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -19,16 +18,14 @@ public class MessageRequestListener extends MessageListener implements Disposabl
 
     private PeerManager peerManager;
     private Messenger messenger;
-    private Set<RequestListener> listeners;
     protected ExecutorService notifier = Executors.newCachedThreadPool();
 
 
-    public MessageRequestListener( PeerManager peerManager, Messenger messenger, Set<RequestListener> listeners )
+    public MessageRequestListener( PeerManager peerManager, Messenger messenger )
     {
         super( RecipientType.PEER_REQUEST_LISTENER.name() );
         this.peerManager = peerManager;
         this.messenger = messenger;
-        this.listeners = listeners;
     }
 
 
@@ -43,7 +40,7 @@ public class MessageRequestListener extends MessageListener implements Disposabl
     {
         MessageRequest messageRequest = message.getPayload( MessageRequest.class );
 
-        for ( RequestListener listener : listeners )
+        for ( RequestListener listener : peerManager.getLocalPeer().getRequestListeners() )
         {
             if ( messageRequest.getRecipient().equalsIgnoreCase( listener.getRecipient() ) )
             {

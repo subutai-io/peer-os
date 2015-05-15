@@ -21,7 +21,6 @@ import org.safehaus.subutai.core.peer.impl.container.CreateContainerGroupRequest
 import org.safehaus.subutai.core.peer.impl.container.DestroyEnvironmentContainersRequestListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.peer.impl.entity.ManagementHostEntity;
-import org.safehaus.subutai.core.peer.impl.request.MessageRequestListener;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,17 +41,17 @@ public class PeerManagerImpl implements PeerManager
     protected LocalPeer localPeer;
     protected Messenger messenger;
     protected CommandResponseListener commandResponseListener;
-    protected MessageResponseListener messageResponseListener;
-    protected MessageRequestListener messageRequestListener;
-
+    private MessageResponseListener messageResponseListener;
     private DaoManager daoManager;
 
 
-    public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager )
+    public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
+                            MessageResponseListener messageResponseListener )
     {
         this.messenger = messenger;
         this.localPeer = localPeer;
         this.daoManager = daoManager;
+        this.messageResponseListener = messageResponseListener;
     }
 
 
@@ -73,11 +72,7 @@ public class PeerManagerImpl implements PeerManager
         commandResponseListener = new CommandResponseListener();
         addRequestListener( commandResponseListener );
         //subscribe to peer message requests
-        messageRequestListener = new MessageRequestListener( this, messenger, localPeer.getRequestListeners() );
-        messenger.addMessageListener( messageRequestListener );
         //subscribe to peer message responses
-        messageResponseListener = new MessageResponseListener( messenger );
-        messenger.addMessageListener( messageResponseListener );
         //add create container requests listener
         addRequestListener( new CreateContainerGroupRequestListener( localPeer ) );
         //add destroy environment containers requests listener
@@ -90,8 +85,6 @@ public class PeerManagerImpl implements PeerManager
     public void destroy()
     {
         commandResponseListener.dispose();
-        messageRequestListener.dispose();
-        messageResponseListener.dispose();
     }
 
 

@@ -31,7 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith( MockitoJUnitRunner.class )
 public class MessageSenderTest
 {
     private static final UUID LOCAL_PEER_ID = UUID.randomUUID();
@@ -71,7 +71,7 @@ public class MessageSenderTest
     @Before
     public void setUp() throws Exception
     {
-        messageSender = new MessageSender( peerManager, messengerDao, messenger );
+        messageSender = new MessageSender( messengerDao, messenger );
         messageSender.mainLoopExecutor = mainLoopExecutor;
         messageSender.restExecutor = restExecutor;
         messageSender.restUtil = restUtil;
@@ -124,6 +124,7 @@ public class MessageSenderTest
         when( localPeer.isLocal() ).thenReturn( false );
         when( localPeer.getId() ).thenReturn( UUID.randomUUID() );
         when( completer.take() ).thenReturn( future );
+        when( messenger.getPeerManager() ).thenReturn( peerManager );
 
         messageSender.deliverMessages();
 

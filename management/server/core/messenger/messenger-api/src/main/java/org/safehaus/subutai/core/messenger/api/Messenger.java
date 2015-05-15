@@ -44,18 +44,4 @@ public interface Messenger
      * @return - status of message
      */
     public MessageStatus getMessageStatus( UUID messageId ) throws MessageException;
-
-    /**
-     * Add listener of messages
-     *
-     * @param listener - listener
-     */
-    public void addMessageListener( MessageListener listener );
-
-    /**
-     * Remove listener
-     *
-     * @param listener - listener
-     */
-    public void removeMessageListener( MessageListener listener );
 }

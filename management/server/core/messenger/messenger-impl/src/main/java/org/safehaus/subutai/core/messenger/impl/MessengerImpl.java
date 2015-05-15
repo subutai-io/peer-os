@@ -9,9 +9,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.naming.NamingException;
+
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageException;
 import org.safehaus.subutai.core.messenger.api.MessageListener;
@@ -37,26 +40,21 @@ public class MessengerImpl implements Messenger, MessageProcessor
     protected final Set<MessageListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<MessageListener, Boolean>() );
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
-    private PeerManager peerManager;
+    //    private PeerManager peerManager;
     protected MessengerDao messengerDao;
     protected MessageSender messageSender;
     private DaoManager daoManager;
 
 
-    public MessengerImpl() throws MessengerException
-    {
-    }
-
-
     public void init() throws MessengerException
     {
-        Preconditions.checkNotNull( peerManager );
+        //        Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( daoManager );
 
         try
         {
             this.messengerDao = new MessengerDao( daoManager.getEntityManagerFactory() );
-            this.messageSender = new MessageSender( peerManager, messengerDao, this );
+            this.messageSender = new MessageSender( messengerDao, this );
 
             messageSender.init();
         }
@@ -75,10 +73,10 @@ public class MessengerImpl implements Messenger, MessageProcessor
     }
 
 
-    public void setPeerManager( final PeerManager peerManager )
-    {
-        this.peerManager = peerManager;
-    }
+    //    public void setPeerManager( final PeerManager peerManager )
+    //    {
+    //        this.peerManager = peerManager;
+    //    }
 
 
     public void setDaoManager( final DaoManager daoManager )
@@ -92,7 +90,20 @@ public class MessengerImpl implements Messenger, MessageProcessor
     {
         Preconditions.checkNotNull( payload, "Invalid payload" );
 
-        return new MessageImpl( peerManager.getLocalPeer().getId(), payload );
+        return new MessageImpl( getPeerManager().getLocalPeer().getId(), payload );
+    }
+
+
+    protected PeerManager getPeerManager()
+    {
+        try
+        {
+            return ServiceLocator.getServiceNoCache( PeerManager.class );
+        }
+        catch ( NamingException e )
+        {
+            throw new RuntimeException( "Failed to obtain PeerManager service", e );
+        }
     }
 
 
@@ -185,7 +196,6 @@ public class MessengerImpl implements Messenger, MessageProcessor
     }
 
 
-    @Override
     public void addMessageListener( final MessageListener listener )
     {
         Preconditions.checkNotNull( listener );
@@ -194,7 +204,6 @@ public class MessengerImpl implements Messenger, MessageProcessor
     }
 
 
-    @Override
     public void removeMessageListener( final MessageListener listener )
     {
         Preconditions.checkNotNull( listener );
