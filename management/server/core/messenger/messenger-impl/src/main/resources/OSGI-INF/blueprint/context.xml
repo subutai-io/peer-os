@@ -18,7 +18,6 @@
   <bean id="messenger" class="org.safehaus.subutai.core.messenger.impl.MessengerImpl" scope="singleton"
         init-method="init"
         destroy-method="destroy" activation="eager">
-    <!--<property name="peerManager" ref="peerManager" />-->
     <property name="daoManager" ref="daoManagerMessenger" />
   </bean>
 
