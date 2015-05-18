@@ -58,32 +58,32 @@ public interface Monitor
      * exceeded. Monitoring infrastructure is initialized with given monitoring settings. This call needs to be executed
      * only once since subscription is stored in persistent storage
      *
-     * @param alertListener alertListener  to trigger
+     * @param subscriberId alertListener  to trigger
      * @param environment environment to monitor
      * @param monitoringSettings monitoring settings
      */
 
-    public void startMonitoring( AlertListener alertListener, Environment environment,
-                                 MonitoringSettings monitoringSettings ) throws MonitorException;
+    public void startMonitoring( String subscriberId, Environment environment, MonitoringSettings monitoringSettings )
+            throws MonitorException;
 
     /**
      * Enables {@code AlertListener} to be triggered if thresholds on the provided container are exceeded. Monitoring
      * infrastructure is initialized with given monitoring settings.
      *
-     * @param alertListener alertListener  to trigger
+     * @param subscriberId alertListener  to trigger
      * @param containerHost container host to activate monitoring on and listen to alerts from
      * @param monitoringSettings monitoring settings
      */
-    public void startMonitoring( AlertListener alertListener, ContainerHost containerHost,
+    public void startMonitoring( String subscriberId, ContainerHost containerHost,
                                  MonitoringSettings monitoringSettings ) throws MonitorException;
 
     /**
      * Disables {@code AlertListener} to be triggered for the given environment
      *
-     * @param alertListener alertListener  to trigger
+     * @param subscriberId alertListener  to trigger
      * @param environment environment to monitor
      */
-    public void stopMonitoring( AlertListener alertListener, Environment environment ) throws MonitorException;
+    public void stopMonitoring( String subscriberId, Environment environment ) throws MonitorException;
 
 
     /**
@@ -129,37 +129,17 @@ public interface Monitor
      */
     public void alert( String alertMetric ) throws MonitorException;
 
-    /**
-     * Adds listener to be notified if threshold within environment is exceeded (after this call, interested parties
-     * need to execute startMonitoring call passing some environment under interest). Usually one calls this method in
-     * init method of client module
-     *
-     * @param listener - listener
-     */
-    public void addAlertListener( AlertListener listener );
 
     /**
-     * Removes listener
-     *
-     * @param listener - listener
-     */
-    public void removeAlertListener( AlertListener listener );
-
-
-    /**
-     *
      * @param host physical or container host to be monitored
      * @param metricType to be retrieved for historical data
-     * @return
      */
     public List<HistoricalMetric> getHistoricalMetric( Host host, MetricType metricType );
 
 
     /**
-     *
      * @param hosts physical or container hosts to be monitored
      * @param metricType to be retrieved for historical data
-     * @return
      */
     public Map<UUID, List<HistoricalMetric>> getHistoricalMetrics( Collection<Host> hosts, MetricType metricType );
 }

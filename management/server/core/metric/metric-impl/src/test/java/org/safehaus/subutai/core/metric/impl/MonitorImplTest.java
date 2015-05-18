@@ -328,9 +328,9 @@ public class MonitorImplTest
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
 
 
-        monitor.startMonitoring( alertListener, environment, monitoringSettings );
+        monitor.startMonitoring( SUBSCRIBER_ID, environment, monitoringSettings );
 
-        verify( monitorDao ).addSubscription( ENVIRONMENT_ID, subscriberId );
+        verify( monitorDao ).addSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
     }
 
 
@@ -349,9 +349,9 @@ public class MonitorImplTest
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
 
 
-        monitor.startMonitoring( alertListener, containerHost, monitoringSettings );
+        monitor.startMonitoring( SUBSCRIBER_ID, containerHost, monitoringSettings );
 
-        verify( monitorDao ).addSubscription( ENVIRONMENT_ID, subscriberId );
+        verify( monitorDao ).addSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
     }
 
 
@@ -360,7 +360,7 @@ public class MonitorImplTest
     {
         doThrow( new DaoException( "" ) ).when( monitorDao ).addSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
 
-        monitor.startMonitoring( alertListener, environment, monitoringSettings );
+        monitor.startMonitoring( SUBSCRIBER_ID, environment, monitoringSettings );
     }
 
 
@@ -369,7 +369,7 @@ public class MonitorImplTest
     {
         doThrow( new DaoException( "" ) ).when( monitorDao ).addSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
 
-        monitor.startMonitoring( alertListener, containerHost, monitoringSettings );
+        monitor.startMonitoring( SUBSCRIBER_ID, containerHost, monitoringSettings );
     }
 
 
@@ -381,9 +381,9 @@ public class MonitorImplTest
         String subscriberId = StringUtils.repeat( "s", 100 );
         when( alertListener.getSubscriberId() ).thenReturn( longSubscriberId );
 
-        monitor.stopMonitoring( alertListener, environment );
+        monitor.stopMonitoring( SUBSCRIBER_ID, environment );
 
-        verify( monitorDao ).removeSubscription( ENVIRONMENT_ID, subscriberId );
+        verify( monitorDao ).removeSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
     }
 
 
@@ -392,7 +392,7 @@ public class MonitorImplTest
     {
         doThrow( new DaoException( "" ) ).when( monitorDao ).removeSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
 
-        monitor.stopMonitoring( alertListener, environment );
+        monitor.stopMonitoring( SUBSCRIBER_ID, environment );
     }
 
 
