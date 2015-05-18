@@ -49,16 +49,12 @@ public class RestServiceImpl implements RestService
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
     private PeerManager peerManager;
     private SubutaiSslContextFactory sslContextFactory;
+    protected JsonUtil jsonUtil = new JsonUtil();
 
 
-    public RestServiceImpl( final PeerManager peerManager )
+    public RestServiceImpl( final PeerManager peerManager, final SubutaiSslContextFactory sslContextFactory )
     {
         this.peerManager = peerManager;
-    }
-
-
-    public void setSslContextFactory( final SubutaiSslContextFactory sslContextFactory )
-    {
         this.sslContextFactory = sslContextFactory;
     }
 
@@ -67,7 +63,7 @@ public class RestServiceImpl implements RestService
     public Response getSelfPeerInfo()
     {
         PeerInfo selfInfo = peerManager.getLocalPeerInfo();
-        return Response.ok( JsonUtil.toJson( selfInfo ) ).build();
+        return Response.ok( jsonUtil.to( selfInfo ) ).build();
     }
 
 
@@ -82,7 +78,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getRegisteredPeers()
     {
-        return Response.ok( JsonUtil.toJson( peerManager.getPeerInfos() ) ).build();
+        return Response.ok( jsonUtil.to( peerManager.getPeerInfos() ) ).build();
     }
 
 
@@ -90,6 +86,7 @@ public class RestServiceImpl implements RestService
     public Response getPeerPolicy( final String peerId )
     {
         Preconditions.checkState( UUIDUtil.isStringAUuid( peerId ) );
+
         LocalPeer localPeer = peerManager.getLocalPeer();
         PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( UUID.fromString( peerId ) );
         if ( peerPolicy == null )
@@ -98,7 +95,7 @@ public class RestServiceImpl implements RestService
         }
         else
         {
-            return Response.ok( JsonUtil.toJson( JsonUtil.toJson( peerPolicy ) ) ).build();
+            return Response.ok( jsonUtil.to( peerPolicy ) ).build();
         }
     }
 
@@ -107,7 +104,7 @@ public class RestServiceImpl implements RestService
     public Response getRegisteredPeerInfo( final String peerId )
     {
         PeerInfo peerInfo = peerManager.getPeer( peerId ).getPeerInfo();
-        return Response.ok( JsonUtil.toJson( peerInfo ) ).build();
+        return Response.ok( jsonUtil.to( peerInfo ) ).build();
     }
 
 
@@ -119,39 +116,9 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response processTrustRequest( String peer, String rootCertPx2 )
-    {
-        try
-        {
-            return null;
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error processing trust request #processTrustRequest", e );
-            return Response.status( Response.Status.NOT_FOUND ).entity( e.toString() ).build();
-        }
-    }
-
-
-    @Override
-    public Response processTrustResponse( String peer, String rootCertPx2, short status )
-    {
-        try
-        {
-            return null;
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error processing trust response #processTrustResponse" );
-            return Response.status( Response.Status.NOT_FOUND ).entity( e.toString() ).build();
-        }
-    }
-
-
-    @Override
     public Response processRegisterRequest( String peer )
     {
-        PeerInfo p = JsonUtil.fromJson( peer, PeerInfo.class );
+        PeerInfo p = jsonUtil.from( peer, PeerInfo.class );
         LOGGER.debug( peer );
 
         if ( peerManager.getPeerInfo( p.getId() ) != null )
@@ -165,7 +132,7 @@ public class RestServiceImpl implements RestService
         try
         {
             peerManager.register( p );
-            return Response.ok( JsonUtil.toJson( peerManager.getLocalPeerInfo() ) ).build();
+            return Response.ok( jsonUtil.to( peerManager.getLocalPeerInfo() ) ).build();
         }
         catch ( Exception e )
         {
@@ -182,7 +149,7 @@ public class RestServiceImpl implements RestService
         WebClient client = RestUtil.createTrustedWebClient( baseUrl );
         client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
         Form form = new Form();
-        form.set( "peer", JsonUtil.toJson( peerManager.getLocalPeerInfo() ) );
+        form.set( "peer", jsonUtil.to( peerManager.getLocalPeerInfo() ) );
 
         try
         {
@@ -215,7 +182,7 @@ public class RestServiceImpl implements RestService
     {
         String responseString = response.readEntity( String.class );
         LOGGER.info( response.toString() );
-        PeerInfo remotePeerInfo = JsonUtil.fromJson( responseString, new TypeToken<PeerInfo>()
+        PeerInfo remotePeerInfo = jsonUtil.from( responseString, new TypeToken<PeerInfo>()
         {}.getType() );
         if ( remotePeerInfo != null )
         {
@@ -236,7 +203,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response unregisterPeer( String peerId )
     {
-        UUID id = JsonUtil.fromJson( peerId, UUID.class );
+        UUID id = jsonUtil.from( peerId, UUID.class );
         try
         {
             boolean result = peerManager.unregister( id.toString() );
@@ -290,7 +257,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            UUID id = JsonUtil.fromJson( rejectedPeerId, UUID.class );
+            UUID id = jsonUtil.from( rejectedPeerId, UUID.class );
             peerManager.unregister( id.toString() );
             return Response.status( Response.Status.NO_CONTENT ).build();
         }
@@ -305,7 +272,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response approveForRegistrationRequest( final String approvedPeer, final String rootCertPx2 )
     {
-        PeerInfo p = JsonUtil.fromJson( approvedPeer, PeerInfo.class );
+        PeerInfo p = jsonUtil.from( approvedPeer, PeerInfo.class );
         p.setStatus( PeerStatus.APPROVED );
         peerManager.update( p );
 
@@ -350,7 +317,7 @@ public class RestServiceImpl implements RestService
     public Response approveForRegistrationRequest( final String peerId )
     {
         //************* Get Peer Info *******************************************
-        UUID uuid = JsonUtil.fromJson( peerId, UUID.class );
+        UUID uuid = jsonUtil.from( peerId, UUID.class );
         PeerInfo remotePeer = peerManager.getPeerInfo( uuid );
         PeerInfo peerToUpdateOnRemote = peerManager.getLocalPeerInfo();
 
@@ -379,7 +346,7 @@ public class RestServiceImpl implements RestService
             client.type( MediaType.APPLICATION_FORM_URLENCODED ).accept( MediaType.APPLICATION_JSON );
 
             Form form = new Form();
-            form.set( "approvedPeer", JsonUtil.toJson( peerToUpdateOnRemote ) );
+            form.set( "approvedPeer", jsonUtil.to( peerToUpdateOnRemote ) );
             form.set( "root_cert_px2", cert );
 
             try
@@ -429,12 +396,12 @@ public class RestServiceImpl implements RestService
     @Override
     public Response updatePeer( String peer, String rootCertPx2 )
     {
-        PeerInfo p = JsonUtil.fromJson( peer, PeerInfo.class );
+        PeerInfo p = jsonUtil.from( peer, PeerInfo.class );
         p.setIp( getRequestIp() );
         p.setName( String.format( "Peer on %s", p.getIp() ) );
         peerManager.update( p );
 
-        return Response.ok( JsonUtil.toJson( p ) ).build();
+        return Response.ok( jsonUtil.to( p ) ).build();
     }
 
 
@@ -535,7 +502,7 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             ContainerHostState containerHostState =
                     localPeer.getContainerHostById( UUID.fromString( containerId ) ).getState();
-            return Response.ok( JsonUtil.toJson( containerHostState ) ).build();
+            return Response.ok( jsonUtil.to( containerHostState ) ).build();
         }
         catch ( Exception e )
         {
@@ -552,7 +519,7 @@ public class RestServiceImpl implements RestService
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
             Template result = localPeer.getTemplate( templateName );
-            return Response.ok( JsonUtil.toJson( result ) ).build();
+            return Response.ok( jsonUtil.to( result ) ).build();
         }
         catch ( Exception e )
         {
@@ -607,11 +574,11 @@ public class RestServiceImpl implements RestService
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            return Response.ok( JsonUtil.toJson( localPeer.getContainerHostById( UUID.fromString( containerId ) )
-                                                          .getAvailableDiskQuota(
-                                                                  JsonUtil.<DiskPartition>fromJson( diskPartition,
-                                                                          new TypeToken<DiskPartition>()
-                                                                          {}.getType() ) ) ) ).build();
+            return Response.ok( jsonUtil.to( localPeer.getContainerHostById( UUID.fromString( containerId ) )
+                                                      .getAvailableDiskQuota(
+                                                              JsonUtil.<DiskPartition>fromJson( diskPartition,
+                                                                      new TypeToken<DiskPartition>()
+                                                                      {}.getType() ) ) ) ).build();
         }
         catch ( Exception e )
         {
@@ -629,7 +596,7 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             ProcessResourceUsage processResourceUsage = localPeer.getContainerHostById( UUID.fromString( containerId ) )
                                                                  .getProcessResourceUsage( processPid );
-            return Response.ok( JsonUtil.toJson( processResourceUsage ) ).build();
+            return Response.ok( jsonUtil.to( processResourceUsage ) ).build();
         }
         catch ( Exception e )
         {
@@ -783,10 +750,10 @@ public class RestServiceImpl implements RestService
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            return Response.ok( JsonUtil.toJson( localPeer.getContainerHostById( UUID.fromString( containerId ) )
-                                                          .getDiskQuota( JsonUtil.<DiskPartition>fromJson( diskPartition,
-                                                                  new TypeToken<DiskPartition>()
-                                                                  {}.getType() ) ) ) ).build();
+            return Response.ok( jsonUtil.to( localPeer.getContainerHostById( UUID.fromString( containerId ) )
+                                                      .getDiskQuota( JsonUtil.<DiskPartition>fromJson( diskPartition,
+                                                              new TypeToken<DiskPartition>()
+                                                              {}.getType() ) ) ) ).build();
         }
         catch ( Exception e )
         {
@@ -857,9 +824,9 @@ public class RestServiceImpl implements RestService
         LocalPeer localPeer = peerManager.getLocalPeer();
         try
         {
-            UUID uuid = JsonUtil.fromJson( containerId, UUID.class );
+            UUID uuid = jsonUtil.from( containerId, UUID.class );
 
-            return Response.ok( JsonUtil.toJson( localPeer.getContainerHostInfoById( uuid ) ) ).build();
+            return Response.ok( jsonUtil.to( localPeer.getContainerHostInfoById( uuid ) ) ).build();
         }
         catch ( Exception e )
         {
@@ -875,7 +842,7 @@ public class RestServiceImpl implements RestService
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            return Response.ok( JsonUtil.toJson( localPeer.getReservedVnis() ) ).build();
+            return Response.ok( jsonUtil.to( localPeer.getReservedVnis() ) ).build();
         }
         catch ( Exception e )
         {
@@ -891,7 +858,7 @@ public class RestServiceImpl implements RestService
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            return Response.ok( JsonUtil.toJson( localPeer.getGateways() ) ).build();
+            return Response.ok( jsonUtil.to( localPeer.getGateways() ) ).build();
         }
         catch ( Exception e )
         {
@@ -907,7 +874,7 @@ public class RestServiceImpl implements RestService
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            int vlan = localPeer.reserveVni( JsonUtil.fromJson( vni, Vni.class ) );
+            int vlan = localPeer.reserveVni( jsonUtil.from( vni, Vni.class ) );
             return Response.ok( vlan ).build();
         }
         catch ( Exception e )
@@ -957,7 +924,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            UUID environmentUUID = JsonUtil.fromJson( environmentId, UUID.class );
+            UUID environmentUUID = jsonUtil.from( environmentId, UUID.class );
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.removeEnvironmentCertificates( environmentUUID );
             return Response.noContent().build();

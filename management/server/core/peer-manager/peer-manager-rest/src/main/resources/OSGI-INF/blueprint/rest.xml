@@ -19,7 +19,7 @@
 
   <bean id="peerRestServiceImpl" class="org.safehaus.subutai.core.peer.rest.RestServiceImpl">
     <argument ref="peerManager" />
-    <property name="sslContextFactory" ref="sslContextFactory" />
+    <argument ref="sslContextFactory" />
   </bean>
 
   <reference id="peerManager" availability="mandatory"
