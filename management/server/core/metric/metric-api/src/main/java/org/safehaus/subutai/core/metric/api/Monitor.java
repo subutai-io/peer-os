@@ -129,37 +129,17 @@ public interface Monitor
      */
     public void alert( String alertMetric ) throws MonitorException;
 
-    /**
-     * Adds listener to be notified if threshold within environment is exceeded (after this call, interested parties
-     * need to execute startMonitoring call passing some environment under interest). Usually one calls this method in
-     * init method of client module
-     *
-     * @param listener - listener
-     */
-    public void addAlertListener( AlertListener listener );
 
     /**
-     * Removes listener
-     *
-     * @param listener - listener
-     */
-    public void removeAlertListener( AlertListener listener );
-
-
-    /**
-     *
      * @param host physical or container host to be monitored
      * @param metricType to be retrieved for historical data
-     * @return
      */
     public List<HistoricalMetric> getHistoricalMetric( Host host, MetricType metricType );
 
 
     /**
-     *
      * @param hosts physical or container hosts to be monitored
      * @param metricType to be retrieved for historical data
-     * @return
      */
     public Map<UUID, List<HistoricalMetric>> getHistoricalMetrics( Collection<Host> hosts, MetricType metricType );
 }

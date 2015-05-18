@@ -773,7 +773,10 @@ public class MonitorImpl implements Monitor
     }
 
 
-    @Override
+    /**
+     * Adds listener to be notified if threshold within environment is exceeded (after this call, interested parties
+     * need to execute startMonitoring call passing some environment under interest).
+     */
     public void addAlertListener( AlertListener alertListener )
     {
         Preconditions.checkNotNull( alertListener );
@@ -782,7 +785,6 @@ public class MonitorImpl implements Monitor
     }
 
 
-    @Override
     public void removeAlertListener( AlertListener alertListener )
     {
         Preconditions.checkNotNull( alertListener );
