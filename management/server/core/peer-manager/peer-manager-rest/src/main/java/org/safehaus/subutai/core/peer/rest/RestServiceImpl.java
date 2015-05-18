@@ -492,7 +492,7 @@ public class RestServiceImpl implements RestService
     }
 
 
-    private String getRequestIp()
+    protected String getRequestIp()
     {
         Message message = PhaseInterceptorChain.getCurrentMessage();
         HttpServletRequest request = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
