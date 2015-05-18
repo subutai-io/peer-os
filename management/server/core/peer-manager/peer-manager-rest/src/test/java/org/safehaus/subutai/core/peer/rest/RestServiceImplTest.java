@@ -12,12 +12,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.peer.PeerPolicy;
 import org.safehaus.subutai.common.peer.PeerStatus;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -29,11 +31,13 @@ import org.apache.cxf.jaxrs.ext.form.Form;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNull;
+import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -49,6 +53,7 @@ public class RestServiceImplTest
     private static final String ENTITY = "entity";
     private static final String CERT = "cert";
     private static final UUID CONTAINER_ID = UUID.randomUUID();
+    private static final String TEMPLATE_NAME = "master";
     @Mock
     SubutaiSslContextFactory sslContextFactory;
     @Mock
@@ -104,6 +109,7 @@ public class RestServiceImplTest
         when( response.readEntity( String.class ) ).thenReturn( ENTITY );
         when( jsonUtil.from( PEER_ID.toString(), UUID.class ) ).thenCallRealMethod();
         when( jsonUtil.from( JSON, PeerInfo.class ) ).thenReturn( peerInfo );
+        when( localPeer.getContainerHostById( CONTAINER_ID ) ).thenReturn( containerHost );
     }
 
 
@@ -350,6 +356,104 @@ public class RestServiceImplTest
         doThrow( exception ).when( localPeer ).bindHost( CONTAINER_ID.toString() );
 
         Response response1 = restService.destroyContainer( CONTAINER_ID.toString() );
+
+        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    }
+
+
+    @Test
+    public void testStartContainer() throws Exception
+    {
+        restService.startContainer( CONTAINER_ID.toString() );
+
+        verify( containerHost ).start();
+
+        doThrow( exception ).when( localPeer ).bindHost( CONTAINER_ID.toString() );
+
+        Response response1 = restService.startContainer( CONTAINER_ID.toString() );
+
+        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    }
+
+
+    @Test
+    public void testStopContainer() throws Exception
+    {
+        restService.stopContainer( CONTAINER_ID.toString() );
+
+        verify( containerHost ).stop();
+
+        doThrow( exception ).when( localPeer ).bindHost( CONTAINER_ID.toString() );
+
+        Response response1 = restService.stopContainer( CONTAINER_ID.toString() );
+
+        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    }
+
+
+    @Test
+    public void testIsContainerConnected() throws Exception
+    {
+        when( containerHost.isConnected() ).thenReturn( true );
+
+        Response response1 = restService.isContainerConnected( CONTAINER_ID.toString() );
+
+        assertTrue( Boolean.valueOf( response1.readEntity( String.class ) ) );
+
+        doThrow( exception ).when( localPeer ).bindHost( CONTAINER_ID.toString() );
+
+        response1 = restService.isContainerConnected( CONTAINER_ID.toString() );
+
+        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    }
+
+
+    @Test
+    public void testGetContainerState() throws Exception
+    {
+        when( containerHost.getState() ).thenReturn( ContainerHostState.RUNNING );
+
+        restService.getContainerState( CONTAINER_ID.toString() );
+
+        verify( jsonUtil ).to( ContainerHostState.RUNNING );
+
+        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
+
+        Response response1 = restService.getContainerState( CONTAINER_ID.toString() );
+
+        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    }
+
+
+    @Test
+    public void testGetTemplate() throws Exception
+    {
+        Template template = mock( Template.class );
+
+        when( localPeer.getTemplate( TEMPLATE_NAME ) ).thenReturn( template );
+
+        restService.getTemplate( TEMPLATE_NAME );
+
+        verify( jsonUtil ).to( template );
+
+        doThrow( exception ).when( localPeer ).getTemplate( TEMPLATE_NAME );
+
+        Response response1 = restService.getTemplate( TEMPLATE_NAME );
+
+        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    }
+
+
+    @Test
+    public void testGetAvailableRamQuota() throws Exception
+    {
+        restService.getAvailableRamQuota( CONTAINER_ID.toString() );
+
+        verify( containerHost ).getAvailableRamQuota();
+
+        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
+
+        Response response1 = restService.getAvailableRamQuota( CONTAINER_ID.toString() );
 
         assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
     }
