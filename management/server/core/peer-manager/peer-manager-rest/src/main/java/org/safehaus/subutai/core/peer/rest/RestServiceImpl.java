@@ -679,7 +679,7 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             return Response.ok( jsonUtil.to( localPeer.getContainerHostById( UUID.fromString( containerId ) )
                                                       .getAvailableDiskQuota(
-                                                              JsonUtil.<DiskPartition>fromJson( diskPartition,
+                                                              jsonUtil.<DiskPartition>from( diskPartition,
                                                                       new TypeToken<DiskPartition>()
                                                                       {}.getType() ) ) ) ).build();
         }
@@ -758,6 +758,27 @@ public class RestServiceImpl implements RestService
 
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.getContainerHostById( UUID.fromString( containerId ) ).setRamQuota( ram );
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error setting ram quota #setRamQuota", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response setRamQuota( final String containerId, final String ramQuota )
+    {
+        try
+        {
+            Preconditions.checkState( UUIDUtil.isStringAUuid( containerId ) );
+
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            localPeer.getContainerHostById( UUID.fromString( containerId ) )
+                     .setRamQuota( jsonUtil.<RamQuota>from( ramQuota, new TypeToken<RamQuota>()
+                     {}.getType() ) );
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -853,7 +874,7 @@ public class RestServiceImpl implements RestService
 
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.getContainerHostById( UUID.fromString( containerId ) )
-                     .setCpuSet( JsonUtil.<Set<Integer>>fromJson( cpuSet, new TypeToken<Set<Integer>>()
+                     .setCpuSet( jsonUtil.<Set<Integer>>from( cpuSet, new TypeToken<Set<Integer>>()
                      {}.getType() ) );
             return Response.ok().build();
         }
@@ -887,27 +908,6 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setRamQuota( final String containerId, final String ramQuota )
-    {
-        try
-        {
-            Preconditions.checkState( UUIDUtil.isStringAUuid( containerId ) );
-
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            localPeer.getContainerHostById( UUID.fromString( containerId ) )
-                     .setRamQuota( JsonUtil.<RamQuota>fromJson( ramQuota, new TypeToken<RamQuota>()
-                     {}.getType() ) );
-            return Response.ok().build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error setting ram quota #setRamQuota", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
-
-
-    @Override
     public Response setDiskQuota( final String containerId, final String diskQuota )
     {
         try
@@ -916,7 +916,7 @@ public class RestServiceImpl implements RestService
 
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.getContainerHostById( UUID.fromString( containerId ) )
-                     .setDiskQuota( JsonUtil.<DiskQuota>fromJson( diskQuota, new TypeToken<DiskQuota>()
+                     .setDiskQuota( jsonUtil.<DiskQuota>from( diskQuota, new TypeToken<DiskQuota>()
                      {}.getType() ) );
             return Response.ok().build();
         }
