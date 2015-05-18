@@ -50,6 +50,7 @@ public class RestServiceImpl implements RestService
     private PeerManager peerManager;
     private SubutaiSslContextFactory sslContextFactory;
     protected JsonUtil jsonUtil = new JsonUtil();
+    protected RestUtil restUtil = new RestUtil();
 
 
     public RestServiceImpl( final PeerManager peerManager, final SubutaiSslContextFactory sslContextFactory )
@@ -146,7 +147,7 @@ public class RestServiceImpl implements RestService
     public Response sendRegistrationRequest( final String peerIp )
     {
         String baseUrl = String.format( "https://%s:%s/cxf", peerIp, ChannelSettings.SECURE_PORT_X1 );
-        WebClient client = RestUtil.createTrustedWebClient( baseUrl );
+        WebClient client = restUtil.getTrustedWebClient( baseUrl );
         client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
         Form form = new Form();
         form.set( "peer", jsonUtil.to( peerManager.getLocalPeerInfo() ) );
@@ -178,7 +179,7 @@ public class RestServiceImpl implements RestService
     }
 
 
-    private Response registerPeerCert( final Response response )
+    protected Response registerPeerCert( final Response response )
     {
         String responseString = response.readEntity( String.class );
         LOGGER.info( response.toString() );
@@ -342,7 +343,7 @@ public class RestServiceImpl implements RestService
             //***********************************************************************
 
             String baseUrl = String.format( "https://%s:%s/cxf", remotePeer.getIp(), ChannelSettings.SECURE_PORT_X1 );
-            WebClient client = RestUtil.createTrustedWebClient( baseUrl );
+            WebClient client = restUtil.getTrustedWebClient( baseUrl );
             client.type( MediaType.APPLICATION_FORM_URLENCODED ).accept( MediaType.APPLICATION_JSON );
 
             Form form = new Form();
