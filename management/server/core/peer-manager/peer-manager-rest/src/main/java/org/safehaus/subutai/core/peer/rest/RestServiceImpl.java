@@ -260,7 +260,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkState( UUIDUtil.isStringAUuid( peerId ) );
 
-            UUID id = jsonUtil.from( peerId, UUID.class );
+            UUID id = UUID.fromString( peerId );
 
             boolean result = peerManager.unregister( id.toString() );
             if ( result )
@@ -325,7 +325,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkState( UUIDUtil.isStringAUuid( peerId ) );
 
-            UUID id = jsonUtil.from( peerId, UUID.class );
+            UUID id = UUID.fromString( peerId );
             peerManager.unregister( id.toString() );
             return Response.status( Response.Status.NO_CONTENT ).build();
         }
@@ -396,7 +396,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkState( UUIDUtil.isStringAUuid( peerId ) );
 
-            UUID uuid = jsonUtil.from( peerId, UUID.class );
+            UUID uuid = UUID.fromString( peerId );
             PeerInfo remotePeer = peerManager.getPeerInfo( uuid );
             PeerInfo peerToUpdateOnRemote = peerManager.getLocalPeerInfo();
 
@@ -854,8 +854,9 @@ public class RestServiceImpl implements RestService
             Preconditions.checkState( UUIDUtil.isStringAUuid( containerId ) );
 
             LocalPeer localPeer = peerManager.getLocalPeer();
-            return Response.ok( JsonUtil
-                    .toJson( localPeer.getContainerHostById( UUID.fromString( containerId ) ).getCpuSet() ) ).build();
+            return Response
+                    .ok( jsonUtil.to( localPeer.getContainerHostById( UUID.fromString( containerId ) ).getCpuSet() ) )
+                    .build();
         }
         catch ( Exception e )
         {
@@ -936,7 +937,7 @@ public class RestServiceImpl implements RestService
             Preconditions.checkState( UUIDUtil.isStringAUuid( containerId ) );
 
             LocalPeer localPeer = peerManager.getLocalPeer();
-            localPeer.setDefaultGateway( localPeer.getContainerHostById( UUID.fromString( containerId ) ), gatewayIp );
+            localPeer.getContainerHostById( UUID.fromString( containerId ) ).setDefaultGateway( gatewayIp );
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -956,7 +957,7 @@ public class RestServiceImpl implements RestService
 
             LocalPeer localPeer = peerManager.getLocalPeer();
 
-            UUID uuid = jsonUtil.from( containerId, UUID.class );
+            UUID uuid = UUID.fromString( containerId );
 
             return Response.ok( jsonUtil.to( localPeer.getContainerHostInfoById( uuid ) ) ).build();
         }
@@ -1060,7 +1061,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkState( UUIDUtil.isStringAUuid( environmentId ) );
 
-            UUID environmentUUID = jsonUtil.from( environmentId, UUID.class );
+            UUID environmentUUID = UUID.fromString( environmentId );
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.removeEnvironmentCertificates( environmentUUID );
             return Response.noContent().build();

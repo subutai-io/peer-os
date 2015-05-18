@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
@@ -53,13 +54,15 @@ public class RestServiceImplTest
 {
     private static final UUID PEER_ID = UUID.randomUUID();
     private static final String JSON = "json";
-    private static final String PEER_IP = "127.0.0.1";
+    private static final String IP = "127.0.0.1";
     private static final String ENTITY = "entity";
     private static final String CERT = "cert";
     private static final UUID CONTAINER_ID = UUID.randomUUID();
     private static final String TEMPLATE_NAME = "master";
     private static final int PID = 123;
     private static final int QUOTA = 123;
+    private static final String ALIAS = "alias";
+    private static final UUID ENV_ID = UUID.randomUUID();
     @Mock
     SubutaiSslContextFactory sslContextFactory;
     @Mock
@@ -114,6 +117,7 @@ public class RestServiceImplTest
         when( response.getStatus() ).thenReturn( Response.Status.OK.getStatusCode() );
         when( response.readEntity( String.class ) ).thenReturn( ENTITY );
         when( jsonUtil.from( PEER_ID.toString(), UUID.class ) ).thenCallRealMethod();
+        when( jsonUtil.from( CONTAINER_ID.toString(), UUID.class ) ).thenCallRealMethod();
         when( jsonUtil.from( JSON, PeerInfo.class ) ).thenReturn( peerInfo );
         when( localPeer.getContainerHostById( CONTAINER_ID ) ).thenReturn( containerHost );
     }
@@ -209,26 +213,26 @@ public class RestServiceImplTest
     @Test
     public void testSendRegistrationRequest() throws Exception
     {
-        restService.sendRegistrationRequest( PEER_IP );
+        restService.sendRegistrationRequest( IP );
 
         verify( restService ).registerPeerCert( response );
 
         when( response.getStatus() ).thenReturn( Response.Status.CONFLICT.getStatusCode() );
 
-        Response response1 = restService.sendRegistrationRequest( PEER_IP );
+        Response response1 = restService.sendRegistrationRequest( IP );
 
         assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
         assertEquals( ENTITY, response1.getEntity() );
 
         when( response.getStatus() ).thenReturn( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() );
 
-        response1 = restService.sendRegistrationRequest( PEER_IP );
+        response1 = restService.sendRegistrationRequest( IP );
 
         assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
 
         doThrow( exception ).when( webClient ).path( anyString() );
 
-        response1 = restService.sendRegistrationRequest( PEER_IP );
+        response1 = restService.sendRegistrationRequest( IP );
 
         assertEquals( exception.toString(), response1.getEntity() );
     }
@@ -338,7 +342,7 @@ public class RestServiceImplTest
     @Test
     public void testUpdatePeer() throws Exception
     {
-        doReturn( PEER_IP ).when( restService ).getRequestIp();
+        doReturn( IP ).when( restService ).getRequestIp();
 
         restService.updatePeer( JSON, CERT );
 
@@ -664,6 +668,126 @@ public class RestServiceImplTest
         doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
 
         Response response1 = restService.setDiskQuota( CONTAINER_ID.toString(), JSON );
+
+        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    }
+
+
+    @Test
+    public void testSetDefaultGateway() throws Exception
+    {
+        restService.setDefaultGateway( CONTAINER_ID.toString(), IP );
+
+        verify( containerHost ).setDefaultGateway( IP );
+
+        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
+
+        Response response1 = restService.setDefaultGateway( CONTAINER_ID.toString(), IP );
+
+        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    }
+
+
+    @Test
+    public void testGetContainerHostInfoById() throws Exception
+    {
+        restService.getContainerHostInfoById( CONTAINER_ID.toString() );
+
+        verify( localPeer ).getContainerHostInfoById( CONTAINER_ID );
+
+        doThrow( exception ).when( peerManager ).getLocalPeer();
+
+        Response response1 = restService.getContainerHostInfoById( CONTAINER_ID.toString() );
+
+        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    }
+
+
+    @Test
+    public void testGetReservedVnis() throws Exception
+    {
+        restService.getReservedVnis();
+
+        verify( localPeer ).getReservedVnis();
+
+        doThrow( exception ).when( peerManager ).getLocalPeer();
+
+        Response response1 = restService.getReservedVnis();
+
+        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    }
+
+
+    @Test
+    public void testGetGateways() throws Exception
+    {
+        restService.getGateways();
+
+        verify( localPeer ).getGateways();
+
+        doThrow( exception ).when( peerManager ).getLocalPeer();
+
+        Response response1 = restService.getGateways();
+
+        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    }
+
+
+    @Test
+    public void testReserveVni() throws Exception
+    {
+        restService.reserveVni( JSON );
+
+        verify( localPeer ).reserveVni( any( Vni.class ) );
+
+        doThrow( exception ).when( peerManager ).getLocalPeer();
+
+        Response response1 = restService.reserveVni( JSON );
+
+        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    }
+
+
+    @Test
+    public void testImportEnvironmentCert() throws Exception
+    {
+        restService.importEnvironmentCert( CERT, ALIAS );
+
+        verify( localPeer ).importCertificate( CERT, ALIAS );
+
+        doThrow( exception ).when( peerManager ).getLocalPeer();
+
+        Response response1 = restService.importEnvironmentCert( CERT, ALIAS );
+
+        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    }
+
+
+    @Test
+    public void testExportEnvironmentCert() throws Exception
+    {
+        restService.exportEnvironmentCert( ENV_ID.toString() );
+
+        verify( localPeer ).exportEnvironmentCertificate( ENV_ID );
+
+        doThrow( exception ).when( peerManager ).getLocalPeer();
+
+        Response response1 = restService.exportEnvironmentCert( ENV_ID.toString() );
+
+        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    }
+
+
+    @Test
+    public void testRemoveEnvironmentCert() throws Exception
+    {
+        restService.removeEnvironmentCert( ENV_ID.toString() );
+
+        verify( localPeer ).removeEnvironmentCertificates( ENV_ID );
+
+        doThrow( exception ).when( peerManager ).getLocalPeer();
+
+        Response response1 = restService.removeEnvironmentCert( ENV_ID.toString() );
 
         assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
     }

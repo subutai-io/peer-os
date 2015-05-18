@@ -478,7 +478,7 @@ public class PeerRegisterForm extends CustomComponent
         {
             Response response = client.path( "peer/unregister" ).type( MediaType.APPLICATION_JSON )
                                       .accept( MediaType.APPLICATION_JSON )
-                                      .query( "peerId", gson.toJson( peerToUnregister.getId().toString() ) ).delete();
+                                      .query( "peerId",  peerToUnregister.getId().toString()  ).delete();
             if ( response.getStatus() == Response.Status.OK.getStatusCode() )
             {
                 LOG.info( response.toString() );
@@ -559,7 +559,7 @@ public class PeerRegisterForm extends CustomComponent
         {
             Response response =
                     client.path( "peer/remove" ).type( MediaType.APPLICATION_JSON ).accept( MediaType.APPLICATION_JSON )
-                          .query( "rejectedPeerId", gson.toJson( peerToUnregister.getId().toString() ) ).delete();
+                          .query( "rejectedPeerId",  peerToUnregister.getId().toString()  ).delete();
             if ( response.getStatus() == Response.Status.NO_CONTENT.getStatusCode() )
             {
                 LOG.info( response.toString() );
