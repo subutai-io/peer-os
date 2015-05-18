@@ -64,7 +64,6 @@ public class MonitorImpl implements Monitor
 {
     private static final String ENVIRONMENT_IS_NULL_MSG = "Environment is null";
     private static final String CONTAINER_IS_NULL_MSG = "Container is null";
-    private static final String ALERT_LISTENER_IS_NULL = "Alert listener is null";
     private static final String INVALID_SUBSCRIBER_ID_MSG = "Invalid subscriber id";
     private static final String SETTINGS_IS_NULL_MSG = "Settings is null";
     private static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class.getName() );
@@ -381,23 +380,21 @@ public class MonitorImpl implements Monitor
 
 
     @Override
-    public void startMonitoring( final AlertListener alertListener, final Environment environment,
+    public void startMonitoring( final String subscriberId, final Environment environment,
                                  final MonitoringSettings monitoringSettings ) throws MonitorException
     {
-        Preconditions.checkNotNull( alertListener, ALERT_LISTENER_IS_NULL );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( subscriberId ), INVALID_SUBSCRIBER_ID_MSG );
         Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
-        Preconditions
-                .checkArgument( !Strings.isNullOrEmpty( alertListener.getSubscriberId() ), INVALID_SUBSCRIBER_ID_MSG );
         Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
 
 
         //make sure subscriber id is truncated to 100 characters
-        String subscriberId = StringUtil.trimToSize( alertListener.getSubscriberId(), Constants.MAX_SUBSCRIBER_ID_LEN );
+        String trimmedSubscriberId = StringUtil.trimToSize( subscriberId, Constants.MAX_SUBSCRIBER_ID_LEN );
 
         //save subscription to database
         try
         {
-            monitorDao.addSubscription( environment.getId(), subscriberId );
+            monitorDao.addSubscription( environment.getId(), trimmedSubscriberId );
         }
         catch ( DaoException e )
         {
@@ -411,24 +408,22 @@ public class MonitorImpl implements Monitor
 
 
     @Override
-    public void startMonitoring( final AlertListener alertListener, final ContainerHost containerHost,
+    public void startMonitoring( final String subscriberId, final ContainerHost containerHost,
                                  final MonitoringSettings monitoringSettings ) throws MonitorException
     {
-        Preconditions.checkNotNull( alertListener, ALERT_LISTENER_IS_NULL );
-        Preconditions
-                .checkArgument( !Strings.isNullOrEmpty( alertListener.getSubscriberId() ), INVALID_SUBSCRIBER_ID_MSG );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( subscriberId ), INVALID_SUBSCRIBER_ID_MSG );
         Preconditions.checkNotNull( containerHost, CONTAINER_IS_NULL_MSG );
         Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
 
         //make sure subscriber id is truncated to 100 characters
-        String subscriberId = StringUtil.trimToSize( alertListener.getSubscriberId(), Constants.MAX_SUBSCRIBER_ID_LEN );
+        String trimmedSubscriberId = StringUtil.trimToSize( subscriberId, Constants.MAX_SUBSCRIBER_ID_LEN );
 
         UUID environmentId = UUID.fromString( containerHost.getEnvironmentId() );
 
         //save subscription to database
         try
         {
-            monitorDao.addSubscription( environmentId, subscriberId );
+            monitorDao.addSubscription( environmentId, trimmedSubscriberId );
         }
         catch ( DaoException e )
         {
@@ -442,21 +437,18 @@ public class MonitorImpl implements Monitor
 
 
     @Override
-    public void stopMonitoring( final AlertListener alertListener, final Environment environment )
-            throws MonitorException
+    public void stopMonitoring( final String subscriberId, final Environment environment ) throws MonitorException
     {
-        Preconditions.checkNotNull( alertListener, ALERT_LISTENER_IS_NULL );
-        Preconditions
-                .checkArgument( !Strings.isNullOrEmpty( alertListener.getSubscriberId() ), INVALID_SUBSCRIBER_ID_MSG );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( subscriberId ), INVALID_SUBSCRIBER_ID_MSG );
         Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
 
         //make sure subscriber id is truncated to 100 characters
-        String subscriberId = StringUtil.trimToSize( alertListener.getSubscriberId(), Constants.MAX_SUBSCRIBER_ID_LEN );
+        String trimmmedSubscriberId = StringUtil.trimToSize( subscriberId, Constants.MAX_SUBSCRIBER_ID_LEN );
 
         //remove subscription from database
         try
         {
-            monitorDao.removeSubscription( environment.getId(), subscriberId );
+            monitorDao.removeSubscription( environment.getId(), trimmmedSubscriberId );
         }
         catch ( DaoException e )
         {

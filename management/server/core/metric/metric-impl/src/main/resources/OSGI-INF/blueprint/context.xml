@@ -18,7 +18,7 @@
     <jpa:unit unitname="metricPUnit" property="entityManagerFactory" />
   </bean>
 
-  <bean id="monitor" class="org.safehaus.subutai.core.metric.impl.MonitorImpl"
+  <bean id="monitor" class="org.safehaus.subutai.core.metric.impl.MonitorImplMonitorImpl"
         scope="singleton" destroy-method="destroy">
     <argument ref="peerManager" />
     <argument ref="daoManagerMetric" />

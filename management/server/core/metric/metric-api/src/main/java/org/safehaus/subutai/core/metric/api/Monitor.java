@@ -58,32 +58,32 @@ public interface Monitor
      * exceeded. Monitoring infrastructure is initialized with given monitoring settings. This call needs to be executed
      * only once since subscription is stored in persistent storage
      *
-     * @param alertListener alertListener  to trigger
+     * @param subscriberId alertListener  to trigger
      * @param environment environment to monitor
      * @param monitoringSettings monitoring settings
      */
 
-    public void startMonitoring( AlertListener alertListener, Environment environment,
-                                 MonitoringSettings monitoringSettings ) throws MonitorException;
+    public void startMonitoring( String subscriberId, Environment environment, MonitoringSettings monitoringSettings )
+            throws MonitorException;
 
     /**
      * Enables {@code AlertListener} to be triggered if thresholds on the provided container are exceeded. Monitoring
      * infrastructure is initialized with given monitoring settings.
      *
-     * @param alertListener alertListener  to trigger
+     * @param subscriberId alertListener  to trigger
      * @param containerHost container host to activate monitoring on and listen to alerts from
      * @param monitoringSettings monitoring settings
      */
-    public void startMonitoring( AlertListener alertListener, ContainerHost containerHost,
+    public void startMonitoring( String subscriberId, ContainerHost containerHost,
                                  MonitoringSettings monitoringSettings ) throws MonitorException;
 
     /**
      * Disables {@code AlertListener} to be triggered for the given environment
      *
-     * @param alertListener alertListener  to trigger
+     * @param subscriberId alertListener  to trigger
      * @param environment environment to monitor
      */
-    public void stopMonitoring( AlertListener alertListener, Environment environment ) throws MonitorException;
+    public void stopMonitoring( String subscriberId, Environment environment ) throws MonitorException;
 
 
     /**
