@@ -33,6 +33,7 @@ public class RestUtil
     private static long defaultConnectionTimeout = 1000 * 60;
     private static int defaultMaxRetransmits = 3;
 
+
     public static enum RequestType
     {
         GET, DELETE, POST
@@ -196,6 +197,12 @@ public class RestUtil
 
         httpConduit.setClient( httpClientPolicy );
         return client;
+    }
+
+
+    public WebClient getTrustedWebClient( String url )
+    {
+        return createTrustedWebClient( url );
     }
 
 

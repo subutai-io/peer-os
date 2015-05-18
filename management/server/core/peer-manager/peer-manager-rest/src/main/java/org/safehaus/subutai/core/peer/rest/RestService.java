@@ -19,7 +19,7 @@ public interface RestService
     @GET
     @Path( "me" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getSelfPeerInfo();
+    public Response getLocalPeerInfo();
 
 
     @GET
@@ -63,19 +63,6 @@ public interface RestService
     Response getGateways();
 
     //*************** Peer Registration Handshake REST - BEGIN ***************************
-
-    @POST
-    @Path( "trust_request" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response processTrustRequest( @FormParam( "peer" ) String peer,
-                                         @FormParam( "rootCertPx2" ) String rootCertPx2 );
-
-    @POST
-    @Path( "trust_response" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response processTrustResponse( @FormParam( "peer" ) String peer,
-                                          @FormParam( "root_cert_px2" ) String rootCertPx2,
-                                          @FormParam( "status" ) short status );
 
     //TODO move all registration process operations to peerManager and remove duplicated code pieces from
     // PeerRegistrationUI and RestServiceImpl
