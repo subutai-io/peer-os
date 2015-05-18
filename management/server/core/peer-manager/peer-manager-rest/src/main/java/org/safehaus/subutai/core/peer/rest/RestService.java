@@ -19,7 +19,7 @@ public interface RestService
     @GET
     @Path( "me" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getSelfPeerInfo();
+    public Response getLocalPeerInfo();
 
 
     @GET
