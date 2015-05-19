@@ -24,7 +24,7 @@ public class MonitoringActivationListener extends RequestListener
     private PeerManager peerManager;
 
 
-    protected MonitoringActivationListener( MonitorImpl monitor, PeerManager peerManager )
+    public MonitoringActivationListener( MonitorImpl monitor, PeerManager peerManager )
     {
         super( RecipientType.MONITORING_ACTIVATION_RECIPIENT.name() );
 
