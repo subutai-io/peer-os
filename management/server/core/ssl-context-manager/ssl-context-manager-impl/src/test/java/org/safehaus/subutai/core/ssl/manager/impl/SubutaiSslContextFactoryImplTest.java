@@ -5,19 +5,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.core.jetty.fragment.SslContextFactoryFragment;
 
 
 @RunWith( MockitoJUnitRunner.class )
 public class SubutaiSslContextFactoryImplTest
 {
+
     SubutaiSslContextFactoryImpl sslContextFactory;
 
 
     @Before
     public void setUp() throws Exception
     {
-        SslContextFactoryFragment.setSslContextFactory( new SslContextFactoryFragment() );
         sslContextFactory = new SubutaiSslContextFactoryImpl();
     }
 

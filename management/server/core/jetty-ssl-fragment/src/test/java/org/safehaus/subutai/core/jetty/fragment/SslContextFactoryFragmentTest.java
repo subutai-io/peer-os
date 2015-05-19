@@ -5,8 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import static org.junit.Assert.assertEquals;
-//import static org.mockito.Mockito.mock;
+import static org.junit.Assert.assertNotNull;
 
 
 public class SslContextFactoryFragmentTest
@@ -20,37 +19,34 @@ public class SslContextFactoryFragmentTest
     public void setUp() throws Exception
     {
         SslContextFactoryFragment fragment = new SslContextFactoryFragment();
-        SslContextFactoryFragment.setSslContextFactory( fragment );
     }
 
 
     @Test
     public void testGetSingleton() throws Exception
     {
-        SslContextFactoryFragment.setSslContextFactory( mockedFragment );
-        assertEquals( mockedFragment, SslContextFactoryFragment.getSingleton() );
+        assertNotNull( SslContextFactoryFragment.getLastInstance() );
     }
 
 
     @Test
     public void testDoStop() throws Exception
     {
-        SslContextFactoryFragment.getSingleton().doStop();
+        SslContextFactoryFragment.getLastInstance().doStop();
     }
 
 
     @Test
     public void testReloadStores() throws Exception
     {
-        SslContextFactoryFragment.getSingleton().reloadStores();
+        SslContextFactoryFragment.getLastInstance().reloadStores();
     }
 
 
     @Test
     public void testReloadStoresThrowsException() throws Exception
     {
-        SslContextFactoryFragment.setSslContextFactory( new TestSslContextFactoryFragment() );
-        SslContextFactoryFragment.getSingleton().reloadStores();
+        SslContextFactoryFragment.getLastInstance().reloadStores();
     }
 
 

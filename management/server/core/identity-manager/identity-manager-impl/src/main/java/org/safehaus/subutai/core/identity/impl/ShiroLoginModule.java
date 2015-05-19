@@ -44,6 +44,14 @@ public class ShiroLoginModule extends AbstractKarafLoginModule
         LOGGER.info( "Initializing shiro login module." );
 
         // WARNING DO NOT REMOVE CODE SNIPPET just for importing JaasRealm
+//        try
+//        {
+//            Class.forName( "org.apache.karaf.jaas.config.JaasRealm" );
+//        }
+//        catch ( ClassNotFoundException e )
+//        {
+//            LOGGER.error( "Error loading class JaasRealm", e );
+//        }
         Object o = subject;
         if ( o instanceof JaasRealm )
         {

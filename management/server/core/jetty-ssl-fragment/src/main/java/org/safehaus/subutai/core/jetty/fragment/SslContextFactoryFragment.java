@@ -12,7 +12,7 @@ public class SslContextFactoryFragment extends SslContextFactory
 {
     private static Logger LOG = LoggerFactory.getLogger( SslContextFactoryFragment.class.getName() );
 
-    private static volatile SslContextFactoryFragment singleton;
+    private static volatile SslContextFactoryFragment lastInstance = new SslContextFactoryFragment();
 
     private boolean customStart = false;
 
@@ -23,19 +23,13 @@ public class SslContextFactoryFragment extends SslContextFactory
     public SslContextFactoryFragment()
     {
         super();
-        singleton = this;
+        lastInstance = this;
     }
 
 
-    public static SslContextFactoryFragment getSingleton()
+    public static SslContextFactoryFragment getLastInstance()
     {
-        return singleton;
-    }
-
-
-    public synchronized static void setSslContextFactory( SslContextFactoryFragment instance )
-    {
-        singleton = instance;
+        return lastInstance;
     }
 
 

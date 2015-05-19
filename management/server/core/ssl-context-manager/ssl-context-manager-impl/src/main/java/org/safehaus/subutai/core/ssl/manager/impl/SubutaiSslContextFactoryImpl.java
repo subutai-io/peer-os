@@ -15,31 +15,27 @@ public class SubutaiSslContextFactoryImpl implements SubutaiSslContextFactory
 
     public SubutaiSslContextFactoryImpl()
     {
-        LOG.error( String.format( "Printing singleton: %s", SslContextFactoryFragment.getSingleton() ) );
+        LOG.error( String.format( "Printing singleton: %s", SslContextFactoryFragment.getLastInstance() ) );
     }
 
 
     @Override
     public void reloadKeyStore()
     {
-        SslContextFactoryFragment.getSingleton().reloadStores();
+        SslContextFactoryFragment.getLastInstance().reloadStores();
     }
 
 
     @Override
     public void reloadTrustStore()
     {
-        SslContextFactoryFragment fragment = SslContextFactoryFragment.getSingleton();
-        if ( fragment != null )
-        {
-            fragment.reloadStores();
-        }
+        SslContextFactoryFragment.getLastInstance().reloadStores();
     }
 
 
     @Override
     public Object getSSLContext()
     {
-        return SslContextFactoryFragment.getSingleton();
+        return SslContextFactoryFragment.getLastInstance();
     }
 }
