@@ -16,7 +16,7 @@ public class RemoteMetricRequestListener extends RequestListener
     private MonitorImpl monitor;
 
 
-    protected RemoteMetricRequestListener( MonitorImpl monitor )
+    public RemoteMetricRequestListener( MonitorImpl monitor )
     {
         super( RecipientType.METRIC_REQUEST_RECIPIENT.name() );
 

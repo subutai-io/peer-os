@@ -65,6 +65,13 @@
     <argument ref="messenger" />
   </bean>
 
+  <reference-list id="peerMsgLstnr"
+                  interface="org.safehaus.subutai.core.peer.api.RequestListener"
+                  availability="optional">
+    <reference-listener ref="peerManager"
+                        bind-method="addRequestListener" unbind-method="removeRequestListener" />
+  </reference-list>
+
   <service ref="localPeer" interface="org.safehaus.subutai.core.hostregistry.api.HostListener" />
 
   <service ref="messageResponseListener" interface="org.safehaus.subutai.core.messenger.api.MessageListener" />

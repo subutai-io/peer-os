@@ -18,7 +18,7 @@ public class RemoteAlertListener extends RequestListener
     protected MonitorImpl monitor;
 
 
-    protected RemoteAlertListener( MonitorImpl monitor )
+    public RemoteAlertListener( MonitorImpl monitor )
     {
         super( RecipientType.ALERT_RECIPIENT.name() );
         this.monitor = monitor;

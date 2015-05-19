@@ -63,7 +63,7 @@ public class PeerManagerImpl implements PeerManager
         }
         catch ( SQLException e )
         {
-            LOG.error( e.getMessage(), e );
+            LOG.error( "Error initializing peer dao", e );
         }
 
         //add command request listener
@@ -71,8 +71,6 @@ public class PeerManagerImpl implements PeerManager
         //add command response listener
         commandResponseListener = new CommandResponseListener();
         addRequestListener( commandResponseListener );
-        //subscribe to peer message requests
-        //subscribe to peer message responses
         //add create container requests listener
         addRequestListener( new CreateContainerGroupRequestListener( localPeer ) );
         //add destroy environment containers requests listener
@@ -216,14 +214,12 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @Override
     public void addRequestListener( RequestListener listener )
     {
         localPeer.addRequestListener( listener );
     }
 
 
-    @Override
     public void removeRequestListener( RequestListener listener )
     {
         localPeer.removeRequestListener( listener );
