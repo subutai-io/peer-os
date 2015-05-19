@@ -18,7 +18,7 @@
     <jpa:unit unitname="metricPUnit" property="entityManagerFactory" />
   </bean>
 
-  <bean id="monitor" class="org.safehaus.subutai.core.metric.impl.MonitorImplMonitorImpl"
+  <bean id="monitor" class="org.safehaus.subutai.core.metric.impl.MonitorImpl"
         scope="singleton" destroy-method="destroy">
     <argument ref="peerManager" />
     <argument ref="daoManagerMetric" />
@@ -34,5 +34,26 @@
   </reference-list>
 
   <service ref="monitor" interface="org.safehaus.subutai.core.metric.api.Monitor" />
+
+  <bean id="remoteAlertLstnr" scope="singleton" class="org.safehaus.subutai.core.metric.impl.RemoteAlertListener">
+    <argument ref="monitor" />
+  </bean>
+
+  <service ref="remoteAlertLstnr" interface="org.safehaus.subutai.core.peer.api.RequestListener" />
+
+  <bean id="remoteMetricLstnr" scope="singleton"
+        class="org.safehaus.subutai.core.metric.impl.RemoteMetricRequestListener">
+    <argument ref="monitor" />
+  </bean>
+
+  <service ref="remoteMetricLstnr" interface="org.safehaus.subutai.core.peer.api.RequestListener" />
+
+  <bean id="activationLstnr" scope="singleton"
+        class="org.safehaus.subutai.core.metric.impl.MonitoringActivationListener">
+    <argument ref="monitor" />
+    <argument ref="peerManager" />
+  </bean>
+
+  <service ref="activationLstnr" interface="org.safehaus.subutai.core.peer.api.RequestListener" />
 
 </blueprint>

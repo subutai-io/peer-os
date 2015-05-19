@@ -63,8 +63,4 @@ public interface PeerManager
      * Returns local peer instance
      */
     public LocalPeer getLocalPeer();
-
-    public void addRequestListener( RequestListener listener );
-
-    public void removeRequestListener( RequestListener listener );
 }

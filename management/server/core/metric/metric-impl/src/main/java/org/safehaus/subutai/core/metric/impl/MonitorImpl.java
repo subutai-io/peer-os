@@ -95,9 +95,9 @@ public class MonitorImpl implements Monitor
             this.peerManager = peerManager;
             this.identityManager = identityManager;
             this.environmentManager = environmentManager;
-            peerManager.addRequestListener( new RemoteAlertListener( this ) );
-            peerManager.addRequestListener( new RemoteMetricRequestListener( this ) );
-            peerManager.addRequestListener( new MonitoringActivationListener( this, peerManager ) );
+//            peerManager.addRequestListener( new RemoteAlertListener( this ) );
+//            peerManager.addRequestListener( new RemoteMetricRequestListener( this ) );
+//            peerManager.addRequestListener( new MonitoringActivationListener( this, peerManager ) );
         }
         catch ( DaoException e )
         {
