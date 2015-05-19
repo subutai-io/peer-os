@@ -41,8 +41,9 @@ public class CertificateManager
     private X509Certificate x509cert = null;
 
 
-    /**************************************************************************************
-     *  CertificateManager Constructor
+    /**
+     * *********************************************************************************** CertificateManager
+     * Constructor
      */
     public void setDateParamaters()
     {
@@ -52,8 +53,10 @@ public class CertificateManager
         notAfter = cal.getTime();
     }
 
-    /**************************************************************************************
-     * Generate x509 Certificate
+
+    /**
+     * *********************************************************************************** Generate x509 Certificate
+     *
      * @param keyStore KeyStore
      * @param keyPair KeyPair
      * @param securityProvider SecurityProvider
@@ -96,7 +99,7 @@ public class CertificateManager
             x509cert.checkValidity( new Date() );
             x509cert.verify( x509cert.getPublicKey() );
         }
-        catch ( Throwable t )
+        catch ( Exception t )
         {
             throw new RuntimeException( "Failed to generate self-signed certificate!", t );
         }

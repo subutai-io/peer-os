@@ -122,9 +122,8 @@ import com.google.common.collect.Sets;
  */
 public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 {
-    //TODO extract id to setting
-    private static final String PEER_ID_PATH = "/var/lib/subutai/id";
-    private static final String PEER_ID_FILE = "peer_id";
+    private String peerIdPath = "/var/lib/subutai/id";
+    private String peerIdFile = "peer_id";
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
     // 5 min
@@ -164,6 +163,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         this.commandExecutor = commandExecutor;
         this.hostRegistry = hostRegistry;
         this.subutaiSslContextFactory = subutaiSslContextFactory;
+    }
+
+
+    public void setPeerIdPath( final String peerIdPath )
+    {
+        this.peerIdPath = peerIdPath;
+    }
+
+
+    public void setPeerIdFile( final String peerIdFile )
+    {
+        this.peerIdFile = peerIdFile;
     }
 
 
@@ -232,7 +243,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected void initPeerInfo( PeerDAO peerDAO )
     {
         //obtain id from fs
-        File scriptsDirectory = new File( PEER_ID_PATH );
+        File scriptsDirectory = new File( peerIdPath );
         if ( !scriptsDirectory.exists() )
         {
             boolean created = scriptsDirectory.mkdirs();
@@ -241,7 +252,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 LOG.info( "Peer id directory created" );
             }
         }
-        Path peerIdFilePath = Paths.get( PEER_ID_PATH, PEER_ID_FILE );
+        Path peerIdFilePath = Paths.get( peerIdPath, peerIdFile );
         File peerIdFile = peerIdFilePath.toFile();
         UUID peerId;
         try
@@ -955,9 +966,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder(
-                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
-                    bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
+                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
