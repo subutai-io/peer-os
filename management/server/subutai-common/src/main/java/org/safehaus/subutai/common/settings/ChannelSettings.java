@@ -79,7 +79,8 @@ public class ChannelSettings
 
             "/cxf/hosts",
 
-            "/cxf/identity/key/{username}",
+            //"/cxf/identity/key/{username}",
+            "/cxf/identity/key/{$}",
 
             "/cxf/messenger/message",
 
