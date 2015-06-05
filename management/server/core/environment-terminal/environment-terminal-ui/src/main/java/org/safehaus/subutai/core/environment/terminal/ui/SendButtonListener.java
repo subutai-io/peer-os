@@ -65,7 +65,7 @@ public class SendButtonListener implements Button.ClickListener
     }
 
 
-    private void executeCommand( Set<ContainerHost> containers )
+    protected void executeCommand( Set<ContainerHost> containers )
     {
 
         RequestBuilder requestBuilder = new RequestBuilder( form.programTxtFld.getValue() );
@@ -96,7 +96,7 @@ public class SendButtonListener implements Button.ClickListener
     }
 
 
-    private boolean checkRequest()
+    protected boolean checkRequest()
     {
 
         if ( !( StringUtil.isNumeric( form.timeoutTxtFld.getValue() ) && NumUtil
@@ -114,7 +114,7 @@ public class SendButtonListener implements Button.ClickListener
     }
 
 
-    private static class ExecuteCommandTask implements Runnable
+    protected static class ExecuteCommandTask implements Runnable
     {
 
         private final TerminalForm form;
