@@ -30,14 +30,14 @@ import com.vaadin.ui.TextField;
  */
 public class TerminalForm extends CustomComponent
 {
-    protected final EnvironmentTree environmentTree;
-    protected final TextField programTxtFld;
-    protected final TextField timeoutTxtFld;
-    protected final TextField workDirTxtFld;
-    protected final CheckBox daemonChk;
+    protected EnvironmentTree environmentTree;
+    protected TextField programTxtFld;
+    protected TextField timeoutTxtFld;
+    protected TextField workDirTxtFld;
+    protected CheckBox daemonChk;
 
-    protected final Label indicator;
-    private final TextArea commandOutputTxtArea;
+    protected Label indicator;
+    protected TextArea commandOutputTxtArea;
     protected AtomicInteger taskCount = new AtomicInteger();
     private ExecutorService executor;
 

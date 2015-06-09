@@ -43,20 +43,20 @@ import com.vaadin.ui.UI;
  */
 @SuppressWarnings( "serial" )
 
-public final class EnvironmentTree extends ConcurrentComponent
+public class EnvironmentTree extends ConcurrentComponent
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( UI.getCurrent().getClass().getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentTree.class );
     private static final String VALUE_PROPERTY = "value";
     private static final String ICON_PROPERTY = "icon";
-    private final Tree tree;
-    private HierarchicalContainer container;
-    private Set<ContainerHost> selectedContainers = new HashSet<>();
-    private Environment environment;
-    private ScheduledExecutorService scheduler;
-    private final EnvironmentManager environmentManager;
-    private final ComboBox envCombo;
-    private final Date updateDate;
+    protected final Tree tree;
+    protected HierarchicalContainer container;
+    protected Set<ContainerHost> selectedContainers = new HashSet<>();
+    protected Environment environment;
+    protected ScheduledExecutorService scheduler;
+    protected final EnvironmentManager environmentManager;
+    protected final ComboBox envCombo;
+    protected final Date updateDate;
 
 
     public EnvironmentTree( final EnvironmentManager environmentManager, final Date updateDate )
@@ -230,6 +230,7 @@ public final class EnvironmentTree extends ConcurrentComponent
         private String propertyId;
         private Set<String> containerNames;
 
+
         public MyCustomFilter( final String propertyId, final Set<String> containerNames )
         {
             this.propertyId = propertyId;
@@ -324,7 +325,7 @@ public final class EnvironmentTree extends ConcurrentComponent
     }
 
 
-    private void refreshContainers()
+    protected void refreshContainers()
     {
 
         if ( environment != null )
