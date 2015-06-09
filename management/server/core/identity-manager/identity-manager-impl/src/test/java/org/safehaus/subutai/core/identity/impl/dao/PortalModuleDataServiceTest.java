@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.identity.impl.dao;
 
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -13,9 +15,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.core.identity.api.PermissionGroup;
-import org.safehaus.subutai.core.identity.impl.entity.PermissionEntity;
-import org.safehaus.subutai.core.identity.impl.entity.PermissionPK;
+import org.safehaus.subutai.core.identity.impl.entity.PortalModuleScopeEntity;
+
+import com.google.common.collect.Lists;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.anyString;
@@ -24,10 +26,10 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith( MockitoJUnitRunner.class )
-public class PermissionDataServiceTest
+public class PortalModuleDataServiceTest
 {
-    private PermissionDataService permissionDataService;
-
+    private PortalModuleDataService portalModuleDataService;
+    private List<Object> myList;
     @Mock
     EntityManagerFactory entityManagerFactory;
     @Mock
@@ -37,41 +39,34 @@ public class PermissionDataServiceTest
     @Mock
     Query query;
     @Mock
-    PermissionPK permissionPK;
-    @Mock
-    PermissionEntity permissionEntity;
+    PortalModuleScopeEntity portalModuleScopeEntity;
     @Mock
     TypedQuery<Object> typedQuery;
+    @Mock
+    Object object;
 
     @Before
     public void setUp() throws Exception
     {
-        permissionDataService = new PermissionDataService( entityManagerFactory );
-        permissionDataService.setEmf( entityManagerFactory );
+        portalModuleDataService = new PortalModuleDataService( entityManagerFactory );
+        portalModuleDataService.setEmf( entityManagerFactory );
+
+        myList = Lists.newArrayList();
 
         when( entityManagerFactory.createEntityManager() ).thenReturn( entityManager );
         when( entityManager.getTransaction() ).thenReturn( transaction );
         when( entityManager.createQuery( anyString() ) ).thenReturn(query  );
         when( entityManager.createQuery( anyString(), Matchers.<Class<Object>>anyObject() ) ).thenReturn( typedQuery );
+
     }
 
-
-    @Test(expected = Exception.class)
-    public void testGetAllException() throws Exception
-    {
-        when( transaction.isActive() ).thenReturn( true );
-        when( entityManager.getTransaction() ).thenThrow( Exception.class );
-
-        permissionDataService.getAll();
-
-        verify( transaction ).begin();
-        verify( entityManager ).close();
-    }
 
     @Test
-    public void testGetAll()
+    public void testGetAll() throws Exception
     {
-        permissionDataService.getAll();
+        when( typedQuery.getResultList() ).thenReturn( myList );
+
+        portalModuleDataService.getAll();
 
         verify( transaction ).begin();
         verify( transaction ).commit();
@@ -80,33 +75,27 @@ public class PermissionDataServiceTest
 
 
     @Test
-    public void testGetAllByPermissionGroup() throws Exception
-    {
-        permissionDataService.getAllByPermissionGroup( PermissionGroup.PEER_PERMISSIONS );
-
-        verify( transaction ).begin();
-        verify( entityManager ).close();
-    }
-
-
-    @Test
-    public void testGetAllByPermissionGroupException() throws Exception
+    public void testGetAllException() throws Exception
     {
         when( typedQuery.getResultList() ).thenThrow( Exception.class );
         when( transaction.isActive() ).thenReturn( true );
 
-        permissionDataService.getAllByPermissionGroup( PermissionGroup.PEER_PERMISSIONS );
+        portalModuleDataService.getAll();
 
         verify( transaction ).rollback();
     }
 
 
+
     @Test
     public void testFind() throws Exception
     {
-        permissionDataService.find( permissionPK );
+        when( typedQuery.getResultList() ).thenReturn( myList );
+
+        portalModuleDataService.find( "55" );
 
         verify( transaction ).begin();
+        verify( transaction ).commit();
         verify( entityManager ).close();
     }
 
@@ -114,20 +103,19 @@ public class PermissionDataServiceTest
     @Test
     public void testFindException() throws Exception
     {
-        when( transaction.isActive() ).thenReturn( true );
         when( typedQuery.getResultList() ).thenThrow( Exception.class );
+        when( transaction.isActive() ).thenReturn( true );
 
-        permissionDataService.find( permissionPK );
+        portalModuleDataService.find( "id" );
 
         verify( transaction ).rollback();
     }
 
 
-
     @Test
     public void testPersist() throws Exception
     {
-        permissionDataService.persist( permissionEntity );
+        portalModuleDataService.persist( portalModuleScopeEntity );
 
         verify( transaction ).begin();
         verify( transaction ).commit();
@@ -140,7 +128,7 @@ public class PermissionDataServiceTest
     {
         when( entityManager.getTransaction() ).thenThrow( Exception.class );
 
-        permissionDataService.persist( permissionEntity );
+        portalModuleDataService.persist( portalModuleScopeEntity );
 
         verify( transaction ).rollback();
     }
@@ -149,38 +137,39 @@ public class PermissionDataServiceTest
     @Test
     public void testRemove() throws Exception
     {
-        when( permissionPK.getPermissionKey() ).thenReturn( "permissionKey" );
-        when( permissionPK.getPermissionGroup() ).thenReturn( PermissionGroup.DEFAULT_PERMISSIONS );
+        portalModuleDataService.remove( "55" );
 
-        permissionDataService.remove( permissionPK );
+        verify( transaction ).begin();
+        verify( transaction ).commit();
+        verify( entityManager).close();
     }
+
 
     @Test
     public void testRemoveException() throws Exception
     {
-        when( permissionPK.getPermissionKey() ).thenReturn( "permissionKey" );
-        when( permissionPK.getPermissionGroup() ).thenReturn( PermissionGroup.DEFAULT_PERMISSIONS );
         when( query.executeUpdate() ).thenThrow( Exception.class );
         when( transaction.isActive() ).thenReturn( true );
-
-        permissionDataService.remove( permissionPK );
+        portalModuleDataService.remove( "55" );
     }
-
 
 
     @Test
     public void testUpdate() throws Exception
     {
-        permissionDataService.update( permissionEntity );
-    }
+        portalModuleDataService.update( portalModuleScopeEntity );
 
+        verify( transaction ).begin();
+        verify( transaction ).commit();
+        verify( entityManager).close();
+    }
 
     @Test(expected = Exception.class)
     public void testUpdateException() throws Exception
     {
         when( entityManager.getTransaction() ).thenThrow( Exception.class );
 
-        permissionDataService.update( permissionEntity );
+        portalModuleDataService.update( portalModuleScopeEntity );
 
         verify( transaction ).rollback();
     }
@@ -189,6 +178,7 @@ public class PermissionDataServiceTest
     @Test
     public void testGetEmf() throws Exception
     {
-        assertNotNull( permissionDataService.getEmf());
+        assertNotNull(portalModuleDataService.getEmf());
     }
+
 }
