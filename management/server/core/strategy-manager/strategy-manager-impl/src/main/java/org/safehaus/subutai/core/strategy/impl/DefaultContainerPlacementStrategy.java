@@ -19,11 +19,11 @@ import com.google.common.collect.Maps;
  */
 public class DefaultContainerPlacementStrategy extends AbstractContainerPlacementStrategy
 {
-    private static final double MIN_HDD_LXC_MB = 5 * 1024;
-    private static final double MIN_HDD_IN_RESERVE_MB = 20 * 1024;
-    private static final double MIN_RAM_LXC_MB = 512;
-    private static final double MIN_RAM_IN_RESERVE_MB = 1024;
-    private UnitUtil unitUtil = new UnitUtil();
+    protected static final double MIN_HDD_LXC_MB = 5 * 1024;
+    protected static final double MIN_HDD_IN_RESERVE_MB = 20 * 1024;
+    protected static final double MIN_RAM_LXC_MB = 512;
+    protected static final double MIN_RAM_IN_RESERVE_MB = 1024;
+//    private UnitUtil unitUtil = new UnitUtil();
 
 
     @Override
@@ -105,9 +105,9 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
         {
             for ( ResourceHostMetric metric : serverMetrics )
             {
-                int numOfLxcByRam = ( int ) ( ( getBytesInMb( metric.getAvailableRam() ) - MIN_RAM_IN_RESERVE_MB )
+                int numOfLxcByRam = ( int ) ( ( UnitUtil.getBytesInMb( metric.getAvailableRam() ) - MIN_RAM_IN_RESERVE_MB )
                         / MIN_RAM_LXC_MB );
-                int numOfLxcByHdd = ( int ) ( ( getBytesInMb( metric.getAvailableDiskVar() ) - MIN_HDD_IN_RESERVE_MB )
+                int numOfLxcByHdd = ( int ) ( ( UnitUtil.getBytesInMb( metric.getAvailableDiskVar() ) - MIN_HDD_IN_RESERVE_MB )
                         / MIN_HDD_LXC_MB );
 
                 if ( numOfLxcByHdd > 0 && numOfLxcByRam > 0 )
@@ -120,9 +120,4 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
         return serverSlots;
     }
 
-
-    private double getBytesInMb( double bytes )
-    {
-        return unitUtil.convert( bytes, UnitUtil.Unit.B, UnitUtil.Unit.MB );
-    }
 }
