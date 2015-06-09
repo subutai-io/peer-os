@@ -13,9 +13,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.core.identity.api.PermissionGroup;
-import org.safehaus.subutai.core.identity.impl.entity.PermissionEntity;
-import org.safehaus.subutai.core.identity.impl.entity.PermissionPK;
+import org.safehaus.subutai.core.identity.impl.entity.CliCommandEntity;
+import org.safehaus.subutai.core.identity.impl.entity.CliCommandPK;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.anyString;
@@ -24,9 +23,9 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith( MockitoJUnitRunner.class )
-public class PermissionDataServiceTest
+public class CliCommandDataServiceTest
 {
-    private PermissionDataService permissionDataService;
+    private CliCommandDataService cliCommandDataService;
 
     @Mock
     EntityManagerFactory entityManagerFactory;
@@ -37,41 +36,30 @@ public class PermissionDataServiceTest
     @Mock
     Query query;
     @Mock
-    PermissionPK permissionPK;
+    CliCommandPK cliCommandPK;
     @Mock
-    PermissionEntity permissionEntity;
+    CliCommandEntity cliCommandEntity;
     @Mock
     TypedQuery<Object> typedQuery;
+
 
     @Before
     public void setUp() throws Exception
     {
-        permissionDataService = new PermissionDataService( entityManagerFactory );
-        permissionDataService.setEmf( entityManagerFactory );
+        cliCommandDataService = new CliCommandDataService( entityManagerFactory );
+        cliCommandDataService.setEmf( entityManagerFactory );
 
         when( entityManagerFactory.createEntityManager() ).thenReturn( entityManager );
         when( entityManager.getTransaction() ).thenReturn( transaction );
-        when( entityManager.createQuery( anyString() ) ).thenReturn(query  );
+        when( entityManager.createQuery( anyString() ) ).thenReturn( query );
         when( entityManager.createQuery( anyString(), Matchers.<Class<Object>>anyObject() ) ).thenReturn( typedQuery );
     }
 
 
-    @Test(expected = Exception.class)
-    public void testGetAllException() throws Exception
-    {
-        when( transaction.isActive() ).thenReturn( true );
-        when( entityManager.getTransaction() ).thenThrow( Exception.class );
-
-        permissionDataService.getAll();
-
-        verify( transaction ).begin();
-        verify( entityManager ).close();
-    }
-
     @Test
-    public void testGetAll()
+    public void testGetAll() throws Exception
     {
-        permissionDataService.getAll();
+        cliCommandDataService.getAll();
 
         verify( transaction ).begin();
         verify( transaction ).commit();
@@ -80,22 +68,12 @@ public class PermissionDataServiceTest
 
 
     @Test
-    public void testGetAllByPermissionGroup() throws Exception
-    {
-        permissionDataService.getAllByPermissionGroup( PermissionGroup.PEER_PERMISSIONS );
-
-        verify( transaction ).begin();
-        verify( entityManager ).close();
-    }
-
-
-    @Test
-    public void testGetAllByPermissionGroupException() throws Exception
+    public void testGetAllException() throws Exception
     {
         when( typedQuery.getResultList() ).thenThrow( Exception.class );
         when( transaction.isActive() ).thenReturn( true );
 
-        permissionDataService.getAllByPermissionGroup( PermissionGroup.PEER_PERMISSIONS );
+        cliCommandDataService.getAll();
 
         verify( transaction ).rollback();
     }
@@ -104,9 +82,13 @@ public class PermissionDataServiceTest
     @Test
     public void testFind() throws Exception
     {
-        permissionDataService.find( permissionPK );
+        when( cliCommandPK.getName() ).thenReturn( "name" );
+        when( cliCommandPK.getScope() ).thenReturn( "scope" );
+
+        cliCommandDataService.find( cliCommandPK );
 
         verify( transaction ).begin();
+        verify( transaction ).commit();
         verify( entityManager ).close();
     }
 
@@ -114,33 +96,34 @@ public class PermissionDataServiceTest
     @Test
     public void testFindException() throws Exception
     {
+        when( cliCommandPK.getName() ).thenReturn( "name" );
+        when( cliCommandPK.getScope() ).thenReturn( "scope" );
         when( transaction.isActive() ).thenReturn( true );
         when( typedQuery.getResultList() ).thenThrow( Exception.class );
 
-        permissionDataService.find( permissionPK );
+        cliCommandDataService.find( cliCommandPK );
 
         verify( transaction ).rollback();
     }
 
 
-
     @Test
     public void testPersist() throws Exception
     {
-        permissionDataService.persist( permissionEntity );
+        cliCommandDataService.persist( cliCommandEntity );
 
         verify( transaction ).begin();
         verify( transaction ).commit();
-        verify( entityManager).close();
+        verify( entityManager ).close();
     }
 
 
-    @Test(expected = Exception.class)
+    @Test( expected = Exception.class )
     public void testPersistException() throws Exception
     {
         when( entityManager.getTransaction() ).thenThrow( Exception.class );
 
-        permissionDataService.persist( permissionEntity );
+        cliCommandDataService.persist( cliCommandEntity );
 
         verify( transaction ).rollback();
     }
@@ -149,38 +132,40 @@ public class PermissionDataServiceTest
     @Test
     public void testRemove() throws Exception
     {
-        when( permissionPK.getPermissionKey() ).thenReturn( "permissionKey" );
-        when( permissionPK.getPermissionGroup() ).thenReturn( PermissionGroup.DEFAULT_PERMISSIONS );
+        cliCommandDataService.remove( cliCommandPK );
 
-        permissionDataService.remove( permissionPK );
+        verify( transaction ).begin();
+        verify( transaction ).commit();
+        verify( entityManager ).close();
     }
+
 
     @Test
     public void testRemoveException() throws Exception
     {
-        when( permissionPK.getPermissionKey() ).thenReturn( "permissionKey" );
-        when( permissionPK.getPermissionGroup() ).thenReturn( PermissionGroup.DEFAULT_PERMISSIONS );
         when( query.executeUpdate() ).thenThrow( Exception.class );
         when( transaction.isActive() ).thenReturn( true );
-
-        permissionDataService.remove( permissionPK );
+        cliCommandDataService.remove( cliCommandPK );
     }
-
 
 
     @Test
     public void testUpdate() throws Exception
     {
-        permissionDataService.update( permissionEntity );
+        cliCommandDataService.update( cliCommandEntity );
+
+        verify( transaction ).begin();
+        verify( transaction ).commit();
+        verify( entityManager ).close();
     }
 
 
-    @Test(expected = Exception.class)
+    @Test( expected = Exception.class )
     public void testUpdateException() throws Exception
     {
         when( entityManager.getTransaction() ).thenThrow( Exception.class );
 
-        permissionDataService.update( permissionEntity );
+        cliCommandDataService.update( cliCommandEntity );
 
         verify( transaction ).rollback();
     }
@@ -189,6 +174,6 @@ public class PermissionDataServiceTest
     @Test
     public void testGetEmf() throws Exception
     {
-        assertNotNull( permissionDataService.getEmf());
+        assertNotNull( cliCommandDataService.getEmf() );
     }
 }
