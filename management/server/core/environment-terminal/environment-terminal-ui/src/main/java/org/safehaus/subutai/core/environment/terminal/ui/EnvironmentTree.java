@@ -35,7 +35,6 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Tree;
-import com.vaadin.ui.UI;
 
 
 /**
@@ -45,7 +44,6 @@ import com.vaadin.ui.UI;
 
 public class EnvironmentTree extends ConcurrentComponent
 {
-
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentTree.class );
     private static final String VALUE_PROPERTY = "value";
     private static final String ICON_PROPERTY = "icon";
@@ -214,7 +212,7 @@ public class EnvironmentTree extends ConcurrentComponent
     }
 
 
-    public HierarchicalContainer getNodeContainer()
+    protected HierarchicalContainer getNodeContainer()
     {
         container = new HierarchicalContainer();
         container.addContainerProperty( VALUE_PROPERTY, ContainerHost.class, null );
@@ -224,14 +222,14 @@ public class EnvironmentTree extends ConcurrentComponent
     }
 
 
-    private static class MyCustomFilter implements Container.Filter
+    protected static class ContainerNamesFilter implements Container.Filter
     {
 
         private String propertyId;
         private Set<String> containerNames;
 
 
-        public MyCustomFilter( final String propertyId, final Set<String> containerNames )
+        public ContainerNamesFilter( final String propertyId, final Set<String> containerNames )
         {
             this.propertyId = propertyId;
             this.containerNames = containerNames;
@@ -282,7 +280,7 @@ public class EnvironmentTree extends ConcurrentComponent
     }
 
 
-    private void filterContainers( final String tag )
+    protected void filterContainers( final String tag )
     {
         try
         {
@@ -292,14 +290,14 @@ public class EnvironmentTree extends ConcurrentComponent
 
             for ( ContainerHost ec : env.getContainerHosts() )
             {
-
+                LOG.debug( String.format( "%s tags: %s", ec.getHostname(), ec.getTags() ) );
                 if ( ec.getTags().contains( tag ) )
                 {
                     matchedContainerNames.add( ec.getHostname() );
                 }
             }
 
-            container.addContainerFilter( new MyCustomFilter( VALUE_PROPERTY, matchedContainerNames ) );
+            container.addContainerFilter( new ContainerNamesFilter( VALUE_PROPERTY, matchedContainerNames ) );
 
             for ( ContainerHost ec : environment.getContainerHosts() )
             {

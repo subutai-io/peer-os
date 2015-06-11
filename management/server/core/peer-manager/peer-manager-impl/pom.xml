@@ -93,10 +93,10 @@
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
+<!--    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
