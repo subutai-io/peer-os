@@ -43,10 +43,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>vaadin-custom</artifactId>
     </dependency>
-    <dependency>
+<!--    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

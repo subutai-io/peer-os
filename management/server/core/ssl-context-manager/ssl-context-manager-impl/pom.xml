@@ -23,10 +23,10 @@
   </properties>
 
   <dependencies>
-    <dependency>
+<!--    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>

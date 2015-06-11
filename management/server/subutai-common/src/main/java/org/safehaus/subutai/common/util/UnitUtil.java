@@ -4,7 +4,7 @@ package org.safehaus.subutai.common.util;
 import com.google.common.base.Preconditions;
 
 
-public class UnitUtil
+public abstract class UnitUtil
 {
     public static enum Unit
     {
@@ -12,7 +12,7 @@ public class UnitUtil
     }
 
 
-    public double convert( Double value, Unit from, Unit to )
+    public static double convert( Double value, Unit from, Unit to )
     {
         Preconditions.checkArgument( value > 0, "Value must be greater than 0" );
         Preconditions.checkNotNull( from );
@@ -32,7 +32,13 @@ public class UnitUtil
     }
 
 
-    private double convertFromGB( final Double value, final Unit to )
+    public static double getBytesInMb( double bytes )
+    {
+        return convert( bytes, UnitUtil.Unit.B, UnitUtil.Unit.MB );
+    }
+
+
+    private static double convertFromGB( final Double value, final Unit to )
     {
         switch ( to )
         {
@@ -48,7 +54,7 @@ public class UnitUtil
     }
 
 
-    private double convertFromMB( final Double value, final Unit to )
+    private static double convertFromMB( final Double value, final Unit to )
     {
         switch ( to )
         {
@@ -64,7 +70,7 @@ public class UnitUtil
     }
 
 
-    private double convertFromKB( final Double value, final Unit to )
+    private static double convertFromKB( final Double value, final Unit to )
     {
         switch ( to )
         {
@@ -80,7 +86,7 @@ public class UnitUtil
     }
 
 
-    private double convertFromBytes( final Double value, final Unit to )
+    private static double convertFromBytes( final Double value, final Unit to )
     {
         switch ( to )
         {

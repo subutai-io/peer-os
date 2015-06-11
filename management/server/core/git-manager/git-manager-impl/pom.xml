@@ -24,10 +24,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>peer-manager-api</artifactId>
     </dependency>
-    <dependency>
+<!--    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>git-manager-api</artifactId>

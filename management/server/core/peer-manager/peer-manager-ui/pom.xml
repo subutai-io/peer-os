@@ -55,10 +55,10 @@
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-server</artifactId>
     </dependency>
-    <dependency>
+<!--    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-    </dependency>
+    </dependency>-->
     <!--Test-->
     <dependency>
       <groupId>org.mockito</groupId>
