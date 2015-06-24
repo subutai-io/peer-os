@@ -74,4 +74,9 @@ public interface ManagementHost extends Host
      * Removes a tunnel to remote peer
      */
     public void removeTunnel( String peerIp ) throws PeerException;
+
+    /**
+     * Returns external IP of mgmt host
+     */
+    public String getExternalIp();
 }

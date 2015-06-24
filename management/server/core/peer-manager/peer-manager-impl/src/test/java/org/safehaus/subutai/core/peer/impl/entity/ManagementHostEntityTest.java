@@ -95,7 +95,7 @@ public class ManagementHostEntityTest
         when( anInterface.getInterfaceName() ).thenReturn( INTERFACE_NAME );
         when( anInterface.getIp() ).thenReturn( IP );
         when( anInterface.getMac() ).thenReturn( MAC );
-        managementHostEntity = new ManagementHostEntity( PEER_ID.toString(), hostInfo );
+        managementHostEntity = new ManagementHostEntity( PEER_ID.toString(), hostInfo, "eth1" );
         managementHostEntity.singleThreadExecutorService = singleThreadExecutorService;
         managementHostEntity.serviceLocator = serviceLocator;
         managementHostEntity.init();

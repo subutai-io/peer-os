@@ -124,6 +124,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 {
     private String peerIdPath = "/var/lib/subutai/id";
     private String peerIdFile = "peer_id";
+    private String externalIpInterface = "eth1";
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
     // 5 min
@@ -175,6 +176,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void setPeerIdFile( final String peerIdFile )
     {
         this.peerIdFile = peerIdFile;
+    }
+
+
+    public void setExternalIpInterface( final String externalIpInterface )
+    {
+        this.externalIpInterface = externalIpInterface;
     }
 
 
@@ -290,7 +297,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         try
         {
             Enumeration<InetAddress> addressEnumeration =
-                    NetworkInterface.getByName( Common.MANAGEMENT_HOST_EXTERNAL_IP_INTERFACE ).getInetAddresses();
+                    NetworkInterface.getByName( externalIpInterface ).getInetAddresses();
             while ( addressEnumeration.hasMoreElements() )
             {
                 InetAddress address = addressEnumeration.nextElement();
@@ -1256,7 +1263,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             if ( managementHost == null )
             {
-                managementHost = new ManagementHostEntity( getId().toString(), resourceHostInfo );
+                managementHost = new ManagementHostEntity( getId().toString(), resourceHostInfo, externalIpInterface );
                 ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
                 try
                 {
