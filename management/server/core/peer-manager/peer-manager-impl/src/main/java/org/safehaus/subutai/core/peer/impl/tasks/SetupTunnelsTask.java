@@ -7,7 +7,6 @@ import java.util.concurrent.Callable;
 
 import org.safehaus.subutai.common.network.Vni;
 import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.Tunnel;
 import org.safehaus.subutai.core.peer.impl.entity.ManagementHostEntity;
@@ -48,7 +47,7 @@ public class SetupTunnelsTask implements Callable<Integer>
         Set<Tunnel> tunnels = networkManager.listTunnels();
 
         //remove local IP, just in case
-        peerIps.remove( managementHost.getIpByInterfaceName( Common.MANAGEMENT_HOST_EXTERNAL_IP_INTERFACE ) );
+        peerIps.remove( managementHost.getExternalIp() );
 
         for ( String peerIp : peerIps )
         {
