@@ -14,10 +14,10 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.cache.ExpiringCache;
 import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.core.messenger.api.Message;
-import org.safehaus.subutai.core.messenger.api.MessageException;
-import org.safehaus.subutai.core.messenger.api.MessageStatus;
-import org.safehaus.subutai.core.messenger.api.Messenger;
+import io.subutai.core.messenger.api.Message;
+import io.subutai.core.messenger.api.MessageException;
+import io.subutai.core.messenger.api.MessageStatus;
+import io.subutai.core.messenger.api.Messenger;
 
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;

@@ -5,9 +5,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.common.protocol.Disposable;
-import org.safehaus.subutai.core.messenger.api.Message;
-import org.safehaus.subutai.core.messenger.api.MessageListener;
-import org.safehaus.subutai.core.messenger.api.Messenger;
+import io.subutai.core.messenger.api.Message;
+import io.subutai.core.messenger.api.MessageListener;
+import io.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.impl.RecipientType;

@@ -12,9 +12,9 @@
   </cxf:bus>
 
   <reference id="messageProcessor" availability="mandatory"
-             interface="org.safehaus.subutai.core.messenger.api.MessageProcessor" />
+             interface="io.subutai.core.messenger.api.MessageProcessor" />
 
-  <bean id="messengerRestImpl" class="org.safehaus.subutai.core.messenger.rest.RestServiceImpl">
+  <bean id="messengerRestImpl" class="io.subutai.core.messenger.rest.RestServiceImpl">
     <argument ref="messageProcessor" />
   </bean>
 
