@@ -1,4 +1,4 @@
-package io.subutai.wol.ui;
+package io.subutai.core.wol.ui;
 
 
 import java.io.BufferedReader;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.protocol.Disposable;
-import io.subutai.wol.api.WolManagerException;
+import io.subutai.core.wol.api.WolManagerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

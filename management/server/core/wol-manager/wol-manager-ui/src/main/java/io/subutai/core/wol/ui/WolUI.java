@@ -1,10 +1,10 @@
-package io.subutai.wol.ui;
+package io.subutai.core.wol.ui;
 
 
 import com.vaadin.ui.Component;
 import io.subutai.common.util.FileUtil;
 import io.subutai.server.ui.api.PortalModule;
-import io.subutai.wol.api.WolManager;
+import io.subutai.core.wol.api.WolManager;
 import java.io.File;
 
 

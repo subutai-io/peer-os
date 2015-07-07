@@ -1,4 +1,4 @@
-package io.subutai.wol.impl;
+package io.subutai.core.wol.impl;
 
 
 import io.subutai.common.command.RequestBuilder;

@@ -1,4 +1,4 @@
-package io.subutai.wol.api;
+package io.subutai.core.wol.api;
 
 
 import java.util.ArrayList;

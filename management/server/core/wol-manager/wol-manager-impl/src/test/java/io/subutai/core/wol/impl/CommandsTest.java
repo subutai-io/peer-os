@@ -1,8 +1,9 @@
-package io.subutai.wol.impl;
+package io.subutai.core.wol.impl;
 
 import org.junit.Before;
 import org.junit.Test;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.core.wol.impl.Commands;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;

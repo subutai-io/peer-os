@@ -1,4 +1,4 @@
-package io.subutai.wol.impl;
+package io.subutai.core.wol.impl;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -7,7 +7,9 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.wol.api.WolManagerException;
+import io.subutai.core.wol.api.WolManagerException;
+import io.subutai.core.wol.impl.Commands;
+import io.subutai.core.wol.impl.WolImpl;
 
 import java.util.ArrayList;
 

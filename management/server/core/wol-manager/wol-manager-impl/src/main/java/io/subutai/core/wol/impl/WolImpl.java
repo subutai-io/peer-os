@@ -1,4 +1,4 @@
-package io.subutai.wol.impl;
+package io.subutai.core.wol.impl;
 
 
 import java.util.ArrayList;
@@ -10,8 +10,8 @@ import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.wol.api.WolManager;
-import io.subutai.wol.api.WolManagerException;
+import io.subutai.core.wol.api.WolManager;
+import io.subutai.core.wol.api.WolManagerException;
 
 import com.google.common.base.Preconditions;
 
