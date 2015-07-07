@@ -7,20 +7,20 @@
   <reference id="hostRegistry" availability="mandatory"
              interface="org.safehaus.subutai.core.hostregistry.api.HostRegistry" />
 
-  <bean id="commandProcessor" class="org.safehaus.subutai.core.executor.impl.CommandProcessor"
+  <bean id="commandProcessor" class="io.subutai.core.executor.impl.CommandProcessor"
         destroy-method="dispose">
     <argument ref="broker" />
     <argument ref="hostRegistry" />
   </bean>
 
   <bean id="executor"
-        class="org.safehaus.subutai.core.executor.impl.CommandExecutorImpl"
+        class="io.subutai.core.executor.impl.CommandExecutorImpl"
         scope="singleton" activation="eager">
     <argument ref="commandProcessor" />
   </bean>
 
   <service ref="commandProcessor" interface="io.subutai.core.broker.api.ByteMessageListener" />
 
-  <service ref="executor" interface="org.safehaus.subutai.core.executor.api.CommandExecutor" />
+  <service ref="executor" interface="io.subutai.core.executor.api.CommandExecutor" />
 
 </blueprint>

@@ -26,7 +26,7 @@
   <reference id="messenger" availability="mandatory"
              interface="org.safehaus.subutai.core.messenger.api.Messenger" />
 
-  <reference id="commandExecutor" interface="org.safehaus.subutai.core.executor.api.CommandExecutor" />
+  <reference id="commandExecutor" interface="io.subutai.core.executor.api.CommandExecutor" />
 
   <reference id="templateRegistry" interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
 

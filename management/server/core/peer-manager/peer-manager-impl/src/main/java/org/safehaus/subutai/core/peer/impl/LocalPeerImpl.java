@@ -66,7 +66,7 @@ import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.ExceptionUtil;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.executor.api.CommandExecutor;
+import io.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;

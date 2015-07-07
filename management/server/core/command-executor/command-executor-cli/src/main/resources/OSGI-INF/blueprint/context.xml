@@ -1,18 +1,18 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <reference id="executor" availability="mandatory"
-             interface="org.safehaus.subutai.core.executor.api.CommandExecutor" />
+             interface="io.subutai.core.executor.api.CommandExecutor" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="command/exec-sync">
-      <action class="org.safehaus.subutai.core.executor.cli.ExecSyncCommand">
+      <action class="io.subutai.core.executor.cli.ExecSyncCommand">
         <argument ref="executor" />
       </action>
     </command>
   </command-bundle>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="command/exec-async">
-      <action class="org.safehaus.subutai.core.executor.cli.ExecAsyncCommand">
+      <action class="io.subutai.core.executor.cli.ExecAsyncCommand">
         <argument ref="executor" />
       </action>
     </command>

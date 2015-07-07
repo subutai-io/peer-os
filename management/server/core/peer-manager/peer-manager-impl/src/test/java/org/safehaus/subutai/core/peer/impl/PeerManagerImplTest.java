@@ -15,7 +15,7 @@ import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.peer.PeerPolicy;
-import org.safehaus.subutai.core.executor.api.CommandExecutor;
+import io.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.key.api.KeyManager;

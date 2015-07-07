@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.environment.terminal.ui;
 
 
-import java.io.PrintStream;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -12,19 +11,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.command.CommandCallback;
-import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.command.RequestType;
 import org.safehaus.subutai.common.command.Response;
 import org.safehaus.subutai.common.host.HostInfo;
 import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.core.executor.api.CommandExecutor;
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
-import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
-import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.core.executor.api.CommandExecutor;
 
 import com.google.common.collect.Sets;
 import com.vaadin.ui.CheckBox;
@@ -36,12 +28,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
