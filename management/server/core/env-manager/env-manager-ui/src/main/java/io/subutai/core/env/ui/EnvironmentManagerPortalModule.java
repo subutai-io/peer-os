@@ -12,7 +12,7 @@ import io.subutai.core.env.api.EnvironmentEventListener;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.server.ui.api.PortalModule;
+import io.subutai.server.ui.api.PortalModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

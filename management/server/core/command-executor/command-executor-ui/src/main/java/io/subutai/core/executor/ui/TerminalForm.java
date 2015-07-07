@@ -13,7 +13,7 @@ import io.subutai.common.command.RequestType;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import org.safehaus.subutai.server.ui.component.HostTree;
+import io.subutai.server.ui.component.HostTree;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;

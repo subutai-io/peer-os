@@ -14,7 +14,7 @@
     <argument ref="templateRegistry" />
   </bean>
 
-  <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />
+  <service ref="module" interface="io.subutai.server.ui.api.PortalModule" />
 
   <service ref="module" interface="io.subutai.core.env.api.EnvironmentEventListener" />
 

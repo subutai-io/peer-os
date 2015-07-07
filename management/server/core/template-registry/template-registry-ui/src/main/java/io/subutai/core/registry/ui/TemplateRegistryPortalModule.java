@@ -5,7 +5,7 @@ import java.io.File;
 
 import io.subutai.common.util.FileUtil;
 import io.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.server.ui.api.PortalModule;
+import io.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
 

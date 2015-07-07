@@ -9,7 +9,7 @@ import io.subutai.core.channel.api.ChannelManager;
 import io.subutai.core.channel.api.entity.IUserChannelToken;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.User;
-import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import io.subutai.server.ui.component.ConfirmationDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

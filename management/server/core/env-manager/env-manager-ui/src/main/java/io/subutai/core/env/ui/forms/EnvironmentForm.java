@@ -15,7 +15,7 @@ import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.env.api.exception.EnvironmentDestructionException;
 import io.subutai.core.env.api.exception.EnvironmentManagerException;
 import io.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import io.subutai.server.ui.component.ConfirmationDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

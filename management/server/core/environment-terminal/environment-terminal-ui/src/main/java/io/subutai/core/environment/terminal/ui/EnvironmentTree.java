@@ -15,7 +15,7 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.server.ui.component.ConcurrentComponent;
+import io.subutai.server.ui.component.ConcurrentComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

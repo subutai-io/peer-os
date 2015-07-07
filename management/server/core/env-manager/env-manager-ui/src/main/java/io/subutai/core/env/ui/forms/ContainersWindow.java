@@ -14,7 +14,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import io.subutai.server.ui.component.ConfirmationDialog;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;

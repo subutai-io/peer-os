@@ -19,6 +19,6 @@
   </bean>
 
   <service ref="module"
-           interface="org.safehaus.subutai.server.ui.api.PortalModule" />
+           interface="io.subutai.server.ui.api.PortalModule" />
 
 </blueprint>

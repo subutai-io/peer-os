@@ -11,7 +11,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.util.FileUtil;
 import io.subutai.core.env.api.EnvironmentEventListener;
 import io.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.server.ui.api.PortalModule;
+import io.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
 

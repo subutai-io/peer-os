@@ -7,7 +7,7 @@ import io.subutai.core.peer.api.HostNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ResourceHost;
 import io.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.server.ui.component.ProgressWindow;
+import io.subutai.server.ui.component.ProgressWindow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;

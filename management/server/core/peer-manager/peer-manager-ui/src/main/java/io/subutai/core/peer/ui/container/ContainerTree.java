@@ -17,7 +17,7 @@ import io.subutai.core.hostregistry.api.ResourceHostInfo;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.ResourceHost;
-import org.safehaus.subutai.server.ui.component.ConcurrentComponent;
+import io.subutai.server.ui.component.ConcurrentComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

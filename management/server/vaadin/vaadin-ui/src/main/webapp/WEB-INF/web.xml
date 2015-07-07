@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
  * NovaForge(TM) is a web-based forge offering a Collaborative Development and 
@@ -33,11 +34,11 @@
   </session-config>
   <servlet>
     <servlet-name>Portal Vaadin App</servlet-name>
-    <servlet-class>org.safehaus.subutai.server.ui.SubutaiVaadinServlet</servlet-class>
+    <servlet-class>io.subutai.server.ui.SubutaiVaadinServlet</servlet-class>
     <init-param>
       <description>Vaadin UI</description>
       <param-name>UI</param-name>
-      <param-value>org.safehaus.subutai.server.ui.MainUI</param-value>
+      <param-value>io.subutai.server.ui.MainUI</param-value>
     </init-param>
     <async-supported>true</async-supported>
   </servlet>

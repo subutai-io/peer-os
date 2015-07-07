@@ -33,7 +33,7 @@ import io.subutai.core.metric.ui.chart.JFreeChartWrapper;
 import io.subutai.core.peer.api.HostNotFoundException;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.ResourceHost;
-import org.safehaus.subutai.server.ui.component.HostTree;
+import io.subutai.server.ui.component.HostTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

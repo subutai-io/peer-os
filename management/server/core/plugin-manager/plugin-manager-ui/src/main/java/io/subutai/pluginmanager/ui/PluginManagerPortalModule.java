@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 import io.subutai.common.util.FileUtil;
 import io.subutai.core.tracker.api.Tracker;
 import io.subutai.pluginmanager.api.PluginManager;
-import org.safehaus.subutai.server.ui.api.PortalModule;
+import io.subutai.server.ui.api.PortalModule;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.ui.Component;

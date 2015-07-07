@@ -6,7 +6,7 @@ import java.io.File;
 import io.subutai.common.util.FileUtil;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import org.safehaus.subutai.server.ui.api.PortalModule;
+import io.subutai.server.ui.api.PortalModule;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.ui.Component;

@@ -13,8 +13,8 @@ import io.subutai.core.tracker.api.Tracker;
 import io.subutai.pluginmanager.api.OperationType;
 import io.subutai.pluginmanager.api.PluginInfo;
 import io.subutai.pluginmanager.api.PluginManager;
-import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
-import org.safehaus.subutai.server.ui.component.ProgressWindow;
+import io.subutai.server.ui.component.ConfirmationDialog;
+import io.subutai.server.ui.component.ProgressWindow;
 
 import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.BrowserFrame;

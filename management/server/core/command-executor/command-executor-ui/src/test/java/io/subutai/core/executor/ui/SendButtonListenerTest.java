@@ -25,7 +25,7 @@ import io.subutai.core.hostregistry.api.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.hostregistry.api.ResourceHostInfo;
-import org.safehaus.subutai.server.ui.component.HostTree;
+import io.subutai.server.ui.component.HostTree;
 
 import com.google.common.collect.Sets;
 import com.vaadin.ui.CheckBox;

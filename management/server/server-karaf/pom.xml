@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.safehaus.subutai</groupId>
+    <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-parent</artifactId>
     <version>2.0.0</version>
   </parent>
@@ -175,7 +175,7 @@
                 <descriptor>mvn:org.apache.karaf.features/spring/${karaf.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.cxf.karaf/apache-cxf/${org.apache.cxf.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.shiro/shiro-features/${org.apache.shiro.version}/xml/features</descriptor>
-                <descriptor>mvn:org.safehaus.subutai/subutai-application/${project.version}/xml/features</descriptor>
+                <descriptor>mvn:${project.groupId}/subutai-application/${project.version}/xml/features</descriptor>
               </descriptors>
               <features>
                 <feature>standard</feature>

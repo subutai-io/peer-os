@@ -25,7 +25,7 @@ import io.subutai.core.peer.api.ContainerGroup;
 import io.subutai.core.peer.api.ContainerGroupNotFoundException;
 import io.subutai.core.peer.api.ResourceHost;
 import io.subutai.core.peer.ui.PeerManagerPortalModule;
-import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import io.subutai.server.ui.component.ConfirmationDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

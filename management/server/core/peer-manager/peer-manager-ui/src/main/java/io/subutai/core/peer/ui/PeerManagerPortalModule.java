@@ -9,7 +9,7 @@ import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
-import org.safehaus.subutai.server.ui.api.PortalModule;
+import io.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
 
