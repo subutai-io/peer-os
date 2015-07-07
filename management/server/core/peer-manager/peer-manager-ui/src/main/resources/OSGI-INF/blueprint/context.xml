@@ -7,7 +7,7 @@
   <reference id="templateRegistry" availability="mandatory"
              interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
   <reference id="hostRegistry" availability="mandatory"
-             interface="org.safehaus.subutai.core.hostregistry.api.HostRegistry" />
+             interface="io.subutai.core.hostregistry.api.HostRegistry" />
   <reference id="sslContextFactory" availability="mandatory"
              interface="org.safehaus.subutai.core.ssl.manager.api.SubutaiSslContextFactory" />
   <reference id="environmentManager" availability="optional"

@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.subutai.common.command.RequestType;
 import org.safehaus.subutai.common.protocol.Disposable;
 import io.subutai.core.executor.api.CommandExecutor;
-import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.server.ui.component.HostTree;
 
 import com.google.common.base.Preconditions;

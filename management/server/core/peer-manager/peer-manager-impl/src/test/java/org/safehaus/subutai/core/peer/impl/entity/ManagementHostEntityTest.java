@@ -23,7 +23,7 @@ import org.safehaus.subutai.common.network.VniVlanMapping;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.network.api.Tunnel;

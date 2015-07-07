@@ -11,7 +11,7 @@ import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import io.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.impl.ContainerHostMetricImpl;

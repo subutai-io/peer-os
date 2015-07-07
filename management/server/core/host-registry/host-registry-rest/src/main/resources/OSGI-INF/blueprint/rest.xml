@@ -12,9 +12,9 @@
   </cxf:bus>
 
   <reference id="hostRegistry" availability="mandatory"
-             interface="org.safehaus.subutai.core.hostregistry.api.HostRegistry" />
+             interface="io.subutai.core.hostregistry.api.HostRegistry" />
 
-  <bean id="hostRegistryRest" class="org.safehaus.subutai.core.hostregistry.rest.RestServiceImpl">
+  <bean id="hostRegistryRest" class="io.subutai.core.hostregistry.rest.RestServiceImpl">
     <argument ref="hostRegistry" />
   </bean>
 

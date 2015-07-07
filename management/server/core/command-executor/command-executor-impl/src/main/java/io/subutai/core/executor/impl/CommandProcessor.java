@@ -14,10 +14,10 @@ import org.safehaus.subutai.common.util.JsonUtil;
 import io.subutai.core.broker.api.Broker;
 import io.subutai.core.broker.api.ByteMessageListener;
 import io.subutai.core.broker.api.Topic;
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
-import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
-import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.core.hostregistry.api.ContainerHostInfo;
+import io.subutai.core.hostregistry.api.HostDisconnectedException;
+import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

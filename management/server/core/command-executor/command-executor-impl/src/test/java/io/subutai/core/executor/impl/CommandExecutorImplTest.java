@@ -12,11 +12,8 @@ import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.Request;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import io.subutai.core.broker.api.Broker;
-import io.subutai.core.executor.impl.CommandExecutorImpl;
-import io.subutai.core.executor.impl.CommandProcessor;
-import io.subutai.core.executor.impl.DummyCallback;
 
-import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.hostregistry.api.HostRegistry;
 
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;

@@ -20,13 +20,11 @@ import org.safehaus.subutai.common.command.Response;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.host.HostInfo;
 import io.subutai.core.executor.api.CommandExecutor;
-import io.subutai.core.executor.ui.SendButtonListener;
-import io.subutai.core.executor.ui.TerminalForm;
 
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
-import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
-import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.core.hostregistry.api.ContainerHostInfo;
+import io.subutai.core.hostregistry.api.HostDisconnectedException;
+import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.server.ui.component.HostTree;
 
 import com.google.common.collect.Sets;

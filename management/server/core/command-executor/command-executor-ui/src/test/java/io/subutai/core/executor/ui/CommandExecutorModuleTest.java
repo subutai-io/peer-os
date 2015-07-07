@@ -7,10 +7,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.core.executor.api.CommandExecutor;
-import io.subutai.core.executor.ui.CommandExecutorModule;
-import io.subutai.core.executor.ui.TerminalForm;
 
-import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.hostregistry.api.HostRegistry;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

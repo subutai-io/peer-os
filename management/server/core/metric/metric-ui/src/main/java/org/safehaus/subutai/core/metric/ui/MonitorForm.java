@@ -27,7 +27,7 @@ import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import io.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.ui.chart.JFreeChartWrapper;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;

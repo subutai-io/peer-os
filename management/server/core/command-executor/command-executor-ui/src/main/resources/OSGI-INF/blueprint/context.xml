@@ -4,7 +4,7 @@
   <reference id="commandExecutor" availability="mandatory"
              interface="io.subutai.core.executor.api.CommandExecutor" />
   <reference id="hostRegistry" availability="mandatory"
-             interface="org.safehaus.subutai.core.hostregistry.api.HostRegistry" />
+             interface="io.subutai.core.hostregistry.api.HostRegistry" />
 
   <bean id="module" scope="singleton" class="io.subutai.core.executor.ui.CommandExecutorModule">
     <argument ref="commandExecutor" />

@@ -34,7 +34,7 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.NumUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.network.api.Tunnel;

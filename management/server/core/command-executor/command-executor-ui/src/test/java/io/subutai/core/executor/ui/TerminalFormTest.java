@@ -7,9 +7,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.core.executor.api.CommandExecutor;
-import io.subutai.core.executor.ui.TerminalForm;
 
-import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.server.ui.component.HostTree;
 
 import com.vaadin.ui.TextArea;

@@ -26,7 +26,7 @@ import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.RamQuota;
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
+import io.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.peer.api.ContainerGroup;
 import org.safehaus.subutai.core.peer.api.ContainerGroupNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;

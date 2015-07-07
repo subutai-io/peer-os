@@ -5,7 +5,7 @@ import java.io.File;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import io.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.ssl.manager.api.SubutaiSslContextFactory;

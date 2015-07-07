@@ -17,7 +17,7 @@ import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.RamQuota;
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
+import io.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.peer.api.ContainerGroup;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ResourceHost;

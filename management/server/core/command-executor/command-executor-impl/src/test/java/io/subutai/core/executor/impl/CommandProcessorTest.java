@@ -22,15 +22,11 @@ import org.safehaus.subutai.common.host.ContainerHostState;
 import io.subutai.core.broker.api.Broker;
 import io.subutai.core.broker.api.BrokerException;
 import io.subutai.core.broker.api.Topic;
-import io.subutai.core.executor.impl.CommandProcess;
-import io.subutai.core.executor.impl.CommandProcessExpiryCallback;
-import io.subutai.core.executor.impl.CommandProcessor;
-import io.subutai.core.executor.impl.ResponseImpl;
 
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
-import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
-import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.core.hostregistry.api.ContainerHostInfo;
+import io.subutai.core.hostregistry.api.HostDisconnectedException;
+import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.hostregistry.api.ResourceHostInfo;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.fail;
