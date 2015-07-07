@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.filetracker.impl;
+package io.subutai.core.filetracker.impl;
 
 
 import java.util.UUID;
@@ -6,7 +6,8 @@ import java.util.UUID;
 import org.junit.Test;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.filetracker.api.InotifyEventType;
+import io.subutai.core.filetracker.api.InotifyEventType;
+import io.subutai.core.filetracker.impl.InotifyEvent;
 
 import static org.junit.Assert.assertEquals;
 

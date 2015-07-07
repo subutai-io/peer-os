@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.filetracker.impl;
+package io.subutai.core.filetracker.impl;
 
 
 import java.util.Collections;
@@ -19,10 +19,10 @@ import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import io.subutai.core.broker.api.ByteMessageListener;
 import io.subutai.core.broker.api.Topic;
-import org.safehaus.subutai.core.filetracker.api.ConfigPointListener;
-import org.safehaus.subutai.core.filetracker.api.FileTracker;
-import org.safehaus.subutai.core.filetracker.api.FileTrackerException;
-import org.safehaus.subutai.core.filetracker.api.InotifyEventType;
+import io.subutai.core.filetracker.api.ConfigPointListener;
+import io.subutai.core.filetracker.api.FileTracker;
+import io.subutai.core.filetracker.api.FileTrackerException;
+import io.subutai.core.filetracker.api.InotifyEventType;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

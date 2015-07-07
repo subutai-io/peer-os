@@ -3,13 +3,13 @@
   <reference id="peerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
-  <bean id="fileTracker" class="org.safehaus.subutai.core.filetracker.impl.FileTrackerImpl"
+  <bean id="fileTracker" class="io.subutai.core.filetracker.impl.FileTrackerImpl"
         destroy-method="destroy" scope="singleton">
     <argument ref="peerManager" />
   </bean>
 
   <reference-list id="cfgPointLstnr"
-                  interface="org.safehaus.subutai.core.filetracker.api.ConfigPointListener"
+                  interface="io.subutai.core.filetracker.api.ConfigPointListener"
                   availability="optional">
     <reference-listener ref="fileTracker"
                         bind-method="addListener" unbind-method="removeListener" />

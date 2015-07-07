@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.filetracker.api;
+package io.subutai.core.filetracker.api;
 
 
 import org.safehaus.subutai.common.peer.Host;

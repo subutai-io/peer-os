@@ -1,7 +1,10 @@
-package org.safehaus.subutai.core.filetracker.api;
+package io.subutai.core.filetracker.api;
 
 
 import org.junit.Test;
+
+import io.subutai.core.filetracker.api.FileTrackerException;
+import io.subutai.core.filetracker.api.InotifyEventType;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;

@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.filetracker.api;
+package io.subutai.core.filetracker.api;
 
 
 public class FileTrackerException extends Exception

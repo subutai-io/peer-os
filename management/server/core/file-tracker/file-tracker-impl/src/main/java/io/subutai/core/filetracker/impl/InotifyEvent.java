@@ -1,9 +1,9 @@
-package org.safehaus.subutai.core.filetracker.impl;
+package io.subutai.core.filetracker.impl;
 
 
 import java.util.UUID;
 
-import org.safehaus.subutai.core.filetracker.api.InotifyEventType;
+import io.subutai.core.filetracker.api.InotifyEventType;
 
 
 /**
