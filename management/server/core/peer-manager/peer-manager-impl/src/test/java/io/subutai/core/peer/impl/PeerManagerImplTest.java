@@ -23,15 +23,13 @@ import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.messenger.api.Messenger;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.RequestListener;
-import io.subutai.core.peer.impl.LocalPeerImpl;
-import io.subutai.core.peer.impl.PeerManagerImpl;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.dao.PeerDAO;
 import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.request.MessageRequestListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
+import io.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
 
 import com.google.common.collect.Lists;

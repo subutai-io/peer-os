@@ -11,7 +11,7 @@
     </cxf:features>
   </cxf:bus>
 
-  <bean id="scriptManagerRestImpl" class="org.safehaus.subutai.core.script.rest.ScriptManagerRestImpl">
+  <bean id="scriptManagerRestImpl" class="io.subutai.core.script.rest.ScriptManagerRestImpl">
 
   </bean>
 

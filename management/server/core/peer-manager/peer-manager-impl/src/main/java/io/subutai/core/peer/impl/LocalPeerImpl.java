@@ -101,7 +101,7 @@ import io.subutai.core.peer.impl.entity.ResourceHostEntity;
 
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
+import io.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.safehaus.subutai.core.strategy.api.StrategyNotFoundException;

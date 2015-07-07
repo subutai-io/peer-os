@@ -44,7 +44,7 @@
              interface="io.subutai.core.identity.api.IdentityManager" />
 
   <reference id="sslContextFactory" availability="mandatory"
-             interface="org.safehaus.subutai.core.ssl.manager.api.SubutaiSslContextFactory" />
+             interface="io.subutai.core.ssl.manager.api.SubutaiSslContextFactory" />
 
   <bean id="localPeer" class="io.subutai.core.peer.impl.LocalPeerImpl" init-method="init"
         destroy-method="dispose" scope="singleton" activation="eager">

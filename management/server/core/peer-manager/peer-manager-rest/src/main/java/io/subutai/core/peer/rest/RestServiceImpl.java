@@ -30,7 +30,7 @@ import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
+import io.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

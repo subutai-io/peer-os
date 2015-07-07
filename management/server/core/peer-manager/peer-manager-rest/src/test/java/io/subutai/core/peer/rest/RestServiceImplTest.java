@@ -28,9 +28,8 @@ import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.rest.RestServiceImpl;
 
-import org.safehaus.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
+import io.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;

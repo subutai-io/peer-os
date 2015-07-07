@@ -2,10 +2,10 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <!--<bean id="sslContextFactory" scope="singleton"-->
-  <!--class="org.safehaus.subutai.core.ssl.manager.impl.CustomSslContextFactoryImpl">-->
+  <!--class="io.subutai.core.ssl.manager.impl.CustomSslContextFactoryImpl">-->
   <!--</bean>-->
 
   <!--<service ref="sslContextFactory"-->
-  <!--interface="org.safehaus.subutai.core.ssl.manager.api.CustomSslContextFactory" />-->
+  <!--interface="io.subutai.core.ssl.manager.api.CustomSslContextFactory" />-->
 
 </blueprint>
