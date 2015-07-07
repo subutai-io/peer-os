@@ -1,4 +1,4 @@
-package io.subutai.pluginmanager.api;
+package io.subutai.core.pluginmanager.api;
 
 
 public interface PluginInfo

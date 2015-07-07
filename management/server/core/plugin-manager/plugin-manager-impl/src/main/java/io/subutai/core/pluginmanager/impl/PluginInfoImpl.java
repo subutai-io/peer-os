@@ -1,7 +1,7 @@
-package io.subutai.pluginmanager.impl;
+package io.subutai.core.pluginmanager.impl;
 
 
-import io.subutai.pluginmanager.api.PluginInfo;
+import io.subutai.core.pluginmanager.api.PluginInfo;
 
 
 public class PluginInfoImpl implements PluginInfo

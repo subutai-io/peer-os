@@ -1,4 +1,4 @@
-package io.subutai.pluginmanager.impl;
+package io.subutai.core.pluginmanager.impl;
 
 
 import java.util.HashSet;
@@ -15,8 +15,9 @@ import io.subutai.core.peer.api.HostNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.pluginmanager.api.PluginInfo;
-import io.subutai.pluginmanager.api.PluginManagerException;
+import io.subutai.core.pluginmanager.api.PluginInfo;
+import io.subutai.core.pluginmanager.api.PluginManagerException;
+import io.subutai.core.pluginmanager.impl.ManagerHelper;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;

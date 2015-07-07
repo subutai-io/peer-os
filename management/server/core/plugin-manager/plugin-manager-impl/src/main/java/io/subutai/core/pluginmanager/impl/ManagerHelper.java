@@ -1,4 +1,4 @@
-package io.subutai.pluginmanager.impl;
+package io.subutai.core.pluginmanager.impl;
 
 
 import java.util.List;
@@ -13,8 +13,8 @@ import io.subutai.common.util.StringUtil;
 import io.subutai.core.peer.api.HostNotFoundException;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.pluginmanager.api.PluginInfo;
-import io.subutai.pluginmanager.api.PluginManagerException;
+import io.subutai.core.pluginmanager.api.PluginInfo;
+import io.subutai.core.pluginmanager.api.PluginManagerException;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;

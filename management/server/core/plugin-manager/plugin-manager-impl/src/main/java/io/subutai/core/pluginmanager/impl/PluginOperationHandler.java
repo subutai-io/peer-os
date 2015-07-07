@@ -1,12 +1,12 @@
-package io.subutai.pluginmanager.impl;
+package io.subutai.core.pluginmanager.impl;
 
 
 import java.util.UUID;
 
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.tracker.TrackerOperation;
-import io.subutai.pluginmanager.api.OperationType;
-import io.subutai.pluginmanager.api.PluginManagerException;
+import io.subutai.core.pluginmanager.api.OperationType;
+import io.subutai.core.pluginmanager.api.PluginManagerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

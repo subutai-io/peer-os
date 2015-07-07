@@ -1,4 +1,4 @@
-package io.subutai.pluginmanager.ui;
+package io.subutai.core.pluginmanager.ui;
 
 
 import java.util.ArrayList;
@@ -10,9 +10,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import io.subutai.core.tracker.api.Tracker;
-import io.subutai.pluginmanager.api.OperationType;
-import io.subutai.pluginmanager.api.PluginInfo;
-import io.subutai.pluginmanager.api.PluginManager;
+import io.subutai.core.pluginmanager.api.OperationType;
+import io.subutai.core.pluginmanager.api.PluginInfo;
+import io.subutai.core.pluginmanager.api.PluginManager;
 import io.subutai.server.ui.component.ConfirmationDialog;
 import io.subutai.server.ui.component.ProgressWindow;
 

@@ -1,4 +1,4 @@
-package io.subutai.pluginmanager.impl;
+package io.subutai.core.pluginmanager.impl;
 
 
 import org.junit.Before;
@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.pluginmanager.impl.PluginInfoImpl;
+import io.subutai.core.pluginmanager.impl.PluginInfoImpl;
 
 import static org.junit.Assert.assertNotNull;
 

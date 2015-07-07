@@ -1,4 +1,4 @@
-package io.subutai.pluginmanager.impl;
+package io.subutai.core.pluginmanager.impl;
 
 
 import java.util.UUID;
@@ -10,9 +10,13 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.core.pluginmanager.impl.Commands;
+import io.subutai.core.pluginmanager.impl.ManagerHelper;
+import io.subutai.core.pluginmanager.impl.PluginManagerImpl;
+import io.subutai.core.pluginmanager.impl.PluginOperationHandler;
 import io.subutai.core.tracker.api.Tracker;
-import io.subutai.pluginmanager.api.OperationType;
-import io.subutai.pluginmanager.api.PluginManagerException;
+import io.subutai.core.pluginmanager.api.OperationType;
+import io.subutai.core.pluginmanager.api.PluginManagerException;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;

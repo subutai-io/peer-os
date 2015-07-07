@@ -1,4 +1,4 @@
-package io.subutai.pluginmanager.impl;
+package io.subutai.core.pluginmanager.impl;
 
 
 import java.util.ArrayList;
@@ -10,10 +10,10 @@ import java.util.concurrent.Executors;
 
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.tracker.api.Tracker;
-import io.subutai.pluginmanager.api.OperationType;
-import io.subutai.pluginmanager.api.PluginInfo;
-import io.subutai.pluginmanager.api.PluginManager;
-import io.subutai.pluginmanager.api.PluginManagerException;
+import io.subutai.core.pluginmanager.api.OperationType;
+import io.subutai.core.pluginmanager.api.PluginInfo;
+import io.subutai.core.pluginmanager.api.PluginManager;
+import io.subutai.core.pluginmanager.api.PluginManagerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,4 +1,4 @@
-package io.subutai.pluginmanager.impl;
+package io.subutai.core.pluginmanager.impl;
 
 
 import java.util.UUID;
@@ -14,9 +14,11 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.pluginmanager.impl.ManagerHelper;
+import io.subutai.core.pluginmanager.impl.PluginManagerImpl;
 import io.subutai.core.tracker.api.Tracker;
-import io.subutai.pluginmanager.api.OperationType;
-import io.subutai.pluginmanager.api.PluginManagerException;
+import io.subutai.core.pluginmanager.api.OperationType;
+import io.subutai.core.pluginmanager.api.PluginManagerException;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;

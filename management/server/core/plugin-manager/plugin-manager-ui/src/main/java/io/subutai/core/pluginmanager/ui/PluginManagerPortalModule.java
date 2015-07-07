@@ -1,4 +1,4 @@
-package io.subutai.pluginmanager.ui;
+package io.subutai.core.pluginmanager.ui;
 
 
 import java.io.File;
@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
 
 import io.subutai.common.util.FileUtil;
 import io.subutai.core.tracker.api.Tracker;
-import io.subutai.pluginmanager.api.PluginManager;
+import io.subutai.core.pluginmanager.api.PluginManager;
 import io.subutai.server.ui.api.PortalModule;
 
 import com.google.common.base.Preconditions;
