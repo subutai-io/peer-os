@@ -11,7 +11,7 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.datatypes.TemplateVersion;
 import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.core.git.api.GitChangedFile;
+import io.subutai.core.git.api.GitChangedFile;
 
 
 /**

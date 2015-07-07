@@ -18,9 +18,9 @@ import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.protocol.api.TemplateService;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.core.git.api.GitChangedFile;
-import org.safehaus.subutai.core.git.api.GitException;
-import org.safehaus.subutai.core.git.api.GitManager;
+import io.subutai.core.git.api.GitChangedFile;
+import io.subutai.core.git.api.GitException;
+import io.subutai.core.git.api.GitManager;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 
 import com.google.common.collect.Lists;

@@ -6,7 +6,7 @@
              availability="mandatory" />
 
   <reference id="gitManager"
-             interface="org.safehaus.subutai.core.git.api.GitManager"
+             interface="io.subutai.core.git.api.GitManager"
              availability="optional" />
 
   <bean id="templateRegistry" scope="singleton" activation="eager"

@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.core.git.api.GitChangedFile;
+import io.subutai.core.git.api.GitChangedFile;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.slf4j.Logger;
