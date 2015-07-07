@@ -49,8 +49,8 @@ import io.subutai.core.env.impl.tasks.GrowEnvironmentTask;
 
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.User;
-import org.safehaus.subutai.core.network.api.NetworkManager;
-import org.safehaus.subutai.core.network.api.NetworkManagerException;
+import io.subutai.core.network.api.NetworkManager;
+import io.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;

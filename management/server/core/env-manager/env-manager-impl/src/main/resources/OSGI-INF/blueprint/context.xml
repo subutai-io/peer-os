@@ -22,7 +22,7 @@
   <reference id="peerManager"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
   <reference id="networkManager"
-             interface="org.safehaus.subutai.core.network.api.NetworkManager" />
+             interface="io.subutai.core.network.api.NetworkManager" />
   <reference id="identityManager"
              interface="io.subutai.core.identity.api.IdentityManager" />
   <reference id="tracker"

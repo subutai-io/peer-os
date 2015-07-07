@@ -4,7 +4,7 @@ package org.safehaus.subutai.core.peer.impl.tasks;
 import java.util.concurrent.Callable;
 
 import org.safehaus.subutai.common.network.Vni;
-import org.safehaus.subutai.core.network.api.NetworkManager;
+import io.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.impl.entity.ManagementHostEntity;
 
 

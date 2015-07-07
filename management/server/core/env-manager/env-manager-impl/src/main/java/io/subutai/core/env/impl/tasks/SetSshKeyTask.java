@@ -8,8 +8,8 @@ import org.safehaus.subutai.common.environment.EnvironmentStatus;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.ResultHolder;
-import org.safehaus.subutai.core.network.api.NetworkManager;
-import org.safehaus.subutai.core.network.api.NetworkManagerException;
+import io.subutai.core.network.api.NetworkManager;
+import io.subutai.core.network.api.NetworkManagerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +21,7 @@ import com.google.common.base.Strings;
  *
  * @see io.subutai.core.env.impl.entity.EnvironmentImpl
  * @see io.subutai.core.env.impl.exception.ResultHolder
- * @see org.safehaus.subutai.core.network.api.NetworkManager
+ * @see io.subutai.core.network.api.NetworkManager
  * @see java.lang.Runnable
  */
 public class SetSshKeyTask implements Runnable

@@ -9,7 +9,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.network.Vni;
-import org.safehaus.subutai.core.network.api.NetworkManager;
+import io.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.impl.entity.ManagementHostEntity;
 
 import static org.mockito.Matchers.any;

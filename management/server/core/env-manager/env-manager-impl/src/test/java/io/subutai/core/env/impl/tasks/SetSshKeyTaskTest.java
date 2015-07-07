@@ -14,8 +14,8 @@ import io.subutai.core.env.impl.TestUtil;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.ResultHolder;
 
-import org.safehaus.subutai.core.network.api.NetworkManager;
-import org.safehaus.subutai.core.network.api.NetworkManagerException;
+import io.subutai.core.network.api.NetworkManager;
+import io.subutai.core.network.api.NetworkManagerException;
 
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;

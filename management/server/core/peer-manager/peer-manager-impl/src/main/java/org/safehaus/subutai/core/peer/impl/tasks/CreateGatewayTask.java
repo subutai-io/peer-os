@@ -6,8 +6,8 @@ import java.util.concurrent.Callable;
 
 import org.safehaus.subutai.common.network.Gateway;
 import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.core.network.api.NetworkManager;
-import org.safehaus.subutai.core.network.api.NetworkManagerException;
+import io.subutai.core.network.api.NetworkManager;
+import io.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 
 

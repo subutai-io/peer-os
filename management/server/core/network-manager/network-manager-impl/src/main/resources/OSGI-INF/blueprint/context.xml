@@ -3,10 +3,10 @@
 
   <reference id="peerManager" availability="mandatory" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
-  <bean id="networkManager" scope="singleton" class="org.safehaus.subutai.core.network.impl.NetworkManagerImpl">
+  <bean id="networkManager" scope="singleton" class="io.subutai.core.network.impl.NetworkManagerImpl">
     <argument ref="peerManager" />
   </bean>
 
-  <service ref="networkManager" interface="org.safehaus.subutai.core.network.api.NetworkManager" />
+  <service ref="networkManager" interface="io.subutai.core.network.api.NetworkManager" />
 
 </blueprint>

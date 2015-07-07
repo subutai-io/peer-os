@@ -45,7 +45,7 @@ import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.EnvironmentTunnelException;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.User;
-import org.safehaus.subutai.core.network.api.NetworkManager;
+import io.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
