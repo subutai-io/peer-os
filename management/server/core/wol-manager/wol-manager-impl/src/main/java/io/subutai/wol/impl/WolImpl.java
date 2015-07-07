@@ -1,4 +1,4 @@
-package org.safehaus.subutai.wol.impl;
+package io.subutai.wol.impl;
 
 
 import java.util.ArrayList;
@@ -10,8 +10,8 @@ import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.PeerException;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.wol.api.WolManager;
-import org.safehaus.subutai.wol.api.WolManagerException;
+import io.subutai.wol.api.WolManager;
+import io.subutai.wol.api.WolManagerException;
 
 import com.google.common.base.Preconditions;
 

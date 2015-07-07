@@ -1,4 +1,4 @@
-package org.safehaus.subutai.wol.impl;
+package io.subutai.wol.impl;
 
 
 import org.safehaus.subutai.common.command.RequestBuilder;

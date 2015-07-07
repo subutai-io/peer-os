@@ -1,4 +1,4 @@
-package org.safehaus.subutai.wol.ui;
+package io.subutai.wol.ui;
 
 
 import java.io.BufferedReader;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.protocol.Disposable;
-import org.safehaus.subutai.wol.api.WolManagerException;
+import io.subutai.wol.api.WolManagerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

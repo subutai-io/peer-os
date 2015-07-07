@@ -1,4 +1,4 @@
-package org.safehaus.subutai.wol.api;
+package io.subutai.wol.api;
 
 
 import java.util.ArrayList;

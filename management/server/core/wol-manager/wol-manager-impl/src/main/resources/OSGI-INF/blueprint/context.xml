@@ -3,10 +3,10 @@
 
   <reference id="peerManager" availability="mandatory" interface="io.subutai.core.peer.api.PeerManager" />
 
-  <bean id="wolManager" scope="singleton" class="org.safehaus.subutai.wol.impl.WolImpl">
+  <bean id="wolManager" scope="singleton" class="io.subutai.wol.impl.WolImpl">
     <argument ref="peerManager" />
   </bean>
 
-  <service ref="wolManager" interface="org.safehaus.subutai.wol.api.WolManager" />
+  <service ref="wolManager" interface="io.subutai.wol.api.WolManager" />
 
 </blueprint>

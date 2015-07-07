@@ -2,9 +2,9 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <reference id="wolManager" availability="mandatory"
-             interface="org.safehaus.subutai.wol.api.WolManager" />
+             interface="io.subutai.wol.api.WolManager" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.wol.ui.WolUI"
+  <bean id="module" scope="singleton" class="io.subutai.wol.ui.WolUI"
         init-method="init" destroy-method="destroy">
     <property name="wolManager" ref="wolManager" />
   </bean>
