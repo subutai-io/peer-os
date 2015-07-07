@@ -1,9 +1,11 @@
-package org.safehaus.subutai.core.jetty.fragment;
+package io.subutai.core.jetty.fragment;
 
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+
+import io.subutai.core.jetty.fragment.SslContextFactoryFragment;
 
 import static org.junit.Assert.assertNotNull;
 

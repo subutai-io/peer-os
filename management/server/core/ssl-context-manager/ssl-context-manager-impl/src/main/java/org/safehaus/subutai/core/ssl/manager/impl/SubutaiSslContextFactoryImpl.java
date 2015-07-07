@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.ssl.manager.impl;
 
 
-import org.safehaus.subutai.core.jetty.fragment.SslContextFactoryFragment;
+import io.subutai.core.jetty.fragment.SslContextFactoryFragment;
 import org.safehaus.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

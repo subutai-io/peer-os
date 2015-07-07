@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.jetty.fragment;
+package io.subutai.core.jetty.fragment;
 
 
 import java.security.KeyStore;

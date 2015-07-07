@@ -91,7 +91,7 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
     <Arg>
       <New class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
         <Arg>
-          <New class="org.safehaus.subutai.core.jetty.fragment.SslContextFactoryFragment">
+          <New class="io.subutai.core.jetty.fragment.SslContextFactoryFragment">
             <!--<Set name="KeyStore">etc/keystores/keystore_server_px2.jks</Set>-->
             <Set name="KeyStore">/var/lib/subutai/keystores/keystore_server_px2.jks</Set>
             <Set name="KeyStorePassword">subutai</Set>
