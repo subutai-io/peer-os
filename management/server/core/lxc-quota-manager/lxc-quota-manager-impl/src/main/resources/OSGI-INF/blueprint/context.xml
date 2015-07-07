@@ -4,10 +4,10 @@
   <reference id="peerManager" availability="optional"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
-  <bean id="lxcQuotaManager" scope="singleton" class="org.safehaus.subutai.core.lxc.quota.impl.QuotaManagerImpl">
+  <bean id="lxcQuotaManager" scope="singleton" class="io.subutai.core.lxc.quota.impl.QuotaManagerImpl">
     <argument ref="peerManager" />
   </bean>
 
-  <service ref="lxcQuotaManager" interface="org.safehaus.subutai.core.lxc.quota.api.QuotaManager" />
+  <service ref="lxcQuotaManager" interface="io.subutai.core.lxc.quota.api.QuotaManager" />
 
 </blueprint>

@@ -46,7 +46,7 @@ import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.hostregistry.api.ResourceHostInfo;
 import io.subutai.core.identity.api.IdentityManager;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
+import io.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.peer.api.ContainerGroupNotFoundException;

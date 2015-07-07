@@ -35,7 +35,7 @@
   <reference id="strategyManager" interface="org.safehaus.subutai.core.strategy.api.StrategyManager" />
 
   <reference id="quotaManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.lxc.quota.api.QuotaManager" />
+             interface="io.subutai.core.lxc.quota.api.QuotaManager" />
 
   <reference id="monitor" availability="optional"
              interface="org.safehaus.subutai.core.metric.api.Monitor" />
