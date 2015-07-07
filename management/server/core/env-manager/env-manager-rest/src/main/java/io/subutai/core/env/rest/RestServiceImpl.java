@@ -24,7 +24,7 @@ import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.env.api.exception.EnvironmentCreationException;
 import io.subutai.core.env.api.exception.EnvironmentDestructionException;
 import io.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.registry.api.TemplateRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

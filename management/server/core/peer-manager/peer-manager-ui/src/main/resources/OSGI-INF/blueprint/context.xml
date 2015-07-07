@@ -5,7 +5,7 @@
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
   <reference id="templateRegistry" availability="mandatory"
-             interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
+             interface="io.subutai.core.registry.api.TemplateRegistry" />
   <reference id="hostRegistry" availability="mandatory"
              interface="io.subutai.core.hostregistry.api.HostRegistry" />
   <reference id="sslContextFactory" availability="mandatory"

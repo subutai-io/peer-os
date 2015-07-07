@@ -12,9 +12,8 @@ import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.cli.ImportTemplateCommand;
 
-import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.registry.api.TemplateRegistry;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.any;

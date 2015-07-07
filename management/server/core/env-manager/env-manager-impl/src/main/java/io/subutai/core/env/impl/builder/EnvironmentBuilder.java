@@ -21,7 +21,7 @@ import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.EnvironmentBuildException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.registry.api.TemplateRegistry;
 
 import org.apache.commons.net.util.SubnetUtils;
 

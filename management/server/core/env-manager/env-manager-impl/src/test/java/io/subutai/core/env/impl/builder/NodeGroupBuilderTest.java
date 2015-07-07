@@ -27,7 +27,7 @@ import io.subutai.core.env.impl.exception.NodeGroupBuildException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.registry.api.TemplateRegistry;
 
 import com.google.common.collect.Sets;
 

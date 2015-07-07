@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.protocol.Template;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.registry.api.TemplateRegistry;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;

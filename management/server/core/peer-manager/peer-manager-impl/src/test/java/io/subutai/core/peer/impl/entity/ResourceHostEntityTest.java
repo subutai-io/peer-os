@@ -29,10 +29,8 @@ import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.peer.api.ContainerState;
 import io.subutai.core.peer.api.HostNotFoundException;
 import io.subutai.core.peer.api.ResourceHostException;
-import io.subutai.core.peer.impl.entity.ContainerHostEntity;
-import io.subutai.core.peer.impl.entity.ResourceHostEntity;
 
-import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.registry.api.TemplateRegistry;
 
 import com.google.common.collect.Sets;
 

@@ -6,7 +6,7 @@
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
   <reference id="templateRegistry" availability="mandatory"
-             interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
+             interface="io.subutai.core.registry.api.TemplateRegistry" />
 
   <bean id="module" scope="singleton" class="io.subutai.core.env.ui.EnvironmentManagerPortalModule">
     <argument ref="environmentManager" />

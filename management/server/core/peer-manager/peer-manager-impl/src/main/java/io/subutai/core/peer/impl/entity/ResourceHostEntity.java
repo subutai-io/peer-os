@@ -38,7 +38,7 @@ import io.subutai.core.peer.api.ResourceHostException;
 import io.subutai.core.peer.impl.container.CreateContainerTask;
 import io.subutai.core.peer.impl.container.DestroyContainerTask;
 
-import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.registry.api.TemplateRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -21,7 +21,7 @@ import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.ResourceHost;
 import io.subutai.core.peer.api.ResourceHostException;
-import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.template.wizard.api.InstallationPhase;
 
 import com.google.common.collect.Lists;

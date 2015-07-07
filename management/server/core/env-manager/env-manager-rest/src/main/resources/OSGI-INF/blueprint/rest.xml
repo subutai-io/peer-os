@@ -16,7 +16,7 @@
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
   <reference id="templateRegistry" availability="mandatory"
-             interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
+             interface="io.subutai.core.registry.api.TemplateRegistry" />
 
   <bean id="environmentRestServiceImpl" class="io.subutai.core.env.rest.RestServiceImpl">
     <argument ref="environmentManager" />

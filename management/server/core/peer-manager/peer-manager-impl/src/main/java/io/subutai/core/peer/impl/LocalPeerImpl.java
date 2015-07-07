@@ -99,8 +99,8 @@ import io.subutai.core.peer.impl.entity.ContainerHostEntity;
 import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.entity.ResourceHostEntity;
 
-import org.safehaus.subutai.core.registry.api.RegistryException;
-import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.registry.api.RegistryException;
+import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
 import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.StrategyManager;

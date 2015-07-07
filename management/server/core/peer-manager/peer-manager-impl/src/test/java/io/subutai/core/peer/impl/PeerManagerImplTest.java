@@ -28,7 +28,7 @@ import io.subutai.core.peer.impl.dao.PeerDAO;
 import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.request.MessageRequestListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
-import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
 import io.subutai.core.strategy.api.StrategyManager;
 

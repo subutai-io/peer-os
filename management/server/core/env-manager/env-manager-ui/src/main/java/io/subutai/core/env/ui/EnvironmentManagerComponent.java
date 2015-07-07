@@ -6,7 +6,7 @@ import io.subutai.core.env.ui.forms.BlueprintForm;
 import io.subutai.core.env.ui.forms.EnvironmentForm;
 import io.subutai.core.env.ui.tabs.EnvironmentContainersQuotaTab;
 import io.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.registry.api.TemplateRegistry;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;

@@ -18,7 +18,7 @@
   </cm:property-placeholder>
 
   <reference id="templateRegistry" availability="mandatory"
-             interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
+             interface="io.subutai.core.registry.api.TemplateRegistry" />
   <reference id="peerManager"
              interface="io.subutai.core.peer.api.PeerManager" />
   <reference id="networkManager"

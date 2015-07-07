@@ -26,7 +26,7 @@ import io.subutai.core.peer.api.ResourceHost;
 import io.subutai.core.peer.api.ResourceHostException;
 import io.subutai.core.peer.ui.container.ContainerTree;
 
-import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
 import io.subutai.core.strategy.api.CriteriaDef;
 import io.subutai.core.strategy.api.StrategyException;
