@@ -9,8 +9,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import org.safehaus.subutai.common.dao.DaoManager;
-import org.safehaus.subutai.common.util.GsonInterfaceAdapter;
+import io.subutai.common.dao.DaoManager;
+import io.subutai.common.util.GsonInterfaceAdapter;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.impl.entity.PeerData;
 import org.slf4j.Logger;

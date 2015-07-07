@@ -5,10 +5,8 @@ import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.common.command.ResponseType;
-import org.safehaus.subutai.common.util.JsonUtil;
-
-import io.subutai.core.executor.impl.ResponseImpl;
+import io.subutai.common.command.ResponseType;
+import io.subutai.common.util.JsonUtil;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;

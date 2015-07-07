@@ -5,10 +5,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.quota.QuotaType;
-import org.safehaus.subutai.common.test.SystemOutRedirectTest;
-
-import io.subutai.core.lxc.quota.cli.ListQuotaTypes;
+import io.subutai.common.quota.QuotaType;
+import io.subutai.common.test.SystemOutRedirectTest;
 
 import static org.junit.Assert.assertTrue;
 

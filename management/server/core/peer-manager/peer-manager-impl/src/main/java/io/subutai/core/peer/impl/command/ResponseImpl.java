@@ -4,8 +4,8 @@ package io.subutai.core.peer.impl.command;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.command.Response;
-import org.safehaus.subutai.common.command.ResponseType;
+import io.subutai.common.command.Response;
+import io.subutai.common.command.ResponseType;
 
 import com.google.common.base.Preconditions;
 

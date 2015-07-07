@@ -3,9 +3,9 @@ package org.safehaus.subutai.server.ui.util;
 
 import javax.servlet.http.Cookie;
 
-import org.safehaus.subutai.common.security.NullSubutaiLoginContext;
-import org.safehaus.subutai.common.security.SubutaiLoginContext;
-import org.safehaus.subutai.common.util.JsonUtil;
+import io.subutai.common.security.NullSubutaiLoginContext;
+import io.subutai.common.security.SubutaiLoginContext;
+import io.subutai.common.util.JsonUtil;
 
 import com.google.common.base.Strings;
 import com.google.gson.JsonSyntaxException;

@@ -18,7 +18,7 @@
   </cm:property-placeholder>
 
   <!-- ***************************************************************** -->
-  <bean id="daoManagerPeer" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager" scope="prototype">
+  <bean id="daoManagerPeer" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
     <jpa:unit unitname="peerManagerPUnit" property="entityManagerFactory" />
   </bean>
   <!-- ***************************************************************** -->

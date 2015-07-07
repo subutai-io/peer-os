@@ -3,7 +3,7 @@ package io.subutai.core.env.rest;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.ContainerHostState;
 
 
 public class TestUtil

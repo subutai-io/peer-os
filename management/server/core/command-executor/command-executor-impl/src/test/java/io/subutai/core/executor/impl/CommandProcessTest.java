@@ -10,17 +10,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.command.CommandCallback;
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.CommandStatus;
-import org.safehaus.subutai.common.command.Response;
-import org.safehaus.subutai.common.command.ResponseType;
+import io.subutai.common.command.CommandCallback;
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.CommandStatus;
+import io.subutai.common.command.Response;
+import io.subutai.common.command.ResponseType;
 
 //import static junit.framework.Assert.assertEquals;
-import io.subutai.core.executor.impl.CommandProcess;
-import io.subutai.core.executor.impl.CommandProcessor;
-import io.subutai.core.executor.impl.ResponseProcessor;
 
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;

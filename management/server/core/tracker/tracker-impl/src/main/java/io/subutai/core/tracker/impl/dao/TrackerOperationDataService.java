@@ -11,7 +11,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
 
-import org.safehaus.subutai.common.tracker.TrackerOperationView;
+import io.subutai.common.tracker.TrackerOperationView;
 import io.subutai.core.tracker.impl.TrackerOperationImpl;
 import io.subutai.core.tracker.impl.TrackerOperationViewImpl;
 import io.subutai.core.tracker.impl.entity.TrackerOperationEntity;

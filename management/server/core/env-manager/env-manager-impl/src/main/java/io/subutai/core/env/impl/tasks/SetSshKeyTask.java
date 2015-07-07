@@ -3,9 +3,9 @@ package io.subutai.core.env.impl.tasks;
 
 import java.util.concurrent.Semaphore;
 
-import org.safehaus.subutai.common.environment.EnvironmentModificationException;
-import org.safehaus.subutai.common.environment.EnvironmentStatus;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.environment.EnvironmentModificationException;
+import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.ResultHolder;
 import io.subutai.core.network.api.NetworkManager;

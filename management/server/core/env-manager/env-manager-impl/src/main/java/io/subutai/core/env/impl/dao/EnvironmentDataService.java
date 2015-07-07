@@ -5,8 +5,8 @@ import java.util.Collection;
 
 import javax.persistence.EntityManager;
 
-import org.safehaus.subutai.common.dao.DaoManager;
-import org.safehaus.subutai.common.protocol.api.DataService;
+import io.subutai.common.dao.DaoManager;
+import io.subutai.common.protocol.api.DataService;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

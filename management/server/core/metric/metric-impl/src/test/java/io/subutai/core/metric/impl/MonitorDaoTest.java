@@ -15,9 +15,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.exception.DaoException;
+import io.subutai.common.exception.DaoException;
 
-import io.subutai.core.metric.impl.MonitorDao;
 import io.subutai.core.metric.impl.model.Subscriber;
 import io.subutai.core.metric.impl.model.SubscriberPK;
 

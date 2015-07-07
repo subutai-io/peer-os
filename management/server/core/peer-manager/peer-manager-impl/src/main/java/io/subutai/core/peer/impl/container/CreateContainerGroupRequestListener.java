@@ -3,9 +3,9 @@ package io.subutai.core.peer.impl.container;
 
 import java.util.Set;
 
-import org.safehaus.subutai.common.environment.CreateContainerGroupRequest;
-import org.safehaus.subutai.common.peer.HostInfoModel;
-import org.safehaus.subutai.common.peer.PeerException;
+import io.subutai.common.environment.CreateContainerGroupRequest;
+import io.subutai.common.peer.HostInfoModel;
+import io.subutai.common.peer.PeerException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.Payload;
 import io.subutai.core.peer.api.RequestListener;

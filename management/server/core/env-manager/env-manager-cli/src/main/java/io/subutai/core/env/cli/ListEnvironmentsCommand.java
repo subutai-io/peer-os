@@ -3,7 +3,7 @@ package io.subutai.core.env.cli;
 
 import java.util.Date;
 
-import org.safehaus.subutai.common.environment.Environment;
+import io.subutai.common.environment.Environment;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 

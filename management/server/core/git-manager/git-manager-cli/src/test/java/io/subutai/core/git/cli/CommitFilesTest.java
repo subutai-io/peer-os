@@ -7,10 +7,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.safehaus.subutai.common.test.SystemOutRedirectTest;
+import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.git.api.GitException;
 import io.subutai.core.git.api.GitManager;
-import io.subutai.core.git.cli.CommitFiles;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;

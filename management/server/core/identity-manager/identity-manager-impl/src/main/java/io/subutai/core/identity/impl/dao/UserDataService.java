@@ -7,8 +7,8 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import org.safehaus.subutai.common.dao.DaoManager;
-import org.safehaus.subutai.common.protocol.api.DataService;
+import io.subutai.common.dao.DaoManager;
+import io.subutai.common.protocol.api.DataService;
 import io.subutai.core.identity.api.User;
 import io.subutai.core.identity.impl.entity.UserEntity;
 

@@ -3,7 +3,7 @@ package io.subutai.core.peer.api;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.util.JsonUtil;
+import io.subutai.common.util.JsonUtil;
 
 import com.google.common.base.Strings;
 

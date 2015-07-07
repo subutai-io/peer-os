@@ -4,12 +4,12 @@ package io.subutai.core.env.cli;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.environment.NodeGroup;
-import org.safehaus.subutai.common.environment.Topology;
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
-import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.util.UUIDUtil;
+import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Topology;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.protocol.PlacementStrategy;
+import io.subutai.common.settings.Common;
+import io.subutai.common.util.UUIDUtil;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;

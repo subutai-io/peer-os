@@ -6,9 +6,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.environment.Environment;
-import org.safehaus.subutai.common.environment.Topology;
-import org.safehaus.subutai.common.test.SystemOutRedirectTest;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.Topology;
+import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.env.api.EnvironmentManager;
 
 import io.subutai.core.peer.api.LocalPeer;

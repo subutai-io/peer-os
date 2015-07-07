@@ -7,14 +7,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.environment.Environment;
-import org.safehaus.subutai.common.metric.HistoricalMetric;
-import org.safehaus.subutai.common.metric.MetricType;
-import org.safehaus.subutai.common.metric.OwnerResourceUsage;
-import org.safehaus.subutai.common.metric.ProcessResourceUsage;
-import org.safehaus.subutai.common.metric.ResourceHostMetric;
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.Host;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.metric.HistoricalMetric;
+import io.subutai.common.metric.MetricType;
+import io.subutai.common.metric.OwnerResourceUsage;
+import io.subutai.common.metric.ProcessResourceUsage;
+import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.Host;
 import io.subutai.core.peer.api.ResourceHost;
 
 

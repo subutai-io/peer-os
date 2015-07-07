@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.ContainerHostState;
 
 import static junit.framework.TestCase.assertEquals;
 

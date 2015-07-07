@@ -3,7 +3,7 @@ package io.subutai.core.identity.rbac.cli;
 
 import java.util.Set;
 
-import org.safehaus.subutai.common.util.ServiceLocator;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.CliCommand;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.Role;

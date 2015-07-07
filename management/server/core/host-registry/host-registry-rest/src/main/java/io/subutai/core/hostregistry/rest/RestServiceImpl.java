@@ -5,7 +5,7 @@ import java.util.Set;
 
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.common.util.JsonUtil;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.hostregistry.api.ResourceHostInfo;
 

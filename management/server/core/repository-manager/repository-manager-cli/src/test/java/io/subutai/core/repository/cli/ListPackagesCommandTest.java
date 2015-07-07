@@ -8,11 +8,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.test.SystemOutRedirectTest;
+import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.repository.api.PackageInfo;
 import io.subutai.core.repository.api.RepositoryException;
 import io.subutai.core.repository.api.RepositoryManager;
-import io.subutai.core.repository.cli.ListPackagesCommand;
 
 import com.google.common.collect.Sets;
 

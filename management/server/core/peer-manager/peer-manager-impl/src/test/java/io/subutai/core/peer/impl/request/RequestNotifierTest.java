@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.peer.Peer;
+import io.subutai.common.peer.Peer;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
 import io.subutai.core.messenger.api.Messenger;
@@ -17,8 +17,6 @@ import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.Payload;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.RequestListener;
-import io.subutai.core.peer.impl.request.MessageRequest;
-import io.subutai.core.peer.impl.request.RequestNotifier;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;

@@ -8,16 +8,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.host.ContainerHostState;
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.test.SystemOutRedirectTest;
+import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.User;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.ResourceHost;
-import io.subutai.core.peer.cli.HostsCommand;
 
 import com.google.common.collect.Sets;
 

@@ -8,10 +8,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.test.SystemOutRedirectTest;
+import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.cli.GetIdCommand;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Mockito.when;

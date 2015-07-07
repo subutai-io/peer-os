@@ -2,7 +2,7 @@ package io.subutai.wol.ui;
 
 
 import com.vaadin.ui.Component;
-import org.safehaus.subutai.common.util.FileUtil;
+import io.subutai.common.util.FileUtil;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import io.subutai.wol.api.WolManager;
 import java.io.File;

@@ -6,7 +6,7 @@
            xsi:schemaLocation="http://aries.apache.org/xmlns/jpa/v1.1.0 http://aries.apache.org/xmlns/jpa/v1.0.0">
 
   <!-- Data Access object to get EntityManager -->
-  <bean id="daoManagerMessenger" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager"
+  <bean id="daoManagerMessenger" init-method="init" class="io.subutai.common.dao.DaoManager"
         scope="prototype">
     <jpa:unit unitname="messengerPUnit" property="entityManagerFactory" />
   </bean>

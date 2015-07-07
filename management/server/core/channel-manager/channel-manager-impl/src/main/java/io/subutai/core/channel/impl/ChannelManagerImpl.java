@@ -5,7 +5,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.safehaus.subutai.common.dao.DaoManager;
+import io.subutai.common.dao.DaoManager;
 import io.subutai.core.channel.api.ChannelManager;
 import io.subutai.core.channel.api.token.ChannelTokenManager;
 import io.subutai.core.channel.impl.token.ChannelTokenController;

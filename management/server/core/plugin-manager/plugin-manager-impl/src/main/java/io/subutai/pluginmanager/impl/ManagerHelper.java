@@ -4,12 +4,12 @@ package io.subutai.pluginmanager.impl;
 import java.util.List;
 import java.util.Set;
 
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.CommandUtil;
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.common.util.StringUtil;
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.CommandUtil;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.StringUtil;
 import io.subutai.core.peer.api.HostNotFoundException;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;

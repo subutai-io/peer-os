@@ -11,15 +11,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.command.Response;
-import org.safehaus.subutai.common.host.HostInfo;
-import org.safehaus.subutai.common.peer.ContainerHost;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.command.Response;
+import io.subutai.common.host.HostInfo;
+import io.subutai.common.peer.ContainerHost;
 
-import io.subutai.core.environment.terminal.ui.EnvironmentTree;
-import io.subutai.core.environment.terminal.ui.SendButtonListener;
-import io.subutai.core.environment.terminal.ui.TerminalForm;
 import io.subutai.core.executor.api.CommandExecutor;
 
 import com.google.common.collect.Sets;

@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.safehaus.subutai.common.mdc.SubutaiExecutors;
+import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.core.env.api.EnvironmentManager;
 
 import com.google.common.base.Strings;

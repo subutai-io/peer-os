@@ -10,7 +10,7 @@
             http://aries.apache.org/xmlns/transactions/v1.0.0 http://aries.apache.org/xmlns/transactions/v1.0.0 ">
 
   <!-- ******************************************************************************** -->
-  <bean id="daoManagerTracker" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager" scope="prototype">
+  <bean id="daoManagerTracker" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
     <jpa:unit unitname="trackerPUnit" property="entityManagerFactory" />
   </bean>
   <!-- ******************************************************************************** -->

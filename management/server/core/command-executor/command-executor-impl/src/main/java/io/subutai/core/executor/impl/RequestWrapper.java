@@ -1,7 +1,7 @@
 package io.subutai.core.executor.impl;
 
 
-import org.safehaus.subutai.common.command.Request;
+import io.subutai.common.command.Request;
 
 import com.google.common.base.Preconditions;
 

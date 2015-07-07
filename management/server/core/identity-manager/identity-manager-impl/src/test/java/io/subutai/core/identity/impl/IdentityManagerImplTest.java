@@ -9,13 +9,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.dao.DaoManager;
+import io.subutai.common.dao.DaoManager;
 import io.subutai.core.identity.api.CliCommand;
 import io.subutai.core.identity.api.Permission;
 import io.subutai.core.identity.api.PermissionGroup;
 import io.subutai.core.identity.api.Role;
 import io.subutai.core.identity.api.User;
-import io.subutai.core.identity.impl.IdentityManagerImpl;
 
 import org.apache.felix.service.command.CommandSession;
 

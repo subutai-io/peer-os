@@ -1,9 +1,9 @@
 package io.subutai.core.metric.impl;
 
 
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.peer.Host;
-import org.safehaus.subutai.common.metric.MetricType;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.Host;
+import io.subutai.common.metric.MetricType;
 import io.subutai.core.metric.api.MonitoringSettings;
 
 

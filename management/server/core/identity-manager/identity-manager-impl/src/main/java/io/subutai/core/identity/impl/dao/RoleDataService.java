@@ -6,7 +6,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.safehaus.subutai.common.protocol.api.DataService;
+import io.subutai.common.protocol.api.DataService;
 import io.subutai.core.identity.api.Role;
 import io.subutai.core.identity.impl.entity.RoleEntity;
 

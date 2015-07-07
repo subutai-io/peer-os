@@ -8,7 +8,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import org.safehaus.subutai.common.protocol.api.DataService;
+import io.subutai.common.protocol.api.DataService;
 import io.subutai.core.identity.impl.entity.PortalModuleScopeEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

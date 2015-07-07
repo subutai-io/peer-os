@@ -9,13 +9,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.peer.Host;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.Host;
 
 import com.google.common.collect.Lists;
-
-import io.subutai.core.template.wizard.impl.ProductsInstallationProcedure;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;

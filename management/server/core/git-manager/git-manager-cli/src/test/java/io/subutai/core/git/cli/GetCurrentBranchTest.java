@@ -4,11 +4,10 @@ package io.subutai.core.git.cli;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.safehaus.subutai.common.test.SystemOutRedirectTest;
+import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.git.api.GitBranch;
 import io.subutai.core.git.api.GitException;
 import io.subutai.core.git.api.GitManager;
-import io.subutai.core.git.cli.GetCurrentBranch;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;

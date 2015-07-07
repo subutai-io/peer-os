@@ -4,7 +4,7 @@ package io.subutai.core.peer.impl.container;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.peer.ContainersDestructionResult;
+import io.subutai.common.peer.ContainersDestructionResult;
 
 import com.google.common.base.Preconditions;
 

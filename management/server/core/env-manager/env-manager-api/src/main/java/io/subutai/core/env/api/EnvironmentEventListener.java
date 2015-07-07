@@ -4,8 +4,8 @@ package io.subutai.core.env.api;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.environment.Environment;
-import org.safehaus.subutai.common.peer.ContainerHost;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.peer.ContainerHost;
 
 
 /**

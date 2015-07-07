@@ -17,8 +17,8 @@ import javax.persistence.Lob;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
 
-import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.common.util.StringUtil;
+import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.StringUtil;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.impl.Envelope;
 

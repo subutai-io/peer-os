@@ -13,7 +13,7 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.safehaus.subutai.common.util.CollectionUtil;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.peer.api.ContainerGroup;
 
 import com.google.common.base.Preconditions;

@@ -5,8 +5,8 @@
   <persistence-unit name="commonServicePUnit" transaction-type="RESOURCE_LOCAL">
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/commonService)
     </non-jta-data-source>
-    <class>org.safehaus.subutai.common.protocol.Template</class>
-    <class>org.safehaus.subutai.common.protocol.TemplatePK</class>
+    <class>io.subutai.common.protocol.Template</class>
+    <class>io.subutai.common.protocol.TemplatePK</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="openjpa.RuntimeUnenhancedClasses" value="supported" />

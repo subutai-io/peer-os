@@ -1,11 +1,11 @@
 package io.subutai.core.lxc.quota.cli;
 
 
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.quota.DiskPartition;
-import org.safehaus.subutai.common.quota.DiskQuota;
-import org.safehaus.subutai.common.quota.DiskQuotaUnit;
-import org.safehaus.subutai.common.quota.QuotaType;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.quota.DiskPartition;
+import io.subutai.common.quota.DiskQuota;
+import io.subutai.common.quota.DiskQuotaUnit;
+import io.subutai.common.quota.QuotaType;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;

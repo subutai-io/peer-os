@@ -5,10 +5,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.metric.ResourceHostMetric;
-import org.safehaus.subutai.common.protocol.Criteria;
+import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.protocol.Criteria;
 import io.subutai.core.strategy.api.StrategyException;
-import io.subutai.core.strategy.impl.MetricComparator;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Mockito.when;

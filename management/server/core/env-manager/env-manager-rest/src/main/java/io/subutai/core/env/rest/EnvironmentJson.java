@@ -4,7 +4,7 @@ package io.subutai.core.env.rest;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.environment.EnvironmentStatus;
 
 
 /**

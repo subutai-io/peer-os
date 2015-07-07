@@ -8,18 +8,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.CommandUtil;
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.peer.Host;
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.CommandUtil;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.Host;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.repository.api.PackageInfo;
 import io.subutai.core.repository.api.RepositoryException;
-import io.subutai.core.repository.impl.Commands;
-import io.subutai.core.repository.impl.RepositoryManagerImpl;
 
 import com.google.common.collect.Sets;
 

@@ -4,7 +4,7 @@ package io.subutai.core.env.impl;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.settings.Common;
+import io.subutai.common.settings.Common;
 
 import com.google.common.collect.Sets;
 

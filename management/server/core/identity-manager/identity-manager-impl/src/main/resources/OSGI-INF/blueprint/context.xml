@@ -10,7 +10,7 @@
 
   <!--*****************************************************************-->
   <bean id="daoManagerSecurity" init-method="init" activation="eager" scope="singleton"
-        class="org.safehaus.subutai.common.dao.DaoManager">
+        class="io.subutai.common.dao.DaoManager">
     <jpa:unit unitname="securityManagerPUnit" property="entityManagerFactory" />
   </bean>
   <!--*****************************************************************-->

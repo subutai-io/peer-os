@@ -8,7 +8,7 @@
 
   <!-- ************************************************************************************************* -->
 
-  <bean id="daoManagerChannel" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager" activation="eager">
+  <bean id="daoManagerChannel" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
     <jpa:unit unitname="channelManagerPUnit" property="entityManagerFactory" />
   </bean>
 

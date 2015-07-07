@@ -19,7 +19,7 @@ import javax.naming.NamingException;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
-import org.safehaus.subutai.common.util.ServiceLocator;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.PortalModuleScope;
 import io.subutai.core.identity.api.Role;

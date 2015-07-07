@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import javax.persistence.EntityManagerFactory;
 
-import org.safehaus.subutai.common.exception.DaoException;
+import io.subutai.common.exception.DaoException;
 import io.subutai.core.metric.impl.dao.SubscriberDataService;
 
 import com.google.common.base.Preconditions;

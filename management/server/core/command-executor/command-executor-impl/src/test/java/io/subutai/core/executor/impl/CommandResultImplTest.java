@@ -3,9 +3,7 @@ package io.subutai.core.executor.impl;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.common.command.CommandStatus;
-
-import io.subutai.core.executor.impl.CommandResultImpl;
+import io.subutai.common.command.CommandStatus;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;

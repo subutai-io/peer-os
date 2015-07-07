@@ -1,7 +1,7 @@
 package io.subutai.core.key.cli;
 
 
-import org.safehaus.subutai.common.peer.Host;
+import io.subutai.common.peer.Host;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.key.api.KeyInfo;
 import io.subutai.core.key.api.KeyManager;

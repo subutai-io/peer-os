@@ -8,12 +8,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.common.peer.PeerInfo;
-import org.safehaus.subutai.common.test.SystemOutRedirectTest;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.cli.ListCommand;
 
 import com.google.common.collect.Lists;
 

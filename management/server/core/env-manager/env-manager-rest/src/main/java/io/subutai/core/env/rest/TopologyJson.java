@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.NodeGroup;
 
 
 public class TopologyJson

@@ -3,7 +3,7 @@ package io.subutai.core.registry.cli;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.common.protocol.Template;
+import io.subutai.common.protocol.Template;
 import io.subutai.core.registry.api.TemplateRegistry;
 
 import static org.junit.Assert.assertTrue;

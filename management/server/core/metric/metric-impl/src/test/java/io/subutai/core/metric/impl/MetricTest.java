@@ -4,9 +4,7 @@ package io.subutai.core.metric.impl;
 import java.util.UUID;
 
 import org.junit.Test;
-import org.safehaus.subutai.common.util.JsonUtil;
-
-import io.subutai.core.metric.impl.ContainerHostMetricImpl;
+import io.subutai.common.util.JsonUtil;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.containsString;

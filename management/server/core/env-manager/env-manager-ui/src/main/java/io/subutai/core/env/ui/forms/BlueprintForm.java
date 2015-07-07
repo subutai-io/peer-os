@@ -3,11 +3,11 @@ package io.subutai.core.env.ui.forms;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.environment.Blueprint;
-import org.safehaus.subutai.common.environment.NodeGroup;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
-import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.common.util.JsonUtil;
+import io.subutai.common.environment.Blueprint;
+import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.protocol.PlacementStrategy;
+import io.subutai.common.util.CollectionUtil;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.env.api.exception.EnvironmentManagerException;
 import io.subutai.core.peer.api.PeerManager;

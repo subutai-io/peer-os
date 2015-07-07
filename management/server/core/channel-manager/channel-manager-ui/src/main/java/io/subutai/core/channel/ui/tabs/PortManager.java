@@ -1,7 +1,7 @@
 package io.subutai.core.channel.ui.tabs;
 
 
-import org.safehaus.subutai.common.settings.ChannelSettings;
+import io.subutai.common.settings.ChannelSettings;
 import io.subutai.core.channel.api.ChannelManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

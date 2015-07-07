@@ -1,7 +1,7 @@
 package io.subutai.core.executor.impl;
 
 
-import org.safehaus.subutai.common.command.Response;
+import io.subutai.common.command.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

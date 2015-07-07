@@ -8,10 +8,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.network.Vni;
+import io.subutai.common.network.Vni;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.impl.entity.ManagementHostEntity;
-import io.subutai.core.peer.impl.tasks.ReserveVniTask;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;

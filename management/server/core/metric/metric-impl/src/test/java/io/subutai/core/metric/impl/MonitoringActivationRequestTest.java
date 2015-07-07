@@ -8,9 +8,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.metric.api.MonitoringSettings;
-import io.subutai.core.metric.impl.MonitoringActivationRequest;
 
 import com.google.common.collect.Sets;
 

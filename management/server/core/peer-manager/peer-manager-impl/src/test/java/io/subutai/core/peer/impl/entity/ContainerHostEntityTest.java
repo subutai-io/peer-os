@@ -9,19 +9,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.host.ContainerHostState;
-import org.safehaus.subutai.common.host.HostArchitecture;
-import org.safehaus.subutai.common.host.Interface;
-import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.protocol.api.DataService;
-import org.safehaus.subutai.common.quota.DiskPartition;
-import org.safehaus.subutai.common.quota.DiskQuota;
-import org.safehaus.subutai.common.quota.RamQuota;
+import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.host.Interface;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.protocol.api.DataService;
+import io.subutai.common.quota.DiskPartition;
+import io.subutai.common.quota.DiskQuota;
+import io.subutai.common.quota.RamQuota;
 import io.subutai.core.hostregistry.api.ContainerHostInfo;
 import io.subutai.core.peer.api.ContainerGroup;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ResourceHost;
-import io.subutai.core.peer.impl.entity.ContainerHostEntity;
 
 import com.google.common.collect.Sets;
 

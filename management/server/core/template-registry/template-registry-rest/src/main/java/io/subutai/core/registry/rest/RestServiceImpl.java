@@ -15,11 +15,11 @@ import java.util.Set;
 
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.common.datatypes.TemplateVersion;
-import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.common.util.JsonUtil;
+import io.subutai.common.datatypes.TemplateVersion;
+import io.subutai.common.protocol.Template;
+import io.subutai.common.settings.Common;
+import io.subutai.common.util.FileUtil;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.RegistryException;

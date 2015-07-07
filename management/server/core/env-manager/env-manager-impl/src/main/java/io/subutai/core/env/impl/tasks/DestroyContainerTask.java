@@ -3,12 +3,12 @@ package io.subutai.core.env.impl.tasks;
 
 import java.util.concurrent.Semaphore;
 
-import org.safehaus.subutai.common.environment.EnvironmentModificationException;
-import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
-import org.safehaus.subutai.common.environment.EnvironmentStatus;
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.environment.EnvironmentModificationException;
+import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.env.impl.EnvironmentManagerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
@@ -27,7 +27,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
  *
  * @see io.subutai.core.env.impl.EnvironmentManagerImpl
  * @see io.subutai.core.env.impl.entity.EnvironmentImpl
- * @see org.safehaus.subutai.common.peer.ContainerHost
+ * @see io.subutai.common.peer.ContainerHost
  * @see io.subutai.core.env.impl.exception.ResultHolder
  * @see java.lang.Runnable
  */

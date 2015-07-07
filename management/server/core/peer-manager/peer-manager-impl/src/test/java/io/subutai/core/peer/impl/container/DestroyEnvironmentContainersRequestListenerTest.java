@@ -8,11 +8,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.peer.ContainersDestructionResult;
+import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.Payload;
-import io.subutai.core.peer.impl.container.DestroyEnvironmentContainersRequest;
-import io.subutai.core.peer.impl.container.DestroyEnvironmentContainersRequestListener;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;

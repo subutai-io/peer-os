@@ -6,12 +6,12 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.CommandUtil;
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.peer.Host;
-import org.safehaus.subutai.common.util.StringUtil;
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.CommandUtil;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.Host;
+import io.subutai.common.util.StringUtil;
 import io.subutai.core.key.api.KeyInfo;
 import io.subutai.core.key.api.KeyManager;
 import io.subutai.core.key.api.KeyManagerException;

@@ -11,10 +11,10 @@ import java.util.concurrent.Executors;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.dao.DaoManager;
-import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.common.util.ServiceLocator;
+import io.subutai.common.dao.DaoManager;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
 import io.subutai.core.messenger.api.MessageListener;

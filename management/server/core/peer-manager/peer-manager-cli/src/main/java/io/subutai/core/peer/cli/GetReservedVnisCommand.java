@@ -3,8 +3,8 @@ package io.subutai.core.peer.cli;
 
 import java.util.Set;
 
-import org.safehaus.subutai.common.network.Vni;
-import org.safehaus.subutai.common.peer.Peer;
+import io.subutai.common.network.Vni;
+import io.subutai.common.peer.Peer;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
 

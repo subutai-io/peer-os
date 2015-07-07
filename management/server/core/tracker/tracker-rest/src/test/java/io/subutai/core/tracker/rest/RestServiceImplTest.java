@@ -15,13 +15,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.tracker.TrackerOperationView;
-import org.safehaus.subutai.common.util.JsonUtil;
+import io.subutai.common.tracker.TrackerOperationView;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.tracker.api.Tracker;
 import io.subutai.core.tracker.impl.TrackerImpl;
 import io.subutai.core.tracker.impl.TrackerOperationImpl;
 import io.subutai.core.tracker.impl.TrackerOperationViewImpl;
-import io.subutai.core.tracker.rest.RestServiceImpl;
 
 import com.google.common.collect.Lists;
 import com.google.gson.reflect.TypeToken;

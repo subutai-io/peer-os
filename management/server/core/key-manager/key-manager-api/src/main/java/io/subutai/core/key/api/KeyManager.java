@@ -3,7 +3,7 @@ package io.subutai.core.key.api;
 
 import java.util.Set;
 
-import org.safehaus.subutai.common.peer.Host;
+import io.subutai.common.peer.Host;
 
 
 /**

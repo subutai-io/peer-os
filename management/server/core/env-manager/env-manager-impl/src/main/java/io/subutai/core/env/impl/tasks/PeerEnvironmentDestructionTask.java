@@ -4,8 +4,8 @@ package io.subutai.core.env.impl.tasks;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
-import org.safehaus.subutai.common.peer.ContainersDestructionResult;
-import org.safehaus.subutai.common.peer.Peer;
+import io.subutai.common.peer.ContainersDestructionResult;
+import io.subutai.common.peer.Peer;
 
 import com.google.common.base.Preconditions;
 
@@ -13,8 +13,8 @@ import com.google.common.base.Preconditions;
 /**
  * PeerEnvironmentDestructionTask destroys Environment on Peer
  *
- * @see org.safehaus.subutai.common.peer.Peer
- * @see org.safehaus.subutai.common.environment.Environment
+ * @see io.subutai.common.peer.Peer
+ * @see io.subutai.common.environment.Environment
  */
 public class PeerEnvironmentDestructionTask implements Callable<ContainersDestructionResult>
 {

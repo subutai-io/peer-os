@@ -4,8 +4,8 @@ package io.subutai.core.metric.impl;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.util.CollectionUtil;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.metric.api.MonitoringSettings;
 
 import com.google.common.base.Preconditions;

@@ -9,15 +9,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.RequestBuilder;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.core.peer.api.HostNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.pluginmanager.api.PluginInfo;
 import io.subutai.pluginmanager.api.PluginManagerException;
-import io.subutai.pluginmanager.impl.ManagerHelper;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;

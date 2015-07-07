@@ -4,7 +4,7 @@ package io.subutai.core.key.impl;
 import java.util.Collections;
 import java.util.Set;
 
-import org.safehaus.subutai.common.util.CollectionUtil;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.key.api.KeyInfo;
 
 import com.google.common.base.Preconditions;

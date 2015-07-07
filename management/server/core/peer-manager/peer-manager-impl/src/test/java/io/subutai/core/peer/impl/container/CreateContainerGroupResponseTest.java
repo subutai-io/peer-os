@@ -6,11 +6,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.peer.HostInfoModel;
+import io.subutai.common.peer.HostInfoModel;
 
 import com.google.common.collect.Sets;
-
-import io.subutai.core.peer.impl.container.CreateContainerGroupResponse;
 
 import static junit.framework.TestCase.assertEquals;
 

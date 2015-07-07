@@ -5,12 +5,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
-import org.safehaus.subutai.common.environment.Topology;
-import org.safehaus.subutai.common.network.Gateway;
-import org.safehaus.subutai.common.network.Vni;
-import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.common.util.ExceptionUtil;
+import io.subutai.common.environment.Topology;
+import io.subutai.common.network.Gateway;
+import io.subutai.common.network.Vni;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.env.api.exception.EnvironmentCreationException;
 import io.subutai.core.env.impl.EnvironmentManagerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;

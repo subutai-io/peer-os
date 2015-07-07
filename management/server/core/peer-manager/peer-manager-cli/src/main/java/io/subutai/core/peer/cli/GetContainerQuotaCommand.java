@@ -3,10 +3,10 @@ package io.subutai.core.peer.cli;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.environment.Environment;
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.quota.QuotaType;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.quota.QuotaType;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;

@@ -3,7 +3,7 @@ package io.subutai.core.peer.ui;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.protocol.Disposable;
+import io.subutai.common.protocol.Disposable;
 import io.subutai.core.peer.ui.container.ContainerComponent;
 import io.subutai.core.peer.ui.forms.PeerRegisterForm;
 import org.slf4j.Logger;

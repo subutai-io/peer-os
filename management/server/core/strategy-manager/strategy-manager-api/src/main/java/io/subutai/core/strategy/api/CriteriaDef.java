@@ -1,7 +1,7 @@
 package io.subutai.core.strategy.api;
 
 
-import org.safehaus.subutai.common.protocol.Criteria;
+import io.subutai.common.protocol.Criteria;
 
 
 public class CriteriaDef<T> extends Criteria<T>

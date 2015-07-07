@@ -1,8 +1,8 @@
 package io.subutai.core.hostregistry.api;
 
 
-import org.safehaus.subutai.common.host.ContainerHostState;
-import org.safehaus.subutai.common.host.HostInfo;
+import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostInfo;
 
 
 /**

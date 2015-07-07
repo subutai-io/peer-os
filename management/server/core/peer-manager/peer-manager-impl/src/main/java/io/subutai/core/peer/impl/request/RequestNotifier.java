@@ -1,7 +1,7 @@
 package io.subutai.core.peer.impl.request;
 
 
-import org.safehaus.subutai.common.peer.Peer;
+import io.subutai.common.peer.Peer;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
 import io.subutai.core.messenger.api.Messenger;

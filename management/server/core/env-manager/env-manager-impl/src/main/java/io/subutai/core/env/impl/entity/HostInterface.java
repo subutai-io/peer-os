@@ -13,7 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.safehaus.subutai.common.host.Interface;
+import io.subutai.common.host.Interface;
 
 
 /**
@@ -24,7 +24,7 @@ import org.safehaus.subutai.common.host.Interface;
  * <p> {@link #mac} - mac address</p>
  * <p> {@link #host} - target host whose metadata being saved</p>
  *
- * @see org.safehaus.subutai.common.host.Interface
+ * @see io.subutai.common.host.Interface
  * @see EnvironmentContainerImpl
  */
 @Entity

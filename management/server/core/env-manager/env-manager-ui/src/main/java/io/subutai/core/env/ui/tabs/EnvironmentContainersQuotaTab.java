@@ -4,9 +4,9 @@ package io.subutai.core.env.ui.tabs;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.environment.Environment;
-import org.safehaus.subutai.common.mdc.SubutaiExecutors;
-import org.safehaus.subutai.common.peer.ContainerHost;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.mdc.SubutaiExecutors;
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.env.ui.EnvironmentManagerComponent;
 import io.subutai.core.env.ui.tabs.subviews.ContainerHostQuotaForm;
 

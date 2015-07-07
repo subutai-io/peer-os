@@ -7,9 +7,9 @@ import java.nio.charset.Charset;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.safehaus.subutai.common.settings.ChannelSettings;
-import org.safehaus.subutai.common.util.IPUtil;
-import org.safehaus.subutai.common.util.UrlUtil;
+import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.util.IPUtil;
+import io.subutai.common.util.UrlUtil;
 import io.subutai.core.channel.api.entity.IUserChannelToken;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.identity.api.User;

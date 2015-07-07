@@ -24,10 +24,10 @@ import java.util.Map;
 import javax.naming.NamingException;
 import javax.servlet.http.Cookie;
 
-import org.safehaus.subutai.common.security.NullSubutaiLoginContext;
-import org.safehaus.subutai.common.security.SubutaiLoginContext;
-import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.util.ServiceLocator;
+import io.subutai.common.security.NullSubutaiLoginContext;
+import io.subutai.common.security.SubutaiLoginContext;
+import io.subutai.common.settings.Common;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.User;
 import org.safehaus.subutai.server.ui.util.HelpManager;

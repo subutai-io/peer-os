@@ -3,7 +3,7 @@ package io.subutai.core.env.cli;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.util.UUIDUtil;
+import io.subutai.common.util.UUIDUtil;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 

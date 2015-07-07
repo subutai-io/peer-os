@@ -1,7 +1,7 @@
 package io.subutai.core.channel.api;
 
 
-import org.safehaus.subutai.common.dao.DaoManager;
+import io.subutai.common.dao.DaoManager;
 
 import io.subutai.core.channel.api.token.ChannelTokenManager;
 

@@ -1,10 +1,10 @@
 package io.subutai.core.env.cli;
 
 
-import org.safehaus.subutai.common.environment.Environment;
-import org.safehaus.subutai.common.environment.NodeGroup;
-import org.safehaus.subutai.common.environment.Topology;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Topology;
+import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;

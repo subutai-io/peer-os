@@ -9,8 +9,8 @@ package io.subutai.core.executor.ui;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.safehaus.subutai.common.command.RequestType;
-import org.safehaus.subutai.common.protocol.Disposable;
+import io.subutai.common.command.RequestType;
+import io.subutai.common.protocol.Disposable;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.server.ui.component.HostTree;

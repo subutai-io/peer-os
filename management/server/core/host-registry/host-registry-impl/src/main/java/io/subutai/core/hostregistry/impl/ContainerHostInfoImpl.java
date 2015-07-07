@@ -4,11 +4,11 @@ package io.subutai.core.hostregistry.impl;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.host.ContainerHostState;
-import org.safehaus.subutai.common.host.HostArchitecture;
-import org.safehaus.subutai.common.host.HostInfo;
-import org.safehaus.subutai.common.host.Interface;
-import org.safehaus.subutai.common.util.CollectionUtil;
+import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.Interface;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.hostregistry.api.ContainerHostInfo;
 
 import com.google.common.base.Objects;

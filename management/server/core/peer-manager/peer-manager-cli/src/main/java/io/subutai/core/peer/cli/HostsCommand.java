@@ -4,9 +4,9 @@ package io.subutai.core.peer.cli;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.Host;
-import org.safehaus.subutai.common.peer.PeerException;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.Host;
+import io.subutai.common.peer.PeerException;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.User;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;

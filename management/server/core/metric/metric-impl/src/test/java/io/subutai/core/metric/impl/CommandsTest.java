@@ -2,9 +2,8 @@ package io.subutai.core.metric.impl;
 
 
 import org.junit.Test;
-import org.safehaus.subutai.common.command.RequestBuilder;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.core.metric.api.MonitoringSettings;
-import io.subutai.core.metric.impl.Commands;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

@@ -10,12 +10,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.environment.Environment;
-import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.Peer;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.Peer;
 import io.subutai.core.env.api.EnvironmentManager;
-import io.subutai.core.environment.terminal.ui.EnvironmentTree;
 
 import com.google.common.collect.Sets;
 import com.vaadin.data.util.HierarchicalContainer;

@@ -1,8 +1,8 @@
 package io.subutai.core.template.wizard.ui;
 
 
-import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.protocol.Template;
+import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.peer.api.HostNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ResourceHost;

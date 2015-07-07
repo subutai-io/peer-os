@@ -12,7 +12,7 @@ import java.util.Set;
 
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.common.util.JsonUtil;
+import io.subutai.common.util.JsonUtil;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 

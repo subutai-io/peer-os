@@ -3,7 +3,7 @@ package io.subutai.wol.api;
 
 import java.util.ArrayList;
 
-import org.safehaus.subutai.common.command.CommandResult;
+import io.subutai.common.command.CommandResult;
 
 
 public interface WolManager

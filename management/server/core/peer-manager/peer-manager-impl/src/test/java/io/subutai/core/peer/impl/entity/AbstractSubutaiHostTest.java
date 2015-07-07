@@ -8,17 +8,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.command.CommandCallback;
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.host.HostArchitecture;
-import org.safehaus.subutai.common.host.HostInfo;
-import org.safehaus.subutai.common.host.Interface;
-import org.safehaus.subutai.common.peer.Peer;
+import io.subutai.common.command.CommandCallback;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.Interface;
+import io.subutai.common.peer.Peer;
 
 import com.google.common.collect.Sets;
-
-import io.subutai.core.peer.impl.entity.AbstractSubutaiHost;
-import io.subutai.core.peer.impl.entity.HostInterface;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;

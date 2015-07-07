@@ -15,8 +15,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.util.RestUtil;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.util.RestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

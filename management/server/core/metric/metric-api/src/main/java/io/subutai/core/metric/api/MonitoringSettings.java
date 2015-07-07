@@ -1,7 +1,7 @@
 package io.subutai.core.metric.api;
 
 
-import org.safehaus.subutai.common.util.NumUtil;
+import io.subutai.common.util.NumUtil;
 
 import com.google.common.base.Preconditions;
 

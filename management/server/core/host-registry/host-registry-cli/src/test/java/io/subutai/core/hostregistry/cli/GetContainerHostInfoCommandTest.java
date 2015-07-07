@@ -9,11 +9,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.test.SystemOutRedirectTest;
+import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.hostregistry.api.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.hostregistry.cli.GetContainerHostInfoCommand;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;

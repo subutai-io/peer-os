@@ -6,10 +6,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.command.CommandUtil;
-import org.safehaus.subutai.common.command.RequestBuilder;
+import io.subutai.common.command.CommandUtil;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.core.peer.api.ResourceHost;
-import io.subutai.core.peer.impl.container.DestroyContainerTask;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;

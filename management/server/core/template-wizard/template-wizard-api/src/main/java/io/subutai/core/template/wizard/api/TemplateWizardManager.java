@@ -4,7 +4,7 @@ package io.subutai.core.template.wizard.api;
 import java.util.List;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.tracker.TrackerOperation;
 
 
 /**

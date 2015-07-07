@@ -3,7 +3,7 @@ package io.subutai.core.peer.impl.command;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.command.RequestBuilder;
+import io.subutai.common.command.RequestBuilder;
 
 
 public class CommandRequest

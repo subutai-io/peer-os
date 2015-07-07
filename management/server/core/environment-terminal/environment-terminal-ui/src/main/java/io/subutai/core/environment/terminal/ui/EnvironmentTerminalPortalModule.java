@@ -6,9 +6,9 @@ import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.environment.Environment;
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.util.FileUtil;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.util.FileUtil;
 import io.subutai.core.env.api.EnvironmentEventListener;
 import io.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;

@@ -15,9 +15,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.dao.DaoManager;
+import io.subutai.common.dao.DaoManager;
 import io.subutai.core.identity.api.User;
-import io.subutai.core.identity.impl.dao.UserDataService;
 import io.subutai.core.identity.impl.entity.UserEntity;
 
 import com.google.common.collect.Lists;

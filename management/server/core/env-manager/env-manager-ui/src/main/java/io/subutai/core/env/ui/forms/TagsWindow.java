@@ -1,7 +1,7 @@
 package io.subutai.core.env.ui.forms;
 
 
-import org.safehaus.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.peer.api.HostNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
 

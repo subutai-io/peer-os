@@ -1,7 +1,7 @@
 package io.subutai.wol.impl;
 
 
-import org.safehaus.subutai.common.command.RequestBuilder;
+import io.subutai.common.command.RequestBuilder;
 
 import com.google.common.collect.Lists;
 

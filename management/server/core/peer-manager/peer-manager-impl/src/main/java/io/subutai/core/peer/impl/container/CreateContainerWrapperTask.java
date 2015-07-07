@@ -3,9 +3,9 @@ package io.subutai.core.peer.impl.container;
 
 import java.util.concurrent.Callable;
 
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.util.NumUtil;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.settings.Common;
+import io.subutai.common.util.NumUtil;
 import io.subutai.core.peer.api.ResourceHost;
 
 import com.google.common.base.Preconditions;

@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.peer.Peer;
+import io.subutai.common.peer.Peer;
 import io.subutai.core.env.impl.TestUtil;
 
 import static org.mockito.Mockito.verify;

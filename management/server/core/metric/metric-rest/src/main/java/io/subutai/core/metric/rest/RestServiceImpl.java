@@ -6,10 +6,10 @@ import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.common.environment.Environment;
-import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
-import org.safehaus.subutai.common.metric.ResourceHostMetric;
-import org.safehaus.subutai.common.util.JsonUtil;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.metric.api.ContainerHostMetric;
 import io.subutai.core.metric.api.Monitor;

@@ -11,13 +11,13 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.safehaus.subutai.common.dao.DaoManager;
-import org.safehaus.subutai.common.security.NullSubutaiLoginContext;
-import org.safehaus.subutai.common.security.SubutaiLoginContext;
-import org.safehaus.subutai.common.security.SubutaiThreadContext;
-import org.safehaus.subutai.common.settings.CLISettings;
-import org.safehaus.subutai.common.settings.ChannelSettings;
-import org.safehaus.subutai.common.util.SecurityUtil;
+import io.subutai.common.dao.DaoManager;
+import io.subutai.common.security.NullSubutaiLoginContext;
+import io.subutai.common.security.SubutaiLoginContext;
+import io.subutai.common.security.SubutaiThreadContext;
+import io.subutai.common.settings.CLISettings;
+import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.util.SecurityUtil;
 import io.subutai.core.identity.api.CliCommand;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.Permission;

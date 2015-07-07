@@ -9,14 +9,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.host.ContainerHostState;
-import org.safehaus.subutai.common.util.JsonUtil;
+import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.hostregistry.api.ResourceHostInfo;
 
 import io.subutai.core.broker.api.Topic;
-import io.subutai.core.hostregistry.impl.HeartBeat;
-import io.subutai.core.hostregistry.impl.HeartBeatListener;
-import io.subutai.core.hostregistry.impl.HostRegistryImpl;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;

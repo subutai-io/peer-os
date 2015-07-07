@@ -6,11 +6,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
-import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.settings.ChannelSettings;
-import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.common.util.RestUtil;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.settings.Common;
+import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.RestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

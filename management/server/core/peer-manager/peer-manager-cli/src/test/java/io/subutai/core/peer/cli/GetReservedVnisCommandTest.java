@@ -6,9 +6,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.peer.Peer;
+import io.subutai.common.peer.Peer;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.cli.GetReservedVnisCommand;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;

@@ -1,7 +1,7 @@
 package io.subutai.core.executor.impl;
 
 
-import org.safehaus.subutai.common.cache.EntryExpiryCallback;
+import io.subutai.common.cache.EntryExpiryCallback;
 
 
 /**

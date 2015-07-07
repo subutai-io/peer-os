@@ -3,7 +3,7 @@ package io.subutai.core.peer.cli;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Template;
+import io.subutai.common.protocol.Template;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;

@@ -3,7 +3,7 @@ package io.subutai.core.registry.cli;
 
 import java.nio.charset.Charset;
 
-import org.safehaus.subutai.common.util.FileUtil;
+import io.subutai.common.util.FileUtil;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.registry.api.TemplateRegistry;
 

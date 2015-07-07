@@ -1,9 +1,9 @@
 package io.subutai.core.executor.impl;
 
 
-import org.safehaus.subutai.common.command.CommandCallback;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.Response;
+import io.subutai.common.command.CommandCallback;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.Response;
 
 
 /**

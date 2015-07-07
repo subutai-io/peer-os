@@ -12,10 +12,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.dao.DaoManager;
-import org.safehaus.subutai.common.tracker.OperationState;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.common.tracker.TrackerOperationView;
+import io.subutai.common.dao.DaoManager;
+import io.subutai.common.tracker.OperationState;
+import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.tracker.TrackerOperationView;
 import io.subutai.core.tracker.api.Tracker;
 import io.subutai.core.tracker.impl.dao.TrackerOperationDataService;
 

@@ -1,7 +1,7 @@
 package io.subutai.core.hostregistry.impl;
 
 
-import org.safehaus.subutai.common.host.Interface;
+import io.subutai.common.host.Interface;
 
 import com.google.common.base.Objects;
 

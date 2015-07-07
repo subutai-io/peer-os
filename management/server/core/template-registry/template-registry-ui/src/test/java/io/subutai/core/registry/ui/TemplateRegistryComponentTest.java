@@ -6,9 +6,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.protocol.Template;
+import io.subutai.common.protocol.Template;
 import io.subutai.core.registry.api.TemplateRegistry;
-import io.subutai.core.registry.ui.TemplateRegistryComponent;
 
 import com.google.common.collect.Lists;
 import com.vaadin.ui.Button;

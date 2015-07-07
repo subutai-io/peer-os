@@ -8,13 +8,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.environment.Environment;
-import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
-import org.safehaus.subutai.common.test.SystemOutRedirectTest;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.metric.api.ContainerHostMetric;
 import io.subutai.core.metric.api.Monitor;
-import io.subutai.core.metric.cli.ContainerHostMetricsCommand;
 
 import com.google.common.collect.Sets;
 

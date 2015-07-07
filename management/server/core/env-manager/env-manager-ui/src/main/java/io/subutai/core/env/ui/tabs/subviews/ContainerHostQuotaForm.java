@@ -3,11 +3,11 @@ package io.subutai.core.env.ui.tabs.subviews;
 
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.common.quota.DiskPartition;
-import org.safehaus.subutai.common.quota.DiskQuota;
-import org.safehaus.subutai.common.quota.RamQuota;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.quota.DiskPartition;
+import io.subutai.common.quota.DiskQuota;
+import io.subutai.common.quota.RamQuota;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

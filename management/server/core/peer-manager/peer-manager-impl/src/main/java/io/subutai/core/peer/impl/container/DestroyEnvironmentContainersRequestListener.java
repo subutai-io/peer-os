@@ -1,7 +1,7 @@
 package io.subutai.core.peer.impl.container;
 
 
-import org.safehaus.subutai.common.peer.ContainersDestructionResult;
+import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.Payload;
 import io.subutai.core.peer.api.RequestListener;

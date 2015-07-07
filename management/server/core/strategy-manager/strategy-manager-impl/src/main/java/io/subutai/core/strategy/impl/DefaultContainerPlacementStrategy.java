@@ -4,10 +4,10 @@ package io.subutai.core.strategy.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.safehaus.subutai.common.metric.ResourceHostMetric;
-import org.safehaus.subutai.common.protocol.Criteria;
-import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.common.util.UnitUtil;
+import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.protocol.Criteria;
+import io.subutai.common.util.CollectionUtil;
+import io.subutai.common.util.UnitUtil;
 import io.subutai.core.strategy.api.AbstractContainerPlacementStrategy;
 
 import com.google.common.collect.Maps;

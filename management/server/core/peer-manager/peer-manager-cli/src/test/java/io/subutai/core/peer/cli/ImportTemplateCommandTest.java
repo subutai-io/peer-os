@@ -8,9 +8,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.common.test.SystemOutRedirectTest;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.protocol.Template;
+import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.peer.api.PeerManager;
 
 import io.subutai.core.registry.api.TemplateRegistry;

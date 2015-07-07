@@ -11,10 +11,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.metric.ResourceHostMetric;
-import org.safehaus.subutai.common.util.UnitUtil;
-
-import io.subutai.core.strategy.impl.DefaultContainerPlacementStrategy;
+import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.util.UnitUtil;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

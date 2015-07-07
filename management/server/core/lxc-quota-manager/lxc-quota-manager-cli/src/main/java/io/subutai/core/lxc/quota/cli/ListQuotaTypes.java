@@ -1,7 +1,7 @@
 package io.subutai.core.lxc.quota.cli;
 
 
-import org.safehaus.subutai.common.quota.QuotaType;
+import io.subutai.common.quota.QuotaType;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 import org.apache.karaf.shell.commands.Command;

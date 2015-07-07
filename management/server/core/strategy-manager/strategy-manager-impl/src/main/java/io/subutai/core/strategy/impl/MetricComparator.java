@@ -1,8 +1,8 @@
 package io.subutai.core.strategy.impl;
 
 
-import org.safehaus.subutai.common.metric.ResourceHostMetric;
-import org.safehaus.subutai.common.protocol.Criteria;
+import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.protocol.Criteria;
 import io.subutai.core.strategy.api.StrategyException;
 
 

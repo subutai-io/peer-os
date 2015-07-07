@@ -9,18 +9,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.exception.HTTPException;
-import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.peer.PeerInfo;
-import org.safehaus.subutai.common.util.RestUtil;
+import io.subutai.common.exception.HTTPException;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.util.RestUtil;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import io.subutai.core.messenger.impl.Envelope;
-import io.subutai.core.messenger.impl.MessageImpl;
-import io.subutai.core.messenger.impl.MessengerDao;
-import io.subutai.core.messenger.impl.RemotePeerMessageSender;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;

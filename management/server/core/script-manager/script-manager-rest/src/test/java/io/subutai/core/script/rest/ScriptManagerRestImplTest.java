@@ -16,14 +16,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.util.JsonUtil;
+import io.subutai.common.util.JsonUtil;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 
 import com.google.common.reflect.TypeToken;
-
-import io.subutai.core.script.rest.ScriptManagerRestImpl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

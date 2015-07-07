@@ -5,12 +5,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
-import org.safehaus.subutai.common.command.CommandCallback;
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.CommandStatus;
-import org.safehaus.subutai.common.command.Response;
-import org.safehaus.subutai.common.command.ResponseType;
+import io.subutai.common.command.CommandCallback;
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.CommandStatus;
+import io.subutai.common.command.Response;
+import io.subutai.common.command.ResponseType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -3,8 +3,8 @@ package io.subutai.core.peer.impl.container;
 
 import java.util.concurrent.Callable;
 
-import org.safehaus.subutai.common.command.CommandUtil;
-import org.safehaus.subutai.common.command.RequestBuilder;
+import io.subutai.common.command.CommandUtil;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.core.peer.api.ResourceHost;
 
 import com.google.common.base.Preconditions;

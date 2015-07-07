@@ -10,7 +10,7 @@ import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import org.safehaus.subutai.common.exception.DaoException;
+import io.subutai.common.exception.DaoException;
 import io.subutai.core.metric.impl.model.Subscriber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

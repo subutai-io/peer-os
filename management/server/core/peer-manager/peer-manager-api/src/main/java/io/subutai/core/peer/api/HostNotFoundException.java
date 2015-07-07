@@ -1,7 +1,7 @@
 package io.subutai.core.peer.api;
 
 
-import org.safehaus.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerException;
 
 
 /**

@@ -8,9 +8,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.dao.DaoManager;
+import io.subutai.common.dao.DaoManager;
 import io.subutai.core.channel.api.token.ChannelTokenManager;
-import io.subutai.core.channel.impl.ChannelManagerImpl;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;

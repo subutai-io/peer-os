@@ -7,10 +7,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.Host;
-import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.common.settings.Common;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.Host;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.settings.Common;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.hostregistry.api.ResourceHostInfo;

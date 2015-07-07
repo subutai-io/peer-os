@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.common.protocol.Template;
+import io.subutai.common.protocol.Template;
 import io.subutai.core.registry.api.TemplateRegistry;
 
 import com.google.common.collect.Lists;

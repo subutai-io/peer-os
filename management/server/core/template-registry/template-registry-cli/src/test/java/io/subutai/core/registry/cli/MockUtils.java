@@ -3,7 +3,7 @@ package io.subutai.core.registry.cli;
 
 import java.util.List;
 
-import org.safehaus.subutai.common.protocol.Template;
+import io.subutai.common.protocol.Template;
 
 import com.google.common.collect.Lists;
 

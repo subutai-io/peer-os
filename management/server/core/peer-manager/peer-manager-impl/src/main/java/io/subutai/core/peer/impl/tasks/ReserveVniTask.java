@@ -3,7 +3,7 @@ package io.subutai.core.peer.impl.tasks;
 
 import java.util.concurrent.Callable;
 
-import org.safehaus.subutai.common.network.Vni;
+import io.subutai.common.network.Vni;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 

@@ -1,7 +1,7 @@
 package io.subutai.pluginmanager.impl;
 
 
-import org.safehaus.subutai.common.command.RequestBuilder;
+import io.subutai.common.command.RequestBuilder;
 
 
 public class Commands

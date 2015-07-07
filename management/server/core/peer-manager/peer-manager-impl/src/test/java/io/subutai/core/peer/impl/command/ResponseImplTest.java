@@ -8,12 +8,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.command.Response;
-import org.safehaus.subutai.common.command.ResponseType;
+import io.subutai.common.command.Response;
+import io.subutai.common.command.ResponseType;
 
 import com.google.common.collect.Sets;
-
-import io.subutai.core.peer.impl.command.ResponseImpl;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Mockito.when;

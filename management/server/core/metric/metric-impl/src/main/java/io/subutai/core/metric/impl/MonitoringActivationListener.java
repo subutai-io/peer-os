@@ -4,7 +4,7 @@ package io.subutai.core.metric.impl;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.metric.api.MonitoringSettings;
 import io.subutai.core.peer.api.Payload;
 import io.subutai.core.peer.api.PeerManager;

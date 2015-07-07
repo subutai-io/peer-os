@@ -1,7 +1,7 @@
 package io.subutai.core.registry.cli;
 
 
-import org.safehaus.subutai.common.protocol.Template;
+import io.subutai.common.protocol.Template;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.registry.api.TemplateRegistry;
 

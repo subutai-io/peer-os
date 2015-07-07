@@ -7,8 +7,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.safehaus.subutai.common.peer.PeerInfo;
-import org.safehaus.subutai.common.peer.PeerPolicy;
+import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.peer.PeerPolicy;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;

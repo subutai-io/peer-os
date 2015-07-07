@@ -3,14 +3,14 @@ package io.subutai.core.peer.impl.command;
 
 import java.util.Map;
 
-import org.safehaus.subutai.common.command.CommandCallback;
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.Response;
-import org.safehaus.subutai.common.peer.Host;
-import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.common.settings.Common;
+import io.subutai.common.command.CommandCallback;
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.Response;
+import io.subutai.common.peer.Host;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.settings.Common;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.Payload;
 import io.subutai.core.peer.api.PeerManager;

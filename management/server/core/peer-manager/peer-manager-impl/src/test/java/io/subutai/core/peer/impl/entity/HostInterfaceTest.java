@@ -6,10 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.host.Interface;
-
-import io.subutai.core.peer.impl.entity.AbstractSubutaiHost;
-import io.subutai.core.peer.impl.entity.HostInterface;
+import io.subutai.common.host.Interface;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Mockito.when;

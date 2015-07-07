@@ -4,7 +4,7 @@ package io.subutai.core.messenger.api;
 import java.util.Map;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.peer.Peer;
+import io.subutai.common.peer.Peer;
 
 
 /**

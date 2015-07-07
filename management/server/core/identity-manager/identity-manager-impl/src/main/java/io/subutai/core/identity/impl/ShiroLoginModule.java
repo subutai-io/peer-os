@@ -16,9 +16,9 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginException;
 
-import org.safehaus.subutai.common.security.ShiroPrincipal;
-import org.safehaus.subutai.common.security.SubutaiLoginContext;
-import org.safehaus.subutai.common.util.ServiceLocator;
+import io.subutai.common.security.ShiroPrincipal;
+import io.subutai.common.security.SubutaiLoginContext;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

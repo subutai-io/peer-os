@@ -18,15 +18,15 @@ import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
-import org.safehaus.subutai.common.command.CommandCallback;
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.host.HostArchitecture;
-import org.safehaus.subutai.common.host.HostInfo;
-import org.safehaus.subutai.common.host.Interface;
-import org.safehaus.subutai.common.peer.Host;
-import org.safehaus.subutai.common.peer.Peer;
+import io.subutai.common.command.CommandCallback;
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.Interface;
+import io.subutai.common.peer.Host;
+import io.subutai.common.peer.Peer;
 
 import com.google.common.base.Preconditions;
 

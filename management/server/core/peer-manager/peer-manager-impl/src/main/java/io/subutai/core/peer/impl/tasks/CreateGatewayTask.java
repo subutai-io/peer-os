@@ -4,8 +4,8 @@ package io.subutai.core.peer.impl.tasks;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import org.safehaus.subutai.common.network.Gateway;
-import org.safehaus.subutai.common.peer.PeerException;
+import io.subutai.common.network.Gateway;
+import io.subutai.common.peer.PeerException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.ManagementHost;

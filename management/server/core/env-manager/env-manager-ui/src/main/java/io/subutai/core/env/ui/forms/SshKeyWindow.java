@@ -1,8 +1,8 @@
 package io.subutai.core.env.ui.forms;
 
 
-import org.safehaus.subutai.common.environment.Environment;
-import org.safehaus.subutai.common.environment.EnvironmentModificationException;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentModificationException;
 
 import com.google.common.base.Strings;
 import com.vaadin.ui.Button;

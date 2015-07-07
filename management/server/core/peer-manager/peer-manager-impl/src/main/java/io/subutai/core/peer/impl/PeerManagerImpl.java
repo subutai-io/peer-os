@@ -5,11 +5,11 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.dao.DaoManager;
-import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.common.peer.PeerInfo;
-import org.safehaus.subutai.common.peer.PeerPolicy;
+import io.subutai.common.dao.DaoManager;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.peer.PeerPolicy;
 import io.subutai.core.messenger.api.Messenger;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;

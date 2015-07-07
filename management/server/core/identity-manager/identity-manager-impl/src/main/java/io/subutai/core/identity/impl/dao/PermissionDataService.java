@@ -8,7 +8,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import org.safehaus.subutai.common.protocol.api.DataService;
+import io.subutai.common.protocol.api.DataService;
 import io.subutai.core.identity.api.PermissionGroup;
 import io.subutai.core.identity.impl.entity.PermissionEntity;
 import io.subutai.core.identity.impl.entity.PermissionPK;

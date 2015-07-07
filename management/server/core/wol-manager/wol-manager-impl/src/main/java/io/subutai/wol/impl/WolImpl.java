@@ -3,11 +3,11 @@ package io.subutai.wol.impl;
 
 import java.util.ArrayList;
 
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.peer.Host;
-import org.safehaus.subutai.common.peer.PeerException;
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.Host;
+import io.subutai.common.peer.PeerException;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.wol.api.WolManager;

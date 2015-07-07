@@ -9,8 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.safehaus.subutai.common.metric.ResourceHostMetric;
-import org.safehaus.subutai.common.protocol.Criteria;
+import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.protocol.Criteria;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;

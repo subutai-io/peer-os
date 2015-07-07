@@ -3,7 +3,7 @@ package io.subutai.core.peer.ui;
 
 import java.io.File;
 
-import org.safehaus.subutai.common.util.FileUtil;
+import io.subutai.common.util.FileUtil;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.peer.api.PeerManager;

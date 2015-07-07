@@ -4,7 +4,7 @@ package io.subutai.core.hostregistry.api;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInfo;
 
 
 /**

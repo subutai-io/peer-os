@@ -6,15 +6,13 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.junit.Test;
-import org.safehaus.subutai.common.environment.NodeGroup;
-import org.safehaus.subutai.common.protocol.Criteria;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
-import org.safehaus.subutai.common.util.JsonUtil;
+import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.protocol.Criteria;
+import io.subutai.common.protocol.PlacementStrategy;
+import io.subutai.common.util.JsonUtil;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import io.subutai.core.env.rest.TopologyJson;
 
 
 public class OutputJsonTest

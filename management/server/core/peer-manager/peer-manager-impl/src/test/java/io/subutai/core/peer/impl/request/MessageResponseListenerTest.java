@@ -12,15 +12,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.cache.ExpiringCache;
-import org.safehaus.subutai.common.peer.PeerException;
+import io.subutai.common.cache.ExpiringCache;
+import io.subutai.common.peer.PeerException;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
 import io.subutai.core.messenger.api.MessageStatus;
 import io.subutai.core.messenger.api.Messenger;
-import io.subutai.core.peer.impl.request.MessageRequest;
-import io.subutai.core.peer.impl.request.MessageResponse;
-import io.subutai.core.peer.impl.request.MessageResponseListener;
 
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;

@@ -7,9 +7,9 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Properties;
 
-import org.safehaus.subutai.common.datatypes.TemplateVersion;
-import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.common.settings.Common;
+import io.subutai.common.datatypes.TemplateVersion;
+import io.subutai.common.protocol.Template;
+import io.subutai.common.settings.Common;
 
 
 /**

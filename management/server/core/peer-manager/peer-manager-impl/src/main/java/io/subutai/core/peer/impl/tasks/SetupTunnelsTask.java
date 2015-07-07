@@ -5,8 +5,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
-import org.safehaus.subutai.common.network.Vni;
-import org.safehaus.subutai.common.peer.PeerException;
+import io.subutai.common.network.Vni;
+import io.subutai.common.peer.PeerException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.Tunnel;
 import io.subutai.core.peer.impl.entity.ManagementHostEntity;

@@ -13,7 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.safehaus.subutai.common.host.Interface;
+import io.subutai.common.host.Interface;
 
 
 @Entity

@@ -8,12 +8,12 @@ package org.safehaus.subutai.server.ui.component;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.safehaus.subutai.common.command.CommandCallback;
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.command.Response;
-import org.safehaus.subutai.common.peer.ContainerHost;
+import io.subutai.common.command.CommandCallback;
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.command.Response;
+import io.subutai.common.peer.ContainerHost;
 
 import com.google.common.base.Strings;
 import com.vaadin.event.ShortcutAction;

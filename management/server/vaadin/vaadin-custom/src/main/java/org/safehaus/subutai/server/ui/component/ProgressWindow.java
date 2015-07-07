@@ -9,8 +9,8 @@ package org.safehaus.subutai.server.ui.component;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.tracker.OperationState;
-import org.safehaus.subutai.common.tracker.TrackerOperationView;
+import io.subutai.common.tracker.OperationState;
+import io.subutai.common.tracker.TrackerOperationView;
 import io.subutai.core.tracker.api.Tracker;
 
 import com.google.gwt.thirdparty.guava.common.base.Strings;

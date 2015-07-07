@@ -9,7 +9,7 @@ import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.common.tracker.TrackerOperationView;
+import io.subutai.common.tracker.TrackerOperationView;
 import io.subutai.core.tracker.api.Tracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

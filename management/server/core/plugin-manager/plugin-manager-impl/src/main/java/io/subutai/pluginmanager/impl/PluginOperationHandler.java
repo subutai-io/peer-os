@@ -3,8 +3,8 @@ package io.subutai.pluginmanager.impl;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.pluginmanager.api.OperationType;
 import io.subutai.pluginmanager.api.PluginManagerException;
 import org.slf4j.Logger;

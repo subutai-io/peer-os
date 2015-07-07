@@ -9,13 +9,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.command.CommandCallback;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.Response;
-
-import io.subutai.core.executor.impl.CommandProcess;
-import io.subutai.core.executor.impl.CommandProcessor;
-import io.subutai.core.executor.impl.ResponseProcessor;
+import io.subutai.common.command.CommandCallback;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.Response;
 
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;

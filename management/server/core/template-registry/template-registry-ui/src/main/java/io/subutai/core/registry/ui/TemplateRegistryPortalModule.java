@@ -3,7 +3,7 @@ package io.subutai.core.registry.ui;
 
 import java.io.File;
 
-import org.safehaus.subutai.common.util.FileUtil;
+import io.subutai.common.util.FileUtil;
 import io.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 

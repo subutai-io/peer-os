@@ -5,9 +5,9 @@ import java.io.File;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.environment.Environment;
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.util.FileUtil;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.util.FileUtil;
 import io.subutai.core.env.api.EnvironmentEventListener;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.peer.api.PeerManager;

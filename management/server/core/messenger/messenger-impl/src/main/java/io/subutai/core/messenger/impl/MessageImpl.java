@@ -3,8 +3,8 @@ package io.subutai.core.messenger.impl;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.common.util.StringUtil;
+import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.StringUtil;
 import io.subutai.core.messenger.api.Message;
 
 import com.google.common.base.Objects;

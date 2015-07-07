@@ -4,11 +4,9 @@ package io.subutai.core.network.impl;
 import java.util.UUID;
 
 import org.junit.Test;
-import org.safehaus.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerHost;
 
 import com.google.common.collect.Sets;
-
-import io.subutai.core.network.impl.Commands;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;

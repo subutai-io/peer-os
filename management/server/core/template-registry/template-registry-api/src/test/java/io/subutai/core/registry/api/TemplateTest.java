@@ -8,7 +8,7 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.common.protocol.Template;
+import io.subutai.common.protocol.Template;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;

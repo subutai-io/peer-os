@@ -10,9 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.environment.NodeGroup;
-
-import io.subutai.core.env.rest.TopologyJson;
+import io.subutai.common.environment.NodeGroup;
 
 import static junit.framework.TestCase.assertEquals;
 

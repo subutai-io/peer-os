@@ -5,12 +5,11 @@ import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.common.host.ContainerHostState;
-import org.safehaus.subutai.common.host.HostArchitecture;
-import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.util.JsonUtil;
+import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.settings.Common;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.hostregistry.api.ResourceHostInfo;
-import io.subutai.core.hostregistry.impl.HeartBeat;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertNotNull;

@@ -4,13 +4,13 @@ package io.subutai.core.env.impl.tasks;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
-import org.safehaus.subutai.common.environment.EnvironmentModificationException;
-import org.safehaus.subutai.common.environment.EnvironmentStatus;
-import org.safehaus.subutai.common.environment.Topology;
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.common.util.ExceptionUtil;
+import io.subutai.common.environment.EnvironmentModificationException;
+import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.environment.Topology;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.env.impl.EnvironmentManagerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.ResultHolder;
@@ -26,8 +26,8 @@ import com.google.common.collect.Sets;
  *
  * @see io.subutai.core.env.impl.entity.EnvironmentImpl
  * @see io.subutai.core.env.impl.exception.ResultHolder
- * @see org.safehaus.subutai.common.environment.Topology
- * @see org.safehaus.subutai.common.peer.ContainerHost
+ * @see io.subutai.common.environment.Topology
+ * @see io.subutai.common.peer.ContainerHost
  */
 public class GrowEnvironmentTask implements Runnable
 {

@@ -3,12 +3,12 @@ package io.subutai.core.executor.cli;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.command.CommandCallback;
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.command.Response;
-import org.safehaus.subutai.common.util.UUIDUtil;
+import io.subutai.common.command.CommandCallback;
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.command.Response;
+import io.subutai.common.util.UUIDUtil;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.slf4j.Logger;

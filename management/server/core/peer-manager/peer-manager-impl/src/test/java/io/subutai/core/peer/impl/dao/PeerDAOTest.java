@@ -12,10 +12,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.dao.DaoManager;
-import org.safehaus.subutai.common.util.JsonUtil;
+import io.subutai.common.dao.DaoManager;
+import io.subutai.common.util.JsonUtil;
 
-import io.subutai.core.peer.impl.dao.PeerDAO;
 import io.subutai.core.peer.impl.entity.PeerData;
 
 import com.google.common.collect.Lists;

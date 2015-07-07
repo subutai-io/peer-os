@@ -3,9 +3,9 @@
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
   <persistence-unit name="default">
     <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
-    <class>org.safehaus.subutai.common.protocol.Template</class>
-    <class>org.safehaus.subutai.common.protocol.TemplatePK</class>
-    <!--<class>org.safehaus.subutai.common.protocol.Template.TemplatePK</class>-->
+    <class>io.subutai.common.protocol.Template</class>
+    <class>io.subutai.common.protocol.TemplatePK</class>
+    <!--<class>Template.TemplatePK</class>-->
     <properties>
       <property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver" />
       <property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:mem:test" />

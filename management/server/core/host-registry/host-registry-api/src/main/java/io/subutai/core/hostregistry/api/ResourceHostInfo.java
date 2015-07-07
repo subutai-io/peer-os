@@ -3,7 +3,7 @@ package io.subutai.core.hostregistry.api;
 
 import java.util.Set;
 
-import org.safehaus.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInfo;
 
 
 /**

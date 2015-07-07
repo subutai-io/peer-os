@@ -11,14 +11,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.host.ContainerHostState;
-import org.safehaus.subutai.common.host.HostArchitecture;
-import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.util.JsonUtil;
+import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.settings.Common;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.hostregistry.api.ResourceHostInfo;
 import io.subutai.core.hostregistry.impl.ResourceHostInfoImpl;
-import io.subutai.core.hostregistry.rest.RestServiceImpl;
 
 import com.google.common.collect.Sets;
 import com.google.gson.reflect.TypeToken;

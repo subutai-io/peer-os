@@ -4,9 +4,9 @@ package io.subutai.core.peer.api;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.metric.ResourceHostMetric;
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.Host;
+import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.Host;
 
 
 /**

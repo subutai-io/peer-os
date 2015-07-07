@@ -6,10 +6,10 @@
     >
 
   <!--TemplateService-->
-  <bean id="templateServiceImpl" class="org.safehaus.subutai.common.protocol.impl.TemplateServiceImpl">
+  <bean id="templateServiceImpl" class="io.subutai.common.protocol.impl.TemplateServiceImpl">
     <jpa:unit unitname="commonServicePUnit" property="entityManagerFactory" />
   </bean>
 
-  <service ref="templateServiceImpl"  interface="org.safehaus.subutai.common.protocol.api.TemplateService" />
+  <service ref="templateServiceImpl"  interface="io.subutai.common.protocol.api.TemplateService" />
 
 </blueprint>

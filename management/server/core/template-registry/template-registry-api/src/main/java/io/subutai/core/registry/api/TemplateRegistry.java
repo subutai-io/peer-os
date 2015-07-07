@@ -9,8 +9,8 @@ package io.subutai.core.registry.api;
 import java.util.List;
 import java.util.Set;
 
-import org.safehaus.subutai.common.datatypes.TemplateVersion;
-import org.safehaus.subutai.common.protocol.Template;
+import io.subutai.common.datatypes.TemplateVersion;
+import io.subutai.common.protocol.Template;
 import io.subutai.core.git.api.GitChangedFile;
 
 

@@ -15,12 +15,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.environment.NodeGroup;
-import org.safehaus.subutai.common.environment.Topology;
-import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.common.peer.PeerInfo;
-import org.safehaus.subutai.common.util.ExceptionUtil;
+import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Topology;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.env.impl.TestUtil;
 
 import io.subutai.core.env.impl.entity.EnvironmentContainerImpl;

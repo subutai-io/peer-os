@@ -4,9 +4,9 @@ package io.subutai.core.peer.api;
 import java.util.List;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.common.peer.PeerInfo;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerInfo;
 
 
 public interface PeerManager

@@ -3,7 +3,7 @@ package io.subutai.core.executor.ui;
 
 import java.io.File;
 
-import org.safehaus.subutai.common.util.FileUtil;
+import io.subutai.common.util.FileUtil;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.server.ui.api.PortalModule;

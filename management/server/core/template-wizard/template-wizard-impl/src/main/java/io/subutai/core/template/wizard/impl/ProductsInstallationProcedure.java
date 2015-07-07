@@ -3,11 +3,11 @@ package io.subutai.core.template.wizard.impl;
 
 import java.util.List;
 
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.CommandUtil;
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.peer.Host;
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.CommandUtil;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.Host;
 import io.subutai.core.template.wizard.api.exception.TemplateWizardException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

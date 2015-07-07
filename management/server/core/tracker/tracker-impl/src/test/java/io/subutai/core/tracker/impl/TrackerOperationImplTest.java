@@ -12,12 +12,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Test;
-import org.safehaus.subutai.common.tracker.OperationState;
-import org.safehaus.subutai.common.util.UUIDUtil;
-
-import io.subutai.core.tracker.impl.TrackerImpl;
-import io.subutai.core.tracker.impl.TrackerOperationImpl;
-import io.subutai.core.tracker.impl.TrackerOperationViewImpl;
+import io.subutai.common.tracker.OperationState;
+import io.subutai.common.util.UUIDUtil;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

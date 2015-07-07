@@ -1,7 +1,7 @@
 package io.subutai.core.identity.ui;
 
 
-import org.safehaus.subutai.common.protocol.Disposable;
+import io.subutai.common.protocol.Disposable;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.ui.tabs.RolesTab;
 import io.subutai.core.identity.ui.tabs.UsersTab;

@@ -17,13 +17,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.dao.DaoManager;
-import org.safehaus.subutai.common.test.SystemOutRedirectTest;
-import org.safehaus.subutai.common.tracker.OperationState;
-import org.safehaus.subutai.common.tracker.TrackerOperationView;
+import io.subutai.common.dao.DaoManager;
+import io.subutai.common.test.SystemOutRedirectTest;
+import io.subutai.common.tracker.OperationState;
+import io.subutai.common.tracker.TrackerOperationView;
 
-import io.subutai.core.tracker.impl.TrackerImpl;
-import io.subutai.core.tracker.impl.TrackerOperationImpl;
 import io.subutai.core.tracker.impl.dao.TrackerOperationDataService;
 
 import static junit.framework.TestCase.assertEquals;

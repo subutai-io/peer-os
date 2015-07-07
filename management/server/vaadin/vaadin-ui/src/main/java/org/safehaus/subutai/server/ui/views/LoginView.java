@@ -5,9 +5,9 @@ import java.io.Serializable;
 
 import javax.servlet.http.Cookie;
 
-import org.safehaus.subutai.common.security.SubutaiLoginContext;
-import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.common.util.ServiceLocator;
+import io.subutai.common.security.SubutaiLoginContext;
+import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.server.ui.MainUI;
 import org.safehaus.subutai.server.ui.util.HelpManager;

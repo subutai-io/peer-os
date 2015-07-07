@@ -7,9 +7,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import org.safehaus.subutai.common.cache.ExpiringCache;
-import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.common.protocol.Disposable;
+import io.subutai.common.cache.ExpiringCache;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.protocol.Disposable;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageListener;
 import io.subutai.core.messenger.api.MessageStatus;

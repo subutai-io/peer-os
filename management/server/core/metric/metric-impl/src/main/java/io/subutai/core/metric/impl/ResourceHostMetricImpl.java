@@ -3,7 +3,7 @@ package io.subutai.core.metric.impl;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.metric.ResourceHostMetric;
 
 import com.google.common.base.Preconditions;
 

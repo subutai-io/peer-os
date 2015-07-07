@@ -4,12 +4,12 @@ package io.subutai.core.template.wizard.impl;
 import java.util.List;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.protocol.Template;
+import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.peer.api.HostNotFoundException;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.ResourceHost;

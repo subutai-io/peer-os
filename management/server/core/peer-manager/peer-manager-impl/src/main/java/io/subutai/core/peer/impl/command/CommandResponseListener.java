@@ -4,10 +4,10 @@ package io.subutai.core.peer.impl.command;
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
-import org.safehaus.subutai.common.cache.EntryExpiryCallback;
-import org.safehaus.subutai.common.cache.ExpiringCache;
-import org.safehaus.subutai.common.command.CommandCallback;
-import org.safehaus.subutai.common.protocol.Disposable;
+import io.subutai.common.cache.EntryExpiryCallback;
+import io.subutai.common.cache.ExpiringCache;
+import io.subutai.common.command.CommandCallback;
+import io.subutai.common.protocol.Disposable;
 import io.subutai.core.peer.api.Payload;
 import io.subutai.core.peer.api.RequestListener;
 import io.subutai.core.peer.impl.RecipientType;

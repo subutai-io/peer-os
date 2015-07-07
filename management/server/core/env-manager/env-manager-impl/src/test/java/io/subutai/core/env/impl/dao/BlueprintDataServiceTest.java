@@ -14,11 +14,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.dao.DaoManager;
-import org.safehaus.subutai.common.environment.Blueprint;
-import org.safehaus.subutai.common.util.JsonUtil;
+import io.subutai.common.dao.DaoManager;
+import io.subutai.common.environment.Blueprint;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.env.api.exception.EnvironmentManagerException;
-import io.subutai.core.env.impl.dao.BlueprintDataService;
 import io.subutai.core.env.impl.entity.EnvironmentBlueprintEntity;
 
 import com.google.common.collect.Lists;

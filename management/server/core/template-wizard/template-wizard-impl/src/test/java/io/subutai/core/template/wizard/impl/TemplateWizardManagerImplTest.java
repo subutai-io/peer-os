@@ -10,12 +10,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.protocol.Template;
+import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.peer.api.HostNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
@@ -23,7 +23,6 @@ import io.subutai.core.peer.api.ResourceHost;
 import io.subutai.core.peer.api.ResourceHostException;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.template.wizard.api.InstallationPhase;
-import io.subutai.core.template.wizard.impl.TemplateWizardManagerImpl;
 
 import com.google.common.collect.Lists;
 

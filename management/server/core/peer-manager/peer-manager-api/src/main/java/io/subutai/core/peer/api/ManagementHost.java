@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.network.Gateway;
-import org.safehaus.subutai.common.network.Vni;
-import org.safehaus.subutai.common.peer.Host;
-import org.safehaus.subutai.common.peer.PeerException;
+import io.subutai.common.network.Gateway;
+import io.subutai.common.network.Vni;
+import io.subutai.common.peer.Host;
+import io.subutai.common.peer.PeerException;
 
 
 /**

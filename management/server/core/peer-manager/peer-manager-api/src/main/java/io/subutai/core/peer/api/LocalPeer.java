@@ -4,11 +4,11 @@ package io.subutai.core.peer.api;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.Host;
-import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.common.protocol.Template;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.Host;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.protocol.Template;
 
 
 /**

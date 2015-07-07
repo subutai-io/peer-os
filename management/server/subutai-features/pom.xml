@@ -26,7 +26,7 @@
       <artifactId>subutai-common-datasource</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.safehaus.subutai</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common-implementation</artifactId>
     </dependency>
 

@@ -8,9 +8,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.command.CommandCallback;
-import org.safehaus.subutai.common.command.Request;
-import org.safehaus.subutai.common.command.RequestBuilder;
+import io.subutai.common.command.CommandCallback;
+import io.subutai.common.command.Request;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.core.broker.api.Broker;
 
 import io.subutai.core.hostregistry.api.HostRegistry;

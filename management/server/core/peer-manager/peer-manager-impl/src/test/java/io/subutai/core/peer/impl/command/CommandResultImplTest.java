@@ -6,10 +6,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.CommandStatus;
-
-import io.subutai.core.peer.impl.command.CommandResultImpl;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.CommandStatus;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;

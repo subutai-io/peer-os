@@ -14,7 +14,7 @@
 
   <!-- Data Access object to get EntityManager -->
 
-  <bean id="daoManagerMetric" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager" scope="prototype">
+  <bean id="daoManagerMetric" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
     <jpa:unit unitname="metricPUnit" property="entityManagerFactory" />
   </bean>
 

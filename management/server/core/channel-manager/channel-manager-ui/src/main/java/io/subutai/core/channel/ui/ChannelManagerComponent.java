@@ -1,7 +1,7 @@
 package io.subutai.core.channel.ui;
 
 
-import org.safehaus.subutai.common.protocol.Disposable;
+import io.subutai.common.protocol.Disposable;
 import io.subutai.core.channel.api.ChannelManager;
 import io.subutai.core.channel.ui.tabs.PortManager;
 import io.subutai.core.channel.ui.tabs.UserTokenManager;

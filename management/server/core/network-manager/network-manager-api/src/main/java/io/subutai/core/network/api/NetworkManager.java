@@ -4,9 +4,9 @@ package io.subutai.core.network.api;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.network.Vni;
-import org.safehaus.subutai.common.network.VniVlanMapping;
-import org.safehaus.subutai.common.peer.ContainerHost;
+import io.subutai.common.network.Vni;
+import io.subutai.common.network.VniVlanMapping;
+import io.subutai.common.peer.ContainerHost;
 
 
 public interface NetworkManager

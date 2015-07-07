@@ -2,14 +2,12 @@ package io.subutai.wol.impl;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.RequestBuilder;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.wol.api.WolManagerException;
-import io.subutai.wol.impl.Commands;
-import io.subutai.wol.impl.WolImpl;
 
 import java.util.ArrayList;
 

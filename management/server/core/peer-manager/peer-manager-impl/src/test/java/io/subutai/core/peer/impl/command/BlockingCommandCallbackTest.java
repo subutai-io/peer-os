@@ -8,11 +8,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.command.CommandCallback;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.Response;
-
-import io.subutai.core.peer.impl.command.BlockingCommandCallback;
+import io.subutai.common.command.CommandCallback;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.Response;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.mockito.Mockito.verify;

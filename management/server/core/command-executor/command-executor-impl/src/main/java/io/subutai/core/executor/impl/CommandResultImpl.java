@@ -1,8 +1,8 @@
 package io.subutai.core.executor.impl;
 
 
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.CommandStatus;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.CommandStatus;
 
 import com.google.common.base.Objects;
 

@@ -7,13 +7,13 @@ import java.util.Set;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.host.ContainerHostState;
-import org.safehaus.subutai.common.host.HostInfo;
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.protocol.Disposable;
-import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.common.util.ServiceLocator;
+import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostInfo;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.protocol.Disposable;
+import io.subutai.common.settings.Common;
+import io.subutai.common.util.CollectionUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.hostregistry.api.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;

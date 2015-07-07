@@ -3,7 +3,7 @@ package io.subutai.core.peer.ui.container;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.util.ServiceLocator;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.ui.PeerManagerPortalModule;
 import io.subutai.core.peer.ui.container.clone.Cloner;

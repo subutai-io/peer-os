@@ -4,12 +4,10 @@ package io.subutai.core.repository.impl;
 import java.util.Set;
 
 import org.junit.Test;
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.util.StringUtil;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.util.StringUtil;
 
 import com.google.common.collect.Sets;
-
-import io.subutai.core.repository.impl.Commands;
 
 import static org.junit.Assert.assertEquals;
 

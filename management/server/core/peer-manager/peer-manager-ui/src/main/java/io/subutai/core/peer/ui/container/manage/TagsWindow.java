@@ -3,10 +3,10 @@ package io.subutai.core.peer.ui.container.manage;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.environment.Environment;
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.common.util.UUIDUtil;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.util.ServiceLocator;
+import io.subutai.common.util.UUIDUtil;
 import io.subutai.core.env.api.EnvironmentManager;
 
 import com.google.common.base.Strings;

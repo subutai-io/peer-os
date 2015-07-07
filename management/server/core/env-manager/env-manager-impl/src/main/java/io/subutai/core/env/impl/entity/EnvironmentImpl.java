@@ -18,15 +18,15 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.safehaus.subutai.common.environment.ContainerHostNotFoundException;
-import org.safehaus.subutai.common.environment.Environment;
-import org.safehaus.subutai.common.environment.EnvironmentModificationException;
-import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
-import org.safehaus.subutai.common.environment.EnvironmentStatus;
-import org.safehaus.subutai.common.environment.Topology;
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.util.CollectionUtil;
+import io.subutai.common.environment.ContainerHostNotFoundException;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentModificationException;
+import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.environment.Topology;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.env.impl.dao.EnvironmentDataService;
 
@@ -45,7 +45,7 @@ import com.google.common.collect.Sets;
  * Database entity to store environment specific fields.
  *
  * @see EnvironmentContainerImpl
- * @see org.safehaus.subutai.common.peer.ContainerHost
+ * @see io.subutai.common.peer.ContainerHost
  */
 @Entity
 @Table( name = "environment" )

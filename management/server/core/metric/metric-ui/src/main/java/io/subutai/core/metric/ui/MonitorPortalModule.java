@@ -5,8 +5,8 @@ import java.io.File;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.common.util.ServiceLocator;
+import io.subutai.common.util.FileUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.slf4j.Logger;

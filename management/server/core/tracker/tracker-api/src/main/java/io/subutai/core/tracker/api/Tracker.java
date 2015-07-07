@@ -10,8 +10,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.common.tracker.TrackerOperationView;
+import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.tracker.TrackerOperationView;
 
 
 /**

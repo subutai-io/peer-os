@@ -6,7 +6,7 @@ import java.util.Collection;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.safehaus.subutai.common.protocol.api.DataService;
+import io.subutai.common.protocol.api.DataService;
 import io.subutai.core.peer.impl.entity.ContainerHostEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

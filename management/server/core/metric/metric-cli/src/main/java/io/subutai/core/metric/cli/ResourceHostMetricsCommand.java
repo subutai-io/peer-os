@@ -3,7 +3,7 @@ package io.subutai.core.metric.cli;
 
 import java.util.Set;
 
-import org.safehaus.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.metric.api.Monitor;
 

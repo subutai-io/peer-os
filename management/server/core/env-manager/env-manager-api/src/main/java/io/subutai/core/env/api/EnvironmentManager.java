@@ -4,12 +4,12 @@ package io.subutai.core.env.api;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.environment.Blueprint;
-import org.safehaus.subutai.common.environment.Environment;
-import org.safehaus.subutai.common.environment.EnvironmentModificationException;
-import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
-import org.safehaus.subutai.common.environment.Topology;
-import org.safehaus.subutai.common.peer.ContainerHost;
+import io.subutai.common.environment.Blueprint;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentModificationException;
+import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.environment.Topology;
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.env.api.exception.EnvironmentCreationException;
 import io.subutai.core.env.api.exception.EnvironmentDestructionException;
 import io.subutai.core.env.api.exception.EnvironmentManagerException;

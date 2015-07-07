@@ -3,7 +3,7 @@ package io.subutai.core.hostregistry.cli;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.util.UUIDUtil;
+import io.subutai.common.util.UUIDUtil;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.hostregistry.api.ResourceHostInfo;

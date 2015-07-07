@@ -4,10 +4,10 @@ package io.subutai.core.network.impl;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.command.OutputRedirection;
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.settings.Common;
+import io.subutai.common.command.OutputRedirection;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.settings.Common;
 
 import com.google.common.collect.Lists;
 

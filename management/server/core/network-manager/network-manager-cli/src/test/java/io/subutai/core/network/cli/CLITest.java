@@ -7,15 +7,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.test.SystemOutRedirectTest;
+import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.network.cli.RemoveContainerIpCommand;
-import io.subutai.core.network.cli.RemoveN2NCommand;
-import io.subutai.core.network.cli.RemoveTunnelCommand;
-import io.subutai.core.network.cli.SetContainerIpCommand;
-import io.subutai.core.network.cli.SetupN2NCommand;
-import io.subutai.core.network.cli.SetupTunnelCommand;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
