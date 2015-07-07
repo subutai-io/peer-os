@@ -6,11 +6,11 @@
   <reference id="templateRegistry" availability="mandatory"
              interface="io.subutai.core.registry.api.TemplateRegistry" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.template.wizard.impl.TemplateWizardManagerImpl">
+  <bean id="module" scope="singleton" class="io.subutai.core.template.wizard.impl.TemplateWizardManagerImpl">
     <property name="peerManager" ref="peerManager" />
     <property name="templateRegistry" ref="templateRegistry" />
   </bean>
 
-  <service ref="module" interface="org.safehaus.subutai.core.template.wizard.api.TemplateWizardManager" />
+  <service ref="module" interface="io.subutai.core.template.wizard.api.TemplateWizardManager" />
 
 </blueprint>

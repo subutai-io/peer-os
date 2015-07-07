@@ -8,9 +8,9 @@
   <reference id="tracker" availability="mandatory"
              interface="org.safehaus.subutai.core.tracker.api.Tracker" />
   <reference id="templateWizard" availability="mandatory"
-             interface="org.safehaus.subutai.core.template.wizard.api.TemplateWizardManager" />
+             interface="io.subutai.core.template.wizard.api.TemplateWizardManager" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.template.wizard.ui.TemplateWizardPortalModule"
+  <bean id="module" scope="singleton" class="io.subutai.core.template.wizard.ui.TemplateWizardPortalModule"
         destroy-method="dispose">
     <argument ref="templateRegistry" />
     <argument ref="peerManager" />
