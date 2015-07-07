@@ -2,7 +2,7 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <reference id="tracker" availability="mandatory"
-             interface="org.safehaus.subutai.core.tracker.api.Tracker" />
+             interface="io.subutai.core.tracker.api.Tracker" />
 
   <reference id="pluginManager" availability="mandatory"
              interface="io.subutai.pluginmanager.api.PluginManager" />

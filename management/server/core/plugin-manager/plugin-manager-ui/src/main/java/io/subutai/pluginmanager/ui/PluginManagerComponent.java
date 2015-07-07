@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.safehaus.subutai.core.tracker.api.Tracker;
+import io.subutai.core.tracker.api.Tracker;
 import io.subutai.pluginmanager.api.OperationType;
 import io.subutai.pluginmanager.api.PluginInfo;
 import io.subutai.pluginmanager.api.PluginManager;

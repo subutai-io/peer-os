@@ -9,7 +9,7 @@ import org.safehaus.subutai.common.util.FileUtil;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.template.wizard.api.TemplateWizardManager;
-import org.safehaus.subutai.core.tracker.api.Tracker;
+import io.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;

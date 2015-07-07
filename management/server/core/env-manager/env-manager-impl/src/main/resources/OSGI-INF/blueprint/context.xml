@@ -26,7 +26,7 @@
   <reference id="identityManager"
              interface="io.subutai.core.identity.api.IdentityManager" />
   <reference id="tracker"
-             interface="org.safehaus.subutai.core.tracker.api.Tracker" />
+             interface="io.subutai.core.tracker.api.Tracker" />
 
   <!-- ************************************************************************************************* -->
   <bean id="daoManagerEnv" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager" activation="eager">

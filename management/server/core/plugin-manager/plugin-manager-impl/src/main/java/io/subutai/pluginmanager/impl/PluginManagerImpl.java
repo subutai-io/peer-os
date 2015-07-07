@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import io.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.tracker.api.Tracker;
+import io.subutai.core.tracker.api.Tracker;
 import io.subutai.pluginmanager.api.OperationType;
 import io.subutai.pluginmanager.api.PluginInfo;
 import io.subutai.pluginmanager.api.PluginManager;

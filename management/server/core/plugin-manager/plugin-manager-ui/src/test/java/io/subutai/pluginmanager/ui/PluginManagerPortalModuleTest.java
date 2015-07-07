@@ -6,10 +6,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.core.tracker.api.Tracker;
+import io.subutai.core.tracker.api.Tracker;
 import io.subutai.pluginmanager.api.PluginManager;
-import io.subutai.pluginmanager.ui.PluginManagerComponent;
-import io.subutai.pluginmanager.ui.PluginManagerPortalModule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

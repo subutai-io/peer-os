@@ -15,11 +15,11 @@
   </bean>
   <!-- ******************************************************************************** -->
 
-  <bean id="tracker" class="org.safehaus.subutai.core.tracker.impl.TrackerImpl"
+  <bean id="tracker" class="io.subutai.core.tracker.impl.TrackerImpl"
         scope="singleton" activation="eager" init-method="init" depends-on="daoManagerTracker">
     <property name="daoManager" ref="daoManagerTracker" />
   </bean>
 
-  <service ref="tracker" interface="org.safehaus.subutai.core.tracker.api.Tracker" />
+  <service ref="tracker" interface="io.subutai.core.tracker.api.Tracker" />
 
 </blueprint>

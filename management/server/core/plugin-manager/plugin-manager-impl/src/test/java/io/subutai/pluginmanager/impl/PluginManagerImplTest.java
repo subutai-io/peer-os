@@ -14,11 +14,9 @@ import org.safehaus.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.tracker.api.Tracker;
+import io.subutai.core.tracker.api.Tracker;
 import io.subutai.pluginmanager.api.OperationType;
 import io.subutai.pluginmanager.api.PluginManagerException;
-import io.subutai.pluginmanager.impl.ManagerHelper;
-import io.subutai.pluginmanager.impl.PluginManagerImpl;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;

@@ -4,7 +4,7 @@
   <reference id="peerManager" availability="mandatory" interface="io.subutai.core.peer.api.PeerManager" />
 
   <reference id="tracker" availability="mandatory"
-             interface="org.safehaus.subutai.core.tracker.api.Tracker" />
+             interface="io.subutai.core.tracker.api.Tracker" />
 
   <bean id="pluginManager" class="io.subutai.pluginmanager.impl.PluginManagerImpl" activation="eager"
         destroy-method="destroy">

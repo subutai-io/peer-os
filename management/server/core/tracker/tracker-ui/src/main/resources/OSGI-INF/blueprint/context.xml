@@ -4,9 +4,9 @@
     xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <reference id="tracker" availability="mandatory"
-             interface="org.safehaus.subutai.core.tracker.api.Tracker" />
+             interface="io.subutai.core.tracker.api.Tracker" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.tracker.ui.TrackerPortalModule"
+  <bean id="module" scope="singleton" class="io.subutai.core.tracker.ui.TrackerPortalModule"
         init-method="init" destroy-method="destroy">
     <argument ref="tracker" />
   </bean>

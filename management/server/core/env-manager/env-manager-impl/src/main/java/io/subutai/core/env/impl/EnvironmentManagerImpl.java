@@ -54,7 +54,7 @@ import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.tracker.api.Tracker;
+import io.subutai.core.tracker.api.Tracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

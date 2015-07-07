@@ -10,13 +10,9 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.tracker.api.Tracker;
+import io.subutai.core.tracker.api.Tracker;
 import io.subutai.pluginmanager.api.OperationType;
 import io.subutai.pluginmanager.api.PluginManagerException;
-import io.subutai.pluginmanager.impl.Commands;
-import io.subutai.pluginmanager.impl.ManagerHelper;
-import io.subutai.pluginmanager.impl.PluginManagerImpl;
-import io.subutai.pluginmanager.impl.PluginOperationHandler;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
