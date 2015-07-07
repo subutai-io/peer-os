@@ -36,7 +36,6 @@ import io.subutai.server.ui.util.SubutaiVaadinUtils;
 import io.subutai.server.ui.views.CoreModulesView;
 import io.subutai.server.ui.views.ModulesView;
 import io.subutai.server.ui.views.LoginView;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
