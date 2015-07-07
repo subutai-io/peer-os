@@ -10,8 +10,8 @@
 <modelVersion>4.0.0</modelVersion>
 
 <artifactId>env-manager</artifactId>
-<name>Environment Manager Parent</name>
-<description>Environment Manager Parent</description>
+<name>Subutai Environment Manager Parent</name>
+<description>Subutai Environment Manager Parent</description>
 <packaging>pom</packaging>
 
 <modules>

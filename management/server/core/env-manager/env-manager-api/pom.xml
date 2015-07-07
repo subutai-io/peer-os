@@ -10,8 +10,8 @@
   </parent>
 
   <artifactId>env-manager-api</artifactId>
-  <name>Environment Manager Api</name>
-  <description>Environment Manager Api</description>
+  <name>Subutai Environment Manager Api</name>
+  <description>Subutai Environment Manager Api</description>
   <packaging>bundle</packaging>
 
   <dependencies>

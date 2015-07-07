@@ -12,6 +12,7 @@
   <packaging>bundle</packaging>
 
   <artifactId>jetty-ssl-fragment</artifactId>
+  <name>Subutai Jetty SSL</name>
 
   <dependencies>
 
