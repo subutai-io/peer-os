@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <artifactId>ssl-context-manager</artifactId>
-    <groupId>org.safehaus.subutai</groupId>
+    <groupId>io.subutai</groupId>
     <version>2.0.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
@@ -15,7 +15,7 @@
   <description>Subutai Ssl Context Factory</description>
 
   <properties>
-    <bundle.namespace>org.safehaus.subutai.identity.ssl</bundle.namespace>
+    <bundle.namespace>${project.groupId}.identity.ssl</bundle.namespace>
     <servlet.spec.groupId>javax.servlet</servlet.spec.groupId>
     <servlet.spec.artifactId>javax.servlet-api</servlet.spec.artifactId>
     <servlet.spec.version>3.1.0</servlet.spec.version>

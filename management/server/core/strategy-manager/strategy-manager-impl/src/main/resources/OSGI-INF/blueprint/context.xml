@@ -2,32 +2,32 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <bean id="roundRobinStrategy"
-        class="org.safehaus.subutai.core.strategy.impl.RoundRobinStrategy">
+        class="io.subutai.core.strategy.impl.RoundRobinStrategy">
   </bean>
 
   <bean id="defaultStrategy"
-        class="org.safehaus.subutai.core.strategy.impl.DefaultContainerPlacementStrategy">
+        class="io.subutai.core.strategy.impl.DefaultContainerPlacementStrategy">
   </bean>
 
   <bean id="bestServerStrategy"
-        class="org.safehaus.subutai.core.strategy.impl.BestServerStrategy">
+        class="io.subutai.core.strategy.impl.BestServerStrategy">
   </bean>
 
   <bean id="strategyManager" scope="singleton"
-        class="org.safehaus.subutai.core.strategy.impl.StrategyManagerImpl"
+        class="io.subutai.core.strategy.impl.StrategyManagerImpl"
         destroy-method="destroy">
   </bean>
 
   <reference-list id="placementStrategies"
-                  interface="org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy"
+                  interface="io.subutai.core.strategy.api.ContainerPlacementStrategy"
                   availability="optional">
     <reference-listener ref="strategyManager"
                         bind-method="registerStrategy" unbind-method="unregisterStrategy" />
   </reference-list>
 
-  <service ref="strategyManager" interface="org.safehaus.subutai.core.strategy.api.StrategyManager" />
-  <service ref="roundRobinStrategy" interface="org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy" />
-  <service ref="defaultStrategy" interface="org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy" />
-  <service ref="bestServerStrategy" interface="org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy" />
+  <service ref="strategyManager" interface="io.subutai.core.strategy.api.StrategyManager" />
+  <service ref="roundRobinStrategy" interface="io.subutai.core.strategy.api.ContainerPlacementStrategy" />
+  <service ref="defaultStrategy" interface="io.subutai.core.strategy.api.ContainerPlacementStrategy" />
+  <service ref="bestServerStrategy" interface="io.subutai.core.strategy.api.ContainerPlacementStrategy" />
 
 </blueprint>

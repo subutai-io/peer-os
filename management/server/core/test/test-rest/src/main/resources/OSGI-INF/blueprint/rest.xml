@@ -11,9 +11,9 @@
     </cxf:features>
   </cxf:bus>
 
-  <reference id="test-impl" interface="org.safehaus.subutai.core.test.api.Test" />
+  <reference id="test-impl" interface="io.subutai.core.test.api.Test" />
 
-  <bean id="testRestImpl" class="org.safehaus.subutai.core.test.rest.TestRestImpl">
+  <bean id="testRestImpl" class="io.subutai.core.test.rest.TestRestImpl">
     <argument ref="test-impl" />
   </bean>
 

@@ -12,13 +12,13 @@
   </cxf:bus>
 
   <reference id="repoManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.repository.api.RepositoryManager" />
+             interface="io.subutai.core.repository.api.RepositoryManager" />
   <reference id="templateRegistry" availability="mandatory"
-             interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
+             interface="io.subutai.core.registry.api.TemplateRegistry" />
   <reference id="peerManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+             interface="io.subutai.core.peer.api.PeerManager" />
 
-  <bean id="templateRegistryRestImpl" class="org.safehaus.subutai.core.registry.rest.RestServiceImpl">
+  <bean id="templateRegistryRestImpl" class="io.subutai.core.registry.rest.RestServiceImpl">
     <argument ref="repoManager" />
     <argument ref="templateRegistry" />
     <argument ref="peerManager" />

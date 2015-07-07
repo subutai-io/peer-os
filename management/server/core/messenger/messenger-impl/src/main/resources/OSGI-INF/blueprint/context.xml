@@ -6,25 +6,25 @@
            xsi:schemaLocation="http://aries.apache.org/xmlns/jpa/v1.1.0 http://aries.apache.org/xmlns/jpa/v1.0.0">
 
   <!-- Data Access object to get EntityManager -->
-  <bean id="daoManagerMessenger" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager"
+  <bean id="daoManagerMessenger" init-method="init" class="io.subutai.common.dao.DaoManager"
         scope="prototype">
     <jpa:unit unitname="messengerPUnit" property="entityManagerFactory" />
   </bean>
 
-  <bean id="messenger" class="org.safehaus.subutai.core.messenger.impl.MessengerImpl" scope="singleton"
+  <bean id="messenger" class="io.subutai.core.messenger.impl.MessengerImpl" scope="singleton"
         init-method="init"
         destroy-method="destroy" activation="eager">
     <property name="daoManager" ref="daoManagerMessenger" />
   </bean>
 
   <reference-list id="messageListener"
-                  interface="org.safehaus.subutai.core.messenger.api.MessageListener"
+                  interface="io.subutai.core.messenger.api.MessageListener"
                   availability="optional" ext:proxy-method="classes">
     <reference-listener ref="messenger"
                         bind-method="addMessageListener" unbind-method="removeMessageListener" />
   </reference-list>
 
-  <service ref="messenger" interface="org.safehaus.subutai.core.messenger.api.Messenger" />
-  <service ref="messenger" interface="org.safehaus.subutai.core.messenger.api.MessageProcessor" />
+  <service ref="messenger" interface="io.subutai.core.messenger.api.Messenger" />
+  <service ref="messenger" interface="io.subutai.core.messenger.api.MessageProcessor" />
 
 </blueprint>

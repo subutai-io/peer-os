@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 <parent>
   <artifactId>mgmt-server-core-parent</artifactId>
-  <groupId>org.safehaus.subutai</groupId>
+  <groupId>io.subutai</groupId>
   <version>2.0.0</version>
 </parent>
 <modelVersion>4.0.0</modelVersion>
 
 <artifactId>env-manager</artifactId>
-<name>Environment Manager Parent</name>
-<description>Environment Manager Parent</description>
+<name>Subutai Environment Manager Parent</name>
+<description>Subutai Environment Manager Parent</description>
 <packaging>pom</packaging>
 
 <modules>

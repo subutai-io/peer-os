@@ -18,31 +18,31 @@
   </cm:property-placeholder>
 
   <reference id="templateRegistry" availability="mandatory"
-             interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
+             interface="io.subutai.core.registry.api.TemplateRegistry" />
   <reference id="peerManager"
-             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+             interface="io.subutai.core.peer.api.PeerManager" />
   <reference id="networkManager"
-             interface="org.safehaus.subutai.core.network.api.NetworkManager" />
+             interface="io.subutai.core.network.api.NetworkManager" />
   <reference id="identityManager"
-             interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
+             interface="io.subutai.core.identity.api.IdentityManager" />
   <reference id="tracker"
-             interface="org.safehaus.subutai.core.tracker.api.Tracker" />
+             interface="io.subutai.core.tracker.api.Tracker" />
 
   <!-- ************************************************************************************************* -->
-  <bean id="daoManagerEnv" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager" activation="eager">
+  <bean id="daoManagerEnv" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
     <jpa:unit unitname="envExtManagerPUnit" property="entityManagerFactory" />
   </bean>
   <!-- ************************************************************************************************** -->
 
   <reference-list id="eventLstnr"
-                  interface="org.safehaus.subutai.core.env.api.EnvironmentEventListener"
+                  interface="io.subutai.core.env.api.EnvironmentEventListener"
                   availability="optional">
     <reference-listener ref="environmentManager"
                         bind-method="registerListener" unbind-method="unregisterListener" />
   </reference-list>
 
   <bean id="environmentManager" scope="singleton" init-method="init" destroy-method="dispose"
-        class="org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl">
+        class="io.subutai.core.env.impl.EnvironmentManagerImpl">
     <argument ref="templateRegistry" />
     <argument ref="peerManager" />
     <argument ref="networkManager" />
@@ -52,6 +52,6 @@
     <argument ref="tracker" />
   </bean>
 
-  <service ref="environmentManager" interface="org.safehaus.subutai.core.env.api.EnvironmentManager" />
+  <service ref="environmentManager" interface="io.subutai.core.env.api.EnvironmentManager" />
 
 </blueprint>

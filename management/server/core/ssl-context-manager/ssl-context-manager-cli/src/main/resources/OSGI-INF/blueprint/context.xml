@@ -2,7 +2,7 @@
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="ssl-context/ssl-context">
-      <action class="org.safehaus.subutai.core.ssl.manager.cli.ReloadKeyStoreCommand">
+      <action class="io.subutai.core.ssl.manager.cli.ReloadKeyStoreCommand">
         <argument ref="sslContextManager" />
       </action>
     </command>
@@ -10,12 +10,12 @@
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="ssl-context/jetty">
-      <action class="org.safehaus.subutai.core.ssl.manager.cli.RestartJettyBundle">
+      <action class="io.subutai.core.ssl.manager.cli.RestartJettyBundle">
       </action>
     </command>
   </command-bundle>
 
   <reference id="sslContextManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.ssl.manager.api.SubutaiSslContextFactory" />
+             interface="io.subutai.core.ssl.manager.api.SubutaiSslContextFactory" />
 
 </blueprint>

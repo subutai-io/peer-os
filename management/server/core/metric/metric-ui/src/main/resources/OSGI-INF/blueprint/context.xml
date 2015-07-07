@@ -4,12 +4,12 @@
     xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <reference id="hostRegistry" availability="mandatory"
-             interface="org.safehaus.subutai.core.hostregistry.api.HostRegistry" />
+             interface="io.subutai.core.hostregistry.api.HostRegistry" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.metric.ui.MonitorPortalModule">
+  <bean id="module" scope="singleton" class="io.subutai.core.metric.ui.MonitorPortalModule">
     <argument ref="hostRegistry" />
   </bean>
 
-  <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />
+  <service ref="module" interface="io.subutai.server.ui.api.PortalModule" />
 
 </blueprint>

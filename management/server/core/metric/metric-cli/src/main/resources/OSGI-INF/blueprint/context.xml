@@ -1,20 +1,20 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <reference id="monitor" availability="mandatory"
-             interface="org.safehaus.subutai.core.metric.api.Monitor" />
+             interface="io.subutai.core.metric.api.Monitor" />
   <reference id="environmentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.env.api.EnvironmentManager" />
+             interface="io.subutai.core.env.api.EnvironmentManager" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="metric/resource-host-metrics">
-      <action class="org.safehaus.subutai.core.metric.cli.ResourceHostMetricsCommand">
+      <action class="io.subutai.core.metric.cli.ResourceHostMetricsCommand">
         <argument ref="monitor" />
       </action>
     </command>
   </command-bundle>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="metric/container-host-metrics">
-      <action class="org.safehaus.subutai.core.metric.cli.ContainerHostMetricsCommand">
+      <action class="io.subutai.core.metric.cli.ContainerHostMetricsCommand">
         <argument ref="monitor" />
         <argument ref="environmentManager" />
       </action>

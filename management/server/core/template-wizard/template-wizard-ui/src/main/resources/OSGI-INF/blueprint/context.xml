@@ -2,15 +2,15 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <reference id="templateRegistry" availability="mandatory"
-             interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
+             interface="io.subutai.core.registry.api.TemplateRegistry" />
   <reference id="peerManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+             interface="io.subutai.core.peer.api.PeerManager" />
   <reference id="tracker" availability="mandatory"
-             interface="org.safehaus.subutai.core.tracker.api.Tracker" />
+             interface="io.subutai.core.tracker.api.Tracker" />
   <reference id="templateWizard" availability="mandatory"
-             interface="org.safehaus.subutai.core.template.wizard.api.TemplateWizardManager" />
+             interface="io.subutai.core.template.wizard.api.TemplateWizardManager" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.template.wizard.ui.TemplateWizardPortalModule"
+  <bean id="module" scope="singleton" class="io.subutai.core.template.wizard.ui.TemplateWizardPortalModule"
         destroy-method="dispose">
     <argument ref="templateRegistry" />
     <argument ref="peerManager" />
@@ -19,6 +19,6 @@
   </bean>
 
   <service ref="module"
-           interface="org.safehaus.subutai.server.ui.api.PortalModule" />
+           interface="io.subutai.server.ui.api.PortalModule" />
 
 </blueprint>

@@ -6,7 +6,7 @@
   <persistence-unit name="metricPUnit" transaction-type="RESOURCE_LOCAL">
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/metricDS)
     </non-jta-data-source>
-    <class>org.safehaus.subutai.core.metric.impl.model.Subscriber</class>
+    <class>io.subutai.core.metric.impl.model.Subscriber</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="openjpa.Log" value="DefaultLevel=WARN" />

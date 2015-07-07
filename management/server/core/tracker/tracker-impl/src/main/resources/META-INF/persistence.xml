@@ -6,7 +6,7 @@
   <persistence-unit name="trackerPUnit" transaction-type="RESOURCE_LOCAL">
    <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/trackerDS)
     </non-jta-data-source>
-    <class>org.safehaus.subutai.core.tracker.impl.entity.TrackerOperationEntity</class>
+    <class>io.subutai.core.tracker.impl.entity.TrackerOperationEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="openjpa.Log" value="DefaultLevel=WARN" />

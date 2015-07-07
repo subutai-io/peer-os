@@ -2,12 +2,12 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <reference id="registryManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
+             interface="io.subutai.core.registry.api.TemplateRegistry" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.registry.ui.TemplateRegistryPortalModule">
+  <bean id="module" scope="singleton" class="io.subutai.core.registry.ui.TemplateRegistryPortalModule">
     <property name="registryManager" ref="registryManager" />
   </bean>
 
-  <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />
+  <service ref="module" interface="io.subutai.server.ui.api.PortalModule" />
 
 </blueprint>

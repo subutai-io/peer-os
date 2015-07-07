@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.safehaus.subutai</groupId>
+    <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-parent</artifactId>
     <version>2.0.0</version>
   </parent>
@@ -22,11 +22,11 @@
       <artifactId>subutai-common</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.safehaus.subutai</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common-datasource</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.safehaus.subutai</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common-implementation</artifactId>
     </dependency>
 

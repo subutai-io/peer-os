@@ -10,16 +10,16 @@
             http://aries.apache.org/xmlns/transactions/v1.0.0 http://aries.apache.org/xmlns/transactions/v1.0.0 ">
 
   <!-- ******************************************************************************** -->
-  <bean id="daoManagerTracker" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager" scope="prototype">
+  <bean id="daoManagerTracker" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
     <jpa:unit unitname="trackerPUnit" property="entityManagerFactory" />
   </bean>
   <!-- ******************************************************************************** -->
 
-  <bean id="tracker" class="org.safehaus.subutai.core.tracker.impl.TrackerImpl"
+  <bean id="tracker" class="io.subutai.core.tracker.impl.TrackerImpl"
         scope="singleton" activation="eager" init-method="init" depends-on="daoManagerTracker">
     <property name="daoManager" ref="daoManagerTracker" />
   </bean>
 
-  <service ref="tracker" interface="org.safehaus.subutai.core.tracker.api.Tracker" />
+  <service ref="tracker" interface="io.subutai.core.tracker.api.Tracker" />
 
 </blueprint>

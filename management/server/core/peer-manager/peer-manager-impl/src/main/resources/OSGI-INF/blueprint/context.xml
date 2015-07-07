@@ -18,35 +18,35 @@
   </cm:property-placeholder>
 
   <!-- ***************************************************************** -->
-  <bean id="daoManagerPeer" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager" scope="prototype">
+  <bean id="daoManagerPeer" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
     <jpa:unit unitname="peerManagerPUnit" property="entityManagerFactory" />
   </bean>
   <!-- ***************************************************************** -->
 
   <reference id="messenger" availability="mandatory"
-             interface="org.safehaus.subutai.core.messenger.api.Messenger" />
+             interface="io.subutai.core.messenger.api.Messenger" />
 
-  <reference id="commandExecutor" interface="org.safehaus.subutai.core.executor.api.CommandExecutor" />
+  <reference id="commandExecutor" interface="io.subutai.core.executor.api.CommandExecutor" />
 
-  <reference id="templateRegistry" interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
+  <reference id="templateRegistry" interface="io.subutai.core.registry.api.TemplateRegistry" />
 
-  <reference id="hostRegistry" interface="org.safehaus.subutai.core.hostregistry.api.HostRegistry" />
+  <reference id="hostRegistry" interface="io.subutai.core.hostregistry.api.HostRegistry" />
 
-  <reference id="strategyManager" interface="org.safehaus.subutai.core.strategy.api.StrategyManager" />
+  <reference id="strategyManager" interface="io.subutai.core.strategy.api.StrategyManager" />
 
   <reference id="quotaManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.lxc.quota.api.QuotaManager" />
+             interface="io.subutai.core.lxc.quota.api.QuotaManager" />
 
   <reference id="monitor" availability="optional"
-             interface="org.safehaus.subutai.core.metric.api.Monitor" />
+             interface="io.subutai.core.metric.api.Monitor" />
 
   <reference id="identityManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
+             interface="io.subutai.core.identity.api.IdentityManager" />
 
   <reference id="sslContextFactory" availability="mandatory"
-             interface="org.safehaus.subutai.core.ssl.manager.api.SubutaiSslContextFactory" />
+             interface="io.subutai.core.ssl.manager.api.SubutaiSslContextFactory" />
 
-  <bean id="localPeer" class="org.safehaus.subutai.core.peer.impl.LocalPeerImpl" init-method="init"
+  <bean id="localPeer" class="io.subutai.core.peer.impl.LocalPeerImpl" init-method="init"
         destroy-method="dispose" scope="singleton" activation="eager">
     <argument ref="daoManagerPeer" />
     <argument ref="templateRegistry" />
@@ -63,38 +63,38 @@
 
   </bean>
 
-  <bean id="messageResponseListener" class="org.safehaus.subutai.core.peer.impl.request.MessageResponseListener"
+  <bean id="messageResponseListener" class="io.subutai.core.peer.impl.request.MessageResponseListener"
         destroy-method="dispose" scope="singleton" activation="eager">
     <argument ref="messenger" />
   </bean>
 
   <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
-        class="org.safehaus.subutai.core.peer.impl.PeerManagerImpl">
+        class="io.subutai.core.peer.impl.PeerManagerImpl">
     <argument ref="messenger" />
     <argument ref="localPeer" />
     <argument ref="daoManagerPeer" />
     <argument ref="messageResponseListener" />
   </bean>
 
-  <bean id="messageRequestListener" class="org.safehaus.subutai.core.peer.impl.request.MessageRequestListener"
+  <bean id="messageRequestListener" class="io.subutai.core.peer.impl.request.MessageRequestListener"
         destroy-method="dispose" scope="singleton" activation="eager">
     <argument ref="peerManager" />
     <argument ref="messenger" />
   </bean>
 
   <reference-list id="peerMsgLstnr"
-                  interface="org.safehaus.subutai.core.peer.api.RequestListener"
+                  interface="io.subutai.core.peer.api.RequestListener"
                   availability="optional">
     <reference-listener ref="peerManager"
                         bind-method="addRequestListener" unbind-method="removeRequestListener" />
   </reference-list>
 
-  <service ref="localPeer" interface="org.safehaus.subutai.core.hostregistry.api.HostListener" />
+  <service ref="localPeer" interface="io.subutai.core.hostregistry.api.HostListener" />
 
-  <service ref="messageResponseListener" interface="org.safehaus.subutai.core.messenger.api.MessageListener" />
+  <service ref="messageResponseListener" interface="io.subutai.core.messenger.api.MessageListener" />
 
-  <service ref="peerManager" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+  <service ref="peerManager" interface="io.subutai.core.peer.api.PeerManager" />
 
-  <service ref="messageRequestListener" interface="org.safehaus.subutai.core.messenger.api.MessageListener" />
+  <service ref="messageRequestListener" interface="io.subutai.core.messenger.api.MessageListener" />
 
 </blueprint>

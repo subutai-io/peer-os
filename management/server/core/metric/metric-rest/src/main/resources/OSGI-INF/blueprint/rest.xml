@@ -12,11 +12,11 @@
   </cxf:bus>
 
   <reference id="monitor" availability="mandatory"
-             interface="org.safehaus.subutai.core.metric.api.Monitor" />
+             interface="io.subutai.core.metric.api.Monitor" />
   <reference id="environmentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.env.api.EnvironmentManager" />
+             interface="io.subutai.core.env.api.EnvironmentManager" />
 
-  <bean id="monitorRestImpl" class="org.safehaus.subutai.core.metric.rest.RestServiceImpl">
+  <bean id="monitorRestImpl" class="io.subutai.core.metric.rest.RestServiceImpl">
     <argument ref="monitor" />
     <argument ref="environmentManager" />
   </bean>

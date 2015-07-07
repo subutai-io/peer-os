@@ -2,15 +2,15 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <reference id="commandExecutor" availability="mandatory"
-             interface="org.safehaus.subutai.core.executor.api.CommandExecutor" />
+             interface="io.subutai.core.executor.api.CommandExecutor" />
   <reference id="hostRegistry" availability="mandatory"
-             interface="org.safehaus.subutai.core.hostregistry.api.HostRegistry" />
+             interface="io.subutai.core.hostregistry.api.HostRegistry" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.executor.ui.CommandExecutorModule">
+  <bean id="module" scope="singleton" class="io.subutai.core.executor.ui.CommandExecutorModule">
     <argument ref="commandExecutor" />
     <argument ref="hostRegistry" />
   </bean>
 
-  <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />
+  <service ref="module" interface="io.subutai.server.ui.api.PortalModule" />
 
 </blueprint>

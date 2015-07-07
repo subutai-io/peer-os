@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.safehaus.subutai</groupId>
+    <groupId>io.subutai</groupId>
     <artifactId>identity-manager-parent</artifactId>
     <version>2.0.0</version>
   </parent>
@@ -104,7 +104,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.safehaus.subutai</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>key-manager-api</artifactId>
     </dependency>
   </dependencies>
@@ -120,7 +120,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Export-Package>org.safehaus.subutai.core.identity.impl</Export-Package>
+            <Export-Package>${project.groupId}.core.identity.impl</Export-Package>
             <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
             <Bundle-SymbolicName>${project.groupId}.core.identity.impl</Bundle-SymbolicName>
           </instructions>

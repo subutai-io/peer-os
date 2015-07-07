@@ -1,21 +1,21 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <reference id="quotaManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.lxc.quota.api.QuotaManager" />
+             interface="io.subutai.core.lxc.quota.api.QuotaManager" />
 
   <reference id="peerManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+             interface="io.subutai.core.peer.api.PeerManager" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="quota/list-quota">
-      <action class="org.safehaus.subutai.core.lxc.quota.cli.ListQuotaTypes">
+      <action class="io.subutai.core.lxc.quota.cli.ListQuotaTypes">
       </action>
     </command>
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="quota/get-quota">
-      <action class="org.safehaus.subutai.core.lxc.quota.cli.GetQuota">
+      <action class="io.subutai.core.lxc.quota.cli.GetQuota">
         <argument ref="quotaManager" />
         <argument ref="peerManager" />
       </action>
@@ -24,7 +24,7 @@
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="quota/set-quota">
-      <action class="org.safehaus.subutai.core.lxc.quota.cli.SetQuota">
+      <action class="io.subutai.core.lxc.quota.cli.SetQuota">
         <argument ref="quotaManager" />
         <argument ref="peerManager" />
       </action>

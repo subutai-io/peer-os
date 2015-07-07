@@ -17,7 +17,7 @@
   </cm:property-placeholder>
 
   <bean id="broker"
-        class="org.safehaus.subutai.core.broker.impl.BrokerImpl"
+        class="io.subutai.core.broker.impl.BrokerImpl"
         init-method="init" destroy-method="dispose" scope="singleton" activation="eager">
     <argument value="${brokerUrl}" />
     <argument value="${maxBrokerConnections}" />
@@ -27,19 +27,19 @@
   </bean>
 
   <reference-list id="byteMessageLstnr"
-                  interface="org.safehaus.subutai.core.broker.api.ByteMessageListener"
+                  interface="io.subutai.core.broker.api.ByteMessageListener"
                   availability="optional">
     <reference-listener ref="broker"
                         bind-method="addByteMessageListener" unbind-method="removeMessageListener" />
   </reference-list>
 
   <reference-list id="textMessageLstnr"
-                  interface="org.safehaus.subutai.core.broker.api.TextMessageListener"
+                  interface="io.subutai.core.broker.api.TextMessageListener"
                   availability="optional">
     <reference-listener ref="broker"
                         bind-method="addTextMessageListener" unbind-method="removeMessageListener" />
   </reference-list>
 
-  <service ref="broker" interface="org.safehaus.subutai.core.broker.api.Broker" />
+  <service ref="broker" interface="io.subutai.core.broker.api.Broker" />
 
 </blueprint>

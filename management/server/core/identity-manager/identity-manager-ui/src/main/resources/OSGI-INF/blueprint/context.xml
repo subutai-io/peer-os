@@ -2,13 +2,13 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <reference id="identityManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
+             interface="io.subutai.core.identity.api.IdentityManager" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.identity.ui.IdentityManagerPortalModule"
+  <bean id="module" scope="singleton" class="io.subutai.core.identity.ui.IdentityManagerPortalModule"
         init-method="init" destroy-method="destroy">
     <property name="identityManager" ref="identityManager" />
   </bean>
 
-  <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />
+  <service ref="module" interface="io.subutai.server.ui.api.PortalModule" />
 
 </blueprint>

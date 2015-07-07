@@ -21,7 +21,7 @@
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <reference-list id="portalModule" availability="optional"
-                  interface="org.safehaus.subutai.server.ui.api.PortalModule">
+                  interface="io.subutai.server.ui.api.PortalModule">
 
     <reference-listener ref="portalModuleService"
                         bind-method="registerModule" unbind-method="unregisterModule" />
@@ -30,9 +30,9 @@
 
   <bean id="portalModuleService"
         scope="singleton" activation="eager"
-        class="org.safehaus.subutai.server.ui.impl.PortalModuleServiceImpl">
+        class="io.subutai.server.ui.impl.PortalModuleServiceImpl">
   </bean>
 
   <service ref="portalModuleService"
-           interface="org.safehaus.subutai.server.ui.api.PortalModuleService" />
+           interface="io.subutai.server.ui.api.PortalModuleService" />
 </blueprint>

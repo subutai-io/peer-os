@@ -1,46 +1,46 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <reference id="networkManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.network.api.NetworkManager" />
+             interface="io.subutai.core.network.api.NetworkManager" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="net/setup-n2n">
-      <action class="org.safehaus.subutai.core.network.cli.SetupN2NCommand">
+      <action class="io.subutai.core.network.cli.SetupN2NCommand">
         <argument ref="networkManager" />
       </action>
     </command>
   </command-bundle>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="net/remove-n2n">
-      <action class="org.safehaus.subutai.core.network.cli.RemoveN2NCommand">
+      <action class="io.subutai.core.network.cli.RemoveN2NCommand">
         <argument ref="networkManager" />
       </action>
     </command>
   </command-bundle>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="net/setup-tunnel">
-      <action class="org.safehaus.subutai.core.network.cli.SetupTunnelCommand">
+      <action class="io.subutai.core.network.cli.SetupTunnelCommand">
         <argument ref="networkManager" />
       </action>
     </command>
   </command-bundle>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="net/remove-tunnel">
-      <action class="org.safehaus.subutai.core.network.cli.RemoveTunnelCommand">
+      <action class="io.subutai.core.network.cli.RemoveTunnelCommand">
         <argument ref="networkManager" />
       </action>
     </command>
   </command-bundle>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="net/set-container-ip">
-      <action class="org.safehaus.subutai.core.network.cli.SetContainerIpCommand">
+      <action class="io.subutai.core.network.cli.SetContainerIpCommand">
         <argument ref="networkManager" />
       </action>
     </command>
   </command-bundle>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="net/remove-container-ip">
-      <action class="org.safehaus.subutai.core.network.cli.RemoveContainerIpCommand">
+      <action class="io.subutai.core.network.cli.RemoveContainerIpCommand">
         <argument ref="networkManager" />
       </action>
     </command>

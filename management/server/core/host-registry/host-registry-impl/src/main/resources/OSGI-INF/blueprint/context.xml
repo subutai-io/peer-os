@@ -13,24 +13,24 @@
   </cm:property-placeholder>
 
   <bean id="hostRegistry"
-        class="org.safehaus.subutai.core.hostregistry.impl.HostRegistryImpl"
+        class="io.subutai.core.hostregistry.impl.HostRegistryImpl"
         init-method="init" destroy-method="dispose" scope="singleton" activation="eager">
     <argument value="${hostExpiration}" />
   </bean>
 
   <reference-list id="hostLstnr"
-                  interface="org.safehaus.subutai.core.hostregistry.api.HostListener"
+                  interface="io.subutai.core.hostregistry.api.HostListener"
                   availability="optional">
     <reference-listener ref="hostRegistry"
                         bind-method="addHostListener" unbind-method="removeHostListener" />
   </reference-list>
 
-  <bean id="heartbeatListener" class="org.safehaus.subutai.core.hostregistry.impl.HeartBeatListener" scope="singleton">
+  <bean id="heartbeatListener" class="io.subutai.core.hostregistry.impl.HeartBeatListener" scope="singleton">
     <argument ref="hostRegistry" />
   </bean>
 
-  <service ref="hostRegistry" interface="org.safehaus.subutai.core.hostregistry.api.HostRegistry" />
+  <service ref="hostRegistry" interface="io.subutai.core.hostregistry.api.HostRegistry" />
 
-  <service ref="heartbeatListener" interface="org.safehaus.subutai.core.broker.api.ByteMessageListener" />
+  <service ref="heartbeatListener" interface="io.subutai.core.broker.api.ByteMessageListener" />
 
 </blueprint>
