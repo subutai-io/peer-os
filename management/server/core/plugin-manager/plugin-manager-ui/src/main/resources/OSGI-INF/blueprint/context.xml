@@ -5,9 +5,9 @@
              interface="org.safehaus.subutai.core.tracker.api.Tracker" />
 
   <reference id="pluginManager" availability="mandatory"
-             interface="org.safehaus.subutai.pluginmanager.api.PluginManager" />
+             interface="io.subutai.pluginmanager.api.PluginManager" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.pluginmanager.ui.PluginManagerPortalModule"
+  <bean id="module" scope="singleton" class="io.subutai.pluginmanager.ui.PluginManagerPortalModule"
         init-method="init" destroy-method="destroy">
     <argument ref="pluginManager" />
     <argument ref="tracker" />

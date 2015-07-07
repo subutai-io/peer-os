@@ -6,12 +6,12 @@
   <reference id="tracker" availability="mandatory"
              interface="org.safehaus.subutai.core.tracker.api.Tracker" />
 
-  <bean id="pluginManager" class="org.safehaus.subutai.pluginmanager.impl.PluginManagerImpl" activation="eager"
+  <bean id="pluginManager" class="io.subutai.pluginmanager.impl.PluginManagerImpl" activation="eager"
         destroy-method="destroy">
     <argument ref="peerManager" />
     <argument ref="tracker" />
   </bean>
 
-  <service ref="pluginManager" interface="org.safehaus.subutai.pluginmanager.api.PluginManager" />
+  <service ref="pluginManager" interface="io.subutai.pluginmanager.api.PluginManager" />
 
 </blueprint>
