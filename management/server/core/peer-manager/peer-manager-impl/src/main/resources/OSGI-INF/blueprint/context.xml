@@ -32,7 +32,7 @@
 
   <reference id="hostRegistry" interface="io.subutai.core.hostregistry.api.HostRegistry" />
 
-  <reference id="strategyManager" interface="org.safehaus.subutai.core.strategy.api.StrategyManager" />
+  <reference id="strategyManager" interface="io.subutai.core.strategy.api.StrategyManager" />
 
   <reference id="quotaManager" availability="mandatory"
              interface="io.subutai.core.lxc.quota.api.QuotaManager" />

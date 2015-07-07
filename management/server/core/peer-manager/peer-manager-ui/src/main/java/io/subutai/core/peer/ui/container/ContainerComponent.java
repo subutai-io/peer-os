@@ -8,7 +8,7 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.ui.PeerManagerPortalModule;
 import io.subutai.core.peer.ui.container.clone.Cloner;
 import io.subutai.core.peer.ui.container.manage.Manager;
-import org.safehaus.subutai.core.strategy.api.StrategyManager;
+import io.subutai.core.strategy.api.StrategyManager;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalSplitPanel;

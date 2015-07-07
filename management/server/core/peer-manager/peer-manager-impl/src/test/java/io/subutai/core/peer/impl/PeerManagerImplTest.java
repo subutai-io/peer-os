@@ -30,7 +30,7 @@ import io.subutai.core.peer.impl.request.MessageRequestListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
-import org.safehaus.subutai.core.strategy.api.StrategyManager;
+import io.subutai.core.strategy.api.StrategyManager;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;

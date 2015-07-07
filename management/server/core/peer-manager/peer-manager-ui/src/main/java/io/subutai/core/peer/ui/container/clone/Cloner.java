@@ -27,10 +27,10 @@ import io.subutai.core.peer.api.ResourceHostException;
 import io.subutai.core.peer.ui.container.ContainerTree;
 
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
-import org.safehaus.subutai.core.strategy.api.CriteriaDef;
-import org.safehaus.subutai.core.strategy.api.StrategyException;
-import org.safehaus.subutai.core.strategy.api.StrategyManager;
+import io.subutai.core.strategy.api.ContainerPlacementStrategy;
+import io.subutai.core.strategy.api.CriteriaDef;
+import io.subutai.core.strategy.api.StrategyException;
+import io.subutai.core.strategy.api.StrategyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
