@@ -6,10 +6,10 @@
              interface="io.subutai.core.identity.api.IdentityManager" />
 
   <bean id="impl"
-        class="org.safehaus.subutai.core.test.impl.TestImpl">
+        class="io.subutai.core.test.impl.TestImpl">
     <argument ref="idm" />
   </bean>
 
-  <service ref="impl" interface="org.safehaus.subutai.core.test.api.Test" />
+  <service ref="impl" interface="io.subutai.core.test.api.Test" />
 
 </blueprint>
