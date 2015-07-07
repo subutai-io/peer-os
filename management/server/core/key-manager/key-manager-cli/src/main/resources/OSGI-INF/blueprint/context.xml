@@ -2,7 +2,7 @@
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="km/gen">
-      <action class="org.safehaus.subutai.core.key.cli.GenerateCommand">
+      <action class="io.subutai.core.key.cli.GenerateCommand">
         <argument ref="keyManager" />
         <argument ref="peerManager" />
       </action>
@@ -11,7 +11,7 @@
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="km/list">
-      <action class="org.safehaus.subutai.core.key.cli.ListCommand">
+      <action class="io.subutai.core.key.cli.ListCommand">
         <argument ref="keyManager" />
         <argument ref="peerManager" />
       </action>
@@ -20,7 +20,7 @@
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="km/export-key">
-      <action class="org.safehaus.subutai.core.key.cli.ExportKeyCommand">
+      <action class="io.subutai.core.key.cli.ExportKeyCommand">
         <argument ref="keyManager" />
         <argument ref="peerManager" />
       </action>
@@ -29,14 +29,14 @@
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="km/gen-subkey">
-      <action class="org.safehaus.subutai.core.key.cli.GenerateSubKeyCommand">
+      <action class="io.subutai.core.key.cli.GenerateSubKeyCommand">
         <argument ref="keyManager" />
         <argument ref="peerManager" />
       </action>
     </command>
   </command-bundle>
 
-  <reference id="keyManager" availability="mandatory" interface="org.safehaus.subutai.core.key.api.KeyManager" />
+  <reference id="keyManager" availability="mandatory" interface="io.subutai.core.key.api.KeyManager" />
   <reference id="peerManager" availability="mandatory" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
 </blueprint>

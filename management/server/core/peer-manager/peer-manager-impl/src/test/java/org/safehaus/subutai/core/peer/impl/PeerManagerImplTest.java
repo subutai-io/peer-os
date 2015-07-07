@@ -18,7 +18,7 @@ import org.safehaus.subutai.common.peer.PeerPolicy;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
-import org.safehaus.subutai.core.key.api.KeyManager;
+import io.subutai.core.key.api.KeyManager;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.metric.api.Monitor;
