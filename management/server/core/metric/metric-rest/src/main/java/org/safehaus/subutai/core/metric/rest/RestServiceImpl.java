@@ -10,7 +10,7 @@ import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.environment.EnvironmentNotFoundException;
 import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import io.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;

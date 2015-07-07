@@ -31,7 +31,7 @@ import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import io.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.metric.api.AlertListener;

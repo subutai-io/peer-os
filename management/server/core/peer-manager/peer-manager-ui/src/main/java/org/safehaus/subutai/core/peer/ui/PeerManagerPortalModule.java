@@ -4,7 +4,7 @@ package org.safehaus.subutai.core.peer.ui;
 import java.io.File;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import io.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;

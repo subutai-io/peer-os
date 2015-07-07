@@ -35,14 +35,14 @@
   <!-- ************************************************************************************************** -->
 
   <reference-list id="eventLstnr"
-                  interface="org.safehaus.subutai.core.env.api.EnvironmentEventListener"
+                  interface="io.subutai.core.env.api.EnvironmentEventListener"
                   availability="optional">
     <reference-listener ref="environmentManager"
                         bind-method="registerListener" unbind-method="unregisterListener" />
   </reference-list>
 
   <bean id="environmentManager" scope="singleton" init-method="init" destroy-method="dispose"
-        class="org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl">
+        class="io.subutai.core.env.impl.EnvironmentManagerImpl">
     <argument ref="templateRegistry" />
     <argument ref="peerManager" />
     <argument ref="networkManager" />
@@ -52,6 +52,6 @@
     <argument ref="tracker" />
   </bean>
 
-  <service ref="environmentManager" interface="org.safehaus.subutai.core.env.api.EnvironmentManager" />
+  <service ref="environmentManager" interface="io.subutai.core.env.api.EnvironmentManager" />
 
 </blueprint>

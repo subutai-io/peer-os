@@ -7,7 +7,7 @@ import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import io.subutai.core.env.api.EnvironmentManager;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.util.IndexedContainer;

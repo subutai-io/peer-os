@@ -7,7 +7,7 @@ import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.quota.QuotaType;
-import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import io.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 

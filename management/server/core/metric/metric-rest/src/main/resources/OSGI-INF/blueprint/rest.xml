@@ -14,7 +14,7 @@
   <reference id="monitor" availability="mandatory"
              interface="org.safehaus.subutai.core.metric.api.Monitor" />
   <reference id="environmentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.env.api.EnvironmentManager" />
+             interface="io.subutai.core.env.api.EnvironmentManager" />
 
   <bean id="monitorRestImpl" class="org.safehaus.subutai.core.metric.rest.RestServiceImpl">
     <argument ref="monitor" />

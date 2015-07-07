@@ -11,7 +11,7 @@
   <reference id="sslContextFactory" availability="mandatory"
              interface="org.safehaus.subutai.core.ssl.manager.api.SubutaiSslContextFactory" />
   <reference id="environmentManager" availability="optional"
-             interface="org.safehaus.subutai.core.env.api.EnvironmentManager" />
+             interface="io.subutai.core.env.api.EnvironmentManager" />
 
   <bean id="module" scope="singleton" class="org.safehaus.subutai.core.peer.ui.PeerManagerPortalModule"
         init-method="init" destroy-method="destroy">

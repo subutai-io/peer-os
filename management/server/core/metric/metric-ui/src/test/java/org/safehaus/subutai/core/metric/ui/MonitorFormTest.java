@@ -1,8 +1,6 @@
 package org.safehaus.subutai.core.metric.ui;
 
 
-import java.util.concurrent.ExecutorService;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,7 +10,7 @@ import org.safehaus.subutai.common.environment.Environment;
 import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import io.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
@@ -20,7 +18,6 @@ import org.safehaus.subutai.core.metric.impl.ContainerHostMetricImpl;
 import org.safehaus.subutai.core.metric.impl.ResourceHostMetricImpl;
 
 import com.google.common.collect.Sets;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Table;
 

@@ -10,7 +10,7 @@
   <reference id="identityManager" availability="mandatory"
              interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
   <reference id="environmentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.env.api.EnvironmentManager" />
+             interface="io.subutai.core.env.api.EnvironmentManager" />
 
   <!-- Data Access object to get EntityManager -->
 

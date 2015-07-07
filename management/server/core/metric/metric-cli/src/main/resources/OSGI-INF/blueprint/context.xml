@@ -3,7 +3,7 @@
   <reference id="monitor" availability="mandatory"
              interface="org.safehaus.subutai.core.metric.api.Monitor" />
   <reference id="environmentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.env.api.EnvironmentManager" />
+             interface="io.subutai.core.env.api.EnvironmentManager" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="metric/resource-host-metrics">

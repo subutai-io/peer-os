@@ -13,7 +13,7 @@ import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.test.SystemOutRedirectTest;
-import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import io.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import static junit.framework.TestCase.assertTrue;

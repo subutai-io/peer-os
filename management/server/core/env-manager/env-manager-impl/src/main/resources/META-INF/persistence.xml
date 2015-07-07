@@ -7,10 +7,10 @@
 
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/envManagerDS2)
     </non-jta-data-source>
-    <class>org.safehaus.subutai.core.env.impl.entity.HostInterface</class>
-    <class>org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl</class>
-    <class>org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl</class>
-    <class>org.safehaus.subutai.core.env.impl.entity.EnvironmentBlueprintEntity</class>
+    <class>io.subutai.core.env.impl.entity.HostInterface</class>
+    <class>io.subutai.core.env.impl.entity.EnvironmentImpl</class>
+    <class>io.subutai.core.env.impl.entity.EnvironmentContainerImpl</class>
+    <class>io.subutai.core.env.impl.entity.EnvironmentBlueprintEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="openjpa.Log" value="DefaultLevel=WARN, Tool=INFO" />
