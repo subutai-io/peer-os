@@ -41,7 +41,7 @@
              interface="org.safehaus.subutai.core.metric.api.Monitor" />
 
   <reference id="identityManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
+             interface="io.subutai.core.identity.api.IdentityManager" />
 
   <reference id="sslContextFactory" availability="mandatory"
              interface="org.safehaus.subutai.core.ssl.manager.api.SubutaiSslContextFactory" />

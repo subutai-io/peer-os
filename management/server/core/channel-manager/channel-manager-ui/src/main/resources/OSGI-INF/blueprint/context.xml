@@ -5,7 +5,7 @@
                interface="io.subutai.core.channel.api.ChannelManager" />
 
     <reference id="identityManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
+             interface="io.subutai.core.identity.api.IdentityManager" />
 
     <bean id="module" scope="singleton" class="io.subutai.core.channel.ui.ChannelManagerPortalModule" init-method="init" destroy-method="destroy">
       <argument ref="channelManager" />

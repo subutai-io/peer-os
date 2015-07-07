@@ -7,7 +7,7 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import io.subutai.core.hostregistry.api.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

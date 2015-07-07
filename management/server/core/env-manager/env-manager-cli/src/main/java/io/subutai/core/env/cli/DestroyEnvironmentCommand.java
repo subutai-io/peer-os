@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.util.UUIDUtil;
 import io.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;

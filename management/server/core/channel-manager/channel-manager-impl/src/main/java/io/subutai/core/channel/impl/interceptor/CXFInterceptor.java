@@ -12,7 +12,7 @@ import org.safehaus.subutai.common.util.IPUtil;
 import org.safehaus.subutai.common.util.UrlUtil;
 import io.subutai.core.channel.api.entity.IUserChannelToken;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
-import org.safehaus.subutai.core.identity.api.User;
+import io.subutai.core.identity.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

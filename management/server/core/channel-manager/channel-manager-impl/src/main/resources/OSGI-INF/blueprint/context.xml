@@ -14,7 +14,7 @@
 
   <!-- ************************************************************************************************** -->
   <reference id="identityManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
+             interface="io.subutai.core.identity.api.IdentityManager" />
 
   <!-- ************************************************************************************************** -->
   <reference-list id="busListener" interface="org.apache.cxf.Bus" availability="optional">

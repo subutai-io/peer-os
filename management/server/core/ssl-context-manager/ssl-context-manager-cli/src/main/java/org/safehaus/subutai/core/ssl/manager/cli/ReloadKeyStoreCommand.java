@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.ssl.manager.cli;
 
 
-import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
 
 import org.apache.karaf.shell.commands.Command;

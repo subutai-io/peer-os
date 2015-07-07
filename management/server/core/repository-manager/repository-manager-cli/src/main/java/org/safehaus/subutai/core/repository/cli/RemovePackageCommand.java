@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.repository.cli;
 
 
-import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.repository.api.RepositoryException;
 import org.safehaus.subutai.core.repository.api.RepositoryManager;
 import org.slf4j.Logger;

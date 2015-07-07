@@ -24,7 +24,7 @@
   <reference id="networkManager"
              interface="org.safehaus.subutai.core.network.api.NetworkManager" />
   <reference id="identityManager"
-             interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
+             interface="io.subutai.core.identity.api.IdentityManager" />
   <reference id="tracker"
              interface="org.safehaus.subutai.core.tracker.api.Tracker" />
 

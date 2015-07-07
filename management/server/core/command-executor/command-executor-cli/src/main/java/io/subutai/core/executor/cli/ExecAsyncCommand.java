@@ -10,7 +10,7 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.command.Response;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import io.subutai.core.executor.api.CommandExecutor;
-import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

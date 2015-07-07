@@ -5,12 +5,11 @@ import java.io.Serializable;
 import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.mdc.SubutaiExecutors;
-import org.safehaus.subutai.core.identity.api.IdentityManager;
-import org.safehaus.subutai.core.identity.api.User;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.test.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 //import org.safehaus.subutai.common.mdc.MDCAwareRunnable;
 

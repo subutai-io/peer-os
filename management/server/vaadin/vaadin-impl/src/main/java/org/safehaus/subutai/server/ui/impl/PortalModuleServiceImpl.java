@@ -8,7 +8,7 @@ import java.util.List;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.server.ui.api.PortalModuleListener;
 import org.safehaus.subutai.server.ui.api.PortalModuleService;

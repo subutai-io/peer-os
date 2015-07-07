@@ -93,7 +93,7 @@
 
   <reference id="peerManager" availability="mandatory" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
   <reference id="identityManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
+             interface="io.subutai.core.identity.api.IdentityManager" />
 
   <reference id="templateRegistry" availability="mandatory"
              interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />

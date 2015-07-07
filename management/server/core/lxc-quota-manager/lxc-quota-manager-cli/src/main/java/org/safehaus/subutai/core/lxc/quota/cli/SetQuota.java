@@ -6,7 +6,7 @@ import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.DiskQuotaUnit;
 import org.safehaus.subutai.common.quota.QuotaType;
-import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;

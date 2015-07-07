@@ -4,7 +4,7 @@ package io.subutai.core.git.cli;
 import io.subutai.core.git.api.GitBranch;
 import io.subutai.core.git.api.GitException;
 import io.subutai.core.git.api.GitManager;
-import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

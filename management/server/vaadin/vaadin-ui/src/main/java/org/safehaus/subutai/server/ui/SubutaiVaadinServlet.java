@@ -5,7 +5,7 @@ import org.safehaus.subutai.common.security.NullSubutaiLoginContext;
 import org.safehaus.subutai.common.security.SubutaiLoginContext;
 import org.safehaus.subutai.common.security.SubutaiThreadContext;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.server.ui.util.SubutaiVaadinUtils;
 
 import com.vaadin.server.DeploymentConfiguration;

@@ -5,7 +5,7 @@ import java.io.File;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import io.subutai.core.channel.api.ChannelManager;
-import org.safehaus.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;

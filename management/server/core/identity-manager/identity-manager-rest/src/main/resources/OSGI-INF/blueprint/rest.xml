@@ -17,11 +17,11 @@
     </jaxrs:serviceBeans>
   </jaxrs:server>
 
-  <bean id="identityRestServiceImpl" class="org.safehaus.subutai.core.identity.rest.RestServiceImpl">
+  <bean id="identityRestServiceImpl" class="io.subutai.core.identity.rest.RestServiceImpl">
     <argument ref="identityManager" />
   </bean>
 
   <reference id="identityManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
+             interface="io.subutai.core.identity.api.IdentityManager" />
 
 </blueprint>

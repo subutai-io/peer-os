@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.safehaus.subutai.common.peer.Host;
-import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.key.api.KeyInfo;
 import org.safehaus.subutai.core.key.api.KeyManager;
 import org.safehaus.subutai.core.key.api.KeyManagerException;

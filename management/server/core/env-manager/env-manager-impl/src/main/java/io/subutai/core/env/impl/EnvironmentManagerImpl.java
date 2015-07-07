@@ -47,8 +47,8 @@ import io.subutai.core.env.impl.tasks.DestroyContainerTask;
 import io.subutai.core.env.impl.tasks.DestroyEnvironmentTask;
 import io.subutai.core.env.impl.tasks.GrowEnvironmentTask;
 
-import org.safehaus.subutai.core.identity.api.IdentityManager;
-import org.safehaus.subutai.core.identity.api.User;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.User;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;

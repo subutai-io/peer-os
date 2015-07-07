@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.peer.cli;
 
 
 import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 

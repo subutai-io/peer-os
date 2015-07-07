@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.test.cli;
 
 
-import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.test.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

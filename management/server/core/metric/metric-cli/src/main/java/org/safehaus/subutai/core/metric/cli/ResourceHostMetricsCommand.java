@@ -4,7 +4,7 @@ package org.safehaus.subutai.core.metric.cli;
 import java.util.Set;
 
 import org.safehaus.subutai.common.metric.ResourceHostMetric;
-import org.safehaus.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.safehaus.subutai.core.metric.api.Monitor;
 
 import org.apache.karaf.shell.commands.Command;
