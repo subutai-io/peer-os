@@ -11,8 +11,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.Request;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.core.broker.api.Broker;
-import org.safehaus.subutai.core.broker.api.BrokerException;
+import io.subutai.core.broker.api.Broker;
+
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 
 import static junit.framework.TestCase.fail;

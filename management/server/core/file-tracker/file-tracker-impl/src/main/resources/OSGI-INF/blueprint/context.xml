@@ -15,6 +15,6 @@
                         bind-method="addListener" unbind-method="removeListener" />
   </reference-list>
 
-  <service ref="fileTracker" interface="org.safehaus.subutai.core.broker.api.ByteMessageListener" />
+  <service ref="fileTracker" interface="io.subutai.core.broker.api.ByteMessageListener" />
 
 </blueprint>

@@ -11,8 +11,9 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.broker.api.Topic;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
+
+import io.subutai.core.broker.api.Topic;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -24,7 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith( MockitoJUnitRunner.class )
 public class HearBeatListenerTest
 {
     private static final String HOST_HOSTNAME = "host";

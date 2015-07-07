@@ -2,8 +2,8 @@ package org.safehaus.subutai.core.hostregistry.impl;
 
 
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.broker.api.ByteMessageListener;
-import org.safehaus.subutai.core.broker.api.Topic;
+import io.subutai.core.broker.api.ByteMessageListener;
+import io.subutai.core.broker.api.Topic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

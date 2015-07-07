@@ -3,7 +3,7 @@
     >
 
   <reference id="broker" availability="mandatory"
-             interface="org.safehaus.subutai.core.broker.api.Broker" />
+             interface="io.subutai.core.broker.api.Broker" />
   <reference id="hostRegistry" availability="mandatory"
              interface="org.safehaus.subutai.core.hostregistry.api.HostRegistry" />
 
@@ -19,7 +19,7 @@
     <argument ref="commandProcessor" />
   </bean>
 
-  <service ref="commandProcessor" interface="org.safehaus.subutai.core.broker.api.ByteMessageListener" />
+  <service ref="commandProcessor" interface="io.subutai.core.broker.api.ByteMessageListener" />
 
   <service ref="executor" interface="org.safehaus.subutai.core.executor.api.CommandExecutor" />
 
