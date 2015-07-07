@@ -1,46 +1,46 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <reference id="repositoryManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.repository.api.RepositoryManager" />
+             interface="io.subutai.core.repository.api.RepositoryManager" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="repo/add">
-      <action class="org.safehaus.subutai.core.repository.cli.AddPackageCommand">
+      <action class="io.subutai.core.repository.cli.AddPackageCommand">
         <argument ref="repositoryManager" />
       </action>
     </command>
   </command-bundle>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="repo/remove">
-      <action class="org.safehaus.subutai.core.repository.cli.RemovePackageCommand">
+      <action class="io.subutai.core.repository.cli.RemovePackageCommand">
         <argument ref="repositoryManager" />
       </action>
     </command>
   </command-bundle>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="repo/extract">
-      <action class="org.safehaus.subutai.core.repository.cli.ExtractPackageCommand">
+      <action class="io.subutai.core.repository.cli.ExtractPackageCommand">
         <argument ref="repositoryManager" />
       </action>
     </command>
   </command-bundle>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="repo/extract-files">
-      <action class="org.safehaus.subutai.core.repository.cli.ExtractFilesCommand">
+      <action class="io.subutai.core.repository.cli.ExtractFilesCommand">
         <argument ref="repositoryManager" />
       </action>
     </command>
   </command-bundle>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="repo/list">
-      <action class="org.safehaus.subutai.core.repository.cli.ListPackagesCommand">
+      <action class="io.subutai.core.repository.cli.ListPackagesCommand">
         <argument ref="repositoryManager" />
       </action>
     </command>
   </command-bundle>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="repo/info">
-      <action class="org.safehaus.subutai.core.repository.cli.PackageInfoCommand">
+      <action class="io.subutai.core.repository.cli.PackageInfoCommand">
         <argument ref="repositoryManager" />
       </action>
     </command>

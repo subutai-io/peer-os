@@ -42,8 +42,8 @@ import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.impl.tasks.CreateGatewayTask;
 import io.subutai.core.peer.impl.tasks.ReserveVniTask;
 import io.subutai.core.peer.impl.tasks.SetupTunnelsTask;
-import org.safehaus.subutai.core.repository.api.RepositoryException;
-import org.safehaus.subutai.core.repository.api.RepositoryManager;
+import io.subutai.core.repository.api.RepositoryException;
+import io.subutai.core.repository.api.RepositoryManager;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;

@@ -24,8 +24,8 @@ import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.repository.api.RepositoryException;
-import org.safehaus.subutai.core.repository.api.RepositoryManager;
+import io.subutai.core.repository.api.RepositoryException;
+import io.subutai.core.repository.api.RepositoryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

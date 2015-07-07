@@ -27,11 +27,9 @@ import io.subutai.core.hostregistry.api.ResourceHostInfo;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.network.api.Tunnel;
-import io.subutai.core.peer.impl.entity.HostInterface;
-import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 
-import org.safehaus.subutai.core.repository.api.RepositoryException;
-import org.safehaus.subutai.core.repository.api.RepositoryManager;
+import io.subutai.core.repository.api.RepositoryException;
+import io.subutai.core.repository.api.RepositoryManager;
 
 import com.google.common.collect.Sets;
 

@@ -12,7 +12,7 @@
   </cxf:bus>
 
   <reference id="repoManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.repository.api.RepositoryManager" />
+             interface="io.subutai.core.repository.api.RepositoryManager" />
   <reference id="templateRegistry" availability="mandatory"
              interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
   <reference id="peerManager" availability="mandatory"

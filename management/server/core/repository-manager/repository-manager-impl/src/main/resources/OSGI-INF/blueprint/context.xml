@@ -5,10 +5,10 @@
              interface="io.subutai.core.peer.api.PeerManager" />
 
   <bean id="repositoryManager" scope="singleton"
-        class="org.safehaus.subutai.core.repository.impl.RepositoryManagerImpl">
+        class="io.subutai.core.repository.impl.RepositoryManagerImpl">
     <argument ref="peerManager" />
   </bean>
 
-  <service ref="repositoryManager" interface="org.safehaus.subutai.core.repository.api.RepositoryManager" />
+  <service ref="repositoryManager" interface="io.subutai.core.repository.api.RepositoryManager" />
 
 </blueprint>
