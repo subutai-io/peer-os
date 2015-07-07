@@ -7,7 +7,7 @@
 
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/channelManagerDS)
     </non-jta-data-source>
-    <class>org.safehaus.subutai.core.channel.impl.entity.UserChannelToken</class>
+    <class>io.subutai.core.channel.impl.entity.UserChannelToken</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="openjpa.Log" value="DefaultLevel=WARN, Tool=INFO" />

@@ -11,8 +11,8 @@
 
   <artifactId>channel-manager-cli</artifactId>
   <packaging>bundle</packaging>
-  <name>Channel Manager Cli</name>
-  <description>Channel Manager Cli</description>
+  <name>Subutai Channel Manager Cli</name>
+  <description>Subutai Channel Manager Cli</description>
 
   <dependencies>
     <dependency>

@@ -11,8 +11,8 @@
 
   <artifactId>channel-manager-ui</artifactId>
   <packaging>bundle</packaging>
-  <name>Channel Manager UI</name>
-  <description>Channel Manager UI</description>
+  <name>Subutai Channel Manager UI</name>
+  <description>Subutai Channel Manager UI</description>
 
   <dependencies>
     <dependency>

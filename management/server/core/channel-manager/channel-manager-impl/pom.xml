@@ -11,8 +11,8 @@
 
   <artifactId>channel-manager-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>Channel Manager Impl</name>
-  <description>Channel Manager Impl</description>
+  <name>Subutai Channel Manager Impl</name>
+  <description>Subutai Channel Manager Impl</description>
 
   <dependencies>
     <dependency>

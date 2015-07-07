@@ -11,8 +11,8 @@
 
   <artifactId>channel-manager-api</artifactId>
   <packaging>bundle</packaging>
-  <name>Channel Manager Api</name>
-  <description>Channel Manager Api</description>
+  <name>Subutai Channel Manager Api</name>
+  <description>Subutai Channel Manager Api</description>
 
   <dependencies>
     <dependency>

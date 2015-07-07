@@ -10,8 +10,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>channel-manager</artifactId>
-  <name>Channel Manager Parent</name>
-  <description>Channel Manager (HTTP Tunel Manager) Parent</description>
+  <name>Subutai Channel Manager Parent</name>
+  <description>Subutai Channel Manager Parent</description>
   <packaging>pom</packaging>
 
   <modules>
