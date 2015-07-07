@@ -21,7 +21,7 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.key.api.KeyManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.messenger.api.Messenger;
-import org.safehaus.subutai.core.metric.api.Monitor;
+import io.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandResponseListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;

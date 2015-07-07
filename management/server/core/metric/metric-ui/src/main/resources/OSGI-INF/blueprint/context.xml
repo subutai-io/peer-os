@@ -6,7 +6,7 @@
   <reference id="hostRegistry" availability="mandatory"
              interface="io.subutai.core.hostregistry.api.HostRegistry" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.metric.ui.MonitorPortalModule">
+  <bean id="module" scope="singleton" class="io.subutai.core.metric.ui.MonitorPortalModule">
     <argument ref="hostRegistry" />
   </bean>
 

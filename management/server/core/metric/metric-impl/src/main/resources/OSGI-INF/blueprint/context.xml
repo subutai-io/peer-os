@@ -18,7 +18,7 @@
     <jpa:unit unitname="metricPUnit" property="entityManagerFactory" />
   </bean>
 
-  <bean id="monitor" class="org.safehaus.subutai.core.metric.impl.MonitorImpl"
+  <bean id="monitor" class="io.subutai.core.metric.impl.MonitorImpl"
         scope="singleton" destroy-method="destroy">
     <argument ref="peerManager" />
     <argument ref="daoManagerMetric" />
@@ -27,29 +27,29 @@
   </bean>
 
   <reference-list id="alertLstnr"
-                  interface="org.safehaus.subutai.core.metric.api.AlertListener"
+                  interface="io.subutai.core.metric.api.AlertListener"
                   availability="optional">
     <reference-listener ref="monitor"
                         bind-method="addAlertListener" unbind-method="removeAlertListener" />
   </reference-list>
 
-  <service ref="monitor" interface="org.safehaus.subutai.core.metric.api.Monitor" />
+  <service ref="monitor" interface="io.subutai.core.metric.api.Monitor" />
 
-  <bean id="remoteAlertLstnr" scope="singleton" class="org.safehaus.subutai.core.metric.impl.RemoteAlertListener">
+  <bean id="remoteAlertLstnr" scope="singleton" class="io.subutai.core.metric.impl.RemoteAlertListener">
     <argument ref="monitor" />
   </bean>
 
   <service ref="remoteAlertLstnr" interface="org.safehaus.subutai.core.peer.api.RequestListener" />
 
   <bean id="remoteMetricLstnr" scope="singleton"
-        class="org.safehaus.subutai.core.metric.impl.RemoteMetricRequestListener">
+        class="io.subutai.core.metric.impl.RemoteMetricRequestListener">
     <argument ref="monitor" />
   </bean>
 
   <service ref="remoteMetricLstnr" interface="org.safehaus.subutai.core.peer.api.RequestListener" />
 
   <bean id="activationLstnr" scope="singleton"
-        class="org.safehaus.subutai.core.metric.impl.MonitoringActivationListener">
+        class="io.subutai.core.metric.impl.MonitoringActivationListener">
     <argument ref="monitor" />
     <argument ref="peerManager" />
   </bean>
