@@ -10,13 +10,10 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import io.subutai.core.metric.api.MonitoringSettings;
-import io.subutai.core.metric.impl.MonitorImpl;
-import io.subutai.core.metric.impl.MonitoringActivationListener;
-import io.subutai.core.metric.impl.MonitoringActivationRequest;
 
-import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.Payload;
-import org.safehaus.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.api.Payload;
+import io.subutai.core.peer.api.PeerManager;
 
 import com.google.common.collect.Sets;
 

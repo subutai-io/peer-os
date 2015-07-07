@@ -39,19 +39,13 @@ import io.subutai.core.metric.api.ContainerHostMetric;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.metric.api.MonitoringSettings;
-import io.subutai.core.metric.impl.AlertNotifier;
-import io.subutai.core.metric.impl.ContainerHostMetricImpl;
-import io.subutai.core.metric.impl.ContainerHostMetricResponse;
-import io.subutai.core.metric.impl.MonitorDao;
-import io.subutai.core.metric.impl.MonitorImpl;
-import io.subutai.core.metric.impl.MonitoringActivationRequest;
 
-import org.safehaus.subutai.core.peer.api.ContainerGroup;
-import org.safehaus.subutai.core.peer.api.HostNotFoundException;
-import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.RemotePeer;
-import org.safehaus.subutai.core.peer.api.ResourceHost;
+import io.subutai.core.peer.api.ContainerGroup;
+import io.subutai.core.peer.api.HostNotFoundException;
+import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.RemotePeer;
+import io.subutai.core.peer.api.ResourceHost;
 
 import org.apache.commons.lang3.StringUtils;
 

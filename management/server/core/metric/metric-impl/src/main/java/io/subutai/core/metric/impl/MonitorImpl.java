@@ -40,12 +40,12 @@ import io.subutai.core.metric.api.ContainerHostMetric;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.metric.api.MonitoringSettings;
-import org.safehaus.subutai.core.peer.api.ContainerGroup;
-import org.safehaus.subutai.core.peer.api.ContainerGroupNotFoundException;
-import org.safehaus.subutai.core.peer.api.HostNotFoundException;
-import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.ResourceHost;
+import io.subutai.core.peer.api.ContainerGroup;
+import io.subutai.core.peer.api.ContainerGroupNotFoundException;
+import io.subutai.core.peer.api.HostNotFoundException;
+import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.ResourceHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

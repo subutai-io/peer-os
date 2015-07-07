@@ -13,8 +13,8 @@ import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.env.api.EnvironmentManager;
 
-import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.api.PeerManager;
 
 import com.google.common.collect.Sets;
 

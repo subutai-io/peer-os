@@ -11,10 +11,10 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.core.peer.api.HostNotFoundException;
-import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.ManagementHost;
-import org.safehaus.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.HostNotFoundException;
+import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.pluginmanager.api.PluginInfo;
 import org.safehaus.subutai.pluginmanager.api.PluginManagerException;
 

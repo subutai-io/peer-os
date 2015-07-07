@@ -13,10 +13,9 @@ import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.QuotaException;
 import io.subutai.core.lxc.quota.api.QuotaManager;
-import io.subutai.core.lxc.quota.cli.GetQuota;
 
-import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.api.PeerManager;
 
 import static org.mockito.Mockito.when;
 

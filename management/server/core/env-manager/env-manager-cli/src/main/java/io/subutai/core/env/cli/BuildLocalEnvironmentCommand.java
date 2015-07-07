@@ -7,7 +7,7 @@ import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-import org.safehaus.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.PeerManager;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;

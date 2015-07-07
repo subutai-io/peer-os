@@ -15,7 +15,7 @@ import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.metric.ResourceHostMetric;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
-import org.safehaus.subutai.core.peer.api.ResourceHost;
+import io.subutai.core.peer.api.ResourceHost;
 
 
 /**

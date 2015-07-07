@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.template.wizard.api.TemplateWizardManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;

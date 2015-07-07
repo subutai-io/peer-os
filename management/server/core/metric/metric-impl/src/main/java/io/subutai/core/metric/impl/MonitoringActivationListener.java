@@ -6,9 +6,9 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.peer.ContainerHost;
 import io.subutai.core.metric.api.MonitoringSettings;
-import org.safehaus.subutai.core.peer.api.Payload;
-import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.RequestListener;
+import io.subutai.core.peer.api.Payload;
+import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.RequestListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

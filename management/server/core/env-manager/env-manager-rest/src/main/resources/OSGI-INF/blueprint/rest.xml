@@ -14,7 +14,7 @@
   <reference id="environmentManager" availability="mandatory"
              interface="io.subutai.core.env.api.EnvironmentManager" />
   <reference id="peerManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+             interface="io.subutai.core.peer.api.PeerManager" />
   <reference id="templateRegistry" availability="mandatory"
              interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
 

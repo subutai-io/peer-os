@@ -23,8 +23,8 @@ import io.subutai.core.env.impl.EnvironmentManagerImpl;
 import io.subutai.core.env.impl.exception.ResultHolder;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
 
-import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.ManagementHost;
+import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.api.ManagementHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

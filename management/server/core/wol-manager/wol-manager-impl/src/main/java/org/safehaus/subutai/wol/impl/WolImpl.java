@@ -8,8 +8,8 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.core.peer.api.ManagementHost;
-import org.safehaus.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.wol.api.WolManager;
 import org.safehaus.subutai.wol.api.WolManagerException;
 

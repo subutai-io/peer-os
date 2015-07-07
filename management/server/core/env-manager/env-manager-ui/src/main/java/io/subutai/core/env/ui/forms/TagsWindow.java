@@ -2,8 +2,8 @@ package io.subutai.core.env.ui.forms;
 
 
 import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.core.peer.api.HostNotFoundException;
-import org.safehaus.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.api.HostNotFoundException;
+import io.subutai.core.peer.api.LocalPeer;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.util.IndexedContainer;

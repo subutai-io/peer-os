@@ -11,8 +11,8 @@ import org.safehaus.subutai.common.environment.Topology;
 import org.safehaus.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.env.api.EnvironmentManager;
 
-import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.api.PeerManager;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;

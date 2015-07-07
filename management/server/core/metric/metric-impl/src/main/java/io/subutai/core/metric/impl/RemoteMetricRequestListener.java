@@ -3,8 +3,8 @@ package io.subutai.core.metric.impl;
 
 import java.util.Set;
 
-import org.safehaus.subutai.core.peer.api.Payload;
-import org.safehaus.subutai.core.peer.api.RequestListener;
+import io.subutai.core.peer.api.Payload;
+import io.subutai.core.peer.api.RequestListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

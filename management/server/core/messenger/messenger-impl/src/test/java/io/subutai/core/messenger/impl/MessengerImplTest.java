@@ -20,15 +20,9 @@ import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
 import io.subutai.core.messenger.api.MessageListener;
 import io.subutai.core.messenger.api.MessageStatus;
-import io.subutai.core.messenger.impl.Envelope;
-import io.subutai.core.messenger.impl.MessageImpl;
-import io.subutai.core.messenger.impl.MessageNotifier;
-import io.subutai.core.messenger.impl.MessageSender;
-import io.subutai.core.messenger.impl.MessengerDao;
-import io.subutai.core.messenger.impl.MessengerImpl;
 
-import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.api.PeerManager;
 
 import com.google.common.collect.Maps;
 

@@ -23,10 +23,9 @@ import io.subutai.core.broker.api.Topic;
 import io.subutai.core.filetracker.api.ConfigPointListener;
 import io.subutai.core.filetracker.api.FileTrackerException;
 import io.subutai.core.filetracker.api.InotifyEventType;
-import io.subutai.core.filetracker.impl.FileTrackerImpl;
 
-import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.api.PeerManager;
 
 import com.google.common.collect.Sets;
 

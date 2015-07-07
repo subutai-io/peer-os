@@ -4,7 +4,7 @@
              interface="io.subutai.core.lxc.quota.api.QuotaManager" />
 
   <reference id="peerManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+             interface="io.subutai.core.peer.api.PeerManager" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="quota/list-quota">

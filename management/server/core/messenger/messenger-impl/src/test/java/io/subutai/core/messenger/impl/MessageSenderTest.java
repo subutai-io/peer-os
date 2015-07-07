@@ -17,18 +17,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.common.util.RestUtil;
-import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
 
 import com.google.common.collect.Sets;
-
-import io.subutai.core.messenger.impl.Envelope;
-import io.subutai.core.messenger.impl.LocalPeerMessageSender;
-import io.subutai.core.messenger.impl.MessageSender;
-import io.subutai.core.messenger.impl.MessengerDao;
-import io.subutai.core.messenger.impl.MessengerImpl;
-import io.subutai.core.messenger.impl.RemotePeerMessageSender;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;

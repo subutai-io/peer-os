@@ -5,7 +5,7 @@ import org.safehaus.subutai.common.peer.Host;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.key.api.KeyInfo;
 import io.subutai.core.key.api.KeyManager;
-import org.safehaus.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.PeerManager;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;

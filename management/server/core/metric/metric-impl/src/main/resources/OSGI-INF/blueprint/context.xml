@@ -6,7 +6,7 @@
     >
 
   <reference id="peerManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+             interface="io.subutai.core.peer.api.PeerManager" />
   <reference id="identityManager" availability="mandatory"
              interface="io.subutai.core.identity.api.IdentityManager" />
   <reference id="environmentManager" availability="mandatory"
@@ -39,14 +39,14 @@
     <argument ref="monitor" />
   </bean>
 
-  <service ref="remoteAlertLstnr" interface="org.safehaus.subutai.core.peer.api.RequestListener" />
+  <service ref="remoteAlertLstnr" interface="io.subutai.core.peer.api.RequestListener" />
 
   <bean id="remoteMetricLstnr" scope="singleton"
         class="io.subutai.core.metric.impl.RemoteMetricRequestListener">
     <argument ref="monitor" />
   </bean>
 
-  <service ref="remoteMetricLstnr" interface="org.safehaus.subutai.core.peer.api.RequestListener" />
+  <service ref="remoteMetricLstnr" interface="io.subutai.core.peer.api.RequestListener" />
 
   <bean id="activationLstnr" scope="singleton"
         class="io.subutai.core.metric.impl.MonitoringActivationListener">
@@ -54,6 +54,6 @@
     <argument ref="peerManager" />
   </bean>
 
-  <service ref="activationLstnr" interface="org.safehaus.subutai.core.peer.api.RequestListener" />
+  <service ref="activationLstnr" interface="io.subutai.core.peer.api.RequestListener" />
 
 </blueprint>

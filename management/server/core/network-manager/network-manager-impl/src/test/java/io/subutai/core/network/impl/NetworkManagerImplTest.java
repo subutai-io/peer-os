@@ -21,18 +21,14 @@ import io.subutai.core.network.api.N2NConnection;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.network.api.Tunnel;
-import org.safehaus.subutai.core.peer.api.HostNotFoundException;
-import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.ManagementHost;
-import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.ResourceHost;
+import io.subutai.core.peer.api.HostNotFoundException;
+import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.ResourceHost;
 
 import com.google.common.collect.Sets;
 
-import io.subutai.core.network.impl.Commands;
-import io.subutai.core.network.impl.HostManager;
-import io.subutai.core.network.impl.NetworkManagerImpl;
-import io.subutai.core.network.impl.SshManager;
 import junit.framework.TestCase;
 
 import static junit.framework.Assert.assertFalse;

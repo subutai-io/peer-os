@@ -13,7 +13,7 @@ import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.settings.Common;
 import io.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 
 import com.vaadin.ui.Button;

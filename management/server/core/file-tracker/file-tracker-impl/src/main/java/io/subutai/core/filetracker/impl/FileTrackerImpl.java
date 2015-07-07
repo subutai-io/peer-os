@@ -23,7 +23,7 @@ import io.subutai.core.filetracker.api.ConfigPointListener;
 import io.subutai.core.filetracker.api.FileTracker;
 import io.subutai.core.filetracker.api.FileTrackerException;
 import io.subutai.core.filetracker.api.InotifyEventType;
-import org.safehaus.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

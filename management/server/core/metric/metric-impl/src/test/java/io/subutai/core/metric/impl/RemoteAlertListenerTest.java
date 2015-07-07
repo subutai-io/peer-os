@@ -9,11 +9,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.core.metric.api.MonitorException;
-import io.subutai.core.metric.impl.ContainerHostMetricImpl;
-import io.subutai.core.metric.impl.MonitorImpl;
-import io.subutai.core.metric.impl.RemoteAlertListener;
 
-import org.safehaus.subutai.core.peer.api.Payload;
+import io.subutai.core.peer.api.Payload;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;

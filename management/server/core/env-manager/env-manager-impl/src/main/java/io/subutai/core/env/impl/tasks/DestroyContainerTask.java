@@ -13,7 +13,7 @@ import io.subutai.core.env.impl.EnvironmentManagerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.ResultHolder;
-import org.safehaus.subutai.core.peer.api.HostNotFoundException;
+import io.subutai.core.peer.api.HostNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

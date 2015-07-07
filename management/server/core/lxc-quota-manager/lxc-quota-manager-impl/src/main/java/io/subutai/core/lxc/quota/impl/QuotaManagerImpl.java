@@ -23,9 +23,9 @@ import org.safehaus.subutai.common.quota.RamQuota;
 import org.safehaus.subutai.common.quota.RamQuotaUnit;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import io.subutai.core.lxc.quota.api.QuotaManager;
-import org.safehaus.subutai.core.peer.api.HostNotFoundException;
-import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.ResourceHost;
+import io.subutai.core.peer.api.HostNotFoundException;
+import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.ResourceHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -2,7 +2,7 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <reference id="peerManager" availability="optional"
-             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+             interface="io.subutai.core.peer.api.PeerManager" />
 
   <bean id="lxcQuotaManager" scope="singleton" class="io.subutai.core.lxc.quota.impl.QuotaManagerImpl">
     <argument ref="peerManager" />

@@ -22,7 +22,7 @@ import io.subutai.core.messenger.api.MessageProcessor;
 import io.subutai.core.messenger.api.MessageStatus;
 import io.subutai.core.messenger.api.Messenger;
 import io.subutai.core.messenger.api.MessengerException;
-import org.safehaus.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
