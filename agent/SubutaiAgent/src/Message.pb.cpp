@@ -39,6 +39,7 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
   Response_Container_reflection_ = NULL;
 const ::google::protobuf::EnumDescriptor* Response_ResponseType_descriptor_ = NULL;
 const ::google::protobuf::EnumDescriptor* Response_ContainerStatus_descriptor_ = NULL;
+
 }  // namespace
 
 
@@ -63,36 +64,33 @@ void protobuf_AssignDesc_Message_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request, timeout_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request, isdaemon_),
   };
-
   Request_reflection_ =
-    new ::google::protobuf::internal::GeneratedMessageReflection(
+    ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
       Request_descriptor_,
       Request::default_instance_,
       Request_offsets_,
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request, _has_bits_[0]),
       -1,
       -1,
-      ::google::protobuf::DescriptorPool::generated_pool(),
-      ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Request),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request, _internal_metadata_));
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request, _internal_metadata_),
+      -1);
   Request_env_descriptor_ = Request_descriptor_->nested_type(0);
   static const int Request_env_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_env, key_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_env, value_),
   };
   Request_env_reflection_ =
-    new ::google::protobuf::internal::GeneratedMessageReflection(
+    ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
       Request_env_descriptor_,
       Request_env::default_instance_,
       Request_env_offsets_,
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_env, _has_bits_[0]),
       -1,
       -1,
-      ::google::protobuf::DescriptorPool::generated_pool(),
-      ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Request_env),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_env, _internal_metadata_));
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request_env, _internal_metadata_),
+      -1);
   Request_RequestType_descriptor_ = Request_descriptor_->enum_type(0);
   Request_OutputType_descriptor_ = Request_descriptor_->enum_type(1);
   Response_descriptor_ = file->message_type(1);
@@ -113,17 +111,16 @@ void protobuf_AssignDesc_Message_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Response, configpoints_),
   };
   Response_reflection_ =
-    new ::google::protobuf::internal::GeneratedMessageReflection(
+    ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
       Response_descriptor_,
       Response::default_instance_,
       Response_offsets_,
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Response, _has_bits_[0]),
       -1,
       -1,
-      ::google::protobuf::DescriptorPool::generated_pool(),
-      ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Response),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Response, _internal_metadata_));
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Response, _internal_metadata_),
+      -1);
   Response_NetworkInterface_descriptor_ = Response_descriptor_->nested_type(0);
   static const int Response_NetworkInterface_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Response_NetworkInterface, interfacename_),
@@ -131,17 +128,16 @@ void protobuf_AssignDesc_Message_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Response_NetworkInterface, mac_),
   };
   Response_NetworkInterface_reflection_ =
-    new ::google::protobuf::internal::GeneratedMessageReflection(
+    ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
       Response_NetworkInterface_descriptor_,
       Response_NetworkInterface::default_instance_,
       Response_NetworkInterface_offsets_,
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Response_NetworkInterface, _has_bits_[0]),
       -1,
       -1,
-      ::google::protobuf::DescriptorPool::generated_pool(),
-      ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Response_NetworkInterface),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Response_NetworkInterface, _internal_metadata_));
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Response_NetworkInterface, _internal_metadata_),
+      -1);
   Response_Container_descriptor_ = Response_descriptor_->nested_type(1);
   static const int Response_Container_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Response_Container, hostname_),
@@ -150,17 +146,16 @@ void protobuf_AssignDesc_Message_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Response_Container, status_),
   };
   Response_Container_reflection_ =
-    new ::google::protobuf::internal::GeneratedMessageReflection(
+    ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
       Response_Container_descriptor_,
       Response_Container::default_instance_,
       Response_Container_offsets_,
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Response_Container, _has_bits_[0]),
       -1,
       -1,
-      ::google::protobuf::DescriptorPool::generated_pool(),
-      ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Response_Container),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Response_Container, _internal_metadata_));
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Response_Container, _internal_metadata_),
+      -1);
   Response_ResponseType_descriptor_ = Response_descriptor_->enum_type(0);
   Response_ContainerStatus_descriptor_ = Response_descriptor_->enum_type(1);
 }
@@ -176,15 +171,15 @@ inline void protobuf_AssignDescriptorsOnce() {
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    Request_descriptor_, &Request::default_instance());
+      Request_descriptor_, &Request::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    Request_env_descriptor_, &Request_env::default_instance());
+      Request_env_descriptor_, &Request_env::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    Response_descriptor_, &Response::default_instance());
+      Response_descriptor_, &Response::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    Response_NetworkInterface_descriptor_, &Response_NetworkInterface::default_instance());
+      Response_NetworkInterface_descriptor_, &Response_NetworkInterface::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    Response_Container_descriptor_, &Response_Container::default_instance());
+      Response_Container_descriptor_, &Response_Container::default_instance());
 }
 
 }  // namespace
@@ -267,6 +262,16 @@ struct StaticDescriptorInitializer_Message_2eproto {
   }
 } static_descriptor_initializer_Message_2eproto_;
 
+namespace {
+
+static void MergeFromFail(int line) GOOGLE_ATTRIBUTE_COLD;
+static void MergeFromFail(int line) {
+  GOOGLE_CHECK(false) << __FILE__ << ":" << line;
+}
+
+}  // namespace
+
+
 // ===================================================================
 
 const ::google::protobuf::EnumDescriptor* Request_RequestType_descriptor() {
@@ -325,17 +330,9 @@ const int Request_env::kValueFieldNumber;
 #endif  // !_MSC_VER
 
 Request_env::Request_env()
-  : ::google::protobuf::Message() , _internal_metadata_(NULL)  {
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:Subutai.Request.env)
-}
-
-Request_env::Request_env(::google::protobuf::Arena* arena)
-  : ::google::protobuf::Message(),
-  _internal_metadata_(arena) {
-  SharedCtor();
-  RegisterArenaDtor(arena);
-  // @@protoc_insertion_point(arena_constructor:Subutai.Request.env)
 }
 
 void Request_env::InitAsDefaultInstance() {
@@ -363,22 +360,12 @@ Request_env::~Request_env() {
 }
 
 void Request_env::SharedDtor() {
-  if (GetArenaNoVirtual() != NULL) {
-    return;
-  }
-
-  key_.Destroy(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
-  value_.Destroy(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+  key_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  value_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != default_instance_) {
   }
 }
 
-void Request_env::ArenaDtor(void* object) {
-  Request_env* _this = reinterpret_cast< Request_env* >(object);
-  (void)_this;
-}
-void Request_env::RegisterArenaDtor(::google::protobuf::Arena* arena) {
-}
 void Request_env::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
@@ -397,16 +384,20 @@ const Request_env& Request_env::default_instance() {
 Request_env* Request_env::default_instance_ = NULL;
 
 Request_env* Request_env::New(::google::protobuf::Arena* arena) const {
-  return ::google::protobuf::Arena::CreateMessage<Request_env>(arena);
+  Request_env* n = new Request_env;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
 }
 
 void Request_env::Clear() {
-  if (_has_bits_[0 / 32] & 3) {
+  if (_has_bits_[0 / 32] & 3u) {
     if (has_key()) {
-      key_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+      key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
     }
     if (has_value()) {
-      value_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+      value_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
     }
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -591,10 +582,10 @@ int Request_env::ByteSize() const {
 }
 
 void Request_env::MergeFrom(const ::google::protobuf::Message& from) {
-  GOOGLE_CHECK_NE(&from, this);
-  const Request_env* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const Request_env*>(
-      &from);
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+  const Request_env* source = 
+      ::google::protobuf::internal::DynamicCastToGenerated<const Request_env>(
+          &from);
   if (source == NULL) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -603,13 +594,15 @@ void Request_env::MergeFrom(const ::google::protobuf::Message& from) {
 }
 
 void Request_env::MergeFrom(const Request_env& from) {
-  GOOGLE_CHECK_NE(&from, this);
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_key()) {
-      set_key(from.key());
+      set_has_key();
+      key_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.key_);
     }
     if (from.has_value()) {
-      set_value(from.value());
+      set_has_value();
+      value_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.value_);
     }
   }
   if (from._internal_metadata_.have_unknown_fields()) {
@@ -637,18 +630,6 @@ bool Request_env::IsInitialized() const {
 
 void Request_env::Swap(Request_env* other) {
   if (other == this) return;
-  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
-    InternalSwap(other);
-  } else {
-    Request_env temp;
-    temp.MergeFrom(*this);
-    CopyFrom(*other);
-    other->CopyFrom(temp);
-  }
-}
-void Request_env::UnsafeArenaSwap(Request_env* other) {
-  if (other == this) return;
-  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
   InternalSwap(other);
 }
 void Request_env::InternalSwap(Request_env* other) {
@@ -686,19 +667,9 @@ const int Request::kIsDaemonFieldNumber;
 #endif  // !_MSC_VER
 
 Request::Request()
-  : ::google::protobuf::Message() , _internal_metadata_(NULL)  {
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:Subutai.Request)
-}
-
-Request::Request(::google::protobuf::Arena* arena)
-  : ::google::protobuf::Message(),
-  _internal_metadata_(arena),
-  args_(arena),
-  environment_(arena) {
-  SharedCtor();
-  RegisterArenaDtor(arena);
-  // @@protoc_insertion_point(arena_constructor:Subutai.Request)
 }
 
 void Request::InitAsDefaultInstance() {
@@ -734,25 +705,15 @@ Request::~Request() {
 }
 
 void Request::SharedDtor() {
-  if (GetArenaNoVirtual() != NULL) {
-    return;
-  }
-
-  id_.Destroy(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
-  commandid_.Destroy(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
-  workingdirectory_.Destroy(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
-  command_.Destroy(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
-  runas_.Destroy(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+  id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  commandid_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  workingdirectory_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  command_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  runas_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != default_instance_) {
   }
 }
 
-void Request::ArenaDtor(void* object) {
-  Request* _this = reinterpret_cast< Request* >(object);
-  (void)_this;
-}
-void Request::RegisterArenaDtor(::google::protobuf::Arena* arena) {
-}
 void Request::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
@@ -771,43 +732,45 @@ const Request& Request::default_instance() {
 Request* Request::default_instance_ = NULL;
 
 Request* Request::New(::google::protobuf::Arena* arena) const {
-  return ::google::protobuf::Arena::CreateMessage<Request>(arena);
+  Request* n = new Request;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
 }
 
 void Request::Clear() {
-#define OFFSET_OF_FIELD_(f) (reinterpret_cast<char*>(      \
-  &reinterpret_cast<Request*>(16)->f) - \
-   reinterpret_cast<char*>(16))
+#define ZR_HELPER_(f) reinterpret_cast<char*>(\
+  &reinterpret_cast<Request*>(16)->f)
 
-#define ZR_(first, last) do {                              \
-    size_t f = OFFSET_OF_FIELD_(first);                    \
-    size_t n = OFFSET_OF_FIELD_(last) - f + sizeof(last);  \
-    ::memset(&first, 0, n);                                \
-  } while (0)
+#define ZR_(first, last) do {\
+  ::memset(&first, 0,\
+           ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
+} while (0)
 
-  if (_has_bits_[0 / 32] & 159) {
+  if (_has_bits_[0 / 32] & 159u) {
     ZR_(type_, stdout_);
     if (has_id()) {
-      id_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+      id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
     }
     if (has_commandid()) {
-      commandid_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+      commandid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
     }
     if (has_workingdirectory()) {
-      workingdirectory_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+      workingdirectory_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
     }
     if (has_command()) {
-      command_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+      command_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
     }
   }
-  if (_has_bits_[8 / 32] & 3840) {
+  if (_has_bits_[8 / 32] & 3840u) {
     ZR_(stderr_, isdaemon_);
     if (has_runas()) {
-      runas_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+      runas_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
     }
   }
 
-#undef OFFSET_OF_FIELD_
+#undef ZR_HELPER_
 #undef ZR_
 
   args_.Clear();
@@ -938,12 +901,15 @@ bool Request::MergePartialFromCodedStream(
       case 7: {
         if (tag == 58) {
          parse_environment:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+          DO_(input->IncrementRecursionDepth());
+         parse_loop_environment:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtualNoRecursionDepth(
                 input, add_environment()));
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(58)) goto parse_environment;
+        if (input->ExpectTag(58)) goto parse_loop_environment;
+        input->UnsafeDecrementRecursionDepth();
         if (input->ExpectTag(64)) goto parse_stdOut;
         break;
       }
@@ -1117,7 +1083,7 @@ void Request::SerializeWithCachedSizes(
   }
 
   // repeated .Subutai.Request.env environment = 7;
-  for (int i = 0; i < this->environment_size(); i++) {
+  for (unsigned int i = 0, n = this->environment_size(); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       7, this->environment(i), output);
   }
@@ -1225,7 +1191,7 @@ void Request::SerializeWithCachedSizes(
   }
 
   // repeated .Subutai.Request.env environment = 7;
-  for (int i = 0; i < this->environment_size(); i++) {
+  for (unsigned int i = 0, n = this->environment_size(); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         7, this->environment(i), target);
@@ -1396,10 +1362,10 @@ int Request::ByteSize() const {
 }
 
 void Request::MergeFrom(const ::google::protobuf::Message& from) {
-  GOOGLE_CHECK_NE(&from, this);
-  const Request* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const Request*>(
-      &from);
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+  const Request* source = 
+      ::google::protobuf::internal::DynamicCastToGenerated<const Request>(
+          &from);
   if (source == NULL) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -1408,7 +1374,7 @@ void Request::MergeFrom(const ::google::protobuf::Message& from) {
 }
 
 void Request::MergeFrom(const Request& from) {
-  GOOGLE_CHECK_NE(&from, this);
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   args_.MergeFrom(from.args_);
   environment_.MergeFrom(from.environment_);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
@@ -1416,16 +1382,20 @@ void Request::MergeFrom(const Request& from) {
       set_type(from.type());
     }
     if (from.has_id()) {
-      set_id(from.id());
+      set_has_id();
+      id_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.id_);
     }
     if (from.has_commandid()) {
-      set_commandid(from.commandid());
+      set_has_commandid();
+      commandid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.commandid_);
     }
     if (from.has_workingdirectory()) {
-      set_workingdirectory(from.workingdirectory());
+      set_has_workingdirectory();
+      workingdirectory_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.workingdirectory_);
     }
     if (from.has_command()) {
-      set_command(from.command());
+      set_has_command();
+      command_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.command_);
     }
     if (from.has_stdout()) {
       set_stdout(from.stdout());
@@ -1436,7 +1406,8 @@ void Request::MergeFrom(const Request& from) {
       set_stderr(from.stderr());
     }
     if (from.has_runas()) {
-      set_runas(from.runas());
+      set_has_runas();
+      runas_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.runas_);
     }
     if (from.has_timeout()) {
       set_timeout(from.timeout());
@@ -1471,18 +1442,6 @@ bool Request::IsInitialized() const {
 
 void Request::Swap(Request* other) {
   if (other == this) return;
-  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
-    InternalSwap(other);
-  } else {
-    Request temp;
-    temp.MergeFrom(*this);
-    CopyFrom(*other);
-    other->CopyFrom(temp);
-  }
-}
-void Request::UnsafeArenaSwap(Request* other) {
-  if (other == this) return;
-  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
   InternalSwap(other);
 }
 void Request::InternalSwap(Request* other) {
@@ -1511,6 +1470,592 @@ void Request::InternalSwap(Request* other) {
   return metadata;
 }
 
+#if PROTOBUF_INLINE_NOT_IN_HEADERS
+// Request_env
+
+// required string key = 1;
+bool Request_env::has_key() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+void Request_env::set_has_key() {
+  _has_bits_[0] |= 0x00000001u;
+}
+void Request_env::clear_has_key() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+void Request_env::clear_key() {
+  key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_key();
+}
+ const ::std::string& Request_env::key() const {
+  // @@protoc_insertion_point(field_get:Subutai.Request.env.key)
+  return key_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Request_env::set_key(const ::std::string& value) {
+  set_has_key();
+  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Subutai.Request.env.key)
+}
+ void Request_env::set_key(const char* value) {
+  set_has_key();
+  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Subutai.Request.env.key)
+}
+ void Request_env::set_key(const char* value, size_t size) {
+  set_has_key();
+  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Subutai.Request.env.key)
+}
+ ::std::string* Request_env::mutable_key() {
+  set_has_key();
+  // @@protoc_insertion_point(field_mutable:Subutai.Request.env.key)
+  return key_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* Request_env::release_key() {
+  clear_has_key();
+  return key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Request_env::set_allocated_key(::std::string* key) {
+  if (key != NULL) {
+    set_has_key();
+  } else {
+    clear_has_key();
+  }
+  key_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), key);
+  // @@protoc_insertion_point(field_set_allocated:Subutai.Request.env.key)
+}
+
+// required string value = 2;
+bool Request_env::has_value() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+void Request_env::set_has_value() {
+  _has_bits_[0] |= 0x00000002u;
+}
+void Request_env::clear_has_value() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+void Request_env::clear_value() {
+  value_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_value();
+}
+ const ::std::string& Request_env::value() const {
+  // @@protoc_insertion_point(field_get:Subutai.Request.env.value)
+  return value_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Request_env::set_value(const ::std::string& value) {
+  set_has_value();
+  value_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Subutai.Request.env.value)
+}
+ void Request_env::set_value(const char* value) {
+  set_has_value();
+  value_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Subutai.Request.env.value)
+}
+ void Request_env::set_value(const char* value, size_t size) {
+  set_has_value();
+  value_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Subutai.Request.env.value)
+}
+ ::std::string* Request_env::mutable_value() {
+  set_has_value();
+  // @@protoc_insertion_point(field_mutable:Subutai.Request.env.value)
+  return value_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* Request_env::release_value() {
+  clear_has_value();
+  return value_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Request_env::set_allocated_value(::std::string* value) {
+  if (value != NULL) {
+    set_has_value();
+  } else {
+    clear_has_value();
+  }
+  value_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set_allocated:Subutai.Request.env.value)
+}
+
+// -------------------------------------------------------------------
+
+// Request
+
+// required .Subutai.Request.RequestType type = 1;
+bool Request::has_type() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+void Request::set_has_type() {
+  _has_bits_[0] |= 0x00000001u;
+}
+void Request::clear_has_type() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+void Request::clear_type() {
+  type_ = 0;
+  clear_has_type();
+}
+ ::Subutai::Request_RequestType Request::type() const {
+  // @@protoc_insertion_point(field_get:Subutai.Request.type)
+  return static_cast< ::Subutai::Request_RequestType >(type_);
+}
+ void Request::set_type(::Subutai::Request_RequestType value) {
+  assert(::Subutai::Request_RequestType_IsValid(value));
+  set_has_type();
+  type_ = value;
+  // @@protoc_insertion_point(field_set:Subutai.Request.type)
+}
+
+// required string id = 2;
+bool Request::has_id() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+void Request::set_has_id() {
+  _has_bits_[0] |= 0x00000002u;
+}
+void Request::clear_has_id() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+void Request::clear_id() {
+  id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_id();
+}
+ const ::std::string& Request::id() const {
+  // @@protoc_insertion_point(field_get:Subutai.Request.id)
+  return id_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Request::set_id(const ::std::string& value) {
+  set_has_id();
+  id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Subutai.Request.id)
+}
+ void Request::set_id(const char* value) {
+  set_has_id();
+  id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Subutai.Request.id)
+}
+ void Request::set_id(const char* value, size_t size) {
+  set_has_id();
+  id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Subutai.Request.id)
+}
+ ::std::string* Request::mutable_id() {
+  set_has_id();
+  // @@protoc_insertion_point(field_mutable:Subutai.Request.id)
+  return id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* Request::release_id() {
+  clear_has_id();
+  return id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Request::set_allocated_id(::std::string* id) {
+  if (id != NULL) {
+    set_has_id();
+  } else {
+    clear_has_id();
+  }
+  id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), id);
+  // @@protoc_insertion_point(field_set_allocated:Subutai.Request.id)
+}
+
+// required string commandId = 3;
+bool Request::has_commandid() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+void Request::set_has_commandid() {
+  _has_bits_[0] |= 0x00000004u;
+}
+void Request::clear_has_commandid() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+void Request::clear_commandid() {
+  commandid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_commandid();
+}
+ const ::std::string& Request::commandid() const {
+  // @@protoc_insertion_point(field_get:Subutai.Request.commandId)
+  return commandid_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Request::set_commandid(const ::std::string& value) {
+  set_has_commandid();
+  commandid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Subutai.Request.commandId)
+}
+ void Request::set_commandid(const char* value) {
+  set_has_commandid();
+  commandid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Subutai.Request.commandId)
+}
+ void Request::set_commandid(const char* value, size_t size) {
+  set_has_commandid();
+  commandid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Subutai.Request.commandId)
+}
+ ::std::string* Request::mutable_commandid() {
+  set_has_commandid();
+  // @@protoc_insertion_point(field_mutable:Subutai.Request.commandId)
+  return commandid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* Request::release_commandid() {
+  clear_has_commandid();
+  return commandid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Request::set_allocated_commandid(::std::string* commandid) {
+  if (commandid != NULL) {
+    set_has_commandid();
+  } else {
+    clear_has_commandid();
+  }
+  commandid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), commandid);
+  // @@protoc_insertion_point(field_set_allocated:Subutai.Request.commandId)
+}
+
+// optional string workingDirectory = 4;
+bool Request::has_workingdirectory() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+void Request::set_has_workingdirectory() {
+  _has_bits_[0] |= 0x00000008u;
+}
+void Request::clear_has_workingdirectory() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+void Request::clear_workingdirectory() {
+  workingdirectory_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_workingdirectory();
+}
+ const ::std::string& Request::workingdirectory() const {
+  // @@protoc_insertion_point(field_get:Subutai.Request.workingDirectory)
+  return workingdirectory_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Request::set_workingdirectory(const ::std::string& value) {
+  set_has_workingdirectory();
+  workingdirectory_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Subutai.Request.workingDirectory)
+}
+ void Request::set_workingdirectory(const char* value) {
+  set_has_workingdirectory();
+  workingdirectory_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Subutai.Request.workingDirectory)
+}
+ void Request::set_workingdirectory(const char* value, size_t size) {
+  set_has_workingdirectory();
+  workingdirectory_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Subutai.Request.workingDirectory)
+}
+ ::std::string* Request::mutable_workingdirectory() {
+  set_has_workingdirectory();
+  // @@protoc_insertion_point(field_mutable:Subutai.Request.workingDirectory)
+  return workingdirectory_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* Request::release_workingdirectory() {
+  clear_has_workingdirectory();
+  return workingdirectory_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Request::set_allocated_workingdirectory(::std::string* workingdirectory) {
+  if (workingdirectory != NULL) {
+    set_has_workingdirectory();
+  } else {
+    clear_has_workingdirectory();
+  }
+  workingdirectory_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), workingdirectory);
+  // @@protoc_insertion_point(field_set_allocated:Subutai.Request.workingDirectory)
+}
+
+// optional string command = 5;
+bool Request::has_command() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+void Request::set_has_command() {
+  _has_bits_[0] |= 0x00000010u;
+}
+void Request::clear_has_command() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+void Request::clear_command() {
+  command_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_command();
+}
+ const ::std::string& Request::command() const {
+  // @@protoc_insertion_point(field_get:Subutai.Request.command)
+  return command_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Request::set_command(const ::std::string& value) {
+  set_has_command();
+  command_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Subutai.Request.command)
+}
+ void Request::set_command(const char* value) {
+  set_has_command();
+  command_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Subutai.Request.command)
+}
+ void Request::set_command(const char* value, size_t size) {
+  set_has_command();
+  command_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Subutai.Request.command)
+}
+ ::std::string* Request::mutable_command() {
+  set_has_command();
+  // @@protoc_insertion_point(field_mutable:Subutai.Request.command)
+  return command_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* Request::release_command() {
+  clear_has_command();
+  return command_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Request::set_allocated_command(::std::string* command) {
+  if (command != NULL) {
+    set_has_command();
+  } else {
+    clear_has_command();
+  }
+  command_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), command);
+  // @@protoc_insertion_point(field_set_allocated:Subutai.Request.command)
+}
+
+// repeated string args = 6;
+int Request::args_size() const {
+  return args_.size();
+}
+void Request::clear_args() {
+  args_.Clear();
+}
+ const ::std::string& Request::args(int index) const {
+  // @@protoc_insertion_point(field_get:Subutai.Request.args)
+  return args_.Get(index);
+}
+ ::std::string* Request::mutable_args(int index) {
+  // @@protoc_insertion_point(field_mutable:Subutai.Request.args)
+  return args_.Mutable(index);
+}
+ void Request::set_args(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:Subutai.Request.args)
+  args_.Mutable(index)->assign(value);
+}
+ void Request::set_args(int index, const char* value) {
+  args_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:Subutai.Request.args)
+}
+ void Request::set_args(int index, const char* value, size_t size) {
+  args_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:Subutai.Request.args)
+}
+ ::std::string* Request::add_args() {
+  return args_.Add();
+}
+ void Request::add_args(const ::std::string& value) {
+  args_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:Subutai.Request.args)
+}
+ void Request::add_args(const char* value) {
+  args_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:Subutai.Request.args)
+}
+ void Request::add_args(const char* value, size_t size) {
+  args_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:Subutai.Request.args)
+}
+ const ::google::protobuf::RepeatedPtrField< ::std::string>&
+Request::args() const {
+  // @@protoc_insertion_point(field_list:Subutai.Request.args)
+  return args_;
+}
+ ::google::protobuf::RepeatedPtrField< ::std::string>*
+Request::mutable_args() {
+  // @@protoc_insertion_point(field_mutable_list:Subutai.Request.args)
+  return &args_;
+}
+
+// repeated .Subutai.Request.env environment = 7;
+int Request::environment_size() const {
+  return environment_.size();
+}
+void Request::clear_environment() {
+  environment_.Clear();
+}
+ const ::Subutai::Request_env& Request::environment(int index) const {
+  // @@protoc_insertion_point(field_get:Subutai.Request.environment)
+  return environment_.Get(index);
+}
+ ::Subutai::Request_env* Request::mutable_environment(int index) {
+  // @@protoc_insertion_point(field_mutable:Subutai.Request.environment)
+  return environment_.Mutable(index);
+}
+ ::Subutai::Request_env* Request::add_environment() {
+  // @@protoc_insertion_point(field_add:Subutai.Request.environment)
+  return environment_.Add();
+}
+ const ::google::protobuf::RepeatedPtrField< ::Subutai::Request_env >&
+Request::environment() const {
+  // @@protoc_insertion_point(field_list:Subutai.Request.environment)
+  return environment_;
+}
+ ::google::protobuf::RepeatedPtrField< ::Subutai::Request_env >*
+Request::mutable_environment() {
+  // @@protoc_insertion_point(field_mutable_list:Subutai.Request.environment)
+  return &environment_;
+}
+
+// optional .Subutai.Request.OutputType stdOut = 8;
+bool Request::has_stdout() const {
+  return (_has_bits_[0] & 0x00000080u) != 0;
+}
+void Request::set_has_stdout() {
+  _has_bits_[0] |= 0x00000080u;
+}
+void Request::clear_has_stdout() {
+  _has_bits_[0] &= ~0x00000080u;
+}
+void Request::clear_stdout() {
+  stdout_ = 0;
+  clear_has_stdout();
+}
+ ::Subutai::Request_OutputType Request::stdout() const {
+  // @@protoc_insertion_point(field_get:Subutai.Request.stdOut)
+  return static_cast< ::Subutai::Request_OutputType >(stdout_);
+}
+ void Request::set_stdout(::Subutai::Request_OutputType value) {
+  assert(::Subutai::Request_OutputType_IsValid(value));
+  set_has_stdout();
+  stdout_ = value;
+  // @@protoc_insertion_point(field_set:Subutai.Request.stdOut)
+}
+
+// optional .Subutai.Request.OutputType stdErr = 9;
+bool Request::has_stderr() const {
+  return (_has_bits_[0] & 0x00000100u) != 0;
+}
+void Request::set_has_stderr() {
+  _has_bits_[0] |= 0x00000100u;
+}
+void Request::clear_has_stderr() {
+  _has_bits_[0] &= ~0x00000100u;
+}
+void Request::clear_stderr() {
+  stderr_ = 0;
+  clear_has_stderr();
+}
+ ::Subutai::Request_OutputType Request::stderr() const {
+  // @@protoc_insertion_point(field_get:Subutai.Request.stdErr)
+  return static_cast< ::Subutai::Request_OutputType >(stderr_);
+}
+ void Request::set_stderr(::Subutai::Request_OutputType value) {
+  assert(::Subutai::Request_OutputType_IsValid(value));
+  set_has_stderr();
+  stderr_ = value;
+  // @@protoc_insertion_point(field_set:Subutai.Request.stdErr)
+}
+
+// optional string runAs = 10;
+bool Request::has_runas() const {
+  return (_has_bits_[0] & 0x00000200u) != 0;
+}
+void Request::set_has_runas() {
+  _has_bits_[0] |= 0x00000200u;
+}
+void Request::clear_has_runas() {
+  _has_bits_[0] &= ~0x00000200u;
+}
+void Request::clear_runas() {
+  runas_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_runas();
+}
+ const ::std::string& Request::runas() const {
+  // @@protoc_insertion_point(field_get:Subutai.Request.runAs)
+  return runas_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Request::set_runas(const ::std::string& value) {
+  set_has_runas();
+  runas_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Subutai.Request.runAs)
+}
+ void Request::set_runas(const char* value) {
+  set_has_runas();
+  runas_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Subutai.Request.runAs)
+}
+ void Request::set_runas(const char* value, size_t size) {
+  set_has_runas();
+  runas_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Subutai.Request.runAs)
+}
+ ::std::string* Request::mutable_runas() {
+  set_has_runas();
+  // @@protoc_insertion_point(field_mutable:Subutai.Request.runAs)
+  return runas_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* Request::release_runas() {
+  clear_has_runas();
+  return runas_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Request::set_allocated_runas(::std::string* runas) {
+  if (runas != NULL) {
+    set_has_runas();
+  } else {
+    clear_has_runas();
+  }
+  runas_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), runas);
+  // @@protoc_insertion_point(field_set_allocated:Subutai.Request.runAs)
+}
+
+// optional int32 timeout = 11;
+bool Request::has_timeout() const {
+  return (_has_bits_[0] & 0x00000400u) != 0;
+}
+void Request::set_has_timeout() {
+  _has_bits_[0] |= 0x00000400u;
+}
+void Request::clear_has_timeout() {
+  _has_bits_[0] &= ~0x00000400u;
+}
+void Request::clear_timeout() {
+  timeout_ = 0;
+  clear_has_timeout();
+}
+ ::google::protobuf::int32 Request::timeout() const {
+  // @@protoc_insertion_point(field_get:Subutai.Request.timeout)
+  return timeout_;
+}
+ void Request::set_timeout(::google::protobuf::int32 value) {
+  set_has_timeout();
+  timeout_ = value;
+  // @@protoc_insertion_point(field_set:Subutai.Request.timeout)
+}
+
+// optional int32 isDaemon = 12;
+bool Request::has_isdaemon() const {
+  return (_has_bits_[0] & 0x00000800u) != 0;
+}
+void Request::set_has_isdaemon() {
+  _has_bits_[0] |= 0x00000800u;
+}
+void Request::clear_has_isdaemon() {
+  _has_bits_[0] &= ~0x00000800u;
+}
+void Request::clear_isdaemon() {
+  isdaemon_ = 0;
+  clear_has_isdaemon();
+}
+ ::google::protobuf::int32 Request::isdaemon() const {
+  // @@protoc_insertion_point(field_get:Subutai.Request.isDaemon)
+  return isdaemon_;
+}
+ void Request::set_isdaemon(::google::protobuf::int32 value) {
+  set_has_isdaemon();
+  isdaemon_ = value;
+  // @@protoc_insertion_point(field_set:Subutai.Request.isDaemon)
+}
+
+#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
 
 // ===================================================================
 
@@ -1581,17 +2126,9 @@ const int Response_NetworkInterface::kMacFieldNumber;
 #endif  // !_MSC_VER
 
 Response_NetworkInterface::Response_NetworkInterface()
-  : ::google::protobuf::Message() , _internal_metadata_(NULL)  {
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:Subutai.Response.NetworkInterface)
-}
-
-Response_NetworkInterface::Response_NetworkInterface(::google::protobuf::Arena* arena)
-  : ::google::protobuf::Message(),
-  _internal_metadata_(arena) {
-  SharedCtor();
-  RegisterArenaDtor(arena);
-  // @@protoc_insertion_point(arena_constructor:Subutai.Response.NetworkInterface)
 }
 
 void Response_NetworkInterface::InitAsDefaultInstance() {
@@ -1620,23 +2157,13 @@ Response_NetworkInterface::~Response_NetworkInterface() {
 }
 
 void Response_NetworkInterface::SharedDtor() {
-  if (GetArenaNoVirtual() != NULL) {
-    return;
-  }
-
-  interfacename_.Destroy(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
-  ip_.Destroy(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
-  mac_.Destroy(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+  interfacename_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ip_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  mac_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != default_instance_) {
   }
 }
 
-void Response_NetworkInterface::ArenaDtor(void* object) {
-  Response_NetworkInterface* _this = reinterpret_cast< Response_NetworkInterface* >(object);
-  (void)_this;
-}
-void Response_NetworkInterface::RegisterArenaDtor(::google::protobuf::Arena* arena) {
-}
 void Response_NetworkInterface::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
@@ -1655,19 +2182,23 @@ const Response_NetworkInterface& Response_NetworkInterface::default_instance() {
 Response_NetworkInterface* Response_NetworkInterface::default_instance_ = NULL;
 
 Response_NetworkInterface* Response_NetworkInterface::New(::google::protobuf::Arena* arena) const {
-  return ::google::protobuf::Arena::CreateMessage<Response_NetworkInterface>(arena);
+  Response_NetworkInterface* n = new Response_NetworkInterface;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
 }
 
 void Response_NetworkInterface::Clear() {
-  if (_has_bits_[0 / 32] & 7) {
+  if (_has_bits_[0 / 32] & 7u) {
     if (has_interfacename()) {
-      interfacename_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+      interfacename_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
     }
     if (has_ip()) {
-      ip_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+      ip_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
     }
     if (has_mac()) {
-      mac_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+      mac_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
     }
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -1880,10 +2411,10 @@ int Response_NetworkInterface::ByteSize() const {
 }
 
 void Response_NetworkInterface::MergeFrom(const ::google::protobuf::Message& from) {
-  GOOGLE_CHECK_NE(&from, this);
-  const Response_NetworkInterface* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const Response_NetworkInterface*>(
-      &from);
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+  const Response_NetworkInterface* source = 
+      ::google::protobuf::internal::DynamicCastToGenerated<const Response_NetworkInterface>(
+          &from);
   if (source == NULL) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -1892,16 +2423,19 @@ void Response_NetworkInterface::MergeFrom(const ::google::protobuf::Message& fro
 }
 
 void Response_NetworkInterface::MergeFrom(const Response_NetworkInterface& from) {
-  GOOGLE_CHECK_NE(&from, this);
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_interfacename()) {
-      set_interfacename(from.interfacename());
+      set_has_interfacename();
+      interfacename_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.interfacename_);
     }
     if (from.has_ip()) {
-      set_ip(from.ip());
+      set_has_ip();
+      ip_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.ip_);
     }
     if (from.has_mac()) {
-      set_mac(from.mac());
+      set_has_mac();
+      mac_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.mac_);
     }
   }
   if (from._internal_metadata_.have_unknown_fields()) {
@@ -1928,18 +2462,6 @@ bool Response_NetworkInterface::IsInitialized() const {
 
 void Response_NetworkInterface::Swap(Response_NetworkInterface* other) {
   if (other == this) return;
-  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
-    InternalSwap(other);
-  } else {
-    Response_NetworkInterface temp;
-    temp.MergeFrom(*this);
-    CopyFrom(*other);
-    other->CopyFrom(temp);
-  }
-}
-void Response_NetworkInterface::UnsafeArenaSwap(Response_NetworkInterface* other) {
-  if (other == this) return;
-  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
   InternalSwap(other);
 }
 void Response_NetworkInterface::InternalSwap(Response_NetworkInterface* other) {
@@ -1970,18 +2492,9 @@ const int Response_Container::kStatusFieldNumber;
 #endif  // !_MSC_VER
 
 Response_Container::Response_Container()
-  : ::google::protobuf::Message() , _internal_metadata_(NULL)  {
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:Subutai.Response.Container)
-}
-
-Response_Container::Response_Container(::google::protobuf::Arena* arena)
-  : ::google::protobuf::Message(),
-  _internal_metadata_(arena),
-  interfaces_(arena) {
-  SharedCtor();
-  RegisterArenaDtor(arena);
-  // @@protoc_insertion_point(arena_constructor:Subutai.Response.Container)
 }
 
 void Response_Container::InitAsDefaultInstance() {
@@ -2010,22 +2523,12 @@ Response_Container::~Response_Container() {
 }
 
 void Response_Container::SharedDtor() {
-  if (GetArenaNoVirtual() != NULL) {
-    return;
-  }
-
-  hostname_.Destroy(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
-  id_.Destroy(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+  hostname_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != default_instance_) {
   }
 }
 
-void Response_Container::ArenaDtor(void* object) {
-  Response_Container* _this = reinterpret_cast< Response_Container* >(object);
-  (void)_this;
-}
-void Response_Container::RegisterArenaDtor(::google::protobuf::Arena* arena) {
-}
 void Response_Container::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
@@ -2044,16 +2547,20 @@ const Response_Container& Response_Container::default_instance() {
 Response_Container* Response_Container::default_instance_ = NULL;
 
 Response_Container* Response_Container::New(::google::protobuf::Arena* arena) const {
-  return ::google::protobuf::Arena::CreateMessage<Response_Container>(arena);
+  Response_Container* n = new Response_Container;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
 }
 
 void Response_Container::Clear() {
-  if (_has_bits_[0 / 32] & 11) {
+  if (_has_bits_[0 / 32] & 11u) {
     if (has_hostname()) {
-      hostname_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+      hostname_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
     }
     if (has_id()) {
-      id_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+      id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
     }
     status_ = 0;
   }
@@ -2111,12 +2618,15 @@ bool Response_Container::MergePartialFromCodedStream(
       case 3: {
         if (tag == 26) {
          parse_interfaces:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+          DO_(input->IncrementRecursionDepth());
+         parse_loop_interfaces:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtualNoRecursionDepth(
                 input, add_interfaces()));
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(26)) goto parse_interfaces;
+        if (input->ExpectTag(26)) goto parse_loop_interfaces;
+        input->UnsafeDecrementRecursionDepth();
         if (input->ExpectTag(32)) goto parse_status;
         break;
       }
@@ -2187,7 +2697,7 @@ void Response_Container::SerializeWithCachedSizes(
   }
 
   // repeated .Subutai.Response.NetworkInterface interfaces = 3;
-  for (int i = 0; i < this->interfaces_size(); i++) {
+  for (unsigned int i = 0, n = this->interfaces_size(); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       3, this->interfaces(i), output);
   }
@@ -2231,7 +2741,7 @@ void Response_Container::SerializeWithCachedSizes(
   }
 
   // repeated .Subutai.Response.NetworkInterface interfaces = 3;
-  for (int i = 0; i < this->interfaces_size(); i++) {
+  for (unsigned int i = 0, n = this->interfaces_size(); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         3, this->interfaces(i), target);
@@ -2296,10 +2806,10 @@ int Response_Container::ByteSize() const {
 }
 
 void Response_Container::MergeFrom(const ::google::protobuf::Message& from) {
-  GOOGLE_CHECK_NE(&from, this);
-  const Response_Container* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const Response_Container*>(
-      &from);
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+  const Response_Container* source = 
+      ::google::protobuf::internal::DynamicCastToGenerated<const Response_Container>(
+          &from);
   if (source == NULL) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -2308,14 +2818,16 @@ void Response_Container::MergeFrom(const ::google::protobuf::Message& from) {
 }
 
 void Response_Container::MergeFrom(const Response_Container& from) {
-  GOOGLE_CHECK_NE(&from, this);
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   interfaces_.MergeFrom(from.interfaces_);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_hostname()) {
-      set_hostname(from.hostname());
+      set_has_hostname();
+      hostname_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.hostname_);
     }
     if (from.has_id()) {
-      set_id(from.id());
+      set_has_id();
+      id_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.id_);
     }
     if (from.has_status()) {
       set_status(from.status());
@@ -2345,18 +2857,6 @@ bool Response_Container::IsInitialized() const {
 
 void Response_Container::Swap(Response_Container* other) {
   if (other == this) return;
-  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
-    InternalSwap(other);
-  } else {
-    Response_Container temp;
-    temp.MergeFrom(*this);
-    CopyFrom(*other);
-    other->CopyFrom(temp);
-  }
-}
-void Response_Container::UnsafeArenaSwap(Response_Container* other) {
-  if (other == this) return;
-  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
   InternalSwap(other);
 }
 void Response_Container::InternalSwap(Response_Container* other) {
@@ -2398,22 +2898,9 @@ const int Response::kConfigPointsFieldNumber;
 #endif  // !_MSC_VER
 
 Response::Response()
-  : ::google::protobuf::Message() , _internal_metadata_(NULL)  {
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:Subutai.Response)
-}
-
-Response::Response(::google::protobuf::Arena* arena)
-  : ::google::protobuf::Message(),
-  _internal_metadata_(arena),
-  interfaces_(arena),
-  containers_(arena),
-  ips_(arena),
-  macs_(arena),
-  configpoints_(arena) {
-  SharedCtor();
-  RegisterArenaDtor(arena);
-  // @@protoc_insertion_point(arena_constructor:Subutai.Response)
 }
 
 void Response::InitAsDefaultInstance() {
@@ -2448,25 +2935,15 @@ Response::~Response() {
 }
 
 void Response::SharedDtor() {
-  if (GetArenaNoVirtual() != NULL) {
-    return;
-  }
-
-  hostname_.Destroy(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
-  id_.Destroy(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
-  commandid_.Destroy(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
-  stdout_.Destroy(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
-  stderr_.Destroy(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+  hostname_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  commandid_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  stdout_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  stderr_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != default_instance_) {
   }
 }
 
-void Response::ArenaDtor(void* object) {
-  Response* _this = reinterpret_cast< Response* >(object);
-  (void)_this;
-}
-void Response::RegisterArenaDtor(::google::protobuf::Arena* arena) {
-}
 void Response::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
@@ -2485,44 +2962,46 @@ const Response& Response::default_instance() {
 Response* Response::default_instance_ = NULL;
 
 Response* Response::New(::google::protobuf::Arena* arena) const {
-  return ::google::protobuf::Arena::CreateMessage<Response>(arena);
+  Response* n = new Response;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
 }
 
 void Response::Clear() {
-#define OFFSET_OF_FIELD_(f) (reinterpret_cast<char*>(      \
-  &reinterpret_cast<Response*>(16)->f) - \
-   reinterpret_cast<char*>(16))
+#define ZR_HELPER_(f) reinterpret_cast<char*>(\
+  &reinterpret_cast<Response*>(16)->f)
 
-#define ZR_(first, last) do {                              \
-    size_t f = OFFSET_OF_FIELD_(first);                    \
-    size_t n = OFFSET_OF_FIELD_(last) - f + sizeof(last);  \
-    ::memset(&first, 0, n);                                \
-  } while (0)
+#define ZR_(first, last) do {\
+  ::memset(&first, 0,\
+           ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
+} while (0)
 
-  if (_has_bits_[0 / 32] & 135) {
+  if (_has_bits_[0 / 32] & 135u) {
     type_ = 0;
     if (has_hostname()) {
-      hostname_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+      hostname_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
     }
     if (has_id()) {
-      id_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+      id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
     }
     if (has_commandid()) {
-      commandid_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+      commandid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
     }
   }
-  if (_has_bits_[8 / 32] & 7936) {
+  if (_has_bits_[8 / 32] & 7936u) {
     ZR_(responsenumber_, exitcode_);
     pid_ = 0;
     if (has_stdout()) {
-      stdout_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+      stdout_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
     }
     if (has_stderr()) {
-      stderr_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+      stderr_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
     }
   }
 
-#undef OFFSET_OF_FIELD_
+#undef ZR_HELPER_
 #undef ZR_
 
   interfaces_.Clear();
@@ -2603,26 +3082,31 @@ bool Response::MergePartialFromCodedStream(
       case 4: {
         if (tag == 34) {
          parse_interfaces:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+          DO_(input->IncrementRecursionDepth());
+         parse_loop_interfaces:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtualNoRecursionDepth(
                 input, add_interfaces()));
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(34)) goto parse_interfaces;
-        if (input->ExpectTag(42)) goto parse_containers;
+        if (input->ExpectTag(34)) goto parse_loop_interfaces;
+        if (input->ExpectTag(42)) goto parse_loop_containers;
+        input->UnsafeDecrementRecursionDepth();
         break;
       }
 
       // repeated .Subutai.Response.Container containers = 5;
       case 5: {
         if (tag == 42) {
-         parse_containers:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+          DO_(input->IncrementRecursionDepth());
+         parse_loop_containers:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtualNoRecursionDepth(
                 input, add_containers()));
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(42)) goto parse_containers;
+        if (input->ExpectTag(42)) goto parse_loop_containers;
+        input->UnsafeDecrementRecursionDepth();
         if (input->ExpectTag(50)) goto parse_ips;
         break;
       }
@@ -2832,13 +3316,13 @@ void Response::SerializeWithCachedSizes(
   }
 
   // repeated .Subutai.Response.NetworkInterface interfaces = 4;
-  for (int i = 0; i < this->interfaces_size(); i++) {
+  for (unsigned int i = 0, n = this->interfaces_size(); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       4, this->interfaces(i), output);
   }
 
   // repeated .Subutai.Response.Container containers = 5;
-  for (int i = 0; i < this->containers_size(); i++) {
+  for (unsigned int i = 0, n = this->containers_size(); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       5, this->containers(i), output);
   }
@@ -2957,14 +3441,14 @@ void Response::SerializeWithCachedSizes(
   }
 
   // repeated .Subutai.Response.NetworkInterface interfaces = 4;
-  for (int i = 0; i < this->interfaces_size(); i++) {
+  for (unsigned int i = 0, n = this->interfaces_size(); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         4, this->interfaces(i), target);
   }
 
   // repeated .Subutai.Response.Container containers = 5;
-  for (int i = 0; i < this->containers_size(); i++) {
+  for (unsigned int i = 0, n = this->containers_size(); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         5, this->containers(i), target);
@@ -3174,10 +3658,10 @@ int Response::ByteSize() const {
 }
 
 void Response::MergeFrom(const ::google::protobuf::Message& from) {
-  GOOGLE_CHECK_NE(&from, this);
-  const Response* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const Response*>(
-      &from);
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+  const Response* source = 
+      ::google::protobuf::internal::DynamicCastToGenerated<const Response>(
+          &from);
   if (source == NULL) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -3186,7 +3670,7 @@ void Response::MergeFrom(const ::google::protobuf::Message& from) {
 }
 
 void Response::MergeFrom(const Response& from) {
-  GOOGLE_CHECK_NE(&from, this);
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   interfaces_.MergeFrom(from.interfaces_);
   containers_.MergeFrom(from.containers_);
   ips_.MergeFrom(from.ips_);
@@ -3197,13 +3681,16 @@ void Response::MergeFrom(const Response& from) {
       set_type(from.type());
     }
     if (from.has_hostname()) {
-      set_hostname(from.hostname());
+      set_has_hostname();
+      hostname_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.hostname_);
     }
     if (from.has_id()) {
-      set_id(from.id());
+      set_has_id();
+      id_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.id_);
     }
     if (from.has_commandid()) {
-      set_commandid(from.commandid());
+      set_has_commandid();
+      commandid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.commandid_);
     }
   }
   if (from._has_bits_[8 / 32] & (0xffu << (8 % 32))) {
@@ -3214,10 +3701,12 @@ void Response::MergeFrom(const Response& from) {
       set_responsenumber(from.responsenumber());
     }
     if (from.has_stdout()) {
-      set_stdout(from.stdout());
+      set_has_stdout();
+      stdout_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.stdout_);
     }
     if (from.has_stderr()) {
-      set_stderr(from.stderr());
+      set_has_stderr();
+      stderr_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.stderr_);
     }
     if (from.has_exitcode()) {
       set_exitcode(from.exitcode());
@@ -3247,18 +3736,6 @@ bool Response::IsInitialized() const {
 
 void Response::Swap(Response* other) {
   if (other == this) return;
-  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
-    InternalSwap(other);
-  } else {
-    Response temp;
-    temp.MergeFrom(*this);
-    CopyFrom(*other);
-    other->CopyFrom(temp);
-  }
-}
-void Response::UnsafeArenaSwap(Response* other) {
-  if (other == this) return;
-  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
   InternalSwap(other);
 }
 void Response::InternalSwap(Response* other) {
@@ -3289,6 +3766,922 @@ void Response::InternalSwap(Response* other) {
   return metadata;
 }
 
+#if PROTOBUF_INLINE_NOT_IN_HEADERS
+// Response_NetworkInterface
+
+// optional string interfaceName = 1;
+bool Response_NetworkInterface::has_interfacename() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+void Response_NetworkInterface::set_has_interfacename() {
+  _has_bits_[0] |= 0x00000001u;
+}
+void Response_NetworkInterface::clear_has_interfacename() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+void Response_NetworkInterface::clear_interfacename() {
+  interfacename_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_interfacename();
+}
+ const ::std::string& Response_NetworkInterface::interfacename() const {
+  // @@protoc_insertion_point(field_get:Subutai.Response.NetworkInterface.interfaceName)
+  return interfacename_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Response_NetworkInterface::set_interfacename(const ::std::string& value) {
+  set_has_interfacename();
+  interfacename_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Subutai.Response.NetworkInterface.interfaceName)
+}
+ void Response_NetworkInterface::set_interfacename(const char* value) {
+  set_has_interfacename();
+  interfacename_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Subutai.Response.NetworkInterface.interfaceName)
+}
+ void Response_NetworkInterface::set_interfacename(const char* value, size_t size) {
+  set_has_interfacename();
+  interfacename_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Subutai.Response.NetworkInterface.interfaceName)
+}
+ ::std::string* Response_NetworkInterface::mutable_interfacename() {
+  set_has_interfacename();
+  // @@protoc_insertion_point(field_mutable:Subutai.Response.NetworkInterface.interfaceName)
+  return interfacename_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* Response_NetworkInterface::release_interfacename() {
+  clear_has_interfacename();
+  return interfacename_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Response_NetworkInterface::set_allocated_interfacename(::std::string* interfacename) {
+  if (interfacename != NULL) {
+    set_has_interfacename();
+  } else {
+    clear_has_interfacename();
+  }
+  interfacename_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), interfacename);
+  // @@protoc_insertion_point(field_set_allocated:Subutai.Response.NetworkInterface.interfaceName)
+}
+
+// optional string ip = 2;
+bool Response_NetworkInterface::has_ip() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+void Response_NetworkInterface::set_has_ip() {
+  _has_bits_[0] |= 0x00000002u;
+}
+void Response_NetworkInterface::clear_has_ip() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+void Response_NetworkInterface::clear_ip() {
+  ip_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_ip();
+}
+ const ::std::string& Response_NetworkInterface::ip() const {
+  // @@protoc_insertion_point(field_get:Subutai.Response.NetworkInterface.ip)
+  return ip_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Response_NetworkInterface::set_ip(const ::std::string& value) {
+  set_has_ip();
+  ip_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Subutai.Response.NetworkInterface.ip)
+}
+ void Response_NetworkInterface::set_ip(const char* value) {
+  set_has_ip();
+  ip_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Subutai.Response.NetworkInterface.ip)
+}
+ void Response_NetworkInterface::set_ip(const char* value, size_t size) {
+  set_has_ip();
+  ip_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Subutai.Response.NetworkInterface.ip)
+}
+ ::std::string* Response_NetworkInterface::mutable_ip() {
+  set_has_ip();
+  // @@protoc_insertion_point(field_mutable:Subutai.Response.NetworkInterface.ip)
+  return ip_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* Response_NetworkInterface::release_ip() {
+  clear_has_ip();
+  return ip_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Response_NetworkInterface::set_allocated_ip(::std::string* ip) {
+  if (ip != NULL) {
+    set_has_ip();
+  } else {
+    clear_has_ip();
+  }
+  ip_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ip);
+  // @@protoc_insertion_point(field_set_allocated:Subutai.Response.NetworkInterface.ip)
+}
+
+// optional string mac = 3;
+bool Response_NetworkInterface::has_mac() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+void Response_NetworkInterface::set_has_mac() {
+  _has_bits_[0] |= 0x00000004u;
+}
+void Response_NetworkInterface::clear_has_mac() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+void Response_NetworkInterface::clear_mac() {
+  mac_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_mac();
+}
+ const ::std::string& Response_NetworkInterface::mac() const {
+  // @@protoc_insertion_point(field_get:Subutai.Response.NetworkInterface.mac)
+  return mac_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Response_NetworkInterface::set_mac(const ::std::string& value) {
+  set_has_mac();
+  mac_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Subutai.Response.NetworkInterface.mac)
+}
+ void Response_NetworkInterface::set_mac(const char* value) {
+  set_has_mac();
+  mac_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Subutai.Response.NetworkInterface.mac)
+}
+ void Response_NetworkInterface::set_mac(const char* value, size_t size) {
+  set_has_mac();
+  mac_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Subutai.Response.NetworkInterface.mac)
+}
+ ::std::string* Response_NetworkInterface::mutable_mac() {
+  set_has_mac();
+  // @@protoc_insertion_point(field_mutable:Subutai.Response.NetworkInterface.mac)
+  return mac_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* Response_NetworkInterface::release_mac() {
+  clear_has_mac();
+  return mac_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Response_NetworkInterface::set_allocated_mac(::std::string* mac) {
+  if (mac != NULL) {
+    set_has_mac();
+  } else {
+    clear_has_mac();
+  }
+  mac_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), mac);
+  // @@protoc_insertion_point(field_set_allocated:Subutai.Response.NetworkInterface.mac)
+}
+
+// -------------------------------------------------------------------
+
+// Response_Container
+
+// optional string hostname = 1;
+bool Response_Container::has_hostname() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+void Response_Container::set_has_hostname() {
+  _has_bits_[0] |= 0x00000001u;
+}
+void Response_Container::clear_has_hostname() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+void Response_Container::clear_hostname() {
+  hostname_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_hostname();
+}
+ const ::std::string& Response_Container::hostname() const {
+  // @@protoc_insertion_point(field_get:Subutai.Response.Container.hostname)
+  return hostname_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Response_Container::set_hostname(const ::std::string& value) {
+  set_has_hostname();
+  hostname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Subutai.Response.Container.hostname)
+}
+ void Response_Container::set_hostname(const char* value) {
+  set_has_hostname();
+  hostname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Subutai.Response.Container.hostname)
+}
+ void Response_Container::set_hostname(const char* value, size_t size) {
+  set_has_hostname();
+  hostname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Subutai.Response.Container.hostname)
+}
+ ::std::string* Response_Container::mutable_hostname() {
+  set_has_hostname();
+  // @@protoc_insertion_point(field_mutable:Subutai.Response.Container.hostname)
+  return hostname_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* Response_Container::release_hostname() {
+  clear_has_hostname();
+  return hostname_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Response_Container::set_allocated_hostname(::std::string* hostname) {
+  if (hostname != NULL) {
+    set_has_hostname();
+  } else {
+    clear_has_hostname();
+  }
+  hostname_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), hostname);
+  // @@protoc_insertion_point(field_set_allocated:Subutai.Response.Container.hostname)
+}
+
+// optional string id = 2;
+bool Response_Container::has_id() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+void Response_Container::set_has_id() {
+  _has_bits_[0] |= 0x00000002u;
+}
+void Response_Container::clear_has_id() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+void Response_Container::clear_id() {
+  id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_id();
+}
+ const ::std::string& Response_Container::id() const {
+  // @@protoc_insertion_point(field_get:Subutai.Response.Container.id)
+  return id_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Response_Container::set_id(const ::std::string& value) {
+  set_has_id();
+  id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Subutai.Response.Container.id)
+}
+ void Response_Container::set_id(const char* value) {
+  set_has_id();
+  id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Subutai.Response.Container.id)
+}
+ void Response_Container::set_id(const char* value, size_t size) {
+  set_has_id();
+  id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Subutai.Response.Container.id)
+}
+ ::std::string* Response_Container::mutable_id() {
+  set_has_id();
+  // @@protoc_insertion_point(field_mutable:Subutai.Response.Container.id)
+  return id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* Response_Container::release_id() {
+  clear_has_id();
+  return id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Response_Container::set_allocated_id(::std::string* id) {
+  if (id != NULL) {
+    set_has_id();
+  } else {
+    clear_has_id();
+  }
+  id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), id);
+  // @@protoc_insertion_point(field_set_allocated:Subutai.Response.Container.id)
+}
+
+// repeated .Subutai.Response.NetworkInterface interfaces = 3;
+int Response_Container::interfaces_size() const {
+  return interfaces_.size();
+}
+void Response_Container::clear_interfaces() {
+  interfaces_.Clear();
+}
+ const ::Subutai::Response_NetworkInterface& Response_Container::interfaces(int index) const {
+  // @@protoc_insertion_point(field_get:Subutai.Response.Container.interfaces)
+  return interfaces_.Get(index);
+}
+ ::Subutai::Response_NetworkInterface* Response_Container::mutable_interfaces(int index) {
+  // @@protoc_insertion_point(field_mutable:Subutai.Response.Container.interfaces)
+  return interfaces_.Mutable(index);
+}
+ ::Subutai::Response_NetworkInterface* Response_Container::add_interfaces() {
+  // @@protoc_insertion_point(field_add:Subutai.Response.Container.interfaces)
+  return interfaces_.Add();
+}
+ const ::google::protobuf::RepeatedPtrField< ::Subutai::Response_NetworkInterface >&
+Response_Container::interfaces() const {
+  // @@protoc_insertion_point(field_list:Subutai.Response.Container.interfaces)
+  return interfaces_;
+}
+ ::google::protobuf::RepeatedPtrField< ::Subutai::Response_NetworkInterface >*
+Response_Container::mutable_interfaces() {
+  // @@protoc_insertion_point(field_mutable_list:Subutai.Response.Container.interfaces)
+  return &interfaces_;
+}
+
+// optional .Subutai.Response.ContainerStatus status = 4;
+bool Response_Container::has_status() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+void Response_Container::set_has_status() {
+  _has_bits_[0] |= 0x00000008u;
+}
+void Response_Container::clear_has_status() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+void Response_Container::clear_status() {
+  status_ = 0;
+  clear_has_status();
+}
+ ::Subutai::Response_ContainerStatus Response_Container::status() const {
+  // @@protoc_insertion_point(field_get:Subutai.Response.Container.status)
+  return static_cast< ::Subutai::Response_ContainerStatus >(status_);
+}
+ void Response_Container::set_status(::Subutai::Response_ContainerStatus value) {
+  assert(::Subutai::Response_ContainerStatus_IsValid(value));
+  set_has_status();
+  status_ = value;
+  // @@protoc_insertion_point(field_set:Subutai.Response.Container.status)
+}
+
+// -------------------------------------------------------------------
+
+// Response
+
+// optional .Subutai.Response.ResponseType type = 1;
+bool Response::has_type() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+void Response::set_has_type() {
+  _has_bits_[0] |= 0x00000001u;
+}
+void Response::clear_has_type() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+void Response::clear_type() {
+  type_ = 0;
+  clear_has_type();
+}
+ ::Subutai::Response_ResponseType Response::type() const {
+  // @@protoc_insertion_point(field_get:Subutai.Response.type)
+  return static_cast< ::Subutai::Response_ResponseType >(type_);
+}
+ void Response::set_type(::Subutai::Response_ResponseType value) {
+  assert(::Subutai::Response_ResponseType_IsValid(value));
+  set_has_type();
+  type_ = value;
+  // @@protoc_insertion_point(field_set:Subutai.Response.type)
+}
+
+// optional string hostname = 2;
+bool Response::has_hostname() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+void Response::set_has_hostname() {
+  _has_bits_[0] |= 0x00000002u;
+}
+void Response::clear_has_hostname() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+void Response::clear_hostname() {
+  hostname_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_hostname();
+}
+ const ::std::string& Response::hostname() const {
+  // @@protoc_insertion_point(field_get:Subutai.Response.hostname)
+  return hostname_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Response::set_hostname(const ::std::string& value) {
+  set_has_hostname();
+  hostname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Subutai.Response.hostname)
+}
+ void Response::set_hostname(const char* value) {
+  set_has_hostname();
+  hostname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Subutai.Response.hostname)
+}
+ void Response::set_hostname(const char* value, size_t size) {
+  set_has_hostname();
+  hostname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Subutai.Response.hostname)
+}
+ ::std::string* Response::mutable_hostname() {
+  set_has_hostname();
+  // @@protoc_insertion_point(field_mutable:Subutai.Response.hostname)
+  return hostname_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* Response::release_hostname() {
+  clear_has_hostname();
+  return hostname_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Response::set_allocated_hostname(::std::string* hostname) {
+  if (hostname != NULL) {
+    set_has_hostname();
+  } else {
+    clear_has_hostname();
+  }
+  hostname_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), hostname);
+  // @@protoc_insertion_point(field_set_allocated:Subutai.Response.hostname)
+}
+
+// optional string id = 3;
+bool Response::has_id() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+void Response::set_has_id() {
+  _has_bits_[0] |= 0x00000004u;
+}
+void Response::clear_has_id() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+void Response::clear_id() {
+  id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_id();
+}
+ const ::std::string& Response::id() const {
+  // @@protoc_insertion_point(field_get:Subutai.Response.id)
+  return id_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Response::set_id(const ::std::string& value) {
+  set_has_id();
+  id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Subutai.Response.id)
+}
+ void Response::set_id(const char* value) {
+  set_has_id();
+  id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Subutai.Response.id)
+}
+ void Response::set_id(const char* value, size_t size) {
+  set_has_id();
+  id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Subutai.Response.id)
+}
+ ::std::string* Response::mutable_id() {
+  set_has_id();
+  // @@protoc_insertion_point(field_mutable:Subutai.Response.id)
+  return id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* Response::release_id() {
+  clear_has_id();
+  return id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Response::set_allocated_id(::std::string* id) {
+  if (id != NULL) {
+    set_has_id();
+  } else {
+    clear_has_id();
+  }
+  id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), id);
+  // @@protoc_insertion_point(field_set_allocated:Subutai.Response.id)
+}
+
+// repeated .Subutai.Response.NetworkInterface interfaces = 4;
+int Response::interfaces_size() const {
+  return interfaces_.size();
+}
+void Response::clear_interfaces() {
+  interfaces_.Clear();
+}
+ const ::Subutai::Response_NetworkInterface& Response::interfaces(int index) const {
+  // @@protoc_insertion_point(field_get:Subutai.Response.interfaces)
+  return interfaces_.Get(index);
+}
+ ::Subutai::Response_NetworkInterface* Response::mutable_interfaces(int index) {
+  // @@protoc_insertion_point(field_mutable:Subutai.Response.interfaces)
+  return interfaces_.Mutable(index);
+}
+ ::Subutai::Response_NetworkInterface* Response::add_interfaces() {
+  // @@protoc_insertion_point(field_add:Subutai.Response.interfaces)
+  return interfaces_.Add();
+}
+ const ::google::protobuf::RepeatedPtrField< ::Subutai::Response_NetworkInterface >&
+Response::interfaces() const {
+  // @@protoc_insertion_point(field_list:Subutai.Response.interfaces)
+  return interfaces_;
+}
+ ::google::protobuf::RepeatedPtrField< ::Subutai::Response_NetworkInterface >*
+Response::mutable_interfaces() {
+  // @@protoc_insertion_point(field_mutable_list:Subutai.Response.interfaces)
+  return &interfaces_;
+}
+
+// repeated .Subutai.Response.Container containers = 5;
+int Response::containers_size() const {
+  return containers_.size();
+}
+void Response::clear_containers() {
+  containers_.Clear();
+}
+ const ::Subutai::Response_Container& Response::containers(int index) const {
+  // @@protoc_insertion_point(field_get:Subutai.Response.containers)
+  return containers_.Get(index);
+}
+ ::Subutai::Response_Container* Response::mutable_containers(int index) {
+  // @@protoc_insertion_point(field_mutable:Subutai.Response.containers)
+  return containers_.Mutable(index);
+}
+ ::Subutai::Response_Container* Response::add_containers() {
+  // @@protoc_insertion_point(field_add:Subutai.Response.containers)
+  return containers_.Add();
+}
+ const ::google::protobuf::RepeatedPtrField< ::Subutai::Response_Container >&
+Response::containers() const {
+  // @@protoc_insertion_point(field_list:Subutai.Response.containers)
+  return containers_;
+}
+ ::google::protobuf::RepeatedPtrField< ::Subutai::Response_Container >*
+Response::mutable_containers() {
+  // @@protoc_insertion_point(field_mutable_list:Subutai.Response.containers)
+  return &containers_;
+}
+
+// repeated string ips = 6;
+int Response::ips_size() const {
+  return ips_.size();
+}
+void Response::clear_ips() {
+  ips_.Clear();
+}
+ const ::std::string& Response::ips(int index) const {
+  // @@protoc_insertion_point(field_get:Subutai.Response.ips)
+  return ips_.Get(index);
+}
+ ::std::string* Response::mutable_ips(int index) {
+  // @@protoc_insertion_point(field_mutable:Subutai.Response.ips)
+  return ips_.Mutable(index);
+}
+ void Response::set_ips(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:Subutai.Response.ips)
+  ips_.Mutable(index)->assign(value);
+}
+ void Response::set_ips(int index, const char* value) {
+  ips_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:Subutai.Response.ips)
+}
+ void Response::set_ips(int index, const char* value, size_t size) {
+  ips_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:Subutai.Response.ips)
+}
+ ::std::string* Response::add_ips() {
+  return ips_.Add();
+}
+ void Response::add_ips(const ::std::string& value) {
+  ips_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:Subutai.Response.ips)
+}
+ void Response::add_ips(const char* value) {
+  ips_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:Subutai.Response.ips)
+}
+ void Response::add_ips(const char* value, size_t size) {
+  ips_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:Subutai.Response.ips)
+}
+ const ::google::protobuf::RepeatedPtrField< ::std::string>&
+Response::ips() const {
+  // @@protoc_insertion_point(field_list:Subutai.Response.ips)
+  return ips_;
+}
+ ::google::protobuf::RepeatedPtrField< ::std::string>*
+Response::mutable_ips() {
+  // @@protoc_insertion_point(field_mutable_list:Subutai.Response.ips)
+  return &ips_;
+}
+
+// repeated string macs = 7;
+int Response::macs_size() const {
+  return macs_.size();
+}
+void Response::clear_macs() {
+  macs_.Clear();
+}
+ const ::std::string& Response::macs(int index) const {
+  // @@protoc_insertion_point(field_get:Subutai.Response.macs)
+  return macs_.Get(index);
+}
+ ::std::string* Response::mutable_macs(int index) {
+  // @@protoc_insertion_point(field_mutable:Subutai.Response.macs)
+  return macs_.Mutable(index);
+}
+ void Response::set_macs(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:Subutai.Response.macs)
+  macs_.Mutable(index)->assign(value);
+}
+ void Response::set_macs(int index, const char* value) {
+  macs_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:Subutai.Response.macs)
+}
+ void Response::set_macs(int index, const char* value, size_t size) {
+  macs_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:Subutai.Response.macs)
+}
+ ::std::string* Response::add_macs() {
+  return macs_.Add();
+}
+ void Response::add_macs(const ::std::string& value) {
+  macs_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:Subutai.Response.macs)
+}
+ void Response::add_macs(const char* value) {
+  macs_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:Subutai.Response.macs)
+}
+ void Response::add_macs(const char* value, size_t size) {
+  macs_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:Subutai.Response.macs)
+}
+ const ::google::protobuf::RepeatedPtrField< ::std::string>&
+Response::macs() const {
+  // @@protoc_insertion_point(field_list:Subutai.Response.macs)
+  return macs_;
+}
+ ::google::protobuf::RepeatedPtrField< ::std::string>*
+Response::mutable_macs() {
+  // @@protoc_insertion_point(field_mutable_list:Subutai.Response.macs)
+  return &macs_;
+}
+
+// optional string commandId = 8;
+bool Response::has_commandid() const {
+  return (_has_bits_[0] & 0x00000080u) != 0;
+}
+void Response::set_has_commandid() {
+  _has_bits_[0] |= 0x00000080u;
+}
+void Response::clear_has_commandid() {
+  _has_bits_[0] &= ~0x00000080u;
+}
+void Response::clear_commandid() {
+  commandid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_commandid();
+}
+ const ::std::string& Response::commandid() const {
+  // @@protoc_insertion_point(field_get:Subutai.Response.commandId)
+  return commandid_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Response::set_commandid(const ::std::string& value) {
+  set_has_commandid();
+  commandid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Subutai.Response.commandId)
+}
+ void Response::set_commandid(const char* value) {
+  set_has_commandid();
+  commandid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Subutai.Response.commandId)
+}
+ void Response::set_commandid(const char* value, size_t size) {
+  set_has_commandid();
+  commandid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Subutai.Response.commandId)
+}
+ ::std::string* Response::mutable_commandid() {
+  set_has_commandid();
+  // @@protoc_insertion_point(field_mutable:Subutai.Response.commandId)
+  return commandid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* Response::release_commandid() {
+  clear_has_commandid();
+  return commandid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Response::set_allocated_commandid(::std::string* commandid) {
+  if (commandid != NULL) {
+    set_has_commandid();
+  } else {
+    clear_has_commandid();
+  }
+  commandid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), commandid);
+  // @@protoc_insertion_point(field_set_allocated:Subutai.Response.commandId)
+}
+
+// optional int32 pid = 9;
+bool Response::has_pid() const {
+  return (_has_bits_[0] & 0x00000100u) != 0;
+}
+void Response::set_has_pid() {
+  _has_bits_[0] |= 0x00000100u;
+}
+void Response::clear_has_pid() {
+  _has_bits_[0] &= ~0x00000100u;
+}
+void Response::clear_pid() {
+  pid_ = 0;
+  clear_has_pid();
+}
+ ::google::protobuf::int32 Response::pid() const {
+  // @@protoc_insertion_point(field_get:Subutai.Response.pid)
+  return pid_;
+}
+ void Response::set_pid(::google::protobuf::int32 value) {
+  set_has_pid();
+  pid_ = value;
+  // @@protoc_insertion_point(field_set:Subutai.Response.pid)
+}
+
+// optional int32 responseNumber = 10;
+bool Response::has_responsenumber() const {
+  return (_has_bits_[0] & 0x00000200u) != 0;
+}
+void Response::set_has_responsenumber() {
+  _has_bits_[0] |= 0x00000200u;
+}
+void Response::clear_has_responsenumber() {
+  _has_bits_[0] &= ~0x00000200u;
+}
+void Response::clear_responsenumber() {
+  responsenumber_ = 0;
+  clear_has_responsenumber();
+}
+ ::google::protobuf::int32 Response::responsenumber() const {
+  // @@protoc_insertion_point(field_get:Subutai.Response.responseNumber)
+  return responsenumber_;
+}
+ void Response::set_responsenumber(::google::protobuf::int32 value) {
+  set_has_responsenumber();
+  responsenumber_ = value;
+  // @@protoc_insertion_point(field_set:Subutai.Response.responseNumber)
+}
+
+// optional string stdOut = 11;
+bool Response::has_stdout() const {
+  return (_has_bits_[0] & 0x00000400u) != 0;
+}
+void Response::set_has_stdout() {
+  _has_bits_[0] |= 0x00000400u;
+}
+void Response::clear_has_stdout() {
+  _has_bits_[0] &= ~0x00000400u;
+}
+void Response::clear_stdout() {
+  stdout_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_stdout();
+}
+ const ::std::string& Response::stdout() const {
+  // @@protoc_insertion_point(field_get:Subutai.Response.stdOut)
+  return stdout_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Response::set_stdout(const ::std::string& value) {
+  set_has_stdout();
+  stdout_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Subutai.Response.stdOut)
+}
+ void Response::set_stdout(const char* value) {
+  set_has_stdout();
+  stdout_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Subutai.Response.stdOut)
+}
+ void Response::set_stdout(const char* value, size_t size) {
+  set_has_stdout();
+  stdout_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Subutai.Response.stdOut)
+}
+ ::std::string* Response::mutable_stdout() {
+  set_has_stdout();
+  // @@protoc_insertion_point(field_mutable:Subutai.Response.stdOut)
+  return stdout_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* Response::release_stdout() {
+  clear_has_stdout();
+  return stdout_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Response::set_allocated_stdout(::std::string* stdout) {
+  if (stdout != NULL) {
+    set_has_stdout();
+  } else {
+    clear_has_stdout();
+  }
+  stdout_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), stdout);
+  // @@protoc_insertion_point(field_set_allocated:Subutai.Response.stdOut)
+}
+
+// optional string stdErr = 12;
+bool Response::has_stderr() const {
+  return (_has_bits_[0] & 0x00000800u) != 0;
+}
+void Response::set_has_stderr() {
+  _has_bits_[0] |= 0x00000800u;
+}
+void Response::clear_has_stderr() {
+  _has_bits_[0] &= ~0x00000800u;
+}
+void Response::clear_stderr() {
+  stderr_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_stderr();
+}
+ const ::std::string& Response::stderr() const {
+  // @@protoc_insertion_point(field_get:Subutai.Response.stdErr)
+  return stderr_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Response::set_stderr(const ::std::string& value) {
+  set_has_stderr();
+  stderr_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Subutai.Response.stdErr)
+}
+ void Response::set_stderr(const char* value) {
+  set_has_stderr();
+  stderr_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Subutai.Response.stdErr)
+}
+ void Response::set_stderr(const char* value, size_t size) {
+  set_has_stderr();
+  stderr_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Subutai.Response.stdErr)
+}
+ ::std::string* Response::mutable_stderr() {
+  set_has_stderr();
+  // @@protoc_insertion_point(field_mutable:Subutai.Response.stdErr)
+  return stderr_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* Response::release_stderr() {
+  clear_has_stderr();
+  return stderr_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Response::set_allocated_stderr(::std::string* stderr) {
+  if (stderr != NULL) {
+    set_has_stderr();
+  } else {
+    clear_has_stderr();
+  }
+  stderr_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), stderr);
+  // @@protoc_insertion_point(field_set_allocated:Subutai.Response.stdErr)
+}
+
+// optional int32 exitCode = 13;
+bool Response::has_exitcode() const {
+  return (_has_bits_[0] & 0x00001000u) != 0;
+}
+void Response::set_has_exitcode() {
+  _has_bits_[0] |= 0x00001000u;
+}
+void Response::clear_has_exitcode() {
+  _has_bits_[0] &= ~0x00001000u;
+}
+void Response::clear_exitcode() {
+  exitcode_ = 0;
+  clear_has_exitcode();
+}
+ ::google::protobuf::int32 Response::exitcode() const {
+  // @@protoc_insertion_point(field_get:Subutai.Response.exitCode)
+  return exitcode_;
+}
+ void Response::set_exitcode(::google::protobuf::int32 value) {
+  set_has_exitcode();
+  exitcode_ = value;
+  // @@protoc_insertion_point(field_set:Subutai.Response.exitCode)
+}
+
+// repeated string configPoints = 14;
+int Response::configpoints_size() const {
+  return configpoints_.size();
+}
+void Response::clear_configpoints() {
+  configpoints_.Clear();
+}
+ const ::std::string& Response::configpoints(int index) const {
+  // @@protoc_insertion_point(field_get:Subutai.Response.configPoints)
+  return configpoints_.Get(index);
+}
+ ::std::string* Response::mutable_configpoints(int index) {
+  // @@protoc_insertion_point(field_mutable:Subutai.Response.configPoints)
+  return configpoints_.Mutable(index);
+}
+ void Response::set_configpoints(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:Subutai.Response.configPoints)
+  configpoints_.Mutable(index)->assign(value);
+}
+ void Response::set_configpoints(int index, const char* value) {
+  configpoints_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:Subutai.Response.configPoints)
+}
+ void Response::set_configpoints(int index, const char* value, size_t size) {
+  configpoints_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:Subutai.Response.configPoints)
+}
+ ::std::string* Response::add_configpoints() {
+  return configpoints_.Add();
+}
+ void Response::add_configpoints(const ::std::string& value) {
+  configpoints_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:Subutai.Response.configPoints)
+}
+ void Response::add_configpoints(const char* value) {
+  configpoints_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:Subutai.Response.configPoints)
+}
+ void Response::add_configpoints(const char* value, size_t size) {
+  configpoints_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:Subutai.Response.configPoints)
+}
+ const ::google::protobuf::RepeatedPtrField< ::std::string>&
+Response::configpoints() const {
+  // @@protoc_insertion_point(field_list:Subutai.Response.configPoints)
+  return configpoints_;
+}
+ ::google::protobuf::RepeatedPtrField< ::std::string>*
+Response::mutable_configpoints() {
+  // @@protoc_insertion_point(field_mutable_list:Subutai.Response.configPoints)
+  return &configpoints_;
+}
+
+#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
 
 // @@protoc_insertion_point(namespace_scope)
 
