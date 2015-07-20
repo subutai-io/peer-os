@@ -23,7 +23,7 @@
   <!-- *********************Channel Manager ************************ -->
 
   <bean id="channelManagerJDBC" class="org.h2.jdbcx.JdbcDataSource" activation="eager">
-    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/channelManagerDb" />
+    <property name="URL" value="jdbc:h2:/apps/subutai-mng/current/db/channelManagerDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -37,7 +37,7 @@
   <!-- *********************Security Manager ************************ -->
 
   <bean id="securityManagerJDBC" class="org.h2.jdbcx.JdbcDataSource" activation="eager">
-    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/securityDb" />
+    <property name="URL" value="jdbc:h2:/apps/subutai-mng/current/db/securityDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -51,7 +51,7 @@
   <!-- *********************Environment Manager ************************ -->
 
   <bean id="envManagerJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/environmentDb" />
+    <property name="URL" value="jdbc:h2:/apps/subutai-mng/current/db/environmentDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -64,7 +64,7 @@
   <!-- *********************Environment Manager 2************************ -->
 
   <bean id="envManagerJDBC2" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/environmentDb2" />
+    <property name="URL" value="jdbc:h2:/apps/subutai-mng/current/db/environmentDb2" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -78,7 +78,7 @@
   <!-- ********************* DataSource Common Service ************************ -->
 
   <bean id="commonServiceJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/commonDb" />
+    <property name="URL" value="jdbc:h2:/apps/subutai-mng/current/db/commonDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -92,7 +92,7 @@
   <!-- ********************* Peer Manager ************************ -->
 
   <bean id="peerManagerJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/peerManagerDb" />
+    <property name="URL" value="jdbc:h2:/apps/subutai-mng/current/db/peerManagerDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -106,7 +106,7 @@
   <!-- ********************* Messenger ************************ -->
 
   <bean id="messengerJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/messengerDb" />
+    <property name="URL" value="jdbc:h2:/apps/subutai-mng/current/db/messengerDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -118,7 +118,7 @@
   </service>
 
   <bean id="trackerJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/trackerDb" />
+    <property name="URL" value="jdbc:h2:/apps/subutai-mng/current/db/trackerDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -130,7 +130,7 @@
   </service>
 
   <bean id="metricJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/metricDb" />
+    <property name="URL" value="jdbc:h2:/apps/subutai-mng/current/db/metricDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -143,8 +143,8 @@
 
   <!--Plugins DataSource-->
   <bean id="pluginsJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <!--<property name="URL" value="jdbc:h2:/var/lib/subutai/db/plugins/pluginsDb;AUTO_SERVER=true" />-->
-    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/plugins/pluginsDb" />
+    <!--<property name="URL" value="jdbc:h2:/apps/subutai-mng/current/db/plugins/pluginsDb;AUTO_SERVER=true" />-->
+    <property name="URL" value="jdbc:h2:/apps/subutai-mng/current/db/plugins/pluginsDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>

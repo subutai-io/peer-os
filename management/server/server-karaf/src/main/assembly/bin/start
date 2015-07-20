@@ -48,7 +48,7 @@ generate_truststore_certificate() {
 	rm $client_cert
 }
 
-folder="/var/lib/subutai/keystores"
+folder="/apps/subutai-mng/current/keystores"
 if [ ! -d $folder ]; then
 	mkdir -p $folder
    generate_keystore_certificate "root_server_px1" $folder"/keystore_server_px1.jks"

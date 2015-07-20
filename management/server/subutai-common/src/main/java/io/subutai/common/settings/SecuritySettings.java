@@ -15,14 +15,14 @@ public class SecuritySettings
     //    public static final String KEYSTORE_PX2_FILE = KARAF_HOME + "/etc/keystores/keystore_server_px2.jks";
     //    public static final String KEYSTORE_PX1_FILE = KARAF_HOME + "/etc/keystores/keystore_server_px1.jks";
 
-    public static final String CERT_EXPORT_DIR = "/var/lib/subutai/keystores/export/";
-    public static final String CERT_IMPORT_DIR = "/var/lib/subutai/keystores/import/";
-    public static final String TRUSTSTORE_PX2_FILE = "/var/lib/subutai/keystores/truststore_server_px2.jks";
-    public static final String TRUSTSTORE_PX1_FILE = "/var/lib/subutai/keystores/truststore_server_px1.jks";
-    public static final String TRUSTSTORE_SPECIAL_PX1_FILE = "/var/lib/subutai/keystores/truststore_special_px1.jks";
-    public static final String KEYSTORE_PX2_FILE = "/var/lib/subutai/keystores/keystore_server_px2.jks";
-    public static final String KEYSTORE_PX1_FILE = "/var/lib/subutai/keystores/keystore_server_px1.jks";
-    public static final String KEYSTORE_SPECIAL_PX1_FILE = "/var/lib/subutai/keystores/keystore_special_px1.jks";
+    public static final String CERT_EXPORT_DIR = "/apps/subutai-mng/current/keystores/export/";
+    public static final String CERT_IMPORT_DIR = "/apps/subutai-mng/current/keystores/import/";
+    public static final String TRUSTSTORE_PX2_FILE = "/apps/subutai-mng/current/keystores/truststore_server_px2.jks";
+    public static final String TRUSTSTORE_PX1_FILE = "/apps/subutai-mng/current/keystores/truststore_server_px1.jks";
+    public static final String TRUSTSTORE_SPECIAL_PX1_FILE = "/apps/subutai-mng/current/keystores/truststore_special_px1.jks";
+    public static final String KEYSTORE_PX2_FILE = "/apps/subutai-mng/current/keystores/keystore_server_px2.jks";
+    public static final String KEYSTORE_PX1_FILE = "/apps/subutai-mng/current/keystores/keystore_server_px1.jks";
+    public static final String KEYSTORE_SPECIAL_PX1_FILE = "/apps/subutai-mng/current/keystores/keystore_special_px1.jks";
 
     public static final String KEYSTORE_PX1_PSW = "subutai";
     public static final String KEYSTORE_PX2_PSW = "subutai";

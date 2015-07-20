@@ -24,7 +24,7 @@ import com.google.common.collect.Sets;
  */
 public class ScriptManagerRestImpl implements ScriptManagerRest
 {
-    private static final String SCRIPTS_DIRECTORY = "/var/lib/subutai/pre-post-scripts/";
+    private static final String SCRIPTS_DIRECTORY = "/apps/subutai-mng/current/pre-post-scripts/";
     protected String scriptsDirectoryPath = SCRIPTS_DIRECTORY;
 
 

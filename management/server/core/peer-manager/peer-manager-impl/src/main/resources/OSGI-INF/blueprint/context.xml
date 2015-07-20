@@ -11,7 +11,7 @@
 
   <cm:property-placeholder persistent-id="peer" update-strategy="none">
     <cm:default-properties>
-      <cm:property name="peerIdPath" value="/var/lib/subutai/id" />
+      <cm:property name="peerIdPath" value="/apps/subutai-mng/current/id" />
       <cm:property name="peerIdFile" value="peer_id" />
       <cm:property name="externalIpInterface" value="eth1" />
     </cm:default-properties>
