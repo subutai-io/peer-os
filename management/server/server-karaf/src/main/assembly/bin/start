@@ -16,6 +16,7 @@
 #    limitations under the License.
 #
 
+
 #Generate certificates before any configuration is applied
 
 #Function to generate self signed certificate for peer
@@ -48,17 +49,15 @@ generate_truststore_certificate() {
 	rm $client_cert
 }
 
-folder="/apps/subutai-mng/current/keystores"
+folder=$SUBUTAI_APP_DATA_PATH"/keystores"
 if [ ! -d $folder ]; then
 	mkdir -p $folder
    generate_keystore_certificate "root_server_px1" $folder"/keystore_server_px1.jks"
    generate_keystore_certificate "root_server_px2" $folder"/keystore_server_px2.jks"
    generate_keystore_certificate "root_special_px1" $folder"/keystore_special_px1.jks"
-
    generate_truststore_certificate "root_server_px2" $folder"/keystore_server_px2.jks" $folder"/truststore_server_px2.jks"
 
 fi
-
 
 
 DIRNAME=`dirname "$0"`

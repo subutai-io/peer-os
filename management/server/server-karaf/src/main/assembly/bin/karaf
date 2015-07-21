@@ -48,13 +48,12 @@ generate_truststore_certificate() {
 	rm $client_cert
 }
 
-folder="/apps/subutai-mng/current/keystores"
+folder=$SUBUTAI_APP_DATA_PATH"/keystores"
 if [ ! -d $folder ]; then
 	mkdir -p $folder
    generate_keystore_certificate "root_server_px1" $folder"/keystore_server_px1.jks"
    generate_keystore_certificate "root_server_px2" $folder"/keystore_server_px2.jks"
    generate_keystore_certificate "root_special_px1" $folder"/keystore_special_px1.jks"
-
    generate_truststore_certificate "root_server_px2" $folder"/keystore_server_px2.jks" $folder"/truststore_server_px2.jks"
 
 fi
@@ -454,7 +453,7 @@ run() {
     fi
     cd "$KARAF_BASE"
 
-    exec "$JAVA" $JAVA_OPTS -Djava.endorsed.dirs="${JAVA_ENDORSED_DIRS}" -Djava.ext.dirs="${JAVA_EXT_DIRS}" -Dkaraf.instances="${KARAF_HOME}/instances" -Dkaraf.home="$KARAF_HOME" -Dkaraf.base="$KARAF_BASE" -Dkaraf.data="$KARAF_DATA" -Dkaraf.etc="$KARAF_ETC" -Djava.io.tmpdir="$KARAF_DATA/tmp" -Djava.util.logging.config.file="$KARAF_BASE/etc/java.util.logging.properties" -Djavax.management.builder.initial=org.apache.karaf.management.boot.KarafMBeanServerBuilder $KARAF_OPTS $OPTS -classpath "$CLASSPATH" $MAIN "$@"
+    exec "$JAVA" $JAVA_OPTS -Djava.endorsed.dirs="${JAVA_ENDORSED_DIRS}" -DsubutaiAppDataPath="${SUBUTAI_APP_DATA_PATH}" -Djava.ext.dirs="${JAVA_EXT_DIRS}" -Dkaraf.instances="${KARAF_HOME}/instances" -Dkaraf.home="$KARAF_HOME" -Dkaraf.base="$KARAF_BASE" -Dkaraf.data="$KARAF_DATA" -Dkaraf.etc="$KARAF_ETC" -Djava.io.tmpdir="$KARAF_DATA/tmp" -Djava.util.logging.config.file="$KARAF_BASE/etc/java.util.logging.properties" -Djavax.management.builder.initial=org.apache.karaf.management.boot.KarafMBeanServerBuilder $KARAF_OPTS $OPTS -classpath "$CLASSPATH" $MAIN "$@"
 }
 
 main() {
