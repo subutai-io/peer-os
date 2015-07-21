@@ -12,11 +12,12 @@ import java.util.Set;
 
 import javax.ws.rs.core.Response;
 
-import io.subutai.common.util.JsonUtil;
-
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 
 import com.google.common.collect.Sets;
+
+import io.subutai.common.settings.Common;
+import io.subutai.common.util.JsonUtil;
 
 
 /**
@@ -24,7 +25,8 @@ import com.google.common.collect.Sets;
  */
 public class ScriptManagerRestImpl implements ScriptManagerRest
 {
-    private static final String SCRIPTS_DIRECTORY = "/var/lib/subutai/pre-post-scripts/";
+    private static final String SCRIPTS_DIRECTORY =
+            String.format( "%s/pre-post-scripts/", Common.SUBUTAI_APP_DATA_PATH );
     protected String scriptsDirectoryPath = SCRIPTS_DIRECTORY;
 
 

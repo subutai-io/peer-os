@@ -1,29 +1,14 @@
 <blueprint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-
+           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
            xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd"
     >
-  <!--
-  <bean id="securityManagerJDBC" class="org.apache.derby.jdbc.EmbeddedXADataSource">
-    <property name="databaseName" value="subutai" />
-    <property name="createDatabase" value="create" />
-  </bean>
-
-    <service ref="dataSource" interface="javax.sql.DataSource">
-        <service-properties>
-            <entry key="osgi.jndi.service.name" value="jdbc/test"/>
-        </service-properties>
-    </service>
-
-    <service ref="dataSource" interface="javax.sql.XADataSource">
-        <service-properties>
-            <entry key="osgi.jndi.service.name" value="jdbc/testxa"/>
-        </service-properties>
-    </service>-->
+  <!-- Allow the use of system properties -->
+  <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
   <!-- *********************Channel Manager ************************ -->
 
   <bean id="channelManagerJDBC" class="org.h2.jdbcx.JdbcDataSource" activation="eager">
-    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/channelManagerDb" />
+    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/channelManagerDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -37,7 +22,7 @@
   <!-- *********************Security Manager ************************ -->
 
   <bean id="securityManagerJDBC" class="org.h2.jdbcx.JdbcDataSource" activation="eager">
-    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/securityDb" />
+    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/securityDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -51,7 +36,7 @@
   <!-- *********************Environment Manager ************************ -->
 
   <bean id="envManagerJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/environmentDb" />
+    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/environmentDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -64,7 +49,7 @@
   <!-- *********************Environment Manager 2************************ -->
 
   <bean id="envManagerJDBC2" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/environmentDb2" />
+    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/environmentDb2" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -78,7 +63,7 @@
   <!-- ********************* DataSource Common Service ************************ -->
 
   <bean id="commonServiceJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/commonDb" />
+    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/commonDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -92,7 +77,7 @@
   <!-- ********************* Peer Manager ************************ -->
 
   <bean id="peerManagerJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/peerManagerDb" />
+    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/peerManagerDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -106,7 +91,7 @@
   <!-- ********************* Messenger ************************ -->
 
   <bean id="messengerJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/messengerDb" />
+    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/messengerDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -118,7 +103,7 @@
   </service>
 
   <bean id="trackerJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/trackerDb" />
+    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/trackerDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -130,7 +115,7 @@
   </service>
 
   <bean id="metricJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/metricDb" />
+    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/metricDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -143,8 +128,7 @@
 
   <!--Plugins DataSource-->
   <bean id="pluginsJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <!--<property name="URL" value="jdbc:h2:/var/lib/subutai/db/plugins/pluginsDb;AUTO_SERVER=true" />-->
-    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/plugins/pluginsDb" />
+    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/plugins/pluginsDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>

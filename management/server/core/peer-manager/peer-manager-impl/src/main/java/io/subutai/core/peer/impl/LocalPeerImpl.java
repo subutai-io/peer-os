@@ -123,7 +123,7 @@ import com.google.common.collect.Sets;
  */
 public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 {
-    private String peerIdPath = "/var/lib/subutai/id";
+    private String peerIdPath = String.format( "%s/id", Common.SUBUTAI_APP_DATA_PATH);
     private String peerIdFile = "peer_id";
     private String externalIpInterface = "eth1";
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );

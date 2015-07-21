@@ -73,7 +73,7 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
         <Arg>
           <New class="org.eclipse.jetty.http.ssl.SslContextFactory">
             <!--<Set name="KeyStore">etc/keystores/keystore_server_px1.jks</Set>-->
-            <Set name="KeyStore">/var/lib/subutai/keystores/keystore_server_px1.jks</Set>
+            <Set name="KeyStore"><SystemProperty name="subutaiAppDataPath" />/keystores/keystore_server_px1.jks</Set>
             <Set name="certAlias">root_server_px1</Set>
             <Set name="KeyStorePassword">subutai</Set>
             <Set name="needClientAuth">false</Set>
@@ -92,12 +92,11 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
       <New class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
         <Arg>
           <New class="io.subutai.core.jetty.fragment.SslContextFactoryFragment">
-            <!--<Set name="KeyStore">etc/keystores/keystore_server_px2.jks</Set>-->
-            <Set name="KeyStore">/var/lib/subutai/keystores/keystore_server_px2.jks</Set>
+            <Set name="KeyStore"><SystemProperty name="subutaiAppDataPath" />/keystores/keystore_server_px2.jks</Set>
             <Set name="KeyStorePassword">subutai</Set>
             <Set name="certAlias">root_server_px2</Set>
             <!--<Set name="TrustStore">etc/keystores/truststore_server_px2.jks</Set>-->
-            <Set name="TrustStore">/var/lib/subutai/keystores/truststore_server_px2.jks</Set>
+            <Set name="TrustStore"><SystemProperty name="subutaiAppDataPath" />/keystores/truststore_server_px2.jks</Set>
             <Set name="TrustStorePassword">subutai</Set>
             <Set name="needClientAuth">true</Set>
           </New>
@@ -115,7 +114,7 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
       <New class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
         <Arg>
           <New class="org.eclipse.jetty.http.ssl.SslContextFactory">
-            <Set name="KeyStore">/var/lib/subutai/keystores/keystore_special_px1.jks</Set>
+            <Set name="KeyStore"><SystemProperty name="subutaiAppDataPath" />/keystores/keystore_special_px1.jks</Set>
             <Set name="certAlias">root_special_px1</Set>
             <Set name="KeyStorePassword">subutai</Set>
             <Set name="needClientAuth">false</Set>
