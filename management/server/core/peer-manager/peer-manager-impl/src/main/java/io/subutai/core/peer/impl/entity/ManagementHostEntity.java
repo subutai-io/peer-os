@@ -23,6 +23,13 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
+
 import io.subutai.common.host.Interface;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.network.Gateway;
@@ -45,16 +52,14 @@ import io.subutai.core.peer.impl.tasks.SetupTunnelsTask;
 import io.subutai.core.repository.api.RepositoryException;
 import io.subutai.core.repository.api.RepositoryManager;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
-
 
 @Entity
 @Table( name = "management_host" )
 @Access( AccessType.FIELD )
 public class ManagementHostEntity extends AbstractSubutaiHost implements ManagementHost, Disposable
 {
+    private static final Logger LOG = LoggerFactory.getLogger( ManagementHostEntity.class.getName() );
+
     private static final String GATEWAY_INTERFACE_NAME_REGEX = "^br-(\\d+)$";
     private static final Pattern GATEWAY_INTERFACE_NAME_PATTERN = Pattern.compile( GATEWAY_INTERFACE_NAME_REGEX );
 
@@ -129,7 +134,8 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         }
         catch ( RepositoryException e )
         {
-            throw new PeerException( "Error adding apt source", e );
+            //            throw new PeerException( "Error adding apt source", e );
+            LOG.error( "Error adding apt source", e );
         }
     }
 
@@ -142,7 +148,8 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         }
         catch ( RepositoryException e )
         {
-            throw new PeerException( "Error removing apt source", e );
+            //            throw new PeerException( "Error removing apt source", e );
+            LOG.error( "Error removing apt source", e );
         }
     }
 
