@@ -4,10 +4,16 @@ package io.subutai.common.util;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.math.BigInteger;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Date;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPSecretKey;
+import org.bouncycastle.openpgp.operator.jcajce.JcaPGPKeyConverter;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertNotNull;
@@ -96,5 +102,31 @@ public class PgpUtilTest
                 keyRef.getEncryptingKeyId() ) );
         assertNotNull( PgpUtil.findSecretKeyByFingerprint( new ByteArrayInputStream( secretKeyRing.toByteArray() ),
                 keyRef.getSigningKeyFingerprint() ) );
+    }
+
+
+    @Test
+    public void testGetX509CertificateFromPgpKeyPair() throws Exception
+    {
+
+        Date today = new Date();
+        PGPPublicKey pgpPublicKey = PgpUtil.findPublicKeyById( findFile( PUBLIC_KEYRING ), PUBLIC_KEY_ID );
+        PGPSecretKey pgpSecretKey = PgpUtil.findSecretKeyById( findFile( SECRET_KEYRING ), SECRET_KEY_ID );
+        X509Certificate x509Certificate =
+                PgpUtil.getX509CertificateFromPgpKeyPair( pgpPublicKey, pgpSecretKey, SECRET_PWD,
+                        "C=ZA, ST=Western Cape, L=Cape Town, O=Thawte Consulting cc,"
+                                + " OU=Certification Services Division,"
+                                + " CN=Thawte Server CA/emailAddress=server-certs@thawte.com",
+                        "C=US, ST=Maryland, L=Pasadena, O=Brent Baccala,"
+                                + "OU=FreeSoft, CN=www.freesoft.org/emailAddress=baccala@freesoft.org",
+
+                        today, new Date( today.getTime() + ( 1000 * 60 * 60 * 24 ) ), new BigInteger( "1" ) );
+
+        assertNotNull( x509Certificate );
+
+
+        JcaPGPKeyConverter c = new JcaPGPKeyConverter();
+        PublicKey publicKey = c.getPublicKey( pgpSecretKey.getPublicKey() );
+        x509Certificate.verify( publicKey, new BouncyCastleProvider() );
     }
 }

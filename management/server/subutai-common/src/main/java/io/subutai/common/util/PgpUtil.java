@@ -8,14 +8,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.security.Signature;
 import java.security.SignatureException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Iterator;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.bcpg.BCPGOutputStream;
 import org.bouncycastle.bcpg.CompressionAlgorithmTags;
@@ -23,6 +34,7 @@ import org.bouncycastle.bcpg.HashAlgorithmTags;
 import org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags;
 import org.bouncycastle.bcpg.sig.Features;
 import org.bouncycastle.bcpg.sig.KeyFlags;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.crypto.generators.RSAKeyPairGenerator;
 import org.bouncycastle.crypto.params.RSAKeyGenerationParameters;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -62,10 +74,12 @@ import org.bouncycastle.openpgp.operator.bc.BcPGPKeyPair;
 import org.bouncycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator;
 import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentSignerBuilder;
 import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentVerifierBuilderProvider;
+import org.bouncycastle.openpgp.operator.jcajce.JcaPGPKeyConverter;
 import org.bouncycastle.openpgp.operator.jcajce.JcePBESecretKeyDecryptorBuilder;
 import org.bouncycastle.openpgp.operator.jcajce.JcePGPDataEncryptorBuilder;
 import org.bouncycastle.openpgp.operator.jcajce.JcePublicKeyDataDecryptorFactoryBuilder;
 import org.bouncycastle.openpgp.operator.jcajce.JcePublicKeyKeyEncryptionMethodGenerator;
+import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.util.io.Streams;
 
 import com.google.common.base.Objects;
@@ -684,7 +698,97 @@ public class PgpUtil
         }
     }
 
+
+    public static X509Certificate getX509CertificateFromPgpKeyPair( PGPPublicKey pgpPublicKey,
+                                                                    PGPSecretKey pgpSecretKey, String secretPwd,
+                                                                    String issuer, String subject, Date dateOfIssue,
+                                                                    Date dateOfExpiry, BigInteger serial )
+            throws PGPException, CertificateException, IOException
+    {
+        JcaPGPKeyConverter c = new JcaPGPKeyConverter();
+        PublicKey publicKey = c.getPublicKey( pgpPublicKey );
+        PrivateKey privateKey = c.getPrivateKey( pgpSecretKey.extractPrivateKey(
+                new JcePBESecretKeyDecryptorBuilder().setProvider( provider ).build( secretPwd.toCharArray() ) ) );
+
+        X509v3CertificateBuilder certBuilder =
+                new X509v3CertificateBuilder( new X500Name( issuer ), serial, dateOfIssue, dateOfExpiry,
+                        new X500Name( subject ), SubjectPublicKeyInfo.getInstance( publicKey.getEncoded() ) );
+        byte[] certBytes = certBuilder.build( new JCESigner( privateKey, "SHA256withRSA" ) ).getEncoded();
+        CertificateFactory certificateFactory = CertificateFactory.getInstance( "X.509" );
+
+        return ( X509Certificate ) certificateFactory.generateCertificate( new ByteArrayInputStream( certBytes ) );
+    }
+
+
     //*****************************************
+
+
+    private static class JCESigner implements ContentSigner
+    {
+
+        private static final AlgorithmIdentifier PKCS1_SHA256_WITH_RSA_OID =
+                new AlgorithmIdentifier( new ASN1ObjectIdentifier( "1.2.840.113549.1.1.11" ) );
+
+        private Signature signature;
+        private ByteArrayOutputStream outputStream;
+
+
+        public JCESigner( PrivateKey privateKey, String signatureAlgorithm )
+        {
+            if ( !"SHA256withRSA".equals( signatureAlgorithm ) )
+            {
+                throw new IllegalArgumentException(
+                        "Signature algorithm \"" + signatureAlgorithm + "\" not yet supported" );
+            }
+            try
+            {
+                this.outputStream = new ByteArrayOutputStream();
+                this.signature = Signature.getInstance( signatureAlgorithm );
+                this.signature.initSign( privateKey );
+            }
+            catch ( GeneralSecurityException gse )
+            {
+                throw new IllegalArgumentException( gse.getMessage() );
+            }
+        }
+
+
+        @Override
+        public AlgorithmIdentifier getAlgorithmIdentifier()
+        {
+            if ( signature.getAlgorithm().equals( "SHA256withRSA" ) )
+            {
+                return PKCS1_SHA256_WITH_RSA_OID;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+
+        @Override
+        public OutputStream getOutputStream()
+        {
+            return outputStream;
+        }
+
+
+        @Override
+        public byte[] getSignature()
+        {
+            try
+            {
+                signature.update( outputStream.toByteArray() );
+                return signature.sign();
+            }
+            catch ( GeneralSecurityException gse )
+            {
+                gse.printStackTrace();
+                return null;
+            }
+        }
+    }
 
 
     @SuppressWarnings( "unchecked" )
