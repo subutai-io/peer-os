@@ -119,7 +119,7 @@ function import {
         if [ $? != 0 ]; then msg_error "Template $template cannot be unlocked!"; exit 1; fi
         subutai destroy $template
         apt-get --assume-yes --force-yes purge $package_name
-	exit 1
+        exit 1
       fi
     elif [ "`is_registered $template`" == "true" ]
     then
@@ -142,7 +142,7 @@ function import {
         msg_error "Debian package of $package_name could not be installed, removing"
         unlock_container_read $template
         if [ $? != 0 ]; then msg_error "Template $template cannot be unlocked!"; exit 1; fi
-	subutai destroy $template
+        subutai destroy $template
         apt-get --assume-yes --force-yes purge $package_name
         exit 1
       fi
