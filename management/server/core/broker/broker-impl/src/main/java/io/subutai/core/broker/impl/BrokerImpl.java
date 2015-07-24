@@ -11,12 +11,6 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TopicSubscriber;
 
-import io.subutai.core.broker.api.Broker;
-import io.subutai.core.broker.api.BrokerException;
-import io.subutai.core.broker.api.ByteMessageListener;
-import io.subutai.core.broker.api.MessageListener;
-import io.subutai.core.broker.api.TextMessageListener;
-import io.subutai.core.broker.api.Topic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +19,13 @@ import org.apache.activemq.pool.PooledConnectionFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+
+import io.subutai.core.broker.api.Broker;
+import io.subutai.core.broker.api.BrokerException;
+import io.subutai.core.broker.api.ByteMessageListener;
+import io.subutai.core.broker.api.MessageListener;
+import io.subutai.core.broker.api.TextMessageListener;
+import io.subutai.core.broker.api.Topic;
 
 
 /**
@@ -100,9 +101,10 @@ public class BrokerImpl implements Broker
 
     public void removeMessageListener( final MessageListener listener )
     {
-        Preconditions.checkNotNull( listener );
-
-        messageRouter.removeListener( listener );
+        if ( listener != null )
+        {
+            messageRouter.removeListener( listener );
+        }
     }
 
 

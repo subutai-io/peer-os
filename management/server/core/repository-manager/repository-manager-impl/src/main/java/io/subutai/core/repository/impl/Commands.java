@@ -55,6 +55,7 @@ public class Commands
     }
 
 
+    //TODO remove all system specific command and paths, use a dedicated binding for this
     public RequestBuilder getAddAptSourceCommand( String hostname, String ip )
     {
         return new RequestBuilder( String.format( "sed '/^path_map.*$/ s/$/ ; %s %s/' apt-cacher.conf > apt-cacher.conf"
@@ -64,6 +65,7 @@ public class Commands
     }
 
 
+    //TODO remove all system specific command and paths, use a dedicated binding for this
     public RequestBuilder getRemoveAptSourceCommand( String ip )
     {
         return new RequestBuilder(

@@ -14,6 +14,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandUtil;
@@ -72,10 +77,6 @@ import io.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
 import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.strategy.api.StrategyNotFoundException;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertEquals;
@@ -246,7 +247,7 @@ public class LocalPeerImplTest
     {
         doReturn( managementHostDataService ).when( localPeer ).getManagementHostDataService();
         doReturn( resourceHostDataService ).when( localPeer ).getResourceHostDataService();
-        doNothing().when( localPeer ).initPeerInfo( any( PeerDAO.class) );
+        doNothing().when( localPeer ).initPeerInfo( any( PeerDAO.class ) );
 
         localPeer.init();
     }
@@ -888,6 +889,7 @@ public class LocalPeerImplTest
         when( resourceHostInfo.getHostname() ).thenReturn( Common.MANAGEMENT_HOSTNAME );
         when( resourceHostInfo.getId() ).thenReturn( MANAGEMENT_HOST_ID );
 
+        localPeer.initialized = true;
         localPeer.onHeartbeat( resourceHostInfo );
 
         verify( managementHost ).updateHostInfo( resourceHostInfo );
@@ -930,9 +932,11 @@ public class LocalPeerImplTest
 
         when( resourceHostInfo.getContainers() ).thenReturn( Sets.newHashSet( containerHostInfo ) );
 
+        doReturn( containerHost ).when( containerHostDataService ).find( anyString() );
+
         localPeer.saveResourceHostContainers( resourceHost, resourceHostInfo.getContainers() );
 
-        verify( containerHostDataService ).update( containerHost );
+        verify( containerHostDataService ).update( any( ContainerHostEntity.class ) );
     }
 
 

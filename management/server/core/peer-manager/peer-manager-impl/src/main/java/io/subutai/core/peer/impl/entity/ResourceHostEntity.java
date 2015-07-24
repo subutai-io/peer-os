@@ -101,6 +101,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
+    //TODO remove all system specific command and paths, use a dedicated binding for this
     @Override
     public ContainerState getContainerHostState( final ContainerHost containerHost ) throws ResourceHostException
     {
@@ -166,7 +167,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
     }
 
-
+    //TODO remove all system specific command and paths, use a dedicated binding for this
     public void startContainerHost( final ContainerHost containerHost ) throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
@@ -220,7 +221,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
     }
 
-
+    //TODO remove all system specific command and paths, use a dedicated binding for this
     public void stopContainerHost( final ContainerHost containerHost ) throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );

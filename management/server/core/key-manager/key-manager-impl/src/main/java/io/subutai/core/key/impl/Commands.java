@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 public class Commands
 {
 
+    //TODO remove /etc/profile as system specific call, place it inside the keymanager binding
     private static final String KEY_MANAGER_BINDING = ". /etc/profile && subutai keymanager";
 
 

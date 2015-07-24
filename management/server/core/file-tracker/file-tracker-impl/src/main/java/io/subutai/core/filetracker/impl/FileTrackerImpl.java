@@ -7,6 +7,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
+
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -24,11 +30,6 @@ import io.subutai.core.filetracker.api.FileTracker;
 import io.subutai.core.filetracker.api.FileTrackerException;
 import io.subutai.core.filetracker.api.InotifyEventType;
 import io.subutai.core.peer.api.PeerManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 
 
 public class FileTrackerImpl implements FileTracker, ByteMessageListener
@@ -61,17 +62,19 @@ public class FileTrackerImpl implements FileTracker, ByteMessageListener
 
     public void addListener( ConfigPointListener listener )
     {
-        Preconditions.checkNotNull( listener );
-
-        listeners.add( listener );
+        if ( listener != null )
+        {
+            listeners.add( listener );
+        }
     }
 
 
     public void removeListener( ConfigPointListener listener )
     {
-        Preconditions.checkNotNull( listener );
-
-        listeners.remove( listener );
+        if ( listener != null )
+        {
+            listeners.remove( listener );
+        }
     }
 
 

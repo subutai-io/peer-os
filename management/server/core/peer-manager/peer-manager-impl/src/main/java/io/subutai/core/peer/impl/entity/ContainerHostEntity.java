@@ -14,6 +14,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -31,9 +34,6 @@ import io.subutai.core.peer.api.ContainerGroup;
 import io.subutai.core.peer.api.ContainerGroupNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ResourceHost;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 
 /**
@@ -83,6 +83,8 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public ContainerHostEntity( String peerId, HostInfo hostInfo )
     {
         super( peerId, hostInfo );
+
+        updateHostInfo( hostInfo );
     }
 
 
