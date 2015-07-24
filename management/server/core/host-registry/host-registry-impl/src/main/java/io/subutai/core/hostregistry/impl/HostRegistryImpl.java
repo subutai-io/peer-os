@@ -9,6 +9,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Sets;
+
 import io.subutai.common.host.HostInfo;
 import io.subutai.core.hostregistry.api.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
@@ -16,12 +22,6 @@ import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.hostregistry.api.HostRegistryException;
 import io.subutai.core.hostregistry.api.ResourceHostInfo;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -180,18 +180,20 @@ public class HostRegistryImpl implements HostRegistry
     @Override
     public void addHostListener( final HostListener listener )
     {
-        Preconditions.checkNotNull( listener );
-
-        hostListeners.add( listener );
+        if ( listener != null )
+        {
+            hostListeners.add( listener );
+        }
     }
 
 
     @Override
     public void removeHostListener( final HostListener listener )
     {
-        Preconditions.checkNotNull( listener );
-
-        hostListeners.remove( listener );
+        if ( listener != null )
+        {
+            hostListeners.remove( listener );
+        }
     }
 
 

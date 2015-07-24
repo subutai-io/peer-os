@@ -13,6 +13,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.google.gson.JsonSyntaxException;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
@@ -46,15 +56,6 @@ import io.subutai.core.peer.api.HostNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.ResourceHost;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -95,9 +96,9 @@ public class MonitorImpl implements Monitor
             this.peerManager = peerManager;
             this.identityManager = identityManager;
             this.environmentManager = environmentManager;
-//            peerManager.addRequestListener( new RemoteAlertListener( this ) );
-//            peerManager.addRequestListener( new RemoteMetricRequestListener( this ) );
-//            peerManager.addRequestListener( new MonitoringActivationListener( this, peerManager ) );
+            //            peerManager.addRequestListener( new RemoteAlertListener( this ) );
+            //            peerManager.addRequestListener( new RemoteMetricRequestListener( this ) );
+            //            peerManager.addRequestListener( new MonitoringActivationListener( this, peerManager ) );
         }
         catch ( DaoException e )
         {
@@ -771,17 +772,19 @@ public class MonitorImpl implements Monitor
      */
     public void addAlertListener( AlertListener alertListener )
     {
-        Preconditions.checkNotNull( alertListener );
-
-        alertListeners.add( alertListener );
+        if ( alertListener != null )
+        {
+            alertListeners.add( alertListener );
+        }
     }
 
 
     public void removeAlertListener( AlertListener alertListener )
     {
-        Preconditions.checkNotNull( alertListener );
-
-        alertListeners.remove( alertListener );
+        if ( alertListener != null )
+        {
+            alertListeners.remove( alertListener );
+        }
     }
 
 

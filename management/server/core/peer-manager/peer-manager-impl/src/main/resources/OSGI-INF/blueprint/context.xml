@@ -83,7 +83,7 @@
 
   <reference-list id="peerMsgLstnr"
                   interface="io.subutai.core.peer.api.RequestListener"
-                  availability="optional">
+                  availability="optional" ext:proxy-method="classes">
     <reference-listener ref="peerManager"
                         bind-method="addRequestListener" unbind-method="removeRequestListener" />
   </reference-list>

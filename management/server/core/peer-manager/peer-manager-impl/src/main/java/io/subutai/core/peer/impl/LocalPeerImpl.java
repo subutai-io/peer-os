@@ -151,6 +151,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private PeerInfo peerInfo;
     private SubutaiSslContextFactory subutaiSslContextFactory;
 
+    protected boolean initialized = false;
+
 
     public LocalPeerImpl( DaoManager daoManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
                           StrategyManager strategyManager, CommandExecutor commandExecutor, HostRegistry hostRegistry,
@@ -228,6 +230,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 setContainersTransientFields( resourceHost.getContainerHosts() );
             }
+
+            initialized = true;
         }
         catch ( Exception e )
         {
@@ -1256,97 +1260,82 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //TODO solve  org.apache.openjpa.persistence.InvalidStateException:
-    // "The context has been closed" which occurs when updating entity fields
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
     {
-        //todo put updating host fields logic to updateHostInfo method
-        if ( resourceHostInfo.getHostname().equals( "management" ) )
+        if ( initialized )
         {
-            if ( managementHost == null )
+            //todo put updating host fields logic to updateHostInfo method
+            if ( resourceHostInfo.getHostname().equals( "management" ) )
             {
-                managementHost = new ManagementHostEntity( getId().toString(), resourceHostInfo, externalIpInterface );
-                ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
-                try
+                if ( managementHost == null )
                 {
-                    managementHost.init();
+                    managementHost =
+                            new ManagementHostEntity( getId().toString(), resourceHostInfo, externalIpInterface );
+                    ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
+                    try
+                    {
+                        managementHost.init();
+                    }
+                    catch ( Exception e )
+                    {
+                        LOG.error( "Error initializing management host", e );
+                    }
+                    managementHostDataService.persist( ( ManagementHostEntity ) managementHost );
                 }
-                catch ( Exception e )
+                else
                 {
-                    LOG.error( "Error initializing management host", e );
+                    ( ( AbstractSubutaiHost ) managementHost ).setNetInterfaces( resourceHostInfo.getInterfaces() );
+                    managementHostDataService.update( ( ManagementHostEntity ) managementHost );
                 }
-                managementHostDataService.persist( ( ManagementHostEntity ) managementHost );
+                ( ( AbstractSubutaiHost ) managementHost ).updateHostInfo( resourceHostInfo );
             }
             else
             {
-                ( ( AbstractSubutaiHost ) managementHost ).setNetInterfaces( resourceHostInfo.getInterfaces() );
-                managementHostDataService.update( ( ManagementHostEntity ) managementHost );
-            }
-            ( ( AbstractSubutaiHost ) managementHost ).updateHostInfo( resourceHostInfo );
-        }
-        else
-        {
-            ResourceHost host;
-            try
-            {
-                host = getResourceHostByName( resourceHostInfo.getHostname() );
+                ResourceHost host;
+                try
+                {
+                    host = getResourceHostByName( resourceHostInfo.getHostname() );
 
-                saveResourceHostContainers( host, resourceHostInfo.getContainers() );
-            }
-            catch ( HostNotFoundException e )
-            {
-                LOG.warn( "Host not found in #onHeartbeat", e );
-                host = new ResourceHostEntity( getId().toString(), resourceHostInfo );
-                host.init();
-                resourceHostDataService.persist( ( ResourceHostEntity ) host );
-                addResourceHost( host );
-                setResourceHostTransientFields( Sets.newHashSet( host ) );
+                    saveResourceHostContainers( host, resourceHostInfo.getContainers() );
+                }
+                catch ( HostNotFoundException e )
+                {
+                    LOG.warn( "Host not found in #onHeartbeat", e );
+                    host = new ResourceHostEntity( getId().toString(), resourceHostInfo );
+                    host.init();
+                    resourceHostDataService.persist( ( ResourceHostEntity ) host );
+                    addResourceHost( host );
+                    setResourceHostTransientFields( Sets.newHashSet( host ) );
 
-                saveResourceHostContainers( host, resourceHostInfo.getContainers() );
+                    saveResourceHostContainers( host, resourceHostInfo.getContainers() );
+                }
+                ( ( AbstractSubutaiHost ) host ).updateHostInfo( resourceHostInfo );
             }
-            ( ( AbstractSubutaiHost ) host ).updateHostInfo( resourceHostInfo );
         }
     }
 
 
-    //TODO solve  org.apache.openjpa.persistence.InvalidStateException:
-    // "The context has been closed" which occurs when updating entity fields
     protected void saveResourceHostContainers( ResourceHost resourceHost, Set<ContainerHostInfo> containerHostInfos )
     {
-        //todo put updating host fields logic to updateHostInfo method
         Set<ContainerHost> oldHosts = resourceHost.getContainerHosts();
         Set<UUID> newContainerIds = Sets.newHashSet();
         for ( ContainerHostInfo containerHostInfo : containerHostInfos )
         {
-
             newContainerIds.add( containerHostInfo.getId() );
 
-            ContainerHost containerHost = null;
-            try
-            {
-                containerHost = resourceHost.getContainerHostById( containerHostInfo.getId() );
-            }
-            catch ( HostNotFoundException ignore )
-            {
-                //ignore
-            }
+            ContainerHost containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
+            setContainersTransientFields( Sets.newHashSet( containerHost ) );
+            ( ( ResourceHostEntity ) resourceHost ).addContainerHost( containerHost );
 
-
-            if ( containerHost == null )
+            if ( containerHostDataService.find( containerHostInfo.getId().toString() ) != null )
             {
-                containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
-                setContainersTransientFields( Sets.newHashSet( containerHost ) );
-                ( ( ResourceHostEntity ) resourceHost ).addContainerHost( containerHost );
-                containerHostDataService.persist( ( ContainerHostEntity ) containerHost );
+                containerHostDataService.update( ( ContainerHostEntity ) containerHost );
             }
             else
             {
-                //update network interfaces
-                ( ( AbstractSubutaiHost ) containerHost ).setNetInterfaces( containerHostInfo.getInterfaces() );
-                containerHostDataService.update( ( ContainerHostEntity ) containerHost );
+                containerHostDataService.persist( ( ContainerHostEntity ) containerHost );
             }
-            ( ( ContainerHostEntity ) containerHost ).updateHostInfo( containerHostInfo );
         }
 
         for ( ContainerHost oldHost : oldHosts )
@@ -1902,18 +1891,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public void addRequestListener( final RequestListener listener )
     {
-        Preconditions.checkNotNull( listener );
-
-        requestListeners.add( listener );
+        if ( listener != null )
+        {
+            requestListeners.add( listener );
+        }
     }
 
 
     @Override
     public void removeRequestListener( final RequestListener listener )
     {
-        Preconditions.checkNotNull( listener );
-
-        requestListeners.remove( listener );
+        if ( listener != null )
+        {
+            requestListeners.remove( listener );
+        }
     }
 
 
