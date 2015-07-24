@@ -26,6 +26,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.net.util.SubnetUtils;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -98,24 +110,12 @@ import io.subutai.core.peer.impl.entity.ContainerGroupEntity;
 import io.subutai.core.peer.impl.entity.ContainerHostEntity;
 import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.entity.ResourceHostEntity;
-
 import io.subutai.core.registry.api.RegistryException;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
 import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.strategy.api.StrategyNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.net.util.SubnetUtils;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -123,7 +123,7 @@ import com.google.common.collect.Sets;
  */
 public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 {
-    private String peerIdPath = String.format( "%s/id", Common.SUBUTAI_APP_DATA_PATH);
+    private String peerIdPath = String.format( "%s/id", Common.SUBUTAI_APP_DATA_PATH );
     private String peerIdFile = "peer_id";
     private String externalIpInterface = "eth1";
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
@@ -1256,6 +1256,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    //TODO solve  org.apache.openjpa.persistence.InvalidStateException:
+    // "The context has been closed" which occurs when updating entity fields
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
     {
@@ -1308,6 +1310,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    //TODO solve  org.apache.openjpa.persistence.InvalidStateException:
+    // "The context has been closed" which occurs when updating entity fields
     protected void saveResourceHostContainers( ResourceHost resourceHost, Set<ContainerHostInfo> containerHostInfos )
     {
         //todo put updating host fields logic to updateHostInfo method
