@@ -179,7 +179,7 @@ public class CreateContainerTask implements Callable<ContainerHost>
         }
     }
 
-
+    //TODO remove all system specific command and paths, use a dedicated binding for this
     protected void updateRepository( final Template template ) throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );

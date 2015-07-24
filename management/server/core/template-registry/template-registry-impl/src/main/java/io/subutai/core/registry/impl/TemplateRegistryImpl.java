@@ -21,6 +21,13 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
+
 import io.subutai.common.cache.ExpiringCache;
 import io.subutai.common.datatypes.TemplateVersion;
 import io.subutai.common.exception.DaoException;
@@ -33,12 +40,6 @@ import io.subutai.core.git.api.GitException;
 import io.subutai.core.git.api.GitManager;
 import io.subutai.core.registry.api.RegistryException;
 import io.subutai.core.registry.api.TemplateRegistry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -51,6 +52,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
     private static final String TEMPLATE_IS_NULL_MSG = "Template name is null or empty";
     private static final String LXC_ARCH_IS_NULL_MSG = "Lxc Arch is null or empty";
     private static final String TEMPLATE_NOT_FOUND_MSG = "Template %s not found";
+    //TODO change this path to use Common.SUBUTAI_APP_DATA_PATH
     private static final String REPO_ROOT_PATH = "/var/lib/git/subutai.git/";
     private final ExpiringCache<String, Boolean> templateDownloadTokens = new ExpiringCache<>();
 

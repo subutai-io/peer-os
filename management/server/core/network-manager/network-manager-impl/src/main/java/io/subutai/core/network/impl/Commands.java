@@ -4,17 +4,20 @@ package io.subutai.core.network.impl;
 import java.util.Set;
 import java.util.UUID;
 
+import com.google.common.collect.Lists;
+
 import io.subutai.common.command.OutputRedirection;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.settings.Common;
 
-import com.google.common.collect.Lists;
-
 
 /**
  * Networking commands
  */
+
+//TODO remove all system specific command and paths, use a dedicated binding
+// or implement missing functionality inside network manager binding for this
 public class Commands
 {
     private static final String MANAGEMENT_HOST_NETWORK_BINDING = "subutai management_network";
