@@ -64,6 +64,9 @@
     <h2database.version>1.4.184</h2database.version>
     <openjpa.version>2.3.0</openjpa.version>
 
+    <org.apache.httpcomonents.version>4.4.1</org.apache.httpcomonents.version>
+    <org.apache.commons.lang3.version>3.4</org.apache.commons.lang3.version>
+    <org.apache.commons.io.version>2.4</org.apache.commons.io.version>
   </properties>
 
   <dependencyManagement>
@@ -433,6 +436,19 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>peer-manager-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- communication-manager -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>communication-manager-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>communication-manager-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -806,11 +822,6 @@
         <version>4.3.2</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpcore-osgi</artifactId>
-        <version>4.3.2</version>
-      </dependency>
-      <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
         <version>1.7.7</version>
@@ -950,7 +961,7 @@
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>2.4</version>
+        <version>${org.apache.commons.io.version}</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.jackson</groupId>
@@ -961,6 +972,18 @@
         <groupId>org.codehaus.jackson</groupId>
         <artifactId>jackson-core-asl</artifactId>
         <version>1.9.13</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpcore-osgi</artifactId>
+        <version>${org.apache.httpcomonents.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient-osgi</artifactId>
+        <version>${org.apache.httpcomonents.version}</version>
       </dependency>
 
       <dependency>
