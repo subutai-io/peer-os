@@ -5,7 +5,7 @@
 
   <persistence-unit name="channelManagerPUnit" transaction-type="RESOURCE_LOCAL">
 
-    <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/channelManagerDS)
+    <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/subutaiDS)
     </non-jta-data-source>
     <class>io.subutai.core.channel.impl.entity.UserChannelToken</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>

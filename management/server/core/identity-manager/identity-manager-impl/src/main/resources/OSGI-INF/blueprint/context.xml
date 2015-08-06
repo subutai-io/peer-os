@@ -6,7 +6,7 @@
 
   <reference id="securityDS" availability="mandatory" activation="eager"
              interface="javax.sql.DataSource"
-             filter="(osgi.jndi.service.name=openjpa/securityManagerDS)" />
+             filter="(osgi.jndi.service.name=openjpa/subutaiDS)" />
 
   <!--*****************************************************************-->
   <bean id="daoManagerSecurity" init-method="init" activation="eager" scope="singleton"
