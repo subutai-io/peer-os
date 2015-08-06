@@ -16,23 +16,16 @@
   <packaging>bundle</packaging>
 
   <dependencies>
-
     <dependency>
-    	<groupId>org.apache.commons</groupId>
-    	<artifactId>commons-lang3</artifactId>
-    	<version>${org.apache.commons.lang3.version}</version>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
+      <version>${org.apache.httpcomonents.httpcore.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore-osgi</artifactId>
-      <version>${org.apache.httpcomonents.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient-osgi</artifactId>
-      <version>${org.apache.httpcomonents.version}</version>
+      <artifactId>httpclient</artifactId>
+      <version>${org.apache.httpcomonents.httpclient.version}</version>
     </dependency>
 
     <dependency>

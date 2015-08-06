@@ -17,8 +17,8 @@
   <modules>
     <module>communication-manager-api</module>
     <module>communication-manager-impl</module>
-<!--
     <module>communication-manager-cli</module>
+<!--
     <module>communication-manager-ui</module>
 -->
   </modules>

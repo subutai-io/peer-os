@@ -1,6 +1,7 @@
 package io.subutai.common.pgp.crypto;
 
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,14 +20,20 @@ import org.bouncycastle.openpgp.PGPSignature;
 import org.bouncycastle.openpgp.PGPSignatureGenerator;
 import org.bouncycastle.openpgp.PGPUtil;
 import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentSignerBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.commons.io.IOUtils;
 
 
 public class PGPSign
 {
-    public static String sign( String data, PGPPrivateKey privateKey ) throws Exception
+    private static final Logger log = LoggerFactory.getLogger( PGPSign.class );
+
+
+    public static byte[] sign( byte[] data, PGPPrivateKey privateKey ) throws Exception
     {
+        log.debug( "Signing with: " + privateKey.getKeyID() );
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
         ArmoredOutputStream aos = new ArmoredOutputStream( bos );
@@ -43,17 +50,18 @@ public class PGPSign
 
         aos.close();
 
-        return bos.toString( "UTF-8" );
+        return bos.toByteArray();
     }
 
 
-    private static void produceSign( String data, BCPGOutputStream bcOut, PGPSignatureGenerator signGen ) throws IOException, PGPException
+    private static void produceSign( byte[] data, BCPGOutputStream bcOut, PGPSignatureGenerator signGen )
+            throws IOException, PGPException
     {
         PGPLiteralDataGenerator literalGen = new PGPLiteralDataGenerator();
 
-        OutputStream os = literalGen.open( bcOut, PGPLiteralData.BINARY, "", data.length(), new Date() );
+        OutputStream os = literalGen.open( bcOut, PGPLiteralData.BINARY, "", data.length, new Date() );
 
-        InputStream is = IOUtils.toInputStream( data );
+        InputStream is = new ByteArrayInputStream( data );
 
         int ch;
 
@@ -73,7 +81,8 @@ public class PGPSign
             throws PGPException, IOException
     {
         PGPSignatureGenerator signGen = new PGPSignatureGenerator(
-                new JcaPGPContentSignerBuilder( privateKey.getPublicKeyPacket().getAlgorithm(), PGPUtil.SHA1 ).setProvider( "BC" ) );
+                new JcaPGPContentSignerBuilder( privateKey.getPublicKeyPacket().getAlgorithm(), PGPUtil.SHA1 )
+                        .setProvider( "BC" ) );
 
         signGen.init( PGPSignature.BINARY_DOCUMENT, privateKey );
 
@@ -81,5 +90,4 @@ public class PGPSign
 
         return signGen;
     }
-
 }

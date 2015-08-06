@@ -9,6 +9,12 @@
   <!-- Allow the use of system properties -->
   <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
 
+  <bean id="communicationManager" class="io.subutai.core.communication.impl.CommunicationManagerImpl"
+         scope="singleton" activation="eager">
+    <property name="bundleContext" ref="blueprintBundleContext"/>
+   </bean>
+
+   <service ref="communicationManager" interface="io.subutai.core.communication.api.CommunicationManager" />
 
 
 
