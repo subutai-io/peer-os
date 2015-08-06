@@ -1,6 +1,7 @@
 package io.subutai.common.pgp.crypto;
 
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,20 +19,29 @@ import org.bouncycastle.openpgp.PGPUtil;
 import org.bouncycastle.openpgp.jcajce.JcaPGPObjectFactory;
 import org.bouncycastle.openpgp.operator.jcajce.JcePublicKeyDataDecryptorFactoryBuilder;
 import org.bouncycastle.util.io.Streams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.commons.io.IOUtils;
 
 
 public class PGPDecrypt
 {
-    public static String decrypt( String encData, PGPPrivateKey privateKey ) throws IOException, PGPException, NoSuchProviderException
+    private static final Logger log = LoggerFactory.getLogger( PGPDecrypt.class );
+
+
+    public static byte[] decrypt( byte[] encData, PGPPrivateKey privateKey )
+            throws IOException, PGPException, NoSuchProviderException
     {
+        log.debug( "Decrypting with: " + privateKey.getKeyID() );
+
         PGPPublicKeyEncryptedData pgpEncData = getPGPEncryptedData( encData );
 
         InputStream is = getInputStream( privateKey, pgpEncData );
 
-        // IMPORTANT: pipe() should be before verify(). Otherwise we get "java.io.EOFException: Unexpected end of ZIP input stream".
-        String data = pipe( is );
+        // IMPORTANT: pipe() should be before verify(). Otherwise we get "java.io.EOFException: Unexpected end of ZIP
+        // input stream".
+        byte[] data = pipe( is );
 
         if ( !pgpEncData.verify() )
         {
@@ -42,7 +52,7 @@ public class PGPDecrypt
     }
 
 
-    private static String pipe( InputStream is ) throws IOException
+    private static byte[] pipe( InputStream is ) throws IOException
     {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
@@ -50,13 +60,15 @@ public class PGPDecrypt
 
         bos.close();
 
-        return bos.toString( "UTF-8" );
+        return bos.toByteArray();
     }
 
 
-    private static InputStream getInputStream( PGPPrivateKey privateKey, PGPPublicKeyEncryptedData pgpEncData ) throws PGPException, IOException
+    private static InputStream getInputStream( PGPPrivateKey privateKey, PGPPublicKeyEncryptedData pgpEncData )
+            throws PGPException, IOException
     {
-        InputStream is = pgpEncData.getDataStream( new JcePublicKeyDataDecryptorFactoryBuilder().setProvider( "BC" ).build( privateKey ) );
+        InputStream is = pgpEncData
+                .getDataStream( new JcePublicKeyDataDecryptorFactoryBuilder().setProvider( "BC" ).build( privateKey ) );
 
         JcaPGPObjectFactory objectFactory = new JcaPGPObjectFactory( is );
 
@@ -72,9 +84,9 @@ public class PGPDecrypt
     }
 
 
-    private static PGPPublicKeyEncryptedData getPGPEncryptedData( String encData ) throws IOException
+    private static PGPPublicKeyEncryptedData getPGPEncryptedData( byte[] encData ) throws IOException
     {
-        InputStream in = PGPUtil.getDecoderStream( IOUtils.toInputStream( encData ) );
+        InputStream in = PGPUtil.getDecoderStream( new ByteArrayInputStream( encData ) );
 
         JcaPGPObjectFactory objectFactory = new JcaPGPObjectFactory( in );
 

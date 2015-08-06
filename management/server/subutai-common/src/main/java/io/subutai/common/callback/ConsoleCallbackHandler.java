@@ -17,7 +17,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
  *
  */
 
-class ConsoleCallbackHandler implements CallbackHandler
+public class ConsoleCallbackHandler implements CallbackHandler
 {
 
     private char[] password = null;

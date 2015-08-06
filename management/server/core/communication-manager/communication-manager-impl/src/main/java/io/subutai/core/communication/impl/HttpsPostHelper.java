@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -73,12 +74,14 @@ public class HttpsPostHelper
     }
 
 
-    public Response execute( String encData ) throws IOException, PGPKeyNotFound, PGPException
+    public Response execute( byte[] encData ) throws IOException, PGPKeyNotFound, PGPException
     {
         HttpPost post = new HttpPost( uri );
 
-        post.setEntity( getHttpEntity( encData ) );
+        post.setEntity( getHttpEntity( new String( encData, "UTF-8" ) ) );
 
+//        httpClient.getParams().setParameter("http.protocol.version", HttpVersion.HTTP_1_1);
+//        httpClient.getParams().setParameter( "http.protocol.content-charset", "UTF-8" );
         HttpResponse response = httpClient.execute( post );
 
         return new Response( response.getStatusLine().getStatusCode(), readContent( response ) );

@@ -1,6 +1,7 @@
 package io.subutai.common.pgp.crypto;
 
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,19 +17,25 @@ import org.bouncycastle.openpgp.PGPSignatureList;
 import org.bouncycastle.openpgp.PGPUtil;
 import org.bouncycastle.openpgp.jcajce.JcaPGPObjectFactory;
 import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentVerifierBuilderProvider;
-
-import org.apache.commons.io.IOUtils;
+import org.bouncycastle.util.encoders.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class PGPVerify
 {
-    public static String verify( String signedData, PGPPublicKey publicKey ) throws Exception
+    private static final Logger log = LoggerFactory.getLogger( PGPVerify.class );
+
+
+    public static byte[] verify( byte[] signedData, PGPPublicKey publicKey ) throws Exception
     {
+        log.debug( "Verifying with: " + Hex.toHexString( publicKey.getFingerprint() ) );
+
         JcaPGPObjectFactory objectFactory = getObjectFactory( signedData );
 
         PGPOnePassSignature onePassSignature = getOnePassSignature( publicKey, objectFactory );
 
-        String data = readSign( objectFactory, onePassSignature );
+        byte[] data = readSign( objectFactory, onePassSignature );
 
         doVerify( objectFactory, onePassSignature );
 
@@ -36,7 +43,8 @@ public class PGPVerify
     }
 
 
-    private static String readSign( JcaPGPObjectFactory objectFactory, PGPOnePassSignature onePassSignature ) throws IOException
+    private static byte[] readSign( JcaPGPObjectFactory objectFactory, PGPOnePassSignature onePassSignature )
+            throws IOException
     {
         InputStream is = getInputStream( objectFactory );
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -48,11 +56,12 @@ public class PGPVerify
             bos.write( ch );
         }
 
-        return bos.toString( "UTF-8" );
+        return bos.toByteArray();
     }
 
 
-    private static void doVerify( JcaPGPObjectFactory objectFactory, PGPOnePassSignature onePassSignature ) throws IOException, PGPException
+    private static void doVerify( JcaPGPObjectFactory objectFactory, PGPOnePassSignature onePassSignature )
+            throws IOException, PGPException
     {
         PGPSignatureList signatures = ( PGPSignatureList ) objectFactory.nextObject();
 
@@ -71,7 +80,8 @@ public class PGPVerify
     }
 
 
-    private static PGPOnePassSignature getOnePassSignature( PGPPublicKey publicKey, JcaPGPObjectFactory pgpFact ) throws IOException, PGPException
+    private static PGPOnePassSignature getOnePassSignature( PGPPublicKey publicKey, JcaPGPObjectFactory pgpFact )
+            throws IOException, PGPException
     {
         PGPOnePassSignatureList p1 = ( PGPOnePassSignatureList ) pgpFact.nextObject();
 
@@ -83,9 +93,9 @@ public class PGPVerify
     }
 
 
-    private static JcaPGPObjectFactory getObjectFactory( String signedData ) throws IOException, PGPException
+    private static JcaPGPObjectFactory getObjectFactory( byte[] signedData ) throws IOException, PGPException
     {
-        InputStream in = PGPUtil.getDecoderStream( IOUtils.toInputStream( signedData ) );
+        InputStream in = PGPUtil.getDecoderStream( new ByteArrayInputStream( signedData ) );
 
         JcaPGPObjectFactory pgpFact = new JcaPGPObjectFactory( in );
 
@@ -93,5 +103,4 @@ public class PGPVerify
 
         return new JcaPGPObjectFactory( compressedData.getDataStream() );
     }
-
 }

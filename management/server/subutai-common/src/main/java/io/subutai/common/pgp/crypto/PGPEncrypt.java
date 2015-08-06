@@ -18,12 +18,19 @@ import org.bouncycastle.openpgp.PGPLiteralDataGenerator;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.operator.jcajce.JcePGPDataEncryptorBuilder;
 import org.bouncycastle.openpgp.operator.jcajce.JcePublicKeyKeyEncryptionMethodGenerator;
+import org.bouncycastle.util.encoders.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class PGPEncrypt
 {
-    public static String encrypt( String data, PGPPublicKey publicKey ) throws IOException, PGPException
+    private static final Logger log = LoggerFactory.getLogger( PGPEncrypt.class );
+
+
+    public static byte[] encrypt( byte[] data, PGPPublicKey publicKey ) throws IOException, PGPException
     {
+        log.debug( "Encrypting with: " + Hex.toHexString( publicKey.getFingerprint() ) );
         byte[] compressedData = compress( data );
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -37,17 +44,16 @@ public class PGPEncrypt
 
         aos.close();
 
-        return bos.toString( "UTF-8" );
+        return bos.toByteArray();
     }
 
 
     private static PGPEncryptedDataGenerator getEncryptedGenerator( PGPPublicKey publicKey )
     {
         PGPEncryptedDataGenerator encGen = new PGPEncryptedDataGenerator(
-                new JcePGPDataEncryptorBuilder( PGPEncryptedData.CAST5 )
-                        .setWithIntegrityPacket( true )
-                        .setSecureRandom( new SecureRandom() )
-                        .setProvider( "BC" ) );
+                new JcePGPDataEncryptorBuilder( PGPEncryptedData.CAST5 ).setWithIntegrityPacket( true )
+                                                                        .setSecureRandom( new SecureRandom() )
+                                                                        .setProvider( "BC" ) );
 
         encGen.addMethod( new JcePublicKeyKeyEncryptionMethodGenerator( publicKey ).setProvider( "BC" ) );
 
@@ -55,15 +61,16 @@ public class PGPEncrypt
     }
 
 
-    private static byte[] compress( String data ) throws IOException
+    private static byte[] compress( byte[] data ) throws IOException
     {
         PGPCompressedDataGenerator compressGen = new PGPCompressedDataGenerator( CompressionAlgorithmTags.ZIP );
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         OutputStream compressOut = compressGen.open( bos );
 
-        OutputStream os = new PGPLiteralDataGenerator().open( compressOut, PGPLiteralData.BINARY, "", data.length(), new Date() );
+        OutputStream os =
+                new PGPLiteralDataGenerator().open( compressOut, PGPLiteralData.BINARY, "", data.length, new Date() );
 
-        os.write( data.getBytes( "UTF-8" ) );
+        os.write( data );
 
         os.close();
 
@@ -71,5 +78,4 @@ public class PGPEncrypt
 
         return bos.toByteArray();
     }
-
 }

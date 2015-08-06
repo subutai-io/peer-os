@@ -30,15 +30,14 @@ public class PGPMessenger
 
 
     /**
-     * Send the data from the sender to the recipient:
-     * - signing with the sender's private key
-     * - encrypt with the recipient's public key
+     * Send the data from the sender to the recipient: - signing with the sender's private key - encrypt with the
+     * recipient's public key
      */
-    public String produce( String data ) throws PGPException
+    public byte[] produce( byte[] data ) throws PGPException
     {
         try
         {
-            String signedData = PGPSign.sign( data, SENDER_PRIVATE_KEY );
+            byte[] signedData = PGPSign.sign( data, SENDER_PRIVATE_KEY );
 
             return PGPEncrypt.encrypt( signedData, RECIPIENT_PUBLIC_KEY );
         }
@@ -50,15 +49,14 @@ public class PGPMessenger
 
 
     /**
-     * Get the data from the recipient to the sender:
-     * - decrypt with the sender's private key
-     * - verify the signature with the recipient's public key
+     * Get the data from the recipient to the sender: - decrypt with the sender's private key - verify the signature
+     * with the recipient's public key
      */
-    public String consume( String encData ) throws PGPException
+    public byte[] consume( byte[] encData ) throws PGPException
     {
         try
         {
-            String signedData = PGPDecrypt.decrypt( encData, SENDER_PRIVATE_KEY );
+            byte[] signedData = PGPDecrypt.decrypt( encData, SENDER_PRIVATE_KEY );
 
             return PGPVerify.verify( signedData, RECIPIENT_PUBLIC_KEY );
         }

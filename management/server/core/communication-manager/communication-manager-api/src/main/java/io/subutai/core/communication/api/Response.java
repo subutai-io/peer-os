@@ -1,10 +1,6 @@
 package io.subutai.core.communication.api;
 
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-
-
 /**
  * Wrapper class for response
  */
@@ -39,9 +35,10 @@ public class Response
     @Override
     public String toString()
     {
-        return new ToStringBuilder( this, ToStringStyle.SHORT_PREFIX_STYLE )
-                .append( "statusCode", getStatusCode() )
-                .append( "content", getContent() )
-                .toString();
+        final StringBuffer sb = new StringBuffer( "Response{" );
+        sb.append( "STATUS_CODE=" ).append( STATUS_CODE );
+        sb.append( ", CONTENT='" ).append( CONTENT ).append( '\'' );
+        sb.append( '}' );
+        return sb.toString();
     }
 }
