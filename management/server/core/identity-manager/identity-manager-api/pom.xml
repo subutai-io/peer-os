@@ -49,9 +49,9 @@
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
+      <artifactId>httpclient-osgi</artifactId>
       <scope>provided</scope>
-      <version>4.3.5</version>
+      <version>${org.apache.httpcomonents.httpclient.version}</version>
     </dependency>
 
   </dependencies>
