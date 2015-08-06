@@ -43,14 +43,12 @@ public class HttpsPostHelper
     private String uri;
 
     private HttpClient httpClient;
-    private boolean devMode = false;
     private SecurityMaterials securityMaterials;
 
 
-    public HttpsPostHelper( String uri, SecurityMaterials securityMaterials, boolean devMode ) throws Exception
+    public HttpsPostHelper( String uri, SecurityMaterials securityMaterials ) throws Exception
     {
         this.uri = uri;
-        this.devMode = devMode;
         this.securityMaterials = securityMaterials;
 
         httpClient = initHttpClient( securityMaterials.getKeyStore(), securityMaterials.getKeyStorePassword(),
@@ -80,8 +78,6 @@ public class HttpsPostHelper
 
         post.setEntity( getHttpEntity( new String( encData, "UTF-8" ) ) );
 
-//        httpClient.getParams().setParameter("http.protocol.version", HttpVersion.HTTP_1_1);
-//        httpClient.getParams().setParameter( "http.protocol.content-charset", "UTF-8" );
         HttpResponse response = httpClient.execute( post );
 
         return new Response( response.getStatusLine().getStatusCode(), readContent( response ) );
@@ -95,13 +91,13 @@ public class HttpsPostHelper
 
         params.add( new BasicNameValuePair( "envelope", envelope ) );
 
-        if ( devMode )
+        if ( securityMaterials.isDevMode() )
         {
             params.add( new BasicNameValuePair( "fingerprint",
-                    Hex.encodeHexString( securityMaterials.getRecipientGPGPublicKey().getFingerprint() ) ) );
+                    Hex.encodeHexString( securityMaterials.getSenderGPGPublicKey().getFingerprint() ) ) );
         }
 
-        return new UrlEncodedFormEntity( params );
+        return new UrlEncodedFormEntity( params, "UTF-8" );
     }
 
 

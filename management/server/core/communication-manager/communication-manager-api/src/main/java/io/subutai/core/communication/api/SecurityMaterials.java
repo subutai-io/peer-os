@@ -33,4 +33,8 @@ public interface SecurityMaterials
     TrustStrategy getTrustStrategy();
 
     void setTrustStrategy( TrustStrategy trustStrategy );
+
+    PGPPublicKey getSenderGPGPublicKey() throws PGPKeyNotFound, PGPException;
+
+    boolean isDevMode();
 }
