@@ -62,56 +62,20 @@ public class CommunicationManagerImpl implements CommunicationManager
         log.debug( String.format( "Sender: %s. Recipient:%s", senderKeyId, recipientKeyId ) );
 
         SecurityMaterials securityMaterials =
-                new FileSystemSecurityMaterials( "/root/keys", /*senderKeyId, recipientKeyId,*/
-                        "416924b9e3ca50d43286e1c32b91c22bdf764422", "8120aba66000a01bd8e3020f202bc7d1835422f6", "PKCS12",
-                        keyStorePasswordCallback, privateKeyPasswordCallback );
-
-        try
-        {
-            new ConsoleCallbackHandler( "jks123" ).handle( new Callback[] { keyStorePasswordCallback } );
-            new ConsoleCallbackHandler( "abc123" ).handle( new Callback[] { privateKeyPasswordCallback } );
-
-            PGPPrivateKey aliceSecretKey =
-                    PGPKeyHelper.readPrivateKey( "/root/keys/alice.secret.gpg", privateKeyPasswordCallback );
-            PGPPublicKey alicePublicKey = PGPKeyHelper.readPublicKey( "/root/keys/alice.public.gpg" );
-            PGPPrivateKey bobSecretKey = PGPKeyHelper.readPrivateKey( "/root/keys/bobby.secret.gpg", "abc123" );
-            PGPPublicKey bobPublicKey = PGPKeyHelper.readPublicKey( "/root/keys/bobby.public.gpg" );
+                new BundleSecurityMaterials( bundleContext.getBundle(), senderKeyId, recipientKeyId, "PKCS12",
+                        keyStorePasswordCallback, privateKeyPasswordCallback, true );
 
 
-            PGPMessenger pgpMessenger = new PGPMessenger( aliceSecretKey, bobPublicKey );
-
-            byte[] encryptedData = pgpMessenger.produce( data.getBytes( "UTF-8" ) );
-
-            log.debug( new String( encryptedData ) );
-
-            pgpMessenger = new PGPMessenger( bobSecretKey, alicePublicKey );
-
-            byte[] result = pgpMessenger.consume( encryptedData );
-
-            System.out.println( new String( result ) );
-        }
-        catch ( PGPException e )
-        {
-            e.printStackTrace();
-        }
-        catch ( IOException e )
-        {
-            e.printStackTrace();
-        }
-        catch ( UnsupportedCallbackException e )
-        {
-            e.printStackTrace();
-        }
         String result = "";
         try
         {
             new ConsoleCallbackHandler( "q1wqgzk" ).handle( new Callback[] { keyStorePasswordCallback } );
             new ConsoleCallbackHandler( "abc123" ).handle( new Callback[] { privateKeyPasswordCallback } );
 
-            result = new HttpsClient().post( uri.toString(), data, securityMaterials, false );
+            result = HttpsClient.post( uri.toString(), data, securityMaterials );
 
-            //            keyStorePasswordCallback.clearPassword();
-            //            privateKeyPasswordCallback.clearPassword();
+            keyStorePasswordCallback.clearPassword();
+            privateKeyPasswordCallback.clearPassword();
         }
         catch ( Exception e )
         {
@@ -179,5 +143,50 @@ public class CommunicationManagerImpl implements CommunicationManager
             result.remove( secretKey );
         }
         return result;
+    }
+
+
+    private void testCrypto()
+    {
+        try
+        {
+            PasswordCallback keyStorePasswordCallback =
+                    new PasswordCallback( "Please enter key store password:", true );
+            PasswordCallback privateKeyPasswordCallback =
+                    new PasswordCallback( "Please enter GPG private key password:", true );
+            new ConsoleCallbackHandler( "jks123" ).handle( new Callback[] { keyStorePasswordCallback } );
+            new ConsoleCallbackHandler( "abc123" ).handle( new Callback[] { privateKeyPasswordCallback } );
+
+            PGPPrivateKey aliceSecretKey =
+                    PGPKeyHelper.readPrivateKey( "/root/keys/alice.secret.gpg", privateKeyPasswordCallback );
+            PGPPublicKey alicePublicKey = PGPKeyHelper.readPublicKey( "/root/keys/alice.public.gpg" );
+            PGPPrivateKey bobSecretKey = PGPKeyHelper.readPrivateKey( "/root/keys/bobby.secret.gpg", "abc123" );
+            PGPPublicKey bobPublicKey = PGPKeyHelper.readPublicKey( "/root/keys/bobby.public.gpg" );
+
+
+            PGPMessenger pgpMessenger = new PGPMessenger( aliceSecretKey, bobPublicKey );
+
+            byte[] encryptedData = pgpMessenger.produce( "Test".getBytes( "UTF-8" ) );
+
+            log.debug( new String( encryptedData ) );
+
+            pgpMessenger = new PGPMessenger( bobSecretKey, alicePublicKey );
+
+            byte[] result = pgpMessenger.consume( encryptedData );
+
+            System.out.println( new String( result ) );
+        }
+        catch ( PGPException e )
+        {
+            e.printStackTrace();
+        }
+        catch ( IOException e )
+        {
+            e.printStackTrace();
+        }
+        catch ( UnsupportedCallbackException e )
+        {
+            e.printStackTrace();
+        }
     }
 }

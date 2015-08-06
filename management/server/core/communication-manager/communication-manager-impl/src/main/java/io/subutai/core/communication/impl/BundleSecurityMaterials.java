@@ -38,13 +38,15 @@ public class BundleSecurityMaterials implements SecurityMaterials
     private String senderKeyId;
     private String recipientKeyId;
     private TrustStrategy trustStrategy;
+    private boolean devMode = false;
 
 
     public BundleSecurityMaterials( Bundle bundle, String senderKeyId, String receiverKeyId, String keyStoreType,
                                     final PasswordCallback keyStorePasswordCallback,
-                                    final PasswordCallback privateKeyPasswordCallback )
+                                    final PasswordCallback privateKeyPasswordCallback, boolean devMode )
     {
         this.bundle = bundle;
+        this.devMode = devMode;
         this.senderKeyId = senderKeyId;
         this.recipientKeyId = receiverKeyId;
         this.keyStoreType = keyStoreType;
@@ -56,9 +58,11 @@ public class BundleSecurityMaterials implements SecurityMaterials
 
     public BundleSecurityMaterials( Bundle bundle, String senderKeyId, String receiverKeyId, String keyStoreType,
                                     final PasswordCallback keyStorePasswordCallback,
-                                    final PasswordCallback privateKeyPasswordCallback, TrustStrategy trustStrategy )
+                                    final PasswordCallback privateKeyPasswordCallback, boolean devMode,
+                                    TrustStrategy trustStrategy )
     {
         this.bundle = bundle;
+        this.devMode = devMode;
         this.senderKeyId = senderKeyId;
         this.recipientKeyId = receiverKeyId;
         this.keyStoreType = keyStoreType;
@@ -106,6 +110,34 @@ public class BundleSecurityMaterials implements SecurityMaterials
             throw new PGPKeyNotFound( filePath );
         }
         return result;
+    }
+
+
+    @Override
+    public PGPPublicKey getSenderGPGPublicKey() throws PGPKeyNotFound, PGPException
+    {
+        String filePath = String.format( "%skeys%s%s.public.gpg", File.separator, File.separator, senderKeyId );
+
+        PGPPublicKey result;
+        try
+        {
+            log.debug( "Reading " + filePath );
+            InputStream is = bundle.getEntry( filePath ).openStream();
+            result = PGPKeyHelper.readPublicKey( is );
+            is.close();
+        }
+        catch ( IOException e )
+        {
+            throw new PGPKeyNotFound( filePath );
+        }
+        return result;
+    }
+
+
+    @Override
+    public boolean isDevMode()
+    {
+        return devMode;
     }
 
 

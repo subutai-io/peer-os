@@ -11,4 +11,10 @@ public class CommunicationException extends Exception
     {
         super( message, cause );
     }
+
+
+    public CommunicationException( final String message )
+    {
+        super( message );
+    }
 }

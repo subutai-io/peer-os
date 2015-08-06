@@ -24,9 +24,9 @@ public class ListCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        System.out.println("Avilable recipients:");
+        System.out.println("Available recipients:");
         List<String> list = communicationManager.getRecipients();
-        System.out.println( "Found " + list.size() + " recipients" );
+        System.out.println( "Found " + list.size() + " recipient(s)" );
         for ( String url : list )
         {
             System.out.println( url );
