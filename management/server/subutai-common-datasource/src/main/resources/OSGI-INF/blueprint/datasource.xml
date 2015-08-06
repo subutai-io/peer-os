@@ -6,7 +6,7 @@
   <!-- Allow the use of system properties -->
   <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
 
-  <!--***********  Subutai DataSource **************** -->
+  <!--***********  Subutai Common DataSource **************** -->
 
   <bean id="subutaiJDBC" class="org.h2.jdbcx.JdbcDataSource">
     <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/subutaiDb;AUTO_SERVER=true" />
@@ -20,7 +20,7 @@
     </service-properties>
   </service>
 
-  <!--***********  Plugins DataSource **************** -->
+  <!--***********  Plugins Common DataSource **************** -->
 
   <bean id="pluginsJDBC" class="org.h2.jdbcx.JdbcDataSource">
     <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/plugins/pluginsDb;AUTO_SERVER=true" />
