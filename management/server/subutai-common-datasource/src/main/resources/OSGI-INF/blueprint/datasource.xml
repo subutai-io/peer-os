@@ -5,130 +5,25 @@
     >
   <!-- Allow the use of system properties -->
   <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
-  <!-- *********************Channel Manager ************************ -->
 
-  <bean id="channelManagerJDBC" class="org.h2.jdbcx.JdbcDataSource" activation="eager">
-    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/channelManagerDb" />
+  <!--***********  Subutai Common DataSource **************** -->
+
+  <bean id="subutaiJDBC" class="org.h2.jdbcx.JdbcDataSource">
+    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/subutaiDb;AUTO_SERVER=true" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
 
-  <service interface="javax.sql.DataSource" ref="channelManagerJDBC" activation="eager">
+  <service interface="javax.sql.DataSource" ref="subutaiJDBC">
     <service-properties>
-      <entry key="osgi.jndi.service.name" value="openjpa/channelManagerDS" />
+      <entry key="osgi.jndi.service.name" value="openjpa/subutaiDS" />
     </service-properties>
   </service>
 
-  <!-- *********************Security Manager ************************ -->
+  <!--***********  Plugins Common DataSource **************** -->
 
-  <bean id="securityManagerJDBC" class="org.h2.jdbcx.JdbcDataSource" activation="eager">
-    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/securityDb" />
-    <property name="user" value="sa" />
-    <property name="password" value="" />
-  </bean>
-
-  <service interface="javax.sql.DataSource" ref="securityManagerJDBC" activation="eager">
-    <service-properties>
-      <entry key="osgi.jndi.service.name" value="openjpa/securityManagerDS" />
-    </service-properties>
-  </service>
-
-  <!-- *********************Environment Manager ************************ -->
-
-  <bean id="envManagerJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/environmentDb" />
-    <property name="user" value="sa" />
-    <property name="password" value="" />
-  </bean>
-
-  <service interface="javax.sql.DataSource" ref="envManagerJDBC">
-    <service-properties>
-      <entry key="osgi.jndi.service.name" value="openjpa/envManagerDS" />
-    </service-properties>
-  </service>
-  <!-- *********************Environment Manager 2************************ -->
-
-  <bean id="envManagerJDBC2" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/environmentDb2" />
-    <property name="user" value="sa" />
-    <property name="password" value="" />
-  </bean>
-
-  <service interface="javax.sql.DataSource" ref="envManagerJDBC2">
-    <service-properties>
-      <entry key="osgi.jndi.service.name" value="openjpa/envManagerDS2" />
-    </service-properties>
-  </service>
-
-  <!-- ********************* DataSource Common Service ************************ -->
-
-  <bean id="commonServiceJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/commonDb" />
-    <property name="user" value="sa" />
-    <property name="password" value="" />
-  </bean>
-
-  <service interface="javax.sql.DataSource" ref="commonServiceJDBC">
-    <service-properties>
-      <entry key="osgi.jndi.service.name" value="openjpa/commonService" />
-    </service-properties>
-  </service>
-
-  <!-- ********************* Peer Manager ************************ -->
-
-  <bean id="peerManagerJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/peerManagerDb" />
-    <property name="user" value="sa" />
-    <property name="password" value="" />
-  </bean>
-
-  <service interface="javax.sql.DataSource" ref="peerManagerJDBC">
-    <service-properties>
-      <entry key="osgi.jndi.service.name" value="openjpa/peerManagerDS" />
-    </service-properties>
-  </service>
-
-  <!-- ********************* Messenger ************************ -->
-
-  <bean id="messengerJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/messengerDb" />
-    <property name="user" value="sa" />
-    <property name="password" value="" />
-  </bean>
-
-  <service interface="javax.sql.DataSource" ref="messengerJDBC">
-    <service-properties>
-      <entry key="osgi.jndi.service.name" value="openjpa/messengerDS" />
-    </service-properties>
-  </service>
-
-  <bean id="trackerJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/trackerDb" />
-    <property name="user" value="sa" />
-    <property name="password" value="" />
-  </bean>
-
-  <service interface="javax.sql.DataSource" ref="trackerJDBC">
-    <service-properties>
-      <entry key="osgi.jndi.service.name" value="openjpa/trackerDS" />
-    </service-properties>
-  </service>
-
-  <bean id="metricJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/metricDb" />
-    <property name="user" value="sa" />
-    <property name="password" value="" />
-  </bean>
-
-  <service interface="javax.sql.DataSource" ref="metricJDBC">
-    <service-properties>
-      <entry key="osgi.jndi.service.name" value="openjpa/metricDS" />
-    </service-properties>
-  </service>
-
-  <!--Plugins DataSource-->
   <bean id="pluginsJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/plugins/pluginsDb" />
+    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/plugins/pluginsDb;AUTO_SERVER=true" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
