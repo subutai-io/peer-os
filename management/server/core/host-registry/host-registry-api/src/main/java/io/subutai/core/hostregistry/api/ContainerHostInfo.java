@@ -7,6 +7,8 @@ import io.subutai.common.host.HostInfo;
 
 /**
  * Container info
+ *
+ * TODO add method getName() which returns lxc container name
  */
 public interface ContainerHostInfo extends HostInfo
 {

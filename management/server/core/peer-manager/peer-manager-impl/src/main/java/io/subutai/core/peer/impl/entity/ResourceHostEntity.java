@@ -19,6 +19,13 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
@@ -37,14 +44,7 @@ import io.subutai.core.peer.api.ResourceHost;
 import io.subutai.core.peer.api.ResourceHostException;
 import io.subutai.core.peer.impl.container.CreateContainerTask;
 import io.subutai.core.peer.impl.container.DestroyContainerTask;
-
 import io.subutai.core.registry.api.TemplateRegistry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -167,7 +167,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
     }
 
-    //TODO remove all system specific command and paths, use a dedicated binding for this
+
     public void startContainerHost( final ContainerHost containerHost ) throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
@@ -183,8 +183,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
 
         RequestBuilder requestBuilder =
-                new RequestBuilder( String.format( "/usr/bin/lxc-start -n %s -d", containerHost.getHostname() ) )
-                        .withTimeout( 1 ).daemon();
+                new RequestBuilder( String.format( "subutai start %s", containerHost.getHostname() ) ).withTimeout( 1 )
+                                                                                                      .daemon();
         try
         {
             commandUtil.execute( requestBuilder, this );
@@ -221,7 +221,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
     }
 
-    //TODO remove all system specific command and paths, use a dedicated binding for this
+
     public void stopContainerHost( final ContainerHost containerHost ) throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
@@ -237,7 +237,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
 
         RequestBuilder requestBuilder =
-                new RequestBuilder( String.format( "/usr/bin/lxc-stop -n %s", containerHost.getHostname() ) )
+                new RequestBuilder( String.format( "subutai stop %s", containerHost.getHostname() ) )
                         .withTimeout( 120 );
         try
         {
