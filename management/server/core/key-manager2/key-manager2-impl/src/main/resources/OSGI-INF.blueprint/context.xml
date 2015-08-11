@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+    <bean id="keyManager2" class="io.subutai.core.key2.impl.KeyManager2Impl"
+          scope="singleton" activation="eager">
+    </bean>
+
+    <service ref="keyManager2" interface="io.subutai.core.key2.api.KeyManager2" />
+
+</blueprint>
