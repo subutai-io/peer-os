@@ -52,8 +52,8 @@ public class TemplateRegistryImpl implements TemplateRegistry
     private static final String TEMPLATE_IS_NULL_MSG = "Template name is null or empty";
     private static final String LXC_ARCH_IS_NULL_MSG = "Lxc Arch is null or empty";
     private static final String TEMPLATE_NOT_FOUND_MSG = "Template %s not found";
-    //TODO change this path to use Common.SUBUTAI_APP_DATA_PATH
-    private static final String REPO_ROOT_PATH = "/var/lib/git/subutai.git/";
+    //TODO make sure that Git is installed to a path prefixed by Common.SUBUTAI_APP_DATA_PATH
+    private static final String REPO_ROOT_PATH = String.format( "%s/git/subutai.git/", Common.SUBUTAI_APP_DATA_PATH );
     private final ExpiringCache<String, Boolean> templateDownloadTokens = new ExpiringCache<>();
 
 
