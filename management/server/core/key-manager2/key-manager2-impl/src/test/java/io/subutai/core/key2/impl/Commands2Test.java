@@ -1,5 +1,6 @@
 package io.subutai.core.key2.impl;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
@@ -11,6 +12,7 @@ import static org.junit.Assert.assertNotNull;
  *
  *
  */
+@Ignore
 public class Commands2Test {
 
     private String EMAIL_FOR_TEST = "test@email.com";

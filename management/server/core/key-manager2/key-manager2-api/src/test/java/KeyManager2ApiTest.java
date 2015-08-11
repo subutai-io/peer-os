@@ -1,4 +1,6 @@
 import io.subutai.core.key2.api.KeyManagerException;
+
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -10,6 +12,7 @@ public class KeyManager2ApiTest
 {
     private String errorMessage = "ERROR";
     @Test
+    @Ignore
     public void testException() throws Exception
     {
         Exception cause = new Exception();
