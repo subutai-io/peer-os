@@ -14,7 +14,8 @@
     <class>io.subutai.core.identity.impl.entity.CliCommandEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
-      <property name="openjpa.Log" value="DefaultLevel=WARN, Runtime=INFO, Tool=INFO, SQL=INFO" />
+      <!--<property name="openjpa.Log" value="DefaultLevel=WARN, Runtime=INFO, Tool=INFO, SQL=INFO" /> -->
+      <property name="openjpa.Log" value="DefaultLevel=WARN" />
       <property name="openjpa.ConnectionFactoryProperties" value="PrintParameters=true" />
       <property name="openjpa.RuntimeUnenhancedClasses" value="supported" />
       <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema" />
