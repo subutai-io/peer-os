@@ -9,13 +9,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Set;
-
 import javax.ws.rs.core.Response;
-
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-
 import com.google.common.collect.Sets;
-
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 
