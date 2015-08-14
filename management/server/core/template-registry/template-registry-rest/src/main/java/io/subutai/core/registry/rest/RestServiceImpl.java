@@ -15,17 +15,6 @@ import java.util.Set;
 
 import javax.ws.rs.core.Response;
 
-import io.subutai.common.datatypes.TemplateVersion;
-import io.subutai.common.protocol.Template;
-import io.subutai.common.settings.Common;
-import io.subutai.common.util.FileUtil;
-import io.subutai.common.util.JsonUtil;
-import io.subutai.core.peer.api.ManagementHost;
-import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.registry.api.RegistryException;
-import io.subutai.core.registry.api.TemplateRegistry;
-import io.subutai.core.repository.api.RepositoryException;
-import io.subutai.core.repository.api.RepositoryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +26,18 @@ import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import io.subutai.common.datatypes.TemplateVersion;
+import io.subutai.common.protocol.Template;
+import io.subutai.common.settings.Common;
+import io.subutai.common.util.FileUtil;
+import io.subutai.common.util.JsonUtil;
+import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.registry.api.RegistryException;
+import io.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.repository.api.RepositoryException;
+import io.subutai.core.repository.api.RepositoryManager;
 
 
 /**
@@ -162,10 +163,12 @@ public class RestServiceImpl implements RestService
                 ManagementHost managementHost = peerManager.getLocalPeer().getManagementHost();
 
                 String configContent = managementHost.readFile(
-                        String.format( "/tmp/%s/%s", packageName.replace( ".deb", "" ), configPath.toString() ) );
+                        String.format( "%s/tmp/%s/%s", Common.SUBUTAI_APP_DATA_PATH, packageName.replace( ".deb", "" ),
+                                configPath.toString() ) );
 
                 String packagesContent = managementHost.readFile(
-                        String.format( "/tmp/%s/%s", packageName.replace( ".deb", "" ), packagesPath.toString() ) );
+                        String.format( "%s/tmp/%s/%s", Common.SUBUTAI_APP_DATA_PATH, packageName.replace( ".deb", "" ),
+                                packagesPath.toString() ) );
 
                 //calculate md5sum of template
                 HashCode md5 = com.google.common.io.Files.hash( path.toFile(), Hashing.md5() );
