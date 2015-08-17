@@ -119,7 +119,7 @@ public class EnvironmentBuilder
             }
             catch ( PeerException e )
             {
-                throw new EnvironmentBuildException( "Error setting up tunnels to remote getPeerInfos", e );
+                throw new EnvironmentBuildException( "Error setting up tunnels to remote peers", e );
             }
         }
 
