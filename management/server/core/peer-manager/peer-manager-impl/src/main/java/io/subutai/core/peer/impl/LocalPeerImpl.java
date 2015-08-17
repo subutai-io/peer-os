@@ -1270,8 +1270,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 if ( managementHost == null )
                 {
-                    managementHost =
-                            new ManagementHostEntity( getId().toString(), resourceHostInfo, externalIpInterface );
+                    managementHost = new ManagementHostEntity( getId().toString(), resourceHostInfo );
                     ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
                     try
                     {
