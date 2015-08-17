@@ -2,7 +2,7 @@ package io.subutai.core.network.api;
 
 
 /**
- * Represents tunnel between getPeerInfos
+ * Represents tunnel between peers
  */
 public interface Tunnel
 {

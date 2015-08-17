@@ -119,7 +119,7 @@ public class MonitorImpl implements Monitor
 
         Set<Peer> peers = Sets.newHashSet();
 
-        //determine container getPeerInfos
+        //determine containers' host peers
         for ( ContainerHost containerHost : containerHosts )
         {
             try
