@@ -139,7 +139,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             Matcher m = LXC_STATE_PATTERN.matcher( outputLines[2] );
             if ( m.find() )
             {
-                return ContainerState.valueOf( m.group( 2 ) );
+                return ContainerState.valueOf( m.group( 3 ) );
             }
         }
 
