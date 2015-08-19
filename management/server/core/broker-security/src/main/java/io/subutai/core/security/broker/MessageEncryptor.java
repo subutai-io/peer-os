@@ -24,13 +24,13 @@ public class MessageEncryptor implements TextMessagePostProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( MessageEncryptor.class.getName() );
 
-    private static final String PUBLIC_KEYRING = "dummy.pkr";
-    private static final String SECRET_KEYRING = "dummy.skr";
+    public static final String PUBLIC_KEYRING = "dummy.pkr";
+    public static final String SECRET_KEYRING = "dummy.skr";
 
-    private static final String PUBLIC_KEY_ID = "e2451337c277dbf1";
-    private static final String SECRET_KEY_ID = "d558f9a4a0b450b3";
+    public static final String PUBLIC_KEY_ID = "e2451337c277dbf1";
+    public static final String SECRET_KEY_ID = "d558f9a4a0b450b3";
 
-    private static final String SECRET_PWD = "12345678";
+    public static final String SECRET_PWD = "12345678";
 
 
     @Override
@@ -74,7 +74,7 @@ public class MessageEncryptor implements TextMessagePostProcessor
     }
 
 
-    public InputStream findFile( final String file )
+    public static InputStream findFile( final String file )
     {
         return MessageEncryptor.class.getClassLoader().getResourceAsStream( file );
     }
