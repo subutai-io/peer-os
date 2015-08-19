@@ -40,15 +40,27 @@ public class MessageRoutingListener implements MessageListener
     }
 
 
-    public void setByteMessagePreProcessor( ByteMessageInterceptor byteMessagePreProcessor )
+    public void addByteMessagePreProcessor( ByteMessageInterceptor byteMessagePreProcessor )
     {
         this.byteMessageInterceptor = byteMessagePreProcessor;
     }
 
 
-    public void setTextMessagePreProcessor( TextMessageInterceptor textMessagePreProcessor )
+    public void removeByteMessagePreProcessor( ByteMessageInterceptor byteMessagePreProcessor )
+    {
+        this.byteMessageInterceptor = null;
+    }
+
+
+    public void addTextMessagePreProcessor( TextMessageInterceptor textMessagePreProcessor )
     {
         this.textMessageInterceptor = textMessagePreProcessor;
+    }
+
+
+    public void removeTextMessagePreProcessor( TextMessageInterceptor textMessagePreProcessor )
+    {
+        this.textMessageInterceptor = null;
     }
 
 

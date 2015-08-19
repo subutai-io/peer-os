@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <bean id="encryptor" scope="singleton" class="io.subutai.core.security.broker.MessageEncryptor">
+
+  </bean>
+
+  <bean id="decryptor" scope="singleton" class="io.subutai.core.security.broker.MessageDecryptor">
+
+  </bean>
+
+  <service ref="encryptor" interface="io.subutai.core.broker.api.TextMessagePostProcessor" />
+
+  <service ref="decryptor" interface="io.subutai.core.broker.api.ByteMessagePreProcessor" />
+
+</blueprint>

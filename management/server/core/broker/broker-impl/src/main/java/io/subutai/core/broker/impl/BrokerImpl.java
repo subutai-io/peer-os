@@ -117,35 +117,76 @@ public class BrokerImpl implements Broker
     }
 
 
-    public void setByteMessagePreProcessor( final ByteMessagePreProcessor byteMessagePreProcessor )
+    public void addByteMessagePreProcessor( final ByteMessagePreProcessor byteMessagePreProcessor )
     {
-        Preconditions.checkNotNull( byteMessagePreProcessor );
-
-        messageRouter.setByteMessagePreProcessor( byteMessagePreProcessor );
+        if ( byteMessagePreProcessor != null )
+        {
+            messageRouter.addByteMessagePreProcessor( byteMessagePreProcessor );
+        }
     }
 
 
-    public void setTextMessagePreProcessor( final TextMessagePreProcessor textMessagePreProcessor )
+    public void removeByteMessagePreProcessor( final ByteMessagePreProcessor byteMessagePreProcessor )
     {
-        Preconditions.checkNotNull( textMessagePreProcessor );
 
-        messageRouter.setTextMessagePreProcessor( textMessagePreProcessor );
+        if ( byteMessagePreProcessor != null )
+        {
+            messageRouter.removeByteMessagePreProcessor( byteMessagePreProcessor );
+        }
     }
 
 
-    public void setByteMessagePostProcessor( final ByteMessagePostProcessor byteMessagePostProcessor )
+    public void addTextMessagePreProcessor( final TextMessagePreProcessor textMessagePreProcessor )
     {
-        Preconditions.checkNotNull( byteMessagePostProcessor );
-
-        this.byteMessagePostProcessor = byteMessagePostProcessor;
+        if ( textMessagePreProcessor != null )
+        {
+            messageRouter.addTextMessagePreProcessor( textMessagePreProcessor );
+        }
     }
 
 
-    public void setTextMessagePostProcessor( final TextMessagePostProcessor textMessagePostProcessor )
+    public void removeTextMessagePreProcessor( final TextMessagePreProcessor textMessagePreProcessor )
     {
-        Preconditions.checkNotNull( textMessagePostProcessor );
+        if ( textMessagePreProcessor != null )
+        {
+            messageRouter.removeTextMessagePreProcessor( textMessagePreProcessor );
+        }
+    }
 
-        this.textMessagePostProcessor = textMessagePostProcessor;
+
+    public void addByteMessagePostProcessor( final ByteMessagePostProcessor byteMessagePostProcessor )
+    {
+        if ( byteMessagePostProcessor != null )
+        {
+            this.byteMessagePostProcessor = byteMessagePostProcessor;
+        }
+    }
+
+
+    public void removeByteMessagePostProcessor( final ByteMessagePostProcessor byteMessagePostProcessor )
+    {
+        if ( byteMessagePostProcessor != null )
+        {
+            this.byteMessagePostProcessor = null;
+        }
+    }
+
+
+    public void addTextMessagePostProcessor( final TextMessagePostProcessor textMessagePostProcessor )
+    {
+        if ( textMessagePostProcessor != null )
+        {
+            this.textMessagePostProcessor = textMessagePostProcessor;
+        }
+    }
+
+
+    public void removeTextMessagePostProcessor( final TextMessagePostProcessor textMessagePostProcessor )
+    {
+        if ( textMessagePostProcessor != null )
+        {
+            this.textMessagePostProcessor = null;
+        }
     }
 
 

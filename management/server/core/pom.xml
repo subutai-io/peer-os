@@ -36,7 +36,6 @@
     <module>wol-manager</module>
     <module>key-manager</module>
     <module>key-manager2</module>
-    <!--<module>backup-manager</module>-->
     <module>plugin-manager</module>
     <module>env-manager</module>
     <module>identity-manager</module>
@@ -47,6 +46,7 @@
     <module>ssl-context-manager</module>
     <module>subutai-cli-rbac</module>
     <module>key-server</module>
+    <module>broker-security</module>
   </modules>
 
 </project>
