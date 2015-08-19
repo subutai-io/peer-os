@@ -16,6 +16,15 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
+  <reference id="byteMessagePreProcessor" availability="optional"
+             interface="io.subutai.core.broker.api.ByteMessagePreProcessor" />
+  <reference id="byteMessagePostProcessor" availability="optional"
+             interface="io.subutai.core.broker.api.ByteMessagePostProcessor" />
+  <reference id="textMessagePreProcessor" availability="optional"
+             interface="io.subutai.core.broker.api.TextMessagePreProcessor" />
+  <reference id="textMessagePostProcessor" availability="optional"
+             interface="io.subutai.core.broker.api.TextMessagePostProcessor" />
+
   <bean id="broker"
         class="io.subutai.core.broker.impl.BrokerImpl"
         init-method="init" destroy-method="dispose" scope="singleton" activation="eager">
@@ -24,6 +33,11 @@
     <argument value="${isPersistent}" />
     <argument value="${messageTimeout}" />
     <argument value="${idleConnectionTimeout}" />
+
+    <property name="byteMessagePreProcessor" ref="byteMessagePreProcessor" />
+    <property name="byteMessagePostProcessor" ref="byteMessagePostProcessor" />
+    <property name="textMessagePreProcessor" ref="textMessagePreProcessor" />
+    <property name="textMessagePostProcessor" ref="textMessagePostProcessor" />
   </bean>
 
   <reference-list id="byteMessageLstnr"
