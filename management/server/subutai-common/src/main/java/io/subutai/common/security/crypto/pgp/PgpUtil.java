@@ -136,12 +136,12 @@ public class PgpUtil
     }
 
 
-    public static byte[] decrypt( final byte[] message, final InputStream secretKey, final String secretPwd )
+    public static byte[] decrypt( final byte[] message, final InputStream secretKeyRing, final String secretPwd )
             throws PGPException
     {
         try
         {
-            final PGPLiteralData msg = asLiteral( message, secretKey, secretPwd );
+            final PGPLiteralData msg = asLiteral( message, secretKeyRing, secretPwd );
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             Streams.pipeAll( msg.getInputStream(), out );
             return out.toByteArray();
