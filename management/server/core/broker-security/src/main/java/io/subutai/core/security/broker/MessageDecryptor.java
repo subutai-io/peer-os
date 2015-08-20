@@ -61,8 +61,7 @@ public class MessageDecryptor implements ByteMessagePreProcessor
                             new String( contentAndSignatures.getDecryptedContent() ) ) );
                 }
 
-                return PgpUtil.decryptAndVerify( message, peerKeyForDecrypting, MessageEncryptor.SECRET_PWD,
-                        hostKeyForVerifying );
+                return contentAndSignatures.getDecryptedContent();
             }
         }
         catch ( Exception e )
