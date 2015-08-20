@@ -20,7 +20,7 @@ import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 
 
-public class PgpUtilTest
+public class PGPEncryptionUtilTest
 {
     private static final String MESSAGE = "hello";
     private static final String PUBLIC_KEYRING = "dummy.pkr";
@@ -36,27 +36,27 @@ public class PgpUtilTest
 
     public static InputStream findFile( final String file )
     {
-        return PgpUtilTest.class.getClassLoader().getResourceAsStream( file );
+        return PGPEncryptionUtilTest.class.getClassLoader().getResourceAsStream( file );
     }
 
 
     @Test
     public void testSignVerify() throws Exception
     {
-        PGPSecretKey secretKey = PgpUtil.findSecretKeyById( findFile( SECRET_KEYRING ), SECRET_KEY_ID );
-        byte[] signedMessage = PgpUtil.sign( MESSAGE.getBytes(), secretKey, SECRET_PWD, true );
+        PGPSecretKey secretKey = PGPEncryptionUtil.findSecretKeyById( findFile( SECRET_KEYRING ), SECRET_KEY_ID );
+        byte[] signedMessage = PGPEncryptionUtil.sign( MESSAGE.getBytes(), secretKey, SECRET_PWD, true );
 
-        assertTrue( PgpUtil.verify( signedMessage, secretKey.getPublicKey() ) );
+        assertTrue( PGPEncryptionUtil.verify( signedMessage, secretKey.getPublicKey() ) );
     }
 
 
     @Test
     public void testEncryptAndDecrypt() throws Exception
     {
-        byte[] encryptedMessage = PgpUtil.encrypt( MESSAGE.getBytes(),
-                PgpUtil.findPublicKeyById( findFile( PUBLIC_KEYRING ), PUBLIC_KEY_ID ), true );
+        byte[] encryptedMessage = PGPEncryptionUtil.encrypt( MESSAGE.getBytes(),
+                PGPEncryptionUtil.findPublicKeyById( findFile( PUBLIC_KEYRING ), PUBLIC_KEY_ID ), true );
 
-        byte[] decryptedMessage = PgpUtil.decrypt( encryptedMessage, findFile( SECRET_KEYRING ), SECRET_PWD );
+        byte[] decryptedMessage = PGPEncryptionUtil.decrypt( encryptedMessage, findFile( SECRET_KEYRING ), SECRET_PWD );
 
         assertTrue( Arrays.equals( MESSAGE.getBytes(), decryptedMessage ) );
     }
@@ -66,25 +66,25 @@ public class PgpUtilTest
     public void testSignEncryptAndDecryptVerify() throws Exception
     {
         PGPSecretKey signingKey =
-                PgpUtil.findSecretKeyByFingerprint( findFile( SECRET_KEYRING ), SECRET_KEY_FINGERPRINT );
+                PGPEncryptionUtil.findSecretKeyByFingerprint( findFile( SECRET_KEYRING ), SECRET_KEY_FINGERPRINT );
         PGPPublicKey encryptingKey =
-                PgpUtil.findPublicKeyByFingerprint( findFile( PUBLIC_KEYRING ), PUBLIC_KEY_FINGERPRINT );
+                PGPEncryptionUtil.findPublicKeyByFingerprint( findFile( PUBLIC_KEYRING ), PUBLIC_KEY_FINGERPRINT );
 
         byte[] signedAndEncryptedMessage =
-                PgpUtil.signAndEncrypt( MESSAGE.getBytes(), signingKey, SECRET_PWD, encryptingKey, true );
+                PGPEncryptionUtil.signAndEncrypt( MESSAGE.getBytes(), signingKey, SECRET_PWD, encryptingKey, true );
 
-        PGPSecretKey decryptingSecretKey = PgpUtil.findSecretKeyByFingerprint( findFile( SECRET_KEYRING ),
-                PgpUtil.BytesToHex( encryptingKey.getFingerprint() ) );
+        PGPSecretKey decryptingSecretKey = PGPEncryptionUtil.findSecretKeyByFingerprint( findFile( SECRET_KEYRING ),
+                PGPEncryptionUtil.BytesToHex( encryptingKey.getFingerprint() ) );
 
         byte[] decryptedAndVerifiedMessage =
-                PgpUtil.decryptAndVerify( signedAndEncryptedMessage, decryptingSecretKey, SECRET_PWD,
+                PGPEncryptionUtil.decryptAndVerify( signedAndEncryptedMessage, decryptingSecretKey, SECRET_PWD,
                         signingKey.getPublicKey() );
 
         assertTrue( Arrays.equals( MESSAGE.getBytes(), decryptedAndVerifiedMessage ) );
 
         //auto secret key detection
         decryptedAndVerifiedMessage =
-                PgpUtil.decryptAndVerify( signedAndEncryptedMessage, findFile( SECRET_KEYRING ), SECRET_PWD,
+                PGPEncryptionUtil.decryptAndVerify( signedAndEncryptedMessage, findFile( SECRET_KEYRING ), SECRET_PWD,
                         signingKey.getPublicKey() );
 
         assertTrue( Arrays.equals( MESSAGE.getBytes(), decryptedAndVerifiedMessage ) );
@@ -96,11 +96,11 @@ public class PgpUtilTest
     {
         ByteArrayOutputStream publicKeyRing = new ByteArrayOutputStream();
         ByteArrayOutputStream secretKeyRing = new ByteArrayOutputStream();
-        PgpUtil.KeyRef keyRef = PgpUtil.generateKeyPair( USER_ID, SECRET_PWD, publicKeyRing, secretKeyRing );
+        PGPEncryptionUtil.KeyRef keyRef = PGPEncryptionUtil.generateKeyPair( USER_ID, SECRET_PWD, publicKeyRing, secretKeyRing );
 
-        assertNotNull( PgpUtil.findPublicKeyById( new ByteArrayInputStream( publicKeyRing.toByteArray() ),
+        assertNotNull( PGPEncryptionUtil.findPublicKeyById( new ByteArrayInputStream( publicKeyRing.toByteArray() ),
                 keyRef.getEncryptingKeyId() ) );
-        assertNotNull( PgpUtil.findSecretKeyByFingerprint( new ByteArrayInputStream( secretKeyRing.toByteArray() ),
+        assertNotNull( PGPEncryptionUtil.findSecretKeyByFingerprint( new ByteArrayInputStream( secretKeyRing.toByteArray() ),
                 keyRef.getSigningKeyFingerprint() ) );
     }
 
@@ -110,10 +110,10 @@ public class PgpUtilTest
     {
 
         Date today = new Date();
-        PGPPublicKey pgpPublicKey = PgpUtil.findPublicKeyById( findFile( PUBLIC_KEYRING ), PUBLIC_KEY_ID );
-        PGPSecretKey pgpSecretKey = PgpUtil.findSecretKeyById( findFile( SECRET_KEYRING ), SECRET_KEY_ID );
+        PGPPublicKey pgpPublicKey = PGPEncryptionUtil.findPublicKeyById( findFile( PUBLIC_KEYRING ), PUBLIC_KEY_ID );
+        PGPSecretKey pgpSecretKey = PGPEncryptionUtil.findSecretKeyById( findFile( SECRET_KEYRING ), SECRET_KEY_ID );
         X509Certificate x509Certificate =
-                PgpUtil.getX509CertificateFromPgpKeyPair( pgpPublicKey, pgpSecretKey, SECRET_PWD,
+                PGPEncryptionUtil.getX509CertificateFromPgpKeyPair( pgpPublicKey, pgpSecretKey, SECRET_PWD,
                         "C=ZA, ST=Western Cape, L=Cape Town, O=Thawte Consulting cc,"
                                 + " OU=Certification Services Division,"
                                 + " CN=Thawte Server CA/emailAddress=server-certs@thawte.com",

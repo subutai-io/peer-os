@@ -47,6 +47,7 @@
     <module>ssl-context-manager</module>
     <module>subutai-cli-rbac</module>
     <module>key-server</module>
+    <module>security-manager</module>
   </modules>
 
 </project>

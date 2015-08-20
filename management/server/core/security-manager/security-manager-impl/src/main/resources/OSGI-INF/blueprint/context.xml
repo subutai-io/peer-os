@@ -8,20 +8,27 @@
 
   <!-- ************************************************************************************************* -->
 
-  <bean id="daoKeyServer" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
-    <jpa:unit unitname="keyServerPUnit" property="entityManagerFactory" />
+  <bean id="daoSecurityManager" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
+    <jpa:unit unitname="securityManagerPUnit" property="entityManagerFactory" />
   </bean>
 
   <!-- ************************************************************************************************** -->
 
-  <bean id="keyServer" scope="singleton" init-method="init" destroy-method="destroy"
-        class="io.subutai.core.keyserver.impl.KeyServerImpl">
-    <property name="daoManager" ref="daoKeyServer" />
+  <reference id="keyServer" interface="io.subutai.core.keyserver.api.KeyServer" />
+
+  <!-- ************************************************************************************************** -->
+
+  <bean id="securityManager" scope="singleton" init-method="init" destroy-method="destroy"
+        class="io.subutai.core.security.impl.SecurityManagerImpl">
+    <property name="daoManager" ref="daoSecurityManager" />
+    <property name="keyServer"  ref="keyServer" />
+    <property name="secretKeyring" value="$[secretKeyring]" />
+    <property name="secretKeyringPwd" value="$[secretKeyringPwd]" />
   </bean>
 
   <!-- ************************************************************************************************** -->
 
-  <service ref="keyServer" interface="io.subutai.core.keyserver.api.KeyServer" />
+  <service ref="securityManager" interface="io.subutai.core.security.api.SecurityManager" />
 
   <!-- ************************************************************************************************** -->
 
