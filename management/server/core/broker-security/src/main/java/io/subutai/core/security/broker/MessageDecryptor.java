@@ -42,12 +42,13 @@ public class MessageDecryptor implements ByteMessagePreProcessor
                 PGPSecretKey peerKeyForDecrypting = PgpUtil.findSecretKeyByFingerprint(
                         MessageEncryptor.findFile( MessageEncryptor.SECRET_KEYRING ),
                         PgpUtil.BytesToHex( encryptingKey.getFingerprint() ) );
-                //todo obtain target host pub key
-                PGPPublicKey hostKeyForVerifying = signingKey.getPublicKey();
 
                 PgpUtil.ContentAndSignatures contentAndSignatures =
                         PgpUtil.decryptAndReturnSignatures( message, peerKeyForDecrypting,
                                 MessageEncryptor.SECRET_PWD );
+
+                //todo obtain target host pub key by id from content
+                PGPPublicKey hostKeyForVerifying = signingKey.getPublicKey();
 
                 if ( PgpUtil.verifySignature( contentAndSignatures, hostKeyForVerifying ) )
                 {
