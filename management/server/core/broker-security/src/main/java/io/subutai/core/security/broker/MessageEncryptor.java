@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.command.Request;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.security.crypto.pgp.PgpUtil;
+import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.UUIDUtil;
 import io.subutai.core.broker.api.TextMessagePostProcessor;
@@ -45,18 +45,19 @@ public class MessageEncryptor implements TextMessagePostProcessor
             {
 
                 //todo obtain MH private key
-                PGPSecretKey peerKeyForSigning = PgpUtil.findSecretKeyById( findFile( SECRET_KEYRING ), SECRET_KEY_ID );
+                PGPSecretKey peerKeyForSigning =
+                        PGPEncryptionUtil.findSecretKeyById( findFile( SECRET_KEYRING ), SECRET_KEY_ID );
                 //todo obtain target host pub key
                 PGPPublicKey hostKeyForEncrypting =
-                        PgpUtil.findPublicKeyById( findFile( PUBLIC_KEYRING ), PUBLIC_KEY_ID );
+                        PGPEncryptionUtil.findPublicKeyById( findFile( PUBLIC_KEYRING ), PUBLIC_KEY_ID );
 
                 RequestWrapper requestWrapper = JsonUtil.fromJson( message, RequestWrapper.class );
 
                 Request originalRequest = requestWrapper.getRequest();
 
-                String encryptedRequestString = new String(
-                        PgpUtil.signAndEncrypt( JsonUtil.toJson( originalRequest ).getBytes(), peerKeyForSigning,
-                                SECRET_PWD, hostKeyForEncrypting, true ) );
+                String encryptedRequestString = new String( PGPEncryptionUtil
+                        .signAndEncrypt( JsonUtil.toJson( originalRequest ).getBytes(), peerKeyForSigning, SECRET_PWD,
+                                hostKeyForEncrypting, true ) );
 
                 EncryptedRequestWrapper encryptedRequestWrapper =
                         new EncryptedRequestWrapper( encryptedRequestString, originalRequest.getId() );

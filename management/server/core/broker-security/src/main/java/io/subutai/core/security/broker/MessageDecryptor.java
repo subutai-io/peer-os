@@ -6,7 +6,7 @@ import org.bouncycastle.openpgp.PGPSecretKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.subutai.common.security.crypto.pgp.PgpUtil;
+import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.core.broker.api.ByteMessagePreProcessor;
 import io.subutai.core.broker.api.Topic;
 
@@ -31,26 +31,25 @@ public class MessageDecryptor implements ByteMessagePreProcessor
                     topic ) )
             {
                 //imitate obtaining MH private key and sender host pub key
-                PGPSecretKey signingKey =
-                        PgpUtil.findSecretKeyById( MessageEncryptor.findFile( MessageEncryptor.SECRET_KEYRING ),
+                PGPSecretKey signingKey = PGPEncryptionUtil
+                        .findSecretKeyById( MessageEncryptor.findFile( MessageEncryptor.SECRET_KEYRING ),
                                 MessageEncryptor.SECRET_KEY_ID );
-                PGPPublicKey encryptingKey =
-                        PgpUtil.findPublicKeyById( MessageEncryptor.findFile( MessageEncryptor.PUBLIC_KEYRING ),
+                PGPPublicKey encryptingKey = PGPEncryptionUtil
+                        .findPublicKeyById( MessageEncryptor.findFile( MessageEncryptor.PUBLIC_KEYRING ),
                                 MessageEncryptor.PUBLIC_KEY_ID );
 
                 //todo obtain MH private key
-                PGPSecretKey peerKeyForDecrypting = PgpUtil.findSecretKeyByFingerprint(
-                        MessageEncryptor.findFile( MessageEncryptor.SECRET_KEYRING ),
-                        PgpUtil.BytesToHex( encryptingKey.getFingerprint() ) );
+                PGPSecretKey peerKeyForDecrypting = PGPEncryptionUtil
+                        .findSecretKeyByFingerprint( MessageEncryptor.findFile( MessageEncryptor.SECRET_KEYRING ),
+                                PGPEncryptionUtil.BytesToHex( encryptingKey.getFingerprint() ) );
 
-                PgpUtil.ContentAndSignatures contentAndSignatures =
-                        PgpUtil.decryptAndReturnSignatures( message, peerKeyForDecrypting,
-                                MessageEncryptor.SECRET_PWD );
+                PGPEncryptionUtil.ContentAndSignatures contentAndSignatures = PGPEncryptionUtil
+                        .decryptAndReturnSignatures( message, peerKeyForDecrypting, MessageEncryptor.SECRET_PWD );
 
                 //todo obtain target host pub key by id from content
                 PGPPublicKey hostKeyForVerifying = signingKey.getPublicKey();
 
-                if ( PgpUtil.verifySignature( contentAndSignatures, hostKeyForVerifying ) )
+                if ( PGPEncryptionUtil.verifySignature( contentAndSignatures, hostKeyForVerifying ) )
                 {
                     LOG.info( String.format( "Verification succeeded%nDecrypted Message: %s",
                             new String( contentAndSignatures.getDecryptedContent() ) ) );
