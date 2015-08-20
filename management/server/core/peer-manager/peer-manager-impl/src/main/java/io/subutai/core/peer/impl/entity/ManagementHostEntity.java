@@ -72,20 +72,15 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     @Transient
     protected ServiceLocator serviceLocator = new ServiceLocator();
 
-    @Transient
-    private String externalIpInterface;
-
 
     protected ManagementHostEntity()
     {
     }
 
 
-    public ManagementHostEntity( final String peerId, final ResourceHostInfo resourceHostInfo,
-                                 final String externalIpInterface )
+    public ManagementHostEntity( final String peerId, final ResourceHostInfo resourceHostInfo )
     {
         super( peerId, resourceHostInfo );
-        this.externalIpInterface = externalIpInterface;
     }
 
 
@@ -104,7 +99,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     @Override
     public String getExternalIp()
     {
-        return getIpByInterfaceName( externalIpInterface );
+        return getPeer().getPeerInfo().getIp();
     }
 
 

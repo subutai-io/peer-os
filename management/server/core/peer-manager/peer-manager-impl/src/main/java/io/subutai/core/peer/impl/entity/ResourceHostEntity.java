@@ -58,7 +58,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     private static final int CONNECT_TIMEOUT = 300;
 
     private static final Logger LOG = LoggerFactory.getLogger( ResourceHostEntity.class );
-    private static final Pattern LXC_STATE_PATTERN = Pattern.compile( "State:(\\s*)(.*)" );
+    //    private static final Pattern LXC_STATE_PATTERN = Pattern.compile( "State:(\\s*)(.*)" );
+    private static final Pattern LXC_STATE_PATTERN = Pattern.compile( "(\\S*)(\\s*)(\\S*)" );
     private static final String PRECONDITION_CONTAINER_IS_NULL_MSG = "Container host is null";
     private static final String CONTAINER_EXCEPTION_MSG_FORMAT = "Container with name %s does not exist";
 
@@ -119,8 +120,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
         RequestBuilder requestBuilder =
-                new RequestBuilder( String.format( "/usr/bin/lxc-info -n %s", containerHost.getHostname() ) )
-                        .withTimeout( 30 );
+                new RequestBuilder( String.format( "subutai list -i %s", containerHost.getHostname() ) );
         CommandResult result;
         try
         {
@@ -133,15 +133,17 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         String stdOut = result.getStdOut();
 
-        Matcher m = LXC_STATE_PATTERN.matcher( stdOut );
-        if ( m.find() )
+        String[] outputLines = stdOut.split( System.lineSeparator() );
+        if ( outputLines.length == 3 )
         {
-            return ContainerState.valueOf( m.group( 2 ) );
+            Matcher m = LXC_STATE_PATTERN.matcher( outputLines[2] );
+            if ( m.find() )
+            {
+                return ContainerState.valueOf( m.group( 3 ) );
+            }
         }
-        else
-        {
-            return ContainerState.UNKNOWN;
-        }
+
+        return ContainerState.UNKNOWN;
     }
 
 

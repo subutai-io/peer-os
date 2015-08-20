@@ -90,7 +90,7 @@ public class MessageSender
 
         Map<UUID, Set<Envelope>> peerEnvelopesMap = Maps.newHashMap();
         int maxTimeToLive = 0;
-        //distribute envelops to getPeerInfos
+        //distribute envelops to peers
         for ( Envelope envelope : envelopes )
         {
             if ( envelope.getTimeToLive() > maxTimeToLive )

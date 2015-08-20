@@ -47,10 +47,10 @@ import com.vaadin.ui.TextField;
 
 
 /**
- * Registration process should be handled in save manner so no middleware attacks occur. In order to get there getPeerInfos
+ * Registration process should be handled in save manner so no middleware attacks occur. In order to get there peers
  * need to exchange with public keys. This will create ssl layer by encrypting all traffic passing through their
  * connection. So first initial handshake will be one direction, to pass keys through encrypted channel and register
- * them in getPeerInfos' trust stores. These newly saved keys will be used further for safe communication, with bidirectional
+ * them in peers' trust stores. These newly saved keys will be used further for safe communication, with bidirectional
  * authentication.
  *
  *
@@ -698,7 +698,7 @@ public class PeerRegisterForm extends CustomComponent
      *
      * @param peerToUpdateOnRemote - local peer info to update/send to remote peer
      * @param remotePeer - remote peer whose request was rejected
-     * @param updateViewListener - used to update getPeerInfos table with relevant buttons captions
+     * @param updateViewListener - used to update peers table with relevant buttons captions
      */
     private void rejectPeerRegistration( final PeerInfo peerToUpdateOnRemote, final PeerInfo remotePeer,
                                          final PeerManageActionsComponent.PeerManageUpdateViewListener

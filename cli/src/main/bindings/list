@@ -229,6 +229,93 @@ function list_containers {
 }
 
 
+
+
+function list_containers_i {
+  local templates=`fs_list_templates`
+  local lxc_list=`lxc-ls`
+  local mode="$2"
+  local containers="$1"
+  if [ -z "$containers" ]; then
+    for container in $lxc_list; do
+      if [ -z "`echo $templates | grep $container`" ]; then
+        containers="$containers $container"
+      fi
+    done
+  fi
+
+
+
+  if [ "fancy"  == "$mode" ]; then
+    local lxc_list_fancy=`lxc-ls -f`
+  fi
+
+ 
+  temp="`echo $containers`"
+  containers=""
+
+  ##find a container in container list
+  for cont in $temp; do
+    for container in $lxc_list; do
+      if [ "$container" == "`echo $cont`" ]; then
+        containers="$containers $cont"
+      fi
+    done
+  done
+
+  temp=""   
+
+  for container in $containers; do
+    if [ "true" == "`fs_is_template $container`" ]; then
+      msg_error "Provided operand $container is a template not a container"
+      exit 1
+    fi
+
+    if [ -z "$mode" ]; then
+      echo $container
+    elif [ "fancy"  == "$mode" ]; then
+      echo "$lxc_list_fancy" | grep -w "$container"
+    elif [ "ancestors" == "$mode" ]; then 
+      echo -e "$container\t\t`get_ancestor_list $container`"
+    elif [ "parents" == "$mode" ]; then 
+      echo -e "$container\t\t`fs_get_parent $container`"
+    fi
+  done
+}
+
+
+function list_infoc { 
+#echo "ALMAZ"
+
+conts=`list_containers_i`
+name=$1
+if [ $name ]; then 
+     status=$(lxc-info -n $name | grep State | awk -F":" '{print $2}' | sed -e 's/^[[:space:]]*//')
+     state=$(lxc-info -n $name | grep State | awk -F" " '{print $2}')
+     
+     if [  "$state" = "RUNNING" ]; then
+      out="$out \n NAME\tSTATE\tHWADDR\tIP\tInterface"
+      out="$out \n ---------------------------------"
+      HW=$( lxc-attach -n $name -- cat /sys/class/net/eth0/address)
+      IP=$( lxc-attach -n $name -- ifconfig eth0 | awk '/inet addr/{print substr($2,6)}' )
+      out="$out \n $name\t $status\t $HW\t  $IP \teth0"
+      echo -e $out | column -t
+     else 
+      out="$out \n NAME\tSTATE"
+      out="$out \n ---------------------------------"
+      if [ -z $state ];then  
+       state="NOT_EXIST"
+     fi
+      out="$out \n $name  $state"
+      echo -e $out | column -t
+     fi     
+else 
+     out2="Name State \n -------------------------------------------------"
+     out2="$out2 \n $(echo "$conts" | awk '{print " lxc-info -n "$1 " | grep \"Name\|State\"  "}' | bash | awk 'NR%2{printf $0" ";next;}1' | awk -F " " '{print $2"  "$4 " \\n "}')"
+     echo -e $out2 | column -t
+fi
+}
+
 function list {
   OPTIND=0
   if [ "$1" == "list" ]; then
@@ -241,9 +328,9 @@ function list {
   parents="false"
   ancestors="false"
   fancy="false"
-
+  infoc="false"
   shift_amount=0;
-  while getopts ":tcrpaf" opt; do
+  while getopts ":tcrpafi" opt; do
     case $opt in
       t)
         templates="true"
@@ -252,6 +339,7 @@ function list {
           exit 1
         fi
         ;;
+
       c)
         containers="true"
         if [[ "true" == "$templates" || "true" == "$registered" ]]; then
@@ -259,6 +347,18 @@ function list {
           exit 1
         fi
         ;;
+     i)
+        infoc="true"
+#  echo "-i recieved"
+        if [[ "true" == "$templates" || "true" == "$registered" ]]; then
+          msg_error "Cannot use the -t, -r, and -i options together." >&2
+          exit 1
+        fi
+      list_infoc $2
+       exit 0
+        ;;
+
+
       r)
         registered="true"
         if [[ "true" == "$templates" || "true" == "$containers" ]]; then
@@ -280,6 +380,7 @@ function list {
           exit 1
         fi
         ;;
+     
       f)
         fancy="true"
         if [[ "true" == "$parents" || "true" == "$ancestors" ]]; then
@@ -340,7 +441,9 @@ function list {
     elif [ "true" == "$ancestors" ]; then
       list_containers "$operands" "ancestors"
     fi
-  elif [ "true" == "$registered" ]; then
+  elif [ "true" == "$infoc" ]; then
+   list_infoc "$operands"
+ elif [ "true" == "$registered" ]; then
     if [  "true" == "$parents" ]; then
       list_registered_templates "parents"
     else

@@ -13,6 +13,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Sets;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
@@ -29,10 +32,7 @@ import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.peer.api.ContainerState;
 import io.subutai.core.peer.api.HostNotFoundException;
 import io.subutai.core.peer.api.ResourceHostException;
-
 import io.subutai.core.registry.api.TemplateRegistry;
-
-import com.google.common.collect.Sets;
 
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertEquals;
@@ -61,6 +61,14 @@ public class ResourceHostEntityTest
     private static final String INTERFACE_NAME = "eth0";
     private static final String IP = "127.0.0.1";
     private static final String MAC = "mac";
+    private static final String CONTAINER_STATUS_STARTED =
+            "NAME                               STATE    HWADDR             IP" + "            Interface\n" +
+                    "---------------------------------\n"
+                    + "qwer                               RUNNING  00:16:3e:83:2c:2e  192.168.22.5  eth0";
+    private static final String CONTAINER_STATUS_STOPPED =
+            "NAME                               STATE    HWADDR             IP" + "            Interface\n" +
+                    "---------------------------------\n"
+                    + "qwer                               STOPPED  00:16:3e:83:2c:2e  192.168.22.5  eth0";
     @Mock
     ContainerHostEntity containerHost;
     @Mock
@@ -157,7 +165,7 @@ public class ResourceHostEntityTest
         }
 
 
-        when( commandResult.getStdOut() ).thenReturn( "State:RUNNING" );
+        when( commandResult.getStdOut() ).thenReturn( CONTAINER_STATUS_STARTED );
         resourceHostEntity.addContainerHost( containerHost );
 
         ContainerState state = resourceHostEntity.getContainerHostState( containerHost );
@@ -223,14 +231,14 @@ public class ResourceHostEntityTest
         }
 
         when( containerHost.isConnected() ).thenReturn( true );
-        when( commandResult.getStdOut() ).thenReturn( "State:RUNNING" );
+        when( commandResult.getStdOut() ).thenReturn( CONTAINER_STATUS_STARTED );
         resourceHostEntity.addContainerHost( containerHost );
 
         resourceHostEntity.startContainerHost( containerHost );
 
         verify( commandUtil, atLeastOnce() ).execute( any( RequestBuilder.class ), eq( resourceHostEntity ) );
 
-        when( commandResult.getStdOut() ).thenReturn( "State:STOPPED" );
+        when( commandResult.getStdOut() ).thenReturn( CONTAINER_STATUS_STOPPED);
 
         try
         {
@@ -241,7 +249,7 @@ public class ResourceHostEntityTest
         {
         }
 
-        when( commandResult.getStdOut() ).thenReturn( "State:RUNNING" );
+        when( commandResult.getStdOut() ).thenReturn( CONTAINER_STATUS_STARTED );
 
         doThrow( new CommandException( "" ) ).when( commandUtil )
                                              .execute( any( RequestBuilder.class ), eq( resourceHostEntity ) );
@@ -406,7 +414,6 @@ public class ResourceHostEntityTest
         resourceHostEntity.createContainer( TEMPLATE_NAME, HOSTNAME, TIMEOUT );
 
         verify( future ).get();
-
     }
 }
 
