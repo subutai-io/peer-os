@@ -4,6 +4,8 @@ package io.subutai.common.security.crypto.pgp;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -86,7 +88,7 @@ import com.google.common.base.Objects;
 /**
  * Provides methods to encrypt, decrypt, sign and verify signature using PGP keypairs
  */
-public class PgpUtil
+public class PGPEncryptionUtil
 {
     public static final BouncyCastleProvider provider = new BouncyCastleProvider();
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
@@ -991,7 +993,9 @@ public class PgpUtil
         return asLiteral( stream );
     }
 
-
+    /**************************************************
+     *
+     */
     private static PGPLiteralData asLiteral( final InputStream clear ) throws IOException, PGPException
     {
         final PGPObjectFactory plainFact = new PGPObjectFactory( clear, new JcaKeyFingerprintCalculator() );
@@ -1025,7 +1029,9 @@ public class PgpUtil
         }
     }
 
-
+    /**************************************************
+     *
+     */
     private static PGPPrivateKey getPrivateKey( final PGPSecretKeyRingCollection keys, final long id,
                                                 final String secretPwd )
     {
@@ -1047,7 +1053,31 @@ public class PgpUtil
         return null;
     }
 
+    /**************************************************
+    *
+    */
+    public static PGPPrivateKey getPrivateKey( final PGPSecretKey secretKey,final String secretPwd )
+    {
+        try
+        {
+            if ( secretKey != null )
+            {
+                return secretKey.extractPrivateKey( new JcePBESecretKeyDecryptorBuilder().setProvider( provider )
+                                                                                   .build( secretPwd.toCharArray() ) );
+            }
+        }
+        catch ( final Exception e )
+        {
+            // Don't print the passphrase but do print null if thats what it was
+            final String passphraseMessage = ( secretPwd == null ) ? "null" : "supplied";
+            System.err.println( "Unable to extract key " + secretKey.getKeyID() + " using " + passphraseMessage + " passphrase" );
+        }
+        return null;
+    }
 
+    /**************************************************
+     *
+     */
     private static PGPPublicKey findPublicKey( InputStream publicKeyRing, String id, boolean fingerprint )
             throws IOException, PGPException
     {
@@ -1220,5 +1250,24 @@ public class PgpUtil
         // Add our encryption subkey, together with its signature.
         keyRingGen.addSubKey( rsakp_enc, enchashgen.generate(), null );
         return keyRingGen;
+    }
+
+
+    /*************************************************************
+    *  Load Keyring  file into InpurStream.
+    */
+    public static InputStream loadKeyring( String keyringFile)
+    {
+        try
+        {
+            FileInputStream keyIn = new FileInputStream(keyringFile);
+
+            return keyIn;
+        }
+        catch(IOException ex)
+        {
+            return null;
+        }
+
     }
 }

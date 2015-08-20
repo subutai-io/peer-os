@@ -3,16 +3,16 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <artifactId>key-server</artifactId>
+    <artifactId>security-manager</artifactId>
     <groupId>io.subutai</groupId>
     <version>2.0.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>key-server-impl</artifactId>
+  <artifactId>security-manager-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Key-Server Impl</name>
-  <description>Subutai Key-Server Impl</description>
+  <name>Subutai Security Manager Impl</name>
+  <description>Subutai Security Manager Impl</description>
 
   <dependencies>
     <dependency>
@@ -21,10 +21,16 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>key-server-api</artifactId>
-      <version>2.0.0</version>
+      <artifactId>security-manager-api</artifactId>
     </dependency>
 
+    <!-- ********* KeyServer ************* -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>key-server-api</artifactId>
+    </dependency>
+
+    <!-- ********* BouncyCastle ********** -->
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcmail-jdk15on</artifactId>
@@ -41,12 +47,13 @@
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-ext-jdk15on</artifactId>
     </dependency>
+    <!--  ********************************* -->
+
 
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
-      <scope>test</scope>
-    </dependency>
+      <scope>test</scope></dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -66,7 +73,7 @@
         <configuration>
           <instructions>
             <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
-            <Bundle-SymbolicName>${project.groupId}.core.keyserver.impl</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.security.impl</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>

@@ -5,22 +5,22 @@
                "http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
                  http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
 
-  <cxf:bus id="cxfBusKeyServer">
+  <cxf:bus id="cxfBusSecurityManager">
     <cxf:features>
       <cxf:logging />
     </cxf:features>
   </cxf:bus>
 
-  <jaxrs:server address="/pks" id="keyServerRest">
+  <jaxrs:server address="/security" id="securityManagerRest">
     <jaxrs:serviceBeans>
-      <ref component-id="keyServerRestImpl" />
+      <ref component-id="securityManagerRestImpl" />
     </jaxrs:serviceBeans>
   </jaxrs:server>
 
-  <reference id="keyServerRef" availability="mandatory" interface="io.subutai.core.keyserver.api.KeyServer" />
+  <reference id="securityManagerRef" availability="mandatory" interface="io.subutai.core.security.api.SecurityManager" />
 
-  <bean id="keyServerRestImpl" class="io.subutai.core.keyserver.rest.KeyServerRestImpl">
-    <argument ref="keyServerRef" />
+  <bean id="securityManagerRestImpl" class="io.subutai.core.keyserver.rest.SecurityManagerRestImpl">
+    <argument ref="securityManagerRef" />
   </bean>
 
 
