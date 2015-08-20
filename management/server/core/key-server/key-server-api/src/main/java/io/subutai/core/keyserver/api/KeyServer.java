@@ -1,7 +1,11 @@
 package io.subutai.core.keyserver.api;
 
 
+import java.io.IOException;
 import java.util.List;
+
+import org.bouncycastle.openpgp.PGPException;
+import org.bouncycastle.openpgp.PGPPublicKey;
 
 import io.subutai.core.keyserver.api.dao.KeyServerDAO;
 import io.subutai.core.keyserver.api.model.SecurityKey;
@@ -35,6 +39,15 @@ public interface KeyServer
 
 
     /********************************
+     * Finds public key with given shortKeyId.
+     *
+     * @param shortKeyId hex encoded shortKeyId to search
+     * @return public key if the key with given fingerprint exists; {@code null} otherwise
+     */
+    public SecurityKey getSecurityKeyByShortKeyId( String shortKeyId );
+
+
+    /********************************
      * Finds public key with given keyId.
      *
      * @param keyId hex encoded fingerprint to search
@@ -58,6 +71,30 @@ public interface KeyServer
      * @return all public keys
      */
     public List<SecurityKey> getSecurityKeyList();
+
+
+    /********************************
+     * Saves the given public key.
+     *
+     * @param key to save
+     */
+    public void addSecurityKey( String key ) throws PGPException, IOException;
+
+
+    /********************************
+     * Saves the given public key.
+     *
+     * @param publicKey to save
+     */
+    public void addSecurityKey( PGPPublicKey publicKey ) throws PGPException, IOException;
+
+
+    /********************************
+     * Saves the given public key.
+     *
+     * @param key to save
+     */
+    public PGPPublicKey addPublicKey( String key ) throws PGPException, IOException;
 
 
     /********************************
@@ -90,5 +127,21 @@ public interface KeyServer
      * @param keyId key ID of a public key to delete
      */
     public void removeSecurityKeyByKeyId( String keyId );
+
+
+    /********************************
+     * converts SecurityKey entity to the PGPPublicKey
+     *
+     * @param securityKey
+     */
+    public PGPPublicKey convertKey( SecurityKey securityKey ) throws PGPException;
+
+
+    /********************************
+     * converts SecurityKey entity to ASCII Armored
+     *
+     * @param keyId
+     */
+    public String getSecurityKeyAsASCII( String keyId ) throws PGPException;
 
 }

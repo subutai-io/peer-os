@@ -22,6 +22,15 @@ public interface KeyServerDAO
 
 
     /********************************
+     * Finds public key with given shortKeyId.
+     *
+     * @param shortKeyId hex encoded shortKeyId to search
+     * @return public key if the key with given fingerprint exists; {@code null} otherwise
+     */
+    SecurityKey findByShortKeyId( String shortKeyId );
+
+
+    /********************************
      * Finds public key with given keyId.
      *
      * @param keyId hex encoded fingerprint to search
@@ -69,5 +78,6 @@ public interface KeyServerDAO
      * @param keyId key ID of a public key to delete
      */
     public void deleteByKeyId( String keyId );
+
 
 }

@@ -62,6 +62,40 @@ public class KeyServerDAOImpl implements KeyServerDAO
         }
     }
 
+    /********************************
+     *
+     */
+    @Override
+    public SecurityKey findByShortKeyId( final String shortKeyId )
+    {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+
+        try
+        {
+            Query query = em.createQuery( "select SK from SecurityKeyEntity as SK where SK.shortKeyId=:shortKeyId" );
+            query.setParameter( "shortKeyId", shortKeyId);
+            List<SecurityKey> securityKeyList  = query.getResultList();
+
+            if(securityKeyList!=null)
+            {
+                return securityKeyList.get( 0 );
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch(Exception ex)
+        {
+            LOG.error( "KeyManagerDAOImpl findByShortKeyId:"+ex.toString() );
+            return null;
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+    }
+
 
     /********************************
      *
