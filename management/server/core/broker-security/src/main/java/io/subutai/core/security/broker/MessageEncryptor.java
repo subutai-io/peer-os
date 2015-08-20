@@ -40,20 +40,23 @@ public class MessageEncryptor implements TextMessagePostProcessor
 
         try
         {
+            //assume this is a host topic
             if ( UUIDUtil.isStringAUuid( topic ) )
             {
-                //assume this is a host topic
 
-                PGPSecretKey signingKey = PgpUtil.findSecretKeyById( findFile( SECRET_KEYRING ), SECRET_KEY_ID );
-                PGPPublicKey encryptingKey = PgpUtil.findPublicKeyById( findFile( PUBLIC_KEYRING ), PUBLIC_KEY_ID );
+                //todo obtain MH private key
+                PGPSecretKey peerKeyForSigning = PgpUtil.findSecretKeyById( findFile( SECRET_KEYRING ), SECRET_KEY_ID );
+                //todo obtain target host pub key
+                PGPPublicKey hostKeyForEncrypting =
+                        PgpUtil.findPublicKeyById( findFile( PUBLIC_KEYRING ), PUBLIC_KEY_ID );
 
                 RequestWrapper requestWrapper = JsonUtil.fromJson( message, RequestWrapper.class );
 
                 Request originalRequest = requestWrapper.getRequest();
 
                 String encryptedRequestString = new String(
-                        PgpUtil.signAndEncrypt( JsonUtil.toJson( originalRequest ).getBytes(), signingKey, SECRET_PWD,
-                                encryptingKey, true ) );
+                        PgpUtil.signAndEncrypt( JsonUtil.toJson( originalRequest ).getBytes(), peerKeyForSigning,
+                                SECRET_PWD, hostKeyForEncrypting, true ) );
 
                 EncryptedRequestWrapper encryptedRequestWrapper =
                         new EncryptedRequestWrapper( encryptedRequestString, originalRequest.getId() );
