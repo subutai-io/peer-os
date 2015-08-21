@@ -14,9 +14,9 @@
 
   <cm:property-placeholder persistent-id="peer" update-strategy="none">
     <cm:default-properties>
-      <cm:property name="secretKeyring" value="" />
+      <cm:property name="secretKeyringFile" value="" />
       <cm:property name="secretKeyringPwd" value="" />
-      <cm:property name="managementHostKeyId" value="" />
+      <cm:property name="managementHostKeyFingerprint" value="" />
     </cm:default-properties>
   </cm:property-placeholder>
 
@@ -41,9 +41,9 @@
     <property name="daoManager" ref="daoSecurityManager" />
     <property name="keyServer"  ref="keyServer" />
     <property name="peerManager"  ref="peerManager" />
-    <property name="secretKeyring" value="$[subutaiAppDataPath]/keystores/${secretKeyring}" />
+    <property name="secretKeyringFile" value="$[subutaiAppDataPath]/keystores/${secretKeyringFile}" />
     <property name="secretKeyringPwd" value="${secretKeyringPwd}" />
-    <property name="managementHostKeyId" value="${managementHostKeyId}" />
+    <property name="manHostKeyFingerprint" value="${managementHostKeyFingerprint}" />
   </bean>
 
   <!-- ************************************************************************************************** -->

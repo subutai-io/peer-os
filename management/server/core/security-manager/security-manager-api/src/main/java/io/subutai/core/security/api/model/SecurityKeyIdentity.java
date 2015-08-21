@@ -22,13 +22,13 @@ public interface SecurityKeyIdentity
     /********************************
      *
      */
-    public String getKeyId();
+    public String getKeyFingerprint();
 
 
     /********************************
      *
      */
-    public void setKeyId( final String publicKeyId );
+    public void setKeyFingerprint( final String keyFingerprint );
 
 
     /********************************
