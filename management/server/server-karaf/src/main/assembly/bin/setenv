@@ -50,3 +50,4 @@
 # export KARAF_REDIRECT # Enable/set the std/err redirection when using bin/start
 #export SUBUTAI_APP_DATA_PATH="/apps/subutai-mng/current"
 export SUBUTAI_APP_DATA_PATH="/var/lib/subutai"
+export SUBUTAI_APP_KEYSTORE_PATH="${SUBUTAI_APP_DATA_PATH}/keystores"

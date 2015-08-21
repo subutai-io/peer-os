@@ -11,7 +11,7 @@
   <!--*****************************************************************-->
   <bean id="daoManagerSecurity" init-method="init" activation="eager" scope="singleton"
         class="io.subutai.common.dao.DaoManager">
-    <jpa:unit unitname="securityManagerPUnit" property="entityManagerFactory" />
+    <jpa:unit unitname="identityManagerPUnit" property="entityManagerFactory" />
   </bean>
   <!--*****************************************************************-->
 
