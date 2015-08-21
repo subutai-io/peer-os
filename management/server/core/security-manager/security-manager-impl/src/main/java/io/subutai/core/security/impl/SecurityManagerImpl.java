@@ -31,10 +31,10 @@ public class SecurityManagerImpl implements SecurityManager
     private EncryptionTool encryptionTool = null;
     private SecurityManagerDAO securityManagerDAO = null;
     private KeyServer keyServer = null;
-    private String secretKeyring;
+    private String secretKeyringFile;
     private String secretKeyringPwd;
-    private String managementHostId;
-    private String managementHostKeyId;
+    private String manHostId;
+    private String manHostKeyFingerprint;
     private PeerManager peerManager;
 
 
@@ -43,16 +43,16 @@ public class SecurityManagerImpl implements SecurityManager
      */
     public void init()
     {
-        managementHostId = peerManager.getLocalPeerInfo().getId().toString();
+        manHostId = peerManager.getLocalPeerInfo().getId().toString();
         securityManagerDAO = new SecurityManagerDAOImpl( daoManager );
         encryptionTool = new EncryptionToolImpl();
 
         keyManager = new KeyManagerImpl( securityManagerDAO,
                 keyServer,
-                secretKeyring,
+                secretKeyringFile,
                 secretKeyringPwd,
-                managementHostId,
-                managementHostKeyId);
+                manHostId,
+                manHostKeyFingerprint);
 
     }
 
@@ -143,18 +143,18 @@ public class SecurityManagerImpl implements SecurityManager
     /********************************
      *
      */
-    public String getSecretKeyring()
+    public String getSecretKeyringFile()
     {
-        return secretKeyring;
+        return secretKeyringFile;
     }
 
 
     /********************************
      *
      */
-    public void setSecretKeyring( final String secretKeyring )
+    public void setSecretKeyringFile( final String secretKeyringFile )
     {
-        this.secretKeyring = secretKeyring;
+        this.secretKeyringFile = secretKeyringFile;
     }
 
 
@@ -197,18 +197,18 @@ public class SecurityManagerImpl implements SecurityManager
     /********************************
      *
      */
-    public String getManagementHostId()
+    public String getManHostId()
     {
-        return managementHostId;
+        return manHostId;
     }
 
 
     /********************************
      *
      */
-    public void setManagementHostId( final String managementHostId )
+    public void setManHostId( final String manHostId )
     {
-        this.managementHostId = managementHostId;
+        this.manHostId = manHostId;
     }
 
 
@@ -233,17 +233,17 @@ public class SecurityManagerImpl implements SecurityManager
     /********************************
      *
      */
-    public String getManagementHostKeyId()
+    public String getManHostKeyFingerprint()
     {
-        return managementHostKeyId;
+        return manHostKeyFingerprint;
     }
 
     /********************************
      *
      */
 
-    public void setManagementHostKeyId( final String managementHostKeyId )
+    public void setManHostKeyFingerprint( final String manHostKeyFingerprint )
     {
-        this.managementHostKeyId = managementHostKeyId;
+        this.manHostKeyFingerprint = manHostKeyFingerprint;
     }
 }

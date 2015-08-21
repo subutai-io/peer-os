@@ -108,6 +108,21 @@ public class PGPKeyUtil
         return getKeyId( new String( hex ) );
     }
 
+    /**************************************************************************************
+     * Retrieves long key id out of given fingerprint. Fingerprint is a 40 hex digits, last 16 digits make up the long
+     * key id.
+     *
+     * @param fingerprint fingerprint bytes array
+     * @return long key id
+     */
+    public static String getFingerprint( byte[] fingerprint )
+    {
+        char[] hex = Hex.encodeHex( fingerprint, false );
+        String fingerprintStr = new String( hex );
+
+        return fingerprintStr;
+    }
+
 
     /**************************************************************************************
      * Retrieves short key id out of given fingerprint. Fingerprint a is 40 hex digits, last 8 digits make up the short

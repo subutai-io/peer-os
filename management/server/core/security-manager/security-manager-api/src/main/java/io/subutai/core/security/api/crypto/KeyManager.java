@@ -68,12 +68,12 @@ public interface KeyManager
     /********************************
      *
      */
-    public String getSecretKeyring();
+    public String getSecretKeyringFile();
 
 
     /********************************
      *
      */
-    public void setSecretKeyring( final String secretKeyring );
+    public void setSecretKeyringFile( final String secretKeyringFile );
 
 }

@@ -35,7 +35,7 @@ public class SecurityManagerDAOImpl implements SecurityManagerDAO
      * Get Security KeyId from DB
      */
     @Override
-    public SecurityKeyIdentity getSecurityKeyIdentity( String hostId )
+    public SecurityKeyIdentity getKeyIdentityData( String hostId )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
@@ -61,12 +61,12 @@ public class SecurityManagerDAOImpl implements SecurityManagerDAO
      * Get PublicKey from DB
      */
     @Override
-    public String getKeyId( String hostId )
+    public String getKeyFingerprint( String hostId )
     {
-        SecurityKeyIdentity securityKeyIdentity = getSecurityKeyIdentity( hostId );
+        SecurityKeyIdentity securityKeyIdentity = getKeyIdentityData( hostId );
 
         if(securityKeyIdentity!=null)
-            return securityKeyIdentity.getKeyId();
+            return securityKeyIdentity.getKeyFingerprint();
         else
             return "";
     }
@@ -76,7 +76,7 @@ public class SecurityManagerDAOImpl implements SecurityManagerDAO
      *
      */
     @Override
-    public void saveKey( String hostId ,String keyId, short type )
+    public void saveKeyIdentityData( String hostId ,String keyId, short type )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
@@ -87,7 +87,7 @@ public class SecurityManagerDAOImpl implements SecurityManagerDAO
             daoManager.startTransaction( em );
 
             securityKeyIdentity.setHostId( hostId );
-            securityKeyIdentity.setKeyId( keyId );
+            securityKeyIdentity.setKeyFingerprint( keyId );
             securityKeyIdentity.setType( type );
 
             em.merge( securityKeyIdentity );
@@ -111,7 +111,7 @@ public class SecurityManagerDAOImpl implements SecurityManagerDAO
      *
      */
     @Override
-    public void removeKey( String hostId )
+    public void removeKeyIdentityData( String hostId )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
@@ -119,7 +119,7 @@ public class SecurityManagerDAOImpl implements SecurityManagerDAO
         {
             daoManager.startTransaction( em );
 
-            em.remove( getSecurityKeyIdentity(hostId ));
+            em.remove( getKeyIdentityData(hostId ));
 
             daoManager.commitTransaction( em );
         }
