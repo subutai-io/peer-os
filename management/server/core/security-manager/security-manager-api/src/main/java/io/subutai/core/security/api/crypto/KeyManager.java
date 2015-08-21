@@ -28,10 +28,23 @@ public interface KeyManager
      */
     public PGPSecretKey getSecretKey(String hostId);
 
+
     /********************************
      *
      */
     public PGPPrivateKey getPrivateKey( String hostId );
+
+
+    /********************************
+     *
+     */
+    public PGPSecretKey getSecretKeyById( String keyId );
+
+
+    /********************************
+     *
+     */
+    public PGPSecretKey getSecretKeyByFingerprint( String fingerprint );
 
 
     /********************************
@@ -50,4 +63,17 @@ public interface KeyManager
      *
      */
     public void removePublicKey( String hostId);
+
+
+    /********************************
+     *
+     */
+    public String getSecretKeyring();
+
+
+    /********************************
+     *
+     */
+    public void setSecretKeyring( final String secretKeyring );
+
 }

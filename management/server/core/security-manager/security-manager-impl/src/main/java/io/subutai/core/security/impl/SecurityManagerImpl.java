@@ -1,11 +1,15 @@
 package io.subutai.core.security.impl;
 
 
+import java.util.UUID;
+
+import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.keyserver.api.KeyServer;
+import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -29,15 +33,27 @@ public class SecurityManagerImpl implements SecurityManager
     private KeyServer keyServer = null;
     private String secretKeyring;
     private String secretKeyringPwd;
+    private String managementHostId;
+    private String managementHostKeyId;
+    private PeerManager peerManager;
+
 
     /********************************
      *
      */
     public void init()
     {
+        managementHostId = peerManager.getLocalPeerInfo().getId().toString();
         securityManagerDAO = new SecurityManagerDAOImpl( daoManager );
-        encryptionTool     = new EncryptionToolImpl();
-        keyManager = new KeyManagerImpl(securityManagerDAO,keyServer,secretKeyring,secretKeyringPwd);
+        encryptionTool = new EncryptionToolImpl();
+
+        keyManager = new KeyManagerImpl( securityManagerDAO,
+                keyServer,
+                secretKeyring,
+                secretKeyringPwd,
+                managementHostId,
+                managementHostKeyId);
+
     }
 
 
@@ -124,7 +140,6 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-
     /********************************
      *
      */
@@ -134,7 +149,6 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-
     /********************************
      *
      */
@@ -142,7 +156,6 @@ public class SecurityManagerImpl implements SecurityManager
     {
         this.secretKeyring = secretKeyring;
     }
-
 
 
     /********************************
@@ -178,5 +191,59 @@ public class SecurityManagerImpl implements SecurityManager
     public void setEncryptionTool( final EncryptionTool encryptionTool )
     {
         this.encryptionTool = encryptionTool;
+    }
+
+
+    /********************************
+     *
+     */
+    public String getManagementHostId()
+    {
+        return managementHostId;
+    }
+
+
+    /********************************
+     *
+     */
+    public void setManagementHostId( final String managementHostId )
+    {
+        this.managementHostId = managementHostId;
+    }
+
+
+    /********************************
+     *
+     */
+    public PeerManager getPeerManager()
+    {
+        return peerManager;
+    }
+
+
+    /********************************
+     *
+     */
+    public void setPeerManager( final PeerManager peerManager )
+    {
+        this.peerManager = peerManager;
+    }
+
+
+    /********************************
+     *
+     */
+    public String getManagementHostKeyId()
+    {
+        return managementHostKeyId;
+    }
+
+    /********************************
+     *
+     */
+
+    public void setManagementHostKeyId( final String managementHostKeyId )
+    {
+        this.managementHostKeyId = managementHostKeyId;
     }
 }

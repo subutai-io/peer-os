@@ -30,6 +30,13 @@
       <artifactId>key-server-api</artifactId>
     </dependency>
 
+    <!-- ********* Peer Manager ************* -->
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>peer-manager-api</artifactId>
+    </dependency>
+
     <!-- ********* BouncyCastle ********** -->
     <dependency>
       <groupId>org.bouncycastle</groupId>
