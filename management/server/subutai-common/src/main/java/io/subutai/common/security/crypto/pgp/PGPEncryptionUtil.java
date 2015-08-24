@@ -5,7 +5,6 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -149,42 +148,6 @@ public class PGPEncryptionUtil
         catch ( Exception e )
         {
             throw new PGPException( "Error in decrypt", e );
-        }
-    }
-
-
-    public static class ContentAndSignatures
-    {
-        private final byte[] decryptedContent;
-        private final PGPOnePassSignatureList onePassSignatureList;
-        private final PGPSignatureList signatureList;
-
-
-        public ContentAndSignatures( final byte[] decryptedContent, final PGPOnePassSignatureList onePassSignatureList,
-                                     final PGPSignatureList signatureList )
-        {
-
-            this.decryptedContent = decryptedContent;
-            this.onePassSignatureList = onePassSignatureList;
-            this.signatureList = signatureList;
-        }
-
-
-        public byte[] getDecryptedContent()
-        {
-            return decryptedContent;
-        }
-
-
-        public PGPOnePassSignatureList getOnePassSignatureList()
-        {
-            return onePassSignatureList;
-        }
-
-
-        public PGPSignatureList getSignatureList()
-        {
-            return signatureList;
         }
     }
 
@@ -993,8 +956,9 @@ public class PGPEncryptionUtil
         return asLiteral( stream );
     }
 
-    /**************************************************
-     *
+
+    /**
+     * ***********************************************
      */
     private static PGPLiteralData asLiteral( final InputStream clear ) throws IOException, PGPException
     {
@@ -1029,8 +993,9 @@ public class PGPEncryptionUtil
         }
     }
 
-    /**************************************************
-     *
+
+    /**
+     * ***********************************************
      */
     private static PGPPrivateKey getPrivateKey( final PGPSecretKeyRingCollection keys, final long id,
                                                 final String secretPwd )
@@ -1053,30 +1018,34 @@ public class PGPEncryptionUtil
         return null;
     }
 
-    /**************************************************
-    *
-    */
-    public static PGPPrivateKey getPrivateKey( final PGPSecretKey secretKey,final String secretPwd )
+
+    /**
+     * ***********************************************
+     */
+    public static PGPPrivateKey getPrivateKey( final PGPSecretKey secretKey, final String secretPwd )
     {
         try
         {
             if ( secretKey != null )
             {
                 return secretKey.extractPrivateKey( new JcePBESecretKeyDecryptorBuilder().setProvider( provider )
-                                                                                   .build( secretPwd.toCharArray() ) );
+                                                                                         .build( secretPwd
+                                                                                                 .toCharArray() ) );
             }
         }
         catch ( final Exception e )
         {
             // Don't print the passphrase but do print null if thats what it was
             final String passphraseMessage = ( secretPwd == null ) ? "null" : "supplied";
-            System.err.println( "Unable to extract key " + secretKey.getKeyID() + " using " + passphraseMessage + " passphrase" );
+            System.err.println(
+                    "Unable to extract key " + secretKey.getKeyID() + " using " + passphraseMessage + " passphrase" );
         }
         return null;
     }
 
-    /**************************************************
-     *
+
+    /**
+     * ***********************************************
      */
     private static PGPPublicKey findPublicKey( InputStream publicKeyRing, String id, boolean fingerprint )
             throws IOException, PGPException
@@ -1253,21 +1222,20 @@ public class PGPEncryptionUtil
     }
 
 
-    /*************************************************************
-    *  Load Keyring  file into InpurStream.
-    */
-    public static InputStream loadKeyring( String keyringFile)
+    /**
+     * ********************************************************** Load Keyring  file into InpurStream.
+     */
+    public static InputStream loadKeyring( String keyringFile )
     {
         try
         {
-            FileInputStream keyIn = new FileInputStream(keyringFile);
+            FileInputStream keyIn = new FileInputStream( keyringFile );
 
             return keyIn;
         }
-        catch(IOException ex)
+        catch ( IOException ex )
         {
             return null;
         }
-
     }
 }

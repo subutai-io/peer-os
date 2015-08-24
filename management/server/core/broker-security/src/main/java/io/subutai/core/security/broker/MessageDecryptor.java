@@ -6,9 +6,10 @@ import org.bouncycastle.openpgp.PGPSecretKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
+import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
 import io.subutai.core.broker.api.ByteMessagePreProcessor;
 import io.subutai.core.broker.api.Topic;
+import io.subutai.core.security.api.crypto.EncryptionTool;
 
 
 /**
@@ -42,14 +43,16 @@ public class MessageDecryptor implements ByteMessagePreProcessor
                 PGPSecretKey peerKeyForDecrypting =
                         MessageEncryptor.getSecurityManager().getKeyManager().getSecretKey( null );
 
-                PGPEncryptionUtil.ContentAndSignatures contentAndSignatures = PGPEncryptionUtil
-                        .decryptAndReturnSignatures( message, peerKeyForDecrypting, MessageEncryptor.SECRET_PWD );
+                EncryptionTool encryptionTool = MessageEncryptor.getSecurityManager().getEncryptionTool();
+
+
+                ContentAndSignatures contentAndSignatures = encryptionTool.decryptAndReturnSignatures( message );
 
                 //todo obtain target host pub key by id from content for verifying
                 //until then imitate obtaining target host pub key
                 PGPPublicKey hostKeyForVerifying = peerKeyForDecrypting.getPublicKey();
 
-                if ( PGPEncryptionUtil.verifySignature( contentAndSignatures, hostKeyForVerifying ) )
+                if ( encryptionTool.verifySignature( contentAndSignatures, hostKeyForVerifying ) )
                 {
                     LOG.info( String.format( "Verification succeeded%nDecrypted Message: %s",
                             new String( contentAndSignatures.getDecryptedContent() ) ) );

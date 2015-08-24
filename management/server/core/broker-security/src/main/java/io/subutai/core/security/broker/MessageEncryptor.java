@@ -12,12 +12,12 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.command.Request;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.UUIDUtil;
 import io.subutai.core.broker.api.TextMessagePostProcessor;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.core.security.api.crypto.EncryptionTool;
 
 
 /**
@@ -26,8 +26,6 @@ import io.subutai.core.security.api.SecurityManager;
 public class MessageEncryptor implements TextMessagePostProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( MessageEncryptor.class.getName() );
-
-    public static final String SECRET_PWD = "12345678";
 
     private final boolean encryptionEnabled;
 
@@ -54,6 +52,8 @@ public class MessageEncryptor implements TextMessagePostProcessor
         {
             try
             {
+                EncryptionTool encryptionTool = getSecurityManager().getEncryptionTool();
+
                 //obtain peer private key for signing
                 PGPSecretKey peerKeyForSigning = getSecurityManager().getKeyManager().getSecretKey( null );
 
@@ -65,9 +65,8 @@ public class MessageEncryptor implements TextMessagePostProcessor
 
                 Request originalRequest = requestWrapper.getRequest();
 
-                String encryptedRequestString = new String( PGPEncryptionUtil
-                        .signAndEncrypt( JsonUtil.toJson( originalRequest ).getBytes(), peerKeyForSigning, SECRET_PWD,
-                                hostKeyForEncrypting, true ) );
+                String encryptedRequestString = new String( encryptionTool
+                        .signAndEncrypt( JsonUtil.toJson( originalRequest ).getBytes(), hostKeyForEncrypting, true ) );
 
                 EncryptedRequestWrapper encryptedRequestWrapper =
                         new EncryptedRequestWrapper( encryptedRequestString, originalRequest.getId() );

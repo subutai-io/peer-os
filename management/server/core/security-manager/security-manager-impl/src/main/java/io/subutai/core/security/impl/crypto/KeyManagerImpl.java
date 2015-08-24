@@ -235,7 +235,7 @@ public class KeyManagerImpl implements KeyManager
     {
         PGPPrivateKey privateKey = null;
 
-        if ( "".equals( hostId ) )
+        if ( Strings.isNullOrEmpty( hostId ) )
         {
             hostId = manHostId;
         }

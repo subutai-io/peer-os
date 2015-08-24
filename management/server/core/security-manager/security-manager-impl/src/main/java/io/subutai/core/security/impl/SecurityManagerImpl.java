@@ -1,9 +1,6 @@
 package io.subutai.core.security.impl;
 
 
-import java.util.UUID;
-
-import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,27 +35,23 @@ public class SecurityManagerImpl implements SecurityManager
     private PeerManager peerManager;
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public void init()
     {
         manHostId = peerManager.getLocalPeerInfo().getId().toString();
         securityManagerDAO = new SecurityManagerDAOImpl( daoManager );
-        encryptionTool = new EncryptionToolImpl();
 
-        keyManager = new KeyManagerImpl( securityManagerDAO,
-                keyServer,
-                secretKeyringFile,
-                secretKeyringPwd,
-                manHostId,
-                manHostKeyFingerprint);
+        keyManager = new KeyManagerImpl( securityManagerDAO, keyServer, secretKeyringFile, secretKeyringPwd, manHostId,
+                manHostKeyFingerprint );
 
+        encryptionTool = new EncryptionToolImpl( ( KeyManagerImpl ) keyManager );
     }
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public void destroy()
     {
@@ -66,8 +59,8 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     @Override
     public KeyManager getKeyManager()
@@ -76,18 +69,17 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
-    @Override
     public void setKeyManager( KeyManager keyManager )
     {
         this.keyManager = keyManager;
     }
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public DaoManager getDaoManager()
     {
@@ -95,8 +87,8 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public void setDaoManager( final DaoManager daoManager )
     {
@@ -104,8 +96,8 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public SecurityManagerDAO getSecurityManagerDAO()
     {
@@ -113,8 +105,8 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public void setSecurityManagerDAO( final SecurityManagerDAO securityManagerDAO )
     {
@@ -122,8 +114,8 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public KeyServer getKeyServer()
     {
@@ -131,8 +123,8 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public void setKeyServer( final KeyServer keyServer )
     {
@@ -140,8 +132,8 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public String getSecretKeyringFile()
     {
@@ -149,8 +141,8 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public void setSecretKeyringFile( final String secretKeyringFile )
     {
@@ -158,8 +150,8 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public String getSecretKeyringPwd()
     {
@@ -167,8 +159,8 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public void setSecretKeyringPwd( final String secretKeyringPwd )
     {
@@ -176,8 +168,8 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public EncryptionTool getEncryptionTool()
     {
@@ -185,8 +177,8 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public void setEncryptionTool( final EncryptionTool encryptionTool )
     {
@@ -194,8 +186,8 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public String getManHostId()
     {
@@ -203,8 +195,8 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public void setManHostId( final String manHostId )
     {
@@ -212,8 +204,8 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public PeerManager getPeerManager()
     {
@@ -221,8 +213,8 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public void setPeerManager( final PeerManager peerManager )
     {
@@ -230,16 +222,17 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public String getManHostKeyFingerprint()
     {
         return manHostKeyFingerprint;
     }
 
-    /********************************
-     *
+
+    /**
+     * *****************************
      */
 
     public void setManHostKeyFingerprint( final String manHostKeyFingerprint )
