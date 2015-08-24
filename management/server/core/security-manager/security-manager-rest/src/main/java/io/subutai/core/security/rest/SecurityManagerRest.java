@@ -22,4 +22,8 @@ public interface SecurityManagerRest
     /********************************
      *
      */
+    @GET
+    @Path( "public-key" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getPublicKey();
 }

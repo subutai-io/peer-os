@@ -33,8 +33,13 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     public SecurityManagerRestImpl( SecurityManager securityManager )
     {
         this.securityManager = securityManager;
+
     }
 
 
-
+    @Override
+    public Response getPublicKey()
+    {
+        return Response.ok( securityManager.getKeyManager().getPublicKeyAsASCII( null ) ).build();
+    }
 }

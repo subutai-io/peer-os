@@ -3,35 +3,18 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <artifactId>security-manager</artifactId>
+    <artifactId>node-registration</artifactId>
     <groupId>io.subutai</groupId>
     <version>2.0.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-
-  <artifactId>security-manager-rest</artifactId>
-  <packaging>bundle</packaging>
-  <name>Subutai Security Manager Rest</name>
-  <description>Subutai Security Manager Rest</description>
+  <artifactId>node-registration-api</artifactId>
 
   <dependencies>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>io.subutai</groupId>
       <artifactId>subutai-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>security-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <scope>test</scope></dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -46,15 +29,14 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
-            <Bundle-SymbolicName>${project.groupId}.core.security.rest</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.registration.api</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
-            <Import-Package>*</Import-Package>
           </instructions>
         </configuration>
       </plugin>
     </plugins>
   </build>
+
 </project>
