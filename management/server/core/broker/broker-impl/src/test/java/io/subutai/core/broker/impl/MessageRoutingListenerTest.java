@@ -48,6 +48,8 @@ public class MessageRoutingListenerTest
     @Mock
     TextMessage textMessage;
 
+    io.subutai.core.broker.api.Topic topic;
+
 
     MessageRoutingListener router;
 
@@ -83,24 +85,24 @@ public class MessageRoutingListenerTest
     {
         when( bytesMessage.getBodyLength() ).thenReturn( 1L );
 
-        router.notifyListener( byteMessageListener, bytesMessage );
+        router.notifyListener( byteMessageListener, bytesMessage, topic );
 
         verify( byteMessageListener ).onMessage( isA( byte[].class ) );
 
-        router.notifyListener( textMessageListener, textMessage );
+        router.notifyListener( textMessageListener, textMessage, topic );
 
         verify( textMessageListener ).onMessage( anyString() );
 
         reset( byteMessageListener );
 
-        router.notifyListener( byteMessageListener, textMessage );
+        router.notifyListener( byteMessageListener, textMessage, topic );
 
         verifyZeroInteractions( byteMessageListener );
 
         JMSException exception = mock( JMSException.class );
         doThrow( exception ).when( bytesMessage ).getBodyLength();
 
-        router.notifyListener( byteMessageListener, bytesMessage );
+        router.notifyListener( byteMessageListener, bytesMessage, topic );
 
         verify( exception ).printStackTrace( any( PrintStream.class ) );
     }

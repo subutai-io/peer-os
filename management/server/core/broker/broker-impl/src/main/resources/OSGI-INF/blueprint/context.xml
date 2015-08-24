@@ -24,7 +24,41 @@
     <argument value="${isPersistent}" />
     <argument value="${messageTimeout}" />
     <argument value="${idleConnectionTimeout}" />
+
   </bean>
+
+  <!-- message interceptors start -->
+
+  <reference-list id="byteMessagePreProcessor"
+                  interface="io.subutai.core.broker.api.ByteMessagePreProcessor"
+                  availability="optional">
+    <reference-listener ref="broker"
+                        bind-method="addByteMessagePreProcessor" unbind-method="removeByteMessagePreProcessor" />
+  </reference-list>
+
+  <reference-list id="byteMessagePostProcessor"
+                  interface="io.subutai.core.broker.api.ByteMessagePostProcessor"
+                  availability="optional">
+    <reference-listener ref="broker"
+                        bind-method="addByteMessagePostProcessor" unbind-method="removeByteMessagePostProcessor" />
+  </reference-list>
+  <reference-list id="textMessagePreProcessor"
+                  interface="io.subutai.core.broker.api.TextMessagePreProcessor"
+                  availability="optional">
+    <reference-listener ref="broker"
+                        bind-method="addTextMessagePreProcessor" unbind-method="removeTextMessagePreProcessor" />
+  </reference-list>
+
+  <reference-list id="textMessagePostProcessor"
+                  interface="io.subutai.core.broker.api.TextMessagePostProcessor"
+                  availability="optional">
+    <reference-listener ref="broker"
+                        bind-method="addTextMessagePostProcessor" unbind-method="removeTextMessagePostProcessor" />
+  </reference-list>
+
+  <!-- message interceptors end -->
+
+  <!-- message listeners start -->
 
   <reference-list id="byteMessageLstnr"
                   interface="io.subutai.core.broker.api.ByteMessageListener"
@@ -39,6 +73,8 @@
     <reference-listener ref="broker"
                         bind-method="addTextMessageListener" unbind-method="removeMessageListener" />
   </reference-list>
+
+  <!-- message listeners end -->
 
   <service ref="broker" interface="io.subutai.core.broker.api.Broker" />
 

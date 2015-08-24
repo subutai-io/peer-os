@@ -23,8 +23,12 @@ import com.google.common.base.Strings;
 import io.subutai.core.broker.api.Broker;
 import io.subutai.core.broker.api.BrokerException;
 import io.subutai.core.broker.api.ByteMessageListener;
+import io.subutai.core.broker.api.ByteMessagePostProcessor;
+import io.subutai.core.broker.api.ByteMessagePreProcessor;
 import io.subutai.core.broker.api.MessageListener;
 import io.subutai.core.broker.api.TextMessageListener;
+import io.subutai.core.broker.api.TextMessagePostProcessor;
+import io.subutai.core.broker.api.TextMessagePreProcessor;
 import io.subutai.core.broker.api.Topic;
 
 
@@ -42,6 +46,8 @@ public class BrokerImpl implements Broker
     private final boolean isPersistent;
     private final int messageTimeout;
     private final int idleConnectionTimeout;
+    private ByteMessagePostProcessor byteMessagePostProcessor;
+    private TextMessagePostProcessor textMessagePostProcessor;
 
 
     public BrokerImpl( final String brokerUrl, final int maxBrokerConnections, final boolean isPersistent,
@@ -62,20 +68,32 @@ public class BrokerImpl implements Broker
 
 
     @Override
-    public void sendTextMessage( final String topic, final String message ) throws BrokerException
+    public void sendTextMessage( final String topic, String message ) throws BrokerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( topic ), "Invalid topic" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( message ), "Message is empty" );
+
+        //post-process the message
+        if ( textMessagePostProcessor != null )
+        {
+            message = textMessagePostProcessor.process( topic, message );
+        }
 
         sendMessage( topic, message );
     }
 
 
     @Override
-    public void sendByteMessage( final String topic, final byte[] message ) throws BrokerException
+    public void sendByteMessage( final String topic, byte[] message ) throws BrokerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( topic ), "Invalid topic" );
         Preconditions.checkArgument( message != null && message.length > 0, "Message is empty" );
+
+        //post-process the message
+        if ( byteMessagePostProcessor != null )
+        {
+            message = byteMessagePostProcessor.process( topic, message );
+        }
 
         sendMessage( topic, message );
     }
@@ -96,6 +114,79 @@ public class BrokerImpl implements Broker
         Preconditions.checkNotNull( listener.getTopic() );
 
         messageRouter.addListener( listener );
+    }
+
+
+    public void addByteMessagePreProcessor( final ByteMessagePreProcessor byteMessagePreProcessor )
+    {
+        if ( byteMessagePreProcessor != null )
+        {
+            messageRouter.addByteMessagePreProcessor( byteMessagePreProcessor );
+        }
+    }
+
+
+    public void removeByteMessagePreProcessor( final ByteMessagePreProcessor byteMessagePreProcessor )
+    {
+
+        if ( byteMessagePreProcessor != null )
+        {
+            messageRouter.removeByteMessagePreProcessor( byteMessagePreProcessor );
+        }
+    }
+
+
+    public void addTextMessagePreProcessor( final TextMessagePreProcessor textMessagePreProcessor )
+    {
+        if ( textMessagePreProcessor != null )
+        {
+            messageRouter.addTextMessagePreProcessor( textMessagePreProcessor );
+        }
+    }
+
+
+    public void removeTextMessagePreProcessor( final TextMessagePreProcessor textMessagePreProcessor )
+    {
+        if ( textMessagePreProcessor != null )
+        {
+            messageRouter.removeTextMessagePreProcessor( textMessagePreProcessor );
+        }
+    }
+
+
+    public void addByteMessagePostProcessor( final ByteMessagePostProcessor byteMessagePostProcessor )
+    {
+        if ( byteMessagePostProcessor != null )
+        {
+            this.byteMessagePostProcessor = byteMessagePostProcessor;
+        }
+    }
+
+
+    public void removeByteMessagePostProcessor( final ByteMessagePostProcessor byteMessagePostProcessor )
+    {
+        if ( byteMessagePostProcessor != null )
+        {
+            this.byteMessagePostProcessor = null;
+        }
+    }
+
+
+    public void addTextMessagePostProcessor( final TextMessagePostProcessor textMessagePostProcessor )
+    {
+        if ( textMessagePostProcessor != null )
+        {
+            this.textMessagePostProcessor = textMessagePostProcessor;
+        }
+    }
+
+
+    public void removeTextMessagePostProcessor( final TextMessagePostProcessor textMessagePostProcessor )
+    {
+        if ( textMessagePostProcessor != null )
+        {
+            this.textMessagePostProcessor = null;
+        }
     }
 
 
