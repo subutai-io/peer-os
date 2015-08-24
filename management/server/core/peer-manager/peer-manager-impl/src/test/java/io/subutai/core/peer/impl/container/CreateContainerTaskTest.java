@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
@@ -81,15 +82,15 @@ public class CreateContainerTaskTest
     @Test( expected = ResourceHostException.class )
     public void testIsTemplateExists() throws Exception
     {
-        assertTrue( task.isTemplateExists( template ) );
+        assertTrue( task.templateExists( template ) );
 
         when( commandResult.getStdOut() ).thenReturn( "" );
 
-        assertFalse( task.isTemplateExists( template ) );
+        assertFalse( task.templateExists( template ) );
 
         doThrow( new CommandException( "" ) ).when( resourceHost ).execute( any( RequestBuilder.class ) );
 
-        task.isTemplateExists( template );
+        task.templateExists( template );
     }
 
 
@@ -107,21 +108,6 @@ public class CreateContainerTaskTest
     }
 
 
-    @Test( expected = ResourceHostException.class )
-    public void testUpdateRepository() throws Exception
-    {
-        when( commandResult.hasSucceeded() ).thenReturn( false );
-
-        task.updateRepository( template );
-
-        verify( resourceHost, times( 2 ) ).execute( any( RequestBuilder.class ) );
-
-        doThrow( new CommandException( "" ) ).when( resourceHost ).execute( any( RequestBuilder.class ) );
-
-        task.updateRepository( template );
-    }
-
-
     @Test
     public void testCall() throws Exception
     {
@@ -129,12 +115,12 @@ public class CreateContainerTaskTest
 
         verify( containerHost ).setDefaultGateway( GATEWAY );
 
-        CreateContainerTask task = new CreateContainerTask( resourceHost, template, HOSTNAME, CIDR, VLAN, GATEWAY, TIMEOUT );
+        CreateContainerTask task =
+                new CreateContainerTask( resourceHost, template, HOSTNAME, CIDR, VLAN, GATEWAY, TIMEOUT );
         task.commandUtil = commandUtil;
 
         task.call();
 
         verify( containerHost, times( 2 ) ).setDefaultGateway( GATEWAY );
-
     }
 }

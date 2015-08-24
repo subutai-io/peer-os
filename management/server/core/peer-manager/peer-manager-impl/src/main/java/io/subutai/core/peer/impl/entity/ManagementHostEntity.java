@@ -121,11 +121,11 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    public void addAptSource( final String hostname, final String ip ) throws PeerException
+    public void addRepository( final String ip ) throws PeerException
     {
         try
         {
-            getRepositoryManager().addAptSource( hostname, ip );
+            getRepositoryManager().addRepository( ip );
         }
         catch ( RepositoryException e )
         {
@@ -135,11 +135,11 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    public void removeAptSource( final String host, final String ip ) throws PeerException
+    public void removeRepository( final String host, final String ip ) throws PeerException
     {
         try
         {
-            getRepositoryManager().removeAptSource( ip );
+            getRepositoryManager().removeRepository( ip );
         }
         catch ( RepositoryException e )
         {

@@ -19,12 +19,12 @@ public interface ManagementHost extends Host
     /**
      * Adds remote apt repository to local apt sources
      */
-    public void addAptSource( final String host, final String ip ) throws PeerException;
+    public void addRepository( final String ip ) throws PeerException;
 
     /**
      * Removes remote apt repository from local apt sources
      */
-    public void removeAptSource( final String host, final String ip ) throws PeerException;
+    public void removeRepository( final String host, final String ip ) throws PeerException;
 
     /**
      * Reads local file's contents as string

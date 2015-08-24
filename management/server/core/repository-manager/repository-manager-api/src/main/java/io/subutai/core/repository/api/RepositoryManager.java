@@ -78,7 +78,7 @@ public interface RepositoryManager
     public String getFullPackageName( String shortPackageName ) throws RepositoryException;
 
 
-    public void addAptSource( String hostname, String ip ) throws RepositoryException;
+    public void addRepository( String ip ) throws RepositoryException;
 
-    public void removeAptSource( String ip ) throws RepositoryException;
+    public void removeRepository( String ip ) throws RepositoryException;
 }

@@ -5,6 +5,11 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
+
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -22,10 +27,6 @@ import io.subutai.core.peer.impl.container.DestroyEnvironmentContainersRequestLi
 import io.subutai.core.peer.impl.dao.PeerDAO;
 import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Lists;
 
 
 /**
@@ -90,7 +91,7 @@ public class PeerManagerImpl implements PeerManager
     public boolean register( final PeerInfo peerInfo ) throws PeerException
     {
         ManagementHost managementHost = getLocalPeer().getManagementHost();
-        managementHost.addAptSource( peerInfo.getId().toString(), peerInfo.getIp() );
+        managementHost.addRepository( peerInfo.getIp() );
 
         return peerDAO.saveInfo( SOURCE_REMOTE_PEER, peerInfo.getId().toString(), peerInfo );
     }
@@ -107,7 +108,7 @@ public class PeerManagerImpl implements PeerManager
         ManagementHostEntity managementHost = ( ManagementHostEntity ) mgmHost;
         UUID remotePeerId = UUID.fromString( uuid );
         PeerInfo p = getPeerInfo( remotePeerId );
-        managementHost.removeAptSource( p.getId().toString(), p.getIp() );
+        managementHost.removeRepository( p.getId().toString(), p.getIp() );
         managementHost.removeTunnel( p.getIp() );
 
         PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( remotePeerId );
