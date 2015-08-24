@@ -11,12 +11,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.NumUtil;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 
 /**
