@@ -4,6 +4,8 @@ package io.subutai.core.registration.impl.resource.entity;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,6 +29,7 @@ import io.subutai.core.registration.api.resource.host.VirtualHost;
  */
 @Entity
 @Table( name = "host_containers" )
+@Access( AccessType.FIELD )
 public class VirtualHostImpl implements VirtualHost
 {
     @Id

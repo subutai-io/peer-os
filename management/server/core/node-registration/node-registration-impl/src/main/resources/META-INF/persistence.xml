@@ -6,7 +6,7 @@
   <persistence-unit name="nodeRegistrationUnit" transaction-type="RESOURCE_LOCAL">
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/subutaiDS)
     </non-jta-data-source>
-    <!--<class>io.subutai.common.peer.InterfaceModel</class>-->
+    <class>io.subutai.common.peer.InterfaceModel</class>
     <class>io.subutai.core.registration.impl.resource.entity.RequestedHostImpl</class>
     <class>io.subutai.core.registration.impl.resource.entity.VirtualHostImpl</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>

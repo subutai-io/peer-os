@@ -1,6 +1,9 @@
 package io.subutai.core.registration.impl.resource.entity;
 
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Access;
@@ -12,7 +15,9 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.google.common.collect.Sets;
@@ -40,15 +45,19 @@ public class RequestedHostImpl implements RequestedHost
     @Column( name = "hostname" )
     private String hostname;
 
-//    @Column( name = "interfaces" )
-//    @OneToMany( targetEntity = InterfaceModel.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL,
-//            orphanRemoval = true )
-//    private Set<Interface> interfaces;
-//
-//    @Column( name = "containers" )
-//    @OneToMany( targetEntity = VirtualHostImpl.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL,
-//            orphanRemoval = true )
-//    private Set<VirtualHost> containers;
+    //    private InterfaceModel interfaceModel;
+
+
+    //    @Column( name = "interface_model" )
+    //    @OneToOne( fetch = FetchType.EAGER, cascade = CascadeType.ALL )
+    //    @OneToMany( orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL )
+    //    @JoinColumn( name = "raw_interfaces" )
+    //    private Set<InterfaceModel> interfaces = Sets.newHashSet();
+    //
+    //    @Column( name = "containers" )
+    //    @OneToMany( targetEntity = VirtualHostImpl.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL,
+    //            orphanRemoval = true )
+    //    private Set<VirtualHost> containers;
 
     @Column( name = "arch" )
     @Enumerated( EnumType.STRING )
@@ -99,16 +108,24 @@ public class RequestedHostImpl implements RequestedHost
     @Override
     public Set<Interface> getInterfaces()
     {
+        //        Set<Interface> temp = Sets.newHashSet();
+        //        temp.addAll( interfaces );
+        //        return temp;
         return Sets.newHashSet();
-//        return interfaces;
     }
+
+
+//    public void setInterfaces( final Set<InterfaceModel> interfaces )
+//    {
+//        this.interfaces = interfaces;
+//    }
 
 
     @Override
     public Set<VirtualHost> getContainers()
     {
         return Sets.newHashSet();
-//        return containers;
+        //        return containers;
     }
 
 
@@ -177,8 +194,8 @@ public class RequestedHostImpl implements RequestedHost
         return "RequestedHostImpl{" +
                 "id='" + id + '\'' +
                 ", hostname='" + hostname + '\'' +
-//                ", interfaces=" + interfaces +
-//                ", containers=" + containers +
+                //                ", interfaces=" + interfaces +
+                //                ", containers=" + containers +
                 ", arch=" + arch +
                 ", publicKey='" + publicKey + '\'' +
                 ", restHook='" + restHook + '\'' +

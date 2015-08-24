@@ -8,8 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.peer.InterfaceModel;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.resource.host.RequestedHost;
@@ -28,16 +30,23 @@ public class RegistrationManagerImpl implements RegistrationManager
 
     public void init()
     {
-        RequestedHostImpl temp =
-                new RequestedHostImpl( UUID.randomUUID().toString(), "hostname", HostArchitecture.AMD64, "some key",
-                        "some rest hook", RegistrationStatus.REQUESTED );
-        requestDataService.persist( temp );
-        LOGGER.error( "Started RegistrationManagerImpl" );
-        List<RequestedHostImpl> requestedHosts = ( List<RequestedHostImpl> ) requestDataService.getAll();
-        for ( final RequestedHostImpl requestedHost : requestedHosts )
-        {
-            LOGGER.error( requestedHost.toString() );
-        }
+        //        RequestedHostImpl temp =
+        //                new RequestedHostImpl( UUID.randomUUID().toString(), "hostname", HostArchitecture.AMD64,
+        // "some key",
+        //                        "some rest hook", RegistrationStatus.REQUESTED );
+        //        InterfaceModel interfaceModel = new InterfaceModel();
+        //        interfaceModel.setMac( UUID.randomUUID().toString() );
+        //        interfaceModel.setIp( "Some ip" );
+        //        interfaceModel.setInterfaceName( "Some i-name" );
+        //        temp.setInterfaces( Sets.newHashSet( interfaceModel ) );
+        //
+        //        requestDataService.persist( temp );
+        LOGGER.info( "Started RegistrationManagerImpl" );
+        //        List<RequestedHostImpl> requestedHosts = ( List<RequestedHostImpl> ) requestDataService.getAll();
+        //        for ( final RequestedHostImpl requestedHost : requestedHosts )
+        //        {
+        //            LOGGER.error( requestedHost.toString() );
+        //        }
     }
 
 
