@@ -1,11 +1,15 @@
 package io.subutai.core.security.impl;
 
 
+import java.util.UUID;
+
+import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.keyserver.api.KeyServer;
+import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -27,17 +31,29 @@ public class SecurityManagerImpl implements SecurityManager
     private EncryptionTool encryptionTool = null;
     private SecurityManagerDAO securityManagerDAO = null;
     private KeyServer keyServer = null;
-    private String secretKeyring;
+    private String secretKeyringFile;
     private String secretKeyringPwd;
+    private String manHostId;
+    private String manHostKeyFingerprint;
+    private PeerManager peerManager;
+
 
     /********************************
      *
      */
     public void init()
     {
+        manHostId = peerManager.getLocalPeerInfo().getId().toString();
         securityManagerDAO = new SecurityManagerDAOImpl( daoManager );
-        encryptionTool     = new EncryptionToolImpl();
-        keyManager = new KeyManagerImpl(securityManagerDAO,keyServer,secretKeyring,secretKeyringPwd);
+        encryptionTool = new EncryptionToolImpl();
+
+        keyManager = new KeyManagerImpl( securityManagerDAO,
+                keyServer,
+                secretKeyringFile,
+                secretKeyringPwd,
+                manHostId,
+                manHostKeyFingerprint);
+
     }
 
 
@@ -124,25 +140,22 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
+    /********************************
+     *
+     */
+    public String getSecretKeyringFile()
+    {
+        return secretKeyringFile;
+    }
+
 
     /********************************
      *
      */
-    public String getSecretKeyring()
+    public void setSecretKeyringFile( final String secretKeyringFile )
     {
-        return secretKeyring;
+        this.secretKeyringFile = secretKeyringFile;
     }
-
-
-
-    /********************************
-     *
-     */
-    public void setSecretKeyring( final String secretKeyring )
-    {
-        this.secretKeyring = secretKeyring;
-    }
-
 
 
     /********************************
@@ -178,5 +191,59 @@ public class SecurityManagerImpl implements SecurityManager
     public void setEncryptionTool( final EncryptionTool encryptionTool )
     {
         this.encryptionTool = encryptionTool;
+    }
+
+
+    /********************************
+     *
+     */
+    public String getManHostId()
+    {
+        return manHostId;
+    }
+
+
+    /********************************
+     *
+     */
+    public void setManHostId( final String manHostId )
+    {
+        this.manHostId = manHostId;
+    }
+
+
+    /********************************
+     *
+     */
+    public PeerManager getPeerManager()
+    {
+        return peerManager;
+    }
+
+
+    /********************************
+     *
+     */
+    public void setPeerManager( final PeerManager peerManager )
+    {
+        this.peerManager = peerManager;
+    }
+
+
+    /********************************
+     *
+     */
+    public String getManHostKeyFingerprint()
+    {
+        return manHostKeyFingerprint;
+    }
+
+    /********************************
+     *
+     */
+
+    public void setManHostKeyFingerprint( final String manHostKeyFingerprint )
+    {
+        this.manHostKeyFingerprint = manHostKeyFingerprint;
     }
 }

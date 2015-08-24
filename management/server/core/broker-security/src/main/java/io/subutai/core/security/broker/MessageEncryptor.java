@@ -40,7 +40,7 @@ public class MessageEncryptor implements TextMessagePostProcessor
 
         try
         {
-            //assume this is a host topic
+            //assume this is a host  topic
             if ( UUIDUtil.isStringAUuid( topic ) )
             {
 
