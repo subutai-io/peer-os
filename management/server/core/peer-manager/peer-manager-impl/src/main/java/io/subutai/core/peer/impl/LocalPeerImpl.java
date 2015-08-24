@@ -291,7 +291,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         //TODO get ownerId from persistent storage
         peerInfo.setOwnerId( UUID.randomUUID() );
         setPeerIp();
-        peerInfo.setName( String.format( "Peer on %s", peerInfo.getIp() ) );
+        peerInfo.setName( String.format( "Peer %s", peerInfo.getId() ) );
 
         peerDAO.saveInfo( PeerManager.SOURCE_LOCAL_PEER, peerInfo.getId().toString(), peerInfo );
     }
@@ -978,8 +978,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
-                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder(
+                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
+                    bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
