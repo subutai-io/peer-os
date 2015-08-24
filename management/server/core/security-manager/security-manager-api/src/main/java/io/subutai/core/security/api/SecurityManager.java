@@ -1,6 +1,7 @@
 package io.subutai.core.security.api;
 
 
+import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 
 
@@ -10,15 +11,11 @@ import io.subutai.core.security.api.crypto.KeyManager;
 public interface SecurityManager
 {
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public KeyManager getKeyManager();
 
 
-
-    /********************************
-     *
-     */
-    public void setKeyManager( KeyManager keyManager );
+    public EncryptionTool getEncryptionTool();
 }

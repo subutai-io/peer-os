@@ -328,7 +328,7 @@ public class RequestBuilder
     }
 
 
-    static class RequestImpl implements Request
+    public static class RequestImpl implements Request
     {
         private RequestType type;
         private UUID id;
