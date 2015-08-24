@@ -1,8 +1,9 @@
 package io.subutai.core.security.broker;
 
 
-import java.io.InputStream;
 import java.util.UUID;
+
+import javax.naming.NamingException;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPSecretKey;
@@ -13,8 +14,10 @@ import io.subutai.common.command.Request;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.UUIDUtil;
 import io.subutai.core.broker.api.TextMessagePostProcessor;
+import io.subutai.core.security.api.SecurityManager;
 
 
 /**
@@ -24,13 +27,21 @@ public class MessageEncryptor implements TextMessagePostProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( MessageEncryptor.class.getName() );
 
-    public static final String PUBLIC_KEYRING = "dummy.pkr";
-    public static final String SECRET_KEYRING = "dummy.skr";
-
-    public static final String PUBLIC_KEY_ID = "e2451337c277dbf1";
-    public static final String SECRET_KEY_ID = "d558f9a4a0b450b3";
-
     public static final String SECRET_PWD = "12345678";
+
+    private final boolean encryptionEnabled;
+
+
+    public MessageEncryptor( final boolean encryptionEnabled )
+    {
+        this.encryptionEnabled = encryptionEnabled;
+    }
+
+
+    public static SecurityManager getSecurityManager() throws NamingException
+    {
+        return ServiceLocator.getServiceNoCache( SecurityManager.class );
+    }
 
 
     @Override
@@ -38,18 +49,17 @@ public class MessageEncryptor implements TextMessagePostProcessor
     {
         LOG.info( String.format( "OUTGOING:%s", message ) );
 
-        try
+        //assume this is a host  topic
+        if ( encryptionEnabled && UUIDUtil.isStringAUuid( topic ) )
         {
-            //assume this is a host  topic
-            if ( UUIDUtil.isStringAUuid( topic ) )
+            try
             {
+                //obtain peer private key for signing
+                PGPSecretKey peerKeyForSigning = getSecurityManager().getKeyManager().getSecretKey( null );
 
-                //todo obtain MH private key
-                PGPSecretKey peerKeyForSigning =
-                        PGPEncryptionUtil.findSecretKeyById( findFile( SECRET_KEYRING ), SECRET_KEY_ID );
-                //todo obtain target host pub key
-                PGPPublicKey hostKeyForEncrypting =
-                        PGPEncryptionUtil.findPublicKeyById( findFile( PUBLIC_KEYRING ), PUBLIC_KEY_ID );
+                //todo obtain target host pub key for encrypting
+                //until then imitate obtaining target host pub key
+                PGPPublicKey hostKeyForEncrypting = peerKeyForSigning.getPublicKey();
 
                 RequestWrapper requestWrapper = JsonUtil.fromJson( message, RequestWrapper.class );
 
@@ -64,23 +74,17 @@ public class MessageEncryptor implements TextMessagePostProcessor
 
                 String encryptedRequestWrapperString = JsonUtil.toJson( encryptedRequestWrapper );
 
-                LOG.info( String.format( "ENCRYPTED: %s", encryptedRequestWrapperString ) );
+                LOG.info( String.format( "Sending encrypted message: %s", encryptedRequestWrapperString ) );
 
                 return encryptedRequestWrapperString;
             }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error in process", e );
+            catch ( Exception e )
+            {
+                LOG.error( "Error in process", e );
+            }
         }
 
         return message;
-    }
-
-
-    public static InputStream findFile( final String file )
-    {
-        return MessageEncryptor.class.getClassLoader().getResourceAsStream( file );
     }
 
 

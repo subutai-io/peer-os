@@ -18,54 +18,54 @@ public class MessageDecryptor implements ByteMessagePreProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( MessageDecryptor.class.getName() );
 
+    private final boolean encryptionEnabled;
+
+
+    public MessageDecryptor( final boolean encryptionEnabled )
+    {
+        this.encryptionEnabled = encryptionEnabled;
+    }
+
 
     @Override
     public byte[] process( final String topic, final byte[] message )
     {
         LOG.info( String.format( "INCOMING:%s", new String( message ) ) );
 
-        try
+        //process incoming heartbeats and responses
+        if ( encryptionEnabled && ( Topic.RESPONSE_TOPIC.name().equalsIgnoreCase( topic ) || Topic.HEARTBEAT_TOPIC
+                .name().equalsIgnoreCase( topic ) ) )
         {
-            //process incoming heartbeats and responses
-            if ( Topic.RESPONSE_TOPIC.name().equalsIgnoreCase( topic ) || Topic.HEARTBEAT_TOPIC.name().equalsIgnoreCase(
-                    topic ) )
+            try
             {
-                //imitate obtaining MH private key and sender host pub key
-                PGPSecretKey signingKey = PGPEncryptionUtil
-                        .findSecretKeyById( MessageEncryptor.findFile( MessageEncryptor.SECRET_KEYRING ),
-                                MessageEncryptor.SECRET_KEY_ID );
-                PGPPublicKey encryptingKey = PGPEncryptionUtil
-                        .findPublicKeyById( MessageEncryptor.findFile( MessageEncryptor.PUBLIC_KEYRING ),
-                                MessageEncryptor.PUBLIC_KEY_ID );
-
-                //todo obtain MH private key
-                PGPSecretKey peerKeyForDecrypting = PGPEncryptionUtil
-                        .findSecretKeyByFingerprint( MessageEncryptor.findFile( MessageEncryptor.SECRET_KEYRING ),
-                                PGPEncryptionUtil.BytesToHex( encryptingKey.getFingerprint() ) );
+                //obtain peer private key for decrypting
+                PGPSecretKey peerKeyForDecrypting =
+                        MessageEncryptor.getSecurityManager().getKeyManager().getSecretKey( null );
 
                 PGPEncryptionUtil.ContentAndSignatures contentAndSignatures = PGPEncryptionUtil
                         .decryptAndReturnSignatures( message, peerKeyForDecrypting, MessageEncryptor.SECRET_PWD );
 
-                //todo obtain target host pub key by id from content
-                PGPPublicKey hostKeyForVerifying = signingKey.getPublicKey();
+                //todo obtain target host pub key by id from content for verifying
+                //until then imitate obtaining target host pub key
+                PGPPublicKey hostKeyForVerifying = peerKeyForDecrypting.getPublicKey();
 
                 if ( PGPEncryptionUtil.verifySignature( contentAndSignatures, hostKeyForVerifying ) )
                 {
                     LOG.info( String.format( "Verification succeeded%nDecrypted Message: %s",
                             new String( contentAndSignatures.getDecryptedContent() ) ) );
+
+                    return contentAndSignatures.getDecryptedContent();
                 }
                 else
                 {
-                    LOG.info( String.format( "Verification failed%nDecrypted Message: %s",
+                    throw new IllegalArgumentException( String.format( "Verification failed%nDecrypted Message: %s",
                             new String( contentAndSignatures.getDecryptedContent() ) ) );
                 }
-
-                return contentAndSignatures.getDecryptedContent();
             }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error in process", e );
+            catch ( Exception e )
+            {
+                LOG.error( "Error in process", e );
+            }
         }
 
         return message;
