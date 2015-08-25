@@ -240,4 +240,10 @@ public class SecurityManagerImpl implements SecurityManager
     {
         this.manHostKeyFingerprint = manHostKeyFingerprint;
     }
+
+
+    public void setPublicKeyringFile( final String publicKeyringFile )
+    {
+        this.publicKeyringFile = publicKeyringFile;
+    }
 }

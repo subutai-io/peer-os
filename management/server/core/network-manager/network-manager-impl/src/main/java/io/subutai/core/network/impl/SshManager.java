@@ -28,9 +28,9 @@ public class SshManager
     private static final Logger LOG = LoggerFactory.getLogger( SshManager.class.getName() );
 
     private Set<ContainerHost> containerHosts;
-
-    private List<String> keys;
     private Commands commands;
+
+    protected List<String> keys;
     protected CommandUtil commandUtil;
 
 
