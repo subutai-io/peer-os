@@ -17,8 +17,6 @@ public interface RegistrationManager
 
     public RequestedHost getRequest( UUID requestId );
 
-    public RequestedHost createHostRequest( String json );
-
     public void queueRequest( RequestedHost requestedHost );
 
     public void rejectRequest( UUID requestId );

@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
-import io.subutai.common.util.JsonUtil;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.resource.host.RequestedHost;
@@ -56,13 +55,6 @@ public class RegistrationManagerImpl implements RegistrationManager
     public RequestedHost getRequest( final UUID requestId )
     {
         return requestDataService.find( requestId );
-    }
-
-
-    @Override
-    public RequestedHost createHostRequest( final String json )
-    {
-        return JsonUtil.fromJson( json, RequestedHostImpl.class );
     }
 
 

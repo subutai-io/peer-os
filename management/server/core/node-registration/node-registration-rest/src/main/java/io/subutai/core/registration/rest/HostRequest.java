@@ -80,12 +80,6 @@ public class HostRequest implements RequestedHost
     }
 
 
-    public void setContainers( final Set<VirtualHost> containers )
-    {
-        //        this.containers = containers;
-    }
-
-
     @Override
     public HostArchitecture getArch()
     {
@@ -164,7 +158,6 @@ public class HostRequest implements RequestedHost
                 "id='" + id + '\'' +
                 ", hostname='" + hostname + '\'' +
                 ", interfaces=" + interfaces +
-                //                ", containers=" + containers +
                 ", arch=" + arch +
                 ", publicKey='" + publicKey + '\'' +
                 ", restHook='" + restHook + '\'' +

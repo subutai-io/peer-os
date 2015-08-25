@@ -16,7 +16,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>io.subutai</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
   </dependencies>
