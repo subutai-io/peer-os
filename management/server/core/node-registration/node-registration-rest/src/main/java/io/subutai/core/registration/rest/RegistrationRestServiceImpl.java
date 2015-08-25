@@ -46,6 +46,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     @Override
     public Response registerPublicKey( final String message )
     {
+        LOGGER.error( message );
         EncryptionTool encryptionTool = securityManager.getEncryptionTool();
         KeyManager keyManager = securityManager.getKeyManager();
         InputStream secretKey = PGPEncryptionUtil.getFileInputStream( keyManager.getSecretKeyringFile() );
