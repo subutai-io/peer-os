@@ -2,25 +2,20 @@ package io.subutai.core.registration.impl.resource.entity;
 
 
 import java.util.Set;
-import java.util.UUID;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.google.common.collect.Sets;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.Interface;
-import io.subutai.common.peer.InterfaceModel;
 import io.subutai.core.registration.api.resource.host.VirtualHost;
 
 
@@ -28,7 +23,7 @@ import io.subutai.core.registration.api.resource.host.VirtualHost;
  * Created by talas on 8/24/15.
  */
 @Entity
-@Table( name = "host_containers" )
+@Table( name = "resource_host_containers" )
 @Access( AccessType.FIELD )
 public class VirtualHostImpl implements VirtualHost
 {
@@ -51,6 +46,14 @@ public class VirtualHostImpl implements VirtualHost
 
     public VirtualHostImpl()
     {
+    }
+
+
+    public VirtualHostImpl( final String id, final String hostname, final HostArchitecture arch )
+    {
+        this.id = id;
+        this.hostname = hostname;
+        this.arch = arch;
     }
 
 

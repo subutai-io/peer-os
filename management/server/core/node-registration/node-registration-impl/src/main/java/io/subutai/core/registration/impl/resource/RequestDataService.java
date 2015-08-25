@@ -73,7 +73,7 @@ public class RequestDataService implements DataService<UUID, RequestedHostImpl>
         try
         {
             em.getTransaction().begin();
-            result = em.find( RequestedHostImpl.class, id );
+            result = em.find( RequestedHostImpl.class, id.toString() );
             em.getTransaction().commit();
         }
         catch ( Exception e )
@@ -125,7 +125,7 @@ public class RequestDataService implements DataService<UUID, RequestedHostImpl>
         try
         {
             em.getTransaction().begin();
-            RequestedHostImpl item = em.find( RequestedHostImpl.class, id );
+            RequestedHostImpl item = em.find( RequestedHostImpl.class, id.toString() );
             em.remove( item );
             em.getTransaction().commit();
         }
