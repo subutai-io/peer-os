@@ -27,6 +27,7 @@ import io.subutai.common.quota.RamQuota;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 
 import io.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
@@ -90,6 +91,8 @@ public class RestServiceImplTest
     PeerException peerException;
     @Mock
     ContainerHost containerHost;
+    @Mock
+    ManagementHost managementHost;
 
     RestServiceImpl restService;
 
@@ -121,6 +124,7 @@ public class RestServiceImplTest
         when( jsonUtil.from( CONTAINER_ID.toString(), UUID.class ) ).thenCallRealMethod();
         when( jsonUtil.from( JSON, PeerInfo.class ) ).thenReturn( peerInfo );
         when( localPeer.getContainerHostById( CONTAINER_ID ) ).thenReturn( containerHost );
+        when( localPeer.getManagementHost() ).thenReturn( managementHost );
     }
 
 

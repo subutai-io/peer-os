@@ -3,6 +3,7 @@ package io.subutai.core.security.impl.crypto;
 
 import java.io.InputStream;
 
+import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPSecretKey;
@@ -27,6 +28,7 @@ public class KeyManagerImpl implements KeyManager
 
     private SecurityManagerDAO securityManagerDAO = null;
     private KeyServer keyServer = null;
+    private String publicKeyringFile;
     private String secretKeyringFile;
     private String secretKeyringPwd;
     private String manHostId;
@@ -36,11 +38,13 @@ public class KeyManagerImpl implements KeyManager
     /**
      * *****************************
      */
-    public KeyManagerImpl( SecurityManagerDAO securityManagerDAO, KeyServer keyServer, String secretKeyringFile,
-                           String secretKeyringPwd, String manHostId, String manHostKeyFingerprint )
+    public KeyManagerImpl( SecurityManagerDAO securityManagerDAO, KeyServer keyServer, String publicKeyringFile,
+                           String secretKeyringFile, String secretKeyringPwd, String manHostId,
+                           String manHostKeyFingerprint )
     {
         this.securityManagerDAO = securityManagerDAO;
         this.keyServer = keyServer;
+        this.publicKeyringFile = publicKeyringFile;
         this.secretKeyringFile = secretKeyringFile;
         this.secretKeyringPwd = secretKeyringPwd;
         this.manHostId = manHostId;
@@ -56,7 +60,7 @@ public class KeyManagerImpl implements KeyManager
      */
     private void init()
     {
-        InputStream instr = PGPEncryptionUtil.loadKeyring( secretKeyringFile );
+        InputStream instr = PGPEncryptionUtil.getFileInputStream( secretKeyringFile );
 
         if ( instr == null )
         {
@@ -78,6 +82,21 @@ public class KeyManagerImpl implements KeyManager
             {
                 savePublicKey( manHostId, secretKey.getPublicKey() );
             }
+        }
+    }
+
+
+    @Override
+    public String getPeerPublicKeyring()
+    {
+        try
+        {
+            return PGPEncryptionUtil.getKeyringArmored( publicKeyringFile );
+        }
+        catch ( PGPException e )
+        {
+            LOG.error( "Error getting peer public keyring:", e );
+            return null;
         }
     }
 
@@ -215,7 +234,8 @@ public class KeyManagerImpl implements KeyManager
             String fingerprint = securityManagerDAO.getKeyFingerprint( hostId );
 
             secretKey = PGPEncryptionUtil
-                    .findSecretKeyByFingerprint( PGPEncryptionUtil.loadKeyring( secretKeyringFile ), fingerprint );
+                    .findSecretKeyByFingerprint( PGPEncryptionUtil.getFileInputStream( secretKeyringFile ),
+                            fingerprint );
 
             return secretKey;
         }
@@ -273,8 +293,8 @@ public class KeyManagerImpl implements KeyManager
 
         try
         {
-            secretKey =
-                    PGPEncryptionUtil.findSecretKeyById( PGPEncryptionUtil.loadKeyring( secretKeyringFile ), keyId );
+            secretKey = PGPEncryptionUtil
+                    .findSecretKeyById( PGPEncryptionUtil.getFileInputStream( secretKeyringFile ), keyId );
         }
         catch ( Exception ex )
         {
@@ -296,7 +316,8 @@ public class KeyManagerImpl implements KeyManager
         try
         {
             secretKey = PGPEncryptionUtil
-                    .findSecretKeyByFingerprint( PGPEncryptionUtil.loadKeyring( secretKeyringFile ), fingerprint );
+                    .findSecretKeyByFingerprint( PGPEncryptionUtil.getFileInputStream( secretKeyringFile ),
+                            fingerprint );
         }
         catch ( Exception ex )
         {

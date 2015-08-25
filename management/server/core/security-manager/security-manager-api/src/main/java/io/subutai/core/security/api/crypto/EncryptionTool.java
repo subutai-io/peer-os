@@ -49,10 +49,7 @@ public interface EncryptionTool
 
 
     /**
-     * Actual methods which are used
-     */
-    /**
-     * Signs message with peer private key and ecnrypts with the given pub key
+     * Signs message with peer private key and encrypts with the given pub key
      *
      * @param message - message
      * @param publicKey - encryption key
