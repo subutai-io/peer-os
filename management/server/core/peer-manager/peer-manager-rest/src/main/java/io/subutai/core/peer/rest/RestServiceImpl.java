@@ -41,6 +41,7 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.UUIDUtil;
 import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
 
@@ -343,9 +344,16 @@ public class RestServiceImpl implements RestService
     {
         try
         {
+
+
             PeerInfo p = jsonUtil.from( approvedPeer, PeerInfo.class );
             p.setStatus( PeerStatus.APPROVED );
             peerManager.update( p );
+
+
+            //adding remote repository
+            ManagementHost managementHost = peerManager.getLocalPeer().getManagementHost();
+            managementHost.addRepository( p.getIp() );
 
             //************ Save Trust SSL Cert **************************************
             KeyStore keyStore;

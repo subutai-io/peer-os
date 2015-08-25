@@ -90,9 +90,6 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public boolean register( final PeerInfo peerInfo ) throws PeerException
     {
-        ManagementHost managementHost = getLocalPeer().getManagementHost();
-        managementHost.addRepository( peerInfo.getIp() );
-
         return peerDAO.saveInfo( SOURCE_REMOTE_PEER, peerInfo.getId().toString(), peerInfo );
     }
 
