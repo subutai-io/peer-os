@@ -1,17 +1,16 @@
 package io.subutai.core.security.rest;
 
 
-import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import com.google.common.collect.Maps;
+
 import io.subutai.common.util.JsonUtil;
-import io.subutai.core.security.api.*;
 import io.subutai.core.security.api.SecurityManager;
 
 
@@ -33,13 +32,14 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     public SecurityManagerRestImpl( SecurityManager securityManager )
     {
         this.securityManager = securityManager;
-
     }
 
 
     @Override
     public Response getPublicKey()
     {
-        return Response.ok( securityManager.getKeyManager().getPublicKeyAsASCII( null ) ).build();
+        Map<String, String> result = Maps.newHashMap();
+        result.put( "Key", securityManager.getKeyManager().getPublicKeyAsASCII( null ) );
+        return Response.ok( JsonUtil.toJson( result ) ).build();
     }
 }
