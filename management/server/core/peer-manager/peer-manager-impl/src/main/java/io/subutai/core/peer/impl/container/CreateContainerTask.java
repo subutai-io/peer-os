@@ -3,6 +3,13 @@ package io.subutai.core.peer.impl.container;
 
 import java.util.concurrent.Callable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
@@ -15,12 +22,6 @@ import io.subutai.core.peer.api.ContainerCreationException;
 import io.subutai.core.peer.api.HostNotFoundException;
 import io.subutai.core.peer.api.ResourceHost;
 import io.subutai.core.peer.api.ResourceHostException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 
 
 public class CreateContainerTask implements Callable<ContainerHost>
@@ -108,30 +109,23 @@ public class CreateContainerTask implements Callable<ContainerHost>
     {
         Preconditions.checkNotNull( template, "Invalid template" );
 
-        if ( isTemplateExists( template ) )
+        if ( !templateExists( template ) )
         {
-            return;
-        }
-        importTemplate( template );
-        if ( isTemplateExists( template ) )
-        {
-            return;
-        }
-        // trying add repository
-        updateRepository( template );
-        importTemplate( template );
-        if ( !isTemplateExists( template ) )
-        {
-            LOG.debug( String.format( "Could not prepare template %s on %s.", template.getTemplateName(),
-                    resourceHost.getHostname() ) );
-            throw new ResourceHostException(
-                    String.format( "Could not prepare template %s on %s", template.getTemplateName(),
-                            resourceHost.getHostname() ) );
+            importTemplate( template );
+
+            if ( !templateExists( template ) )
+            {
+                LOG.debug( String.format( "Could not prepare template %s on %s.", template.getTemplateName(),
+                        resourceHost.getHostname() ) );
+                throw new ResourceHostException(
+                        String.format( "Could not prepare template %s on %s", template.getTemplateName(),
+                                resourceHost.getHostname() ) );
+            }
         }
     }
 
 
-    protected boolean isTemplateExists( final Template template ) throws ResourceHostException
+    protected boolean templateExists( final Template template ) throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
 
@@ -176,41 +170,6 @@ public class CreateContainerTask implements Callable<ContainerHost>
         {
             LOG.error( "Template import failed", ce );
             throw new ResourceHostException( "Template import failed", ce );
-        }
-    }
-
-    //TODO remove all system specific command and paths, use a dedicated binding for this
-    protected void updateRepository( final Template template ) throws ResourceHostException
-    {
-        Preconditions.checkNotNull( template, "Invalid template" );
-
-        if ( template.isRemote() )
-        {
-            try
-            {
-                LOG.debug( String.format( "Adding remote repository %s to %s...", template.getPeerId(),
-                        resourceHost.getHostname() ) );
-                CommandResult commandResult = resourceHost.execute( new RequestBuilder( String.format(
-                        "echo \"deb http://gw.intra.lan:9999/%1$s trusty main\" > /etc/apt/sources.list"
-                                + ".d/%1$s.list ", template.getPeerId().toString() ) ) );
-                if ( !commandResult.hasSucceeded() )
-                {
-                    LOG.warn( String.format( "Could not add repository %s to %s.", template.getPeerId(),
-                            resourceHost.getHostname() ), commandResult );
-                }
-                LOG.debug( String.format( "Updating repository index on %s...", resourceHost.getHostname() ) );
-                commandResult = resourceHost.execute( new RequestBuilder( "apt-get update" ).withTimeout( 300 ) );
-                if ( !commandResult.hasSucceeded() )
-                {
-                    LOG.warn( String.format( "Could not update repository %s on %s.", template.getPeerId(),
-                            resourceHost.getHostname() ), commandResult );
-                }
-            }
-            catch ( CommandException ce )
-            {
-                LOG.error( "Command exception.", ce );
-                throw new ResourceHostException( "General command exception on updating repository.", ce );
-            }
         }
     }
 }

@@ -1225,7 +1225,7 @@ public class PGPEncryptionUtil
     /**
      * ********************************************************** Load Keyring  file into InpurStream.
      */
-    public static InputStream loadKeyring( String keyringFile )
+    public static InputStream getFileInputStream( String keyringFile )
     {
         try
         {
@@ -1236,6 +1236,30 @@ public class PGPEncryptionUtil
         catch ( IOException ex )
         {
             return null;
+        }
+    }
+
+
+    public static String getKeyringArmored( String keyringFile ) throws PGPException
+    {
+        try
+        {
+            FileInputStream keyIn = new FileInputStream( keyringFile );
+            InputStream keyring = PGPUtil.getDecoderStream( keyIn );
+            PGPPublicKeyRingCollection pgpPub =
+                    new PGPPublicKeyRingCollection( keyring, new JcaKeyFingerprintCalculator() );
+
+            ByteArrayOutputStream encOut = new ByteArrayOutputStream();
+            ArmoredOutputStream armorOut = new ArmoredOutputStream( encOut );
+
+            armorOut.write( pgpPub.getEncoded() );
+            armorOut.flush();
+            armorOut.close();
+            return new String( encOut.toByteArray() );
+        }
+        catch ( Exception e )
+        {
+            throw new PGPException( "Error loading keyring", e );
         }
     }
 }

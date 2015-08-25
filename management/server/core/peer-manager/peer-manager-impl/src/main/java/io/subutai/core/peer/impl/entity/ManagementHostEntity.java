@@ -121,30 +121,30 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    public void addAptSource( final String hostname, final String ip ) throws PeerException
+    public void addRepository( final String ip ) throws PeerException
     {
         try
         {
-            getRepositoryManager().addAptSource( hostname, ip );
+            getRepositoryManager().addRepository( ip );
         }
         catch ( RepositoryException e )
         {
-            //            throw new PeerException( "Error adding apt source", e );
-            LOG.error( "Error adding apt source", e );
+            //            throw new PeerException( "Error adding repository", e );
+            LOG.error( "Error adding repository", e );
         }
     }
 
 
-    public void removeAptSource( final String host, final String ip ) throws PeerException
+    public void removeRepository( final String host, final String ip ) throws PeerException
     {
         try
         {
-            getRepositoryManager().removeAptSource( ip );
+            getRepositoryManager().removeRepository( ip );
         }
         catch ( RepositoryException e )
         {
-            //            throw new PeerException( "Error removing apt source", e );
-            LOG.error( "Error removing apt source", e );
+            //            throw new PeerException( "Error removing repository", e );
+            LOG.error( "Error removing repository", e );
         }
     }
 

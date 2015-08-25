@@ -136,25 +136,25 @@ public class ManagementHostEntityTest
 
     @Test/*( expected = PeerException.class )*/ public void testAddAptSource() throws Exception
     {
-        managementHostEntity.addAptSource( HOSTNAME, IP );
+        managementHostEntity.addRepository( IP );
 
-        verify( repositoryManager ).addAptSource( HOSTNAME, IP );
+        verify( repositoryManager ).addRepository( IP );
 
-        doThrow( new RepositoryException( "" ) ).when( repositoryManager ).addAptSource( anyString(), anyString() );
+        doThrow( new RepositoryException( "" ) ).when( repositoryManager ).addRepository( anyString() );
 
-        //        managementHostEntity.addAptSource( HOSTNAME, IP );
+        //        managementHostEntity.addRepository( HOSTNAME, IP );
     }
 
 
     @Test/*( expected = PeerException.class )*/ public void testRemoveAptSource() throws Exception
     {
-        managementHostEntity.removeAptSource( HOSTNAME, IP );
+        managementHostEntity.removeRepository( HOSTNAME, IP );
 
-        verify( repositoryManager ).removeAptSource( IP );
+        verify( repositoryManager ).removeRepository( IP );
 
-        doThrow( new RepositoryException( "" ) ).when( repositoryManager ).removeAptSource( anyString() );
+        doThrow( new RepositoryException( "" ) ).when( repositoryManager ).removeRepository( anyString() );
         //
-        //        managementHostEntity.removeAptSource( HOSTNAME, IP );
+        //        managementHostEntity.removeRepository( HOSTNAME, IP );
     }
 
 
