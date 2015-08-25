@@ -20,8 +20,12 @@
   <reference id="securityManagerRef" availability="mandatory"
              interface="io.subutai.core.security.api.SecurityManager" />
 
+  <reference id="registrationManagerRef" availability="mandatory"
+             interface="io.subutai.core.registration.api.RegistrationManager" />
+
   <bean id="nodeRegistrationRest" class="io.subutai.core.registration.rest.RegistrationRestServiceImpl">
     <argument ref="securityManagerRef" />
+    <argument ref="registrationManagerRef" />
   </bean>
 
 </blueprint>

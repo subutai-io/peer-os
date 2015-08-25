@@ -29,6 +29,11 @@
       <groupId>io.subutai</groupId>
       <artifactId>security-manager-api</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>io.subutai</groupId>
+      <artifactId>node-registration-api</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
