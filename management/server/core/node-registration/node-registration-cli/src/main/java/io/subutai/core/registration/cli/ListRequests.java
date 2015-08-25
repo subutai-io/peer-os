@@ -23,10 +23,11 @@ public class ListRequests extends SubutaiShellCommandSupport
     protected Object doExecute() throws Exception
     {
         List<RequestedHost> requestedHosts = registrationManager.getRequests();
-        requestedHosts.forEach( request -> {
-            System.out.println( request.toString() );
+        for ( final RequestedHost requestedHost : requestedHosts )
+        {
+            System.out.println( requestedHost.toString() );
             System.out.println( "==========" );
-        } );
+        }
         return null;
     }
 }

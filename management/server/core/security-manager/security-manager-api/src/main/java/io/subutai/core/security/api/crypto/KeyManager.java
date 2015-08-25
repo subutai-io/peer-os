@@ -77,4 +77,6 @@ public interface KeyManager
      * *****************************
      */
     public void setSecretKeyringFile( final String secretKeyringFile );
+
+    public String getSecretKeyringPwd();
 }

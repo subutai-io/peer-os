@@ -39,7 +39,8 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     public Response getPublicKey()
     {
         Map<String, String> result = Maps.newHashMap();
-        result.put( "Key", securityManager.getKeyManager().getPublicKeyAsASCII( null ) );
+        result.put( "Key", securityManager.getKeyManager().getPeerPublicKeyring() );
+
         return Response.ok( JsonUtil.toJson( result ) ).build();
     }
 }

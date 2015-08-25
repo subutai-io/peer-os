@@ -21,9 +21,13 @@
     </dependency>
 
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.5</version>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>javax.ws.rs-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.subutai</groupId>
+      <artifactId>security-manager-api</artifactId>
     </dependency>
   </dependencies>
 
