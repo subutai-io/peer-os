@@ -101,10 +101,6 @@ public class PeerManagerImpl implements PeerManager
     public boolean unregister( final String uuid ) throws PeerException
     {
         ManagementHost mgmHost = getLocalPeer().getManagementHost();
-        if ( !( mgmHost instanceof ManagementHostEntity ) )
-        {
-            return false;
-        }
         ManagementHostEntity managementHost = ( ManagementHostEntity ) mgmHost;
         UUID remotePeerId = UUID.fromString( uuid );
         PeerInfo p = getPeerInfo( remotePeerId );

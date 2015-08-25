@@ -129,8 +129,8 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         }
         catch ( RepositoryException e )
         {
-            //            throw new PeerException( "Error adding apt source", e );
-            LOG.error( "Error adding apt source", e );
+            //            throw new PeerException( "Error adding repository", e );
+            LOG.error( "Error adding repository", e );
         }
     }
 
@@ -143,8 +143,8 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         }
         catch ( RepositoryException e )
         {
-            //            throw new PeerException( "Error removing apt source", e );
-            LOG.error( "Error removing apt source", e );
+            //            throw new PeerException( "Error removing repository", e );
+            LOG.error( "Error removing repository", e );
         }
     }
 
