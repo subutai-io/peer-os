@@ -4,9 +4,10 @@ package io.subutai.core.network.impl;
 import java.util.UUID;
 
 import org.junit.Test;
-import io.subutai.common.peer.ContainerHost;
 
 import com.google.common.collect.Sets;
+
+import io.subutai.common.peer.ContainerHost;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -181,13 +182,6 @@ public class CommandsTest
     public void testGetReadSSHCommand() throws Exception
     {
         assertNotNull( commands.getReadSSHCommand() );
-    }
-
-
-    @Test
-    public void testGetWriteSSHCommand() throws Exception
-    {
-        assertNotNull( commands.getWriteSSHCommand( KEY ) );
     }
 
 
