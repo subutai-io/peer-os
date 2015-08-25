@@ -11,69 +11,70 @@ import org.bouncycastle.openpgp.PGPSecretKey;
  */
 public interface KeyManager
 {
-    /********************************
-     *
+    /**
+     * *****************************
      */
-    public String getPublicKeyAsASCII(String hostId);
+    public String getPublicKeyAsASCII( String hostId );
+
+    public String getPeerPublicKeyring();
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
-    public PGPPublicKey getPublicKey(String hostId);
+    public PGPPublicKey getPublicKey( String hostId );
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
-    public PGPSecretKey getSecretKey(String hostId);
+    public PGPSecretKey getSecretKey( String hostId );
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public PGPPrivateKey getPrivateKey( String hostId );
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public PGPSecretKey getSecretKeyById( String keyId );
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public PGPSecretKey getSecretKeyByFingerprint( String fingerprint );
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
-    public void savePublicKey( String hostId, String keyAsASCII);
+    public void savePublicKey( String hostId, String keyAsASCII );
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
-    public void savePublicKey( String hostId, PGPPublicKey publicKey);
+    public void savePublicKey( String hostId, PGPPublicKey publicKey );
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
-    public void removePublicKey( String hostId);
+    public void removePublicKey( String hostId );
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public String getSecretKeyringFile();
 
 
-    /********************************
-     *
+    /**
+     * *****************************
      */
     public void setSecretKeyringFile( final String secretKeyringFile );
-
 }
