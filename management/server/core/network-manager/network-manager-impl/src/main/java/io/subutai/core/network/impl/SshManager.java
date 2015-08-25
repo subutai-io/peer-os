@@ -1,7 +1,15 @@
 package io.subutai.core.network.impl;
 
 
+import java.util.List;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -9,11 +17,6 @@ import io.subutai.common.command.CommandUtil;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.network.api.NetworkManagerException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 
 /**
@@ -26,7 +29,7 @@ public class SshManager
 
     private Set<ContainerHost> containerHosts;
 
-    private String keys;
+    private List<String> keys;
     private Commands commands;
     protected CommandUtil commandUtil;
 
@@ -37,6 +40,7 @@ public class SshManager
         this.containerHosts = containerHosts;
         this.commands = new Commands();
         this.commandUtil = new CommandUtil();
+        this.keys = Lists.newArrayList();
     }
 
 
@@ -127,8 +131,6 @@ public class SshManager
 
     protected void read() throws NetworkManagerException
     {
-        StringBuilder value = new StringBuilder();
-
         for ( ContainerHost host : containerHosts )
         {
             try
@@ -136,7 +138,7 @@ public class SshManager
                 CommandResult command = commandUtil.execute( commands.getReadSSHCommand(), host );
                 if ( !Strings.isNullOrEmpty( command.getStdOut() ) )
                 {
-                    value.append( command.getStdOut() );
+                    keys.add( command.getStdOut() );
                 }
             }
             catch ( CommandException e )
@@ -146,12 +148,10 @@ public class SshManager
             }
         }
 
-        if ( Strings.isNullOrEmpty( value.toString() ) )
+        if ( keys.isEmpty() )
         {
             throw new NetworkManagerException( "Could not read ssh keys from containers" );
         }
-
-        keys = value.toString();
     }
 
 
@@ -159,14 +159,26 @@ public class SshManager
     {
         for ( ContainerHost host : containerHosts )
         {
-            try
+            int i = 0;
+            StringBuilder keyBuilder = new StringBuilder();
+            for ( String key : keys )
             {
-                commandUtil.execute( commands.getWriteSSHCommand( keys ), host );
-            }
-            catch ( CommandException e )
-            {
-                LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
-                throw new NetworkManagerException( e );
+                keyBuilder.append( key );
+                i++;
+                if ( i % 5 == 0 || i == keys.size() )
+                {
+                    try
+                    {
+                        commandUtil.execute( commands.getAppendSshKeyCommand( keyBuilder.toString() ), host );
+
+                        keyBuilder.setLength( 0 );
+                    }
+                    catch ( CommandException e )
+                    {
+                        LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
+                        throw new NetworkManagerException( e );
+                    }
+                }
             }
         }
     }
