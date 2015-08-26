@@ -28,7 +28,7 @@
 
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ssl-context-manager-api</artifactId>
+      <artifactId>http-context-manager-api</artifactId>
     </dependency>
 <!--
     <dependency>

@@ -98,37 +98,9 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
         int status = currentStatus;
         if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X1 ) )
         {
-            if ( ChannelSettings.checkURLArray( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
-            {
-                status = 1;
-            }
-                /*
-                else
-                {
-                    User user  = channelManagerImpl.getIdentityManager().getUser();
-
-                    if(channelManagerImpl.getIdentityManager().checkRestPermissions( user,basePath ) != 1)
-                    {
-                        status = 1;
-                    }
-                }*/
         }
         else if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
         {
-            if ( ChannelSettings.checkURLArray( basePath, ChannelSettings.URL_ACCESS_PX2 ) == 0 )
-            {
-                status = 1;
-            }
-                /*
-                else
-                {
-                    User user  = channelManagerImpl.getIdentityManager().getUser();
-
-                    if(channelManagerImpl.getIdentityManager().checkRestPermissions( user,basePath ) != 1)
-                    {
-                        status = 1;
-                    }
-                }*/
         }
         else if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X3 ) )
         {
@@ -137,52 +109,8 @@ public class CXFInterceptor extends AbstractPhaseInterceptor<Message>
         else if ( url.getPort() == Integer.parseInt( ChannelSettings.SPECIAL_PORT_X1 ) || url.getPort() == Integer
                 .parseInt( ChannelSettings.SPECIAL_SECURE_PORT_X1 ) )
         {
-            String query = ( String ) message.get( Message.QUERY_STRING );
-            String paramValue = UrlUtil.getQueryParameterValue( "sptoken", query );
-
-            if ( !"".equals( paramValue ) )
-            {
-                IUserChannelToken userChannelToken =
-                        channelManagerImpl.getChannelTokenManager().getUserChannelToken( paramValue );
-                status = validateUserPermissions( userChannelToken, url, basePath, status );
-            }
-            else
-            {
-                status = 1;
-            }
         }
         return status;
     }
 
-
-    private int validateUserPermissions( final IUserChannelToken userChannelToken, final URL url, final String basePath,
-                                         final int currentStatus )
-    {
-        int status = currentStatus;
-        if ( userChannelToken != null )
-        {
-            if ( IPUtil.isValidIPRange( userChannelToken.getIpRangeStart(), userChannelToken.getIpRangeStart(),
-                    url.getHost() ) )
-            {
-                User user = channelManagerImpl.getIdentityManager().getUser( userChannelToken.getUserId() );
-                if ( channelManagerImpl.getIdentityManager().checkRestPermissions( user, basePath ) != 1 )
-                {
-                    status = 1;
-                }
-                else
-                {
-                    channelManagerImpl.getIdentityManager().loginWithToken( user.getUsername() );
-                }
-            }
-            else
-            {
-                status = 1;
-            }
-        }
-        else
-        {
-            status = 1;
-        }
-        return status;
-    }
 }

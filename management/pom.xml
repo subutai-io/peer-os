@@ -93,12 +93,6 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- fragments -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>jetty-ssl-fragment</artifactId>
-        <version>${project.version}</version>
-      </dependency>
 
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -153,25 +147,6 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- key-manager -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>key-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>key-manager-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>key-manager-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- key-server -->
@@ -627,17 +602,17 @@
       <!-- ssl-context-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>ssl-context-manager-api</artifactId>
+        <artifactId>http-context-manager-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>ssl-context-manager-impl</artifactId>
+        <artifactId>http-context-manager-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>ssl-context-manager-cli</artifactId>
+        <artifactId>http-context-manager-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
 

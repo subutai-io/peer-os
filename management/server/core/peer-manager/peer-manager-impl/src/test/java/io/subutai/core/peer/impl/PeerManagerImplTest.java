@@ -18,7 +18,6 @@ import io.subutai.common.peer.PeerPolicy;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.key.api.KeyManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.messenger.api.Messenger;
 import io.subutai.core.metric.api.Monitor;
@@ -29,7 +28,6 @@ import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.request.MessageRequestListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.registry.api.TemplateRegistry;
-import io.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
 import io.subutai.core.strategy.api.StrategyManager;
 
 import com.google.common.collect.Lists;
@@ -87,11 +85,7 @@ public class PeerManagerImplTest
     @Mock
     DaoManager daoManager;
     @Mock
-    KeyManager keyManager;
-    @Mock
     IdentityManager identityManager;
-    @Mock
-    SubutaiSslContextFactory sslContextFactory;
     @Mock
     ManagementHostEntity managementHost;
     @Mock

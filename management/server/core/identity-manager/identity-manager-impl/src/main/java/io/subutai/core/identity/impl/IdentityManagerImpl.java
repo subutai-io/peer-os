@@ -186,8 +186,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         {
             for ( RestEndpointScope restEndpointScope : restEndpointScopeList )
             {
-                if ( restEndpointScope.getRestEndpoint().contains( "{*}" )
-                        || ChannelSettings.checkURL( restURL, restEndpointScope.getRestEndpoint() ) == 1 )
+                if ( restEndpointScope.getRestEndpoint().contains( "{*}" ))
                 {
                     return 1;
                 }
@@ -240,29 +239,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
             RoleEntity adminRole = new RoleEntity();
             adminRole.setName( "admin" );
 
-            for ( final String uri : ChannelSettings.URL_ACCESS_PX1 )
-            {
-                if ( uri.length() == 0 )
-                {
-                    continue;
-                }
-                RestEndpointScopeEntity restEndpointScopeEntity = new RestEndpointScopeEntity( uri );
-                restEndpointDataService.update( restEndpointScopeEntity );
-                adminRole.addRestEndpointScope( restEndpointScopeEntity );
-            }
-
-            for ( final String uri : ChannelSettings.URL_ACCESS_PX3 )
-            {
-                if ( uri.length() == 0 )
-                {
-                    continue;
-                }
-                RestEndpointScopeEntity restEndpointScopeEntity = new RestEndpointScopeEntity( uri );
-                restEndpointDataService.update( restEndpointScopeEntity );
-                adminRole.addRestEndpointScope( restEndpointScopeEntity );
-            }
-
-            for ( final String uri : ChannelSettings.URL_ACCESS_PX2 )
+            for ( final String uri : ChannelSettings.REST_URL )
             {
                 if ( uri.length() == 0 )
                 {

@@ -7,27 +7,25 @@ package io.subutai.common.settings;
 public class ChannelSettings
 {
     public static final String OPEN_PORT = "8181";
-    public static final String SPECIAL_PORT_X1 = "8542";
-    public static final String SPECIAL_SECURE_PORT_X1 = "8552";
-    public static final String SECURE_PORT_X1 = "8543";
-    public static final String SECURE_PORT_X2 = "8544";
-    public static final String SECURE_PORT_X3 = "8545";
+    public static final String SPECIAL_PORT_X1 = "8282";
+    public static final String SPECIAL_SECURE_PORT_X1 = "8243";
+    public static final String SECURE_PORT_X1 = "8443";
+    public static final String SECURE_PORT_X2 = "8444";
+    public static final String SECURE_PORT_X3 = "8445";
 
 
-    public static final String[] URL_ACCESS_PX1 = {
+    public static final String[] REST_URL = {
+
             // All  Services
             "/{*}",
-            "/cxf/peer/register", "/cxf/peer/register/{$}",
+            "/cxf/peer/register",
+            "/cxf/peer/register/{$}",
             "/cxf/peer/reject",
             "/cxf/peer/approve",
             "/cxf/peer/remove",
             "/cxf/peer/trust_request",
             "/cxf/peer/trust_response",
-            "/cxf/peer/approve/{$}"
-    };
-
-    public static final String[] URL_ACCESS_PX2 = {
-
+            "/cxf/peer/approve/{$}",
             "/cxf/peer/",
             "/cxf/peer/getlist",
             "/cxf/peer/me",
@@ -276,67 +274,4 @@ public class ChannelSettings
             "/cxf/{$}/clusters/{$}/add/node/{$}"
 
     };
-
-    public static final String[] URL_ACCESS_PX3 = {
-            ""
-    };
-
-
-    public static final String[] URL_ACCESS_SPECIAL_PORT_PX1 = {
-            ""
-    };
-
-
-    public static short checkURLArray( String uri, String[] urlAccessArray )
-    {
-        short status = 0;
-
-        for ( final String aUrlAccess : urlAccessArray )
-        {
-            if ( checkURL( uri, aUrlAccess ) == 1 )
-            {
-                status = 1;
-                break;
-            }
-        }
-
-        return status;
-    }
-
-
-    public static short checkURL( String uri, String urlAccess )
-    {
-        short status = 0;
-
-        String subURI[] = uri.split( "/" );
-        int subURISize = subURI.length;
-        String subURLAccess[] = urlAccess.split( "/" );
-
-        if ( subURISize == subURLAccess.length )
-        {
-            int st = 0;
-
-            for ( int i = 0; i < subURISize; i++ )
-            {
-                if ( "{$}".equals( subURLAccess[i] ) )
-                {
-                    st++;
-                }
-                else
-                {
-                    if ( subURI[i].equals( subURLAccess[i] ) )
-                    {
-                        st++;
-                    }
-                }
-            }
-
-            if ( st == subURISize )
-            {
-                status = 1;
-            }
-        }
-
-        return status;
-    }
 }
