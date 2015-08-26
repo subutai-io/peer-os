@@ -42,9 +42,6 @@
   <reference id="identityManager" availability="mandatory"
              interface="io.subutai.core.identity.api.IdentityManager" />
 
-  <reference id="sslContextFactory" availability="mandatory"
-             interface="io.subutai.core.ssl.manager.api.SubutaiSslContextFactory" />
-
   <bean id="localPeer" class="io.subutai.core.peer.impl.LocalPeerImpl" init-method="init"
         destroy-method="dispose" scope="singleton" activation="eager">
     <argument ref="daoManagerPeer" />
@@ -54,7 +51,6 @@
     <argument ref="commandExecutor" />
     <argument ref="hostRegistry" />
     <argument ref="monitor" />
-    <argument ref="sslContextFactory" />
 
     <property name="peerIdPath" value="$[subutaiAppDataPath]/id" />
     <property name="peerIdFile" value="${peerIdFile}" />

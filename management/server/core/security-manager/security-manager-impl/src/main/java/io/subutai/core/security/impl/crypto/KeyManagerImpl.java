@@ -35,8 +35,8 @@ public class KeyManagerImpl implements KeyManager
     private String manHostKeyFingerprint;
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     public KeyManagerImpl( SecurityManagerDAO securityManagerDAO, KeyServer keyServer, String publicKeyringFile,
                            String secretKeyringFile, String secretKeyringPwd, String manHostId,
@@ -55,8 +55,8 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     private void init()
     {
@@ -86,6 +86,9 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
+    /* *****************************
+     *
+     */
     @Override
     public String getPeerPublicKeyring()
     {
@@ -101,21 +104,19 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     @Override
     public void savePublicKey( String hostId, String keyAsASCII )
     {
         try
         {
-            // Store public key in the KeyServer
-            PGPPublicKey publicKey = keyServer.addPublicKey( keyAsASCII );
+            PGPPublicKey publicKey = PGPKeyUtil.readPublicKey( keyAsASCII );
 
             if ( publicKey != null )
             {
-                String keyIdStr = PGPKeyUtil.encodeNumericKeyId( publicKey.getKeyID() );
-                securityManagerDAO.saveKeyIdentityData( hostId, keyIdStr, ( short ) 2 );
+                savePublicKey( hostId, publicKey );
             }
         }
         catch ( Exception ex )
@@ -125,8 +126,8 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     @Override
     public void savePublicKey( String hostId, PGPPublicKey publicKey )
@@ -149,8 +150,8 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     @Override
     public void removePublicKey( String hostId )
@@ -169,8 +170,8 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     @Override
     public String getPublicKeyAsASCII( String hostId )
@@ -187,8 +188,8 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     @Override
     public PGPPublicKey getPublicKey( String hostId )
@@ -216,8 +217,8 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     @Override
     public PGPSecretKey getSecretKey( String hostId )
@@ -247,8 +248,8 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     @Override
     public PGPPrivateKey getPrivateKey( String hostId )
@@ -283,8 +284,8 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     @Override
     public PGPSecretKey getSecretKeyById( String keyId )
@@ -305,8 +306,8 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     @Override
     public PGPSecretKey getSecretKeyByFingerprint( String fingerprint )
@@ -328,8 +329,8 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     @Override
     public String getSecretKeyringFile()
@@ -338,8 +339,8 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     @Override
     public void setSecretKeyringFile( final String secretKeyringFile )
@@ -348,8 +349,8 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     public String getSecretKeyringPwd()
     {
@@ -357,8 +358,8 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     public void setSecretKeyringPwd( final String secretKeyringPwd )
     {
@@ -366,8 +367,8 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     public String getManagementHostId()
     {
@@ -375,8 +376,8 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     public void setManHostId( final String manHostId )
     {
@@ -384,8 +385,8 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     public String getManHostKeyFingerprint()
     {
@@ -393,8 +394,8 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     public void setManHostKeyFingerprint( final String manHostKeyFingerprint )
     {

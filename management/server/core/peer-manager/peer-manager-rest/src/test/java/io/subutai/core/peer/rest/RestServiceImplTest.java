@@ -29,9 +29,6 @@ import io.subutai.common.util.RestUtil;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-
-import io.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
-
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
 
@@ -66,8 +63,6 @@ public class RestServiceImplTest
     private static final String ALIAS = "alias";
     private static final UUID ENV_ID = UUID.randomUUID();
     @Mock
-    SubutaiSslContextFactory sslContextFactory;
-    @Mock
     PeerManager peerManager;
     @Mock
     LocalPeer localPeer;
@@ -100,7 +95,7 @@ public class RestServiceImplTest
     @Before
     public void setUp() throws Exception
     {
-        restService = spy( new RestServiceImpl( peerManager, sslContextFactory ) );
+        restService = spy( new RestServiceImpl( peerManager ) );
         restService.jsonUtil = jsonUtil;
         restService.restUtil = restUtil;
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
@@ -267,7 +262,7 @@ public class RestServiceImplTest
 
         restService.unregisterPeer( PEER_ID.toString() );
 
-        verify( sslContextFactory ).reloadTrustStore();
+        //verify( sslContextFactory ).reloadTrustStore();
 
         when( peerManager.unregister( PEER_ID.toString() ) ).thenReturn( false );
 
@@ -312,7 +307,7 @@ public class RestServiceImplTest
     {
         restService.approveForRegistrationRequest( JSON, CERT );
 
-        verify( sslContextFactory ).reloadTrustStore();
+        //verify( sslContextFactory ).reloadTrustStore();
 
         doThrow( exception ).when( peerManager ).update( peerInfo );
 
@@ -334,7 +329,7 @@ public class RestServiceImplTest
 
         restService.approveForRegistrationRequest( PEER_ID.toString() );
 
-        verify( sslContextFactory ).reloadTrustStore();
+        //verify( sslContextFactory ).reloadTrustStore();
 
         doThrow( exception ).when( peerManager ).update( peerInfo );
 
