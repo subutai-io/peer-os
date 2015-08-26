@@ -8,7 +8,6 @@ import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
-import io.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
 import io.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
@@ -22,20 +21,7 @@ public class PeerManagerPortalModule implements PortalModule
     private PeerManager peerManager;
     private TemplateRegistry registry;
     private HostRegistry hostRegistry;
-    private SubutaiSslContextFactory sslContextFactory;
     private EnvironmentManager environmentManager;
-
-
-    public void setSslContextFactory( final SubutaiSslContextFactory sslContextFactory )
-    {
-        this.sslContextFactory = sslContextFactory;
-    }
-
-
-    public SubutaiSslContextFactory getSslContextFactory()
-    {
-        return sslContextFactory;
-    }
 
 
     public EnvironmentManager getEnvironmentManager()

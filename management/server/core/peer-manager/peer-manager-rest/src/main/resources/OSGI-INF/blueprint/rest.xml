@@ -19,13 +19,10 @@
 
   <bean id="peerRestServiceImpl" class="io.subutai.core.peer.rest.RestServiceImpl">
     <argument ref="peerManager" />
-    <argument ref="sslContextFactory" />
   </bean>
 
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
 
-  <reference id="sslContextFactory" availability="mandatory"
-             interface="io.subutai.core.ssl.manager.api.SubutaiSslContextFactory" />
 
 </blueprint>

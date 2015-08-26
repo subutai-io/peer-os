@@ -73,7 +73,6 @@ import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.entity.ResourceHostEntity;
 import io.subutai.core.registry.api.RegistryException;
 import io.subutai.core.registry.api.TemplateRegistry;
-import io.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
 import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.strategy.api.StrategyNotFoundException;
@@ -182,8 +181,6 @@ public class LocalPeerImplTest
     @Mock
     ResourceHostInfo resourceHostInfo;
     @Mock
-    SubutaiSslContextFactory subutaiSslContextFactory;
-    @Mock
     DaoManager daoManager;
 
     LocalPeerImpl localPeer;
@@ -194,7 +191,7 @@ public class LocalPeerImplTest
     {
         localPeer =
                 spy( new LocalPeerImpl( daoManager, templateRegistry, quotaManager, strategyManager, commandExecutor,
-                        hostRegistry, monitor, subutaiSslContextFactory ) );
+                        hostRegistry, monitor ) );
 
         localPeer.containerHostDataService = containerHostDataService;
         localPeer.containerGroupDataService = containerGroupDataService;
@@ -1193,25 +1190,6 @@ public class LocalPeerImplTest
 
         verify( managementHost ).setupTunnels( Sets.newHashSet( IP ), ENVIRONMENT_ID );
     }
-
-
-    @Test
-    public void testImportCertificate() throws Exception
-    {
-        localPeer.importCertificate( CERT, ALIAS );
-
-        verify( subutaiSslContextFactory ).reloadTrustStore();
-    }
-
-
-    @Test
-    public void testExportEnvironmentCertificate() throws Exception
-    {
-        localPeer.exportEnvironmentCertificate( ENVIRONMENT_ID );
-
-        verify( subutaiSslContextFactory ).reloadKeyStore();
-    }
-
 
     @Test
     public void testRemoveEnvironmentCertificates() throws Exception

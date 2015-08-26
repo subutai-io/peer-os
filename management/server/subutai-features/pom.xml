@@ -31,12 +31,6 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- fragments -->
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>jetty-ssl-fragment</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-cli-rbac</artifactId>
@@ -116,24 +110,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>security-manager-rest</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- key-manager -->
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>key-manager-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>key-manager-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>key-manager-cli</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -448,18 +424,18 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- ssl-context-manager -->
+    <!-- http-context-manager -->
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ssl-context-manager-api</artifactId>
+      <artifactId>http-context-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ssl-context-manager-impl</artifactId>
+      <artifactId>http-context-manager-impl</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ssl-context-manager-cli</artifactId>
+      <artifactId>http-context-manager-cli</artifactId>
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
