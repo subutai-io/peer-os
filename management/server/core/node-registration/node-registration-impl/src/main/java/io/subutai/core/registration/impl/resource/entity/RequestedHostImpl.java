@@ -109,6 +109,17 @@ public class RequestedHostImpl implements RequestedHost
     }
 
 
+
+    @Override
+    public Set<Interface> getInterfaces()
+    {
+        Set<Interface> temp = Sets.newHashSet();
+        temp.addAll( interfaces );
+        return temp;
+        //        return Sets.newHashSet();
+    }
+
+
     @Override
     public String getId()
     {
@@ -124,18 +135,37 @@ public class RequestedHostImpl implements RequestedHost
 
 
     @Override
-    public Set<Interface> getInterfaces()
+    public HostArchitecture getArch()
     {
-        Set<Interface> temp = Sets.newHashSet();
-        temp.addAll( interfaces );
-        return temp;
-        //        return Sets.newHashSet();
+        return arch;
     }
 
 
-    public void setInterfaces( final Set<HostInterface> interfaces )
+    @Override
+    public String getSecret()
     {
-        this.interfaces = interfaces;
+        return secret;
+    }
+
+
+    @Override
+    public String getPublicKey()
+    {
+        return publicKey;
+    }
+
+
+    @Override
+    public String getRestHook()
+    {
+        return restHook;
+    }
+
+
+    @Override
+    public RegistrationStatus getStatus()
+    {
+        return status;
     }
 
 
@@ -157,37 +187,9 @@ public class RequestedHostImpl implements RequestedHost
 
 
     @Override
-    public HostArchitecture getArch()
-    {
-        return arch;
-    }
-
-
-    @Override
-    public String getPublicKey()
-    {
-        return publicKey;
-    }
-
-
-    @Override
-    public String getRestHook()
-    {
-        return restHook;
-    }
-
-
-    @Override
     public void setRestHook( final String restHook )
     {
         this.restHook = restHook;
-    }
-
-
-    @Override
-    public RegistrationStatus getStatus()
-    {
-        return status;
     }
 
 
@@ -197,17 +199,16 @@ public class RequestedHostImpl implements RequestedHost
     }
 
 
-    public String getSecret()
-    {
-        return secret;
-    }
-
-
     public void setSecret( final String secret )
     {
         this.secret = secret;
     }
 
+
+    public void setInterfaces( final Set<HostInterface> interfaces )
+    {
+        this.interfaces = interfaces;
+    }
 
     @Override
     public boolean equals( final Object o )

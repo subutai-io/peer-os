@@ -44,6 +44,23 @@ public class RegistrationManagerImpl implements RegistrationManager
 
     public void init()
     {
+        //        RequestedHostImpl temp =
+        //                new RequestedHostImpl( UUID.randomUUID().toString(), "hostname", HostArchitecture.AMD64,
+        // "some key",
+        //                        "some rest hook", RegistrationStatus.REQUESTED );
+        //        InterfaceModel interfaceModel = new InterfaceModel();
+        //        interfaceModel.setMac( UUID.randomUUID().toString() );
+        //        interfaceModel.setIp( "Some ip" );
+        //        interfaceModel.setInterfaceName( "Some i-name" );
+        //        temp.setInterfaces( Sets.newHashSet( interfaceModel ) );
+        //
+        //        requestDataService.persist( temp );
+        //        LOGGER.info( "Started RegistrationManagerImpl" );
+        //        List<RequestedHostImpl> requestedHosts = ( List<RequestedHostImpl> ) requestDataService.getAll();
+        //        for ( final RequestedHostImpl requestedHost : requestedHosts )
+        //        {
+        //            LOGGER.error( requestedHost.toString() );
+        //        }
     }
 
 
