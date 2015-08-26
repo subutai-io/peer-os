@@ -11,8 +11,8 @@
 
   <artifactId>http-context-manager-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai HTTP Context Factory</name>
-  <description>Subutai HTTP Context Factory</description>
+  <name>Subutai HTTP Context Manager Impl</name>
+  <description>Subutai HTTP Context Manager Impl</description>
 
   <properties>
     <servlet.spec.groupId>javax.servlet</servlet.spec.groupId>

@@ -11,8 +11,8 @@
 
   <artifactId>http-context-manager-api</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai HTTP Context Factory Api</name>
-  <description>Subutai HTTP Context Factory Api</description>
+  <name>Subutai HTTP Context Manager Api</name>
+  <description>Subutai HTTP Context Manager Api</description>
 
   <build>
     <plugins>
