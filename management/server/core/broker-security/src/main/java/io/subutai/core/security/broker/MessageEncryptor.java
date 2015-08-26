@@ -6,7 +6,6 @@ import java.util.UUID;
 import javax.naming.NamingException;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
-import org.bouncycastle.openpgp.PGPSecretKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,12 +53,9 @@ public class MessageEncryptor implements TextMessagePostProcessor
             {
                 EncryptionTool encryptionTool = getSecurityManager().getEncryptionTool();
 
-                //obtain peer private key for signing
-                PGPSecretKey peerKeyForSigning = getSecurityManager().getKeyManager().getSecretKey( null );
-
-                //todo obtain target host pub key for encrypting
-                //until then imitate obtaining target host pub key
-                PGPPublicKey hostKeyForEncrypting = peerKeyForSigning.getPublicKey();
+                //obtain target host pub key for encrypting
+                PGPPublicKey hostKeyForEncrypting =
+                        MessageEncryptor.getSecurityManager().getKeyManager().getPublicKey( topic );
 
                 RequestWrapper requestWrapper = JsonUtil.fromJson( message, RequestWrapper.class );
 
