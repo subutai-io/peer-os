@@ -24,8 +24,7 @@ public interface SecurityManagerRest
     @POST
     @Path( "keyman/addpublickey" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response addPublicKey( @FormParam( "hostid" ) String hostId,
-                                  @FormParam( "keytext" ) String keyText);
+    public Response addPublicKey( @FormParam( "hostid" ) String hostId, @FormParam( "keytext" ) String keyText );
 
     /* *******************************
      *
@@ -33,9 +32,8 @@ public interface SecurityManagerRest
     @POST
     @Path( "keyman/addsecuritykey" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response addSecurityKey( @FormParam( "hostid" ) String hostId,
-                                    @FormParam( "keytext" ) String keyText,
-                                    @FormParam( "keytype" ) short keyType);
+    public Response addSecurityKey( @FormParam( "hostid" ) String hostId, @FormParam( "keytext" ) String keyText,
+                                    @FormParam( "keytype" ) short keyType );
 
     /* *******************************
      *
@@ -43,7 +41,7 @@ public interface SecurityManagerRest
     @DELETE
     @Path( "keyman/removepublickey" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response removePublicKey( @QueryParam ( "hostid" ) String   hostId);
+    public Response removePublicKey( @QueryParam( "hostid" ) String hostId );
 
 
     /* *******************************
@@ -52,7 +50,7 @@ public interface SecurityManagerRest
     @GET
     @Path( "keyman/getpublickey" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getPublicKey( @QueryParam ( "hostid" ) String   hostId);
+    public Response getPublicKey( @QueryParam( "hostid" ) String hostId );
 
 
 }
