@@ -19,7 +19,7 @@
 
   <reference id="securityManagerRef" availability="mandatory" interface="io.subutai.core.security.api.SecurityManager" />
 
-  <bean id="securityManagerRestImpl" class="io.subutai.core.keyserver.rest.SecurityManagerRestImpl">
+  <bean id="securityManagerRestImpl" class="io.subutai.core.security.rest.SecurityManagerRestImpl">
     <argument ref="securityManagerRef" />
   </bean>
 
