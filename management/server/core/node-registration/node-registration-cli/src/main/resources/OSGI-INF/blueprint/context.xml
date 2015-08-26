@@ -1,0 +1,30 @@
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="node/approve">
+      <action class="io.subutai.core.registration.cli.ApproveRequest">
+        <argument ref="nodeRegistration" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="node/reject">
+      <action class="io.subutai.core.registration.cli.RejectRequest">
+        <argument ref="nodeRegistration" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="node/list-requests">
+      <action class="io.subutai.core.registration.cli.ListRequests">
+        <argument ref="nodeRegistration" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <reference id="nodeRegistration" availability="mandatory"
+             interface="io.subutai.core.registration.api.RegistrationManager" />
+
+</blueprint>

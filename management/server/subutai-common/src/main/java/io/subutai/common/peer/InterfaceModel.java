@@ -1,9 +1,9 @@
 package io.subutai.common.peer;
 
 
-import io.subutai.common.host.Interface;
-
 import com.google.common.base.Preconditions;
+
+import io.subutai.common.host.Interface;
 
 
 public class InterfaceModel implements Interface

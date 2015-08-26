@@ -2,14 +2,11 @@ package io.subutai.core.security.rest;
 
 
 import java.io.InputStream;
-
 import javax.ws.rs.core.Response;
-
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
-
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.core.security.api.SecurityManager;
 
@@ -86,7 +83,6 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
             return Response.ok( key).build();
         }
     }
-
 
 
 }

@@ -112,13 +112,11 @@ public class KeyManagerImpl implements KeyManager
     {
         try
         {
-            // Store public key in the KeyServer
-            PGPPublicKey publicKey = keyServer.addPublicKey( keyAsASCII );
+            PGPPublicKey publicKey = PGPKeyUtil.readPublicKey( keyAsASCII );
 
             if ( publicKey != null )
             {
-                String keyIdStr = PGPKeyUtil.encodeNumericKeyId( publicKey.getKeyID() );
-                securityManagerDAO.saveKeyIdentityData( hostId, keyIdStr, ( short ) 2 );
+                savePublicKey( hostId, publicKey );
             }
         }
         catch ( Exception ex )
