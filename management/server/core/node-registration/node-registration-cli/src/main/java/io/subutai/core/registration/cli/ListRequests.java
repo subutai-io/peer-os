@@ -13,10 +13,16 @@ import io.subutai.core.registration.api.resource.host.RequestedHost;
 /**
  * Created by talas on 8/25/15.
  */
-@Command( scope = "node", name = "list-requests", description = "approve new registration request" )
+@Command( scope = "node", name = "list", description = "approve new registration request" )
 public class ListRequests extends SubutaiShellCommandSupport
 {
     private RegistrationManager registrationManager;
+
+
+    public ListRequests( final RegistrationManager registrationManager )
+    {
+        this.registrationManager = registrationManager;
+    }
 
 
     @Override

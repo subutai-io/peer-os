@@ -3,6 +3,7 @@ package io.subutai.core.registration.impl;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
@@ -13,13 +14,17 @@ import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
+import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.host.Interface;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.resource.host.RequestedHost;
 import io.subutai.core.registration.impl.resource.RequestDataService;
+import io.subutai.core.registration.impl.resource.entity.HostInterface;
 import io.subutai.core.registration.impl.resource.entity.RequestedHostImpl;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -44,17 +49,19 @@ public class RegistrationManagerImpl implements RegistrationManager
 
     public void init()
     {
-        //        RequestedHostImpl temp =
-        //                new RequestedHostImpl( UUID.randomUUID().toString(), "hostname", HostArchitecture.AMD64,
-        // "some key",
-        //                        "some rest hook", RegistrationStatus.REQUESTED );
-        //        InterfaceModel interfaceModel = new InterfaceModel();
-        //        interfaceModel.setMac( UUID.randomUUID().toString() );
-        //        interfaceModel.setIp( "Some ip" );
-        //        interfaceModel.setInterfaceName( "Some i-name" );
-        //        temp.setInterfaces( Sets.newHashSet( interfaceModel ) );
+        HostInterface interfaceModel = new HostInterface();
+        interfaceModel.setMac( UUID.randomUUID().toString() );
+        interfaceModel.setIp( "Some ip" );
+        interfaceModel.setInterfaceName( "Some i-name" );
+        Set<Interface> ifaces = Sets.newHashSet();
+        ifaces.addAll( Sets.newHashSet( interfaceModel ) );
+
+        RequestedHostImpl temp =
+                new RequestedHostImpl( UUID.randomUUID().toString(), "hostname", HostArchitecture.AMD64, "secret",
+                        "some rest hook", "some key", RegistrationStatus.REQUESTED, ifaces );
         //
-        //        requestDataService.persist( temp );
+        //                requestDataService.persist( temp );
+        queueRequest( temp );
         //        LOGGER.info( "Started RegistrationManagerImpl" );
         //        List<RequestedHostImpl> requestedHosts = ( List<RequestedHostImpl> ) requestDataService.getAll();
         //        for ( final RequestedHostImpl requestedHost : requestedHosts )
@@ -117,6 +124,7 @@ public class RegistrationManagerImpl implements RegistrationManager
     {
         RequestedHostImpl registrationRequest = requestDataService.find( requestId );
         registrationRequest.setStatus( RegistrationStatus.REJECTED );
+        requestDataService.update( registrationRequest );
 
         WebClient client = RestUtil.createWebClient( registrationRequest.getRestHook() );
 
@@ -165,7 +173,7 @@ public class RegistrationManagerImpl implements RegistrationManager
         {
             LOGGER.error( "Error approving new connections request", e );
         }
-        client.post( encoded );
+        client.post( "Accepted" );
     }
 
 

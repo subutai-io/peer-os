@@ -11,35 +11,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import io.subutai.common.dao.DaoManager;
-import io.subutai.common.security.NullSubutaiLoginContext;
-import io.subutai.common.security.SubutaiLoginContext;
-import io.subutai.common.security.SubutaiThreadContext;
-import io.subutai.common.settings.CLISettings;
-import io.subutai.common.settings.ChannelSettings;
-import io.subutai.common.util.SecurityUtil;
-import io.subutai.core.identity.api.CliCommand;
-import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.Permission;
-import io.subutai.core.identity.api.PermissionGroup;
-import io.subutai.core.identity.api.PortalModuleScope;
-import io.subutai.core.identity.api.RestEndpointScope;
-import io.subutai.core.identity.api.Role;
-import io.subutai.core.identity.api.Roles;
-import io.subutai.core.identity.api.User;
-import io.subutai.core.identity.impl.entity.PermissionEntity;
-import io.subutai.core.identity.impl.dao.CliCommandDataService;
-import io.subutai.core.identity.impl.dao.PermissionDataService;
-import io.subutai.core.identity.impl.dao.PortalModuleDataService;
-import io.subutai.core.identity.impl.dao.RestEndpointDataService;
-import io.subutai.core.identity.impl.dao.RoleDataService;
-import io.subutai.core.identity.impl.dao.UserDataService;
-import io.subutai.core.identity.impl.entity.CliCommandEntity;
-import io.subutai.core.identity.impl.entity.PermissionPK;
-import io.subutai.core.identity.impl.entity.PortalModuleScopeEntity;
-import io.subutai.core.identity.impl.entity.RestEndpointScopeEntity;
-import io.subutai.core.identity.impl.entity.RoleEntity;
-import io.subutai.core.identity.impl.entity.UserEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +32,36 @@ import org.apache.shiro.util.SimpleByteSource;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
+import io.subutai.common.dao.DaoManager;
+import io.subutai.common.security.NullSubutaiLoginContext;
+import io.subutai.common.security.SubutaiLoginContext;
+import io.subutai.common.security.SubutaiThreadContext;
+import io.subutai.common.settings.CLISettings;
+import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.util.SecurityUtil;
+import io.subutai.core.identity.api.CliCommand;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.Permission;
+import io.subutai.core.identity.api.PermissionGroup;
+import io.subutai.core.identity.api.PortalModuleScope;
+import io.subutai.core.identity.api.RestEndpointScope;
+import io.subutai.core.identity.api.Role;
+import io.subutai.core.identity.api.Roles;
+import io.subutai.core.identity.api.User;
+import io.subutai.core.identity.impl.dao.CliCommandDataService;
+import io.subutai.core.identity.impl.dao.PermissionDataService;
+import io.subutai.core.identity.impl.dao.PortalModuleDataService;
+import io.subutai.core.identity.impl.dao.RestEndpointDataService;
+import io.subutai.core.identity.impl.dao.RoleDataService;
+import io.subutai.core.identity.impl.dao.UserDataService;
+import io.subutai.core.identity.impl.entity.CliCommandEntity;
+import io.subutai.core.identity.impl.entity.PermissionEntity;
+import io.subutai.core.identity.impl.entity.PermissionPK;
+import io.subutai.core.identity.impl.entity.PortalModuleScopeEntity;
+import io.subutai.core.identity.impl.entity.RestEndpointScopeEntity;
+import io.subutai.core.identity.impl.entity.RoleEntity;
+import io.subutai.core.identity.impl.entity.UserEntity;
 
 
 /**
@@ -186,7 +187,7 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         {
             for ( RestEndpointScope restEndpointScope : restEndpointScopeList )
             {
-                if ( restEndpointScope.getRestEndpoint().contains( "{*}" ))
+                if ( restEndpointScope.getRestEndpoint().contains( "{*}" ) )
                 {
                     return 1;
                 }

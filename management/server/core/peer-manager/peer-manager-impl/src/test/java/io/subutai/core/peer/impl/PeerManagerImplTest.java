@@ -11,6 +11,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerInfo;
@@ -29,9 +33,6 @@ import io.subutai.core.peer.impl.request.MessageRequestListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.strategy.api.StrategyManager;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;

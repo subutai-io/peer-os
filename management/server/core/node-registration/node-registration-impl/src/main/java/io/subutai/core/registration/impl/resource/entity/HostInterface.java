@@ -5,6 +5,8 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -21,13 +23,16 @@ import io.subutai.common.host.Interface;
 @Access( AccessType.FIELD )
 public class HostInterface implements Interface
 {
+    @Id
+    @GeneratedValue( strategy = GenerationType.IDENTITY )
+    private Long id;
+
     @Column( name = "i_name" )
     private String interfaceName;
 
     @Column( name = "ip_addr" )
     private String ip;
 
-    @Id
     @Column( name = "mac" )
     private String mac;
 
@@ -62,6 +67,18 @@ public class HostInterface implements Interface
     public void setMac( final String mac )
     {
         this.mac = mac;
+    }
+
+
+    public Long getId()
+    {
+        return id;
+    }
+
+
+    public void setId( final Long id )
+    {
+        this.id = id;
     }
 
 
