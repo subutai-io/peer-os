@@ -1,9 +1,7 @@
 package io.subutai.core.registration.api.resource.host;
 
 
-import java.net.InterfaceAddress;
 import java.util.Set;
-import java.util.UUID;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.Interface;
@@ -30,4 +28,8 @@ public interface RequestedHost
     public String getPublicKey();
 
     public String getRestHook();
+
+    public void setRestHook( String restHook );
+
+    public String getSecret();
 }

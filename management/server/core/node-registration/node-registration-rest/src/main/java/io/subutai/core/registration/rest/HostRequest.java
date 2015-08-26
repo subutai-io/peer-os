@@ -102,6 +102,13 @@ public class HostRequest implements RequestedHost
 
 
     @Override
+    public void setRestHook( final String restHook )
+    {
+        this.restHook = restHook;
+    }
+
+
+    @Override
     public RegistrationStatus getStatus()
     {
         return status;

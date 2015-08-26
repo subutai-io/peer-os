@@ -4,10 +4,15 @@ package io.subutai.core.registration.rest;
 import java.io.InputStream;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import com.google.common.collect.Maps;
 
@@ -59,6 +64,11 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         {
             String decryptedMessage = new String( decrypted, "UTF-8" );
             RequestedHost temp = JsonUtil.fromJson( decryptedMessage, HostRequest.class );
+
+            Message interceptor = PhaseInterceptorChain.getCurrentMessage();
+            HttpServletRequest request = ( HttpServletRequest ) interceptor.get( AbstractHTTPDestination.HTTP_REQUEST );
+            temp.setRestHook( String.format( "%s:%s", request.getRemoteAddr(), temp.getRestHook() ) );
+
             registrationManager.queueRequest( temp );
             securityManager.getKeyManager().savePublicKey( temp.getId(), temp.getPublicKey() );
         }

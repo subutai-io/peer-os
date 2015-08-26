@@ -59,6 +59,7 @@ public class RequestedHostImpl implements RequestedHost
     @Enumerated( EnumType.STRING )
     private HostArchitecture arch;
 
+    @Column( name = "secret" )
     private String secret;
 
     @Column( name = "public_key" )
@@ -86,6 +87,25 @@ public class RequestedHostImpl implements RequestedHost
         this.publicKey = publicKey;
         this.restHook = restHook;
         this.status = status;
+    }
+
+
+    public RequestedHostImpl( final String id, final String hostname, final HostArchitecture arch, final String secret,
+                              final String publicKey, final String restHook, final RegistrationStatus status,
+                              Set<Interface> interfaces )
+    {
+        this.id = id;
+        this.hostname = hostname;
+        this.arch = arch;
+        this.secret = secret;
+        this.publicKey = publicKey;
+        this.restHook = restHook;
+        this.status = status;
+
+        for ( final Interface anInterface : interfaces )
+        {
+            this.interfaces.add( new HostInterface( anInterface ) );
+        }
     }
 
 
@@ -154,6 +174,13 @@ public class RequestedHostImpl implements RequestedHost
     public String getRestHook()
     {
         return restHook;
+    }
+
+
+    @Override
+    public void setRestHook( final String restHook )
+    {
+        this.restHook = restHook;
     }
 
 

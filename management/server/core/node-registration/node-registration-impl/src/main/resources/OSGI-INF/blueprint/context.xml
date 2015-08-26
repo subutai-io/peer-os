@@ -8,9 +8,13 @@
 
   <bean id="registrationManager" scope="singleton" class="io.subutai.core.registration.impl.RegistrationManagerImpl"
         init-method="init">
+    <argument ref="securityManagerRef" />
     <property name="requestDataService" ref="requestDS"/>
   </bean>
 
   <service ref="registrationManager" interface="io.subutai.core.registration.api.RegistrationManager" />
+
+  <reference id="securityManagerRef" availability="mandatory"
+             interface="io.subutai.core.security.api.SecurityManager" />
 
 </blueprint>

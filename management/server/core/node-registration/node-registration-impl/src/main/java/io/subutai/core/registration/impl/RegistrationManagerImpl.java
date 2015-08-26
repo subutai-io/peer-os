@@ -1,19 +1,29 @@
 package io.subutai.core.registration.impl;
 
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 
+import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.cxf.jaxrs.client.WebClient;
+
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
+import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
+import io.subutai.common.util.RestUtil;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.resource.host.RequestedHost;
 import io.subutai.core.registration.impl.resource.RequestDataService;
 import io.subutai.core.registration.impl.resource.entity.RequestedHostImpl;
+import io.subutai.core.security.api.SecurityManager;
+import io.subutai.core.security.api.crypto.EncryptionTool;
+import io.subutai.core.security.api.crypto.KeyManager;
 
 
 /**
@@ -23,6 +33,13 @@ public class RegistrationManagerImpl implements RegistrationManager
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RegistrationManagerImpl.class );
     private RequestDataService requestDataService;
+    private SecurityManager securityManager;
+
+
+    public RegistrationManagerImpl( final SecurityManager securityManager )
+    {
+        this.securityManager = securityManager;
+    }
 
 
     public void init()
@@ -38,6 +55,8 @@ public class RegistrationManagerImpl implements RegistrationManager
 
     public void setRequestDataService( final RequestDataService requestDataService )
     {
+        Preconditions.checkNotNull( requestDataService, "RequestDataService shouldn't be null." );
+
         this.requestDataService = requestDataService;
     }
 
@@ -61,7 +80,18 @@ public class RegistrationManagerImpl implements RegistrationManager
     @Override
     public void queueRequest( final RequestedHost requestedHost )
     {
-        requestDataService.persist( ( RequestedHostImpl ) requestedHost );
+        if ( requestDataService.find( UUID.fromString( requestedHost.getId() ) ) != null )
+        {
+            LOGGER.info( "Already requested registration" );
+        }
+        else
+        {
+            RequestedHostImpl temp =
+                    new RequestedHostImpl( requestedHost.getId(), requestedHost.getHostname(), requestedHost.getArch(),
+                            requestedHost.getSecret(), requestedHost.getPublicKey(), requestedHost.getRestHook(),
+                            RegistrationStatus.REQUESTED, requestedHost.getInterfaces() );
+            requestDataService.persist( temp );
+        }
     }
 
 
@@ -70,6 +100,26 @@ public class RegistrationManagerImpl implements RegistrationManager
     {
         RequestedHostImpl registrationRequest = requestDataService.find( requestId );
         registrationRequest.setStatus( RegistrationStatus.REJECTED );
+
+        WebClient client = RestUtil.createWebClient( registrationRequest.getRestHook() );
+
+        EncryptionTool encryptionTool = securityManager.getEncryptionTool();
+        KeyManager keyManager = securityManager.getKeyManager();
+        InputStream secretKey = PGPEncryptionUtil.getFileInputStream( keyManager.getSecretKeyringFile() );
+
+        String message = RegistrationStatus.REJECTED.name();
+        PGPPublicKey publicKey = keyManager.getPublicKey( registrationRequest.getId() );
+        byte[] encodedArray = encryptionTool.encrypt( message.getBytes(), publicKey, true );
+        String encoded = message;
+        try
+        {
+            encoded = new String( encodedArray, "UTF-8" );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error approving new connections request", e );
+        }
+        client.query( "Message", encoded ).delete();
     }
 
 
@@ -78,9 +128,33 @@ public class RegistrationManagerImpl implements RegistrationManager
     {
         RequestedHostImpl registrationRequest = requestDataService.find( requestId );
         registrationRequest.setStatus( RegistrationStatus.APPROVED );
+        requestDataService.update( registrationRequest );
 
-        /**
-         * TODO Perform key saving process in KeyServer
-         */
+        WebClient client = RestUtil.createWebClient( registrationRequest.getRestHook() );
+
+        EncryptionTool encryptionTool = securityManager.getEncryptionTool();
+        KeyManager keyManager = securityManager.getKeyManager();
+        InputStream secretKey = PGPEncryptionUtil.getFileInputStream( keyManager.getSecretKeyringFile() );
+
+        String message = RegistrationStatus.APPROVED.name();
+        PGPPublicKey publicKey = keyManager.getPublicKey( registrationRequest.getId() );
+        byte[] encodedArray = encryptionTool.encrypt( message.getBytes(), publicKey, true );
+        String encoded = message;
+        try
+        {
+            encoded = new String( encodedArray, "UTF-8" );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error approving new connections request", e );
+        }
+        client.post( encoded );
+    }
+
+
+    @Override
+    public void removeRequest( final UUID requestId )
+    {
+        requestDataService.remove( requestId );
     }
 }

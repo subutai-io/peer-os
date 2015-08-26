@@ -22,4 +22,6 @@ public interface RegistrationManager
     public void rejectRequest( UUID requestId );
 
     public void approveRequest( UUID requestId );
+
+    public void removeRequest( UUID requestId );
 }
