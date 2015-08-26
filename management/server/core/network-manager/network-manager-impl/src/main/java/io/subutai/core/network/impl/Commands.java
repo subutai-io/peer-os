@@ -181,15 +181,6 @@ public class Commands
     }
 
 
-    public RequestBuilder getWriteSSHCommand( String key )
-    {
-        return new RequestBuilder( String.format( "mkdir -p /root/.ssh && " +
-                "chmod 700 /root/.ssh && " +
-                "echo '%s' > /root/.ssh/authorized_keys && " +
-                "chmod 644 /root/.ssh/authorized_keys", key ) );
-    }
-
-
     public RequestBuilder getAppendSshKeyCommand( String key )
     {
         return new RequestBuilder( String.format( "mkdir -p /root/.ssh && " +

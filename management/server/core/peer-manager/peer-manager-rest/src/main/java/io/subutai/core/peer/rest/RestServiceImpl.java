@@ -9,6 +9,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.ext.form.Form;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
+
+import com.google.common.base.Preconditions;
+import com.google.gson.reflect.TypeToken;
+
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.network.Vni;
@@ -29,18 +41,9 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.UUIDUtil;
 import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.ext.form.Form;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.transport.http.AbstractHTTPDestination;
-
-import com.google.common.base.Preconditions;
-import com.google.gson.reflect.TypeToken;
 
 
 public class RestServiceImpl implements RestService
@@ -170,7 +173,7 @@ public class RestServiceImpl implements RestService
             }
 
             p.setStatus( PeerStatus.REQUESTED );
-            p.setName( String.format( "Peer on %s", p.getIp() ) );
+            p.setName( String.format( "Peer %s", p.getId() ) );
 
             peerManager.register( p );
             return Response.ok( jsonUtil.to( peerManager.getLocalPeerInfo() ) ).build();
@@ -339,9 +342,16 @@ public class RestServiceImpl implements RestService
     {
         try
         {
+
+
             PeerInfo p = jsonUtil.from( approvedPeer, PeerInfo.class );
             p.setStatus( PeerStatus.APPROVED );
             peerManager.update( p );
+
+
+            //adding remote repository
+            ManagementHost managementHost = peerManager.getLocalPeer().getManagementHost();
+            managementHost.addRepository( p.getIp() );
 
             //************ Save Trust SSL Cert **************************************
             KeyStore keyStore;
@@ -476,7 +486,7 @@ public class RestServiceImpl implements RestService
         {
             PeerInfo p = jsonUtil.from( peer, PeerInfo.class );
             p.setIp( getRequestIp() );
-            p.setName( String.format( "Peer on %s", p.getIp() ) );
+            p.setName( String.format( "Peer %s", p.getId() ) );
             peerManager.update( p );
 
             return Response.ok( jsonUtil.to( p ) ).build();

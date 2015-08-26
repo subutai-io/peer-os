@@ -9,23 +9,6 @@ import java.util.UUID;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.subutai.common.environment.Environment;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.Peer;
-import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.peer.PeerStatus;
-import io.subutai.common.security.crypto.keystore.KeyStoreData;
-import io.subutai.common.security.crypto.keystore.KeyStoreManager;
-import io.subutai.common.settings.ChannelSettings;
-import io.subutai.common.settings.SecuritySettings;
-import io.subutai.common.util.JsonUtil;
-import io.subutai.common.util.RestUtil;
-import io.subutai.core.peer.api.ContainerGroup;
-import io.subutai.core.peer.api.ContainerGroupNotFoundException;
-import io.subutai.core.peer.api.ResourceHost;
-import io.subutai.core.peer.ui.PeerManagerPortalModule;
-import io.subutai.server.ui.component.ConfirmationDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +27,25 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
+
+import io.subutai.common.environment.Environment;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.peer.PeerStatus;
+import io.subutai.common.security.crypto.keystore.KeyStoreData;
+import io.subutai.common.security.crypto.keystore.KeyStoreManager;
+import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.settings.SecuritySettings;
+import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.RestUtil;
+import io.subutai.core.peer.api.ContainerGroup;
+import io.subutai.core.peer.api.ContainerGroupNotFoundException;
+import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.core.peer.api.ResourceHost;
+import io.subutai.core.peer.ui.PeerManagerPortalModule;
+import io.subutai.server.ui.component.ConfirmationDialog;
 
 
 /**
@@ -317,8 +319,7 @@ public class PeerRegisterForm extends CustomComponent
                 String responseString = response.readEntity( String.class );
                 LOG.info( response.toString() );
                 PeerInfo remotePeerInfo = JsonUtil.fromJson( responseString, new TypeToken<PeerInfo>()
-                {
-                }.getType() );
+                {}.getType() );
                 registerPeer( remotePeerInfo );
             }
             else if ( response.getStatus() == Response.Status.CONFLICT.getStatusCode() )
@@ -425,7 +426,7 @@ public class PeerRegisterForm extends CustomComponent
     {
         int relationExists = relationExist;
         for ( final Iterator<ResourceHost> itResource =
-              module.getPeerManager().getLocalPeer().getResourceHosts().iterator();
+                      module.getPeerManager().getLocalPeer().getResourceHosts().iterator();
               itResource.hasNext() && relationExists == 0; )
         {
             ResourceHost resourceHost = itResource.next();
@@ -478,7 +479,7 @@ public class PeerRegisterForm extends CustomComponent
         {
             Response response = client.path( "peer/unregister" ).type( MediaType.APPLICATION_JSON )
                                       .accept( MediaType.APPLICATION_JSON )
-                                      .query( "peerId",  peerToUnregister.getId().toString()  ).delete();
+                                      .query( "peerId", peerToUnregister.getId().toString() ).delete();
             if ( response.getStatus() == Response.Status.OK.getStatusCode() )
             {
                 LOG.info( response.toString() );
@@ -557,7 +558,7 @@ public class PeerRegisterForm extends CustomComponent
         {
             Response response =
                     client.path( "peer/remove" ).type( MediaType.APPLICATION_JSON ).accept( MediaType.APPLICATION_JSON )
-                          .query( "rejectedPeerId",  peerToUnregister.getId().toString()  ).delete();
+                          .query( "rejectedPeerId", peerToUnregister.getId().toString() ).delete();
             if ( response.getStatus() == Response.Status.NO_CONTENT.getStatusCode() )
             {
                 LOG.info( response.toString() );
@@ -640,6 +641,11 @@ public class PeerRegisterForm extends CustomComponent
             Response response = client.path( "peer/approve" ).put( form );
             if ( response.getStatus() == Response.Status.OK.getStatusCode() )
             {
+
+                //adding remote repository
+                ManagementHost managementHost = module.getPeerManager().getLocalPeer().getManagementHost();
+                managementHost.addRepository( remotePeer.getIp() );
+
                 LOG.info( response.readEntity( String.class ) );
                 remotePeer.setStatus( PeerStatus.APPROVED );
                 String rootCertPx2 = response.readEntity( String.class );

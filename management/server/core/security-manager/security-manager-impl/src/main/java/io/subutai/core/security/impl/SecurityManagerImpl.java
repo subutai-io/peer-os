@@ -28,6 +28,7 @@ public class SecurityManagerImpl implements SecurityManager
     private EncryptionTool encryptionTool = null;
     private SecurityManagerDAO securityManagerDAO = null;
     private KeyServer keyServer = null;
+    private String publicKeyringFile;
     private String secretKeyringFile;
     private String secretKeyringPwd;
     private String manHostId;
@@ -43,8 +44,8 @@ public class SecurityManagerImpl implements SecurityManager
         manHostId = peerManager.getLocalPeerInfo().getId().toString();
         securityManagerDAO = new SecurityManagerDAOImpl( daoManager );
 
-        keyManager = new KeyManagerImpl( securityManagerDAO, keyServer, secretKeyringFile, secretKeyringPwd, manHostId,
-                manHostKeyFingerprint );
+        keyManager = new KeyManagerImpl( securityManagerDAO, keyServer, publicKeyringFile, secretKeyringFile,
+                secretKeyringPwd, manHostId, manHostKeyFingerprint );
 
         encryptionTool = new EncryptionToolImpl( ( KeyManagerImpl ) keyManager );
     }
@@ -238,5 +239,11 @@ public class SecurityManagerImpl implements SecurityManager
     public void setManHostKeyFingerprint( final String manHostKeyFingerprint )
     {
         this.manHostKeyFingerprint = manHostKeyFingerprint;
+    }
+
+
+    public void setPublicKeyringFile( final String publicKeyringFile )
+    {
+        this.publicKeyringFile = publicKeyringFile;
     }
 }

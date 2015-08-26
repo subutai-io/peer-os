@@ -8,6 +8,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Sets;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
@@ -18,8 +21,6 @@ import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.repository.api.PackageInfo;
 import io.subutai.core.repository.api.RepositoryException;
-
-import com.google.common.collect.Sets;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -222,7 +223,7 @@ public class RepositoryManagerImplTest
         doThrow( new CommandException( "" ) ).when( commandUtil )
                                              .execute( any( RequestBuilder.class ), eq( managementHost ) );
 
-        repositoryManager.addAptSource( ARGUMENT, ARGUMENT );
+        repositoryManager.addRepository( ARGUMENT );
     }
 
 
@@ -232,6 +233,6 @@ public class RepositoryManagerImplTest
         doThrow( new CommandException( "" ) ).when( commandUtil )
                                              .execute( any( RequestBuilder.class ), eq( managementHost ) );
 
-        repositoryManager.removeAptSource( ARGUMENT );
+        repositoryManager.removeRepository( ARGUMENT );
     }
 }

@@ -6,14 +6,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.network.api.NetworkManagerException;
-
-import com.google.common.collect.Sets;
 
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
@@ -47,6 +49,7 @@ public class SshManagerTest
         when( commandUtil.execute( any( RequestBuilder.class ), any( ContainerHost.class ) ) ).thenReturn( result );
         when( result.getStdOut() ).thenReturn( SSH_KEY );
         sshManager.commandUtil = commandUtil;
+        sshManager.keys = Lists.newArrayList( SSH_KEY );
     }
 
 
@@ -129,6 +132,7 @@ public class SshManagerTest
 
         verifyCommandUtilExec();
 
+        sshManager.keys.clear();
         reset( result );
 
         try

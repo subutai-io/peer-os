@@ -14,6 +14,7 @@
 
   <cm:property-placeholder persistent-id="peer" update-strategy="none">
     <cm:default-properties>
+      <cm:property name="publicKeyringFile" value="" />
       <cm:property name="secretKeyringFile" value="" />
       <cm:property name="secretKeyringPwd" value="" />
       <cm:property name="managementHostKeyFingerprint" value="" />
@@ -42,6 +43,7 @@
     <property name="keyServer"  ref="keyServer" />
     <property name="peerManager"  ref="peerManager" />
     <property name="secretKeyringFile" value="$[subutaiAppDataPath]/keystores/${secretKeyringFile}" />
+    <property name="publicKeyringFile" value="$[subutaiAppDataPath]/keystores/${publicKeyringFile}" />
     <property name="secretKeyringPwd" value="${secretKeyringPwd}" />
     <property name="manHostKeyFingerprint" value="${managementHostKeyFingerprint}" />
   </bean>
