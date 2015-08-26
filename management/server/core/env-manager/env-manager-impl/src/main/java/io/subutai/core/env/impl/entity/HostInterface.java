@@ -17,18 +17,15 @@ import io.subutai.common.host.Interface;
 
 
 /**
- * {@link HostInterface} stores host network interface
- * information.
- * <p> {@link #interfaceName} - host interface name</p>
- * <p> {@link #ip} - ip address</p>
- * <p> {@link #mac} - mac address</p>
- * <p> {@link #host} - target host whose metadata being saved</p>
+ * {@link HostInterface} stores host network interface information. <p> {@link #interfaceName} - host interface name</p>
+ * <p> {@link #ip} - ip address</p> <p> {@link #mac} - mac address</p> <p> {@link #host} - target host whose metadata
+ * being saved</p>
  *
  * @see io.subutai.common.host.Interface
  * @see EnvironmentContainerImpl
  */
 @Entity
-@Table( name = "interface" )
+@Table( name = "environment_container_interface" )
 @Access( AccessType.FIELD )
 public class HostInterface implements Interface, Serializable
 {
