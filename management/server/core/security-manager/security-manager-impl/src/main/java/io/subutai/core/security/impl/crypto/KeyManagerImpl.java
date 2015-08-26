@@ -114,7 +114,7 @@ public class KeyManagerImpl implements KeyManager
 
             if ( publicKey != null )
             {
-                String keyIdStr = PGPKeyUtil.encodeNumericKeyId( publicKey.getKeyID() );
+                String keyIdStr = PGPKeyUtil.getFingerprint( publicKey.getFingerprint() );
                 securityManagerDAO.saveKeyIdentityData( hostId, keyIdStr, ( short ) 2 );
             }
         }

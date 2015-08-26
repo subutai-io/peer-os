@@ -17,7 +17,7 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="node/list-requests">
+    <command name="node/list">
       <action class="io.subutai.core.registration.cli.ListRequests">
         <argument ref="nodeRegistration" />
       </action>
