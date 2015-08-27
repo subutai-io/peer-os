@@ -74,7 +74,7 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
     <Arg>
       <New class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
         <Arg>
-          <New class="io.subutai.core.http.manager.impl.jetty.CustomSslContextFactory">
+          <New class="io.subutai.core.http.context.jetty.CustomSslContextFactory">
             <Set name="KeyStore"><SystemProperty name="subutaiAppDataPath" />/keystores/keystore_server_px2.jks</Set>
             <Set name="KeyStorePassword">subutai</Set>
             <Set name="certAlias">root_server_px2</Set>

@@ -5,7 +5,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
+
 import org.apache.commons.codec.binary.Hex;
+
+import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.core.keyserver.api.model.SecurityKey;
 import io.subutai.core.keyserver.impl.model.SecurityKeyEntity;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
@@ -32,10 +36,48 @@ public class SecurityKeyUtil
         pk.setFingerprint( fingerprint );
         pk.setKeyId( PGPKeyUtil.getKeyId( fingerprint ) );
         pk.setShortKeyId( PGPKeyUtil.getShortKeyId( fingerprint ) );
-        pk.setKeyData( pgpKey.getEncoded());
+        pk.setKeyData( pgpKey.getPublicKeyPacket().getEncoded());
 
 
         return pk;
+    }
+
+
+    /********************************************
+     *  Convert BouncyCastle PGPKeyRing to SecurityKey entity
+     *
+     * @param pgpKeyRing
+     * @return
+     * @throws IOException
+     */
+    public static SecurityKey convert( PGPPublicKeyRing pgpKeyRing ) throws IOException
+    {
+        try
+        {
+            PGPPublicKey pgpKey = PGPKeyUtil.readPublicKey( pgpKeyRing );
+
+            if ( pgpKey != null )
+            {
+                String fingerprint = new String( Hex.encodeHex( pgpKey.getFingerprint(), false ) );
+
+                SecurityKey pk = new SecurityKeyEntity();
+
+                pk.setFingerprint( fingerprint );
+                pk.setKeyId( PGPKeyUtil.getKeyId( fingerprint ) );
+                pk.setShortKeyId( PGPKeyUtil.getShortKeyId( fingerprint ) );
+                pk.setKeyData( pgpKeyRing.getEncoded() );
+
+                return pk;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch(Exception ex)
+        {
+            return null;
+        }
     }
 
 

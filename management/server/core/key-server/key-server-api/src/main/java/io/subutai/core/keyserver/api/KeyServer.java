@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
 
 import io.subutai.core.keyserver.api.dao.KeyServerDAO;
 import io.subutai.core.keyserver.api.model.SecurityKey;
@@ -92,10 +93,17 @@ public interface KeyServer
     /********************************
      * Saves the given public key.
      *
+     * @param publicKeyRing to save
+     */
+    public void addSecurityKey( PGPPublicKeyRing publicKeyRing ) throws PGPException, IOException;
+
+
+    /********************************
+     * Saves the given public key.
+     *
      * @param key to save
      */
     public PGPPublicKey addPublicKey( String key ) throws PGPException, IOException;
-
 
     /********************************
      * Saves the given public key.
@@ -127,14 +135,6 @@ public interface KeyServer
      * @param keyId key ID of a public key to delete
      */
     public void removeSecurityKeyByKeyId( String keyId );
-
-
-    /********************************
-     * converts SecurityKey entity to the PGPPublicKey
-     *
-     * @param securityKey
-     */
-    public PGPPublicKey convertKey( SecurityKey securityKey ) throws PGPException;
 
 
     /********************************
