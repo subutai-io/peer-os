@@ -153,11 +153,14 @@ gpg2 --trust-model always --no-default-keyring --secret-keyring $child_gpg_dir/s
 #curl the DATA
 curl -X POST -H 'Content-Type: text/plain' -d @$child_gpg_dir/stdout.asc gw.intra.lan:8181/cxf/registration/public-key
 rm -f $child_gpg_dir/stdout.asc
-rm -f $child_gpg_dir/stdin.asc
+rm -f $child_gpg_dir/stdin.txt
+rm -f $child_gpg_dir/mgn.key
 }
 #----------- 
+if [ -n "$token" ]; then
   generate_defaults 
   exchange_keys_and_encrypt  
+fi
 #starting lxc in this method 
   git_child_branch $child
 
