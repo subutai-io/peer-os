@@ -1,0 +1,65 @@
+<blueprint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
+           xmlns:cxf="http://cxf.apache.org/blueprint/core" xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+           http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
+
+  <reference id="gatewayImpl" availability="mandatory"
+             interface="io.subutai.core.gateway.api.Gateway" />
+
+  <bean id="gatewayRestServiceImpl" class="io.subutai.core.gateway.rest.RestServiceImpl">
+    <argument ref="gatewayImpl" />
+  </bean>
+
+  <bean id="loggingInInterceptor" class="org.apache.cxf.interceptor.LoggingInInterceptor">
+    <property name="prettyLogging" value="true" />
+  </bean>
+
+  <bean id="loggingOutInterceptor" class="org.apache.cxf.interceptor.LoggingOutInterceptor">
+    <property name="prettyLogging" value="true" />
+  </bean>
+
+  <cxf:bus>
+    <cxf:inInterceptors>
+      <ref  component-id="loggingInInterceptor" />
+    </cxf:inInterceptors>
+    <cxf:outInterceptors>
+      <ref component-id="loggingOutInterceptor" />
+    </cxf:outInterceptors>
+    <cxf:outFaultInterceptors>
+      <ref component-id="loggingOutInterceptor" />
+    </cxf:outFaultInterceptors>
+    <cxf:inFaultInterceptors>
+      <ref component-id="loggingInInterceptor" />
+    </cxf:inFaultInterceptors>
+    <cxf:features>
+      <cxf:logging />
+    </cxf:features>
+  </cxf:bus>
+
+<!--
+  <bean id="jacksonMapper" class="org.safehaus.util.JarvisObjectMapper">
+    <property name="dateFormat">
+      <bean class="java.text.SimpleDateFormat">
+        <argument type="java.lang.String" value="yyyy-MM-dd'T'HH:mm:ss.SSSZ" />
+      </bean>
+    </property>
+  </bean>
+-->
+
+  <bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider">
+<!--
+    <property name="mapper" ref="jacksonMapper" />
+-->
+  </bean>
+
+  <jaxrs:server address="/rest/api/v1/" id="gatewayRestService">
+    <jaxrs:serviceBeans>
+      <ref component-id="gatewayRestServiceImpl" />
+    </jaxrs:serviceBeans>
+    <jaxrs:providers>
+      <ref component-id="jsonProvider" />
+    </jaxrs:providers>
+  </jaxrs:server>
+
+</blueprint>
