@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <artifactId>mgmt-server-core-parent</artifactId>
+    <groupId>io.subutai</groupId>
+    <version>2.0.0</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>http-context-manager</artifactId>
+  <packaging>pom</packaging>
+  <name>Subutai HTTP Context Manager Parent</name>
+  <description>Subutai HTTP Context Manager Parent</description>
+
+  <modules>
+    <module>http-context-manager-impl</module>
+    <module>http-context-manager-api</module>
+    <module>http-context-manager-cli</module>
+  </modules>
+
+</project>

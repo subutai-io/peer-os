@@ -6,14 +6,13 @@ import java.util.List;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.keyserver.api.KeyServer;
 import io.subutai.core.keyserver.api.model.SecurityKey;
-import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 
 
 /**
@@ -128,7 +127,7 @@ public class KeyServerRestImpl implements KeyServerRest
     }
 
 
-    /********************************
+    /* *******************************
      *
      */
     @Override
@@ -140,7 +139,7 @@ public class KeyServerRestImpl implements KeyServerRest
     }
 
 
-    /********************************
+    /* *******************************
      *
      */
     @Override
@@ -152,7 +151,7 @@ public class KeyServerRestImpl implements KeyServerRest
     }
 
 
-    /********************************
+    /* *******************************
      *
      */
     public KeyServer getKeyServer()
@@ -161,7 +160,7 @@ public class KeyServerRestImpl implements KeyServerRest
     }
 
 
-    /********************************
+    /* *******************************
      *
      */
     public void setKeyServer( KeyServer keyServer )
@@ -170,7 +169,7 @@ public class KeyServerRestImpl implements KeyServerRest
     }
 
 
-    /********************************
+    /* *******************************
      *
      */
     private Response handleGetOperation( String searchParam )
@@ -212,7 +211,7 @@ public class KeyServerRestImpl implements KeyServerRest
     }
 
 
-    /********************************
+    /* *******************************
      *
      */
     private Response getKey( String keyId,short searchBy )
@@ -255,7 +254,7 @@ public class KeyServerRestImpl implements KeyServerRest
     }
 
 
-    /********************************
+    /* *******************************
      *
      */
     private Response handleIndexOperation( String searchParam )

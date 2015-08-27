@@ -47,7 +47,7 @@
         <configuration>
           <instructions>
             <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
-            <Bundle-SymbolicName>${project.groupId}.core.security.impl</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.security.rest</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>

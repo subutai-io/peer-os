@@ -12,6 +12,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.ext.form.Form;
+
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
@@ -27,12 +31,8 @@ import io.subutai.common.quota.RamQuota;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-
-import io.subutai.core.ssl.manager.api.SubutaiSslContextFactory;
-
-import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.ext.form.Form;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNull;
@@ -65,8 +65,6 @@ public class RestServiceImplTest
     private static final String ALIAS = "alias";
     private static final UUID ENV_ID = UUID.randomUUID();
     @Mock
-    SubutaiSslContextFactory sslContextFactory;
-    @Mock
     PeerManager peerManager;
     @Mock
     LocalPeer localPeer;
@@ -90,6 +88,8 @@ public class RestServiceImplTest
     PeerException peerException;
     @Mock
     ContainerHost containerHost;
+    @Mock
+    ManagementHost managementHost;
 
     RestServiceImpl restService;
 
@@ -97,7 +97,7 @@ public class RestServiceImplTest
     @Before
     public void setUp() throws Exception
     {
-        restService = spy( new RestServiceImpl( peerManager, sslContextFactory ) );
+        restService = spy( new RestServiceImpl( peerManager ) );
         restService.jsonUtil = jsonUtil;
         restService.restUtil = restUtil;
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
@@ -121,6 +121,7 @@ public class RestServiceImplTest
         when( jsonUtil.from( CONTAINER_ID.toString(), UUID.class ) ).thenCallRealMethod();
         when( jsonUtil.from( JSON, PeerInfo.class ) ).thenReturn( peerInfo );
         when( localPeer.getContainerHostById( CONTAINER_ID ) ).thenReturn( containerHost );
+        when( localPeer.getManagementHost() ).thenReturn( managementHost );
     }
 
 
@@ -263,7 +264,7 @@ public class RestServiceImplTest
 
         restService.unregisterPeer( PEER_ID.toString() );
 
-        verify( sslContextFactory ).reloadTrustStore();
+        //verify( sslContextFactory ).reloadTrustStore();
 
         when( peerManager.unregister( PEER_ID.toString() ) ).thenReturn( false );
 
@@ -308,7 +309,7 @@ public class RestServiceImplTest
     {
         restService.approveForRegistrationRequest( JSON, CERT );
 
-        verify( sslContextFactory ).reloadTrustStore();
+        //verify( sslContextFactory ).reloadTrustStore();
 
         doThrow( exception ).when( peerManager ).update( peerInfo );
 
@@ -330,7 +331,7 @@ public class RestServiceImplTest
 
         restService.approveForRegistrationRequest( PEER_ID.toString() );
 
-        verify( sslContextFactory ).reloadTrustStore();
+        //verify( sslContextFactory ).reloadTrustStore();
 
         doThrow( exception ).when( peerManager ).update( peerInfo );
 

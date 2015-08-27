@@ -6,6 +6,10 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
@@ -17,10 +21,6 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.repository.api.PackageInfo;
 import io.subutai.core.repository.api.RepositoryException;
 import io.subutai.core.repository.api.RepositoryManager;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -177,29 +177,29 @@ public class RepositoryManagerImpl implements RepositoryManager
 
 
     @Override
-    public void addAptSource( final String hostname, final String ip ) throws RepositoryException
+    public void addRepository( final String ip ) throws RepositoryException
     {
         try
         {
-            commandUtil.execute( commands.getAddAptSourceCommand( hostname, ip ), getManagementHost() );
+            commandUtil.execute( commands.getRepositoryCommand( ip ), getManagementHost() );
         }
         catch ( HostNotFoundException | CommandException e )
         {
-            throw new RepositoryException( "Could not add remote host as apt source", e );
+            throw new RepositoryException( "Could not add remote repository", e );
         }
     }
 
 
     @Override
-    public void removeAptSource( final String ip ) throws RepositoryException
+    public void removeRepository( final String ip ) throws RepositoryException
     {
         try
         {
-            commandUtil.execute( commands.getRemoveAptSourceCommand( ip ), getManagementHost() );
+            commandUtil.execute( commands.getRemoveRepositoryCommand( ip ), getManagementHost() );
         }
         catch ( HostNotFoundException | CommandException e )
         {
-            throw new RepositoryException( "Could not add remote host as apt source", e );
+            throw new RepositoryException( "Could not remove remote repository", e );
         }
     }
 }
