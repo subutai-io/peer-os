@@ -89,9 +89,9 @@ public class KeyManagerImpl implements KeyManager
                     savePublicKey( manHostId, publicKeyRing );
                 }
             }
-            catch(Exception ex)
+            catch ( Exception ex )
             {
-                LOG.error( " **** Error, Loading PGPPublicKeyRing **** :" +ex.toString() );
+                LOG.error( " **** Error, Loading PGPPublicKeyRing **** :" + ex.toString() );
             }
         }
     }
@@ -137,11 +137,30 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
+    @Override
+    public void savePublicKeyRing( String hostId, String keyringAsASCII )
+    {
+        try
+        {
+            PGPPublicKeyRing pgpPublicKeyRing = PGPKeyUtil.readPublicKeyRing( keyringAsASCII );
+
+            if ( pgpPublicKeyRing != null )
+            {
+                savePublicKey( hostId, pgpPublicKeyRing );
+            }
+        }
+        catch ( Exception ex )
+        {
+            LOG.error( "Error storing Public key:" + ex.toString() );
+        }
+    }
+
+
     /* *****************************
      *
      */
     @Override
-    public void savePublicKey( String hostId, PGPPublicKeyRing publicKeyRing)
+    public void savePublicKey( String hostId, PGPPublicKeyRing publicKeyRing )
     {
         try
         {
@@ -247,7 +266,7 @@ public class KeyManagerImpl implements KeyManager
             }
             else
             {
-                byte []keyData = keyServer.getSecurityKeyByFingerprint( fingerprint ).getKeyData();
+                byte[] keyData = keyServer.getSecurityKeyByFingerprint( fingerprint ).getKeyData();
                 ByteArrayOutputStream encOut = new ByteArrayOutputStream();
                 ArmoredOutputStream armorOut = new ArmoredOutputStream( encOut );
 
@@ -255,11 +274,8 @@ public class KeyManagerImpl implements KeyManager
                 armorOut.flush();
                 armorOut.close();
 
-                return new String(encOut.toByteArray());
-
+                return new String( encOut.toByteArray() );
             }
-
-
         }
         catch ( Exception ex )
         {
@@ -286,7 +302,8 @@ public class KeyManagerImpl implements KeyManager
         {
             String fingerprint = securityManagerDAO.getKeyFingerprint( hostId );
 
-            publicKey = PGPKeyUtil.readPublicKey( ( keyServer.getSecurityKeyByFingerprint( fingerprint ).getKeyData() ));
+            publicKey =
+                    PGPKeyUtil.readPublicKey( ( keyServer.getSecurityKeyByFingerprint( fingerprint ).getKeyData() ) );
 
             return publicKey;
         }

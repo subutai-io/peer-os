@@ -68,7 +68,12 @@ public interface KeyManager
     /**
      * *****************************
      */
-    public void savePublicKey( String hostId,  PGPPublicKeyRing publicKeyRing);
+    public void savePublicKeyRing( String hostId, String keyringAsASCII );
+
+    /**
+     * *****************************
+     */
+    public void savePublicKey( String hostId, PGPPublicKeyRing publicKeyRing );
 
 
     /* *****************************

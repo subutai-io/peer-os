@@ -1,9 +1,6 @@
 package io.subutai.core.registration.rest;
 
 
-import java.io.InputStream;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
@@ -14,9 +11,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
-import com.google.common.collect.Maps;
-
-import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.resource.host.RequestedHost;
@@ -25,9 +19,6 @@ import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 
 
-/**
- * Created by talas on 8/25/15.
- */
 public class RegistrationRestServiceImpl implements RegistrationRestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RegistrationRestServiceImpl.class );
@@ -46,9 +37,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     @Override
     public Response getPublicKey()
     {
-        Map<String, String> result = Maps.newHashMap();
-        result.put( "Key", securityManager.getKeyManager().getPeerPublicKeyring() );
-        return Response.ok( JsonUtil.toJson( result ) ).build();
+        return Response.ok( securityManager.getKeyManager().getPeerPublicKeyring() ).build();
     }
 
 
@@ -57,11 +46,10 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     {
         EncryptionTool encryptionTool = securityManager.getEncryptionTool();
         KeyManager keyManager = securityManager.getKeyManager();
-        InputStream secretKey = PGPEncryptionUtil.getFileInputStream( keyManager.getSecretKeyringFile() );
 
-        byte[] decrypted = encryptionTool.decrypt( message.getBytes(), secretKey, keyManager.getSecretKeyringPwd() );
         try
         {
+            byte[] decrypted = encryptionTool.decrypt( message.getBytes() );
             String decryptedMessage = new String( decrypted, "UTF-8" );
             RequestedHost temp = JsonUtil.fromJson( decryptedMessage, HostRequest.class );
 
@@ -70,7 +58,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
             temp.setRestHook( String.format( "%s:%s", request.getRemoteAddr(), temp.getRestHook() ) );
 
             registrationManager.queueRequest( temp );
-            securityManager.getKeyManager().savePublicKey( temp.getId(), temp.getPublicKey() );
+            keyManager.savePublicKeyRing( temp.getId(), temp.getPublicKey() );
         }
         catch ( Exception e )
         {

@@ -1,11 +1,8 @@
 package io.subutai.core.security.api.crypto;
 
 
-import java.io.InputStream;
-
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
-import org.bouncycastle.openpgp.PGPSecretKey;
 
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
 
@@ -23,29 +20,15 @@ public interface EncryptionTool
 
 
     /**
-     * *****************************************
+     * Decrypts message with Peer private key
      */
-    public byte[] decrypt( final byte[] message, final InputStream secretKey, final String secretPwd );
+    public byte[] decrypt( final byte[] message ) throws PGPException;
 
-
-    /**
-     * *****************************************
-     */
-    public byte[] decryptAndVerify( byte[] encryptedMessage, final PGPSecretKey secretKey, final String secretPwd,
-                                    final PGPPublicKey publicKey );
-
-    ;
 
     /**
      * *****************************************
      */
     public boolean verify( byte[] signedMessage, PGPPublicKey publicKey );
-
-
-    /**
-     * *****************************************
-     */
-    public byte[] sign( byte[] message, PGPSecretKey secretKey, String secretPwd, boolean armor );
 
 
     /**
