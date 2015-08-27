@@ -17,15 +17,11 @@ public class ChannelSettings
     public static final String[] REST_URL = {
 
             // All  Services
-            "/{*}",
-            "/cxf/peer/register",
-            "/cxf/peer/register/{$}",
+            "/{*}", "/cxf/peer/register", "/cxf/peer/register/{$}",
             "/cxf/peer/reject",
             "/cxf/peer/approve",
             "/cxf/peer/remove",
-            "/cxf/peer/trust_request",
-            "/cxf/peer/trust_response",
-            "/cxf/peer/approve/{$}",
+            "/cxf/peer/trust_request", "/cxf/peer/trust_response", "/cxf/peer/approve/{$}",
             "/cxf/peer/",
             "/cxf/peer/getlist",
             "/cxf/peer/me",

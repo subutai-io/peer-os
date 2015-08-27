@@ -1,12 +1,14 @@
 package io.subutai.core.security.broker;
 
 
+import java.util.UUID;
+
 import org.bouncycastle.openpgp.PGPPublicKey;
-import org.bouncycastle.openpgp.PGPSecretKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.broker.api.ByteMessagePreProcessor;
 import io.subutai.core.broker.api.Topic;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -39,18 +41,35 @@ public class MessageDecryptor implements ByteMessagePreProcessor
         {
             try
             {
-                //obtain peer private key for decrypting
-                PGPSecretKey peerKeyForDecrypting =
-                        MessageEncryptor.getSecurityManager().getKeyManager().getSecretKey( null );
 
                 EncryptionTool encryptionTool = MessageEncryptor.getSecurityManager().getEncryptionTool();
 
-
                 ContentAndSignatures contentAndSignatures = encryptionTool.decryptAndReturnSignatures( message );
 
-                //todo obtain target host pub key by id from content for verifying
-                //until then imitate obtaining target host pub key
-                PGPPublicKey hostKeyForVerifying = peerKeyForDecrypting.getPublicKey();
+                //obtain target host pub key by id from content for verifying
+                UUID hostId;
+
+                if ( Topic.RESPONSE_TOPIC.name().equalsIgnoreCase( topic ) )
+                {
+                    //obtain host id from response
+                    ResponseWrapper responseWrapper =
+                            JsonUtil.fromJson( new String( contentAndSignatures.getDecryptedContent() ),
+                                    ResponseWrapper.class );
+
+                    hostId = responseWrapper.getResponse().getId();
+                }
+                else
+                {
+                    //obtain host id from heartbeat
+                    HeartBeat heartBeat = JsonUtil.fromJson( new String( contentAndSignatures.getDecryptedContent() ),
+                            HeartBeat.class );
+
+                    hostId = heartBeat.getHostInfo().getId();
+                }
+
+
+                PGPPublicKey hostKeyForVerifying =
+                        MessageEncryptor.getSecurityManager().getKeyManager().getPublicKey( hostId.toString() );
 
                 if ( encryptionTool.verifySignature( contentAndSignatures, hostKeyForVerifying ) )
                 {

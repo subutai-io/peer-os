@@ -5,14 +5,13 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-
-import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.keyserver.api.KeyServer;
 import io.subutai.core.keyserver.api.model.SecurityKey;
-import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 
 
 /**

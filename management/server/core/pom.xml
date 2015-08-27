@@ -47,6 +47,7 @@
     <module>broker-security</module>
     <module>node-registration</module>
     <module>http-context-factory</module>
+    <module>gateway</module>
   </modules>
 
 </project>

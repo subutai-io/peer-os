@@ -13,6 +13,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -62,6 +63,7 @@ public class RequestedHostImpl implements RequestedHost
     @Column( name = "secret" )
     private String secret;
 
+    @Lob
     @Column( name = "public_key" )
     private String publicKey;
 

@@ -1,13 +1,14 @@
 package io.subutai.core.security.rest;
 
 
-import java.io.InputStream;
 import javax.ws.rs.core.Response;
+
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Strings;
-import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
+
 import io.subutai.core.security.api.SecurityManager;
 
 
@@ -90,7 +91,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     @Override
     public Response getPublicKeyData( final String hostId )
     {
-        String key = securityManager.getKeyManager().getPublicKeyDataAsASCII( hostId);
+        String key = securityManager.getKeyManager().getPublicKeyDataAsASCII( hostId );
 
         if ( Strings.isNullOrEmpty( key ) )
         {

@@ -48,6 +48,8 @@ public class CLISettings
 
             put( "test", Sets.newHashSet( "exec" ) );
 
+            put( "node", Sets.newHashSet( "approve", "reject", "list" ) );
+
             put( "registry",
                     Sets.newHashSet( "get-template", "register-template", "get-child-templates", "get-parent-template",
                             "unregister-template", "list-template-tree", "list-templates", "get-parent-templates" ) );

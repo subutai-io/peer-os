@@ -60,6 +60,10 @@
     <!--<org.bouncycastle.version>1.46</org.bouncycastle.version>-->
     <org.bouncycastle.version>1.52</org.bouncycastle.version>
 
+    <!-- JWT lib -->
+    <nimbus.jwt.version>3.10</nimbus.jwt.version>
+
+
     <!-- Database  -->
     <h2database.version>1.4.184</h2database.version>
     <openjpa.version>2.3.0</openjpa.version>
@@ -671,6 +675,29 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- gateway -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>gateway-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>gateway-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>gateway-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>gateway-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- Vaadin -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -798,6 +825,13 @@
         <artifactId>el-api</artifactId>
         <version>2.2</version>
       </dependency>
+      <!-- Json Mapper -->
+      <dependency>
+      	<groupId>com.fasterxml.jackson.jaxrs</groupId>
+      	<artifactId>jackson-jaxrs-json-provider</artifactId>
+      	<version>2.6.1</version>
+      </dependency>
+
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!--Testing dependencies-->
@@ -1057,6 +1091,13 @@
         <artifactId>shiro-web</artifactId>
         <version>${org.apache.shiro.version}</version>
       </dependency>
+      <dependency>
+      	<groupId>com.nimbusds</groupId>
+      	<artifactId>nimbus-jose-jwt</artifactId>
+      	<version>${nimbus.jwt.version}</version>
+      </dependency>
+
+
     </dependencies>
   </dependencyManagement>
 
