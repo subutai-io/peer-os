@@ -2,7 +2,6 @@ package io.subutai.core.registration.rest;
 
 
 import java.io.InputStream;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
@@ -13,8 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
-
-import com.google.common.collect.Maps;
 
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.util.JsonUtil;
@@ -46,9 +43,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     @Override
     public Response getPublicKey()
     {
-        Map<String, String> result = Maps.newHashMap();
-        result.put( "Key", securityManager.getKeyManager().getPeerPublicKeyring() );
-        return Response.ok( JsonUtil.toJson( result ) ).build();
+        return Response.ok( securityManager.getKeyManager().getPeerPublicKeyring() ).build();
     }
 
 
