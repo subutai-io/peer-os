@@ -84,5 +84,59 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
         }
     }
 
+    /* ******************************
+     *
+     */
+    @Override
+    public Response getPublicKeyData( final String hostId )
+    {
+        String key = securityManager.getKeyManager().getPublicKeyDataAsASCII( hostId);
 
+        if ( Strings.isNullOrEmpty( key ) )
+        {
+            return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
+        }
+        else
+        {
+            return Response.ok( key).build();
+        }
+    }
+
+
+    /* ******************************
+     *
+     */
+    @Override
+    public Response getPublicKeyId( final String hostId )
+    {
+        PGPPublicKey key = securityManager.getKeyManager().getPublicKey(hostId);
+
+        if ( key == null )
+        {
+            return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
+        }
+        else
+        {
+            return Response.ok( key.getKeyID()).build();
+        }
+    }
+
+
+    /* ******************************
+     *
+     */
+    @Override
+    public Response getPublicKeyFingerprint( final String hostId )
+    {
+        PGPPublicKey key = securityManager.getKeyManager().getPublicKey(hostId);
+
+        if ( key == null )
+        {
+            return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
+        }
+        else
+        {
+            return Response.ok( key.getFingerprint()).build();
+        }
+    }
 }

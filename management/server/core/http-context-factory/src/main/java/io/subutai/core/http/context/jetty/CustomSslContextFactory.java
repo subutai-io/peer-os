@@ -1,13 +1,15 @@
-package io.subutai.core.http.manager.impl.jetty;
+package io.subutai.core.http.context.jetty;
 
 
 import java.security.KeyStore;
-
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+/**
+ * extends Jetty SSLContextFactory
+ */
 public class CustomSslContextFactory extends SslContextFactory
 {
     private static Logger LOG = LoggerFactory.getLogger( CustomSslContextFactory.class.getName() );

@@ -622,6 +622,14 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- ssl-context-factory -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>http-context-factory</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- ssl-context-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>

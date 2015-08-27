@@ -233,7 +233,7 @@ public class PGPKeyUtil
      */
     public static String exportAscii( PGPPublicKey pgpKey ) throws PGPException
     {
-        ByteArrayOutputStream out = new ByteArrayOutputStream( 1024 );
+        ByteArrayOutputStream out = new ByteArrayOutputStream(  );
         try ( OutputStream os = new ArmoredOutputStream( out ) )
         {
             pgpKey.encode( os );
@@ -287,7 +287,7 @@ public class PGPKeyUtil
         try
         {
             instr = org.bouncycastle.openpgp.PGPUtil.getDecoderStream( instr );
-            pgpPub = new PGPPublicKeyRingCollection(instr, new JcaKeyFingerprintCalculator() );
+            pgpPub = new PGPPublicKeyRingCollection( instr,new JcaKeyFingerprintCalculator() );
         }
         catch ( IOException | PGPException ex )
         {
@@ -320,4 +320,67 @@ public class PGPKeyUtil
     }
 
 
+    /* *******************************************
+     *
+     */
+    public static PGPPublicKeyRing readPublicKeyRing( InputStream instr ) throws PGPException
+    {
+        PGPPublicKeyRingCollection pgpPub;
+        try
+        {
+            instr = org.bouncycastle.openpgp.PGPUtil.getDecoderStream( instr );
+            pgpPub = new PGPPublicKeyRingCollection( instr,new JcaKeyFingerprintCalculator() );
+        }
+        catch ( IOException | PGPException ex )
+        {
+            throw new PGPException( "Failed to init public key ring", ex );
+        }
+
+        //
+        // we just loop through the collection till we find a key suitable for encryption, in the real
+        // world you would probably want to be a bit smarter about this.
+        //
+
+        Iterator keyRingIter = pgpPub.getKeyRings();
+        while ( keyRingIter.hasNext() )
+        {
+            PGPPublicKeyRing keyRing = ( PGPPublicKeyRing ) keyRingIter.next();
+
+            return keyRing;
+
+        }
+
+        throw new IllegalArgumentException( "Can't find encryption key in key ring." );
+    }
+
+
+    /* *******************************************
+     *
+     */
+    public static PGPPublicKey readPublicKey( PGPPublicKeyRing keyRing ) throws PGPException
+    {
+        try
+        {
+            Iterator keyIter = keyRing.getPublicKeys();
+
+            while ( keyIter.hasNext() )
+            {
+                PGPPublicKey key = ( PGPPublicKey ) keyIter.next();
+
+                if ( key.isEncryptionKey() )
+                {
+                    return key;
+                }
+            }
+        }
+        catch(Exception ex)
+        {
+            return null;
+        }
+
+        return null;
+    }
+
 }
+
+

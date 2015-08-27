@@ -1,11 +1,14 @@
 package io.subutai.core.security.impl.crypto;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
+import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,27 +63,35 @@ public class KeyManagerImpl implements KeyManager
      */
     private void init()
     {
-        InputStream instr = PGPEncryptionUtil.getFileInputStream( secretKeyringFile );
+        InputStream instrSecRing = PGPEncryptionUtil.getFileInputStream( secretKeyringFile );
+        InputStream instrPubRing = PGPEncryptionUtil.getFileInputStream( publicKeyringFile );
 
-        if ( instr == null )
+        if ( instrSecRing == null || instrPubRing == null )
         {
             LOG.error( " **** Error! Cannot find localHost KeyRing **** " );
         }
         else
         {
-            // Insert Local PeerId and KeyId
-
-            LOG.info( "******** Creating Key record for localhost *******" );
-
-            PGPSecretKey secretKey = getSecretKeyByFingerprint( manHostKeyFingerprint );
-
-            if ( secretKey == null )
+            try
             {
-                LOG.error( " **** Error! Cannot extract SecretKey from KeyRing **** " );
+                // Insert Local PeerId and KeyId
+
+                LOG.info( "******** Creating Key record for localhost *******" );
+
+                PGPPublicKeyRing publicKeyRing = PGPKeyUtil.readPublicKeyRing( instrPubRing );
+
+                if ( publicKeyRing == null )
+                {
+                    LOG.error( " **** Error! Cannot extract PGPPublicKeyRing **** " );
+                }
+                else
+                {
+                    savePublicKey( manHostId, publicKeyRing );
+                }
             }
-            else
+            catch(Exception ex)
             {
-                savePublicKey( manHostId, secretKey.getPublicKey() );
+                LOG.error( " **** Error, Loading PGPPublicKeyRing **** :" +ex.toString() );
             }
         }
     }
@@ -117,6 +128,32 @@ public class KeyManagerImpl implements KeyManager
             if ( publicKey != null )
             {
                 savePublicKey( hostId, publicKey );
+            }
+        }
+        catch ( Exception ex )
+        {
+            LOG.error( "Error storing Public key:" + ex.toString() );
+        }
+    }
+
+
+    /* *****************************
+     *
+     */
+    @Override
+    public void savePublicKey( String hostId, PGPPublicKeyRing publicKeyRing)
+    {
+        try
+        {
+            PGPPublicKey publicKey = PGPKeyUtil.readPublicKey( publicKeyRing );
+
+            if ( publicKey != null )
+            {
+                // Store public key in the KeyServer
+                keyServer.addSecurityKey( publicKeyRing );
+
+                String fingerprint = PGPKeyUtil.getFingerprint( publicKey.getFingerprint() );
+                securityManagerDAO.saveKeyIdentityData( hostId, fingerprint, ( short ) 2 );
             }
         }
         catch ( Exception ex )
@@ -192,6 +229,50 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
+    public String getPublicKeyDataAsASCII( String hostId )
+    {
+        if ( Strings.isNullOrEmpty( hostId ) )
+        {
+            hostId = manHostId;
+        }
+
+        try
+        {
+            String fingerprint = securityManagerDAO.getKeyFingerprint( hostId );
+
+            if ( Strings.isNullOrEmpty( fingerprint ) )
+            {
+                LOG.error( "Error !Public key not found :" );
+                return "";
+            }
+            else
+            {
+                byte []keyData = keyServer.getSecurityKeyByFingerprint( fingerprint ).getKeyData();
+                ByteArrayOutputStream encOut = new ByteArrayOutputStream();
+                ArmoredOutputStream armorOut = new ArmoredOutputStream( encOut );
+
+                armorOut.write( keyData );
+                armorOut.flush();
+                armorOut.close();
+
+                return new String(encOut.toByteArray());
+
+            }
+
+
+        }
+        catch ( Exception ex )
+        {
+            LOG.error( "Error getting Public key:" + ex.toString() );
+            return "";
+        }
+    }
+
+
+    /* *****************************
+     *
+     */
+    @Override
     public PGPPublicKey getPublicKey( String hostId )
     {
         PGPPublicKey publicKey = null;
@@ -205,7 +286,7 @@ public class KeyManagerImpl implements KeyManager
         {
             String fingerprint = securityManagerDAO.getKeyFingerprint( hostId );
 
-            publicKey = keyServer.convertKey( keyServer.getSecurityKeyByFingerprint( fingerprint ) );
+            publicKey = PGPKeyUtil.readPublicKey( ( keyServer.getSecurityKeyByFingerprint( fingerprint ).getKeyData() ));
 
             return publicKey;
         }

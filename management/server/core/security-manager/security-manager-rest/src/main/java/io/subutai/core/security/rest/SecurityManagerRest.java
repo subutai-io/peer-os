@@ -54,5 +54,29 @@ public interface SecurityManagerRest
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getPublicKey( @QueryParam ( "hostid" ) String   hostId);
 
+    /* *******************************
+     *
+     */
+    @GET
+    @Path( "keyman/getpublickeydata" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getPublicKeyData( @QueryParam ( "hostid" ) String   hostId);
+
+
+    /* *******************************
+     *
+     */
+    @GET
+    @Path( "keyman/getpublickeyid" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getPublicKeyId( @QueryParam ( "hostid" ) String   hostId);
+
+    /* *******************************
+     *
+     */
+    @GET
+    @Path( "keyman/getpublickeyfingerprint" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getPublicKeyFingerprint( @QueryParam ( "hostid" ) String   hostId);
 
 }

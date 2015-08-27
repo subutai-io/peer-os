@@ -3,6 +3,7 @@ package io.subutai.core.security.api.crypto;
 
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKey;
 
 
@@ -11,11 +12,21 @@ import org.bouncycastle.openpgp.PGPSecretKey;
  */
 public interface KeyManager
 {
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     public String getPublicKeyAsASCII( String hostId );
 
+
+    /* *****************************
+     *
+     */
+    public String getPublicKeyDataAsASCII( String hostId );
+
+
+    /* *****************************
+     *
+     */
     public String getPeerPublicKeyring();
 
 
@@ -54,9 +65,14 @@ public interface KeyManager
      */
     public void savePublicKey( String hostId, String keyAsASCII );
 
-
     /**
      * *****************************
+     */
+    public void savePublicKey( String hostId,  PGPPublicKeyRing publicKeyRing);
+
+
+    /* *****************************
+     *
      */
     public void savePublicKey( String hostId, PGPPublicKey publicKey );
 

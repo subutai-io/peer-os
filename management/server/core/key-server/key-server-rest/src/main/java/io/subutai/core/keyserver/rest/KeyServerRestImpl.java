@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+
+import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.subutai.common.util.JsonUtil;
@@ -238,7 +240,7 @@ public class KeyServerRestImpl implements KeyServerRest
 
             if(securityKey!=null)
             {
-                return Response.ok( PGPKeyUtil.exportAscii( keyServer.convertKey(securityKey))).build();
+                return Response.ok( PGPKeyUtil.exportAscii( PGPKeyUtil.readPublicKey( securityKey.getKeyData()))).build();
             }
             else
             {

@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,13 +117,13 @@ public class KeyServerImpl implements KeyServer
     }
 
 
-    /********************************
+    /* *******************************
      *
      */
     @Override
     public void addSecurityKey( String key ) throws PGPException, IOException
     {
-        PGPPublicKey publicKey = PGPKeyUtil.readPublicKey( key );
+        PGPPublicKey publicKey  = PGPKeyUtil.readPublicKey( key );
         SecurityKey securityKey = SecurityKeyUtil.convert( publicKey );
 
         keyServerDAO.save( securityKey );
@@ -130,6 +131,18 @@ public class KeyServerImpl implements KeyServer
 
 
     /********************************
+     *
+     */
+    @Override
+    public void addSecurityKey( PGPPublicKeyRing publicRing ) throws PGPException, IOException
+    {
+        SecurityKey securityKey = SecurityKeyUtil.convert( publicRing );
+
+        keyServerDAO.save( securityKey );
+    }
+
+
+    /* *******************************
      *
      */
     @Override
@@ -141,7 +154,7 @@ public class KeyServerImpl implements KeyServer
     }
 
 
-    /********************************
+    /* *******************************
      *
      */
     @Override
@@ -166,7 +179,7 @@ public class KeyServerImpl implements KeyServer
     }
 
 
-    /********************************
+    /* *******************************
      *
      */
     @Override
@@ -183,7 +196,7 @@ public class KeyServerImpl implements KeyServer
     }
 
 
-    /********************************
+    /* *******************************
      *
      */
     @Override
@@ -193,7 +206,7 @@ public class KeyServerImpl implements KeyServer
     }
 
 
-    /********************************
+    /* *******************************
      *
      */
     @Override
@@ -203,7 +216,7 @@ public class KeyServerImpl implements KeyServer
     }
 
 
-    /********************************
+    /* *******************************
      *
      */
     @Override
@@ -213,7 +226,7 @@ public class KeyServerImpl implements KeyServer
     }
 
 
-    /********************************
+    /* *******************************
      *
      */
     @Override
@@ -223,17 +236,7 @@ public class KeyServerImpl implements KeyServer
     }
 
 
-    /********************************
-     *
-     */
-    @Override
-    public PGPPublicKey convertKey( SecurityKey securityKey ) throws PGPException
-    {
-        return SecurityKeyUtil.convert( securityKey );
-    }
-
-
-    /********************************
+    /* *******************************
      *
      */
     @Override

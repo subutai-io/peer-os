@@ -36,8 +36,8 @@ public class SecurityManagerImpl implements SecurityManager
     private PeerManager peerManager;
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     public void init()
     {
