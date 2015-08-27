@@ -9,8 +9,11 @@
   <!-- Allow the use of system properties -->
   <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
 
+  <reference id="identityManager" availability="mandatory" interface="io.subutai.core.identity.api.IdentityManager" />
+
   <bean id="gatewayImpl" class="io.subutai.core.gateway.impl.GatewayImpl"
         scope="singleton" activation="eager">
+    <property name="identityManager" ref="identityManager"/>
   </bean>
 
   <service ref="gatewayImpl" interface="io.subutai.core.gateway.api.Gateway" />
