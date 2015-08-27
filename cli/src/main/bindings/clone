@@ -152,8 +152,8 @@ gpg2 --no-default-keyring --secret-keyring $child_gpg_dir/secret.sec --keyring $
 gpg2 --trust-model always --no-default-keyring --secret-keyring $child_gpg_dir/secret.sec --keyring $child_gpg_dir/public.pub --encrypt --output $child_gpg_dir/stdout.asc --armor -r test@mail.org -u $child@subutai.io $child_gpg_dir/stdin.txt
 #curl the DATA
 curl -X POST -H 'Content-Type: text/plain' -d @$child_gpg_dir/stdout.asc gw.intra.lan:8181/cxf/registration/public-key
-#rm -f $child_gpg_dir/stdout.asc
-#rm -f $child_gpg_dir/stdout.asc
+rm -f $child_gpg_dir/stdout.asc
+rm -f $child_gpg_dir/stdin.asc
 }
 #----------- 
   generate_defaults 
