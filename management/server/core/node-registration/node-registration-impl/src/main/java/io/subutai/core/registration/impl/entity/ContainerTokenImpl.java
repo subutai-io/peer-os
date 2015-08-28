@@ -17,13 +17,13 @@ import io.subutai.core.registration.api.service.ContainerToken;
  * Created by talas on 8/28/15.
  */
 @Entity
-@Table( name = "container_secret" )
+@Table( name = "containers_token" )
 @Access( AccessType.FIELD )
 public class ContainerTokenImpl implements ContainerToken
 {
     @Id
-    @Column( name = "temporary_secret" )
-    private String secret;
+    @Column( name = "container_token" )
+    private String token;
 
     @Column( name = "container_host_id" )
     private String hostId;
@@ -40,9 +40,9 @@ public class ContainerTokenImpl implements ContainerToken
     }
 
 
-    public ContainerTokenImpl( final String secret, final String hostId, final Timestamp dateCreated, final Long ttl )
+    public ContainerTokenImpl( final String token, final String hostId, final Timestamp dateCreated, final Long ttl )
     {
-        this.secret = secret;
+        this.token = token;
         this.hostId = hostId;
         this.dateCreated = dateCreated;
         this.ttl = ttl;
@@ -57,9 +57,9 @@ public class ContainerTokenImpl implements ContainerToken
 
 
     @Override
-    public String getSecret()
+    public String getToken()
     {
-        return secret;
+        return token;
     }
 
 
@@ -91,14 +91,14 @@ public class ContainerTokenImpl implements ContainerToken
 
         final ContainerTokenImpl that = ( ContainerTokenImpl ) o;
 
-        return secret.equals( that.secret );
+        return token.equals( that.token );
     }
 
 
     @Override
     public int hashCode()
     {
-        return secret.hashCode();
+        return token.hashCode();
     }
 
 
@@ -106,7 +106,7 @@ public class ContainerTokenImpl implements ContainerToken
     public String toString()
     {
         return "ContainerTokenImpl{" +
-                "secret='" + secret + '\'' +
+                "token='" + token + '\'' +
                 ", dateCreated=" + dateCreated +
                 ", ttl=" + ttl +
                 '}';

@@ -9,7 +9,7 @@ import java.sql.Timestamp;
  */
 public interface ContainerToken
 {
-    public String getSecret();
+    public String getToken();
 
     public Timestamp getDateCreated();
 

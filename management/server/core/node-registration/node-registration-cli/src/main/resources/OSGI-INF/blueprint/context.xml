@@ -24,6 +24,14 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="node/generate">
+      <action class="io.subutai.core.registration.cli.ListRequests">
+        <argument ref="nodeRegistration" />
+      </action>
+    </command>
+  </command-bundle>
+
   <reference id="nodeRegistration" availability="mandatory"
              interface="io.subutai.core.registration.api.RegistrationManager" />
 
