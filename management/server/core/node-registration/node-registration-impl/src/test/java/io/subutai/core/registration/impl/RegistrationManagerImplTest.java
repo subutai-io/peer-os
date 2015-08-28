@@ -12,9 +12,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.core.registration.api.resource.host.RequestedHost;
-import io.subutai.core.registration.impl.resource.RequestDataService;
-import io.subutai.core.registration.impl.resource.entity.RequestedHostImpl;
+import io.subutai.core.registration.api.service.RequestedHost;
+import io.subutai.core.registration.impl.dao.RequestDataService;
+import io.subutai.core.registration.impl.entity.RequestedHostImpl;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;

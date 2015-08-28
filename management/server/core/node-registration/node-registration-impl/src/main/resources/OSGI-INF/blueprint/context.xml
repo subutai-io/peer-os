@@ -2,7 +2,7 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0">
 
-  <bean id="requestDS" class="io.subutai.core.registration.impl.resource.RequestDataService">
+  <bean id="requestDS" class="io.subutai.core.registration.impl.dao.RequestDataService">
     <jpa:unit unitname="nodeRegistrationUnit" property="emf" />
   </bean>
 

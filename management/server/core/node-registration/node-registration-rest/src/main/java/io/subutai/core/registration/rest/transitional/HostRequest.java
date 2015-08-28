@@ -1,4 +1,4 @@
-package io.subutai.core.registration.rest;
+package io.subutai.core.registration.rest.transitional;
 
 
 import java.util.Set;
@@ -9,8 +9,8 @@ import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.Interface;
 import io.subutai.common.peer.InterfaceModel;
 import io.subutai.core.registration.api.RegistrationStatus;
-import io.subutai.core.registration.api.resource.host.RequestedHost;
-import io.subutai.core.registration.api.resource.host.VirtualHost;
+import io.subutai.core.registration.api.service.RequestedHost;
+import io.subutai.core.registration.api.service.VirtualHost;
 
 
 /**

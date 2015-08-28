@@ -1,10 +1,11 @@
-package io.subutai.core.registration.impl.resource.entity;
+package io.subutai.core.registration.impl.entity.entity;
 
 
 import org.junit.Before;
 import org.junit.Test;
 
 import io.subutai.common.host.Interface;
+import io.subutai.core.registration.impl.entity.HostInterface;
 
 import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.mock;

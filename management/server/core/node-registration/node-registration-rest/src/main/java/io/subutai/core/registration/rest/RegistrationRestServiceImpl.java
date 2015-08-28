@@ -16,7 +16,9 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.registration.api.RegistrationManager;
-import io.subutai.core.registration.api.resource.host.RequestedHost;
+import io.subutai.core.registration.api.service.ContainerToken;
+import io.subutai.core.registration.api.service.RequestedHost;
+import io.subutai.core.registration.rest.transitional.HostRequest;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -66,6 +68,36 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
 
             registrationManager.queueRequest( temp );
             securityManager.getKeyManager().savePublicKey( temp.getId(), temp.getPublicKey() );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error decrypting file.", e );
+        }
+
+        return Response.ok().build();
+    }
+
+
+    @Override
+    public Response verifyContainerToken( final String message )
+    {
+        EncryptionTool encryptionTool = securityManager.getEncryptionTool();
+        KeyManager keyManager = securityManager.getKeyManager();
+        InputStream secretKey = PGPEncryptionUtil.getFileInputStream( keyManager.getSecretKeyringFile() );
+
+        byte[] decrypted = encryptionTool.decrypt( message.getBytes(), secretKey, keyManager.getSecretKeyringPwd() );
+        try
+        {
+            String decryptedMessage = new String( decrypted, "UTF-8" );
+
+            String token =
+                    decryptedMessage.substring( 0, decryptedMessage.indexOf( System.getProperty( "line.separator" ) ) );
+            String publicKey = decryptedMessage
+                    .substring( decryptedMessage.indexOf( System.getProperty( "line.separator" ) ) + 1 );
+
+            ContainerToken containerToken = registrationManager.verifyToken( token );
+
+            securityManager.getKeyManager().savePublicKey( containerToken.getHostId(), publicKey );
         }
         catch ( Exception e )
         {

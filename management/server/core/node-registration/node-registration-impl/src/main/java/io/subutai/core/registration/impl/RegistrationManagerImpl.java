@@ -2,6 +2,7 @@ package io.subutai.core.registration.impl;
 
 
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -22,10 +23,14 @@ import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
-import io.subutai.core.registration.api.resource.host.RequestedHost;
-import io.subutai.core.registration.impl.resource.RequestDataService;
-import io.subutai.core.registration.impl.resource.entity.HostInterface;
-import io.subutai.core.registration.impl.resource.entity.RequestedHostImpl;
+import io.subutai.core.registration.api.exception.NodeRegistrationException;
+import io.subutai.core.registration.api.service.ContainerToken;
+import io.subutai.core.registration.api.service.RequestedHost;
+import io.subutai.core.registration.impl.dao.ContainerTokenDataService;
+import io.subutai.core.registration.impl.dao.RequestDataService;
+import io.subutai.core.registration.impl.entity.ContainerTokenImpl;
+import io.subutai.core.registration.impl.entity.HostInterface;
+import io.subutai.core.registration.impl.entity.RequestedHostImpl;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -39,11 +44,14 @@ public class RegistrationManagerImpl implements RegistrationManager
     private static final Logger LOGGER = LoggerFactory.getLogger( RegistrationManagerImpl.class );
     private RequestDataService requestDataService;
     private SecurityManager securityManager;
+    private ContainerTokenDataService containerTokenDataService;
 
 
-    public RegistrationManagerImpl( final SecurityManager securityManager )
+    public RegistrationManagerImpl( final SecurityManager securityManager,
+                                    ContainerTokenDataService containerTokenDataService )
     {
         this.securityManager = securityManager;
+        this.containerTokenDataService = containerTokenDataService;
     }
 
 
@@ -181,5 +189,43 @@ public class RegistrationManagerImpl implements RegistrationManager
     public void removeRequest( final UUID requestId )
     {
         requestDataService.remove( requestId );
+    }
+
+
+    @Override
+    public ContainerToken generateContainerTTLToken( String containerHostId, final Long ttl )
+    {
+        ContainerTokenImpl token = new ContainerTokenImpl( UUID.randomUUID().toString(), containerHostId,
+                new Timestamp( System.currentTimeMillis() ), ttl );
+        try
+        {
+            containerTokenDataService.persist( token );
+        }
+        catch ( Exception ex )
+        {
+            LOGGER.error( "Error persisting container token", ex );
+        }
+
+        return token;
+    }
+
+
+    @Override
+    public ContainerToken verifyToken( final String token ) throws NodeRegistrationException
+    {
+
+        ContainerTokenImpl containerToken = containerTokenDataService.find( token );
+
+        if ( containerToken == null )
+        {
+            throw new NodeRegistrationException( "Couldn't verify container token" );
+        }
+
+        if ( containerToken.getDateCreated().getTime() + containerToken.getTtl() < System.currentTimeMillis() )
+        {
+            throw new NodeRegistrationException( "Container token expired" );
+        }
+
+        return containerToken;
     }
 }

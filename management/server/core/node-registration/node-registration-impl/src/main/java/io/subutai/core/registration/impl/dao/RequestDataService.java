@@ -1,4 +1,4 @@
-package io.subutai.core.registration.impl.resource;
+package io.subutai.core.registration.impl.dao;
 
 
 import java.util.Collection;
@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.protocol.api.DataService;
-import io.subutai.core.registration.impl.resource.entity.RequestedHostImpl;
+import io.subutai.core.registration.impl.entity.RequestedHostImpl;
 
 
 /**

@@ -1,4 +1,4 @@
-package io.subutai.core.registration.api.resource.host;
+package io.subutai.core.registration.api.service;
 
 
 import java.util.Set;
