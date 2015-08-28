@@ -2,14 +2,14 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0">
 
-  <bean id="requestDS" class="io.subutai.core.registration.impl.dao.RequestDataService">
-    <jpa:unit unitname="nodeRegistrationUnit" property="emf" />
+  <bean id="daoManager" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
+    <jpa:unit unitname="nodeRegistrationUnit" property="entityManagerFactory" />
   </bean>
 
   <bean id="registrationManager" scope="singleton" class="io.subutai.core.registration.impl.RegistrationManagerImpl"
         init-method="init">
     <argument ref="securityManagerRef" />
-    <property name="requestDataService" ref="requestDS"/>
+    <argument ref="daoManager" />
   </bean>
 
   <service ref="registrationManager" interface="io.subutai.core.registration.api.RegistrationManager" />

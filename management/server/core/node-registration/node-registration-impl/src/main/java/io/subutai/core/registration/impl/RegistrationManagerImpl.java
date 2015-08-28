@@ -4,7 +4,6 @@ package io.subutai.core.registration.impl;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
@@ -15,10 +14,8 @@ import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
-import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.Interface;
+import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.registration.api.RegistrationManager;
@@ -29,7 +26,6 @@ import io.subutai.core.registration.api.service.RequestedHost;
 import io.subutai.core.registration.impl.dao.ContainerTokenDataService;
 import io.subutai.core.registration.impl.dao.RequestDataService;
 import io.subutai.core.registration.impl.entity.ContainerTokenImpl;
-import io.subutai.core.registration.impl.entity.HostInterface;
 import io.subutai.core.registration.impl.entity.RequestedHostImpl;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -45,31 +41,36 @@ public class RegistrationManagerImpl implements RegistrationManager
     private RequestDataService requestDataService;
     private SecurityManager securityManager;
     private ContainerTokenDataService containerTokenDataService;
+    private DaoManager daoManager;
 
 
-    public RegistrationManagerImpl( final SecurityManager securityManager,
-                                    ContainerTokenDataService containerTokenDataService )
+    public RegistrationManagerImpl( final SecurityManager securityManager, final DaoManager daoManager )
     {
         this.securityManager = securityManager;
-        this.containerTokenDataService = containerTokenDataService;
+        this.daoManager = daoManager;
     }
 
 
     public void init()
     {
-        HostInterface interfaceModel = new HostInterface();
-        interfaceModel.setMac( UUID.randomUUID().toString() );
-        interfaceModel.setIp( "Some ip" );
-        interfaceModel.setInterfaceName( "Some i-name" );
-        Set<Interface> ifaces = Sets.newHashSet();
-        ifaces.addAll( Sets.newHashSet( interfaceModel ) );
+        containerTokenDataService = new ContainerTokenDataService( daoManager );
+        requestDataService = new RequestDataService( daoManager );
 
-        RequestedHostImpl temp =
-                new RequestedHostImpl( UUID.randomUUID().toString(), "hostname", HostArchitecture.AMD64, "secret",
-                        "some rest hook", "some key", RegistrationStatus.REQUESTED, ifaces );
+        //        HostInterface interfaceModel = new HostInterface();
+        //        interfaceModel.setMac( UUID.randomUUID().toString() );
+        //        interfaceModel.setIp( "Some ip" );
+        //        interfaceModel.setInterfaceName( "Some i-name" );
+        //        Set<Interface> ifaces = Sets.newHashSet();
+        //        ifaces.addAll( Sets.newHashSet( interfaceModel ) );
         //
-        //                requestDataService.persist( temp );
-        queueRequest( temp );
+        //        RequestedHostImpl temp =
+        //                new RequestedHostImpl( UUID.randomUUID().toString(), "hostname", HostArchitecture.AMD64,
+        // "secret",
+        //                        "some rest hook", "some key", RegistrationStatus.REQUESTED, ifaces );
+
+        //                        requestDataService.persist( temp );
+        //        queueRequest( temp );
+
         //        LOGGER.info( "Started RegistrationManagerImpl" );
         //        List<RequestedHostImpl> requestedHosts = ( List<RequestedHostImpl> ) requestDataService.getAll();
         //        for ( final RequestedHostImpl requestedHost : requestedHosts )

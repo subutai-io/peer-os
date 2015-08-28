@@ -5,13 +5,13 @@ import java.util.Collection;
 import java.util.UUID;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
+import io.subutai.common.dao.DaoManager;
 import io.subutai.common.protocol.api.DataService;
 import io.subutai.core.registration.impl.entity.RequestedHostImpl;
 
@@ -22,18 +22,13 @@ import io.subutai.core.registration.impl.entity.RequestedHostImpl;
 public class RequestDataService implements DataService<UUID, RequestedHostImpl>
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RequestDataService.class );
-    private EntityManagerFactory emf;
+
+    private DaoManager daoManager;
 
 
-    public EntityManagerFactory getEmf()
+    public RequestDataService( final DaoManager daoManager )
     {
-        return emf;
-    }
-
-
-    public void setEmf( final EntityManagerFactory emf )
-    {
-        this.emf = emf;
+        this.daoManager = daoManager;
     }
 
 
@@ -41,12 +36,11 @@ public class RequestDataService implements DataService<UUID, RequestedHostImpl>
     public Collection<RequestedHostImpl> getAll()
     {
         Collection<RequestedHostImpl> result = Lists.newArrayList();
-        EntityManager em = emf.createEntityManager();
+        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             em.getTransaction().begin();
-            result = em.createQuery( "select h from RequestedHostImpl h", RequestedHostImpl.class )
-                       .getResultList();
+            result = em.createQuery( "select h from RequestedHostImpl h", RequestedHostImpl.class ).getResultList();
             em.getTransaction().commit();
         }
         catch ( Exception e )
@@ -69,7 +63,7 @@ public class RequestDataService implements DataService<UUID, RequestedHostImpl>
     public RequestedHostImpl find( final UUID id )
     {
         RequestedHostImpl result = null;
-        EntityManager em = emf.createEntityManager();
+        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             em.getTransaction().begin();
@@ -95,7 +89,7 @@ public class RequestDataService implements DataService<UUID, RequestedHostImpl>
     @Override
     public void persist( final RequestedHostImpl item )
     {
-        EntityManager em = emf.createEntityManager();
+        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             em.getTransaction().begin();
@@ -121,7 +115,7 @@ public class RequestDataService implements DataService<UUID, RequestedHostImpl>
     @Override
     public void remove( final UUID id )
     {
-        EntityManager em = emf.createEntityManager();
+        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             em.getTransaction().begin();
@@ -147,7 +141,7 @@ public class RequestDataService implements DataService<UUID, RequestedHostImpl>
     @Override
     public void update( final RequestedHostImpl item )
     {
-        EntityManager em = emf.createEntityManager();
+        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             em.getTransaction().begin();
