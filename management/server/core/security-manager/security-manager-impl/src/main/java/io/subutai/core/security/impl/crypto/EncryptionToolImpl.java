@@ -1,11 +1,8 @@
 package io.subutai.core.security.impl.crypto;
 
 
-import java.io.InputStream;
-
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
-import org.bouncycastle.openpgp.PGPSecretKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,41 +51,6 @@ public class EncryptionToolImpl implements EncryptionTool
      * *****************************************
      */
     @Override
-    public byte[] decrypt( final byte[] message, final InputStream secretKey, final String secretPwd )
-    {
-        try
-        {
-            return PGPEncryptionUtil.decrypt( message, secretKey, secretPwd );
-        }
-        catch ( Exception ex )
-        {
-            return null;
-        }
-    }
-
-
-    /**
-     * *****************************************
-     */
-    @Override
-    public byte[] decryptAndVerify( byte[] encryptedMessage, final PGPSecretKey secretKey, final String secretPwd,
-                                    final PGPPublicKey publicKey )
-    {
-        try
-        {
-            return PGPEncryptionUtil.decryptAndVerify( encryptedMessage, secretKey, secretPwd, publicKey );
-        }
-        catch ( Exception ex )
-        {
-            return null;
-        }
-    }
-
-
-    /**
-     * *****************************************
-     */
-    @Override
     public boolean verify( byte[] signedMessage, PGPPublicKey publicKey )
     {
         try
@@ -106,23 +68,6 @@ public class EncryptionToolImpl implements EncryptionTool
      * *****************************************
      */
     @Override
-    public byte[] sign( byte[] message, PGPSecretKey secretKey, String secretPwd, boolean armor )
-    {
-        try
-        {
-            return PGPEncryptionUtil.sign( message, secretKey, secretPwd, armor );
-        }
-        catch ( Exception ex )
-        {
-            return null;
-        }
-    }
-
-
-    /**
-     * *****************************************
-     */
-    @Override
     public byte[] signAndEncrypt( final byte[] message, final PGPPublicKey publicKey, final boolean armored )
             throws PGPException
     {
@@ -130,6 +75,15 @@ public class EncryptionToolImpl implements EncryptionTool
         return PGPEncryptionUtil
                 .signAndEncrypt( message, keyManager.getSecretKey( null ), keyManager.getSecretKeyringPwd(), publicKey,
                         armored );
+    }
+
+
+    @Override
+    public byte[] decrypt( final byte[] message ) throws PGPException
+    {
+        return PGPEncryptionUtil
+                .decrypt( message, PGPEncryptionUtil.getFileInputStream( keyManager.getSecretKeyringFile() ),
+                        keyManager.getSecretKeyringPwd() );
     }
 
 

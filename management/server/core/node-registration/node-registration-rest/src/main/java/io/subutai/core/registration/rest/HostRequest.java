@@ -13,9 +13,6 @@ import io.subutai.core.registration.api.resource.host.RequestedHost;
 import io.subutai.core.registration.api.resource.host.VirtualHost;
 
 
-/**
- * Created by talas on 8/25/15.
- */
 public class HostRequest implements RequestedHost
 {
     private String id;
