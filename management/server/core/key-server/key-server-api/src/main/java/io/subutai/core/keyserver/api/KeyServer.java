@@ -25,12 +25,6 @@ public interface KeyServer
 
 
     /********************************
-     * Set DAO object
-     */
-    public void setKeyServerDAO( KeyServerDAO keyServerDAO );
-
-
-    /********************************
      * Finds public key with given fingerprint.
      *
      * @param fingerprint hex encoded fingerprint to search
@@ -85,34 +79,27 @@ public interface KeyServer
     /********************************
      * Saves the given public key.
      *
-     * @param publicKey to save
-     */
-    public void addSecurityKey( PGPPublicKey publicKey ) throws PGPException, IOException;
-
-
-    /********************************
-     * Saves the given public key.
-     *
      * @param publicKeyRing to save
      */
     public void addSecurityKey( PGPPublicKeyRing publicKeyRing ) throws PGPException, IOException;
 
 
     /********************************
-     * Saves the given public key.
+     * Saves the given public keyring.
      *
-     * @param key to save
+     * @param keyRing to save
      */
-    public PGPPublicKey addPublicKey( String key ) throws PGPException, IOException;
+    public PGPPublicKeyRing addPublicKeyRing( String keyRing ) throws PGPException, IOException;
 
     /********************************
      * Saves the given public key.
      *
      * @param keyId to save
      * @param fingerprint to save
-     * @param keyData to save
+     * @param keyRingData to save
      */
-    public void saveSecurityKey( String keyId,String fingerprint,short keyType,byte[] keyData);
+    public void saveSecurityKey( String keyId,String fingerprint,short keyType,byte[] keyRingData);
+
 
     /********************************
      * Saves the given public key.
@@ -120,6 +107,7 @@ public interface KeyServer
      * @param securityKey to save
      */
     public void saveSecurityKey( SecurityKey securityKey );
+
 
     /********************************
      * Deletes the given public key.
@@ -136,12 +124,5 @@ public interface KeyServer
      */
     public void removeSecurityKeyByKeyId( String keyId );
 
-
-    /********************************
-     * converts SecurityKey entity to ASCII Armored
-     *
-     * @param keyId
-     */
-    public String getSecurityKeyAsASCII( String keyId ) throws PGPException;
 
 }

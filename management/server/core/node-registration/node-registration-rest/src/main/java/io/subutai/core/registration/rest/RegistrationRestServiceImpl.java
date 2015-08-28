@@ -37,7 +37,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     @Override
     public Response getPublicKey()
     {
-        return Response.ok( securityManager.getKeyManager().getPeerPublicKeyring() ).build();
+        return Response.ok( securityManager.getKeyManager().getPublicKeyRingAsASCII( null ) ).build();
     }
 
 

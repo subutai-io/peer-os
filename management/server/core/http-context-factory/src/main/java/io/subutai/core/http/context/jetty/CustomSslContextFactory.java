@@ -2,6 +2,11 @@ package io.subutai.core.http.context.jetty;
 
 
 import java.security.KeyStore;
+import java.security.cert.CRL;
+import java.util.Collection;
+
+import javax.net.ssl.TrustManager;
+
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,5 +85,13 @@ public class CustomSslContextFactory extends SslContextFactory
     public void setCustomStart( final boolean customStart )
     {
         this.customStart = customStart;
+    }
+
+
+    @Override
+    protected TrustManager[] getTrustManagers( final KeyStore trustStore, final Collection<? extends CRL> crls )
+            throws Exception
+    {
+        return super.getTrustManagers( trustStore, crls );
     }
 }

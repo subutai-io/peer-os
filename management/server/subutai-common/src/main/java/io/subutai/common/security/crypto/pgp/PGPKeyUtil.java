@@ -274,12 +274,20 @@ public class PGPKeyUtil
     }
 
 
-    /**
-     * *****************************************
+    /* *****************************************
+     *
      */
     public static PGPPublicKey readPublicKey( byte[] keyMaterial ) throws PGPException
     {
         return readPublicKey( new ByteArrayInputStream( keyMaterial ) );
+    }
+
+    /* *****************************************
+     *
+     */
+    public static PGPPublicKeyRing readPublicKeyRing( byte[] keyMaterial ) throws PGPException
+    {
+        return readPublicKeyRing( new ByteArrayInputStream( keyMaterial ) );
     }
 
 

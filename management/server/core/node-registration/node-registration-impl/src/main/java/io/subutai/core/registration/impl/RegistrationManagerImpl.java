@@ -130,7 +130,6 @@ public class RegistrationManagerImpl implements RegistrationManager
 
         EncryptionTool encryptionTool = securityManager.getEncryptionTool();
         KeyManager keyManager = securityManager.getKeyManager();
-        InputStream secretKey = PGPEncryptionUtil.getFileInputStream( keyManager.getSecretKeyringFile() );
 
         String message = RegistrationStatus.REJECTED.name();
         PGPPublicKey publicKey = keyManager.getPublicKey( registrationRequest.getId() );
@@ -159,7 +158,6 @@ public class RegistrationManagerImpl implements RegistrationManager
 
         EncryptionTool encryptionTool = securityManager.getEncryptionTool();
         KeyManager keyManager = securityManager.getKeyManager();
-        InputStream secretKey = PGPEncryptionUtil.getFileInputStream( keyManager.getSecretKeyringFile() );
 
         String message = RegistrationStatus.APPROVED.name();
         PGPPublicKey publicKey = keyManager.getPublicKey( registrationRequest.getId() );

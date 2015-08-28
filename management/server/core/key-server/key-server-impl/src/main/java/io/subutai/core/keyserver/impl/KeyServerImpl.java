@@ -146,26 +146,14 @@ public class KeyServerImpl implements KeyServer
      *
      */
     @Override
-    public void addSecurityKey( PGPPublicKey publicKey ) throws PGPException, IOException
+    public PGPPublicKeyRing addPublicKeyRing( String keyRing ) throws PGPException, IOException
     {
-        SecurityKey securityKey = SecurityKeyUtil.convert( publicKey );
-
-        keyServerDAO.save( securityKey );
-    }
-
-
-    /* *******************************
-     *
-     */
-    @Override
-    public PGPPublicKey addPublicKey( String key ) throws PGPException, IOException
-    {
-        PGPPublicKey publicKey = PGPKeyUtil.readPublicKey( key );
-        SecurityKey securityKey = SecurityKeyUtil.convert( publicKey );
+        PGPPublicKeyRing publicKeyRing = PGPKeyUtil.readPublicKeyRing( keyRing );
+        SecurityKey securityKey    = SecurityKeyUtil.convert( publicKeyRing );
 
         keyServerDAO.save( securityKey );
 
-        return publicKey;
+        return publicKeyRing;
     }
 
 
@@ -229,28 +217,9 @@ public class KeyServerImpl implements KeyServer
     /* *******************************
      *
      */
-    @Override
     public void setKeyServerDAO( KeyServerDAO keyServerDAO )
     {
         this.keyServerDAO = keyServerDAO;
     }
 
-
-    /* *******************************
-     *
-     */
-    @Override
-    public String getSecurityKeyAsASCII( String keyId ) throws PGPException
-    {
-        SecurityKey securityKey = keyServerDAO.find( keyId );
-
-        if ( securityKey != null )
-        {
-            return PGPKeyUtil.exportAscii( SecurityKeyUtil.convert( securityKey ) );
-        }
-        else
-        {
-            return null;
-        }
-    }
 }

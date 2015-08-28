@@ -14,6 +14,7 @@ import io.subutai.core.security.api.dao.SecurityManagerDAO;
 import io.subutai.core.security.impl.crypto.EncryptionToolImpl;
 import io.subutai.core.security.impl.crypto.KeyManagerImpl;
 import io.subutai.core.security.impl.dao.SecurityManagerDAOImpl;
+import io.subutai.core.security.impl.model.SecurityKeyData;
 
 
 /**
@@ -28,12 +29,32 @@ public class SecurityManagerImpl implements SecurityManager
     private EncryptionTool encryptionTool = null;
     private SecurityManagerDAO securityManagerDAO = null;
     private KeyServer keyServer = null;
-    private String publicKeyringFile;
-    private String secretKeyringFile;
-    private String secretKeyringPwd;
-    private String manHostId;
-    private String manHostKeyFingerprint;
-    private PeerManager peerManager;
+    private PeerManager peerManager = null;
+    private SecurityKeyData keyData= null;
+
+    /* *****************************
+     *
+     */
+    public SecurityManagerImpl()
+    {
+
+    }
+
+    /* *****************************
+     *
+     */
+    public SecurityManagerImpl( String secretKeyringFile,
+                                String publicKeyringFile,
+                                String secretKeyringPwd,
+                                String manHostKeyFingerprint)
+    {
+        keyData = new SecurityKeyData();
+
+        keyData.setManHostKeyFingerprint( manHostKeyFingerprint );
+        keyData.setSecretKeyringFile( secretKeyringFile );
+        keyData.setPublicKeyringFile( publicKeyringFile);
+        keyData.setSecretKeyringPwd( secretKeyringPwd );
+    }
 
 
     /* *****************************
@@ -41,18 +62,16 @@ public class SecurityManagerImpl implements SecurityManager
      */
     public void init()
     {
-        manHostId = peerManager.getLocalPeerInfo().getId().toString();
+        keyData.setManHostId( peerManager.getLocalPeerInfo().getId().toString());
+
         securityManagerDAO = new SecurityManagerDAOImpl( daoManager );
-
-        keyManager = new KeyManagerImpl( securityManagerDAO, keyServer, publicKeyringFile, secretKeyringFile,
-                secretKeyringPwd, manHostId, manHostKeyFingerprint );
-
+        keyManager = new KeyManagerImpl( securityManagerDAO, keyServer, keyData );
         encryptionTool = new EncryptionToolImpl( ( KeyManagerImpl ) keyManager );
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     public void destroy()
     {
@@ -88,8 +107,8 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /**
-     * *****************************
+    /* ****************************
+     *
      */
     public void setDaoManager( final DaoManager daoManager )
     {
@@ -97,8 +116,8 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     public SecurityManagerDAO getSecurityManagerDAO()
     {
@@ -106,8 +125,8 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     public void setSecurityManagerDAO( final SecurityManagerDAO securityManagerDAO )
     {
@@ -115,8 +134,8 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     public KeyServer getKeyServer()
     {
@@ -124,48 +143,12 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     public void setKeyServer( final KeyServer keyServer )
     {
         this.keyServer = keyServer;
-    }
-
-
-    /**
-     * *****************************
-     */
-    public String getSecretKeyringFile()
-    {
-        return secretKeyringFile;
-    }
-
-
-    /**
-     * *****************************
-     */
-    public void setSecretKeyringFile( final String secretKeyringFile )
-    {
-        this.secretKeyringFile = secretKeyringFile;
-    }
-
-
-    /**
-     * *****************************
-     */
-    public String getSecretKeyringPwd()
-    {
-        return secretKeyringPwd;
-    }
-
-
-    /**
-     * *****************************
-     */
-    public void setSecretKeyringPwd( final String secretKeyringPwd )
-    {
-        this.secretKeyringPwd = secretKeyringPwd;
     }
 
 
@@ -178,8 +161,8 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     public void setEncryptionTool( final EncryptionTool encryptionTool )
     {
@@ -187,26 +170,17 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
-    public String getManHostId()
+    public SecurityKeyData getSecurityKeyData()
     {
-        return manHostId;
+        return keyData;
     }
 
 
-    /**
-     * *****************************
-     */
-    public void setManHostId( final String manHostId )
-    {
-        this.manHostId = manHostId;
-    }
-
-
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     public PeerManager getPeerManager()
     {
@@ -214,36 +188,11 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     public void setPeerManager( final PeerManager peerManager )
     {
         this.peerManager = peerManager;
-    }
-
-
-    /**
-     * *****************************
-     */
-    public String getManHostKeyFingerprint()
-    {
-        return manHostKeyFingerprint;
-    }
-
-
-    /**
-     * *****************************
-     */
-
-    public void setManHostKeyFingerprint( final String manHostKeyFingerprint )
-    {
-        this.manHostKeyFingerprint = manHostKeyFingerprint;
-    }
-
-
-    public void setPublicKeyringFile( final String publicKeyringFile )
-    {
-        this.publicKeyringFile = publicKeyringFile;
     }
 }

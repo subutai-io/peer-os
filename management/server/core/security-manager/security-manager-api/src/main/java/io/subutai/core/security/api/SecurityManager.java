@@ -11,11 +11,15 @@ import io.subutai.core.security.api.crypto.KeyManager;
 public interface SecurityManager
 {
 
-    /**
-     * *****************************
+    /* **********************************
+     *
      */
     public KeyManager getKeyManager();
 
 
+    /* **********************************
+     *
+     */
     public EncryptionTool getEncryptionTool();
+
 }
