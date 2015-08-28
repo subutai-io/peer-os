@@ -22,43 +22,27 @@ public interface SecurityManagerRest
      *
      */
     @POST
-    @Path( "keyman/addpublickey" )
+    @Path( "keyman/addpublickeyring" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response addPublicKey( @FormParam( "hostid" ) String hostId, @FormParam( "keytext" ) String keyText );
+    public Response addPublicKeyRing( @FormParam( "hostid" ) String hostId, @FormParam( "keytext" ) String keyText );
 
-    /* *******************************
-     *
-     */
-    @POST
-    @Path( "keyman/addsecuritykey" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response addSecurityKey( @FormParam( "hostid" ) String hostId, @FormParam( "keytext" ) String keyText,
-                                    @FormParam( "keytype" ) short keyType );
 
     /* *******************************
      *
      */
     @DELETE
-    @Path( "keyman/removepublickey" )
+    @Path( "keyman/removepublickeyring" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response removePublicKey( @QueryParam( "hostid" ) String hostId );
+    public Response removePublicKeyRing( @QueryParam( "hostid" ) String hostId );
 
 
     /* *******************************
      *
      */
     @GET
-    @Path( "keyman/getpublickey" )
+    @Path( "keyman/getpublickeyring" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getPublicKey( @QueryParam( "hostid" ) String hostId );
-
-    /* *******************************
-     *
-     */
-    @GET
-    @Path( "keyman/getpublickeydata" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getPublicKeyData( @QueryParam ( "hostid" ) String   hostId);
+    public Response getPublicKeyRing( @QueryParam( "hostid" ) String hostId );
 
 
     /* *******************************

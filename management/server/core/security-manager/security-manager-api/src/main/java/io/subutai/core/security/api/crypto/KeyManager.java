@@ -15,89 +15,61 @@ public interface KeyManager
     /* *****************************
      *
      */
-    public String getPublicKeyAsASCII( String hostId );
+    public String getPublicKeyRingAsASCII( String hostId );
 
 
     /* *****************************
-     *
+     * Gets KeyRing from the store
      */
-    public String getPublicKeyDataAsASCII( String hostId );
+    public PGPPublicKeyRing getPublicKeyRing( String hostId );
 
 
     /* *****************************
-     *
-     */
-    public String getPeerPublicKeyring();
-
-
-    /**
-     * *****************************
+     * Gets KeyRing from the store and returns Publickey object
      */
     public PGPPublicKey getPublicKey( String hostId );
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
     public PGPSecretKey getSecretKey( String hostId );
-
-
-    /**
-     * *****************************
-     */
-    public PGPPrivateKey getPrivateKey( String hostId );
-
-
-    /**
-     * *****************************
-     */
-    public PGPSecretKey getSecretKeyById( String keyId );
-
-
-    /**
-     * *****************************
-     */
-    public PGPSecretKey getSecretKeyByFingerprint( String fingerprint );
-
-
-    /**
-     * *****************************
-     */
-    public void savePublicKey( String hostId, String keyAsASCII );
-
-    /**
-     * *****************************
-     */
-    public void savePublicKeyRing( String hostId, String keyringAsASCII );
-
-    /**
-     * *****************************
-     */
-    public void savePublicKey( String hostId, PGPPublicKeyRing publicKeyRing );
 
 
     /* *****************************
      *
      */
-    public void savePublicKey( String hostId, PGPPublicKey publicKey );
+    public PGPPrivateKey getPrivateKey( String hostId );
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
-    public void removePublicKey( String hostId );
+    public PGPSecretKey getSecretKeyById( String keyId );
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
-    public String getSecretKeyringFile();
+    public PGPSecretKey getSecretKeyByFingerprint( String fingerprint );
 
 
-    /**
-     * *****************************
+    /* *****************************
+     *
      */
-    public void setSecretKeyringFile( final String secretKeyringFile );
+    public void savePublicKeyRing( String hostId, String keyringAsASCII );
 
-    public String getSecretKeyringPwd();
+
+    /* *****************************
+     *
+     */
+    public void savePublicKeyRing( String hostId, PGPPublicKeyRing publicKeyRing );
+
+
+    /* *****************************
+     *
+     */
+    public void removePublicKeyRing( String hostId );
+
+
 }

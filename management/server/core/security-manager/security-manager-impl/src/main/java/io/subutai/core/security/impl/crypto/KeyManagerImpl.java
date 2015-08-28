@@ -1,25 +1,20 @@
 package io.subutai.core.security.impl.crypto;
 
 
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-
-import org.bouncycastle.bcpg.ArmoredOutputStream;
-import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Strings;
-
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.core.keyserver.api.KeyServer;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.security.api.dao.SecurityManagerDAO;
+import io.subutai.core.security.impl.model.SecurityKeyData;
 
 
 /**
@@ -31,11 +26,21 @@ public class KeyManagerImpl implements KeyManager
 
     private SecurityManagerDAO securityManagerDAO = null;
     private KeyServer keyServer = null;
-    private String publicKeyringFile;
-    private String secretKeyringFile;
-    private String secretKeyringPwd;
-    private String manHostId;
-    private String manHostKeyFingerprint;
+    private SecurityKeyData keyData = null;
+
+
+    /* *****************************
+     *
+     */
+    public KeyManagerImpl( SecurityManagerDAO securityManagerDAO, KeyServer keyServer, SecurityKeyData securityKeyData )
+    {
+        this.keyData = securityKeyData;
+        this.securityManagerDAO = securityManagerDAO;
+        this.keyServer = keyServer;
+
+        // Create Key Identity Record , save Public key in the KeyStore.
+        init();
+    }
 
 
     /* *****************************
@@ -47,11 +52,13 @@ public class KeyManagerImpl implements KeyManager
     {
         this.securityManagerDAO = securityManagerDAO;
         this.keyServer = keyServer;
-        this.publicKeyringFile = publicKeyringFile;
-        this.secretKeyringFile = secretKeyringFile;
-        this.secretKeyringPwd = secretKeyringPwd;
-        this.manHostId = manHostId;
-        this.manHostKeyFingerprint = manHostKeyFingerprint;
+
+        keyData = new SecurityKeyData();
+        keyData.setPublicKeyringFile( publicKeyringFile );
+        keyData.setSecretKeyringFile( secretKeyringFile );
+        keyData.setSecretKeyringPwd( secretKeyringPwd );
+        keyData.setManHostId( manHostId );
+        keyData.setManHostKeyFingerprint( manHostKeyFingerprint );
 
         // Create Key Identity Record , save Public key in the KeyStore.
         init();
@@ -63,8 +70,8 @@ public class KeyManagerImpl implements KeyManager
      */
     private void init()
     {
-        InputStream instrSecRing = PGPEncryptionUtil.getFileInputStream( secretKeyringFile );
-        InputStream instrPubRing = PGPEncryptionUtil.getFileInputStream( publicKeyringFile );
+        InputStream instrSecRing = PGPEncryptionUtil.getFileInputStream( keyData.getSecretKeyringFile());
+        InputStream instrPubRing = PGPEncryptionUtil.getFileInputStream( keyData.getPublicKeyringFile() );
 
         if ( instrSecRing == null || instrPubRing == null )
         {
@@ -86,7 +93,7 @@ public class KeyManagerImpl implements KeyManager
                 }
                 else
                 {
-                    savePublicKey( manHostId, publicKeyRing );
+                    savePublicKeyRing( keyData.getManHostId(), publicKeyRing );
                 }
             }
             catch ( Exception ex )
@@ -101,43 +108,6 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public String getPeerPublicKeyring()
-    {
-        try
-        {
-            return PGPEncryptionUtil.getKeyringArmored( publicKeyringFile );
-        }
-        catch ( PGPException e )
-        {
-            LOG.error( "Error getting peer public keyring:", e );
-            return null;
-        }
-    }
-
-
-    /* *****************************
-     *
-     */
-    @Override
-    public void savePublicKey( String hostId, String keyAsASCII )
-    {
-        try
-        {
-            PGPPublicKey publicKey = PGPKeyUtil.readPublicKey( keyAsASCII );
-
-            if ( publicKey != null )
-            {
-                savePublicKey( hostId, publicKey );
-            }
-        }
-        catch ( Exception ex )
-        {
-            LOG.error( "Error storing Public key:" + ex.toString() );
-        }
-    }
-
-
-    @Override
     public void savePublicKeyRing( String hostId, String keyringAsASCII )
     {
         try
@@ -146,7 +116,7 @@ public class KeyManagerImpl implements KeyManager
 
             if ( pgpPublicKeyRing != null )
             {
-                savePublicKey( hostId, pgpPublicKeyRing );
+                savePublicKeyRing( hostId, pgpPublicKeyRing );
             }
         }
         catch ( Exception ex )
@@ -160,7 +130,7 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public void savePublicKey( String hostId, PGPPublicKeyRing publicKeyRing )
+    public void savePublicKeyRing( String hostId, PGPPublicKeyRing publicKeyRing )
     {
         try
         {
@@ -186,31 +156,7 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public void savePublicKey( String hostId, PGPPublicKey publicKey )
-    {
-        try
-        {
-            if ( publicKey != null )
-            {
-                // Store public key in the KeyServer
-                keyServer.addSecurityKey( publicKey );
-
-                String fingerprint = PGPKeyUtil.getFingerprint( publicKey.getFingerprint() );
-                securityManagerDAO.saveKeyIdentityData( hostId, fingerprint, ( short ) 2 );
-            }
-        }
-        catch ( Exception ex )
-        {
-            LOG.error( "Error storing Public key:" + ex.toString() );
-        }
-    }
-
-
-    /* *****************************
-     *
-     */
-    @Override
-    public void removePublicKey( String hostId )
+    public void removePublicKeyRing( String hostId )
     {
         try
         {
@@ -230,16 +176,20 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public String getPublicKeyAsASCII( String hostId )
+    public PGPPublicKey getPublicKey( String hostId )
     {
-        try
+        PGPPublicKeyRing publicKeyRing = null;
+
+        publicKeyRing = getPublicKeyRing( hostId );
+
+        if(publicKeyRing!=null)
         {
-            return PGPKeyUtil.exportAscii( getPublicKey( hostId ) );
+            return publicKeyRing.getPublicKey();
         }
-        catch ( Exception ex )
+        else
         {
-            LOG.error( "Error getting Public key:" + ex.toString() );
-            return "";
+            LOG.error( "********* Error getting Public key ********" );
+            return null;
         }
     }
 
@@ -248,11 +198,11 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public String getPublicKeyDataAsASCII( String hostId )
+    public String getPublicKeyRingAsASCII( String hostId )
     {
         if ( Strings.isNullOrEmpty( hostId ) )
         {
-            hostId = manHostId;
+            hostId = keyData.getManHostId();
         }
 
         try
@@ -267,19 +217,13 @@ public class KeyManagerImpl implements KeyManager
             else
             {
                 byte[] keyData = keyServer.getSecurityKeyByFingerprint( fingerprint ).getKeyData();
-                ByteArrayOutputStream encOut = new ByteArrayOutputStream();
-                ArmoredOutputStream armorOut = new ArmoredOutputStream( encOut );
 
-                armorOut.write( keyData );
-                armorOut.flush();
-                armorOut.close();
-
-                return new String( encOut.toByteArray() );
+                return PGPEncryptionUtil.getKeyringArmored( keyData );
             }
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error getting Public key:" + ex.toString() );
+            LOG.error( "Error getting Public keyRing:" + ex.toString() );
             return "";
         }
     }
@@ -289,28 +233,29 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public PGPPublicKey getPublicKey( String hostId )
+    public PGPPublicKeyRing getPublicKeyRing( String hostId )
     {
-        PGPPublicKey publicKey = null;
+        PGPPublicKeyRing publicKeyRing = null;
 
         if ( Strings.isNullOrEmpty( hostId ) )
         {
-            hostId = manHostId;
+            hostId = keyData.getManHostId();
         }
 
         try
         {
             String fingerprint = securityManagerDAO.getKeyFingerprint( hostId );
 
-            publicKey =
-                    PGPKeyUtil.readPublicKey( ( keyServer.getSecurityKeyByFingerprint( fingerprint ).getKeyData() ) );
+            byte[] keyData = keyServer.getSecurityKeyByFingerprint( fingerprint ).getKeyData();
 
-            return publicKey;
+            publicKeyRing = PGPKeyUtil.readPublicKeyRing( keyData);
+
+            return publicKeyRing;
         }
         catch ( Exception ex )
         {
             LOG.error( "Error getting Public key:" + ex.toString() );
-            return publicKey;
+            return publicKeyRing;
         }
     }
 
@@ -325,7 +270,7 @@ public class KeyManagerImpl implements KeyManager
 
         if ( Strings.isNullOrEmpty( hostId ) )
         {
-            hostId = manHostId;
+            hostId = keyData.getManHostId();
         }
 
         try
@@ -333,7 +278,7 @@ public class KeyManagerImpl implements KeyManager
             String fingerprint = securityManagerDAO.getKeyFingerprint( hostId );
 
             secretKey = PGPEncryptionUtil
-                    .findSecretKeyByFingerprint( PGPEncryptionUtil.getFileInputStream( secretKeyringFile ),
+                    .findSecretKeyByFingerprint( PGPEncryptionUtil.getFileInputStream( keyData.getSecretKeyringFile() ),
                             fingerprint );
 
             return secretKey;
@@ -356,7 +301,7 @@ public class KeyManagerImpl implements KeyManager
 
         if ( Strings.isNullOrEmpty( hostId ) )
         {
-            hostId = manHostId;
+            hostId = keyData.getManHostId();
         }
 
         try
@@ -365,7 +310,7 @@ public class KeyManagerImpl implements KeyManager
 
             if ( secretKey != null )
             {
-                privateKey = PGPEncryptionUtil.getPrivateKey( secretKey, secretKeyringPwd );
+                privateKey = PGPEncryptionUtil.getPrivateKey( secretKey, keyData.getSecretKeyringPwd() );
 
                 return privateKey;
             }
@@ -393,7 +338,7 @@ public class KeyManagerImpl implements KeyManager
         try
         {
             secretKey = PGPEncryptionUtil
-                    .findSecretKeyById( PGPEncryptionUtil.getFileInputStream( secretKeyringFile ), keyId );
+                    .findSecretKeyById( PGPEncryptionUtil.getFileInputStream( keyData.getSecretKeyringFile() ), keyId );
         }
         catch ( Exception ex )
         {
@@ -415,7 +360,7 @@ public class KeyManagerImpl implements KeyManager
         try
         {
             secretKey = PGPEncryptionUtil
-                    .findSecretKeyByFingerprint( PGPEncryptionUtil.getFileInputStream( secretKeyringFile ),
+                    .findSecretKeyByFingerprint( PGPEncryptionUtil.getFileInputStream( keyData.getSecretKeyringFile() ),
                             fingerprint );
         }
         catch ( Exception ex )
@@ -430,73 +375,11 @@ public class KeyManagerImpl implements KeyManager
     /* *****************************
      *
      */
-    @Override
-    public String getSecretKeyringFile()
+    public SecurityKeyData getSecurityKeyData()
     {
-        return secretKeyringFile;
+        return keyData;
     }
 
 
-    /* *****************************
-     *
-     */
-    @Override
-    public void setSecretKeyringFile( final String secretKeyringFile )
-    {
-        this.secretKeyringFile = secretKeyringFile;
-    }
 
-
-    /* *****************************
-     *
-     */
-    public String getSecretKeyringPwd()
-    {
-        return secretKeyringPwd;
-    }
-
-
-    /* *****************************
-     *
-     */
-    public void setSecretKeyringPwd( final String secretKeyringPwd )
-    {
-        this.secretKeyringPwd = secretKeyringPwd;
-    }
-
-
-    /* *****************************
-     *
-     */
-    public String getManagementHostId()
-    {
-        return manHostId;
-    }
-
-
-    /* *****************************
-     *
-     */
-    public void setManHostId( final String manHostId )
-    {
-        this.manHostId = manHostId;
-    }
-
-
-    /* *****************************
-     *
-     */
-    public String getManHostKeyFingerprint()
-    {
-        return manHostKeyFingerprint;
-    }
-
-
-    /* *****************************
-     *
-     */
-    public void setManHostKeyFingerprint( final String manHostKeyFingerprint )
-    {
-        this.manHostKeyFingerprint = manHostKeyFingerprint;
-    }
 }

@@ -15,9 +15,9 @@ import io.subutai.core.security.api.model.SecurityKeyIdentity;
  */
 
 @Entity
-@Table( name = SecurityKeyIndetityEntity.TABLE_NAME )
+@Table( name = SecurityKeyIdentityEntity.TABLE_NAME )
 @Access( AccessType.FIELD )
-public class SecurityKeyIndetityEntity implements SecurityKeyIdentity
+public class SecurityKeyIdentityEntity implements SecurityKeyIdentity
 {
     /********* Table name *********/
     public static final String TABLE_NAME = "security_key_identity";

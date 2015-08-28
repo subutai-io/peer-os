@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.core.security.api.crypto.EncryptionTool;
+import io.subutai.core.security.impl.model.SecurityKeyData;
 
 
 /**
@@ -21,8 +22,8 @@ public class EncryptionToolImpl implements EncryptionTool
     private final KeyManagerImpl keyManager;
 
 
-    /**
-     * *****************************************
+    /* *****************************************
+     *
      */
     public EncryptionToolImpl( KeyManagerImpl keyManager )
     {
@@ -30,8 +31,8 @@ public class EncryptionToolImpl implements EncryptionTool
     }
 
 
-    /**
-     * *****************************************
+    /* *****************************************
+     *
      */
     @Override
     public byte[] encrypt( final byte[] message, final PGPPublicKey publicKey, boolean armored )
@@ -47,8 +48,8 @@ public class EncryptionToolImpl implements EncryptionTool
     }
 
 
-    /**
-     * *****************************************
+    /* *****************************************
+     *
      */
     @Override
     public boolean verify( byte[] signedMessage, PGPPublicKey publicKey )
@@ -64,8 +65,8 @@ public class EncryptionToolImpl implements EncryptionTool
     }
 
 
-    /**
-     * *****************************************
+    /* *****************************************
+     *
      */
     @Override
     public byte[] signAndEncrypt( final byte[] message, final PGPPublicKey publicKey, final boolean armored )
@@ -73,28 +74,37 @@ public class EncryptionToolImpl implements EncryptionTool
     {
 
         return PGPEncryptionUtil
-                .signAndEncrypt( message, keyManager.getSecretKey( null ), keyManager.getSecretKeyringPwd(), publicKey,
-                        armored );
+                .signAndEncrypt( message, keyManager.getSecretKey( null ), keyManager.getSecurityKeyData().getSecretKeyringPwd(),
+        publicKey, armored);
     }
 
 
+    /* *****************************************
+     *
+     */
     @Override
     public byte[] decrypt( final byte[] message ) throws PGPException
     {
         return PGPEncryptionUtil
-                .decrypt( message, PGPEncryptionUtil.getFileInputStream( keyManager.getSecretKeyringFile() ),
-                        keyManager.getSecretKeyringPwd() );
+                .decrypt( message, PGPEncryptionUtil.getFileInputStream( keyManager.getSecurityKeyData().getSecretKeyringFile() ),
+                        keyManager.getSecurityKeyData().getSecretKeyringPwd() );
     }
 
 
+    /* *****************************************
+     *
+     */
     @Override
     public ContentAndSignatures decryptAndReturnSignatures( final byte[] encryptedMessage ) throws PGPException
     {
         return PGPEncryptionUtil.decryptAndReturnSignatures( encryptedMessage, keyManager.getSecretKey( null ),
-                keyManager.getSecretKeyringPwd() );
+                keyManager.getSecurityKeyData().getSecretKeyringPwd() );
     }
 
 
+    /* *****************************************
+     *
+     */
     @Override
     public boolean verifySignature( final ContentAndSignatures contentAndSignatures, final PGPPublicKey publicKey )
             throws PGPException

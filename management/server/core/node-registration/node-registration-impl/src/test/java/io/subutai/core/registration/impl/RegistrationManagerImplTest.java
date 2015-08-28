@@ -67,7 +67,6 @@ public class RegistrationManagerImplTest
         when( host1.getId() ).thenReturn( "This is id" );
         when( securityManager.getEncryptionTool() ).thenReturn( encryptionTool );
         when( securityManager.getKeyManager() ).thenReturn( keyManager );
-        when( keyManager.getSecretKeyringFile() ).thenReturn( "keyring file" );
     }
 
 

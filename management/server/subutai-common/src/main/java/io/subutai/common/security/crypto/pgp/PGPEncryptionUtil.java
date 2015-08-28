@@ -1222,8 +1222,8 @@ public class PGPEncryptionUtil
     }
 
 
-    /**
-     * ********************************************************** Load Keyring  file into InpurStream.
+    /* **********************************************************
+     * Load Keyring  file into InputStream.
      */
     public static InputStream getFileInputStream( String keyringFile )
     {
@@ -1240,6 +1240,9 @@ public class PGPEncryptionUtil
     }
 
 
+    /* **********************************************************
+     *
+     */
     public static String getKeyringArmored( String keyringFile ) throws PGPException
     {
         try
@@ -1253,6 +1256,28 @@ public class PGPEncryptionUtil
             ArmoredOutputStream armorOut = new ArmoredOutputStream( encOut );
 
             armorOut.write( pgpPub.getEncoded() );
+            armorOut.flush();
+            armorOut.close();
+            return new String( encOut.toByteArray() );
+        }
+        catch ( Exception e )
+        {
+            throw new PGPException( "Error loading keyring", e );
+        }
+    }
+
+
+    /* **********************************************************
+     *
+     */
+    public static String getKeyringArmored( byte[] data) throws PGPException
+    {
+        try
+        {
+            ByteArrayOutputStream encOut = new ByteArrayOutputStream();
+            ArmoredOutputStream armorOut = new ArmoredOutputStream( encOut );
+
+            armorOut.write( data);
             armorOut.flush();
             armorOut.close();
             return new String( encOut.toByteArray() );
