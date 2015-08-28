@@ -32,7 +32,7 @@ function clone {
 
   local parent="$1"
   local child="$2"
-
+  local token="$3" #token to be used for validation
   # Check that parent exists
   lxc_assert "$parent" "`clone_usage`"
   # Check that container name is legal and it does not exist
@@ -40,7 +40,7 @@ function clone {
   lxc_assert_no $child
 
   config=/var/lib/lxc/$child/config
-
+  child_gpg_dir=/var/lib/lxc/$child/rootfs/root/.gnupg
   if [ "`are_containers_readable $parent $child`" == "true" ]
   then
      msg_error "Container(s) locked by a subutai process"
@@ -119,8 +119,49 @@ function clone {
      local gateway="`getgw $ipAddress`"
      configure_dns $child $gateway
   fi
- 
-  #starting lxc in this method 
+#----GPG----
+function generate_defaults {
+mkdir $child_gpg_dir
+touch $child_gpg_dir/defaults
+echo "%echo Generating default keys 
+Key-Type: default
+Key-Length: 2048
+Subkey-Type: default
+Name-Real: $child
+Name-Comment: $child GPG key
+Name-Email: $child@subutai.io
+Expire-Date: 0
+Passphrase: secret
+%pubring $child_gpg_dir/public.pub
+%secring $child_gpg_dir/secret.sec
+%commit
+%echo Done">>$child_gpg_dir/defaults
+gpg2 --batch --gen-key $child_gpg_dir/defaults
+}
+
+function exchange_keys_and_encrypt {
+#GET Management Public Key from server
+curl gw.intra.lan:8181/cxf/registration/public-key > $child_gpg_dir/mgn.key
+#Import Mgn PK to keyring
+gpg2 --no-default-keyring --secret-keyring $child_gpg_dir/secret.sec --keyring $child_gpg_dir/public.pub --import $child_gpg_dir/mgn.key
+#Write token to file
+echo "token:"$token > $child_gpg_dir/stdin.txt
+#Add cloned container PK to the file
+gpg2 --no-default-keyring --secret-keyring $child_gpg_dir/secret.sec --keyring $child_gpg_dir/public.pub --export --armor $child@subutai.io >> $child_gpg_dir/stdin.txt
+#Encrypt the file
+gpg2 --trust-model always --no-default-keyring --secret-keyring $child_gpg_dir/secret.sec --keyring $child_gpg_dir/public.pub --encrypt --output $child_gpg_dir/stdout.asc --armor -r test@mail.org -u $child@subutai.io $child_gpg_dir/stdin.txt
+#curl the DATA
+curl -X POST -H 'Content-Type: text/plain' -d @$child_gpg_dir/stdout.asc gw.intra.lan:8181/cxf/registration/public-key
+rm -f $child_gpg_dir/stdout.asc
+rm -f $child_gpg_dir/stdin.txt
+rm -f $child_gpg_dir/mgn.key
+}
+#----------- 
+if [ -n "$token" ]; then
+  generate_defaults 
+  exchange_keys_and_encrypt  
+fi
+#starting lxc in this method 
   git_child_branch $child
 
   #wait for ssh service up
@@ -158,9 +199,9 @@ function clone {
   fi
   msg_ok "Successfully cloned $child container from $parent"
   unlock_container_write $child
-
   if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
   
+  msg_ok "Successfully unlocked $child container for write"
   #apt-get updating operation in the container
   (lxc-attach -n $child -- apt-get update) > /dev/null 2>&1
 }
