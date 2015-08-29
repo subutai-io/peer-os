@@ -2,7 +2,6 @@ package io.subutai.common.security.crypto.pgp;
 
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.PublicKey;
@@ -76,15 +75,15 @@ public class PGPEncryptionUtilTest
         PGPSecretKey decryptingSecretKey = PGPEncryptionUtil.findSecretKeyByFingerprint( findFile( SECRET_KEYRING ),
                 PGPEncryptionUtil.BytesToHex( encryptingKey.getFingerprint() ) );
 
-        byte[] decryptedAndVerifiedMessage =
-                PGPEncryptionUtil.decryptAndVerify( signedAndEncryptedMessage, decryptingSecretKey, SECRET_PWD,
+        byte[] decryptedAndVerifiedMessage = PGPEncryptionUtil
+                .decryptAndVerify( signedAndEncryptedMessage, decryptingSecretKey, SECRET_PWD,
                         signingKey.getPublicKey() );
 
         assertTrue( Arrays.equals( MESSAGE.getBytes(), decryptedAndVerifiedMessage ) );
 
         //auto secret key detection
-        decryptedAndVerifiedMessage =
-                PGPEncryptionUtil.decryptAndVerify( signedAndEncryptedMessage, findFile( SECRET_KEYRING ), SECRET_PWD,
+        decryptedAndVerifiedMessage = PGPEncryptionUtil
+                .decryptAndVerify( signedAndEncryptedMessage, findFile( SECRET_KEYRING ), SECRET_PWD,
                         signingKey.getPublicKey() );
 
         assertTrue( Arrays.equals( MESSAGE.getBytes(), decryptedAndVerifiedMessage ) );
@@ -94,14 +93,13 @@ public class PGPEncryptionUtilTest
     @Test
     public void testGenerateKeyPair() throws Exception
     {
-        ByteArrayOutputStream publicKeyRing = new ByteArrayOutputStream();
-        ByteArrayOutputStream secretKeyRing = new ByteArrayOutputStream();
-        PGPEncryptionUtil.KeyRef keyRef = PGPEncryptionUtil.generateKeyPair( USER_ID, SECRET_PWD, publicKeyRing, secretKeyRing );
+        KeyPair keyPair = PGPEncryptionUtil.generateKeyPair( USER_ID, SECRET_PWD, false );
 
-        assertNotNull( PGPEncryptionUtil.findPublicKeyById( new ByteArrayInputStream( publicKeyRing.toByteArray() ),
-                keyRef.getEncryptingKeyId() ) );
-        assertNotNull( PGPEncryptionUtil.findSecretKeyByFingerprint( new ByteArrayInputStream( secretKeyRing.toByteArray() ),
-                keyRef.getSigningKeyFingerprint() ) );
+        assertNotNull( PGPEncryptionUtil
+                .findPublicKeyById( new ByteArrayInputStream( keyPair.getPubKeyring() ), keyPair.getSubKeyId() ) );
+        assertNotNull( PGPEncryptionUtil
+                .findSecretKeyByFingerprint( new ByteArrayInputStream( keyPair.getSecKeyring() ),
+                        keyPair.getPrimaryKeyFingerprint() ) );
     }
 
 
@@ -112,8 +110,8 @@ public class PGPEncryptionUtilTest
         Date today = new Date();
         PGPPublicKey pgpPublicKey = PGPEncryptionUtil.findPublicKeyById( findFile( PUBLIC_KEYRING ), PUBLIC_KEY_ID );
         PGPSecretKey pgpSecretKey = PGPEncryptionUtil.findSecretKeyById( findFile( SECRET_KEYRING ), SECRET_KEY_ID );
-        X509Certificate x509Certificate =
-                PGPEncryptionUtil.getX509CertificateFromPgpKeyPair( pgpPublicKey, pgpSecretKey, SECRET_PWD,
+        X509Certificate x509Certificate = PGPEncryptionUtil
+                .getX509CertificateFromPgpKeyPair( pgpPublicKey, pgpSecretKey, SECRET_PWD,
                         "C=ZA, ST=Western Cape, L=Cape Town, O=Thawte Consulting cc,"
                                 + " OU=Certification Services Division,"
                                 + " CN=Thawte Server CA/emailAddress=server-certs@thawte.com",

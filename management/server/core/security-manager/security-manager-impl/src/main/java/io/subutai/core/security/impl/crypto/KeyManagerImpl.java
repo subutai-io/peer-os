@@ -218,7 +218,7 @@ public class KeyManagerImpl implements KeyManager
             {
                 byte[] keyData = keyServer.getSecurityKeyByFingerprint( fingerprint ).getKeyData();
 
-                return PGPEncryptionUtil.getKeyringArmored( keyData );
+                return PGPEncryptionUtil.armorByteArrayToString( keyData );
             }
         }
         catch ( Exception ex )
