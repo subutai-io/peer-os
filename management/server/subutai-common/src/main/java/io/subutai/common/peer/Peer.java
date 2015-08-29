@@ -1,6 +1,7 @@
 package io.subutai.common.peer;
 
 
+import java.net.NetworkInterface;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -12,6 +13,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateContainerGroupRequest;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.Interface;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
@@ -386,4 +388,11 @@ public interface Peer
      * @return - containerHost
      */
     public HostInfo getContainerHostInfoById( UUID containerHostId ) throws PeerException;
+
+
+    /**
+     * Gets interfaces by IP address filtered by regexp pattern
+     */
+
+    Set<Interface> getInterfacesByIp( String pattern );
 }

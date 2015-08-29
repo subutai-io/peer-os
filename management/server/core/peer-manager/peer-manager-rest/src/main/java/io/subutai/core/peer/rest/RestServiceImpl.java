@@ -22,6 +22,7 @@ import com.google.common.base.Preconditions;
 import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.Interface;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
@@ -43,7 +44,6 @@ import io.subutai.common.util.UUIDUtil;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-
 
 
 public class RestServiceImpl implements RestService
@@ -1078,5 +1078,13 @@ public class RestServiceImpl implements RestService
             LOGGER.error( "Error removing environment certificate #removeEnvironmentCert", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.getMessage() ).build();
         }
+    }
+
+
+    @Override
+    public Set<Interface> getInterfacesByIp( final String pattern )
+    {
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        return localPeer.getInterfacesByIp( pattern );
     }
 }

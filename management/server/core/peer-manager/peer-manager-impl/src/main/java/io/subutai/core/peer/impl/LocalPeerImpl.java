@@ -33,6 +33,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -47,6 +48,7 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.CreateContainerGroupRequest;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.Interface;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.Gateway;
@@ -108,6 +110,7 @@ import io.subutai.core.peer.impl.dao.ResourceHostDataService;
 import io.subutai.core.peer.impl.entity.AbstractSubutaiHost;
 import io.subutai.core.peer.impl.entity.ContainerGroupEntity;
 import io.subutai.core.peer.impl.entity.ContainerHostEntity;
+import io.subutai.core.peer.impl.entity.HostInterface;
 import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.entity.ResourceHostEntity;
 import io.subutai.core.registry.api.RegistryException;
@@ -1909,6 +1912,30 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public Set<RequestListener> getRequestListeners()
     {
         return Collections.unmodifiableSet( requestListeners );
+    }
+
+
+    @Override
+    public Set<Interface> getInterfacesByIp( final String pattern )
+    {
+        Set<Interface> result = new HashSet<>();
+        try
+        {
+            result = getManagementHost().getNetInterfaces();
+            Sets.filter( result, new Predicate<Interface>()
+            {
+                @Override
+                public boolean apply( final Interface anInterface )
+                {
+                    return anInterface.getIp().matches( pattern );
+                }
+            } );
+        }
+        catch ( HostNotFoundException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        return result;
     }
 
 

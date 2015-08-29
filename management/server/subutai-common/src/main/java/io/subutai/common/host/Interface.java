@@ -1,9 +1,13 @@
 package io.subutai.common.host;
 
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+
 /**
  * Represent a host network interface
  */
+@XmlRootElement
 public interface Interface
 {
     /**

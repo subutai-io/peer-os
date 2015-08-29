@@ -1,6 +1,8 @@
 package io.subutai.core.peer.impl;
 
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -15,6 +17,7 @@ import io.subutai.common.environment.CreateContainerGroupRequest;
 import io.subutai.common.exception.HTTPException;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.Interface;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
@@ -49,6 +52,7 @@ import io.subutai.core.peer.impl.command.CommandResultImpl;
 import io.subutai.core.peer.impl.container.ContainersDestructionResultImpl;
 import io.subutai.core.peer.impl.container.CreateContainerGroupResponse;
 import io.subutai.core.peer.impl.container.DestroyEnvironmentContainersRequest;
+import io.subutai.core.peer.impl.entity.HostInterface;
 import io.subutai.core.peer.impl.request.MessageRequest;
 import io.subutai.core.peer.impl.request.MessageResponse;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
@@ -1291,6 +1295,26 @@ public class RemotePeerImpl implements RemotePeer
         {
             throw new PeerException( String.format( "Error obtaining reserved VNIs from peer %s", getName() ), e );
         }
+    }
+
+
+    private String buildPath( String path )
+    {
+        return String.format( "%s/%s", baseUrl, path.startsWith( "/" ) ? path.substring( 1 ) : path );
+    }
+
+
+    @Override
+    public Set<Interface> getInterfacesByIp( final String pattern )
+    {
+        Preconditions.checkNotNull( pattern, "Pattern could not be null" );
+
+        String path = "peer/interfaces";
+
+        WebClient client = WebClient.create( buildPath( path ) );
+        Collection interfaces = client.getCollection( Interface.class );
+        LOG.debug( String.format( "%d", interfaces.size() ) );
+        return new HashSet<Interface>( interfaces );
     }
 
 
