@@ -240,7 +240,7 @@ public class KeyServerRestImpl implements KeyServerRest
 
             if(securityKey!=null)
             {
-                return Response.ok( PGPEncryptionUtil.getKeyringArmored( securityKey.getKeyData() )).build();
+                return Response.ok( PGPEncryptionUtil.armorByteArrayToString( securityKey.getKeyData() )).build();
             }
             else
             {
