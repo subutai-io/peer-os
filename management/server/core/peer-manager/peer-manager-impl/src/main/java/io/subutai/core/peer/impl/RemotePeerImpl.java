@@ -43,6 +43,7 @@ import io.subutai.common.util.RestUtil;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
 import io.subutai.core.messenger.api.Messenger;
+import io.subutai.common.peer.InterfacePattern;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.Payload;
 import io.subutai.core.peer.api.RemotePeer;
@@ -52,7 +53,6 @@ import io.subutai.core.peer.impl.command.CommandResultImpl;
 import io.subutai.core.peer.impl.container.ContainersDestructionResultImpl;
 import io.subutai.core.peer.impl.container.CreateContainerGroupResponse;
 import io.subutai.core.peer.impl.container.DestroyEnvironmentContainersRequest;
-import io.subutai.core.peer.impl.entity.HostInterface;
 import io.subutai.core.peer.impl.request.MessageRequest;
 import io.subutai.core.peer.impl.request.MessageResponse;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
@@ -1305,7 +1305,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public Set<Interface> getInterfacesByIp( final String pattern )
+    public Set<Interface> getNetworkInterfaces( final InterfacePattern pattern )
     {
         Preconditions.checkNotNull( pattern, "Pattern could not be null" );
 

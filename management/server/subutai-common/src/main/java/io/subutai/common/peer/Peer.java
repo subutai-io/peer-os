@@ -1,7 +1,6 @@
 package io.subutai.common.peer;
 
 
-import java.net.NetworkInterface;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -389,4 +388,11 @@ public interface Peer
      */
     public HostInfo getContainerHostInfoById( UUID containerHostId ) throws PeerException;
 
+
+
+    /**
+     * Gets network interfaces by given field name and regexp pattern. Allowed field names are "id" and "name".
+     */
+
+    Set<Interface> getNetworkInterfaces( InterfacePattern pattern );
 }

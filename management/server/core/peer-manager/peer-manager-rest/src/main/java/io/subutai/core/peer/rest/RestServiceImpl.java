@@ -42,6 +42,7 @@ import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.UUIDUtil;
+import io.subutai.common.peer.InterfacePattern;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
@@ -1083,18 +1084,16 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Set<Interface> getInterfaces( final InterfaceRequest request )
+    public Set<Interface> getNetworkInterfaces( final InterfacePattern request )
     {
         LocalPeer localPeer = peerManager.getLocalPeer();
-        if ( "ip".equals( request.getField() ) )
+        try
         {
-            return localPeer.getInterfacesByIp( request.getPattern() );
+            return localPeer.getNetworkInterfaces( request );
         }
-        else if ( "name".equals( request.getField() ) )
+        catch ( Exception e )
         {
-            return localPeer.getInterfacesByName( request.getPattern() );
+            throw new WebApplicationException( e );
         }
-
-        throw new WebApplicationException( new IllegalArgumentException( "Unknown field name." ) );
     }
 }

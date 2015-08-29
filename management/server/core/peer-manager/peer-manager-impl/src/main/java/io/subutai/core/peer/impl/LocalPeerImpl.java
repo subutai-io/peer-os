@@ -57,6 +57,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostInfoModel;
+import io.subutai.common.peer.InterfacePattern;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.Disposable;
@@ -978,8 +979,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
-                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder(
+                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
+                    bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1914,8 +1916,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @Override
-    public Set<Interface> getInterfacesByIp( final String pattern )
+    private Set<Interface> getInterfacesByIp( final String pattern )
     {
         LOG.debug( pattern );
         Set<Interface> result = new HashSet<>();
@@ -1938,8 +1939,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @Override
-    public Set<Interface> getInterfacesByName( final String pattern )
+    private Set<Interface> getInterfacesByName( final String pattern )
     {
         LOG.debug( pattern );
         Set<Interface> result = new HashSet<>();
@@ -1959,6 +1959,21 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             LOG.error( e.getMessage(), e );
         }
         return result;
+    }
+
+
+    @Override
+    public Set<Interface> getNetworkInterfaces( final InterfacePattern pattern )
+    {
+        if ( "ip".equals( pattern.getField() ) )
+        {
+            return getInterfacesByIp( pattern.getPattern() );
+        }
+        else if ( "name".equals( pattern.getField() ) )
+        {
+            return getInterfacesByName( pattern.getPattern() );
+        }
+        throw new IllegalArgumentException( "Unknown field." );
     }
 
 

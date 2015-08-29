@@ -1,4 +1,4 @@
-package io.subutai.core.peer.rest;
+package io.subutai.common.peer;
 
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -8,10 +8,22 @@ import javax.xml.bind.annotation.XmlRootElement;
  * JSON request parameter
  */
 @XmlRootElement
-public class InterfaceRequest
+public class InterfacePattern
 {
     private String field;
     private String pattern;
+
+
+    public InterfacePattern()
+    {
+    }
+
+
+    public InterfacePattern( final String field, final String pattern )
+    {
+        this.field = field;
+        this.pattern = pattern;
+    }
 
 
     public String getPattern()
