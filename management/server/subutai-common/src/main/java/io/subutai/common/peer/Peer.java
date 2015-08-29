@@ -389,10 +389,4 @@ public interface Peer
      */
     public HostInfo getContainerHostInfoById( UUID containerHostId ) throws PeerException;
 
-
-    /**
-     * Gets interfaces by IP address filtered by regexp pattern
-     */
-
-    Set<Interface> getInterfacesByIp( String pattern );
 }

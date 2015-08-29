@@ -978,9 +978,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder(
-                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
-                    bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
+                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1918,16 +1917,40 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public Set<Interface> getInterfacesByIp( final String pattern )
     {
+        LOG.debug( pattern );
         Set<Interface> result = new HashSet<>();
         try
         {
-            result = getManagementHost().getNetInterfaces();
-            Sets.filter( result, new Predicate<Interface>()
+            result = Sets.filter( getManagementHost().getNetInterfaces(), new Predicate<Interface>()
             {
                 @Override
                 public boolean apply( final Interface anInterface )
                 {
                     return anInterface.getIp().matches( pattern );
+                }
+            } );
+        }
+        catch ( HostNotFoundException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        return result;
+    }
+
+
+    @Override
+    public Set<Interface> getInterfacesByName( final String pattern )
+    {
+        LOG.debug( pattern );
+        Set<Interface> result = new HashSet<>();
+        try
+        {
+            result = Sets.filter( getManagementHost().getNetInterfaces(), new Predicate<Interface>()
+            {
+                @Override
+                public boolean apply( final Interface anInterface )
+                {
+                    return anInterface.getInterfaceName().matches( pattern );
                 }
             } );
         }

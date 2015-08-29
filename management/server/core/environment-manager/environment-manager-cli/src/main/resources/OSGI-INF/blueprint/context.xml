@@ -1,0 +1,66 @@
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <reference id="environmentManager" availability="mandatory"
+             interface="io.subutai.core.environment.api.EnvironmentManager" />
+  <reference id="peerManager" availability="mandatory"
+             interface="io.subutai.core.peer.api.PeerManager" />
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="env/build-local">
+      <action class="io.subutai.core.environment.cli.BuildLocalEnvironmentCommand">
+        <argument ref="environmentManager" />
+        <argument ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="env/grow-local">
+      <action class="io.subutai.core.environment.cli.GrowLocalEnvironmentCommand">
+        <argument ref="environmentManager" />
+        <argument ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="env/list">
+      <action class="io.subutai.core.environment.cli.ListEnvironmentsCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="env/view">
+      <action class="io.subutai.core.environment.cli.ViewEnvironmentCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="env/destroy">
+      <action class="io.subutai.core.environment.cli.DestroyEnvironmentCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="env/destroy-container">
+      <action class="io.subutai.core.environment.cli.DestroyContainerCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+
+  </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="env/remove">
+      <action class="io.subutai.core.environment.cli.RemoveEnvironmentCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+</blueprint>

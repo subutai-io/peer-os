@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -1082,9 +1083,18 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Set<Interface> getInterfacesByIp( final String pattern )
+    public Set<Interface> getInterfaces( final InterfaceRequest request )
     {
         LocalPeer localPeer = peerManager.getLocalPeer();
-        return localPeer.getInterfacesByIp( pattern );
+        if ( "ip".equals( request.getField() ) )
+        {
+            return localPeer.getInterfacesByIp( request.getPattern() );
+        }
+        else if ( "name".equals( request.getField() ) )
+        {
+            return localPeer.getInterfacesByName( request.getPattern() );
+        }
+
+        throw new WebApplicationException( new IllegalArgumentException( "Unknown field name." ) );
     }
 }

@@ -3,6 +3,7 @@ package io.subutai.core.peer.rest;
 
 import java.util.Set;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -261,8 +262,9 @@ public interface RestService
 
     //*********** Environment Specific REST - END ***************
 
-    @GET
-    @Path( "interfaces/{pattern}" )
+    @POST
+    @Path( "interfaces" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Set<Interface> getInterfacesByIp( @PathParam( "pattern" ) String pattern );
+    @Consumes( { MediaType.APPLICATION_JSON } )
+    Set<Interface> getInterfaces( InterfaceRequest pattern );
 }

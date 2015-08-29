@@ -4,6 +4,7 @@ package io.subutai.core.peer.api;
 import java.util.Set;
 import java.util.UUID;
 
+import io.subutai.common.host.Interface;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.Peer;
@@ -144,4 +145,19 @@ public interface LocalPeer extends Peer
     public void removeRequestListener( RequestListener listener );
 
     public Set<RequestListener> getRequestListeners();
+
+
+    /**
+     * Gets network interfaces by IP address filtered by regexp pattern
+     */
+
+    Set<Interface> getInterfacesByIp( String pattern );
+
+
+    /**
+     * Gets network interfaces by device name filtered by regexp pattern
+     */
+
+    Set<Interface> getInterfacesByName( String pattern );
+
 }
