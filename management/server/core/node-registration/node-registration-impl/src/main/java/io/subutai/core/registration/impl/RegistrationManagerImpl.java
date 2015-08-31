@@ -1,7 +1,6 @@
 package io.subutai.core.registration.impl;
 
 
-import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +15,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
-import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
@@ -111,7 +109,7 @@ public class RegistrationManagerImpl implements RegistrationManager
 
 
     @Override
-    public void queueRequest( final RequestedHost requestedHost )
+    public void queueRequest( final RequestedHost requestedHost ) throws NodeRegistrationException
     {
         if ( requestDataService.find( UUID.fromString( requestedHost.getId() ) ) != null )
         {
@@ -123,8 +121,16 @@ public class RegistrationManagerImpl implements RegistrationManager
                     new RequestedHostImpl( requestedHost.getId(), requestedHost.getHostname(), requestedHost.getArch(),
                             requestedHost.getSecret(), requestedHost.getPublicKey(), requestedHost.getRestHook(),
                             RegistrationStatus.REQUESTED, requestedHost.getInterfaces() );
-            requestDataService.persist( temp );
-            securityManager.getKeyManager().savePublicKey( temp.getId(), temp.getPublicKey() );
+            try
+            {
+                requestDataService.persist( temp );
+
+                securityManager.getKeyManager().savePublicKeyRing( temp.getId(), temp.getPublicKey() );
+            }
+            catch ( Exception ex )
+            {
+                throw new NodeRegistrationException( "Failed adding resource host registration request to queue", ex );
+            }
         }
     }
 
@@ -228,8 +234,14 @@ public class RegistrationManagerImpl implements RegistrationManager
             throw new NodeRegistrationException( "Container token expired" );
         }
 
-        securityManager.getKeyManager().savePublicKey( containerHostId, publicKey );
-
+        try
+        {
+            securityManager.getKeyManager().savePublicKeyRing( containerHostId, publicKey );
+        }
+        catch ( Exception ex )
+        {
+            throw new NodeRegistrationException( "Failed to store container pubkey", ex );
+        }
         return containerToken;
     }
 }

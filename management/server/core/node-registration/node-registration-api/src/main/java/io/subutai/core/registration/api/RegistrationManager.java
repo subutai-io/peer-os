@@ -19,7 +19,7 @@ public interface RegistrationManager
 
     public RequestedHost getRequest( UUID requestId );
 
-    public void queueRequest( RequestedHost requestedHost );
+    public void queueRequest( RequestedHost requestedHost ) throws NodeRegistrationException;
 
     public void rejectRequest( UUID requestId );
 

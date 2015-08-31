@@ -1,9 +1,6 @@
 package io.subutai.core.registration.rest;
 
 
-import java.io.InputStream;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
@@ -81,11 +78,10 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     {
         EncryptionTool encryptionTool = securityManager.getEncryptionTool();
         KeyManager keyManager = securityManager.getKeyManager();
-        InputStream secretKey = PGPEncryptionUtil.getFileInputStream( keyManager.getSecretKeyringFile() );
 
-        byte[] decrypted = encryptionTool.decrypt( message.getBytes(), secretKey, keyManager.getSecretKeyringPwd() );
         try
         {
+            byte[] decrypted = encryptionTool.decrypt( message.getBytes() );
             String decryptedMessage = new String( decrypted, "UTF-8" );
             String lineSeparator = System.getProperty( "line.separator" );
 
