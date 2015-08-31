@@ -12,6 +12,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import io.subutai.common.host.Interface;
 
@@ -19,14 +22,17 @@ import io.subutai.common.host.Interface;
 @Entity
 @Table( name = "interface" )
 @Access( AccessType.FIELD )
+@XmlRootElement
 public class HostInterface implements Interface, Serializable
 {
     @Id
     @GeneratedValue
+    @JsonIgnore
     private Long id;
 
     @Column( name = "name", nullable = false )
     private String interfaceName;
+
     @Column( name = "ip", nullable = false )
     private String ip;
     @Column( name = "mac", nullable = false )
@@ -34,6 +40,7 @@ public class HostInterface implements Interface, Serializable
 
     @ManyToOne
     @JoinColumn( name = "host_id" )
+    @JsonIgnore
     private AbstractSubutaiHost host;
 
 

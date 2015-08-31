@@ -10,6 +10,7 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.Peer;
 import io.subutai.core.env.api.exception.EnvironmentCreationException;
 import io.subutai.core.env.api.exception.EnvironmentDestructionException;
 import io.subutai.core.env.api.exception.EnvironmentManagerException;
@@ -193,4 +194,6 @@ public interface EnvironmentManager
      * @return - domain url or null if not assigned
      */
     public String getDomain( UUID environmentId ) throws EnvironmentManagerException, EnvironmentNotFoundException;
+
+    String createN2NTunnel( Set<Peer> peers ) throws EnvironmentManagerException;
 }
