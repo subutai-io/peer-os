@@ -23,7 +23,7 @@ public interface LocalPeer extends Peer
      *
      * @return if host is registered and connected returns implementation of this host, otherwise throws exception.
      */
-    Host bindHost( String id ) throws HostNotFoundException;
+    public Host bindHost( String id ) throws HostNotFoundException;
 
     /**
      * Binds host with given ID
@@ -32,7 +32,7 @@ public interface LocalPeer extends Peer
      *
      * @return if host is registered and connected returns implementation of this host, otherwise throws exception.
      */
-    Host bindHost( UUID id ) throws HostNotFoundException;
+    public Host bindHost( UUID id ) throws HostNotFoundException;
 
     /**
      * Returns implementation of ResourceHost interface.
@@ -43,22 +43,22 @@ public interface LocalPeer extends Peer
     /**
      * Returns resource host instance by its hostname
      */
-    ResourceHost getResourceHostByName( String hostname ) throws HostNotFoundException;
+    public ResourceHost getResourceHostByName( String hostname ) throws HostNotFoundException;
 
     /**
      * Returns resource host instance by its id
      */
-    ResourceHost getResourceHostById( UUID hostId ) throws HostNotFoundException;
+    public ResourceHost getResourceHostById( UUID hostId ) throws HostNotFoundException;
 
     /**
      * Returns resource host instance by hostname of its container
      */
-    ResourceHost getResourceHostByContainerName( String containerName ) throws HostNotFoundException;
+    public ResourceHost getResourceHostByContainerName( String containerName ) throws HostNotFoundException;
 
     /**
      * Returns resource host instance by id ot its container
      */
-    ResourceHost getResourceHostByContainerId( UUID hostId ) throws HostNotFoundException;
+    public ResourceHost getResourceHostByContainerId( UUID hostId ) throws HostNotFoundException;
 
 
     /**
@@ -67,26 +67,27 @@ public interface LocalPeer extends Peer
      * @param hostname name of the container
      */
 
-    ContainerHost getContainerHostByName( String hostname ) throws HostNotFoundException;
+    public ContainerHost getContainerHostByName( String hostname ) throws HostNotFoundException;
 
     /**
      * Returns implementation of ContainerHost interface.
      *
      * @param hostId ID of the container
      */
-    ContainerHost getContainerHostById( UUID hostId ) throws HostNotFoundException;
+    public ContainerHost getContainerHostById( UUID hostId ) throws HostNotFoundException;
 
     /**
      * Returns instance of management host
      */
-    ManagementHost getManagementHost() throws HostNotFoundException;
+    public ManagementHost getManagementHost() throws HostNotFoundException;
 
     /**
      * Returns all local peer's resource hosts
      */
-    Set<ResourceHost> getResourceHosts();
+    public Set<ResourceHost> getResourceHosts();
 
-    void cleanDb();
+    //todo remove this method
+    public void cleanDb();
 
     /**
      * Creates container on the local peer
@@ -95,8 +96,8 @@ public interface LocalPeer extends Peer
      * @param template - source template from which to clone container
      * @param containerName - container name
      */
-    ContainerHost createContainer( final ResourceHost resourceHost, final Template template,
-                                   final String containerName ) throws PeerException;
+    public ContainerHost createContainer( final ResourceHost resourceHost, final Template template,
+                                          final String containerName ) throws PeerException;
 
 
     /**
@@ -108,7 +109,7 @@ public interface LocalPeer extends Peer
      *
      * @throws ContainerGroupNotFoundException - thrown if container is created not as a part of environment
      */
-    ContainerGroup findContainerGroupByContainerId( UUID containerId ) throws ContainerGroupNotFoundException;
+    public ContainerGroup findContainerGroupByContainerId( UUID containerId ) throws ContainerGroupNotFoundException;
 
     /**
      * Returns container group by environment id
@@ -119,7 +120,8 @@ public interface LocalPeer extends Peer
      *
      * @throws ContainerGroupNotFoundException - thrown if group is not found
      */
-    ContainerGroup findContainerGroupByEnvironmentId( UUID environmentId ) throws ContainerGroupNotFoundException;
+    public ContainerGroup findContainerGroupByEnvironmentId( UUID environmentId )
+            throws ContainerGroupNotFoundException;
 
     /**
      * Returns set of container groups by owner id
@@ -128,19 +130,43 @@ public interface LocalPeer extends Peer
      *
      * @return - set of {@code ContainerGroup}
      */
-    Set<ContainerGroup> findContainerGroupsByOwnerId( UUID ownerId );
+    public Set<ContainerGroup> findContainerGroupsByOwnerId( UUID ownerId );
 
     //networking
 
     /**
      * Sets up tunnels on the local peer to the specified remote peers
      */
-    int setupTunnels( Set<String> peerIps, UUID environmentId ) throws PeerException;
+    public int setupTunnels( Set<String> peerIps, UUID environmentId ) throws PeerException;
 
 
-    void addRequestListener( RequestListener listener );
+    public void addRequestListener( RequestListener listener );
 
-    void removeRequestListener( RequestListener listener );
+    public void removeRequestListener( RequestListener listener );
 
-    Set<RequestListener> getRequestListeners();
+    public Set<RequestListener> getRequestListeners();
+
+    /**
+     * Returns domain assigned to vni if any
+     *
+     * @param vni - vni
+     *
+     * @return - domain or null if no domain assigned to the vni
+     */
+    public String getVniDomain( Long vni ) throws PeerException;
+
+    /**
+     * Removes domain from vni if any
+     *
+     * @param vni -vni
+     */
+    public void removeVniDomain( Long vni ) throws PeerException;
+
+    /**
+     * Assigns domain to vni
+     *
+     * @param vni - vni
+     * @param domain -  domain to assign
+     */
+    public void setVniDomain( Long vni, String domain ) throws PeerException;
 }
