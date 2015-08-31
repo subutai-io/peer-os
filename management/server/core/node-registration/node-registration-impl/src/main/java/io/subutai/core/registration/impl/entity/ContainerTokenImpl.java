@@ -40,10 +40,10 @@ public class ContainerTokenImpl implements ContainerToken
     }
 
 
-    public ContainerTokenImpl( final String token, final String hostId, final Timestamp dateCreated, final Long ttl )
+    public ContainerTokenImpl( final String token, final Timestamp dateCreated, final Long ttl )
     {
         this.token = token;
-        this.hostId = hostId;
+        this.hostId = "";
         this.dateCreated = dateCreated;
         this.ttl = ttl;
     }

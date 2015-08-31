@@ -27,8 +27,9 @@ public interface RegistrationManager
 
     public void removeRequest( UUID requestId );
 
-    public ContainerToken generateContainerTTLToken( String containerHostId, Long ttl );
+    public ContainerToken generateContainerTTLToken( Long ttl );
 
-    public ContainerToken verifyToken( String token, String publicKey ) throws NodeRegistrationException;
+    public ContainerToken verifyToken( String token, String containerHostId, String publicKey )
+            throws NodeRegistrationException;
 
 }

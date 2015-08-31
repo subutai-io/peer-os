@@ -195,10 +195,11 @@ public class RegistrationManagerImpl implements RegistrationManager
 
 
     @Override
-    public ContainerToken generateContainerTTLToken( String containerHostId, final Long ttl )
+    public ContainerToken generateContainerTTLToken( final Long ttl )
     {
-        ContainerTokenImpl token = new ContainerTokenImpl( UUID.randomUUID().toString(), containerHostId,
-                new Timestamp( System.currentTimeMillis() ), ttl );
+        ContainerTokenImpl token =
+                new ContainerTokenImpl( UUID.randomUUID().toString(), new Timestamp( System.currentTimeMillis() ),
+                        ttl );
         try
         {
             containerTokenDataService.persist( token );
@@ -213,7 +214,8 @@ public class RegistrationManagerImpl implements RegistrationManager
 
 
     @Override
-    public ContainerToken verifyToken( final String token, String publicKey ) throws NodeRegistrationException
+    public ContainerToken verifyToken( final String token, String containerHostId, String publicKey )
+            throws NodeRegistrationException
     {
 
         ContainerTokenImpl containerToken = containerTokenDataService.find( token );
@@ -228,7 +230,7 @@ public class RegistrationManagerImpl implements RegistrationManager
             throw new NodeRegistrationException( "Container token expired" );
         }
 
-        securityManager.getKeyManager().savePublicKey( containerToken.getHostId(), publicKey );
+        securityManager.getKeyManager().savePublicKey( containerHostId, publicKey );
 
         return containerToken;
     }

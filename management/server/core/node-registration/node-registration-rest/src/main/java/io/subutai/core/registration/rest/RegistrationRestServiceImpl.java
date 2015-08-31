@@ -88,12 +88,17 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         try
         {
             String decryptedMessage = new String( decrypted, "UTF-8" );
+            String lineSeparator = System.getProperty( "line.separator" );
 
-            String token =
-                    decryptedMessage.substring( 0, decryptedMessage.indexOf( System.getProperty( "line.separator" ) ) );
-            String publicKey = decryptedMessage
-                    .substring( decryptedMessage.indexOf( System.getProperty( "line.separator" ) ) + 1 );
-            registrationManager.verifyToken( token, publicKey );
+            String token = decryptedMessage.substring( 0, decryptedMessage.indexOf( lineSeparator ) );
+            decryptedMessage = decryptedMessage.substring( decryptedMessage.indexOf( lineSeparator ) + 1 );
+
+            String containerId = decryptedMessage.substring( 0, decryptedMessage.indexOf( lineSeparator ) );
+            //decryptedMessage = decryptedMessage.substring( decryptedMessage.indexOf( lineSeparator ) + 1 );
+
+            String publicKey = decryptedMessage.substring( decryptedMessage.indexOf( lineSeparator ) + 1 );
+
+            registrationManager.verifyToken( token, containerId, publicKey );
         }
         catch ( Exception e )
         {
