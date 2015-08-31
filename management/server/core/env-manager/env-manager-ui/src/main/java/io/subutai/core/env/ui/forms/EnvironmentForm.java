@@ -8,14 +8,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.environment.EnvironmentStatus;
-import io.subutai.core.env.api.EnvironmentManager;
-import io.subutai.core.env.api.exception.EnvironmentDestructionException;
-import io.subutai.core.env.api.exception.EnvironmentManagerException;
-import io.subutai.core.peer.api.PeerManager;
-import io.subutai.server.ui.component.ConfirmationDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +18,15 @@ import com.vaadin.ui.Embedded;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
+
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.core.env.api.EnvironmentManager;
+import io.subutai.core.env.api.exception.EnvironmentDestructionException;
+import io.subutai.core.env.api.exception.EnvironmentManagerException;
+import io.subutai.core.peer.api.PeerManager;
+import io.subutai.server.ui.component.ConfirmationDialog;
 
 
 public class EnvironmentForm
@@ -38,6 +39,7 @@ public class EnvironmentForm
     private static final String REMOVE = "Remove";
     private static final String CONTAINERS = "Containers";
     private static final String REFRESH_METADATA = "Refresh Info";
+    private static final String DOMAIN = "Domain";
     private static final String NAME = "Name";
     private static final String STATUS = "Status";
     private static final String DESTROY = "Destroy";
@@ -134,6 +136,15 @@ public class EnvironmentForm
             final Button destroyBtn = new Button( DESTROY );
             final Button removeBtn = new Button( REMOVE );
             final Button refreshContainersButton = new Button( REFRESH_METADATA );
+            final Button domainBtn = new Button( DOMAIN );
+            domainBtn.setId(environment.getName() + "-domain");
+            domainBtn.addClickListener( new Button.ClickListener() {
+                @Override
+                public void buttonClick( final Button.ClickEvent event )
+                {
+
+                }
+            } );
             containersBtn.setId( environment.getName() + "-containers" );
             containersBtn.addClickListener( new Button.ClickListener()
             {

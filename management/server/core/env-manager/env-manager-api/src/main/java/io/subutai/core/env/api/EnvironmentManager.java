@@ -164,4 +164,33 @@ public interface EnvironmentManager
      * @param environmentId - target environment Id
      */
     public void updateEnvironmentContainersMetadata( UUID environmentId ) throws EnvironmentManagerException;
+
+    /**
+     * Removes an assigned domain if any from the environment
+     *
+     * @param environmentId - id of the environment which domain to remove
+     * @param async - indicates whether operation is done synchronously or asynchronously to the calling party
+     */
+    public void removeDomain( UUID environmentId, boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException;
+
+    /**
+     * Assigns a domain to the environment. External client would be able to access the environment containers via the
+     * domain name.
+     *
+     * @param environmentId - id of the environment to assign the passed domain to
+     * @param newDomain - domain url
+     * @param async - indicates whether operation is done synchronously or asynchronously to the calling party
+     */
+    public void assignDomain( UUID environmentId, String newDomain, boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException;
+
+    /**
+     * Returns the currently assigned domain
+     *
+     * @param environmentId - id of the environment which domain to return
+     *
+     * @return - domain url or null if not assigned
+     */
+    public String getDomain( UUID environmentId ) throws EnvironmentManagerException, EnvironmentNotFoundException;
 }

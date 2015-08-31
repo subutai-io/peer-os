@@ -50,7 +50,7 @@ public interface ManagementHost extends Host
     public int reserveVni( Vni vni ) throws PeerException;
 
     /**
-     * Retursn all existing gateways
+     * Returns all existing gateways
      */
     public Set<Gateway> getGateways() throws PeerException;
 

@@ -9,6 +9,14 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.ContainerHostNotFoundException;
@@ -34,19 +42,19 @@ import io.subutai.core.env.api.exception.EnvironmentManagerException;
 import io.subutai.core.env.api.exception.EnvironmentSecurityException;
 import io.subutai.core.env.impl.builder.EnvironmentBuilder;
 import io.subutai.core.env.impl.dao.BlueprintDataService;
-import io.subutai.core.env.impl.dao.EnvironmentDataService;
-import io.subutai.core.env.impl.tasks.CreateEnvironmentTask;
-import io.subutai.core.env.impl.tasks.SetSshKeyTask;
 import io.subutai.core.env.impl.dao.EnvironmentContainerDataService;
+import io.subutai.core.env.impl.dao.EnvironmentDataService;
 import io.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.EnvironmentBuildException;
 import io.subutai.core.env.impl.exception.EnvironmentTunnelException;
 import io.subutai.core.env.impl.exception.ResultHolder;
+import io.subutai.core.env.impl.tasks.CreateEnvironmentTask;
 import io.subutai.core.env.impl.tasks.DestroyContainerTask;
 import io.subutai.core.env.impl.tasks.DestroyEnvironmentTask;
 import io.subutai.core.env.impl.tasks.GrowEnvironmentTask;
-
+import io.subutai.core.env.impl.tasks.SetDomainTask;
+import io.subutai.core.env.impl.tasks.SetSshKeyTask;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.User;
 import io.subutai.core.network.api.NetworkManager;
@@ -55,13 +63,6 @@ import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.tracker.api.Tracker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -731,6 +732,108 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
         }
     }
+
+
+    /** domain functions ** */
+
+    @Override
+    public void removeDomain( final UUID environmentId, final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Setting environment %s domain", environmentId ) );
+
+        removeDomain( environmentId, op, async, true );
+    }
+
+
+    public void removeDomain( final UUID environmentId, final TrackerOperation op, final boolean async,
+                              boolean checkAccess )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+
+        final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
+
+        SetDomainTask setDomainTask = new SetDomainTask( environment, resultHolder, op, null );
+
+        executor.submit( setDomainTask );
+
+        if ( !async )
+        {
+            try
+            {
+                setDomainTask.waitCompletion();
+
+                if ( resultHolder.getResult() != null )
+                {
+                    throw resultHolder.getResult();
+                }
+            }
+            catch ( InterruptedException e )
+            {
+                throw new EnvironmentModificationException( e );
+            }
+        }
+    }
+
+
+    @Override
+    public void assignDomain( final UUID environmentId, final String newDomain, final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Assigning environment %s domain", environmentId ) );
+
+        assignDomain( environmentId, op, newDomain, async, true );
+    }
+
+
+    public void assignDomain( final UUID environmentId, final TrackerOperation op, final String newDomain,
+                              final boolean async, final boolean checkAccess )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newDomain ), "Invalid domain" );
+        Preconditions.checkArgument( newDomain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+
+        final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
+
+        SetDomainTask setDomainTask = new SetDomainTask( environment, resultHolder, op, newDomain );
+
+        executor.submit( setDomainTask );
+
+        if ( !async )
+        {
+            try
+            {
+                setDomainTask.waitCompletion();
+
+                if ( resultHolder.getResult() != null )
+                {
+                    throw resultHolder.getResult();
+                }
+            }
+            catch ( InterruptedException e )
+            {
+                throw new EnvironmentModificationException( e );
+            }
+        }
+    }
+
+
+    @Override
+    public String getDomain( final UUID environmentId ) throws EnvironmentManagerException, EnvironmentNotFoundException
+    {
+        return null;
+    }
+
+
+    /** domain functions ** */
 
 
     public void registerListener( final EnvironmentEventListener listener )
