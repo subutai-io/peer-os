@@ -88,6 +88,7 @@ import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
@@ -119,7 +120,6 @@ import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.strategy.api.StrategyNotFoundException;
-import io.subutai.core.http.manager.api.HttpContextManager;
 
 
 /**
@@ -1010,7 +1010,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( PeerException | HostDisconnectedException e )
         {
-            LOG.error( "Error checking host connected status #isConnected", e );
+//            LOG.error( "Error checking host connected status #isConnected", e );
             return false;
         }
     }
@@ -1888,6 +1888,54 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         return managementHost.setupTunnels( peerIps, environmentId );
+    }
+
+
+    @Override
+    public String getVniDomain( final Long vni ) throws PeerException
+    {
+        Set<Vni> reservedVnis = getManagementHost().getReservedVnis();
+
+        for ( Vni reservedVni : reservedVnis )
+        {
+            if ( reservedVni.getVni() == vni )
+            {
+                return getManagementHost().getVlanDomain( reservedVni.getVlan() );
+            }
+        }
+        throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+    }
+
+
+    @Override
+    public void removeVniDomain( final Long vni ) throws PeerException
+    {
+        Set<Vni> reservedVnis = getManagementHost().getReservedVnis();
+
+        for ( Vni reservedVni : reservedVnis )
+        {
+            if ( reservedVni.getVni() == vni )
+            {
+                getManagementHost().removeVlanDomain( reservedVni.getVlan() );
+            }
+        }
+        throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+    }
+
+
+    @Override
+    public void setVniDomain( final Long vni, final String domain ) throws PeerException
+    {
+        Set<Vni> reservedVnis = getManagementHost().getReservedVnis();
+
+        for ( Vni reservedVni : reservedVnis )
+        {
+            if ( reservedVni.getVni() == vni )
+            {
+                getManagementHost().setVlanDomain( reservedVni.getVlan(), domain );
+            }
+        }
+        throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
     }
 
 

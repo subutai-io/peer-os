@@ -7,6 +7,10 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
@@ -25,10 +29,6 @@ import io.subutai.core.network.api.Tunnel;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.ResourceHost;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -262,6 +262,48 @@ public class NetworkManagerImpl implements NetworkManager
 
         execute( getManagementHost(),
                 commands.getReserveVniCommand( vni.getVni(), vni.getVlan(), vni.getEnvironmentId() ) );
+    }
+
+
+    @Override
+    public String getVlanDomain( final int vLanId ) throws NetworkManagerException
+    {
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+
+        try
+        {
+            CommandResult result = getManagementHost().execute( commands.getGetVlanDomainCommand( vLanId ) );
+            if ( result.hasSucceeded() )
+            {
+                return result.getStdOut();
+            }
+        }
+        catch ( CommandException e )
+        {
+            throw new NetworkManagerException( e );
+        }
+
+        return null;
+    }
+
+
+    @Override
+    public void removeVlanDomain( final int vLanId ) throws NetworkManagerException
+    {
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+
+        execute( getManagementHost(), commands.getRemoveVlanDomainCommand( vLanId ) );
+    }
+
+
+    @Override
+    public void setVlanDomain( final int vLanId, final String domain ) throws NetworkManagerException
+    {
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ), "Invalid domain" );
+        Preconditions.checkArgument( domain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
+
+        execute( getManagementHost(), commands.getSetVlanDomainCommand( vLanId, domain ) );
     }
 
 
