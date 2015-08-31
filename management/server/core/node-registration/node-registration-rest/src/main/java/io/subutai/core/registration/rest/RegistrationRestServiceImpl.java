@@ -59,8 +59,6 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
 
             Message interceptor = PhaseInterceptorChain.getCurrentMessage();
             HttpServletRequest request = ( HttpServletRequest ) interceptor.get( AbstractHTTPDestination.HTTP_REQUEST );
-            temp.setRestHook( String.format( "%s:%s", request.getRemoteAddr(), temp.getRestHook() ) );
-
             registrationManager.queueRequest( temp );
         }
         catch ( Exception e )
