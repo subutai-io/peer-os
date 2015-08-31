@@ -33,6 +33,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -47,6 +48,7 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.CreateContainerGroupRequest;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.Interface;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.Gateway;
@@ -55,9 +57,11 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostInfoModel;
+import io.subutai.common.peer.InterfacePattern;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.Disposable;
+import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.CpuQuotaInfo;
 import io.subutai.common.quota.DiskPartition;
@@ -978,9 +982,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder(
-                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
-                    bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
+                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1912,6 +1915,91 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public Set<RequestListener> getRequestListeners()
     {
         return Collections.unmodifiableSet( requestListeners );
+    }
+
+
+    private Set<Interface> getInterfacesByIp( final String pattern )
+    {
+        LOG.debug( pattern );
+        Set<Interface> result = new HashSet<>();
+        try
+        {
+            if ( LOG.isDebugEnabled() )
+            {
+                for ( Interface i : getManagementHost().getNetInterfaces() )
+                {
+                    LOG.debug( String.format( "%s %s %s", i.getInterfaceName(), i.getIp(), i.getMac() ) );
+                }
+            }
+            result = Sets.filter( getManagementHost().getNetInterfaces(), new Predicate<Interface>()
+            {
+                @Override
+                public boolean apply( final Interface anInterface )
+                {
+                    if ( LOG.isDebugEnabled() )
+                    {
+                        LOG.debug( String.format( "%s match %s = %s", anInterface.getIp(), pattern,
+                                anInterface.getIp().matches( pattern ) ) );
+                    }
+                    return anInterface.getIp().matches( pattern );
+                }
+            } );
+        }
+        catch ( HostNotFoundException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        return Collections.unmodifiableSet( result );
+    }
+
+
+    private Set<Interface> getInterfacesByName( final String pattern )
+    {
+        LOG.debug( pattern );
+        Set<Interface> result = new HashSet<>();
+        try
+        {
+            result = Sets.filter( getManagementHost().getNetInterfaces(), new Predicate<Interface>()
+            {
+                @Override
+                public boolean apply( final Interface anInterface )
+                {
+                    return anInterface.getInterfaceName().matches( pattern );
+                }
+            } );
+        }
+        catch ( HostNotFoundException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        return result;
+    }
+
+
+    @Override
+    public Set<Interface> getNetworkInterfaces( final InterfacePattern pattern )
+    {
+        if ( "ip".equals( pattern.getField() ) )
+        {
+            return getInterfacesByIp( pattern.getPattern() );
+        }
+        else if ( "name".equals( pattern.getField() ) )
+        {
+            return getInterfacesByName( pattern.getPattern() );
+        }
+        throw new IllegalArgumentException( "Unknown field." );
+    }
+
+
+    @Override
+    public void addToN2NTunnel( final N2NConfig config )
+            throws PeerException
+    {
+        LOG.debug( String.format( "Adding local peer to n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
+                config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
+
+
+        getManagementHost().addToTunnel( config );
     }
 
 
