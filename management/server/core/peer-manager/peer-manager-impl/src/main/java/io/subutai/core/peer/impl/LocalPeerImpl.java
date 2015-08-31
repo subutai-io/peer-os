@@ -1989,6 +1989,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
+    public void addToSubnet( final String superNodeIp, final int n2nPort, final String interfaceName,
+                             final String communityName, final String address, final String sharedKey )
+            throws PeerException
+    {
+        LOG.debug( String.format( "Adding local peer to n2n community: %s:%d %s %s %s", superNodeIp, n2nPort,
+                interfaceName, communityName, address ) );
+
+        getManagementHost().addToSubnet( superNodeIp, n2nPort, interfaceName, communityName, address, sharedKey );
+    }
+
+
+    @Override
     public boolean equals( final Object o )
     {
         if ( this == o )

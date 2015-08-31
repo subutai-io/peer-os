@@ -79,4 +79,7 @@ public interface ManagementHost extends Host
      * Returns external IP of mgmt host
      */
     public String getExternalIp();
+
+    void addToSubnet( String superNodeIp, int n2nPort, String interfaceName, String communityName, String address,
+                      String sharedKey ) throws PeerException;
 }

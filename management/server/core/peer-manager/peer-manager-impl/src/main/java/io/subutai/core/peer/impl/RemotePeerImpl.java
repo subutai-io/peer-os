@@ -1319,6 +1319,15 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public void addToSubnet( final String superNodeIp, final int n2nPort, final String interfaceName,
+                             final String communityName, final String address, final String sharedKey )
+    {
+        LOG.debug( String.format( "Adding remote peer to n2n community: %s:%d %s %s %s", superNodeIp, n2nPort,
+                interfaceName, communityName, address ) );
+    }
+
+
+    @Override
     public boolean equals( final Object o )
     {
         if ( this == o )

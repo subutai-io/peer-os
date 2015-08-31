@@ -81,6 +81,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private static final Logger LOGGER = LoggerFactory.getLogger( EnvironmentManagerImpl.class );
     public static final String PEER_SUBNET_MASK = "255.255.255.0";
     private static final String TRACKER_SOURCE = "Environment Manager";
+    private static final int N2N_PORT = 5000;
 
     private final PeerManager peerManager;
     private final NetworkManager networkManager;
@@ -898,7 +899,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void createTunnel( final Set<Peer> peers )
+    public void createTunnel( final Set<Peer> peers ) throws EnvironmentManagerException
     {
         Set<String> allSubnets = getSubnets( peers );
         if ( LOGGER.isDebugEnabled() )
@@ -910,7 +911,44 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
         }
         String freeSubnet = findFreePeersSubnet( allSubnets );
+
         LOGGER.debug( String.format( "Free subnet for peer: %s", freeSubnet ) );
+        try
+        {
+            if ( freeSubnet == null )
+            {
+                throw new IllegalStateException( "Could not calculate subnet." );
+            }
+            String superNodeIp = peerManager.getLocalPeer().getManagementHost().getExternalIp();
+            String interfaceName = generateInterfaceName( freeSubnet );
+            String communityName = generateCommunityName( freeSubnet );
+            String sharedKey = UUID.randomUUID().toString();
+            SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeSubnet, PEER_SUBNET_MASK ).getInfo();
+            final String[] addresses = subnetInfo.getAllAddresses();
+            int counter = 0;
+            for ( Peer peer : peers )
+            {
+                peer.addToSubnet( superNodeIp, N2N_PORT, interfaceName, communityName, addresses[counter], sharedKey );
+                counter++;
+            }
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new EnvironmentManagerException( "Could not create n2n tunnel.", e );
+        }
+    }
+
+
+    private String generateCommunityName( final String freeSubnet )
+    {
+        return String.format( "com-%s", freeSubnet.replace( ".", "-" ) );
+    }
+
+
+    private String generateInterfaceName( final String freeSubnet )
+    {
+        return String.format( "n2n-%s", freeSubnet.replace( ".", "-" ) );
     }
 
 

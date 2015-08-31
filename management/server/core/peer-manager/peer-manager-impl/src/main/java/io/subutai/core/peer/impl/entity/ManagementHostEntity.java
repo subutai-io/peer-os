@@ -30,6 +30,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandUtil;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.Interface;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.network.Gateway;
@@ -46,6 +49,7 @@ import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.network.api.Tunnel;
 import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.core.peer.api.ResourceHostException;
 import io.subutai.core.peer.impl.tasks.CreateGatewayTask;
 import io.subutai.core.peer.impl.tasks.ReserveVniTask;
 import io.subutai.core.peer.impl.tasks.SetupTunnelsTask;
@@ -71,6 +75,8 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     protected ExecutorService singleThreadExecutorService = SubutaiExecutors.newSingleThreadExecutor();
     @Transient
     protected ServiceLocator serviceLocator = new ServiceLocator();
+    @Transient
+    protected CommandUtil commandUtil = new CommandUtil();
 
 
     protected ManagementHostEntity()
@@ -459,5 +465,27 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         }
 
         throw new PeerException( "No available vlan found" );
+    }
+
+
+    @Override
+    public void addToSubnet( final String superNodeIp, final int n2nPort, final String interfaceName,
+                             final String communityName, final String address, final String sharedKey )
+            throws PeerException
+    {
+        //subutai management_network -N 127.0.0.1 5000 n2n15 timur15 10.1.15.1 string secret
+
+        RequestBuilder requestBuilder = new RequestBuilder(
+                String.format( "subutai management_network -N %s %d %s %s %s string %s", superNodeIp, n2nPort,
+                        interfaceName, communityName, address, sharedKey ) );
+
+        try
+        {
+            commandUtil.execute( requestBuilder, this );
+        }
+        catch ( CommandException e )
+        {
+            throw new PeerException( "Could not add peer to subnet", e );
+        }
     }
 }

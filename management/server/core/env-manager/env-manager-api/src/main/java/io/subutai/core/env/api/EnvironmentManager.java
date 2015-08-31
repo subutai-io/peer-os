@@ -166,5 +166,5 @@ public interface EnvironmentManager
      */
     public void updateEnvironmentContainersMetadata( UUID environmentId ) throws EnvironmentManagerException;
 
-    void createTunnel( Set<Peer> peers );
+    void createTunnel( Set<Peer> peers ) throws EnvironmentManagerException;
 }
