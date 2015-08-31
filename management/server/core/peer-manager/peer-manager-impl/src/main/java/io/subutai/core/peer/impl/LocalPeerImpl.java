@@ -1992,7 +1992,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void addToTunnel( final N2NConfig config )
+    public void addToN2NTunnel( final N2NConfig config )
             throws PeerException
     {
         LOG.debug( String.format( "Adding local peer to n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),

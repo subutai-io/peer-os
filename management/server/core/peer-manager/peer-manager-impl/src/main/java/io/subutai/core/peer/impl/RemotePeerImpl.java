@@ -1338,7 +1338,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void addToTunnel( final N2NConfig config )
+    public void addToN2NTunnel( final N2NConfig config )
     {
         LOG.debug( String.format( "Adding remote peer to n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
                 config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );

@@ -52,7 +52,7 @@ public class CreateTunnelCommand extends OsgiCommandSupport
             System.out.println( String.format( "\tAdding peer %s to tunnel...", peerId ) );
             peerSet.add( peerManager.getPeer( peerId ) );
         }
-        String tunnelNetwork = environmentManager.createTunnel( peerSet );
+        String tunnelNetwork = environmentManager.createN2NTunnel( peerSet );
         System.out.println( "Tunnel created successfully: " + tunnelNetwork );
 
         return null;

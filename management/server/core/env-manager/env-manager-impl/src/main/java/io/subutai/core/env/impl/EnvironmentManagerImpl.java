@@ -900,7 +900,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public String createTunnel( final Set<Peer> peers ) throws EnvironmentManagerException
+    public String createN2NTunnel( final Set<Peer> peers ) throws EnvironmentManagerException
     {
         Set<String> allSubnets = getSubnets( peers );
         if ( LOGGER.isDebugEnabled() )
@@ -929,7 +929,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             int counter = 0;
             for ( Peer peer : peers )
             {
-                peer.addToTunnel(
+                peer.addToN2NTunnel(
                         new N2NConfig( superNodeIp, N2N_PORT, interfaceName, communityName, addresses[counter],
                                 sharedKey ) );
                 counter++;

@@ -396,5 +396,5 @@ public interface Peer
 
     Set<Interface> getNetworkInterfaces( InterfacePattern pattern );
 
-    void addToTunnel( N2NConfig config ) throws PeerException;
+    void addToN2NTunnel( N2NConfig config ) throws PeerException;
 }

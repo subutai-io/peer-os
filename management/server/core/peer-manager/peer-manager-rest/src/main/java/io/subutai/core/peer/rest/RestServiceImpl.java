@@ -1108,7 +1108,7 @@ public class RestServiceImpl implements RestService
         LocalPeer localPeer = peerManager.getLocalPeer();
         try
         {
-            localPeer.addToTunnel( config );
+            localPeer.addToN2NTunnel( config );
             return Response.ok().build();
         }
         catch ( Exception e )
