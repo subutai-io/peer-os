@@ -124,6 +124,7 @@ public class RegistrationManagerImpl implements RegistrationManager
                             requestedHost.getSecret(), requestedHost.getPublicKey(), requestedHost.getRestHook(),
                             RegistrationStatus.REQUESTED, requestedHost.getInterfaces() );
             requestDataService.persist( temp );
+            securityManager.getKeyManager().savePublicKey( temp.getId(), temp.getPublicKey() );
         }
     }
 
@@ -212,7 +213,7 @@ public class RegistrationManagerImpl implements RegistrationManager
 
 
     @Override
-    public ContainerToken verifyToken( final String token ) throws NodeRegistrationException
+    public ContainerToken verifyToken( final String token, String publicKey ) throws NodeRegistrationException
     {
 
         ContainerTokenImpl containerToken = containerTokenDataService.find( token );
@@ -226,6 +227,8 @@ public class RegistrationManagerImpl implements RegistrationManager
         {
             throw new NodeRegistrationException( "Container token expired" );
         }
+
+        securityManager.getKeyManager().savePublicKey( containerToken.getHostId(), publicKey );
 
         return containerToken;
     }

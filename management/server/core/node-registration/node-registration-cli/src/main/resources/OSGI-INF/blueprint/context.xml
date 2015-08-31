@@ -25,8 +25,16 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="node/generate">
-      <action class="io.subutai.core.registration.cli.ListRequests">
+    <command name="node/generate-token">
+      <action class="io.subutai.core.registration.cli.GenerateContainerToken">
+        <argument ref="nodeRegistration" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="node/verify">
+      <action class="io.subutai.core.registration.cli.VerifyContainerToken">
         <argument ref="nodeRegistration" />
       </action>
     </command>

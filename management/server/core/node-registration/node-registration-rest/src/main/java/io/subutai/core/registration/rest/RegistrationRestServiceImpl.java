@@ -16,7 +16,6 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.registration.api.RegistrationManager;
-import io.subutai.core.registration.api.service.ContainerToken;
 import io.subutai.core.registration.api.service.RequestedHost;
 import io.subutai.core.registration.rest.transitional.HostRequest;
 import io.subutai.core.security.api.SecurityManager;
@@ -67,11 +66,11 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
             temp.setRestHook( String.format( "%s:%s", request.getRemoteAddr(), temp.getRestHook() ) );
 
             registrationManager.queueRequest( temp );
-            securityManager.getKeyManager().savePublicKey( temp.getId(), temp.getPublicKey() );
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error decrypting file.", e );
+            return Response.serverError().build();
         }
 
         return Response.ok().build();
@@ -94,16 +93,14 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
                     decryptedMessage.substring( 0, decryptedMessage.indexOf( System.getProperty( "line.separator" ) ) );
             String publicKey = decryptedMessage
                     .substring( decryptedMessage.indexOf( System.getProperty( "line.separator" ) ) + 1 );
-
-            ContainerToken containerToken = registrationManager.verifyToken( token );
-
-            securityManager.getKeyManager().savePublicKey( containerToken.getHostId(), publicKey );
+            registrationManager.verifyToken( token, publicKey );
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error decrypting file.", e );
+            return Response.serverError().build();
         }
 
-        return Response.ok().build();
+        return Response.ok( "Accepted" ).build();
     }
 }

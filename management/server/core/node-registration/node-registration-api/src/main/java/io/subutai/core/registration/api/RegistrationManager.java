@@ -29,6 +29,6 @@ public interface RegistrationManager
 
     public ContainerToken generateContainerTTLToken( String containerHostId, Long ttl );
 
-    public ContainerToken verifyToken( String token ) throws NodeRegistrationException;
+    public ContainerToken verifyToken( String token, String publicKey ) throws NodeRegistrationException;
 
 }

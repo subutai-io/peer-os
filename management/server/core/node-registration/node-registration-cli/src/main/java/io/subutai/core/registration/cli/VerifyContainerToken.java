@@ -19,6 +19,10 @@ public class VerifyContainerToken extends SubutaiShellCommandSupport
     @Argument( index = 0, name = "token", multiValued = false, required = true, description = "Token" )
     private String token;
 
+    @Argument( index = 1, name = "publicKey", multiValued = false, required = true, description = "Container public "
+            + "key" )
+    private String publicKey;
+
     private RegistrationManager registrationManager;
 
 
@@ -33,7 +37,7 @@ public class VerifyContainerToken extends SubutaiShellCommandSupport
     {
         try
         {
-            ContainerToken containerToken = registrationManager.verifyToken( token );
+            ContainerToken containerToken = registrationManager.verifyToken( token, publicKey );
             System.out.println( String.format( "Container id: %s", containerToken.getHostId() ) );
             System.out.println( String.format( "Token       : %s", containerToken.getToken() ) );
         }
