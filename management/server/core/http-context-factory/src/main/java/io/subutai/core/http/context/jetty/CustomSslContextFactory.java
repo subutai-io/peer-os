@@ -88,10 +88,10 @@ public class CustomSslContextFactory extends SslContextFactory
     }
 
 
-    @Override
+    /*@Override
     protected TrustManager[] getTrustManagers( final KeyStore trustStore, final Collection<? extends CRL> crls )
             throws Exception
     {
         return super.getTrustManagers( trustStore, crls );
-    }
+    }*/
 }

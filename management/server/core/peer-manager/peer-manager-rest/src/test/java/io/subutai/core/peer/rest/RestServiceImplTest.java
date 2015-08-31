@@ -30,6 +30,7 @@ import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.RamQuota;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
+import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
@@ -90,6 +91,8 @@ public class RestServiceImplTest
     ContainerHost containerHost;
     @Mock
     ManagementHost managementHost;
+    @Mock
+    HttpContextManager httpContextManager;
 
     RestServiceImpl restService;
 
@@ -97,7 +100,7 @@ public class RestServiceImplTest
     @Before
     public void setUp() throws Exception
     {
-        restService = spy( new RestServiceImpl( peerManager ) );
+        restService = spy( new RestServiceImpl( peerManager, httpContextManager ) );
         restService.jsonUtil = jsonUtil;
         restService.restUtil = restUtil;
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
@@ -264,7 +267,7 @@ public class RestServiceImplTest
 
         restService.unregisterPeer( PEER_ID.toString() );
 
-        //verify( sslContextFactory ).reloadTrustStore();
+        verify( httpContextManager ).reloadTrustStore();
 
         when( peerManager.unregister( PEER_ID.toString() ) ).thenReturn( false );
 
@@ -309,7 +312,7 @@ public class RestServiceImplTest
     {
         restService.approveForRegistrationRequest( JSON, CERT );
 
-        //verify( sslContextFactory ).reloadTrustStore();
+        verify( httpContextManager ).reloadTrustStore();
 
         doThrow( exception ).when( peerManager ).update( peerInfo );
 
@@ -331,7 +334,7 @@ public class RestServiceImplTest
 
         restService.approveForRegistrationRequest( PEER_ID.toString() );
 
-        //verify( sslContextFactory ).reloadTrustStore();
+        verify( httpContextManager ).reloadTrustStore();
 
         doThrow( exception ).when( peerManager ).update( peerInfo );
 

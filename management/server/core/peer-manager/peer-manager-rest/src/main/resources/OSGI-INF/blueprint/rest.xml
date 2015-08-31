@@ -19,10 +19,14 @@
 
   <bean id="peerRestServiceImpl" class="io.subutai.core.peer.rest.RestServiceImpl">
     <argument ref="peerManager" />
+    <argument ref="httpContextManager" />
   </bean>
 
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
+
+  <reference id="httpContextManager" availability="mandatory"
+             interface="io.subutai.core.http.manager.api.HttpContextManager" />
 
 
 </blueprint>
