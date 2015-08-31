@@ -1,4 +1,4 @@
-package io.subutai.core.registration.impl.resource.entity;
+package io.subutai.core.registration.impl.entity;
 
 
 import java.util.Set;
@@ -16,7 +16,7 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.Interface;
-import io.subutai.core.registration.api.resource.host.VirtualHost;
+import io.subutai.core.registration.api.service.VirtualHost;
 
 
 /**

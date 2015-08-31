@@ -1,8 +1,7 @@
-package io.subutai.core.registration.api.resource.host;
+package io.subutai.core.registration.api.service;
 
 
 import java.util.Set;
-import java.util.UUID;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.Interface;

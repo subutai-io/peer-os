@@ -12,9 +12,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.core.registration.api.resource.host.RequestedHost;
-import io.subutai.core.registration.impl.resource.RequestDataService;
-import io.subutai.core.registration.impl.resource.entity.RequestedHostImpl;
+import io.subutai.common.dao.DaoManager;
+import io.subutai.core.registration.api.service.RequestedHost;
+import io.subutai.core.registration.impl.dao.ContainerTokenDataService;
+import io.subutai.core.registration.impl.dao.RequestDataService;
+import io.subutai.core.registration.impl.entity.RequestedHostImpl;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -39,6 +41,12 @@ public class RegistrationManagerImplTest
     RequestDataService requestDataService;
 
     @Mock
+    ContainerTokenDataService containerTokenDataService;
+
+    @Mock
+    DaoManager daoManager;
+
+    @Mock
     SecurityManager securityManager;
 
     RegistrationManagerImpl registrationManager;
@@ -49,7 +57,7 @@ public class RegistrationManagerImplTest
     @Before
     public void setUp() throws Exception
     {
-        registrationManager = new RegistrationManagerImpl( securityManager );
+        registrationManager = new RegistrationManagerImpl( securityManager, daoManager );
         registrationManager.setRequestDataService( requestDataService );
 
         RequestedHostImpl host1 = mock( RequestedHostImpl.class );
