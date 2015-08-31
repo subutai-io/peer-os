@@ -63,4 +63,13 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="env/tunnel">
+      <action class="io.subutai.core.env.cli.CreateTunnelCommand">
+        <argument ref="environmentManager" />
+        <argument ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
 </blueprint>

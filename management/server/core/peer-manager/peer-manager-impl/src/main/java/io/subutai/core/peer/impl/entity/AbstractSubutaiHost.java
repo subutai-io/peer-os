@@ -1,6 +1,7 @@
 package io.subutai.core.peer.impl.entity;
 
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -181,7 +182,7 @@ public abstract class AbstractSubutaiHost implements Host
     @Override
     public Set<Interface> getNetInterfaces()
     {
-        return this.interfaces;
+        return Collections.unmodifiableSet( this.interfaces );
     }
 
 
