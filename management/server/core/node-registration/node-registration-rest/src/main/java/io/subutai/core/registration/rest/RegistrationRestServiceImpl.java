@@ -2,6 +2,7 @@ package io.subutai.core.registration.rest;
 
 
 import java.io.InputStream;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
@@ -13,7 +14,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
-import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.service.RequestedHost;
@@ -44,7 +44,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     @Override
     public Response getPublicKey()
     {
-        return Response.ok( securityManager.getKeyManager().getPeerPublicKeyring() ).build();
+        return Response.ok( securityManager.getKeyManager().getPublicKeyRingAsASCII( null ) ).build();
     }
 
 
@@ -53,11 +53,10 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     {
         EncryptionTool encryptionTool = securityManager.getEncryptionTool();
         KeyManager keyManager = securityManager.getKeyManager();
-        InputStream secretKey = PGPEncryptionUtil.getFileInputStream( keyManager.getSecretKeyringFile() );
 
-        byte[] decrypted = encryptionTool.decrypt( message.getBytes(), secretKey, keyManager.getSecretKeyringPwd() );
         try
         {
+            byte[] decrypted = encryptionTool.decrypt( message.getBytes() );
             String decryptedMessage = new String( decrypted, "UTF-8" );
             RequestedHost temp = JsonUtil.fromJson( decryptedMessage, HostRequest.class );
 

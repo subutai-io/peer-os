@@ -39,13 +39,17 @@
 
   <bean id="securityManager" scope="singleton" init-method="init" destroy-method="destroy"
         class="io.subutai.core.security.impl.SecurityManagerImpl">
+
+    <argument value="$[subutaiAppDataPath]/keystores/${secretKeyringFile}" />
+    <argument value="$[subutaiAppDataPath]/keystores/${publicKeyringFile}" />
+    <argument value="${secretKeyringPwd}" />
+    <argument value="${managementHostKeyFingerprint}" />
+
     <property name="daoManager" ref="daoSecurityManager" />
     <property name="keyServer"  ref="keyServer" />
     <property name="peerManager"  ref="peerManager" />
-    <property name="secretKeyringFile" value="$[subutaiAppDataPath]/keystores/${secretKeyringFile}" />
-    <property name="publicKeyringFile" value="$[subutaiAppDataPath]/keystores/${publicKeyringFile}" />
-    <property name="secretKeyringPwd" value="${secretKeyringPwd}" />
-    <property name="manHostKeyFingerprint" value="${managementHostKeyFingerprint}" />
+
+
   </bean>
 
   <!-- ************************************************************************************************** -->

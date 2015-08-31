@@ -5,10 +5,10 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.keyserver.api.KeyServer;
@@ -240,7 +240,7 @@ public class KeyServerRestImpl implements KeyServerRest
 
             if(securityKey!=null)
             {
-                return Response.ok( PGPKeyUtil.exportAscii( keyServer.convertKey(securityKey))).build();
+                return Response.ok( PGPEncryptionUtil.armorByteArrayToString( securityKey.getKeyData() )).build();
             }
             else
             {

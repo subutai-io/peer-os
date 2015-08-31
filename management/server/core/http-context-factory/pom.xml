@@ -1,36 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <artifactId>http-context-manager</artifactId>
+    <artifactId>mgmt-server-core-parent</artifactId>
     <groupId>io.subutai</groupId>
     <version>2.0.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>http-context-manager-impl</artifactId>
+  <artifactId>http-context-factory</artifactId>
+  <name>Subutai HTTP Context factory</name>
+  <description>Subutai HTTP Context factory</description>
   <packaging>bundle</packaging>
-  <name>Subutai HTTP Context Manager Impl</name>
-  <description>Subutai HTTP Context Manager Impl</description>
-
-  <properties>
-    <servlet.spec.groupId>javax.servlet</servlet.spec.groupId>
-    <servlet.spec.artifactId>javax.servlet-api</servlet.spec.artifactId>
-    <servlet.spec.version>3.1.0</servlet.spec.version>
-    <dependency.fileinstall.version>4.2.1</dependency.fileinstall.version>
-  </properties>
-
   <dependencies>
 
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
-
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>http-context-manager-api</artifactId>
+      <groupId>org.eclipse.jetty.aggregate</groupId>
+      <artifactId>jetty-all-server</artifactId>
+      <version>8.1.15.v20140411</version>
     </dependency>
 
     <dependency>
@@ -71,10 +63,20 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.core.http.manager.impl</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.http.context</Bundle-SymbolicName>
             <Import-Package>*</Import-Package>
-            <Export-Package>*;
-              {local-packages};version=${project.version};</Export-Package>
+            <Fragment-Host>org.ops4j.pax.web.pax-web-jetty</Fragment-Host>
+            <Export-Package>
+              sun.security.validator.KeyStores;
+              sun.security.validator;
+              javax.net.ssl.SSLContext;
+              javax.net.ssl.SSLEngine;
+              javax.net.ssl.SSLServerSocket;
+              javax.net.ssl.SSLSocket;
+              org.eclipse.jetty.util.security.CertificateValidator;
+              org.eclipse.jetty.util.security.Password;
+              {local-packages};version=${project.version};-noimport:=true
+            </Export-Package>
           </instructions>
         </configuration>
       </plugin>
