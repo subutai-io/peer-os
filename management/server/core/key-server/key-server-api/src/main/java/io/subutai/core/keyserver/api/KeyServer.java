@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
 
 import io.subutai.core.keyserver.api.dao.KeyServerDAO;
 import io.subutai.core.keyserver.api.model.SecurityKey;
@@ -21,12 +22,6 @@ public interface KeyServer
      * Get DAO object
      */
     public KeyServerDAO getKeyServerDAO();
-
-
-    /********************************
-     * Set DAO object
-     */
-    public void setKeyServerDAO( KeyServerDAO keyServerDAO );
 
 
     /********************************
@@ -84,27 +79,27 @@ public interface KeyServer
     /********************************
      * Saves the given public key.
      *
-     * @param publicKey to save
+     * @param publicKeyRing to save
      */
-    public void addSecurityKey( PGPPublicKey publicKey ) throws PGPException, IOException;
+    public void addSecurityKey( PGPPublicKeyRing publicKeyRing ) throws PGPException, IOException;
 
 
     /********************************
-     * Saves the given public key.
+     * Saves the given public keyring.
      *
-     * @param key to save
+     * @param keyRing to save
      */
-    public PGPPublicKey addPublicKey( String key ) throws PGPException, IOException;
-
+    public PGPPublicKeyRing addPublicKeyRing( String keyRing ) throws PGPException, IOException;
 
     /********************************
      * Saves the given public key.
      *
      * @param keyId to save
      * @param fingerprint to save
-     * @param keyData to save
+     * @param keyRingData to save
      */
-    public void saveSecurityKey( String keyId,String fingerprint,short keyType,byte[] keyData);
+    public void saveSecurityKey( String keyId,String fingerprint,short keyType,byte[] keyRingData);
+
 
     /********************************
      * Saves the given public key.
@@ -112,6 +107,7 @@ public interface KeyServer
      * @param securityKey to save
      */
     public void saveSecurityKey( SecurityKey securityKey );
+
 
     /********************************
      * Deletes the given public key.
@@ -128,20 +124,5 @@ public interface KeyServer
      */
     public void removeSecurityKeyByKeyId( String keyId );
 
-
-    /********************************
-     * converts SecurityKey entity to the PGPPublicKey
-     *
-     * @param securityKey
-     */
-    public PGPPublicKey convertKey( SecurityKey securityKey ) throws PGPException;
-
-
-    /********************************
-     * converts SecurityKey entity to ASCII Armored
-     *
-     * @param keyId
-     */
-    public String getSecurityKeyAsASCII( String keyId ) throws PGPException;
 
 }

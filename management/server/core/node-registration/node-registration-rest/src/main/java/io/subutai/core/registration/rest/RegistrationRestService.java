@@ -9,18 +9,20 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 
-/**
- * Created by talas on 8/25/15.
- */
 public interface RegistrationRestService
 {
     @GET
     @Path( "public-key" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( { MediaType.TEXT_PLAIN } )
     public Response getPublicKey();
 
     @POST
     @Path( "public-key" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+
     public Response registerPublicKey( String message );
+
+    @POST
+    @Path( "verify/container-token" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response verifyContainerToken( String message );
 }

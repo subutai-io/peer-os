@@ -50,6 +50,7 @@ import io.subutai.core.hostregistry.api.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
@@ -182,6 +183,8 @@ public class LocalPeerImplTest
     ResourceHostInfo resourceHostInfo;
     @Mock
     DaoManager daoManager;
+    @Mock
+    HttpContextManager httpContextManager;
 
     LocalPeerImpl localPeer;
 
@@ -191,7 +194,7 @@ public class LocalPeerImplTest
     {
         localPeer =
                 spy( new LocalPeerImpl( daoManager, templateRegistry, quotaManager, strategyManager, commandExecutor,
-                        hostRegistry, monitor ) );
+                        hostRegistry, monitor,httpContextManager ) );
 
         localPeer.containerHostDataService = containerHostDataService;
         localPeer.containerGroupDataService = containerGroupDataService;
@@ -1189,6 +1192,23 @@ public class LocalPeerImplTest
         localPeer.setupTunnels( Sets.newHashSet( IP ), ENVIRONMENT_ID );
 
         verify( managementHost ).setupTunnels( Sets.newHashSet( IP ), ENVIRONMENT_ID );
+    }
+
+    @Test
+    public void testImportCertificate() throws Exception
+    {
+        localPeer.importCertificate( CERT, ALIAS );
+
+        verify( httpContextManager ).reloadTrustStore();
+    }
+
+
+    @Test
+    public void testExportEnvironmentCertificate() throws Exception
+    {
+        localPeer.exportEnvironmentCertificate( ENVIRONMENT_ID );
+
+        verify( httpContextManager ).reloadKeyStore();
     }
 
     @Test

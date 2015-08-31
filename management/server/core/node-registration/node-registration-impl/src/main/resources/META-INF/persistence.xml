@@ -6,9 +6,10 @@
   <persistence-unit name="nodeRegistrationUnit" transaction-type="RESOURCE_LOCAL">
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/subutaiDS)
     </non-jta-data-source>
-    <class>io.subutai.core.registration.impl.resource.entity.HostInterface</class>
-    <class>io.subutai.core.registration.impl.resource.entity.RequestedHostImpl</class>
-    <class>io.subutai.core.registration.impl.resource.entity.VirtualHostImpl</class>
+    <class>io.subutai.core.registration.impl.entity.HostInterface</class>
+    <class>io.subutai.core.registration.impl.entity.ContainerTokenImpl</class>
+    <class>io.subutai.core.registration.impl.entity.RequestedHostImpl</class>
+    <class>io.subutai.core.registration.impl.entity.VirtualHostImpl</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <!--<property name="openjpa.Log" value="DefaultLevel=WARN, Runtime=TRACE, Tool=INFO, SQL=TRACE" /> -->

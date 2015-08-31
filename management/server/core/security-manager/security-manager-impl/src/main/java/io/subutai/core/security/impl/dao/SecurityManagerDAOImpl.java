@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.security.api.dao.SecurityManagerDAO;
 import io.subutai.core.security.api.model.SecurityKeyIdentity;
-import io.subutai.core.security.impl.model.SecurityKeyIndetityEntity;
+import io.subutai.core.security.impl.model.SecurityKeyIdentityEntity;
 
 
 /**
@@ -41,7 +41,7 @@ public class SecurityManagerDAOImpl implements SecurityManagerDAO
 
         try
         {
-            SecurityKeyIdentity securityKeyIdentity = em.find( SecurityKeyIndetityEntity.class, hostId );
+            SecurityKeyIdentity securityKeyIdentity = em.find( SecurityKeyIdentityEntity.class, hostId );
 
             return securityKeyIdentity;
         }
@@ -82,7 +82,7 @@ public class SecurityManagerDAOImpl implements SecurityManagerDAO
 
         try
         {
-            SecurityKeyIdentity securityKeyIdentity = new SecurityKeyIndetityEntity();
+            SecurityKeyIdentity securityKeyIdentity = new SecurityKeyIdentityEntity();
 
             daoManager.startTransaction( em );
 

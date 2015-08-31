@@ -2,6 +2,8 @@ package io.subutai.core.env.impl;
 
 
 import java.sql.SQLException;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -18,12 +20,15 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.Interface;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.InterfacePattern;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.env.api.EnvironmentEventListener;
@@ -46,7 +51,8 @@ import io.subutai.core.env.impl.exception.ResultHolder;
 import io.subutai.core.env.impl.tasks.DestroyContainerTask;
 import io.subutai.core.env.impl.tasks.DestroyEnvironmentTask;
 import io.subutai.core.env.impl.tasks.GrowEnvironmentTask;
-
+import io.subutai.core.env.impl.tasks.SetDomainTask;
+import io.subutai.core.env.impl.tasks.SetSshKeyTask;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.User;
 import io.subutai.core.network.api.NetworkManager;
@@ -57,6 +63,10 @@ import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.tracker.api.Tracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -70,7 +80,9 @@ import com.google.common.collect.Sets;
 public class EnvironmentManagerImpl implements EnvironmentManager
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( EnvironmentManagerImpl.class );
+    public static final String PEER_SUBNET_MASK = "255.255.255.0";
     private static final String TRACKER_SOURCE = "Environment Manager";
+    private static final int N2N_PORT = 5000;
 
     private final PeerManager peerManager;
     private final NetworkManager networkManager;
@@ -733,6 +745,126 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    /** domain functions ** */
+
+    @Override
+    public void removeDomain( final UUID environmentId, final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Setting environment %s domain", environmentId ) );
+
+        removeDomain( environmentId, op, async, true );
+    }
+
+
+    public void removeDomain( final UUID environmentId, final TrackerOperation op, final boolean async,
+                              boolean checkAccess )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+
+        final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
+
+        SetDomainTask setDomainTask = new SetDomainTask( environment, peerManager, resultHolder, op, null );
+
+        executor.submit( setDomainTask );
+
+        if ( !async )
+        {
+            try
+            {
+                setDomainTask.waitCompletion();
+
+                if ( resultHolder.getResult() != null )
+                {
+                    throw resultHolder.getResult();
+                }
+            }
+            catch ( InterruptedException e )
+            {
+                throw new EnvironmentModificationException( e );
+            }
+        }
+    }
+
+
+    @Override
+    public void assignDomain( final UUID environmentId, final String newDomain, final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Assigning environment %s domain", environmentId ) );
+
+        assignDomain( environmentId, op, newDomain, async, true );
+    }
+
+
+    public void assignDomain( final UUID environmentId, final TrackerOperation op, final String newDomain,
+                              final boolean async, final boolean checkAccess )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newDomain ), "Invalid domain" );
+        Preconditions.checkArgument( newDomain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+
+        final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
+
+        SetDomainTask setDomainTask = new SetDomainTask( environment, peerManager, resultHolder, op, newDomain );
+
+        executor.submit( setDomainTask );
+
+        if ( !async )
+        {
+            try
+            {
+                setDomainTask.waitCompletion();
+
+                if ( resultHolder.getResult() != null )
+                {
+                    throw resultHolder.getResult();
+                }
+            }
+            catch ( InterruptedException e )
+            {
+                throw new EnvironmentModificationException( e );
+            }
+        }
+    }
+
+
+    @Override
+    public String getDomain( final UUID environmentId ) throws EnvironmentManagerException, EnvironmentNotFoundException
+    {
+        return getDomain( environmentId, true );
+    }
+
+
+    public String getDomain( final UUID environmentId, final boolean checkAccess )
+            throws EnvironmentManagerException, EnvironmentNotFoundException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+
+        try
+        {
+            return peerManager.getLocalPeer().getVniDomain( environment.getVni() );
+        }
+        catch ( PeerException e )
+        {
+            throw new EnvironmentManagerException( "Error obtaining environment domain", e );
+        }
+    }
+
+
+    /** domain functions ** */
+
+
     public void registerListener( final EnvironmentEventListener listener )
     {
         if ( listener != null )
@@ -884,5 +1016,115 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             throw new EnvironmentSecurityException(
                     String.format( "Access to environment %s is denied", environment.getName() ) );
         }
+    }
+
+
+    @Override
+    public String createN2NTunnel( final Set<Peer> peers ) throws EnvironmentManagerException
+    {
+        Set<String> allSubnets = getSubnets( peers );
+        if ( LOGGER.isDebugEnabled() )
+        {
+            LOGGER.debug( String.format( "Found %d peer subnets:", allSubnets.size() ) );
+            for ( String s : allSubnets )
+            {
+                LOGGER.debug( s );
+            }
+        }
+        String freeSubnet = findFreePeersSubnet( allSubnets );
+
+        LOGGER.debug( String.format( "Free subnet for peer: %s", freeSubnet ) );
+        try
+        {
+            if ( freeSubnet == null )
+            {
+                throw new IllegalStateException( "Could not calculate subnet." );
+            }
+            String superNodeIp = peerManager.getLocalPeer().getManagementHost().getExternalIp();
+            String interfaceName = generateInterfaceName( freeSubnet );
+            String communityName = generateCommunityName( freeSubnet );
+            String sharedKey = UUID.randomUUID().toString();
+            SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeSubnet, PEER_SUBNET_MASK ).getInfo();
+            final String[] addresses = subnetInfo.getAllAddresses();
+            int counter = 0;
+            for ( Peer peer : peers )
+            {
+                peer.addToN2NTunnel(
+                        new N2NConfig( superNodeIp, N2N_PORT, interfaceName, communityName, addresses[counter],
+                                sharedKey ) );
+                counter++;
+            }
+            return freeSubnet;
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new EnvironmentManagerException( "Could not create n2n tunnel.", e );
+        }
+    }
+
+
+    private String generateCommunityName( final String freeSubnet )
+    {
+        return String.format( "com-%s", freeSubnet.replace( ".", "-" ) );
+    }
+
+
+    private String generateInterfaceName( final String freeSubnet )
+    {
+        return String.format( "n2n-%s", freeSubnet.replace( ".", "-" ) );
+    }
+
+
+    private String findFreePeersSubnet( final Set<String> allSubnets )
+    {
+        String result = null;
+        int i = 11;
+        int j = 0;
+
+        while ( result == null && i < 254 )
+        {
+            String s = String.format( "10.%d.%d.0", i, j );
+            if ( !allSubnets.contains( s ) )
+            {
+                result = s;
+            }
+
+            j++;
+            if ( j > 254 )
+            {
+                i++;
+                j = 0;
+            }
+        }
+
+        return result;
+    }
+
+
+    private Set<String> getSubnets( final Set<Peer> allPeers )
+    {
+        Set<String> allSubnets = new HashSet<>();
+
+        InterfacePattern peerSubnetsPattern = new InterfacePattern( "ip", "^10.*" );
+        for ( Peer peer : allPeers )
+        {
+            Set<Interface> r = peer.getNetworkInterfaces( peerSubnetsPattern );
+
+            Collection peerSubnets = CollectionUtils.collect( r, new Transformer()
+            {
+                @Override
+                public Object transform( final Object o )
+                {
+                    Interface i = ( Interface ) o;
+                    SubnetUtils u = new SubnetUtils( i.getIp(), PEER_SUBNET_MASK );
+                    return u.getInfo().getNetworkAddress();
+                }
+            } );
+
+            allSubnets.addAll( peerSubnets );
+        }
+
+        return allSubnets;
     }
 }

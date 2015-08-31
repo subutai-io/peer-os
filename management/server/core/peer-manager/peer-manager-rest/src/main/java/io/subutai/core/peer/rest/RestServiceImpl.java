@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -22,6 +23,7 @@ import com.google.common.base.Preconditions;
 import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.Interface;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
@@ -30,6 +32,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.PeerStatus;
+import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
@@ -40,23 +43,26 @@ import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.UUIDUtil;
+import io.subutai.common.peer.InterfacePattern;
+import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-
 
 
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
     private PeerManager peerManager;
+    private HttpContextManager httpContextManager;
     protected JsonUtil jsonUtil = new JsonUtil();
     protected RestUtil restUtil = new RestUtil();
 
 
-    public RestServiceImpl( final PeerManager peerManager )
+    public RestServiceImpl( final PeerManager peerManager, HttpContextManager httpContextManager )
     {
         this.peerManager = peerManager;
+        this.httpContextManager = httpContextManager;
     }
 
 
@@ -280,7 +286,7 @@ public class RestServiceImpl implements RestService
                 keyStoreManager.deleteEntry( keyStore, keyStoreData );
                 //***********************************************************************
 
-                //sslContextFactory.reloadTrustStore();
+                httpContextManager.reloadTrustStore();
 
                 return Response.ok( "Successfully unregistered peer: " + peerId ).build();
             }
@@ -384,7 +390,7 @@ public class RestServiceImpl implements RestService
             String hexCert = myKeyStoreManager.exportCertificateHEXString( myKeyStore, myKeyStoreData );
             //***********************************************************************
 
-            //sslContextFactory.reloadTrustStore();
+            httpContextManager.reloadTrustStore();
 
             return Response.ok( hexCert ).build();
         }
@@ -456,7 +462,7 @@ public class RestServiceImpl implements RestService
                     keyStoreManager.importCertificateHEXString( keyStore, keyStoreData );
                     //***********************************************************************
 
-                    //sslContextFactory.reloadTrustStore();
+                    httpContextManager.reloadTrustStore();
 
                     remotePeer.setStatus( PeerStatus.APPROVED );
 
@@ -1077,6 +1083,37 @@ public class RestServiceImpl implements RestService
         {
             LOGGER.error( "Error removing environment certificate #removeEnvironmentCert", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.getMessage() ).build();
+        }
+    }
+
+
+    @Override
+    public Set<Interface> getNetworkInterfaces( final InterfacePattern request )
+    {
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        try
+        {
+            return localPeer.getNetworkInterfaces( request );
+        }
+        catch ( Exception e )
+        {
+            throw new WebApplicationException( e );
+        }
+    }
+
+
+    @Override
+    public Response addToTunnel( final N2NConfig config )
+    {
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        try
+        {
+            localPeer.addToN2NTunnel( config );
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            throw new WebApplicationException( e );
         }
     }
 }

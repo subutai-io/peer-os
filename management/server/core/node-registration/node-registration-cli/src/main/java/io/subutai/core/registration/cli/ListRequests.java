@@ -7,7 +7,7 @@ import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.registration.api.RegistrationManager;
-import io.subutai.core.registration.api.resource.host.RequestedHost;
+import io.subutai.core.registration.api.service.RequestedHost;
 
 
 /**

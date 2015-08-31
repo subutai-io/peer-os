@@ -4,6 +4,7 @@ package io.subutai.common.util;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyStore;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Response;
@@ -13,6 +14,7 @@ import io.subutai.common.security.crypto.keystore.KeyStoreData;
 import io.subutai.common.security.crypto.keystore.KeyStoreManager;
 import io.subutai.common.security.crypto.ssl.SSLManager;
 import io.subutai.common.settings.ChannelSettings;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +34,45 @@ public class RestUtil
     private static long defaultReceiveTimeout = 1000 * 60 * 5;
     private static long defaultConnectionTimeout = 1000 * 60;
     private static int defaultMaxRetransmits = 3;
+
+
+    public WebClient createTrustedWebClientWithAuthAndProviders( final String url, final String alias,
+                                                     final List<Object> providers )
+    {
+        WebClient client = WebClient.create( url, providers );
+        HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
+
+        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+        httpClientPolicy.setConnectionTimeout( defaultConnectionTimeout );
+        httpClientPolicy.setReceiveTimeout( defaultReceiveTimeout );
+        httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
+
+        httpConduit.setClient( httpClientPolicy );
+
+        KeyStoreManager keyStoreManager = new KeyStoreManager();
+        KeyStoreData keyStoreData = new KeyStoreData();
+        keyStoreData.setupKeyStorePx2();
+        keyStoreData.setAlias( alias );
+        KeyStore keyStore = keyStoreManager.load( keyStoreData );
+
+        LOG.debug( String.format( "Getting keyStore with alias: %s for url: %s", alias, url ) );
+        LOG.debug( String.format( "KeyStore: %s", keyStore.toString() ) );
+
+        KeyStoreData trustStoreData = new KeyStoreData();
+        trustStoreData.setupTrustStorePx2();
+        KeyStore trustStore = keyStoreManager.load( trustStoreData );
+
+        SSLManager sslManager = new SSLManager( keyStore, keyStoreData, trustStore, trustStoreData );
+
+        TLSClientParameters tlsClientParameters = new TLSClientParameters();
+        tlsClientParameters.setDisableCNCheck( true );
+        tlsClientParameters.setTrustManagers( sslManager.getClientTrustManagers() );
+        tlsClientParameters.setKeyManagers( sslManager.getClientKeyManagers() );
+        tlsClientParameters.setCertAlias( alias );
+        httpConduit.setTlsClientParameters( tlsClientParameters );
+
+        return client;
+    }
 
 
     public static enum RequestType

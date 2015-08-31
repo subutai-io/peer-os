@@ -1,7 +1,6 @@
 package io.subutai.common.security.crypto.pgp;
 
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -80,8 +79,6 @@ import org.bouncycastle.openpgp.operator.jcajce.JcePublicKeyDataDecryptorFactory
 import org.bouncycastle.openpgp.operator.jcajce.JcePublicKeyKeyEncryptionMethodGenerator;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.util.io.Streams;
-
-import com.google.common.base.Objects;
 
 
 /**
@@ -558,99 +555,34 @@ public class PGPEncryptionUtil
     }
 
 
-    public static KeyRef generateKeyPair( String userId, String secretPwd, OutputStream newPublicKeyRing,
-                                          OutputStream newSecretKeyRing ) throws PGPException
+    public static KeyPair generateKeyPair( String userId, String secretPwd, boolean armored ) throws PGPException
     {
         try
         {
-            KeyRef keyRef = new KeyRef();
-            PGPKeyRingGenerator krgen = generateKeyRingGenerator( userId, secretPwd, keyRef );
+            KeyPair keyPair = new KeyPair();
 
-            // Generate public key ring, dump to file.
+            PGPKeyRingGenerator krgen = generateKeyRingGenerator( userId, secretPwd, keyPair );
+
+            // Generate public key ring
             PGPPublicKeyRing pkr = krgen.generatePublicKeyRing();
-            BufferedOutputStream pubout = new BufferedOutputStream( newPublicKeyRing );
-            //        System.out.println( Long.toHexString( pkr.getPublicKey().getKeyID() ) );
-            pkr.encode( pubout );
-            pubout.close();
+            ByteArrayOutputStream pubOut = new ByteArrayOutputStream();
+            pkr.encode( pubOut );
+            pubOut.close();
 
-            // Generate private key, dump to file.
+            // Generate private key
             PGPSecretKeyRing skr = krgen.generateSecretKeyRing();
-            BufferedOutputStream secout = new BufferedOutputStream( newSecretKeyRing );
-            skr.encode( secout );
-            secout.close();
+            ByteArrayOutputStream secOut = new ByteArrayOutputStream();
+            skr.encode( secOut );
+            secOut.close();
 
-            return keyRef;
+            keyPair.setPubKeyring( armored ? armorByteArray( pubOut.toByteArray() ) : pubOut.toByteArray() );
+            keyPair.setSecKeyring( armored ? armorByteArray( secOut.toByteArray() ) : secOut.toByteArray() );
+
+            return keyPair;
         }
         catch ( Exception e )
         {
             throw new PGPException( "Error in generateKeyPair", e );
-        }
-    }
-
-
-    public static class KeyRef
-    {
-        private String signingKeyId;
-        private String signingKeyFingerprint;
-        private String encryptingKeyId;
-        private String encryptingKeyFingerprint;
-
-
-        public void setSigningKeyId( final String signingKeyId )
-        {
-            this.signingKeyId = signingKeyId;
-        }
-
-
-        public void setSigningKeyFingerprint( final String signingKeyFingerprint )
-        {
-            this.signingKeyFingerprint = signingKeyFingerprint;
-        }
-
-
-        public String getSigningKeyId()
-        {
-            return signingKeyId;
-        }
-
-
-        public String getSigningKeyFingerprint()
-        {
-            return signingKeyFingerprint;
-        }
-
-
-        public String getEncryptingKeyId()
-        {
-            return encryptingKeyId;
-        }
-
-
-        public void setEncryptingKeyId( final String encryptingKeyId )
-        {
-            this.encryptingKeyId = encryptingKeyId;
-        }
-
-
-        public String getEncryptingKeyFingerprint()
-        {
-            return encryptingKeyFingerprint;
-        }
-
-
-        public void setEncryptingKeyFingerprint( final String encryptingKeyFingerprint )
-        {
-            this.encryptingKeyFingerprint = encryptingKeyFingerprint;
-        }
-
-
-        @Override
-        public String toString()
-        {
-            return Objects.toStringHelper( this ).add( "signingKeyId", signingKeyId )
-                          .add( "signingKeyFingerprint", signingKeyFingerprint )
-                          .add( "encryptingKeyId", encryptingKeyId )
-                          .add( "encryptingKeyFingerprint", encryptingKeyFingerprint ).toString();
         }
     }
 
@@ -934,13 +866,14 @@ public class PGPEncryptionUtil
     }
 
 
-    private static PGPLiteralData asLiteral( final byte[] message, final InputStream secretKeyRingPath,
+    private static PGPLiteralData asLiteral( final byte[] message, final InputStream secretKeyRing,
                                              final String secretPwd ) throws IOException, PGPException
     {
         PGPPrivateKey key = null;
         PGPPublicKeyEncryptedData encrypted = null;
         final PGPSecretKeyRingCollection keys =
-                new PGPSecretKeyRingCollection( ( secretKeyRingPath ), new JcaKeyFingerprintCalculator() );
+                new PGPSecretKeyRingCollection( PGPUtil.getDecoderStream( secretKeyRing ),
+                        new JcaKeyFingerprintCalculator() );
         for ( final Iterator<PGPPublicKeyEncryptedData> i = getEncryptedObjects( message );
               ( key == null ) && i.hasNext(); )
         {
@@ -1051,8 +984,8 @@ public class PGPEncryptionUtil
             throws IOException, PGPException
     {
 
-        PGPPublicKeyRingCollection keyrings =
-                new PGPPublicKeyRingCollection( publicKeyRing, new JcaKeyFingerprintCalculator() );
+        PGPPublicKeyRingCollection keyrings = new PGPPublicKeyRingCollection( PGPUtil.getDecoderStream( publicKeyRing ),
+                new JcaKeyFingerprintCalculator() );
 
         Iterator<PGPPublicKeyRing> it = keyrings.getKeyRings();
         while ( it.hasNext() )
@@ -1093,8 +1026,8 @@ public class PGPEncryptionUtil
             throws IOException, PGPException
     {
 
-        PGPSecretKeyRingCollection keyrings =
-                new PGPSecretKeyRingCollection( secretKeyRing, new JcaKeyFingerprintCalculator() );
+        PGPSecretKeyRingCollection keyrings = new PGPSecretKeyRingCollection( PGPUtil.getDecoderStream( secretKeyRing ),
+                new JcaKeyFingerprintCalculator() );
 
         Iterator<PGPSecretKeyRing> it = keyrings.getKeyRings();
         while ( it.hasNext() )
@@ -1131,10 +1064,10 @@ public class PGPEncryptionUtil
     }
 
 
-    private static PGPKeyRingGenerator generateKeyRingGenerator( String userId, String secretPwd, KeyRef keyRef )
+    private static PGPKeyRingGenerator generateKeyRingGenerator( String userId, String secretPwd, KeyPair keyPair )
             throws Exception
     {
-        return generateKeyRingGenerator( userId, secretPwd.toCharArray(), 0xc0, keyRef );
+        return generateKeyRingGenerator( userId, secretPwd.toCharArray(), 0xc0, 2048, keyPair );
     }
 
     // Note: s2kcount is a number between 0 and 0xff that controls the
@@ -1151,8 +1084,8 @@ public class PGPEncryptionUtil
     // default -- about 130,000 iterations.
 
 
-    private static PGPKeyRingGenerator generateKeyRingGenerator( String id, char[] pass, int s2kcount, KeyRef keyRef )
-            throws Exception
+    private static PGPKeyRingGenerator generateKeyRingGenerator( String id, char[] pass, int s2kcount, int keySize,
+                                                                 KeyPair keyPair ) throws Exception
     {
         // This object generates individual key-pairs.
         RSAKeyPairGenerator kpg = new RSAKeyPairGenerator();
@@ -1160,17 +1093,17 @@ public class PGPEncryptionUtil
         // Boilerplate RSA parameters, no need to change anything
         // except for the RSA key-size (2048). You can use whatever
         // key-size makes sense for you -- 4096, etc.
-        kpg.init( new RSAKeyGenerationParameters( BigInteger.valueOf( 0x10001 ), new SecureRandom(), 2048, 12 ) );
+        kpg.init( new RSAKeyGenerationParameters( BigInteger.valueOf( 0x10001 ), new SecureRandom(), keySize, 12 ) );
 
         // First create the master (signing) key with the generator.
         PGPKeyPair rsakp_sign = new BcPGPKeyPair( PGPPublicKey.RSA_SIGN, kpg.generateKeyPair(), new Date() );
         // Then an encryption subkey.
-        PGPKeyPair rsakp_enc = new BcPGPKeyPair( PGPPublicKey.RSA_ENCRYPT, kpg.generateKeyPair(), new Date() );
+        PGPKeyPair rsakp_enc = new BcPGPKeyPair( PGPPublicKey.RSA_GENERAL, kpg.generateKeyPair(), new Date() );
 
-        keyRef.setSigningKeyId( Long.toHexString( rsakp_sign.getKeyID() ) );
-        keyRef.setSigningKeyFingerprint( BytesToHex( rsakp_sign.getPublicKey().getFingerprint() ) );
-        keyRef.setEncryptingKeyId( Long.toHexString( rsakp_enc.getKeyID() ) );
-        keyRef.setEncryptingKeyFingerprint( BytesToHex( rsakp_enc.getPublicKey().getFingerprint() ) );
+        keyPair.setPrimaryKeyId( Long.toHexString( rsakp_sign.getKeyID() ) );
+        keyPair.setPrimaryKeyFingerprint( BytesToHex( rsakp_sign.getPublicKey().getFingerprint() ) );
+        keyPair.setSubKeyId( Long.toHexString( rsakp_enc.getKeyID() ) );
+        keyPair.setSubKeyFingerprint( BytesToHex( rsakp_enc.getPublicKey().getFingerprint() ) );
 
         // Add a self-signature on the id
         PGPSignatureSubpacketGenerator signhashgen = new PGPSignatureSubpacketGenerator();
@@ -1204,14 +1137,13 @@ public class PGPEncryptionUtil
         // versions use a default of 0x60.
         //        PBESecretKeyEncryptor pske = ( new BcPBESecretKeyEncryptorBuilder( PGPEncryptedData.AES_256 ) )
         // .build( pass );
-
         PBESecretKeyEncryptor pske =
                 ( new BcPBESecretKeyEncryptorBuilder( PGPEncryptedData.AES_256, sha256Calc, s2kcount ) ).build( pass );
         // Finally, create the keyring itself. The constructor
         // takes parameters that allow it to generate the self
         // signature.
         PGPKeyRingGenerator keyRingGen =
-                new PGPKeyRingGenerator( PGPSignature.POSITIVE_CERTIFICATION, rsakp_sign, id, sha1Calc,
+                new PGPKeyRingGenerator( PGPSignature.DEFAULT_CERTIFICATION, rsakp_sign, id, sha1Calc,
                         signhashgen.generate(), null,
                         new BcPGPContentSignerBuilder( rsakp_sign.getPublicKey().getAlgorithm(),
                                 HashAlgorithmTags.SHA1 ), pske );
@@ -1222,8 +1154,8 @@ public class PGPEncryptionUtil
     }
 
 
-    /**
-     * ********************************************************** Load Keyring  file into InpurStream.
+    /* **********************************************************
+     * Load Keyring  file into InputStream.
      */
     public static InputStream getFileInputStream( String keyringFile )
     {
@@ -1240,22 +1172,43 @@ public class PGPEncryptionUtil
     }
 
 
-    public static String getKeyringArmored( String keyringFile ) throws PGPException
+    /* **********************************************************
+     *
+     */
+    public static String armorByteArrayToString( byte[] data ) throws PGPException
     {
         try
         {
-            FileInputStream keyIn = new FileInputStream( keyringFile );
-            InputStream keyring = PGPUtil.getDecoderStream( keyIn );
-            PGPPublicKeyRingCollection pgpPub =
-                    new PGPPublicKeyRingCollection( keyring, new JcaKeyFingerprintCalculator() );
-
             ByteArrayOutputStream encOut = new ByteArrayOutputStream();
             ArmoredOutputStream armorOut = new ArmoredOutputStream( encOut );
 
-            armorOut.write( pgpPub.getEncoded() );
+            armorOut.write( data );
             armorOut.flush();
             armorOut.close();
             return new String( encOut.toByteArray() );
+        }
+        catch ( Exception e )
+        {
+            throw new PGPException( "Error loading keyring", e );
+        }
+    }
+
+    /* **********************************************************
+     *
+     */
+
+
+    public static byte[] armorByteArray( byte[] data ) throws PGPException
+    {
+        try
+        {
+            ByteArrayOutputStream encOut = new ByteArrayOutputStream();
+            ArmoredOutputStream armorOut = new ArmoredOutputStream( encOut );
+
+            armorOut.write( data );
+            armorOut.flush();
+            armorOut.close();
+            return encOut.toByteArray();
         }
         catch ( Exception e )
         {

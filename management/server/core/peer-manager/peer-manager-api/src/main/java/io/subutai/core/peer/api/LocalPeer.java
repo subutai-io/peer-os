@@ -86,6 +86,7 @@ public interface LocalPeer extends Peer
      */
     public Set<ResourceHost> getResourceHosts();
 
+    //todo remove this method
     public void cleanDb();
 
     /**
@@ -144,4 +145,28 @@ public interface LocalPeer extends Peer
     public void removeRequestListener( RequestListener listener );
 
     public Set<RequestListener> getRequestListeners();
+
+    /**
+     * Returns domain assigned to vni if any
+     *
+     * @param vni - vni
+     *
+     * @return - domain or null if no domain assigned to the vni
+     */
+    public String getVniDomain( Long vni ) throws PeerException;
+
+    /**
+     * Removes domain from vni if any
+     *
+     * @param vni -vni
+     */
+    public void removeVniDomain( Long vni ) throws PeerException;
+
+    /**
+     * Assigns domain to vni
+     *
+     * @param vni - vni
+     * @param domain -  domain to assign
+     */
+    public void setVniDomain( Long vni, String domain ) throws PeerException;
 }

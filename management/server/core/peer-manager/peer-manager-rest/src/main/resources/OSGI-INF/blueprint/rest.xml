@@ -11,18 +11,32 @@
     </cxf:features>
   </cxf:bus>
 
+  <bean id="jacksonMapper" class="com.fasterxml.jackson.databind.ObjectMapper">
+  </bean>
+
+  <bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider">
+    <property name="mapper" ref="jacksonMapper" />
+  </bean>
+
   <jaxrs:server address="/peer" id="peerRestService">
     <jaxrs:serviceBeans>
       <ref component-id="peerRestServiceImpl" />
     </jaxrs:serviceBeans>
+    <jaxrs:providers>
+      <ref component-id="jsonProvider" />
+    </jaxrs:providers>
   </jaxrs:server>
 
   <bean id="peerRestServiceImpl" class="io.subutai.core.peer.rest.RestServiceImpl">
     <argument ref="peerManager" />
+    <argument ref="httpContextManager" />
   </bean>
 
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
+
+  <reference id="httpContextManager" availability="mandatory"
+             interface="io.subutai.core.http.manager.api.HttpContextManager" />
 
 
 </blueprint>

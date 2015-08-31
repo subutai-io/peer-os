@@ -62,7 +62,8 @@
 
     <!-- JWT lib -->
     <nimbus.jwt.version>3.10</nimbus.jwt.version>
-
+    <!-- Jackson JSON lib lib -->
+    <jackson.version>2.6.1</jackson.version>
 
     <!-- Database  -->
     <h2database.version>1.4.184</h2database.version>
@@ -151,7 +152,6 @@
         <version>${project.version}</version>
       </dependency>
 
-
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!--Node Registration-manager -->
       <dependency>
@@ -221,6 +221,28 @@
         <artifactId>env-manager-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- environment-manager -->
+<!--      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>environment-manager-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>environment-manager-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>environment-manager-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>environment-manager-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>-->
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- environment-terminal -->
@@ -626,6 +648,14 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- ssl-context-factory -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>http-context-factory</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- ssl-context-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -802,6 +832,11 @@
         <version>${org.apache.cxf.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-rs-extension-providers</artifactId>
+        <version>${org.apache.cxf.version}</version>
+      </dependency>
+      <dependency>
         <groupId>javax.ws.rs</groupId>
         <artifactId>javax.ws.rs-api</artifactId>
         <version>2.0-m10</version>
@@ -819,11 +854,15 @@
       </dependency>
       <!-- Json Mapper -->
       <dependency>
-      	<groupId>com.fasterxml.jackson.jaxrs</groupId>
-      	<artifactId>jackson-jaxrs-json-provider</artifactId>
-      	<version>2.6.1</version>
+        <groupId>com.fasterxml.jackson.jaxrs</groupId>
+        <artifactId>jackson-jaxrs-json-provider</artifactId>
+        <version>${jackson.version}</version>
       </dependency>
-
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!--Testing dependencies-->
@@ -1084,11 +1123,10 @@
         <version>${org.apache.shiro.version}</version>
       </dependency>
       <dependency>
-      	<groupId>com.nimbusds</groupId>
-      	<artifactId>nimbus-jose-jwt</artifactId>
-      	<version>${nimbus.jwt.version}</version>
+        <groupId>com.nimbusds</groupId>
+        <artifactId>nimbus-jose-jwt</artifactId>
+        <version>${nimbus.jwt.version}</version>
       </dependency>
-
 
     </dependencies>
   </dependencyManagement>

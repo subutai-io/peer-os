@@ -1,11 +1,13 @@
 package io.subutai.common.peer;
 
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.host.Interface;
 
-
+@XmlRootElement
 public class InterfaceModel implements Interface
 {
     private String interfaceName;

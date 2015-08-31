@@ -27,15 +27,15 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
+
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>http-context-manager-api</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.eclipse.jetty.aggregate</groupId>
-      <artifactId>jetty-all-server</artifactId>
-      <version>8.1.15.v20140411</version>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>http-context-factory</artifactId>
     </dependency>
 
     <dependency>
@@ -76,24 +76,18 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.core.http.manager.impl</Bundle-SymbolicName>
-            <Import-Package>*</Import-Package>
-            <Fragment-Host>org.ops4j.pax.web.pax-web-jetty</Fragment-Host>
             <Export-Package>
               sun.security.validator.KeyStores;
               sun.security.validator;
-              javax.net.ssl.SSLContext;
-              javax.net.ssl.SSLEngine;
-              javax.net.ssl.SSLServerSocket;
-              javax.net.ssl.SSLSocket;
-              org.eclipse.jetty.util.security.CertificateValidator;
-              org.eclipse.jetty.util.security.Password;
-              {local-packages};version=${project.version};-noimport:=true
+              {local-packages};version=${project.version};
             </Export-Package>
+            <Bundle-SymbolicName>${project.groupId}.core.http.manager.impl</Bundle-SymbolicName>
+            <Import-Package>*</Import-Package>
           </instructions>
         </configuration>
       </plugin>
     </plugins>
   </build>
+
 
 </project>

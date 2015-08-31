@@ -9,6 +9,7 @@ import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.protocol.N2NConfig;
 
 
 /**
@@ -50,7 +51,7 @@ public interface ManagementHost extends Host
     public int reserveVni( Vni vni ) throws PeerException;
 
     /**
-     * Retursn all existing gateways
+     * Returns all existing gateways
      */
     public Set<Gateway> getGateways() throws PeerException;
 
@@ -79,4 +80,30 @@ public interface ManagementHost extends Host
      * Returns external IP of mgmt host
      */
     public String getExternalIp();
+
+    void addToTunnel( N2NConfig config ) throws PeerException;
+
+    /**
+     * Returns domain assigned to vlan if any
+     *
+     * @param vlan - vlan id
+     *
+     * @return - domain or null if no domain assigned to the vlan
+     */
+    public String getVlanDomain( int vlan ) throws PeerException;
+
+    /**
+     * Removes domain from vlan if any
+     *
+     * @param vlan - vlan id
+     */
+    public void removeVlanDomain( int vlan ) throws PeerException;
+
+    /**
+     * Assigns domain to vlan
+     *
+     * @param vlan - vlan id
+     * @param domain - domain to assign
+     */
+    public void setVlanDomain( int vlan, String domain ) throws PeerException;
 }
