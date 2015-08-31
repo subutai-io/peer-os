@@ -7,11 +7,11 @@ package io.subutai.common.settings;
 public class ChannelSettings
 {
     public static final String OPEN_PORT = "8181";
-    public static final String SPECIAL_PORT_X1 = "8282";
-    public static final String SPECIAL_SECURE_PORT_X1 = "8243";
-    public static final String SECURE_PORT_X1 = "8443";
-    public static final String SECURE_PORT_X2 = "8444";
-    public static final String SECURE_PORT_X3 = "8445";
+    public static final String SPECIAL_PORT_X1 = "8542";
+    public static final String SPECIAL_SECURE_PORT_X1 = "8552";
+    public static final String SECURE_PORT_X1 = "8543";
+    public static final String SECURE_PORT_X2 = "8544";
+    public static final String SECURE_PORT_X3 = "8545";
 
 
     public static final String[] REST_URL = {

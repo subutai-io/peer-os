@@ -63,12 +63,10 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.core.http.context</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.http.context.jetty</Bundle-SymbolicName>
             <Import-Package>*</Import-Package>
             <Fragment-Host>org.ops4j.pax.web.pax-web-jetty</Fragment-Host>
             <Export-Package>
-              sun.security.validator.KeyStores;
-              sun.security.validator;
               javax.net.ssl.SSLContext;
               javax.net.ssl.SSLEngine;
               javax.net.ssl.SSLServerSocket;
