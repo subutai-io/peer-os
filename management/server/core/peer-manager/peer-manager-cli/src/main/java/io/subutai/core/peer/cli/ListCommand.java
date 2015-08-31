@@ -2,7 +2,10 @@ package io.subutai.core.peer.cli;
 
 
 import java.util.List;
+import java.util.Set;
 
+import io.subutai.common.host.Interface;
+import io.subutai.common.peer.InterfacePattern;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
@@ -44,8 +47,24 @@ public class ListCommand extends SubutaiShellCommandSupport
             {
                 peerStatus += " " + pe.getMessage();
             }
-            System.out.println(
-                    peer.getId() + " " + peer.getPeerInfo().getIp() + " " + peer.getName() + " " + peerStatus );
+
+            try
+            {
+                System.out.println(
+                        peer.getId() + " " + peer.getPeerInfo().getIp() + " " + peer.getName() + " " + peerStatus );
+
+                Set<Interface> ints = peer.getNetworkInterfaces( new InterfacePattern( "name", ".*" ) );
+                System.out.println( String.format( "Interfaces count: %d", ints != null ? ints.size() : -1 ) );
+
+                for ( Interface i : ints )
+                {
+                    System.out.println( String.format( "\t%-15s %-15s %-15s", i.getInterfaceName(), i.getIp(), i.getMac() ) );
+                }
+            }
+            catch ( Exception e )
+            {
+                log.error( e.getMessage(), e );
+            }
         }
         return null;
     }

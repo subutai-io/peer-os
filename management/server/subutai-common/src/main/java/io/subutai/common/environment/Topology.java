@@ -23,6 +23,12 @@ public class Topology
     }
 
 
+    public Set<Peer> getAllPeers()
+    {
+        return Collections.unmodifiableSet( nodeGroupPlacement.keySet() );
+    }
+
+
     public void addNodeGroupPlacement( Peer peer, NodeGroup nodeGroup )
     {
         Preconditions.checkNotNull( peer, "Invalid peer" );

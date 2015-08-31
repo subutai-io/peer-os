@@ -21,7 +21,7 @@
 
   <cxf:bus>
     <cxf:inInterceptors>
-      <ref  component-id="loggingInInterceptor" />
+      <ref component-id="loggingInInterceptor" />
     </cxf:inInterceptors>
     <cxf:outInterceptors>
       <ref component-id="loggingOutInterceptor" />
@@ -37,23 +37,14 @@
     </cxf:features>
   </cxf:bus>
 
-<!--
-  <bean id="jacksonMapper" class="org.safehaus.util.JarvisObjectMapper">
-    <property name="dateFormat">
-      <bean class="java.text.SimpleDateFormat">
-        <argument type="java.lang.String" value="yyyy-MM-dd'T'HH:mm:ss.SSSZ" />
-      </bean>
-    </property>
+  <bean id="jacksonMapper" class="com.fasterxml.jackson.databind.ObjectMapper">
   </bean>
--->
 
   <bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider">
-<!--
     <property name="mapper" ref="jacksonMapper" />
--->
   </bean>
 
-  <jaxrs:server address="/rest/api/v1/" id="gatewayRestService">
+  <jaxrs:server address="/rest/api/v1/gateway" id="gatewayRestService">
     <jaxrs:serviceBeans>
       <ref component-id="gatewayRestServiceImpl" />
     </jaxrs:serviceBeans>

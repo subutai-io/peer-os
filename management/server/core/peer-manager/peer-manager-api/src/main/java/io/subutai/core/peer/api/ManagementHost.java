@@ -9,6 +9,7 @@ import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.protocol.N2NConfig;
 
 
 /**
@@ -79,4 +80,6 @@ public interface ManagementHost extends Host
      * Returns external IP of mgmt host
      */
     public String getExternalIp();
+
+    void addToTunnel( N2NConfig config ) throws PeerException;
 }
