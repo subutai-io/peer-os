@@ -22,6 +22,7 @@ public class Commands
 {
     private static final String MANAGEMENT_HOST_NETWORK_BINDING = "subutai management_network";
     private static final String RESOURCE_HOST_NETWORK_BINDING = "subutai network";
+    private static final String MANAGEMENT_PROXY_BINDING = "subutai proxy";
 
 
     //container commands
@@ -161,6 +162,13 @@ public class Commands
     public RequestBuilder getListReservedVnisCommand()
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-Z", "list" ) );
+    }
+
+
+    public RequestBuilder getVlanDomainCommand( int vlan )
+    {
+        return new RequestBuilder( MANAGEMENT_PROXY_BINDING )
+                .withCmdArgs( Lists.newArrayList( "check", String.valueOf( vlan ), "-d" ) );
     }
 
     // ssh and hosts

@@ -144,4 +144,6 @@ public interface LocalPeer extends Peer
     public void removeRequestListener( RequestListener listener );
 
     public Set<RequestListener> getRequestListeners();
+
+    public String getVniDomain( Long vni ) throws PeerException;
 }

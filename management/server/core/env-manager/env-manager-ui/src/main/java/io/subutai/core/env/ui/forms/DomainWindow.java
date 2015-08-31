@@ -35,11 +35,13 @@ public class DomainWindow extends Window
         final TextField domainTxt = new TextField( "Domain" );
         try
         {
-            domainTxt.setValue( environmentManager.getDomain( environment.getId() ) );
+            String currentDomain = environmentManager.getDomain( environment.getId() );
+            domainTxt.setValue( currentDomain == null ? "" : currentDomain );
         }
         catch ( EnvironmentNotFoundException | EnvironmentManagerException e )
         {
             Notification.show( "Error obtaining current domain", e.getMessage(), Notification.Type.ERROR_MESSAGE );
+            close();
         }
 
         Button domainBtn = new Button( "Assign" );

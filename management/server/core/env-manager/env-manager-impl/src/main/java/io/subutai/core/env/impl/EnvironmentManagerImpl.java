@@ -829,7 +829,25 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public String getDomain( final UUID environmentId ) throws EnvironmentManagerException, EnvironmentNotFoundException
     {
-        return null;
+        return getDomain( environmentId, true );
+    }
+
+
+    public String getDomain( final UUID environmentId, final boolean checkAccess )
+            throws EnvironmentManagerException, EnvironmentNotFoundException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+
+        try
+        {
+            return peerManager.getLocalPeer().getVniDomain( environment.getVni() );
+        }
+        catch ( PeerException e )
+        {
+            throw new EnvironmentManagerException( "Error obtaining environment domain", e );
+        }
     }
 
 

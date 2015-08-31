@@ -79,4 +79,6 @@ public interface ManagementHost extends Host
      * Returns external IP of mgmt host
      */
     public String getExternalIp();
+
+    public String getVlanDomain( int vlan ) throws PeerException;
 }

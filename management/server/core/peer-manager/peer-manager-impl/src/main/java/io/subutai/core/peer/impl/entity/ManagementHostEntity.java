@@ -103,6 +103,20 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
+    @Override
+    public String getVlanDomain( final int vlan ) throws PeerException
+    {
+        try
+        {
+            return getNetworkManager().getVlanDomain( vlan );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( String.format( "Error obtaining domain by vlan %d", vlan ), e );
+        }
+    }
+
+
     public <T> Future<T> queueSequentialTask( Callable<T> callable )
     {
         return singleThreadExecutorService.submit( callable );

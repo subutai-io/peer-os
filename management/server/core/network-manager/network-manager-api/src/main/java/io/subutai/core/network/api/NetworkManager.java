@@ -108,6 +108,8 @@ public interface NetworkManager
 
     public Set<Vni> getReservedVnis() throws NetworkManagerException;
 
+    public String getVlanDomain( int vLanId ) throws NetworkManagerException;
+
     /**
      * Enables passwordless ssh access between containers
      *
