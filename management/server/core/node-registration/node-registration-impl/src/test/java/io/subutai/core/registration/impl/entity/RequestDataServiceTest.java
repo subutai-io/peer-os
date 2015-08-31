@@ -1,4 +1,4 @@
-package io.subutai.core.registration.impl.resource;
+package io.subutai.core.registration.impl.entity;
 
 
 import org.junit.Test;

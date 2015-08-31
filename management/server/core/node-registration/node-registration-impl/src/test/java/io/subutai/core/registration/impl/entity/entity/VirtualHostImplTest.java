@@ -1,4 +1,4 @@
-package io.subutai.core.registration.impl.resource.entity;
+package io.subutai.core.registration.impl.entity.entity;
 
 
 import java.util.UUID;
@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.subutai.common.host.HostArchitecture;
+import io.subutai.core.registration.impl.entity.VirtualHostImpl;
 
 import static org.junit.Assert.assertEquals;
 
