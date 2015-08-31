@@ -10,13 +10,18 @@
              interface="io.subutai.core.hostregistry.api.HostRegistry" />
   <reference id="environmentManager" availability="optional"
              interface="io.subutai.core.env.api.EnvironmentManager" />
+  <reference id="httpContextManager" availability="mandatory"
+             interface="io.subutai.core.http.manager.api.HttpContextManager" />
 
   <bean id="module" scope="singleton" class="io.subutai.core.peer.ui.PeerManagerPortalModule"
         init-method="init" destroy-method="destroy">
     <argument ref="peerManager" />
     <argument ref="templateRegistry" />
     <argument ref="hostRegistry" />
+
+    <property name="httpContextManager" ref="httpContextManager" />
     <property name="environmentManager" ref="environmentManager" />
+
   </bean>
 
   <service ref="module" interface="io.subutai.server.ui.api.PortalModule">

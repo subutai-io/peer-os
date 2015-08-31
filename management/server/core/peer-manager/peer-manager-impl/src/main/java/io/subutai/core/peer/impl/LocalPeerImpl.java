@@ -119,6 +119,7 @@ import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.strategy.api.StrategyNotFoundException;
+import io.subutai.core.http.manager.api.HttpContextManager;
 
 
 /**
@@ -152,13 +153,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
     protected Set<RequestListener> requestListeners = Sets.newHashSet();
     private PeerInfo peerInfo;
+    private HttpContextManager httpContextManager;
 
     protected boolean initialized = false;
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
                           StrategyManager strategyManager, CommandExecutor commandExecutor, HostRegistry hostRegistry,
-                          Monitor monitor )
+                          Monitor monitor, HttpContextManager httpContextManager )
 
     {
         this.strategyManager = strategyManager;
@@ -168,6 +170,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         this.monitor = monitor;
         this.commandExecutor = commandExecutor;
         this.hostRegistry = hostRegistry;
+        this.httpContextManager = httpContextManager;
     }
 
 
@@ -1752,7 +1755,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 keyStoreManager.importCertificateHEXString( keyStore, keyStoreData );
                 //***********************************************************************
                 LOG.debug( String.format( "Importing new certificate to trustStore with alias: %s", alias ) );
-                //this.subutaiSslContextFactory.reloadTrustStore();
+                httpContextManager.reloadTrustStore();
             }
         }
         catch ( KeyStoreException e )
@@ -1803,7 +1806,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 keyStoreManager.saveX509Certificate( keyStore, environmentKeyStoreData, cert, keyPair );
 
-                //subutaiSslContextFactory.reloadKeyStore();
+                httpContextManager.reloadKeyStore();
                 LOG.debug( String.format( "Saving new certificate to keyStore with alias: %s", alias ) );
             }
         }
@@ -1865,7 +1868,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
 
             //***********************************************************************
-            //subutaiSslContextFactory.reloadTrustStore();
+            httpContextManager.reloadTrustStore();
         }
         catch ( KeyStoreException e )
         {
