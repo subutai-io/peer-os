@@ -272,7 +272,7 @@ public class NetworkManagerImpl implements NetworkManager
 
         try
         {
-            CommandResult result = getManagementHost().execute( commands.getVlanDomainCommand( vLanId ) );
+            CommandResult result = getManagementHost().execute( commands.getGetVlanDomainCommand( vLanId ) );
             if ( result.hasSucceeded() )
             {
                 return result.getStdOut();
@@ -284,6 +284,26 @@ public class NetworkManagerImpl implements NetworkManager
         }
 
         return null;
+    }
+
+
+    @Override
+    public void removeVlanDomain( final int vLanId ) throws NetworkManagerException
+    {
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+
+        execute( getManagementHost(), commands.getRemoveVlanDomainCommand( vLanId ) );
+    }
+
+
+    @Override
+    public void setVlanDomain( final int vLanId, final String domain ) throws NetworkManagerException
+    {
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ), "Invalid domain" );
+        Preconditions.checkArgument( domain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
+
+        execute( getManagementHost(), commands.getSetVlanDomainCommand( vLanId, domain ) );
     }
 
 

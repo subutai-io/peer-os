@@ -16,8 +16,6 @@ import io.subutai.common.settings.Common;
  * Networking commands
  */
 
-//TODO remove all system specific command and paths, use a dedicated binding
-// or implement missing functionality inside network manager binding for this
 public class Commands
 {
     private static final String MANAGEMENT_HOST_NETWORK_BINDING = "subutai management_network";
@@ -165,10 +163,24 @@ public class Commands
     }
 
 
-    public RequestBuilder getVlanDomainCommand( int vlan )
+    public RequestBuilder getGetVlanDomainCommand( int vLanId )
     {
         return new RequestBuilder( MANAGEMENT_PROXY_BINDING )
-                .withCmdArgs( Lists.newArrayList( "check", String.valueOf( vlan ), "-d" ) );
+                .withCmdArgs( Lists.newArrayList( "check", String.valueOf( vLanId ), "-d" ) );
+    }
+
+
+    public RequestBuilder getRemoveVlanDomainCommand( final int vLanId )
+    {
+        return new RequestBuilder( MANAGEMENT_PROXY_BINDING )
+                .withCmdArgs( Lists.newArrayList( "del", String.valueOf( vLanId ), "-d" ) );
+    }
+
+
+    public RequestBuilder getSetVlanDomainCommand( final int vLanId, final String domain )
+    {
+        return new RequestBuilder( MANAGEMENT_PROXY_BINDING )
+                .withCmdArgs( Lists.newArrayList( "add", String.valueOf( vLanId ), "-d", domain ) );
     }
 
     // ssh and hosts

@@ -101,14 +101,22 @@ public interface NetworkManager
      */
     public void removeVniVLanMapping( int tunnelId, long vni, int vLanId ) throws NetworkManagerException;
 
+    /**
+     * Returns all vni-vlan mappings on management host
+     */
     public Set<VniVlanMapping> getVniVlanMappings() throws NetworkManagerException;
 
-
+    /**
+     * Reserves VNI on management host
+     *
+     * @param vni - vni to reserve
+     */
     public void reserveVni( Vni vni ) throws NetworkManagerException;
 
+    /**
+     * Returns all reserved VNIs on management host
+     */
     public Set<Vni> getReservedVnis() throws NetworkManagerException;
-
-    public String getVlanDomain( int vLanId ) throws NetworkManagerException;
 
     /**
      * Enables passwordless ssh access between containers
@@ -152,5 +160,29 @@ public interface NetworkManager
      * @param domainName - domain name e.g. "intra.lan"
      */
     public void registerHosts( Set<ContainerHost> containers, String domainName ) throws NetworkManagerException;
+
+    /**
+     * Returns domain assigned to vlan
+     *
+     * @param vLanId - vlan id
+     *
+     * @return - domain or null if not assigned
+     */
+    public String getVlanDomain( int vLanId ) throws NetworkManagerException;
+
+
+    /**
+     * Removes domain assigned to vlan if any
+     *
+     * @param vLanId - vlan id
+     */
+    public void removeVlanDomain( int vLanId ) throws NetworkManagerException;
+
+    /**
+     * Assigns domain to vlan
+     *
+     * @param vLanId - vlan id
+     */
+    public void setVlanDomain( int vLanId, String domain ) throws NetworkManagerException;
 }
 

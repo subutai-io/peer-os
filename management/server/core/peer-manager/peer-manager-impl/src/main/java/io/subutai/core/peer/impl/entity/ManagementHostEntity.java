@@ -117,6 +117,34 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
+    @Override
+    public void removeVlanDomain( final int vlan ) throws PeerException
+    {
+        try
+        {
+            getNetworkManager().removeVlanDomain( vlan );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( String.format( "Error removing domain by vlan %d", vlan ), e );
+        }
+    }
+
+
+    @Override
+    public void setVlanDomain( final int vlan, final String domain ) throws PeerException
+    {
+        try
+        {
+            getNetworkManager().setVlanDomain( vlan, domain );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( String.format( "Error setting domain by vlan %d", vlan ), e );
+        }
+    }
+
+
     public <T> Future<T> queueSequentialTask( Callable<T> callable )
     {
         return singleThreadExecutorService.submit( callable );

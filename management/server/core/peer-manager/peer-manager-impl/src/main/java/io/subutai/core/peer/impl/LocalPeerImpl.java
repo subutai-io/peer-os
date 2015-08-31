@@ -1904,6 +1904,38 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
+    public void removeVniDomain( final Long vni ) throws PeerException
+    {
+        Set<Vni> reservedVnis = getManagementHost().getReservedVnis();
+
+        for ( Vni reservedVni : reservedVnis )
+        {
+            if ( reservedVni.getVni() == vni )
+            {
+                getManagementHost().removeVlanDomain( reservedVni.getVlan() );
+            }
+        }
+        throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+    }
+
+
+    @Override
+    public void setVniDomain( final Long vni, final String domain ) throws PeerException
+    {
+        Set<Vni> reservedVnis = getManagementHost().getReservedVnis();
+
+        for ( Vni reservedVni : reservedVnis )
+        {
+            if ( reservedVni.getVni() == vni )
+            {
+                getManagementHost().setVlanDomain( reservedVni.getVlan(), domain );
+            }
+        }
+        throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+    }
+
+
+    @Override
     public void addRequestListener( final RequestListener listener )
     {
         if ( listener != null )

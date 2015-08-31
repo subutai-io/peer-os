@@ -6,11 +6,14 @@ import java.util.concurrent.Semaphore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
+
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.ResultHolder;
+import io.subutai.core.peer.api.PeerManager;
 
 
 /**
@@ -23,14 +26,16 @@ public class SetDomainTask implements Runnable
     private final TrackerOperation op;
     private final ResultHolder<EnvironmentModificationException> resultHolder;
     private final String domain;
+    private final PeerManager peerManager;
     protected Semaphore semaphore;
 
 
-    public SetDomainTask( final EnvironmentImpl environment,
+    public SetDomainTask( final EnvironmentImpl environment, final PeerManager peerManager,
                           final ResultHolder<EnvironmentModificationException> resultHolder, final TrackerOperation op,
                           final String domain )
     {
         this.environment = environment;
+        this.peerManager = peerManager;
         this.resultHolder = resultHolder;
         this.op = op;
         this.domain = domain;
@@ -45,9 +50,14 @@ public class SetDomainTask implements Runnable
         {
             environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-
-            //todo here
-
+            if ( Strings.isNullOrEmpty( domain ) )
+            {
+                peerManager.getLocalPeer().removeVniDomain( environment.getVni() );
+            }
+            else
+            {
+                peerManager.getLocalPeer().setVniDomain( environment.getVni(), domain );
+            }
 
             environment.setStatus( EnvironmentStatus.HEALTHY );
 

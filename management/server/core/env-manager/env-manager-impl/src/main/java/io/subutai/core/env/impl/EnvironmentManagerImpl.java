@@ -757,7 +757,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
 
-        SetDomainTask setDomainTask = new SetDomainTask( environment, resultHolder, op, null );
+        SetDomainTask setDomainTask = new SetDomainTask( environment, peerManager, resultHolder, op, null );
 
         executor.submit( setDomainTask );
 
@@ -803,7 +803,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
 
-        SetDomainTask setDomainTask = new SetDomainTask( environment, resultHolder, op, newDomain );
+        SetDomainTask setDomainTask = new SetDomainTask( environment, peerManager, resultHolder, op, newDomain );
 
         executor.submit( setDomainTask );
 
