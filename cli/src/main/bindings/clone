@@ -121,7 +121,7 @@ function clone {
   fi
 #----GPG----
 function generate_defaults {
-mkdir $child_gpg_dir
+mkdir -p $child_gpg_dir
 touch $child_gpg_dir/defaults
 echo "%echo Generating default keys 
 Key-Type: default
@@ -131,36 +131,49 @@ Name-Real: $child
 Name-Comment: $child GPG key
 Name-Email: $child@subutai.io
 Expire-Date: 0
-Passphrase: secret
+Passphrase: 12345678 
 %pubring $child_gpg_dir/public.pub
-%secring $child_gpg_dir/secret.sec
 %commit
 %echo Done">>$child_gpg_dir/defaults
-gpg2 --batch --gen-key $child_gpg_dir/defaults
+echo 12345678 | gpg2 --pinentry-mode loopback --passphrase-fd 0 --batch --gen-key $child_gpg_dir/defaults 
 }
 
 function exchange_keys_and_encrypt {
 #GET Management Public Key from server
+
 curl gw.intra.lan:8181/cxf/registration/public-key > $child_gpg_dir/mgn.key
+
 #Import Mgn PK to keyring
-gpg2 --no-default-keyring --secret-keyring $child_gpg_dir/secret.sec --keyring $child_gpg_dir/public.pub --import $child_gpg_dir/mgn.key
+key_id=`gpg2 --no-default-keyring --keyring $child_gpg_dir/public.pub --import $child_gpg_dir/mgn.key 2>&1 | grep key | awk -F " " '{ print $3 }'`
 #Write token to file
-echo "token:"$token > $child_gpg_dir/stdin.txt
+echo $token > $child_gpg_dir/stdin.txt
+container_uuid=$(cat /proc/sys/kernel/random/uuid)
+touch $child_gpg_dir/../container.conf 
+echo $container_uuid >> $child_gpg_dir/../container.conf
+echo $container_uuid >> $child_gpg_dir/stdin.txt
+
 #Add cloned container PK to the file
-gpg2 --no-default-keyring --secret-keyring $child_gpg_dir/secret.sec --keyring $child_gpg_dir/public.pub --export --armor $child@subutai.io >> $child_gpg_dir/stdin.txt
+gpg2 --no-default-keyring --keyring $child_gpg_dir/public.pub --export --armor $child@subutai.io >> $child_gpg_dir/stdin.txt
 #Encrypt the file
-gpg2 --trust-model always --no-default-keyring --secret-keyring $child_gpg_dir/secret.sec --keyring $child_gpg_dir/public.pub --encrypt --output $child_gpg_dir/stdout.asc --armor -r test@mail.org -u $child@subutai.io $child_gpg_dir/stdin.txt
+gpg2 --trust-model always --no-default-keyring --keyring $child_gpg_dir/public.pub --encrypt --output $child_gpg_dir/stdout.asc --armor -r ${key_id::-1} -u $child@subutai.io $child_gpg_dir/stdin.txt
 #curl the DATA
-curl -X POST -H 'Content-Type: text/plain' -d @$child_gpg_dir/stdout.asc gw.intra.lan:8181/cxf/registration/public-key
+status=`curl -sw '%{http_code}' -X POST -H 'Content-Type: text/plain' --data-binary @$child_gpg_dir/stdout.asc gw.intra.lan:8181/cxf/registration/verify/container-token`
+
+if [ "$status" != "Accepted200" ]; then
+msg_error "Failed to exchange GPG Public Keys. StatusCode: $status"
+  unlock_container_write $child
+	subutai destroy $child
+	exit 1;
+fi
 rm -f $child_gpg_dir/stdout.asc
 rm -f $child_gpg_dir/stdin.txt
-rm -f $child_gpg_dir/mgn.key
 }
 #----------- 
 if [ -n "$token" ]; then
   generate_defaults 
-  exchange_keys_and_encrypt  
-fi
+  exchange_keys_and_encrypt
+fi 
+
 #starting lxc in this method 
   git_child_branch $child
 
