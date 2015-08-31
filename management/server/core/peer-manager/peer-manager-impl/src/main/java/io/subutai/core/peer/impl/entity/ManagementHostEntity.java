@@ -40,6 +40,7 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.Disposable;
+import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.NumUtil;
@@ -469,15 +470,14 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
-    public void addToSubnet( final String superNodeIp, final int n2nPort, final String interfaceName,
-                             final String communityName, final String address, final String sharedKey )
-            throws PeerException
+    public void addToTunnel( final N2NConfig config ) throws PeerException
     {
         //subutai management_network -N 127.0.0.1 5000 n2n15 timur15 10.1.15.1 string secret
 
         RequestBuilder requestBuilder = new RequestBuilder(
-                String.format( "subutai management_network -N %s %d %s %s %s string %s", superNodeIp, n2nPort,
-                        interfaceName, communityName, address, sharedKey ) );
+                String.format( "subutai management_network -N %s %d %s %s %s string %s", config.getSuperNodeIp(),
+                        config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress(),
+                        config.getSharedKey() ) ).withTimeout( 15 ).daemon();
 
         try
         {

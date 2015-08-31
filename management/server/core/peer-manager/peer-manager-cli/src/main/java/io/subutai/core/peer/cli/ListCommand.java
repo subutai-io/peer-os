@@ -47,13 +47,19 @@ public class ListCommand extends SubutaiShellCommandSupport
             {
                 peerStatus += " " + pe.getMessage();
             }
-            Set<Interface> ints = peer.getNetworkInterfaces( new InterfacePattern( "name", ".*" ) );
-            System.out.println(
-                    peer.getId() + " " + peer.getPeerInfo().getIp() + " " + peer.getName() + " " + peerStatus );
 
             try
             {
+                System.out.println(
+                        peer.getId() + " " + peer.getPeerInfo().getIp() + " " + peer.getName() + " " + peerStatus );
+
+                Set<Interface> ints = peer.getNetworkInterfaces( new InterfacePattern( "name", ".*" ) );
                 System.out.println( String.format( "Interfaces count: %d", ints != null ? ints.size() : -1 ) );
+
+                for ( Interface i : ints )
+                {
+                    System.out.println( String.format( "\t%-15s %-15s %-15s", i.getInterfaceName(), i.getIp(), i.getMac() ) );
+                }
             }
             catch ( Exception e )
             {

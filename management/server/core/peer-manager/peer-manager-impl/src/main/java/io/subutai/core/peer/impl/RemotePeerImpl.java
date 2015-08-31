@@ -1,12 +1,28 @@
 package io.subutai.core.peer.impl;
 
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.apache.cxf.jaxrs.client.WebClient;
+
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
+import com.google.common.reflect.TypeToken;
 
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
@@ -25,8 +41,10 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostInfoModel;
+import io.subutai.common.peer.InterfacePattern;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.CpuQuotaInfo;
 import io.subutai.common.quota.DiskPartition;
@@ -43,31 +61,21 @@ import io.subutai.common.util.RestUtil;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
 import io.subutai.core.messenger.api.Messenger;
-import io.subutai.common.peer.InterfacePattern;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.Payload;
 import io.subutai.core.peer.api.RemotePeer;
 import io.subutai.core.peer.impl.command.BlockingCommandCallback;
+import io.subutai.core.peer.impl.command.CommandRequest;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.command.CommandResultImpl;
 import io.subutai.core.peer.impl.container.ContainersDestructionResultImpl;
 import io.subutai.core.peer.impl.container.CreateContainerGroupResponse;
 import io.subutai.core.peer.impl.container.DestroyEnvironmentContainersRequest;
+import io.subutai.core.peer.impl.container.DestroyEnvironmentContainersResponse;
+import io.subutai.core.peer.impl.entity.HostInterface;
 import io.subutai.core.peer.impl.request.MessageRequest;
 import io.subutai.core.peer.impl.request.MessageResponse;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
-import io.subutai.core.peer.impl.command.CommandRequest;
-import io.subutai.core.peer.impl.container.DestroyEnvironmentContainersResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.apache.cxf.jaxrs.client.WebClient;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
-import com.google.common.reflect.TypeToken;
 
 
 /**
@@ -1309,21 +1317,48 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( pattern, "Pattern could not be null" );
 
-        String path = "peer/interfaces";
 
-        WebClient client = WebClient.create( buildPath( path ) );
-        Collection interfaces = client.getCollection( Interface.class );
+        String path = buildPath( "peer/interfaces" );
+
+        //TODO: implement as singleton
+        List<Object> providers = new ArrayList<Object>();
+        providers.add( new JacksonJaxbJsonProvider() );
+
+        WebClient client =
+                restUtil.createTrustedWebClientWithAuthAndProviders( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS,
+                        providers );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+
+        Collection interfaces = client.postAndGetCollection( pattern, HostInterface.class );
         LOG.debug( String.format( "%d", interfaces.size() ) );
         return new HashSet<Interface>( interfaces );
     }
 
 
     @Override
-    public void addToSubnet( final String superNodeIp, final int n2nPort, final String interfaceName,
-                             final String communityName, final String address, final String sharedKey )
+    public void addToTunnel( final N2NConfig config )
     {
-        LOG.debug( String.format( "Adding remote peer to n2n community: %s:%d %s %s %s", superNodeIp, n2nPort,
-                interfaceName, communityName, address ) );
+        LOG.debug( String.format( "Adding remote peer to n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
+                config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
+
+        String path = "peer/n2ntunnel";
+        LOG.debug( String.format( "%s %s %s", peerInfo.getIp(), peerInfo.getPort(), baseUrl ) );
+
+
+        //TODO: implement as singleton
+        List<Object> providers = new ArrayList<Object>();
+        providers.add( new JacksonJaxbJsonProvider() );
+
+        WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
+                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, providers );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+
+        Response response = client.post( config );
+        LOG.debug( String.format( "%s", response ) );
     }
 
 

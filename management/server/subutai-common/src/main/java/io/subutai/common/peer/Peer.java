@@ -16,6 +16,7 @@ import io.subutai.common.host.Interface;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
+import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.CpuQuotaInfo;
 import io.subutai.common.quota.DiskPartition;
@@ -389,13 +390,11 @@ public interface Peer
     public HostInfo getContainerHostInfoById( UUID containerHostId ) throws PeerException;
 
 
-
     /**
      * Gets network interfaces by given field name and regexp pattern. Allowed field names are "id" and "name".
      */
 
     Set<Interface> getNetworkInterfaces( InterfacePattern pattern );
 
-    void addToSubnet( String superNodeIp, int n2nPort, String interfaceName, String communityName, String address,
-                      String sharedKey ) throws PeerException;
+    void addToTunnel( N2NConfig config ) throws PeerException;
 }

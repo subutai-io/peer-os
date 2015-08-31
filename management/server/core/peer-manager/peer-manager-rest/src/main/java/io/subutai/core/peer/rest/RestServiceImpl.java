@@ -32,6 +32,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.PeerStatus;
+import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
@@ -58,7 +59,7 @@ public class RestServiceImpl implements RestService
     protected RestUtil restUtil = new RestUtil();
 
 
-    public RestServiceImpl( final PeerManager peerManager, HttpContextManager httpContextManager)
+    public RestServiceImpl( final PeerManager peerManager, HttpContextManager httpContextManager )
     {
         this.peerManager = peerManager;
         this.httpContextManager = httpContextManager;
@@ -1093,6 +1094,22 @@ public class RestServiceImpl implements RestService
         try
         {
             return localPeer.getNetworkInterfaces( request );
+        }
+        catch ( Exception e )
+        {
+            throw new WebApplicationException( e );
+        }
+    }
+
+
+    @Override
+    public Response addToTunnel( final N2NConfig config )
+    {
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        try
+        {
+            localPeer.addToTunnel( config );
+            return Response.ok().build();
         }
         catch ( Exception e )
         {

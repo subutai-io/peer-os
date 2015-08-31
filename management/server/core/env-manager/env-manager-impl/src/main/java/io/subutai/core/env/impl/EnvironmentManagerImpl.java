@@ -28,6 +28,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.InterfacePattern;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.env.api.EnvironmentEventListener;
@@ -899,7 +900,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void createTunnel( final Set<Peer> peers ) throws EnvironmentManagerException
+    public String createTunnel( final Set<Peer> peers ) throws EnvironmentManagerException
     {
         Set<String> allSubnets = getSubnets( peers );
         if ( LOGGER.isDebugEnabled() )
@@ -928,9 +929,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             int counter = 0;
             for ( Peer peer : peers )
             {
-                peer.addToSubnet( superNodeIp, N2N_PORT, interfaceName, communityName, addresses[counter], sharedKey );
+                peer.addToTunnel(
+                        new N2NConfig( superNodeIp, N2N_PORT, interfaceName, communityName, addresses[counter],
+                                sharedKey ) );
                 counter++;
             }
+            return freeSubnet;
         }
         catch ( Exception e )
         {

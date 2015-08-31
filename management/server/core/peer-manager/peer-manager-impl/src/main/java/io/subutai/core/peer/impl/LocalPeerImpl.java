@@ -61,6 +61,7 @@ import io.subutai.common.peer.InterfacePattern;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.Disposable;
+import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.CpuQuotaInfo;
 import io.subutai.common.quota.DiskPartition;
@@ -111,7 +112,6 @@ import io.subutai.core.peer.impl.dao.ResourceHostDataService;
 import io.subutai.core.peer.impl.entity.AbstractSubutaiHost;
 import io.subutai.core.peer.impl.entity.ContainerGroupEntity;
 import io.subutai.core.peer.impl.entity.ContainerHostEntity;
-import io.subutai.core.peer.impl.entity.HostInterface;
 import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.entity.ResourceHostEntity;
 import io.subutai.core.registry.api.RegistryException;
@@ -1949,7 +1949,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             LOG.error( e.getMessage(), e );
         }
-        return result;
+        return Collections.unmodifiableSet( result );
     }
 
 
@@ -1992,14 +1992,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void addToSubnet( final String superNodeIp, final int n2nPort, final String interfaceName,
-                             final String communityName, final String address, final String sharedKey )
+    public void addToTunnel( final N2NConfig config )
             throws PeerException
     {
-        LOG.debug( String.format( "Adding local peer to n2n community: %s:%d %s %s %s", superNodeIp, n2nPort,
-                interfaceName, communityName, address ) );
+        LOG.debug( String.format( "Adding local peer to n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
+                config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
 
-        getManagementHost().addToSubnet( superNodeIp, n2nPort, interfaceName, communityName, address, sharedKey );
+
+        getManagementHost().addToTunnel( config );
     }
 
 

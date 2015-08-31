@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 
 import io.subutai.common.host.Interface;
 import io.subutai.common.peer.InterfacePattern;
+import io.subutai.common.protocol.N2NConfig;
 
 
 public interface RestService
@@ -268,4 +269,10 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     @Consumes( { MediaType.APPLICATION_JSON } )
     Set<Interface> getNetworkInterfaces( InterfacePattern pattern );
+
+    @POST
+    @Path( "n2ntunnel" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    @Consumes( { MediaType.APPLICATION_JSON } )
+    Response addToTunnel( N2NConfig config );
 }
