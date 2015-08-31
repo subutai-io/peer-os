@@ -2,11 +2,6 @@ package io.subutai.core.http.context.jetty;
 
 
 import java.security.KeyStore;
-import java.security.cert.CRL;
-import java.util.Collection;
-
-import javax.net.ssl.TrustManager;
-
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
