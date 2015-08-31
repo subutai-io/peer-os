@@ -26,7 +26,7 @@ public class GenerateContainerToken extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        ContainerToken containerToken = registrationManager.generateContainerTTLToken( 30 * 1000L );
+        ContainerToken containerToken = registrationManager.generateContainerTTLToken( 30 * 1000000L );
         System.out.println( containerToken.getToken() );
         return null;
     }
