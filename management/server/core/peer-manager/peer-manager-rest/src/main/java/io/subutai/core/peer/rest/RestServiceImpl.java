@@ -40,6 +40,7 @@ import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.UUIDUtil;
+import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
@@ -50,13 +51,15 @@ public class RestServiceImpl implements RestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
     private PeerManager peerManager;
+    private HttpContextManager httpContextManager;
     protected JsonUtil jsonUtil = new JsonUtil();
     protected RestUtil restUtil = new RestUtil();
 
 
-    public RestServiceImpl( final PeerManager peerManager )
+    public RestServiceImpl( final PeerManager peerManager, HttpContextManager httpContextManager)
     {
         this.peerManager = peerManager;
+        this.httpContextManager = httpContextManager;
     }
 
 
@@ -280,7 +283,7 @@ public class RestServiceImpl implements RestService
                 keyStoreManager.deleteEntry( keyStore, keyStoreData );
                 //***********************************************************************
 
-                //sslContextFactory.reloadTrustStore();
+                httpContextManager.reloadTrustStore();
 
                 return Response.ok( "Successfully unregistered peer: " + peerId ).build();
             }
@@ -384,7 +387,7 @@ public class RestServiceImpl implements RestService
             String hexCert = myKeyStoreManager.exportCertificateHEXString( myKeyStore, myKeyStoreData );
             //***********************************************************************
 
-            //sslContextFactory.reloadTrustStore();
+            httpContextManager.reloadTrustStore();
 
             return Response.ok( hexCert ).build();
         }
@@ -456,7 +459,7 @@ public class RestServiceImpl implements RestService
                     keyStoreManager.importCertificateHEXString( keyStore, keyStoreData );
                     //***********************************************************************
 
-                    //sslContextFactory.reloadTrustStore();
+                    httpContextManager.reloadTrustStore();
 
                     remotePeer.setStatus( PeerStatus.APPROVED );
 
