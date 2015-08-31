@@ -1010,7 +1010,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( PeerException | HostDisconnectedException e )
         {
-            LOG.error( "Error checking host connected status #isConnected", e );
+//            LOG.error( "Error checking host connected status #isConnected", e );
             return false;
         }
     }
