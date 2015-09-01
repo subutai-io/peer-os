@@ -1,4 +1,4 @@
-package io.subutai.core.registration.impl.resource.entity;
+package io.subutai.core.registration.impl.entity.entity;
 
 
 import java.util.UUID;
@@ -10,6 +10,9 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.core.registration.api.RegistrationStatus;
+import io.subutai.core.registration.impl.entity.HostInterface;
+import io.subutai.core.registration.impl.entity.RequestedHostImpl;
+import io.subutai.core.registration.impl.entity.VirtualHostImpl;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;

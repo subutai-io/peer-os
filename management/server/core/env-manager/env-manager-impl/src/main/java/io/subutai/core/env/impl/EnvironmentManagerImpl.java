@@ -11,6 +11,18 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.net.util.SubnetUtils;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.ContainerHostNotFoundException;
@@ -40,19 +52,21 @@ import io.subutai.core.env.api.exception.EnvironmentManagerException;
 import io.subutai.core.env.api.exception.EnvironmentSecurityException;
 import io.subutai.core.env.impl.builder.EnvironmentBuilder;
 import io.subutai.core.env.impl.dao.BlueprintDataService;
-import io.subutai.core.env.impl.dao.EnvironmentDataService;
-import io.subutai.core.env.impl.tasks.CreateEnvironmentTask;
-import io.subutai.core.env.impl.tasks.SetSshKeyTask;
 import io.subutai.core.env.impl.dao.EnvironmentContainerDataService;
+import io.subutai.core.env.impl.dao.EnvironmentDataService;
 import io.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.EnvironmentBuildException;
 import io.subutai.core.env.impl.exception.EnvironmentTunnelException;
 import io.subutai.core.env.impl.exception.ResultHolder;
+import io.subutai.core.env.impl.tasks.Awaitable;
+import io.subutai.core.env.impl.tasks.CreateEnvironmentTask;
 import io.subutai.core.env.impl.tasks.DestroyContainerTask;
 import io.subutai.core.env.impl.tasks.DestroyEnvironmentTask;
 import io.subutai.core.env.impl.tasks.GrowEnvironmentTask;
-
+import io.subutai.core.env.impl.tasks.SetContainerDomainTask;
+import io.subutai.core.env.impl.tasks.SetDomainTask;
+import io.subutai.core.env.impl.tasks.SetSshKeyTask;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.User;
 import io.subutai.core.network.api.NetworkManager;
@@ -61,18 +75,6 @@ import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.tracker.api.Tracker;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Transformer;
-import org.apache.commons.net.util.SubnetUtils;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -266,7 +268,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         final ResultHolder<EnvironmentCreationException> resultHolder = new ResultHolder<>();
 
 
-        CreateEnvironmentTask createEnvironmentTask =
+        Awaitable createEnvironmentTask =
                 new CreateEnvironmentTask( peerManager.getLocalPeer(), this, environment, topology, resultHolder, op );
 
         executor.submit( createEnvironmentTask );
@@ -330,7 +332,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final Set<Throwable> exceptions = Sets.newHashSet();
 
-        DestroyEnvironmentTask destroyEnvironmentTask =
+        Awaitable destroyEnvironmentTask =
                 new DestroyEnvironmentTask( this, environment, exceptions, resultHolder, forceMetadataRemoval,
                         peerManager.getLocalPeer(), op );
 
@@ -393,7 +395,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
 
-        GrowEnvironmentTask growEnvironmentTask =
+        Awaitable growEnvironmentTask =
                 new GrowEnvironmentTask( this, environment, topology, resultHolder, newContainers, op );
 
         executor.submit( growEnvironmentTask );
@@ -465,7 +467,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
 
-        DestroyContainerTask destroyContainerTask =
+        Awaitable destroyContainerTask =
                 new DestroyContainerTask( this, environment, environmentContainer, forceMetadataRemoval, resultHolder,
                         op );
 
@@ -511,7 +513,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
 
-        SetSshKeyTask setSshKeyTask = new SetSshKeyTask( environment, networkManager, resultHolder, sshKey, op );
+        Awaitable setSshKeyTask = new SetSshKeyTask( environment, networkManager, resultHolder, sshKey, op );
 
         executor.submit( setSshKeyTask );
 
@@ -754,6 +756,188 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
         }
     }
+
+
+    /** reverse proxy domain functions ** */
+
+    @Override
+    public void removeDomain( final UUID environmentId, final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Removing environment %s domain", environmentId ) );
+
+        toggleEnvironmentDomain( environmentId, null, op, async, true );
+    }
+
+
+    @Override
+    public void assignDomain( final UUID environmentId, final String newDomain, final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newDomain ), "Invalid domain" );
+        Preconditions.checkArgument( newDomain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
+
+        TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Assigning environment %s domain", environmentId ) );
+
+        toggleEnvironmentDomain( environmentId, newDomain, op, async, true );
+    }
+
+
+    public void toggleEnvironmentDomain( final UUID environmentId, final String domain, final TrackerOperation op,
+                                         final boolean async, boolean checkAccess )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+
+        final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
+
+        Awaitable setDomainTask = new SetDomainTask( environment, peerManager, resultHolder, op, domain );
+
+        executor.submit( setDomainTask );
+
+        if ( !async )
+        {
+            try
+            {
+                setDomainTask.waitCompletion();
+
+                if ( resultHolder.getResult() != null )
+                {
+                    throw resultHolder.getResult();
+                }
+            }
+            catch ( InterruptedException e )
+            {
+                throw new EnvironmentModificationException( e );
+            }
+        }
+    }
+
+
+    @Override
+    public String getDomain( final UUID environmentId ) throws EnvironmentManagerException, EnvironmentNotFoundException
+    {
+        return getDomain( environmentId, true );
+    }
+
+
+    public String getDomain( final UUID environmentId, final boolean checkAccess )
+            throws EnvironmentManagerException, EnvironmentNotFoundException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+
+        try
+        {
+            return peerManager.getLocalPeer().getVniDomain( environment.getVni() );
+        }
+        catch ( PeerException e )
+        {
+            throw new EnvironmentManagerException( "Error obtaining environment domain", e );
+        }
+    }
+
+
+    @Override
+    public boolean isContainerInDomain( final UUID containerHostId, final UUID environmentId )
+            throws EnvironmentManagerException, EnvironmentNotFoundException
+    {
+
+        return isContainerInDomain( containerHostId, environmentId, true );
+    }
+
+
+    public boolean isContainerInDomain( final UUID containerHostId, final UUID environmentId,
+                                        final boolean checkAccess )
+            throws EnvironmentManagerException, EnvironmentNotFoundException
+    {
+        Preconditions.checkNotNull( containerHostId, "Invalid container id" );
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+
+        try
+        {
+            ContainerHost containerHost = environment.getContainerHostById( containerHostId );
+
+            return peerManager.getLocalPeer().isIpInVniDomain(
+                    containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ), environment.getVni() );
+        }
+        catch ( ContainerHostNotFoundException | PeerException e )
+        {
+            throw new EnvironmentManagerException( "Error checking container domain", e );
+        }
+    }
+
+
+    @Override
+    public void addContainerToDomain( final UUID containerHostId, final UUID environmentId, final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
+    {
+        TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Adding container %s to environment domain", containerHostId ) );
+
+        toggleContainerDomain( containerHostId, environmentId, true, op, async, true );
+    }
+
+
+    @Override
+    public void removeContainerFromDomain( final UUID containerHostId, final UUID environmentId, final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
+    {
+        TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Removing container %s from environment domain", containerHostId ) );
+
+        toggleContainerDomain( containerHostId, environmentId, false, op, async, true );
+    }
+
+
+    public void toggleContainerDomain( final UUID containerHostId, final UUID environmentId, final boolean add,
+                                       final TrackerOperation op, final boolean async, final boolean checkAccess )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
+    {
+        Preconditions.checkNotNull( containerHostId, "Invalid container id" );
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+
+        final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
+
+
+        ContainerHost containerHost = environment.getContainerHostById( containerHostId );
+
+
+        Awaitable setContainerDomainTask =
+                new SetContainerDomainTask( environment, containerHost, op, resultHolder, peerManager, add );
+
+        executor.submit( setContainerDomainTask );
+
+        if ( !async )
+        {
+            try
+            {
+                setContainerDomainTask.waitCompletion();
+
+                if ( resultHolder.getResult() != null )
+                {
+                    throw resultHolder.getResult();
+                }
+            }
+            catch ( InterruptedException e )
+            {
+                throw new EnvironmentModificationException( e );
+            }
+        }
+    }
+
+
+    /** reverse proxy domain functions end ** */
 
 
     public void registerListener( final EnvironmentEventListener listener )

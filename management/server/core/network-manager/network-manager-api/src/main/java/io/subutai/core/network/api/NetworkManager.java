@@ -101,11 +101,21 @@ public interface NetworkManager
      */
     public void removeVniVLanMapping( int tunnelId, long vni, int vLanId ) throws NetworkManagerException;
 
+    /**
+     * Returns all vni-vlan mappings on management host
+     */
     public Set<VniVlanMapping> getVniVlanMappings() throws NetworkManagerException;
 
-
+    /**
+     * Reserves VNI on management host
+     *
+     * @param vni - vni to reserve
+     */
     public void reserveVni( Vni vni ) throws NetworkManagerException;
 
+    /**
+     * Returns all reserved VNIs on management host
+     */
     public Set<Vni> getReservedVnis() throws NetworkManagerException;
 
     /**
@@ -150,5 +160,55 @@ public interface NetworkManager
      * @param domainName - domain name e.g. "intra.lan"
      */
     public void registerHosts( Set<ContainerHost> containers, String domainName ) throws NetworkManagerException;
+
+    /**
+     * Returns reverse proxy domain assigned to vlan
+     *
+     * @param vLanId - vlan id
+     *
+     * @return - domain or null if not assigned
+     */
+    public String getVlanDomain( int vLanId ) throws NetworkManagerException;
+
+
+    /**
+     * Removes reverse proxy domain assigned to vlan if any
+     *
+     * @param vLanId - vlan id
+     */
+    public void removeVlanDomain( int vLanId ) throws NetworkManagerException;
+
+    /**
+     * Assigns reverse proxy domain to vlan
+     *
+     * @param vLanId - vlan id
+     */
+    public void setVlanDomain( int vLanId, String domain ) throws NetworkManagerException;
+
+    /**
+     * Checks if IP is in vlan reverse proxy domain
+     *
+     * @param hostIp - ip to check
+     * @param vLanId - vlan id
+     *
+     * @return - true if ip is in vlan domain, false otherwise
+     */
+    public boolean isIpInVlanDomain( String hostIp, int vLanId ) throws NetworkManagerException;
+
+    /**
+     * Adds ip to vlan reverse proxy domain
+     *
+     * @param hostIp - ip to add
+     * @param vLanId - vlan id
+     */
+    public void addIpToVlanDomain( String hostIp, int vLanId ) throws NetworkManagerException;
+
+    /**
+     * Removes ip from reverse proxy domain
+     *
+     * @param hostIp - ip to remove
+     * @param vLanId - vlan id
+     */
+    public void removeIpFromVlanDomain( String hostIp, int vLanId ) throws NetworkManagerException;
 }
 

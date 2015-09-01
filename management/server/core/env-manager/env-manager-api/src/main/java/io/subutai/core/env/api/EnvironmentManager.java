@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import io.subutai.common.environment.Blueprint;
+import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
@@ -113,6 +114,7 @@ public interface EnvironmentManager
      * @throws EnvironmentModificationException - thrown if error occurs during environment modification
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
+    //todo use containerId instead of containerHost
     public void destroyContainer( ContainerHost containerHost, boolean async, boolean forceMetadataRemoval )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
@@ -166,5 +168,47 @@ public interface EnvironmentManager
      */
     public void updateEnvironmentContainersMetadata( UUID environmentId ) throws EnvironmentManagerException;
 
-    String createN2NTunnel( Set<Peer> peers ) throws EnvironmentManagerException;
+    /**
+     * Removes an assigned domain if any from the environment
+     *
+     * @param environmentId - id of the environment which domain to remove
+     * @param async - indicates whether operation is done synchronously or asynchronously to the calling party
+     */
+    public void removeDomain( UUID environmentId, boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException;
+
+    /**
+     * Assigns a domain to the environment. External client would be able to access the environment containers via the
+     * domain name.
+     *
+     * @param environmentId - id of the environment to assign the passed domain to
+     * @param newDomain - domain url
+     * @param async - indicates whether operation is done synchronously or asynchronously to the calling party
+     */
+    public void assignDomain( UUID environmentId, String newDomain, boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException;
+
+    /**
+     * Returns the currently assigned domain
+     *
+     * @param environmentId - id of the environment which domain to return
+     *
+     * @return - domain url or null if not assigned
+     */
+    public String getDomain( UUID environmentId ) throws EnvironmentManagerException, EnvironmentNotFoundException;
+
+
+    public boolean isContainerInDomain( UUID containerHostId, UUID environmentId )
+            throws EnvironmentManagerException, EnvironmentNotFoundException;
+
+
+    public void addContainerToDomain( UUID containerHostId, UUID environmentId, boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
+
+
+    public void removeContainerFromDomain( UUID containerHostId, UUID environmentId, boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
+
+
+    public String createN2NTunnel( Set<Peer> peers ) throws EnvironmentManagerException;
 }

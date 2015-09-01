@@ -88,6 +88,7 @@ import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
@@ -119,7 +120,6 @@ import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.strategy.api.StrategyNotFoundException;
-import io.subutai.core.http.manager.api.HttpContextManager;
 
 
 /**
@@ -982,8 +982,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
-                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder(
+                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
+                    bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1010,7 +1011,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( PeerException | HostDisconnectedException e )
         {
-            LOG.error( "Error checking host connected status #isConnected", e );
+            //            LOG.error( "Error checking host connected status #isConnected", e );
             return false;
         }
     }
@@ -1892,6 +1893,124 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
+    public String getVniDomain( final Long vni ) throws PeerException
+    {
+        Integer vlan = getVlanByVni( vni );
+
+        if ( vlan != null )
+        {
+            return getManagementHost().getVlanDomain( vlan );
+        }
+        else
+        {
+
+            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+        }
+    }
+
+
+    @Override
+    public void removeVniDomain( final Long vni ) throws PeerException
+    {
+        Integer vlan = getVlanByVni( vni );
+
+        if ( vlan != null )
+        {
+            getManagementHost().removeVlanDomain( vlan );
+        }
+        else
+        {
+
+            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+        }
+    }
+
+
+    @Override
+    public void setVniDomain( final Long vni, final String domain ) throws PeerException
+    {
+        Integer vlan = getVlanByVni( vni );
+
+        if ( vlan != null )
+        {
+            getManagementHost().setVlanDomain( vlan, domain );
+        }
+        else
+        {
+
+            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+        }
+    }
+
+
+    @Override
+    public boolean isIpInVniDomain( final String hostIp, final Long vni ) throws PeerException
+    {
+        Integer vlan = getVlanByVni( vni );
+
+        if ( vlan != null )
+        {
+            return getManagementHost().isIpInVlanDomain( hostIp, vlan );
+        }
+        else
+        {
+
+            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+        }
+    }
+
+
+    @Override
+    public void addIpToVniDomain( final String hostIp, final Long vni ) throws PeerException
+    {
+        Integer vlan = getVlanByVni( vni );
+
+        if ( vlan != null )
+        {
+            getManagementHost().addIpToVlanDomain( hostIp, vlan );
+        }
+        else
+        {
+
+            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+        }
+    }
+
+
+    @Override
+    public void removeIpFromVniDomain( final String hostIp, final Long vni ) throws PeerException
+    {
+        Integer vlan = getVlanByVni( vni );
+
+        if ( vlan != null )
+        {
+            getManagementHost().removeIpFromVlanDomain( hostIp, vlan );
+        }
+        else
+        {
+
+            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+        }
+    }
+
+
+    protected Integer getVlanByVni( long vni ) throws PeerException
+    {
+        Set<Vni> reservedVnis = getManagementHost().getReservedVnis();
+
+        for ( Vni reservedVni : reservedVnis )
+        {
+            if ( reservedVni.getVni() == vni )
+            {
+                return reservedVni.getVlan();
+            }
+        }
+
+        return null;
+    }
+
+
+    @Override
     public void addRequestListener( final RequestListener listener )
     {
         if ( listener != null )
@@ -1992,8 +2111,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void addToN2NTunnel( final N2NConfig config )
-            throws PeerException
+    public void addToN2NTunnel( final N2NConfig config ) throws PeerException
     {
         LOG.debug( String.format( "Adding local peer to n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
                 config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
