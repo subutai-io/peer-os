@@ -162,7 +162,7 @@ public interface NetworkManager
     public void registerHosts( Set<ContainerHost> containers, String domainName ) throws NetworkManagerException;
 
     /**
-     * Returns domain assigned to vlan
+     * Returns reverse proxy domain assigned to vlan
      *
      * @param vLanId - vlan id
      *
@@ -172,17 +172,43 @@ public interface NetworkManager
 
 
     /**
-     * Removes domain assigned to vlan if any
+     * Removes reverse proxy domain assigned to vlan if any
      *
      * @param vLanId - vlan id
      */
     public void removeVlanDomain( int vLanId ) throws NetworkManagerException;
 
     /**
-     * Assigns domain to vlan
+     * Assigns reverse proxy domain to vlan
      *
      * @param vLanId - vlan id
      */
     public void setVlanDomain( int vLanId, String domain ) throws NetworkManagerException;
+
+    /**
+     * Checks if IP is in vlan reverse proxy domain
+     *
+     * @param hostIp - ip to check
+     * @param vLanId - vlan id
+     *
+     * @return - true if ip is in vlan domain, false otherwise
+     */
+    public boolean isIpInVlanDomain( String hostIp, int vLanId ) throws NetworkManagerException;
+
+    /**
+     * Adds ip to vlan reverse proxy domain
+     *
+     * @param hostIp - ip to add
+     * @param vLanId - vlan id
+     */
+    public void addIpToVlanDomain( String hostIp, int vLanId ) throws NetworkManagerException;
+
+    /**
+     * Removes ip from reverse proxy domain
+     *
+     * @param hostIp - ip to remove
+     * @param vLanId - vlan id
+     */
+    public void removeIpFromVlanDomain( String hostIp, int vLanId ) throws NetworkManagerException;
 }
 

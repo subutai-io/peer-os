@@ -3,7 +3,7 @@ package io.subutai.core.env.ui.forms;
 
 import com.google.common.base.Strings;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
@@ -25,14 +25,18 @@ public class DomainWindow extends Window
     {
 
         setCaption( "Environment domain" );
-        setWidth( "500px" );
-        setHeight( "200px" );
+        setWidth( "300px" );
+        setHeight( "120px" );
         setModal( true );
         setClosable( true );
 
-        HorizontalLayout content = new HorizontalLayout();
+        GridLayout content = new GridLayout( 2, 1 );
+        content.setSizeFull();
+        content.setMargin( true );
+        content.setSpacing( true );
 
-        final TextField domainTxt = new TextField( "Domain" );
+
+        final TextField domainTxt = new TextField();
         try
         {
             String currentDomain = environmentManager.getDomain( environment.getId() );

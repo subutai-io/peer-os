@@ -137,12 +137,13 @@ public class EnvironmentForm
             final Button removeBtn = new Button( REMOVE );
             final Button refreshContainersButton = new Button( REFRESH_METADATA );
             final Button domainBtn = new Button( DOMAIN );
-            domainBtn.setId(environment.getName() + "-domain");
-            domainBtn.addClickListener( new Button.ClickListener() {
+            domainBtn.setId( environment.getName() + "-domain" );
+            domainBtn.addClickListener( new Button.ClickListener()
+            {
                 @Override
                 public void buttonClick( final Button.ClickEvent event )
                 {
-
+                    contentRoot.getUI().addWindow( new DomainWindow( environment, environmentManager ) );
                 }
             } );
             containersBtn.setId( environment.getName() + "-containers" );
@@ -258,7 +259,7 @@ public class EnvironmentForm
 
             environmentsTable.addItem( new Object[] {
                     environment.getId(), environment.getName(), getCreationDate( environment.getCreationTimestamp() ),
-                    icon, containersBtn, sshKeyBtn, destroyBtn, refreshContainersButton, removeBtn
+                    icon, containersBtn, sshKeyBtn, domainBtn, destroyBtn, refreshContainersButton, removeBtn
             }, null );
         }
         environmentsTable.refreshRowCache();
@@ -297,6 +298,7 @@ public class EnvironmentForm
         table.addContainerProperty( STATUS, Embedded.class, null );
         table.addContainerProperty( CONTAINERS, Button.class, null );
         table.addContainerProperty( SSH_KEY, Button.class, null );
+        table.addContainerProperty( DOMAIN, Button.class, null );
         table.addContainerProperty( DESTROY, Button.class, null );
         table.addContainerProperty( REFRESH_METADATA, Button.class, null );
         table.addContainerProperty( REMOVE, Button.class, null );

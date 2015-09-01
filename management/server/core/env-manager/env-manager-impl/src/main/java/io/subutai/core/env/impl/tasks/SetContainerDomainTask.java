@@ -6,10 +6,10 @@ import java.util.concurrent.Semaphore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
-
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
@@ -18,29 +18,32 @@ import io.subutai.core.peer.api.PeerManager;
 
 
 /**
- * (Un)sets environment domain
+ * Include/excludes container to/from environment domain
  */
-public class SetDomainTask implements Awaitable
+public class SetContainerDomainTask implements Awaitable
 {
-    private static final Logger LOG = LoggerFactory.getLogger( SetDomainTask.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( SetContainerDomainTask.class.getName() );
     private final EnvironmentImpl environment;
+    private final ContainerHost containerHost;
     private final TrackerOperation op;
     private final ResultHolder<EnvironmentModificationException> resultHolder;
-    private final String domain;
+    private final boolean add;
     private final PeerManager peerManager;
     protected Semaphore semaphore;
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
-    public SetDomainTask( final EnvironmentImpl environment, final PeerManager peerManager,
-                          final ResultHolder<EnvironmentModificationException> resultHolder, final TrackerOperation op,
-                          final String domain )
+    public SetContainerDomainTask( final EnvironmentImpl environment, final ContainerHost containerHost,
+                                   final TrackerOperation op,
+                                   final ResultHolder<EnvironmentModificationException> resultHolder,
+                                   final PeerManager peerManager, boolean add )
     {
         this.environment = environment;
-        this.peerManager = peerManager;
-        this.resultHolder = resultHolder;
+        this.containerHost = containerHost;
         this.op = op;
-        this.domain = domain;
+        this.resultHolder = resultHolder;
+        this.add = add;
+        this.peerManager = peerManager;
         this.semaphore = new Semaphore( 0 );
     }
 
@@ -52,25 +55,29 @@ public class SetDomainTask implements Awaitable
         {
             environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-            if ( Strings.isNullOrEmpty( domain ) )
+            if ( add )
             {
-                peerManager.getLocalPeer().removeVniDomain( environment.getVni() );
+                peerManager.getLocalPeer()
+                           .addIpToVniDomain( containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ),
+                                   environment.getVni() );
             }
             else
             {
-                peerManager.getLocalPeer().setVniDomain( environment.getVni(), domain );
+                peerManager.getLocalPeer().removeIpFromVniDomain(
+                        containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ),
+                        environment.getVni() );
             }
 
             environment.setStatus( EnvironmentStatus.HEALTHY );
 
-            op.addLogDone( "Environment domain is successfully set" );
+            op.addLogDone( "Container domain is successfully set" );
         }
         catch ( Exception e )
         {
-            LOG.error( String.format( "Error setting domain of environment %s", environment.getName() ), e );
+            LOG.error( String.format( "Error setting domain of container %s", containerHost.getId() ), e );
             environment.setStatus( EnvironmentStatus.UNHEALTHY );
             resultHolder.setResult( new EnvironmentModificationException( exceptionUtil.getRootCause( e ) ) );
-            op.addLogFailed( String.format( "Error setting domain of environment: %s",
+            op.addLogFailed( String.format( "Error setting domain of container %s: %s", containerHost.getId(),
                     exceptionUtil.getRootCauseMessage( e ) ) );
         }
         finally

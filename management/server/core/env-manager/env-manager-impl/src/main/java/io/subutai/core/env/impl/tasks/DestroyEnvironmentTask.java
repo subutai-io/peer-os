@@ -8,6 +8,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
+
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.mdc.SubutaiExecutors;
@@ -20,16 +26,10 @@ import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.env.api.exception.EnvironmentDestructionException;
 import io.subutai.core.env.impl.EnvironmentManagerImpl;
-import io.subutai.core.env.impl.exception.ResultHolder;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
-
+import io.subutai.core.env.impl.exception.ResultHolder;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -40,7 +40,7 @@ import com.google.common.collect.Sets;
  * @see io.subutai.core.env.impl.exception.ResultHolder
  * @see java.lang.Runnable
  */
-public class DestroyEnvironmentTask implements Runnable
+public class DestroyEnvironmentTask implements Awaitable
 {
     private static final Logger LOG = LoggerFactory.getLogger( DestroyEnvironmentTask.class.getName() );
     protected static final String CONTAINER_GROUP_NOT_FOUND = "Container group not found";
@@ -261,6 +261,7 @@ public class DestroyEnvironmentTask implements Runnable
     }
 
 
+    @Override
     public void waitCompletion() throws InterruptedException
     {
         semaphore.acquire();

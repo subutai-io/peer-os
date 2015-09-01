@@ -5,6 +5,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
+
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
@@ -15,12 +21,6 @@ import io.subutai.common.settings.Common;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.server.ui.component.ConfirmationDialog;
-
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 
 
 public class ContainersWindow extends Window
@@ -112,6 +112,15 @@ public class ContainersWindow extends Window
             final Button tagsBtn = new Button( "Tags" );
             final Button stopBtn = new Button( "Stop" );
             final Button destroyBtn = new Button( "Destroy" );
+            final Button domainBtn = new Button( "Domain" );
+            domainBtn.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( final Button.ClickEvent event )
+                {
+                    getUI().addWindow( new ContainerDomainWindow( containerHost, environment, environmentManager ) );
+                }
+            } );
             tagsBtn.addClickListener( new Button.ClickListener()
             {
                 @Override
@@ -188,8 +197,8 @@ public class ContainersWindow extends Window
             } );
             containersTable.addItem( new Object[] {
                     containerHost.getId().toString(), containerHost.getTemplateName(), containerHost.getHostname(),
-                    containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ), tagsBtn, startBtn,
-                    stopBtn, destroyBtn
+                    containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ), tagsBtn, domainBtn,
+                    startBtn, stopBtn, destroyBtn
             }, null );
             boolean isContainerConnected = containerHost.isConnected();
             startBtn.setEnabled( !isContainerConnected );
@@ -270,6 +279,7 @@ public class ContainersWindow extends Window
         table.addContainerProperty( "Hostname", String.class, null );
         table.addContainerProperty( "IP", String.class, null );
         table.addContainerProperty( "Tags", Button.class, null );
+        table.addContainerProperty( "Domain", Button.class, null );
         table.addContainerProperty( "Start", Button.class, null );
         table.addContainerProperty( "Stop", Button.class, null );
         table.addContainerProperty( "Destroy", Button.class, null );
