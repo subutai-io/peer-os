@@ -191,6 +191,20 @@ public class Commands
     }
 
 
+    public RequestBuilder getAddIpToVlanDomainCommand( final String hostIp, final int vLanId )
+    {
+        return new RequestBuilder( MANAGEMENT_PROXY_BINDING )
+                .withCmdArgs( Lists.newArrayList( "add", String.valueOf( vLanId ), "-h", hostIp ) );
+    }
+
+
+    public RequestBuilder getRemoveIpFromVlanDomainCommand( final String hostIp, final int vLanId )
+    {
+        return new RequestBuilder( MANAGEMENT_PROXY_BINDING )
+                .withCmdArgs( Lists.newArrayList( "del", String.valueOf( vLanId ), "-h", hostIp ) );
+    }
+
+
     // ssh and hosts
 
 

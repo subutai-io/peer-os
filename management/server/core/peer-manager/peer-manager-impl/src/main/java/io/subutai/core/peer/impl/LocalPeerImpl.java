@@ -1895,53 +1895,106 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public String getVniDomain( final Long vni ) throws PeerException
     {
-        Set<Vni> reservedVnis = getManagementHost().getReservedVnis();
+        Integer vlan = getVlanByVni( vni );
 
-        for ( Vni reservedVni : reservedVnis )
+        if ( vlan != null )
         {
-            if ( reservedVni.getVni() == vni )
-            {
-                return getManagementHost().getVlanDomain( reservedVni.getVlan() );
-            }
+            return getManagementHost().getVlanDomain( vlan );
         }
-        throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+        else
+        {
+
+            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+        }
     }
 
 
     @Override
     public void removeVniDomain( final Long vni ) throws PeerException
     {
-        Set<Vni> reservedVnis = getManagementHost().getReservedVnis();
+        Integer vlan = getVlanByVni( vni );
 
-        for ( Vni reservedVni : reservedVnis )
+        if ( vlan != null )
         {
-            if ( reservedVni.getVni() == vni )
-            {
-                getManagementHost().removeVlanDomain( reservedVni.getVlan() );
-            }
+            getManagementHost().removeVlanDomain( vlan );
         }
-        throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+        else
+        {
+
+            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+        }
     }
 
 
     @Override
     public void setVniDomain( final Long vni, final String domain ) throws PeerException
     {
-        Set<Vni> reservedVnis = getManagementHost().getReservedVnis();
+        Integer vlan = getVlanByVni( vni );
 
-        for ( Vni reservedVni : reservedVnis )
+        if ( vlan != null )
         {
-            if ( reservedVni.getVni() == vni )
-            {
-                getManagementHost().setVlanDomain( reservedVni.getVlan(), domain );
-            }
+            getManagementHost().setVlanDomain( vlan, domain );
         }
-        throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+        else
+        {
+
+            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+        }
     }
 
 
     @Override
     public boolean isIpInVniDomain( final String hostIp, final Long vni ) throws PeerException
+    {
+        Integer vlan = getVlanByVni( vni );
+
+        if ( vlan != null )
+        {
+            return getManagementHost().isIpInVlanDomain( hostIp, vlan );
+        }
+        else
+        {
+
+            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+        }
+    }
+
+
+    @Override
+    public void addIpToVniDomain( final String hostIp, final Long vni ) throws PeerException
+    {
+        Integer vlan = getVlanByVni( vni );
+
+        if ( vlan != null )
+        {
+            getManagementHost().addIpToVlanDomain( hostIp, vlan );
+        }
+        else
+        {
+
+            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+        }
+    }
+
+
+    @Override
+    public void removeIpFromVniDomain( final String hostIp, final Long vni ) throws PeerException
+    {
+        Integer vlan = getVlanByVni( vni );
+
+        if ( vlan != null )
+        {
+            getManagementHost().removeIpFromVlanDomain( hostIp, vlan );
+        }
+        else
+        {
+
+            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+        }
+    }
+
+
+    protected Integer getVlanByVni( long vni ) throws PeerException
     {
         Set<Vni> reservedVnis = getManagementHost().getReservedVnis();
 
@@ -1949,10 +2002,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             if ( reservedVni.getVni() == vni )
             {
-                return getManagementHost().isIpInVlanDomain( hostIp, reservedVni.getVlan() );
+                return reservedVni.getVlan();
             }
         }
-        throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+
+        return null;
     }
 
 

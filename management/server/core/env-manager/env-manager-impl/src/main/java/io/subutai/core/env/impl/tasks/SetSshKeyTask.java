@@ -3,6 +3,11 @@ package io.subutai.core.env.impl.tasks;
 
 import java.util.concurrent.Semaphore;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
+
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.tracker.TrackerOperation;
@@ -10,10 +15,6 @@ import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.ResultHolder;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Strings;
 
 
 /**
@@ -24,7 +25,7 @@ import com.google.common.base.Strings;
  * @see io.subutai.core.network.api.NetworkManager
  * @see java.lang.Runnable
  */
-public class SetSshKeyTask implements Runnable
+public class SetSshKeyTask implements Awaitable
 {
     private static final Logger LOG = LoggerFactory.getLogger( SetSshKeyTask.class.getName() );
 
@@ -94,6 +95,7 @@ public class SetSshKeyTask implements Runnable
     }
 
 
+    @Override
     public void waitCompletion() throws InterruptedException
     {
         semaphore.acquire();

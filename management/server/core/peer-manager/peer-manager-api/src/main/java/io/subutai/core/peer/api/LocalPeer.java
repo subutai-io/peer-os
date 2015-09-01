@@ -177,4 +177,8 @@ public interface LocalPeer extends Peer
      * @param vni - vni
      */
     public boolean isIpInVniDomain( String hostIp, Long vni ) throws PeerException;
+
+    public void addIpToVniDomain( String hostIp, Long vni ) throws PeerException;
+
+    public void removeIpFromVniDomain( String hostIp, Long vni ) throws PeerException;
 }

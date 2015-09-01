@@ -84,7 +84,7 @@ public interface ManagementHost extends Host
     void addToTunnel( N2NConfig config ) throws PeerException;
 
     /**
-     * Returns domain assigned to vlan if any
+     * Returns reverse proxy environment domain assigned to vlan if any
      *
      * @param vlan - vlan id
      *
@@ -100,7 +100,7 @@ public interface ManagementHost extends Host
     public void removeVlanDomain( int vlan ) throws PeerException;
 
     /**
-     * Assigns domain to vlan
+     * Assigns reverse proxy environment domain  to vlan
      *
      * @param vlan - vlan id
      * @param domain - domain to assign
@@ -108,10 +108,26 @@ public interface ManagementHost extends Host
     public void setVlanDomain( int vlan, String domain ) throws PeerException;
 
     /**
-     * Returns true if hostIp is added to domain by vni
+     * Returns true if hostIp is added to reverse proxy environment domain  by vni
      *
      * @param hostIp - ip of host to check
      * @param vlan - vlan id
      */
     public boolean isIpInVlanDomain( String hostIp, int vlan ) throws PeerException;
+
+    /**
+     * Adds ip to reverse proxy environment domain
+     *
+     * @param hostIp - ip to remove
+     * @param vlan - vlan id
+     */
+    public void addIpToVlanDomain( String hostIp, int vlan ) throws PeerException;
+
+    /**
+     * Removes ip from reverse proxy environment domain
+     *
+     * @param hostIp - ip to remove
+     * @param vlan - vlan id
+     */
+    public void removeIpFromVlanDomain( String hostIp, int vlan ) throws PeerException;
 }

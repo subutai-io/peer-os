@@ -165,6 +165,34 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
+    @Override
+    public void addIpToVlanDomain( final String hostIp, final int vlan ) throws PeerException
+    {
+        try
+        {
+            getNetworkManager().addIpToVlanDomain( hostIp, vlan );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( String.format( "Error adding ip %s to domain by vlan %d", hostIp, vlan ), e );
+        }
+    }
+
+
+    @Override
+    public void removeIpFromVlanDomain( final String hostIp, final int vlan ) throws PeerException
+    {
+        try
+        {
+            getNetworkManager().removeIpFromVlanDomain( hostIp, vlan );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( String.format( "Error removing ip %s from domain by vlan %d", hostIp, vlan ), e );
+        }
+    }
+
+
     public <T> Future<T> queueSequentialTask( Callable<T> callable )
     {
         return singleThreadExecutorService.submit( callable );

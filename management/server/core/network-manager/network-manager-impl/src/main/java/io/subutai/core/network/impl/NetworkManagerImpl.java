@@ -333,6 +333,28 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
+    public void addIpToVlanDomain( final String hostIp, final int vLanId ) throws NetworkManagerException
+    {
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostIp ), "Invalid host IP" );
+        Preconditions.checkArgument( hostIp.matches( Common.HOSTNAME_REGEX ), "Invalid host IP" );
+
+        execute( getManagementHost(), commands.getAddIpToVlanDomainCommand( hostIp, vLanId ) );
+    }
+
+
+    @Override
+    public void removeIpFromVlanDomain( final String hostIp, final int vLanId ) throws NetworkManagerException
+    {
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostIp ), "Invalid host IP" );
+        Preconditions.checkArgument( hostIp.matches( Common.HOSTNAME_REGEX ), "Invalid host IP" );
+
+        execute( getManagementHost(), commands.getRemoveIpFromVlanDomainCommand( hostIp, vLanId ) );
+    }
+
+
+    @Override
     public Set<Vni> getReservedVnis() throws NetworkManagerException
     {
         Set<Vni> reservedVnis = Sets.newHashSet();

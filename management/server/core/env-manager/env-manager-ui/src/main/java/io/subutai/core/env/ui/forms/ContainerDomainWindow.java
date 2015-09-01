@@ -7,7 +7,9 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Window;
 
+import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.env.api.EnvironmentManager;
@@ -50,12 +52,57 @@ public class ContainerDomainWindow extends Window
                 if ( isContainerInDomainChk.getValue() )
                 {
                     //include container to environment domain
-                    Notification.show( "Including" );
+                    isContainerInDomainChk.setEnabled( false );
+                    Notification.show( "Please, wait..." );
+                    getUI().access( new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            try
+                            {
+                                environmentManager
+                                        .addContainerToDomain( containerHost.getId(), environment.getId(), false );
+                            }
+                            catch ( EnvironmentNotFoundException | ContainerHostNotFoundException |
+                                    EnvironmentModificationException e )
+                            {
+                                Notification.show( "Error adding container to domain", e.getMessage(),
+                                        Notification.Type.ERROR_MESSAGE );
+                                close();
+                            }
+
+
+                            isContainerInDomainChk.setEnabled( true );
+                        }
+                    } );
                 }
                 else
                 {
                     //exclude container from environment domain
-                    Notification.show( "Excluding" );
+                    isContainerInDomainChk.setEnabled( false );
+                    Notification.show( "Please, wait..." );
+                    getUI().access( new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            try
+                            {
+                                environmentManager
+                                        .removeContainerFromDomain( containerHost.getId(), environment.getId(), false );
+                            }
+                            catch ( EnvironmentModificationException | ContainerHostNotFoundException |
+                                    EnvironmentNotFoundException e )
+                            {
+                                Notification.show( "Error removing container from domain", e.getMessage(),
+                                        Notification.Type.ERROR_MESSAGE );
+                                close();
+                            }
+
+                            isContainerInDomainChk.setEnabled( true );
+                        }
+                    } );
                 }
             }
         } );

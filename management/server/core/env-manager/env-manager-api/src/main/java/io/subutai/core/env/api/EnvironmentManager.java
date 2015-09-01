@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import io.subutai.common.environment.Blueprint;
+import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
@@ -196,8 +197,18 @@ public interface EnvironmentManager
      */
     public String getDomain( UUID environmentId ) throws EnvironmentManagerException, EnvironmentNotFoundException;
 
-    String createN2NTunnel( Set<Peer> peers ) throws EnvironmentManagerException;
 
     public boolean isContainerInDomain( UUID containerHostId, UUID environmentId )
             throws EnvironmentManagerException, EnvironmentNotFoundException;
+
+
+    public void addContainerToDomain( UUID containerHostId, UUID environmentId, boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
+
+
+    public void removeContainerFromDomain( UUID containerHostId, UUID environmentId, boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
+
+
+    public String createN2NTunnel( Set<Peer> peers ) throws EnvironmentManagerException;
 }

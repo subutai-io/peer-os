@@ -5,6 +5,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.apache.commons.net.util.SubnetUtils;
+
+import com.google.common.collect.Sets;
+
 import io.subutai.common.environment.Topology;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
@@ -16,15 +23,9 @@ import io.subutai.core.env.impl.EnvironmentManagerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.ResultHolder;
 import io.subutai.core.peer.api.LocalPeer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.apache.commons.net.util.SubnetUtils;
-
-import com.google.common.collect.Sets;
 
 
-public class CreateEnvironmentTask implements Runnable
+public class CreateEnvironmentTask implements Awaitable
 {
     private static final Logger LOG = LoggerFactory.getLogger( CreateEnvironmentTask.class.getName() );
 
@@ -134,6 +135,7 @@ public class CreateEnvironmentTask implements Runnable
     }
 
 
+    @Override
     public void waitCompletion() throws InterruptedException
     {
         semaphore.acquire();

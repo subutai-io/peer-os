@@ -19,7 +19,7 @@ import io.subutai.core.peer.api.PeerManager;
 /**
  * (Un)sets environment domain
  */
-public class SetDomainTask implements Runnable
+public class SetDomainTask implements Awaitable
 {
     private static final Logger LOG = LoggerFactory.getLogger( SetDomainTask.class.getName() );
     private final EnvironmentImpl environment;
@@ -77,6 +77,7 @@ public class SetDomainTask implements Runnable
     }
 
 
+    @Override
     public void waitCompletion() throws InterruptedException
     {
         semaphore.acquire();
