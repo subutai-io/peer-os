@@ -1,8 +1,6 @@
 package io.subutai.core.security.broker;
 
 
-import java.util.UUID;
-
 import javax.naming.NamingException;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
@@ -10,11 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.command.Request;
-import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.UUIDUtil;
 import io.subutai.core.broker.api.TextMessagePostProcessor;
+import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 
@@ -38,6 +36,13 @@ public class MessageEncryptor implements TextMessagePostProcessor
     public static SecurityManager getSecurityManager() throws NamingException
     {
         return ServiceLocator.getServiceNoCache( SecurityManager.class );
+    }
+
+
+    public static RegistrationManager getRegistrationManager() throws NamingException
+    {
+
+        return ServiceLocator.getServiceNoCache( RegistrationManager.class );
     }
 
 
@@ -74,31 +79,5 @@ public class MessageEncryptor implements TextMessagePostProcessor
         }
 
         return message;
-    }
-
-
-    class RequestWrapper
-    {
-        private RequestBuilder.RequestImpl request;
-
-
-        public RequestBuilder.RequestImpl getRequest()
-        {
-            return request;
-        }
-    }
-
-
-    class EncryptedRequestWrapper
-    {
-        private final String request;
-        private final UUID hostId;
-
-
-        public EncryptedRequestWrapper( final String request, final UUID hostId )
-        {
-            this.request = request;
-            this.hostId = hostId;
-        }
     }
 }
