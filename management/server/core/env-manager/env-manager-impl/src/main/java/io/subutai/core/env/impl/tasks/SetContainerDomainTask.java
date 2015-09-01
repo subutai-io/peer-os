@@ -11,6 +11,7 @@ import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.ResultHolder;
 import io.subutai.core.peer.api.PeerManager;
@@ -29,6 +30,7 @@ public class SetContainerDomainTask implements Awaitable
     private final boolean add;
     private final PeerManager peerManager;
     protected Semaphore semaphore;
+    protected ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
     public SetContainerDomainTask( final EnvironmentImpl environment, final ContainerHost containerHost,
@@ -74,9 +76,9 @@ public class SetContainerDomainTask implements Awaitable
         {
             LOG.error( String.format( "Error setting domain of container %s", containerHost.getId() ), e );
             environment.setStatus( EnvironmentStatus.UNHEALTHY );
-            resultHolder.setResult( new EnvironmentModificationException( e ) );
+            resultHolder.setResult( new EnvironmentModificationException( exceptionUtil.getRootCause( e ) ) );
             op.addLogFailed( String.format( "Error setting domain of container %s: %s", containerHost.getId(),
-                    e.getMessage() ) );
+                    exceptionUtil.getRootCauseMessage( e ) ) );
         }
         finally
         {

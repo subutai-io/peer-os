@@ -11,6 +11,7 @@ import com.google.common.base.Strings;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.ResultHolder;
 import io.subutai.core.peer.api.PeerManager;
@@ -28,6 +29,7 @@ public class SetDomainTask implements Awaitable
     private final String domain;
     private final PeerManager peerManager;
     protected Semaphore semaphore;
+    protected ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
     public SetDomainTask( final EnvironmentImpl environment, final PeerManager peerManager,
@@ -67,8 +69,9 @@ public class SetDomainTask implements Awaitable
         {
             LOG.error( String.format( "Error setting domain of environment %s", environment.getName() ), e );
             environment.setStatus( EnvironmentStatus.UNHEALTHY );
-            resultHolder.setResult( new EnvironmentModificationException( e ) );
-            op.addLogFailed( String.format( "Error setting domain of environment: %s", e.getMessage() ) );
+            resultHolder.setResult( new EnvironmentModificationException( exceptionUtil.getRootCause( e ) ) );
+            op.addLogFailed( String.format( "Error setting domain of environment: %s",
+                    exceptionUtil.getRootCauseMessage( e ) ) );
         }
         finally
         {

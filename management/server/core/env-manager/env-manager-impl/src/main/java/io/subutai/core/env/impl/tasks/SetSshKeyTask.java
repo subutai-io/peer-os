@@ -11,6 +11,7 @@ import com.google.common.base.Strings;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.ResultHolder;
 import io.subutai.core.network.api.NetworkManager;
@@ -35,6 +36,7 @@ public class SetSshKeyTask implements Awaitable
     private final String sshKey;
     private final TrackerOperation op;
     protected Semaphore semaphore;
+    protected ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
     public SetSshKeyTask( final EnvironmentImpl environment, final NetworkManager networkManager,
@@ -85,8 +87,9 @@ public class SetSshKeyTask implements Awaitable
         {
             LOG.error( String.format( "Error setting ssh key to environment %s", environment.getName() ), e );
             environment.setStatus( EnvironmentStatus.UNHEALTHY );
-            resultHolder.setResult( new EnvironmentModificationException( e ) );
-            op.addLogFailed( String.format( "Error setting environment ssh key: %s", e.getMessage() ) );
+            resultHolder.setResult( new EnvironmentModificationException( exceptionUtil.getRootCause( e ) ) );
+            op.addLogFailed(
+                    String.format( "Error setting environment ssh key: %s", exceptionUtil.getRootCauseMessage( e ) ) );
         }
         finally
         {
