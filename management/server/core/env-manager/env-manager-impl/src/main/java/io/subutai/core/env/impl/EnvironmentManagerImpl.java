@@ -17,6 +17,7 @@ import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInfo;
@@ -177,7 +178,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         for ( Environment environment : environments )
         {
             setEnvironmentTransientFields( environment );
-            setContainersTransientFields( environment.getContainerHosts() );
+            setContainersTransientFields( environment );
         }
 
         if ( !isUserAdmin() )
@@ -226,7 +227,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         setEnvironmentTransientFields( environment );
 
         //set container's transient fields
-        setContainersTransientFields( environment.getContainerHosts() );
+        setContainersTransientFields( environment );
 
         return environment;
     }
@@ -663,16 +664,26 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void setContainersTransientFields( final Set<ContainerHost> containers )
+    public void setContainersTransientFields( final Environment environment/*, final Set<ContainerHost> containers */)
     {
-        for ( ContainerHost containerHost : containers )
+        for ( ContainerHost containerHost : environment.getContainerHosts())
         {
             ( ( EnvironmentContainerImpl ) containerHost ).setDataService( environmentContainerDataService );
             ( ( EnvironmentContainerImpl ) containerHost ).setEnvironmentManager( this );
-            ( ( EnvironmentContainerImpl ) containerHost ).setPeer( peerManager.getPeer( containerHost.getPeerId() ) );
+
+
+            String peerId = containerHost.getPeerId();
+            Peer peer = peerManager.getPeer( peerId );
+
+            String n2nIp =  environment.findN2nIp(peerId);
+            if ( n2nIp != null )
+            {
+                peer.getPeerInfo().setIp( n2nIp );
+            }
+
+            ( ( EnvironmentContainerImpl ) containerHost ).setPeer( peer );
         }
     }
-
 
     public void configureSsh( final Set<ContainerHost> containerHosts ) throws NetworkManagerException
     {

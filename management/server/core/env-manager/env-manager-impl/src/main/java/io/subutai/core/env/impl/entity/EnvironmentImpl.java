@@ -22,6 +22,7 @@ import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerHost;
@@ -77,6 +78,10 @@ public class EnvironmentImpl implements Environment, Serializable
             cascade = CascadeType.ALL, orphanRemoval = true )
     private Set<ContainerHost> containers = Sets.newHashSet();
 
+    @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = EnvironmentPeerImpl.class,
+            cascade = CascadeType.ALL, orphanRemoval = true )
+    private Set<EnvironmentPeer> environmentPeers = Sets.newHashSet();
+
     @Enumerated( EnumType.STRING )
     private EnvironmentStatus status;
 
@@ -111,6 +116,19 @@ public class EnvironmentImpl implements Environment, Serializable
         this.status = EnvironmentStatus.EMPTY;
         this.lastUsedIpIndex = 0;//0 is reserved for gateway
         this.userId = userId;
+    }
+
+
+    @Override
+    public Set<EnvironmentPeer> getEnvironmentPeers()
+    {
+        return environmentPeers;
+    }
+
+
+    public void setEnvironmentPeers( final Set<EnvironmentPeer> environmentPeers )
+    {
+        this.environmentPeers = environmentPeers;
     }
 
 
@@ -215,6 +233,22 @@ public class EnvironmentImpl implements Environment, Serializable
             hosts.add( getContainerHostById( id ) );
         }
         return hosts;
+    }
+
+
+    @Override
+    public String findN2nIp( final String peerId )
+    {
+        String result = null;
+        for ( EnvironmentPeer p : environmentPeers )
+        {
+            if ( p.getPeerId().equals( peerId ) )
+            {
+                result = p.getIp();
+                break;
+            }
+        }
+        return result;
     }
 
 

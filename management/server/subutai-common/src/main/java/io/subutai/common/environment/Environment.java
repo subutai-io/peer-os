@@ -40,6 +40,8 @@ public interface Environment
      */
     public long getCreationTimestamp();
 
+    Set<EnvironmentPeer> getEnvironmentPeers();
+
     /**
      * Returns ssh key if any of environment
      *
@@ -121,4 +123,6 @@ public interface Environment
     public ContainerHost getContainerHostByHostname( String hostname ) throws ContainerHostNotFoundException;
 
     public Set<ContainerHost> getContainerHostsByIds( Set<UUID> ids ) throws ContainerHostNotFoundException;
+
+    String findN2nIp( String peerId );
 }
