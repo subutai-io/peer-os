@@ -44,8 +44,6 @@ public class MessageEncryptor implements TextMessagePostProcessor
     @Override
     public String process( final String topic, final String message )
     {
-        LOG.info( String.format( "OUTGOING:%s", message ) );
-
         //assume this is a host  topic
         if ( encryptionEnabled && UUIDUtil.isStringAUuid( topic ) )
         {
@@ -67,11 +65,7 @@ public class MessageEncryptor implements TextMessagePostProcessor
                 EncryptedRequestWrapper encryptedRequestWrapper =
                         new EncryptedRequestWrapper( encryptedRequestString, originalRequest.getId() );
 
-                String encryptedRequestWrapperString = JsonUtil.toJson( encryptedRequestWrapper );
-
-                LOG.info( String.format( "Sending encrypted message: %s", encryptedRequestWrapperString ) );
-
-                return encryptedRequestWrapperString;
+                return JsonUtil.toJson( encryptedRequestWrapper );
             }
             catch ( Exception e )
             {
