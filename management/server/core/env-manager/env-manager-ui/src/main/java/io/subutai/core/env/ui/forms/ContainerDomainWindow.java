@@ -22,14 +22,17 @@ public class ContainerDomainWindow extends Window
                                   final EnvironmentManager environmentManager )
     {
         setCaption( "Container domain" );
-        setWidth( "500px" );
-        setHeight( "200px" );
+        setWidth( "250px" );
+        setHeight( "80px" );
         setModal( true );
         setClosable( true );
 
         HorizontalLayout content = new HorizontalLayout();
+        content.setSizeFull();
+        content.setMargin( true );
 
-        final CheckBox isContainerInDomainChk = new CheckBox( "Container in domain" );
+
+        final CheckBox isContainerInDomainChk = new CheckBox( "Is container in domain" );
         isContainerInDomainChk.setImmediate( true );
 
         try
