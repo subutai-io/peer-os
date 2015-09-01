@@ -106,4 +106,12 @@ public interface ManagementHost extends Host
      * @param domain - domain to assign
      */
     public void setVlanDomain( int vlan, String domain ) throws PeerException;
+
+    /**
+     * Returns true if hostIp is added to domain by vni
+     *
+     * @param hostIp - ip of host to check
+     * @param vlan - vlan id
+     */
+    public boolean isIpInVlanDomain( String hostIp, int vlan ) throws PeerException;
 }

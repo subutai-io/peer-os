@@ -169,4 +169,12 @@ public interface LocalPeer extends Peer
      * @param domain -  domain to assign
      */
     public void setVniDomain( Long vni, String domain ) throws PeerException;
+
+    /**
+     * Returns true if hostIp is added to domain by vni
+     *
+     * @param hostIp - ip of host to check
+     * @param vni - vni
+     */
+    public boolean isIpInVniDomain( String hostIp, Long vni ) throws PeerException;
 }

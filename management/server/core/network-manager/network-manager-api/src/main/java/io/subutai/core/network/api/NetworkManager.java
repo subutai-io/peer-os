@@ -184,5 +184,15 @@ public interface NetworkManager
      * @param vLanId - vlan id
      */
     public void setVlanDomain( int vLanId, String domain ) throws NetworkManagerException;
+
+    /**
+     * Checks if IP is in vlan domain
+     *
+     * @param hostIp - ip to check
+     * @param vLanId - vlan id
+     *
+     * @return - true if ip is in vlan domain, false otherwise
+     */
+    public boolean isIpInVlanDomain( String hostIp, int vLanId ) throws NetworkManagerException;
 }
 

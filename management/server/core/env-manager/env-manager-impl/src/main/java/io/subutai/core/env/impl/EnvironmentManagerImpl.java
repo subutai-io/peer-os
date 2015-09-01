@@ -11,6 +11,18 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.net.util.SubnetUtils;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.ContainerHostNotFoundException;
@@ -39,15 +51,14 @@ import io.subutai.core.env.api.exception.EnvironmentManagerException;
 import io.subutai.core.env.api.exception.EnvironmentSecurityException;
 import io.subutai.core.env.impl.builder.EnvironmentBuilder;
 import io.subutai.core.env.impl.dao.BlueprintDataService;
-import io.subutai.core.env.impl.dao.EnvironmentDataService;
-import io.subutai.core.env.impl.tasks.CreateEnvironmentTask;
-import io.subutai.core.env.impl.tasks.SetSshKeyTask;
 import io.subutai.core.env.impl.dao.EnvironmentContainerDataService;
+import io.subutai.core.env.impl.dao.EnvironmentDataService;
 import io.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.EnvironmentBuildException;
 import io.subutai.core.env.impl.exception.EnvironmentTunnelException;
 import io.subutai.core.env.impl.exception.ResultHolder;
+import io.subutai.core.env.impl.tasks.CreateEnvironmentTask;
 import io.subutai.core.env.impl.tasks.DestroyContainerTask;
 import io.subutai.core.env.impl.tasks.DestroyEnvironmentTask;
 import io.subutai.core.env.impl.tasks.GrowEnvironmentTask;
@@ -61,17 +72,6 @@ import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.tracker.api.Tracker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Transformer;
-import org.apache.commons.net.util.SubnetUtils;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -858,6 +858,38 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         catch ( PeerException e )
         {
             throw new EnvironmentManagerException( "Error obtaining environment domain", e );
+        }
+    }
+
+
+    @Override
+    public boolean isContainerInDomain( final UUID containerHostId, final UUID environmentId )
+            throws EnvironmentManagerException, EnvironmentNotFoundException
+    {
+
+        return isContainerInDomain( containerHostId, environmentId, true );
+    }
+
+
+    public boolean isContainerInDomain( final UUID containerHostId, final UUID environmentId,
+                                        final boolean checkAccess )
+            throws EnvironmentManagerException, EnvironmentNotFoundException
+    {
+        Preconditions.checkNotNull( containerHostId, "Invalid container id" );
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+
+        try
+        {
+            ContainerHost containerHost = environment.getContainerHostById( containerHostId );
+
+            return peerManager.getLocalPeer().isIpInVniDomain(
+                    containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ), environment.getVni() );
+        }
+        catch ( ContainerHostNotFoundException | PeerException e )
+        {
+            throw new EnvironmentManagerException( "Error checking container domain", e );
         }
     }
 

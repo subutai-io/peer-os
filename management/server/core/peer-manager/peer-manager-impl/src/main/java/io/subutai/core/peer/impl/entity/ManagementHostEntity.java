@@ -50,7 +50,6 @@ import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.network.api.Tunnel;
 import io.subutai.core.peer.api.ManagementHost;
-import io.subutai.core.peer.api.ResourceHostException;
 import io.subutai.core.peer.impl.tasks.CreateGatewayTask;
 import io.subutai.core.peer.impl.tasks.ReserveVniTask;
 import io.subutai.core.peer.impl.tasks.SetupTunnelsTask;
@@ -148,6 +147,20 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         catch ( NetworkManagerException e )
         {
             throw new PeerException( String.format( "Error setting domain by vlan %d", vlan ), e );
+        }
+    }
+
+
+    @Override
+    public boolean isIpInVlanDomain( final String hostIp, final int vlan ) throws PeerException
+    {
+        try
+        {
+            return getNetworkManager().isIpInVlanDomain( hostIp, vlan );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( String.format( "Error checking domain by ip %s and vlan %d", hostIp, vlan ), e );
         }
     }
 

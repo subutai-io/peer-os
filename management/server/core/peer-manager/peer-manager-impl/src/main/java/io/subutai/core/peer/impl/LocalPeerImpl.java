@@ -982,8 +982,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
-                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder(
+                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
+                    bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1010,7 +1011,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( PeerException | HostDisconnectedException e )
         {
-//            LOG.error( "Error checking host connected status #isConnected", e );
+            //            LOG.error( "Error checking host connected status #isConnected", e );
             return false;
         }
     }
@@ -1940,6 +1941,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
+    public boolean isIpInVniDomain( final String hostIp, final Long vni ) throws PeerException
+    {
+        Set<Vni> reservedVnis = getManagementHost().getReservedVnis();
+
+        for ( Vni reservedVni : reservedVnis )
+        {
+            if ( reservedVni.getVni() == vni )
+            {
+                return getManagementHost().isIpInVlanDomain( hostIp, reservedVni.getVlan() );
+            }
+        }
+        throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+    }
+
+
+    @Override
     public void addRequestListener( final RequestListener listener )
     {
         if ( listener != null )
@@ -2040,8 +2057,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void addToN2NTunnel( final N2NConfig config )
-            throws PeerException
+    public void addToN2NTunnel( final N2NConfig config ) throws PeerException
     {
         LOG.debug( String.format( "Adding local peer to n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
                 config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
