@@ -72,6 +72,13 @@ Usage:   Delete Reserved VNI Delete tunnell mapping Delete Gateway
          Example: subutai management_network -Z deleteall 234
 
 -------------------------------------------------------------------------------
+Usage:   subutai management_network -e INTERFACENAME COMMUNITYNAME
+         Example: subutai management -e n2n1 comname
+                  where n2n1     - n2n interface name
+                        comname  - communityname
+-------------------------------------------------------------------------------
+
+
 EOF
 }
 
