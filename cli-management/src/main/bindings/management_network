@@ -111,12 +111,17 @@ function management_network {
   local removeTapDevice="false"
   local reserveVNI="false"
   local lresVNI="false"
+  local reloadN2N="false"
   shift_amount=0;
-  while getopts ":clrfspdNLRSVTDmvMEZ:" opt; do
+  while getopts ":clrfspdNLRSVTDmvMEZe:" opt; do
      case $opt in
        c)
 	 createTunnel="true"	
 	 shift
+         ;;
+       e)
+         reloadN2N="true"
+         shift
          ;;
        l)
 	 listTunnel="true"
@@ -234,6 +239,8 @@ function management_network {
      msg_info "A port of $tunnelPortName is opened type=$tunnelType and IP=$tunnelIpAddress in br-tun bridge."
    fi
    
+
+
    if [ "true" == "$listTunnel" ]; then
       echo -e "List of Tunnels"
       echo -e "--------"
@@ -366,8 +373,25 @@ function management_network {
          msg_info "All Matched flows are deleted in $bridgeName"
       fi
    fi
-   
-   if [ "true" == "$createN2NTunnel" ]; then
+
+   if [ "true" == "$reloadN2N" ]; then
+
+      intname=$1
+      comname=$2
+
+      edgePorts="/var/subutai-network/edgePorts.txt" 
+      portN2N=$(cat $edgePorts  | grep "$intname,$comname" | awk -F"," '{print $8}')
+      if [ -z "$portN2N" ]; then
+        msg_error "provide manageent port for edge"
+      fi
+      echo "reload N2N port=$portN2N action=reload"
+      echo "reload" | nc -w1 -4u localhost $portN2N
+
+   fi
+
+
+
+  if [ "true" == "$createN2NTunnel" ]; then
       supernodeIpAddress="$1"
       supernodePort="$2"
       interfaceName="$3"
@@ -375,7 +399,7 @@ function management_network {
       localPeerIpAddress="$5"
       keyType="$6"
       keyFile="$7"
-      extra="$8"
+      extra="$9"
 
       if [ -z "$supernodeIpAddress" ]; then
          msg_error "supernodeIpAddress Parameter not provided. Aborting ..."
@@ -414,27 +438,69 @@ function management_network {
          show_usage "`management_network_usage`"
       fi
 
+      edgePorts="/var/subutai-network/edgePorts.txt"
+      if [ -e "$edgePorts" ]; then
+         echo ""
+      else
+        msg_info " file $edgePorts not exist"
+        touch  $edgePorts
+      fi
+
+      
+   mgmtport=""
+      for i in `seq 5645 65535`;
+      do
+           checkport=$(netstat -na | grep "^udp " | grep "127.0.0.1:$i")
+           if [ -z "$checkport" ]; then
+              echo "port $i is free "
+              mgmtport=$i
+              break
+             
+           fi
+      done
+      if [ -z "$mgmtport" ]; then
+         msg_error "NO free UDP port in system"
+         exit 1
+      fi
+#         mgmtport=5644
+#      fi
+
+
+
+
       if [ "$extra" ]; then
          msg_error "extra Parameter provided. Aborting ..."
          show_usage "`management_network_usage`"
       fi
 
+      checksettingsN2N="$supernodeIpAddress,$supernodePort,$interfaceName,$communityName,$keyType,$keyFile,$localPeerIpAddress"
+      checkExist=$(cat $edgePorts | grep $checksettingsN2N )
+      #echo "checkExist=$checkExist   $settingsN2N"
+      if [ "$checkExist" ]; then 
+           echo "edge with given options exists already"
+      else 
+
       net_check_N2N_IpAddress $supernodeIpAddress $localPeerIpAddress
       net_check_portNumber $supernodePort
       net_check_keyType $keyType
       net_create_tap_device $interfaceName $localPeerIpAddress 
-      
+      sleep 10
       if [ $keyType = "string" ]; then 
-         edge -l $supernodeIpAddress:$supernodePort -d $interfaceName -c $communityName -k $keyFile -r -a $localPeerIpAddress
+         edge -l $supernodeIpAddress:$supernodePort -d $interfaceName -c $communityName -k $keyFile -r -a $localPeerIpAddress -t $mgmtport
       elif [ $keyType = "file" ]; then 
          net_check_keyFile $keyFile
-         edge -l $supernodeIpAddress:$supernodePort -d $interfaceName -c $communityName -K $keyFile -r -a $localPeerIpAddress
+         edge -l $supernodeIpAddress:$supernodePort -d $interfaceName -c $communityName -K $keyFile -r -a $localPeerIpAddress -t $mgmtport
       fi
-
+       
+     settingsN2N="$supernodeIpAddress,$supernodePort,$interfaceName,$communityName,$keyType,$keyFile,$localPeerIpAddress,$mgmtport"
+      echo $settingsN2N >> $edgePorts
       msg_info "New Com device is created: $interfaceName"
       msg_info "New CommunityName is created: $communityName"
-     
+     fi
    fi
+
+
+   
 
    if [ "true" == "$listN2NTunnel" ]; then
       result=`echo -e "LocalPeerIP \t ServerIP \t Port \t LocalInterface \t Community"`
