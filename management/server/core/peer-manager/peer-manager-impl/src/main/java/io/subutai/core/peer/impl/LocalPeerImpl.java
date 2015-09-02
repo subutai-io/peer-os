@@ -135,7 +135,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     // 5 min
     private static final long HOST_INACTIVE_TIME = 5 * 1000 * 60;
 
-    private static final int WAIT_CONTAINER_CONNECTION_SEC = 300;
+
     private DaoManager daoManager;
     private TemplateRegistry templateRegistry;
     protected ManagementHost managementHost;
@@ -492,7 +492,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 taskFutures.add( executorService.submit(
                         new CreateContainerWrapperTask( resourceHostEntity, templateName, /*request.getTemplates(),*/
                                 hostname, String.format( "%s/%s", ipAddress, networkPrefix ), vlan, gateway,
-                                WAIT_CONTAINER_CONNECTION_SEC ) ) );
+                                Common.WAIT_CONTAINER_CONNECTION_SEC ) ) );
 
                 currentIpAddressOffset++;
             }
@@ -982,9 +982,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder(
-                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
-                    bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
+                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
