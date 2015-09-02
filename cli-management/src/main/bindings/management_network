@@ -389,9 +389,7 @@ function management_network {
 
    fi
 
-
-
-  if [ "true" == "$createN2NTunnel" ]; then
+   if [ "true" == "$createN2NTunnel" ]; then
       supernodeIpAddress="$1"
       supernodePort="$2"
       interfaceName="$3"
@@ -477,7 +475,28 @@ function management_network {
       checkExist=$(cat $edgePorts | grep $checksettingsN2N )
       #echo "checkExist=$checkExist   $settingsN2N"
       if [ "$checkExist" ]; then 
-           echo "edge with given options exists already"
+
+          isProcessExists=$(ps -ax | grep edge | grep $interfaceName | grep $communityName | grep $localPeerIpAddress)
+          if [ "$isProcessExists" ];then     
+               msg_info "edge PROCESS with given options exists already" 
+           else 
+             msg_info "exist in file but Process not exists"
+             net_check_N2N_IpAddress $supernodeIpAddress $localPeerIpAddress
+             net_check_portNumber $supernodePort
+             net_check_keyType $keyType
+             net_create_tap_device $interfaceName $localPeerIpAddress 
+             sleep 10
+            if [ $keyType = "string" ]; then 
+              edge -l $supernodeIpAddress:$supernodePort -d $interfaceName -c $communityName -k $keyFile -r -a $localPeerIpAddress -t $mgmtport
+            elif [ $keyType = "file" ]; then 
+              net_check_keyFile $keyFile
+            edge -l $supernodeIpAddress:$supernodePort -d $interfaceName -c $communityName -K $keyFile -r -a $localPeerIpAddress -t $mgmtport
+            fi
+
+           fi
+        
+
+
       else 
 
       net_check_N2N_IpAddress $supernodeIpAddress $localPeerIpAddress
@@ -498,6 +517,10 @@ function management_network {
       msg_info "New CommunityName is created: $communityName"
      fi
    fi
+
+
+
+
 
 
    
