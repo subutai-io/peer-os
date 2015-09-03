@@ -8,11 +8,15 @@
 
   <cm:property-placeholder persistent-id="broker" update-strategy="none">
     <cm:default-properties>
-      <cm:property name="brokerUrl" value="failover:tcp://localhost:61616" />
+      <cm:property name="brokerUrl" value="mqtt+nio+ssl://0.0.0.0:8883?needClientAuth=true&amp;transport.enabledProtocols=TLSv1.1" />
       <cm:property name="maxBrokerConnections" value="10" />
       <cm:property name="isPersistent" value="true" />
       <cm:property name="messageTimeout" value="0" />
       <cm:property name="idleConnectionTimeout" value="300" />
+      <!--<cm:property name="keystore" />-->
+      <!--<cm:property name="keystorePassword" />-->
+      <!--<cm:property name="truststore" />-->
+      <!--<cm:property name="truststorePassword" />-->
     </cm:default-properties>
   </cm:property-placeholder>
 
@@ -24,6 +28,10 @@
     <argument value="${isPersistent}" />
     <argument value="${messageTimeout}" />
     <argument value="${idleConnectionTimeout}" />
+    <argument value="${keystore}" />
+    <argument value="${keystorePassword}" />
+    <argument value="${truststore}" />
+    <argument value="${truststorePassword}" />
 
   </bean>
 

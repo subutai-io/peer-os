@@ -1,6 +1,10 @@
 package io.subutai.core.broker.impl;
 
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.security.KeyStore;
+
 import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
@@ -10,12 +14,16 @@ import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TopicSubscriber;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.TrustManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.pool.PooledConnectionFactory;
+import org.apache.activemq.broker.BrokerService;
+import org.apache.activemq.broker.SslContext;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -38,20 +46,28 @@ import io.subutai.core.broker.api.Topic;
 public class BrokerImpl implements Broker
 {
     private static final Logger LOG = LoggerFactory.getLogger( BrokerImpl.class.getName() );
+    private static final String VM_BROKER_URL = "vm://localhost";
 
     protected MessageRoutingListener messageRouter;
-    protected PooledConnectionFactory pool;
     private final String brokerUrl;
     private final int maxBrokerConnections;
     private final boolean isPersistent;
     private final int messageTimeout;
     private final int idleConnectionTimeout;
+    private final String keystore;
+    private final String keystorePassword;
+    private final String truststore;
+    private final String truststorePassword;
     private ByteMessagePostProcessor byteMessagePostProcessor;
     private TextMessagePostProcessor textMessagePostProcessor;
+    private SslContext customSslContext;
+    private BrokerService broker;
+    private ActiveMQConnectionFactory amqFactory;
 
 
     public BrokerImpl( final String brokerUrl, final int maxBrokerConnections, final boolean isPersistent,
-                       final int messageTimeout, final int idleConnectionTimeout )
+                       final int messageTimeout, final int idleConnectionTimeout, final String keystore,
+                       final String keystorePassword, final String truststore, final String truststorePassword )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( brokerUrl ), "Invalid broker URL" );
         Preconditions.checkArgument( maxBrokerConnections > 0, "Max broker connections number must be greater than 0" );
@@ -64,6 +80,11 @@ public class BrokerImpl implements Broker
         this.messageTimeout = messageTimeout;
         this.idleConnectionTimeout = idleConnectionTimeout;
         this.messageRouter = new MessageRoutingListener();
+        //todo prefix store paths with Common.SUBUTAI_APP_DATA_PATH
+        this.keystore = keystore;
+        this.keystorePassword = keystorePassword;
+        this.truststore = truststore;
+        this.truststorePassword = truststorePassword;
     }
 
 
@@ -199,22 +220,88 @@ public class BrokerImpl implements Broker
     }
 
 
+    public synchronized void reloadTrustStore() throws BrokerException
+    {
+        try
+        {
+            ReloadableX509TrustManager tm =
+                    ( ReloadableX509TrustManager ) customSslContext.getTrustManagersAsArray()[0];
+            tm.reloadTrustManager();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error reloading broker SSL context", e );
+            throw new BrokerException( e );
+        }
+    }
+
+
     public void init() throws BrokerException
     {
-        ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory( brokerUrl );
+        //setup broker
+        broker = getBroker();
+
+        try
+        {
+            customSslContext = getSslContext();
+            broker.setSslContext( customSslContext );
+            broker.addConnector( "vm://localhost" );
+            broker.addConnector( brokerUrl );
+            broker.start();
+            broker.waitUntilStarted();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error starting broker", e );
+            throw new BrokerException( e );
+        }
+
+
+        //setup client
+        amqFactory = getConnectionFactory( VM_BROKER_URL );
         amqFactory.setWatchTopicAdvisories( false );
         amqFactory.setCheckForDuplicates( true );
 
-        setupConnectionPool( amqFactory );
         setupRouter( amqFactory );
     }
 
 
-    public void dispose()
+    protected BrokerService getBroker()
     {
-        if ( pool != null )
+        return new BrokerService();
+    }
+
+
+    protected ActiveMQConnectionFactory getConnectionFactory( String url )
+    {
+        return new ActiveMQConnectionFactory( url );
+    }
+
+
+    protected SslContext getSslContext() throws Exception
+    {
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance( KeyManagerFactory.getDefaultAlgorithm() );
+        KeyStore ks = KeyStore.getInstance( "jks" );
+        KeyManager[] keystoreManagers = null;
+
+        ks.load( new FileInputStream( new File( keystore ) ), keystorePassword.toCharArray() );
+        kmf.init( ks, keystorePassword.toCharArray() );
+        keystoreManagers = kmf.getKeyManagers();
+
+        TrustManager[] trustStoreManagers = new TrustManager[] {
+                new ReloadableX509TrustManager( truststore, truststorePassword )
+        };
+
+        SslContext context = new SslContext( keystoreManagers, trustStoreManagers, null );
+        return context;
+    }
+
+
+    public void dispose() throws Exception
+    {
+        if ( broker != null )
         {
-            pool.stop();
+            broker.stop();
         }
     }
 
@@ -243,15 +330,6 @@ public class BrokerImpl implements Broker
     }
 
 
-    private void setupConnectionPool( ActiveMQConnectionFactory amqFactory )
-    {
-        pool = new PooledConnectionFactory( amqFactory );
-        pool.setMaxConnections( maxBrokerConnections );
-        pool.setIdleTimeout( idleConnectionTimeout * 1000 );
-        pool.start();
-    }
-
-
     private void sendMessage( String topic, Object message ) throws BrokerException
     {
         Connection connection = null;
@@ -260,7 +338,7 @@ public class BrokerImpl implements Broker
 
         try
         {
-            connection = pool.createConnection();
+            connection = amqFactory.createConnection();
             connection.start();
             session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
             Destination destination = session.createTopic( topic );

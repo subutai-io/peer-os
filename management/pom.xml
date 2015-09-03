@@ -18,6 +18,12 @@
 
   <repositories>
     <repository>
+      <id>MavenCentral</id>
+      <name>Maven repository</name>
+      <url>http://repo1.maven.org/maven2</url>
+    </repository>
+
+    <repository>
       <id>com.springsource.repository.bundles.release</id>
       <name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
       <url>http://repository.springsource.com/maven/bundles/release</url>
@@ -28,6 +34,8 @@
       <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
       <url>http://repository.springsource.com/maven/bundles/external</url>
     </repository>
+
+
   </repositories>
 
   <properties>
@@ -73,6 +81,7 @@
     <org.apache.httpcomonents.httpcore.version>4.4.1</org.apache.httpcomonents.httpcore.version>
     <org.apache.commons.lang3.version>3.4</org.apache.commons.lang3.version>
     <org.apache.commons.io.version>2.4</org.apache.commons.io.version>
+    <org.apache.activemq.version>5.11.0</org.apache.activemq.version>
   </properties>
 
   <dependencyManagement>
@@ -223,26 +232,26 @@
       </dependency>
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- environment-manager -->
-<!--      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>environment-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>environment-manager-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>environment-manager-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>environment-manager-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>-->
+      <!--      <dependency>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>environment-manager-api</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>environment-manager-impl</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>environment-manager-cli</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>environment-manager-rest</artifactId>
+              <version>${project.version}</version>
+            </dependency>-->
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- environment-terminal -->
@@ -333,6 +342,11 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>broker-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>activemq-wrapper</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -947,12 +961,12 @@
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-simple</artifactId>
+        <artifactId>slf4j-api</artifactId>
         <version>1.7.7</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
+        <artifactId>slf4j-simple</artifactId>
         <version>1.7.7</version>
       </dependency>
       <dependency>
@@ -1004,26 +1018,11 @@
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- broker -->
-      <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-client</artifactId>
-        <version>5.11.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-pool</artifactId>
-        <version>5.11.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-jms-pool</artifactId>
-        <version>5.11.0</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.management.j2ee</groupId>
-        <artifactId>management-api</artifactId>
-        <version>1.1-rev-1</version>
-      </dependency>
+      <!--<dependency>-->
+      <!--<groupId>org.apache.activemq</groupId>-->
+      <!--<artifactId>activemq-broker</artifactId>-->
+      <!--<version>${org.apache.activemq.version}</version>-->
+      <!--</dependency>-->
       <dependency>
         <groupId>commons-pool</groupId>
         <artifactId>commons-pool</artifactId>
