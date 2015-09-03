@@ -982,8 +982,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
-                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder(
+                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
+                    bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1290,6 +1291,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 {
                     ( ( AbstractSubutaiHost ) managementHost ).setNetInterfaces( resourceHostInfo.getInterfaces() );
                     managementHostDataService.update( ( ManagementHostEntity ) managementHost );
+                    peerInfo.setIp( managementHost.getIpByInterfaceName( externalIpInterface ) );
                 }
                 ( ( AbstractSubutaiHost ) managementHost ).updateHostInfo( resourceHostInfo );
             }
