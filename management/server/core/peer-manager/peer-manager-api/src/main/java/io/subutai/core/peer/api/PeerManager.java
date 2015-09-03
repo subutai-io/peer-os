@@ -63,4 +63,6 @@ public interface PeerManager
      * Returns local peer instance
      */
     public LocalPeer getLocalPeer();
+
+    Peer getPeer( String peerId, String n2nIp );
 }

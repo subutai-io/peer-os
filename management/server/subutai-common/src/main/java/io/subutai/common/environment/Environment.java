@@ -125,4 +125,8 @@ public interface Environment
     public Set<ContainerHost> getContainerHostsByIds( Set<UUID> ids ) throws ContainerHostNotFoundException;
 
     String findN2nIp( String peerId );
+
+    void addEnvironmentPeer( EnvironmentPeer environmentPeer );
+
+//    Peer getPeer( String peerId );
 }

@@ -1,6 +1,8 @@
 package io.subutai.core.env.impl.tasks;
 
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
@@ -12,15 +14,18 @@ import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Sets;
 
+import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.Peer;
+import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.env.api.exception.EnvironmentCreationException;
 import io.subutai.core.env.impl.EnvironmentManagerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
+import io.subutai.core.env.impl.entity.EnvironmentPeerImpl;
 import io.subutai.core.env.impl.exception.ResultHolder;
 import io.subutai.core.peer.api.LocalPeer;
 
@@ -59,7 +64,21 @@ public class CreateEnvironmentTask implements Awaitable
     {
         try
         {
-            Set<Peer> allPeers = Sets.newHashSet( topology.getNodeGroupPlacement().keySet() );
+            Set<Peer> allPeers = new HashSet<>( topology.getAllPeers() );
+
+            op.addLog( "Setting up n2n tunnel..." );
+
+            List<N2NConfig> tunnels = environmentManager.createN2NTunnel( allPeers );
+
+            for ( N2NConfig config : tunnels )
+            {
+                final EnvironmentPeer p = new EnvironmentPeerImpl();
+                p.setIp( config.getAddress() );
+                String peerId = config.getPeerId().toString();
+                p.setPeerId( peerId );
+
+                environment.addEnvironmentPeer( p );
+            }
 
             op.addLog( "Setting up secure channel..." );
 
@@ -109,6 +128,7 @@ public class CreateEnvironmentTask implements Awaitable
             {
                 peer.reserveVni( newVni );
             }
+
 
             //save environment VNI
             environment.setVni( vni );

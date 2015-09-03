@@ -222,7 +222,9 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
         {
             if ( !aPeer.getId().equals( localPeer.getId() ) && !aPeer.getId().equals( peer.getId() ) )
             {
-                peerIps.add( aPeer.getPeerInfo().getIp() );
+                String n2nIp = environment.findN2nIp( peer.getId().toString() );
+                peerIps.add( n2nIp );
+//                peerIps.add( aPeer.getPeerInfo().getIp() );
             }
         }
     }

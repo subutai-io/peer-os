@@ -33,6 +33,8 @@ public class EnvironmentPeerImpl implements EnvironmentPeer, Serializable
     private Environment environment;
     @Column( name = "ip" )
     private String ip;
+    @Column( name = "peer_id" )
+    private String peerId;
 
 
     public Long getId()
@@ -68,5 +70,18 @@ public class EnvironmentPeerImpl implements EnvironmentPeer, Serializable
     public void setIp( final String ip )
     {
         this.ip = ip;
+    }
+
+
+    @Override
+    public String getPeerId()
+    {
+        return peerId;
+    }
+
+
+    public void setPeerId( final String peerId )
+    {
+        this.peerId = peerId;
     }
 }

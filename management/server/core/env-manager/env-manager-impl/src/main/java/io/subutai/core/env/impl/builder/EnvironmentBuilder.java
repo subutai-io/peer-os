@@ -106,7 +106,9 @@ public class EnvironmentBuilder
         {
             if ( !peer.getId().equals( localPeer.getId() ) )
             {
-                peerIps.add( peer.getPeerInfo().getIp() );
+                String n2nIp = environment.findN2nIp( peer.getId().toString() );
+                //                peerIps.add( peer.getPeerInfo().getIp() );
+                peerIps.add( n2nIp );
             }
         }
 

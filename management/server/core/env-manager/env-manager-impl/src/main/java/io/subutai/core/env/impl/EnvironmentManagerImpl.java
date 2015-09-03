@@ -2,9 +2,11 @@ package io.subutai.core.env.impl;
 
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -666,9 +668,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void setContainersTransientFields( final Environment environment/*, final Set<ContainerHost> containers */)
+    public void setContainersTransientFields( final Environment environment/*, final Set<ContainerHost> containers */ )
     {
-        for ( ContainerHost containerHost : environment.getContainerHosts())
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
         {
             ( ( EnvironmentContainerImpl ) containerHost ).setDataService( environmentContainerDataService );
             ( ( EnvironmentContainerImpl ) containerHost ).setEnvironmentManager( this );
@@ -676,16 +678,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
             String peerId = containerHost.getPeerId();
             Peer peer = peerManager.getPeer( peerId );
-
-            String n2nIp =  environment.findN2nIp(peerId);
-            if ( n2nIp != null )
-            {
-                peer.getPeerInfo().setIp( n2nIp );
-            }
+//
+//            String n2nIp = environment.findN2nIp( peerId );
+//            if ( n2nIp != null )
+//            {
+//                peer.getPeerInfo().setIp( n2nIp );
+//            }
 
             ( ( EnvironmentContainerImpl ) containerHost ).setPeer( peer );
         }
     }
+
 
     public void configureSsh( final Set<ContainerHost> containerHosts ) throws NetworkManagerException
     {
@@ -1095,7 +1098,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public String createN2NTunnel( final Set<Peer> peers ) throws EnvironmentManagerException
+    public List<N2NConfig> createN2NTunnel( final Set<Peer> peers ) throws EnvironmentManagerException
     {
         Set<String> allSubnets = getSubnets( peers );
         if ( LOGGER.isDebugEnabled() )
@@ -1122,14 +1125,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeSubnet, PEER_SUBNET_MASK ).getInfo();
             final String[] addresses = subnetInfo.getAllAddresses();
             int counter = 0;
+
+            List<N2NConfig> result = new ArrayList<>( peers.size() );
             for ( Peer peer : peers )
             {
-                peer.addToN2NTunnel(
-                        new N2NConfig( superNodeIp, N2N_PORT, interfaceName, communityName, addresses[counter],
-                                sharedKey ) );
+                N2NConfig config = new N2NConfig( peer.getId(), superNodeIp, N2N_PORT, interfaceName, communityName,
+                        addresses[counter], sharedKey );
+                peer.addToN2NTunnel( config );
+                result.add( config );
                 counter++;
             }
-            return freeSubnet;
+            return result;
         }
         catch ( Exception e )
         {
@@ -1137,7 +1143,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             throw new EnvironmentManagerException( "Could not create n2n tunnel.", e );
         }
     }
-
 
     private String generateCommunityName( final String freeSubnet )
     {

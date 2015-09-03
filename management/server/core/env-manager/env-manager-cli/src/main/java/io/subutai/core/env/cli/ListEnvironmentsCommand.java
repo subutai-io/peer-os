@@ -4,6 +4,7 @@ package io.subutai.core.env.cli;
 import java.util.Date;
 
 import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
@@ -42,6 +43,13 @@ public class ListEnvironmentsCommand extends SubutaiShellCommandSupport
                     String.format( "Environment creation time %s", new Date( environment.getCreationTimestamp() ) ) );
             System.out.println( String.format( "Environment status %s", environment.getStatus() ) );
             System.out.println( String.format( "Subnet CIDR %s", environment.getSubnetCidr() ) );
+            System.out.println( String.format( "N2N config:", environment.getSubnetCidr() ) );
+
+            for ( EnvironmentPeer environmentPeer : environment.getEnvironmentPeers() )
+            {
+                System.out.println( String.format( "\t%s\t%s", environmentPeer.getPeerId(), environmentPeer.getIp() ) );
+            }
+
             System.out.println( "-----------------------------------------------------------------" );
         }
 

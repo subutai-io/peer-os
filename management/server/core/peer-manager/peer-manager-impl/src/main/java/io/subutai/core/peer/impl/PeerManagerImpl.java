@@ -202,6 +202,24 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
+    public Peer getPeer( final String peerId, final String n2nIp )
+    {
+        if ( localPeer.getId().equals( peerId ) )
+        {
+            return localPeer;
+        }
+
+        PeerInfo pi = getPeerInfo( UUID.fromString( peerId ) );
+        if ( pi != null )
+        {
+            pi.setIp( n2nIp );
+            return new RemotePeerImpl( localPeer, pi, messenger, commandResponseListener, messageResponseListener );
+        }
+        return null;
+    }
+
+
+    @Override
     public PeerInfo getLocalPeerInfo()
     {
         return localPeer.getPeerInfo();

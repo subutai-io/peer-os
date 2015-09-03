@@ -248,8 +248,29 @@ public class EnvironmentImpl implements Environment, Serializable
                 break;
             }
         }
+        LOG.debug( String.format( "N2N ip for %s: %s", peerId, result == null ? "not found" : result ) );
         return result;
     }
+
+
+    @Override
+    public void addEnvironmentPeer( final EnvironmentPeer environmentPeer )
+    {
+        if ( environmentPeer == null )
+        {
+            throw new IllegalArgumentException( "Environment peer could not be null." );
+        }
+
+        environmentPeer.setEnvironment( this );
+        environmentPeers.add( environmentPeer );
+    }
+
+
+//    @Override
+//    public Peer getPeer( final String peerId )
+//    {
+//        return environmentManager.getPeer(peerId, findN2nIp( peerId ));
+//    }
 
 
     @Override
