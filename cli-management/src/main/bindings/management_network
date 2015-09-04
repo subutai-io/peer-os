@@ -398,8 +398,12 @@ function management_network {
    fi
    
    if [ "true" == "$createN2NTunnel" ]; then
+     sockdir="var/run/n2n/sockets"
+    if [ -d "$sockdir" ]; then
+    # Control will enter here if $DIRECTORY exists.
       mkdir -p /var/run/n2n/sockets
       chmod 755 /var/run/n2n/sockets
+    fi
       supernodeIpAddress="$1"
       supernodePort="$2"
       interfaceName="$3"
