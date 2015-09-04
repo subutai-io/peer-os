@@ -346,10 +346,11 @@ public class RequestBuilder
         private Set<String> configPoints;
 
 
-        RequestImpl( final RequestType type, final UUID id, final String workingDirectory, final String command,
-                     final List<String> args, final Map<String, String> environment, final OutputRedirection stdOut,
-                     final OutputRedirection stdErr, final String runAs, final Integer timeout, final Integer isDaemon,
-                     final Set<String> configPoints, final int pid )
+        public RequestImpl( final RequestType type, final UUID id, final String workingDirectory, final String command,
+                            final List<String> args, final Map<String, String> environment,
+                            final OutputRedirection stdOut, final OutputRedirection stdErr, final String runAs,
+                            final Integer timeout, final Integer isDaemon, final Set<String> configPoints,
+                            final int pid )
         {
             this.type = type;
             this.id = id;

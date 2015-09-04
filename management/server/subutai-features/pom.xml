@@ -254,6 +254,10 @@
     <!-- broker -->
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>activemq-wrapper</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>broker-api</artifactId>
     </dependency>
     <dependency>

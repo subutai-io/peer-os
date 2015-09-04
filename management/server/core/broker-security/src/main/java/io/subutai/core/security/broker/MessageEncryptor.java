@@ -1,8 +1,6 @@
 package io.subutai.core.security.broker;
 
 
-import java.util.UUID;
-
 import javax.naming.NamingException;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
@@ -11,10 +9,12 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.command.Request;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.UUIDUtil;
 import io.subutai.core.broker.api.TextMessagePostProcessor;
+import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 
@@ -25,6 +25,7 @@ import io.subutai.core.security.api.crypto.EncryptionTool;
 public class MessageEncryptor implements TextMessagePostProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( MessageEncryptor.class.getName() );
+    private static final String CLONE_CMD_REGEX = "\\s*subutai\\s*clone[\\s\\S]*?";
 
     private final boolean encryptionEnabled;
 
@@ -41,11 +42,16 @@ public class MessageEncryptor implements TextMessagePostProcessor
     }
 
 
+    public static RegistrationManager getRegistrationManager() throws NamingException
+    {
+
+        return ServiceLocator.getServiceNoCache( RegistrationManager.class );
+    }
+
+
     @Override
     public String process( final String topic, final String message )
     {
-        LOG.info( String.format( "OUTGOING:%s", message ) );
-
         //assume this is a host  topic
         if ( encryptionEnabled && UUIDUtil.isStringAUuid( topic ) )
         {
@@ -61,17 +67,29 @@ public class MessageEncryptor implements TextMessagePostProcessor
 
                 Request originalRequest = requestWrapper.getRequest();
 
+                if ( originalRequest.getCommand().toLowerCase().matches( CLONE_CMD_REGEX ) )
+                {
+                    //add token for container creation
+                    originalRequest =
+                            new RequestBuilder.RequestImpl( originalRequest.getType(), originalRequest.getId(),
+                                    originalRequest.getWorkingDirectory(),
+                                    String.format( "%s %s", originalRequest.getCommand(), getRegistrationManager()
+                                            .generateContainerTTLToken( ( originalRequest.getTimeout()
+                                                    + Common.WAIT_CONTAINER_CONNECTION_SEC ) * 1000L ) ),
+                                    originalRequest.getArgs(), originalRequest.getEnvironment(),
+                                    originalRequest.getStdOut(), originalRequest.getStdErr(),
+                                    originalRequest.getRunAs(), originalRequest.getTimeout(),
+                                    originalRequest.isDaemon(), originalRequest.getConfigPoints(),
+                                    originalRequest.getPid() );
+                }
+
                 String encryptedRequestString = new String( encryptionTool
                         .signAndEncrypt( JsonUtil.toJson( originalRequest ).getBytes(), hostKeyForEncrypting, true ) );
 
                 EncryptedRequestWrapper encryptedRequestWrapper =
                         new EncryptedRequestWrapper( encryptedRequestString, originalRequest.getId() );
 
-                String encryptedRequestWrapperString = JsonUtil.toJson( encryptedRequestWrapper );
-
-                LOG.info( String.format( "Sending encrypted message: %s", encryptedRequestWrapperString ) );
-
-                return encryptedRequestWrapperString;
+                return JsonUtil.toJson( encryptedRequestWrapper );
             }
             catch ( Exception e )
             {
@@ -80,31 +98,5 @@ public class MessageEncryptor implements TextMessagePostProcessor
         }
 
         return message;
-    }
-
-
-    class RequestWrapper
-    {
-        private RequestBuilder.RequestImpl request;
-
-
-        public RequestBuilder.RequestImpl getRequest()
-        {
-            return request;
-        }
-    }
-
-
-    class EncryptedRequestWrapper
-    {
-        private final String request;
-        private final UUID hostId;
-
-
-        public EncryptedRequestWrapper( final String request, final UUID hostId )
-        {
-            this.request = request;
-            this.hostId = hostId;
-        }
     }
 }

@@ -17,38 +17,33 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>broker-api</artifactId>
+      <artifactId>subutai-common</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>activemq-wrapper</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>broker-api</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpkix-jdk15on</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-all</artifactId>
-      <version>5.11.0</version>
-      <scope>test</scope>
+      <version>${org.apache.activemq.version}</version>
+      <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-client</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-pool</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-jms-pool</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.management.j2ee</groupId>
-      <artifactId>management-api</artifactId>
-    </dependency>
+
     <dependency>
       <groupId>commons-pool</groupId>
       <artifactId>commons-pool</artifactId>
@@ -80,6 +75,7 @@
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
+            <Import-Package>javax.jms.*;version=${org.apache.activemq.version},!javax.jms*, *</Import-Package>
           </instructions>
         </configuration>
       </plugin>
