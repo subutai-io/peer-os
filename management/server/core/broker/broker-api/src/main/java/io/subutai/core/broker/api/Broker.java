@@ -26,4 +26,16 @@ public interface Broker
      * @throws BrokerException - thrown in case something went wrong
      */
     public void sendByteMessage( String topic, byte[] message ) throws BrokerException;
+
+
+    /**
+     * Creates a new client keypair & adds public key certificate to broker's truststore.
+     *
+     * Client can immediately connect to broker using these credentials
+     *
+     * @param clientId - unique client id
+     *
+     * @return - client credentials {@code ClientCredentials}
+     */
+    public ClientCredentials createNewClientCredentials( String clientId ) throws BrokerException;
 }

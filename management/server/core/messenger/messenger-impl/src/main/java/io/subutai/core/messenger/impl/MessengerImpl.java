@@ -11,6 +11,13 @@ import java.util.concurrent.Executors;
 
 import javax.naming.NamingException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.gson.JsonSyntaxException;
+
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.util.JsonUtil;
@@ -23,12 +30,6 @@ import io.subutai.core.messenger.api.MessageStatus;
 import io.subutai.core.messenger.api.Messenger;
 import io.subutai.core.messenger.api.MessengerException;
 import io.subutai.core.peer.api.PeerManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -190,16 +191,19 @@ public class MessengerImpl implements Messenger, MessageProcessor
 
     public void addMessageListener( final MessageListener listener )
     {
-        Preconditions.checkNotNull( listener );
+        if ( listener != null )
+        {
 
-        listeners.add( listener );
+            listeners.add( listener );
+        }
     }
 
 
     public void removeMessageListener( final MessageListener listener )
     {
-        Preconditions.checkNotNull( listener );
-
-        listeners.remove( listener );
+        if ( listener != null )
+        {
+            listeners.remove( listener );
+        }
     }
 }
