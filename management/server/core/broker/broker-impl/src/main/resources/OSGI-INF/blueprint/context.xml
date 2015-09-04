@@ -24,6 +24,7 @@
     <argument value="${keystorePassword}" />
     <argument value="${truststore}" />
     <argument value="${truststorePassword}" />
+    <argument value="${caCertificate}" />
 
   </bean>
 

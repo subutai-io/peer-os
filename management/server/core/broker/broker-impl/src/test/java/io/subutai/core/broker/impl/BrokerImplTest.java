@@ -48,6 +48,7 @@ public class BrokerImplTest
 
     private static final String BROKER_URL = "vm://localhost";
     private static final String KEYSTORE = "path/to/keystore";
+    private static final String CA_CERTIFICATE = "path/to/cert";
     private static final String KEYSTORE_PASSWORD = "pwd";
     private static final int MESSAGE_TIMEOUT = 10;
     private static final String TOPIC = "topic";
@@ -90,7 +91,7 @@ public class BrokerImplTest
     public void setUp() throws Exception
     {
         broker = spy( new BrokerImpl( BROKER_URL, true, MESSAGE_TIMEOUT, KEYSTORE, KEYSTORE_PASSWORD, KEYSTORE,
-                KEYSTORE_PASSWORD ) );
+                KEYSTORE_PASSWORD, CA_CERTIFICATE ) );
         doReturn( sslContext ).when( broker ).getSslContext();
         doReturn( brokerService ).when( broker ).getBroker();
         doReturn( amqFactory ).when( broker ).getConnectionFactory();

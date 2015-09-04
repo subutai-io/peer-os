@@ -3,7 +3,11 @@ package io.subutai.core.broker.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.KeyPair;
 import java.security.KeyStore;
+import java.security.cert.X509Certificate;
 
 import javax.jms.BytesMessage;
 import javax.jms.Connection;
@@ -28,11 +32,13 @@ import org.apache.activemq.broker.SslContext;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import io.subutai.common.security.crypto.certificate.CertificateData;
 import io.subutai.core.broker.api.Broker;
 import io.subutai.core.broker.api.BrokerException;
 import io.subutai.core.broker.api.ByteMessageListener;
 import io.subutai.core.broker.api.ByteMessagePostProcessor;
 import io.subutai.core.broker.api.ByteMessagePreProcessor;
+import io.subutai.core.broker.api.ClientCredentials;
 import io.subutai.core.broker.api.MessageListener;
 import io.subutai.core.broker.api.TextMessageListener;
 import io.subutai.core.broker.api.TextMessagePostProcessor;
@@ -57,15 +63,17 @@ public class BrokerImpl implements Broker
     private final String keystorePassword;
     private final String truststore;
     private final String truststorePassword;
+    private final String caCertificate;
     private ByteMessagePostProcessor byteMessagePostProcessor;
     private TextMessagePostProcessor textMessagePostProcessor;
     private SslContext customSslContext;
     private ActiveMQConnectionFactory amqFactory;
+    private SslUtil sslUtil = new SslUtil();
 
 
     public BrokerImpl( final String brokerUrl, final boolean isPersistent, final int messageTimeout,
                        final String keystore, final String keystorePassword, final String truststore,
-                       final String truststorePassword )
+                       final String truststorePassword, final String caCertificate )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( brokerUrl ), "Invalid broker URL" );
         Preconditions.checkArgument( messageTimeout >= 0, "Message timeout must be greater than or equal to 0" );
@@ -83,6 +91,32 @@ public class BrokerImpl implements Broker
         this.keystorePassword = keystorePassword;
         this.truststore = truststore;
         this.truststorePassword = truststorePassword;
+        this.caCertificate = caCertificate;
+    }
+
+
+    @Override
+    public ClientCredentials createNewClientCredentials( String clientId ) throws BrokerException
+    {
+        try
+        {
+            KeyPair keyPair = sslUtil.generateKeyPair( "RSA", 2048 );
+            CertificateData certData = new CertificateData();
+            certData.setCommonName( String.format( "client-%s", clientId ) );
+            X509Certificate certificate = sslUtil.generateSelfSignedCertificate( keyPair, certData );
+            String clientCert = sslUtil.convertToPem( certificate );
+            String clientKey = sslUtil.convertToPem( keyPair.getPrivate() );
+            String caCert = new String( Files.readAllBytes( Paths.get( caCertificate ) ) );
+            //add client certificate to broker truststore
+            registerClientCertificateWithBroker( String.format( "client-%s", clientId ), certificate );
+
+            return new ClientCredentials( clientCert, clientKey, caCert );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error in createNewClientCredentials", e );
+            throw new BrokerException( e );
+        }
     }
 
 
@@ -218,16 +252,17 @@ public class BrokerImpl implements Broker
     }
 
 
-    public synchronized void reloadTrustStore() throws BrokerException
+    public synchronized void registerClientCertificateWithBroker( String alias, X509Certificate certificate )
+            throws BrokerException
     {
         try
         {
             ReloadableX509TrustManager tm = ( ReloadableX509TrustManager ) getSslContext().getTrustManagersAsArray()[0];
-            tm.reloadTrustManager();
+            tm.addServerCertAndReload( alias, certificate );
         }
         catch ( Exception e )
         {
-            LOG.error( "Error reloading broker SSL context", e );
+            LOG.error( "Error in registerClientCertificateWithBroker", e );
             throw new BrokerException( e );
         }
     }

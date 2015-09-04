@@ -23,7 +23,6 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 import io.subutai.common.security.crypto.certificate.CertificateData;
-import io.subutai.common.security.crypto.key.KeyPairType;
 
 
 public class SslUtil
@@ -36,7 +35,7 @@ public class SslUtil
      *
      * @return - certificate / private key in PEM format
      */
-    public static String convertToPem( Object obj )
+    public String convertToPem( Object obj )
     {
         try
         {
@@ -110,14 +109,14 @@ public class SslUtil
     /**
      * Generates a key-pair
      *
-     * @param keyPairType - type of algorithm
+     * @param algorithm - key algorithm
      * @param keySize - key size
      */
-    public KeyPair generateKeyPair( KeyPairType keyPairType, int keySize )
+    public KeyPair generateKeyPair( String algorithm, int keySize )
     {
         try
         {
-            KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance( keyPairType.jce() );
+            KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance( algorithm );
             keyPairGen.initialize( keySize );
             return keyPairGen.genKeyPair();
         }
