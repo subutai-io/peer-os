@@ -1146,13 +1146,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     private String generateCommunityName( final String freeSubnet )
     {
-        return String.format( "com-%s", freeSubnet.replace( ".", "-" ) );
+        return String.format( "com_%s", freeSubnet.replace( ".", "_" ) );
     }
 
 
     private String generateInterfaceName( final String freeSubnet )
     {
-        return String.format( "n2n-%s", freeSubnet.replace( ".", "-" ) );
+        return String.format( "n2n_%s", freeSubnet.replace( ".", "_" ) );
     }
 
 

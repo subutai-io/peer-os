@@ -1,10 +1,15 @@
 package io.subutai.core.env.impl.builder;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.subutai.common.environment.CreateContainerGroupRequest;
 import io.subutai.common.environment.NodeGroup;
@@ -36,6 +41,7 @@ import com.google.common.collect.Sets;
  */
 public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger( NodeGroupBuilder.class );
 
     private final EnvironmentImpl environment;
     private final TemplateRegistry templateRegistry;
@@ -173,10 +179,10 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
             Set<EnvironmentContainerImpl> containers = Sets.newHashSet();
             try
             {
-                Set<String> peerIps = Sets.newHashSet();
+                Map<String, String> peerIps = new HashMap();
 
                 //add initiator peer mandatorily
-                peerIps.add( localPeer.getManagementHost().getExternalIp() );
+                peerIps.put( localPeer.getPeerInfo().getIp(), environment.findN2nIp( localPeer.getId().toString() ) );
 
                 combinePeers( localPeer, peerIps );
 
@@ -216,15 +222,15 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
     }
 
 
-    private void combinePeers( final LocalPeer localPeer, final Set<String> peerIps )
+    private void combinePeers( final LocalPeer localPeer, final Map<String, String> peerIps )
     {
         for ( Peer aPeer : allPeers )
         {
             if ( !aPeer.getId().equals( localPeer.getId() ) && !aPeer.getId().equals( peer.getId() ) )
             {
-                String n2nIp = environment.findN2nIp( peer.getId().toString() );
-                peerIps.add( n2nIp );
-//                peerIps.add( aPeer.getPeerInfo().getIp() );
+                String n2nIp = environment.findN2nIp( aPeer.getId().toString() );
+                //                                peerIps.add( n2nIp );
+                peerIps.put( aPeer.getPeerInfo().getIp(), n2nIp );
             }
         }
     }

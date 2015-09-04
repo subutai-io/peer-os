@@ -266,11 +266,11 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-//    @Override
-//    public Peer getPeer( final String peerId )
-//    {
-//        return environmentManager.getPeer(peerId, findN2nIp( peerId ));
-//    }
+    //    @Override
+    //    public Peer getPeer( final String peerId )
+    //    {
+    //        return environmentManager.getPeer(peerId, findN2nIp( peerId ));
+    //    }
 
 
     @Override

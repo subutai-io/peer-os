@@ -128,5 +128,5 @@ public interface Environment
 
     void addEnvironmentPeer( EnvironmentPeer environmentPeer );
 
-//    Peer getPeer( String peerId );
+
 }
