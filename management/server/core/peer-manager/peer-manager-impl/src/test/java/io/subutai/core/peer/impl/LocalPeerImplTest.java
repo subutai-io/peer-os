@@ -2,6 +2,7 @@ package io.subutai.core.peer.impl;
 
 
 import java.io.PrintStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -87,6 +88,7 @@ import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -122,6 +124,7 @@ public class LocalPeerImplTest
     private static final int QUOTA = 123;
     private static final String ALIAS = "alias";
     private static final String CERT = "cert";
+    private static final String N2N_IP = "10.11.0.1";
 
 
     @Mock
@@ -188,10 +191,14 @@ public class LocalPeerImplTest
 
     LocalPeerImpl localPeer;
 
+    Map<String, String> peerMap = new HashMap<>();
+
 
     @Before
     public void setUp() throws Exception
     {
+        peerMap = new HashMap<>();
+        peerMap.put( IP, N2N_IP );
         localPeer =
                 spy( new LocalPeerImpl( daoManager, templateRegistry, quotaManager, strategyManager, commandExecutor,
                         hostRegistry, monitor, httpContextManager ) );
@@ -357,20 +364,20 @@ public class LocalPeerImplTest
         distribution.put( resourceHost, Sets.newHashSet( CONTAINER_NAME ) );
         doReturn( distribution ).when( localPeer )
                                 .distributeContainersToResourceHosts( any( CreateContainerGroupRequest.class ) );
-        doReturn( Common.MIN_VLAN_ID ).when( localPeer ).setupTunnels( anySet(), any( UUID.class ) );
+        doReturn( Common.MIN_VLAN_ID ).when( localPeer ).setupTunnels( anyMap(), any( UUID.class ) );
         doReturn( Sets.newHashSet( hostInfoModel ) ).when( localPeer )
                                                     .processRequestCompletion( anyList(), any( ExecutorService.class ),
                                                             any( CreateContainerGroupRequest.class ) );
 
         localPeer.createContainerGroup(
-                new CreateContainerGroupRequest( Sets.newHashSet( IP ), ENVIRONMENT_ID, UUID.randomUUID(), OWNER_ID,
-                        SUBNET, Lists.newArrayList( template ), 1, "ROUND_ROBIN", Lists.<Criteria>newArrayList(), 0 ) );
+                new CreateContainerGroupRequest( peerMap, ENVIRONMENT_ID, UUID.randomUUID(), OWNER_ID, SUBNET,
+                        Lists.newArrayList( template ), 1, "ROUND_ROBIN", Lists.<Criteria>newArrayList(), 0 ) );
 
         try
         {
             localPeer.createContainerGroup(
-                    new CreateContainerGroupRequest( Sets.newHashSet( IP ), ENVIRONMENT_ID, UUID.randomUUID(), OWNER_ID,
-                            "", Lists.newArrayList( template ), 1, "ROUND_ROBIN", Lists.<Criteria>newArrayList(), 0 ) );
+                    new CreateContainerGroupRequest( peerMap, ENVIRONMENT_ID, UUID.randomUUID(), OWNER_ID, "",
+                            Lists.newArrayList( template ), 1, "ROUND_ROBIN", Lists.<Criteria>newArrayList(), 0 ) );
             fail( "Expected PeerException" );
         }
         catch ( PeerException e )
@@ -382,7 +389,7 @@ public class LocalPeerImplTest
         try
         {
             localPeer.createContainerGroup(
-                    new CreateContainerGroupRequest( Sets.newHashSet( IP ), ENVIRONMENT_ID, UUID.randomUUID(), OWNER_ID,
+                    new CreateContainerGroupRequest( peerMap, ENVIRONMENT_ID, UUID.randomUUID(), OWNER_ID,
                             SUBNET, Lists.newArrayList( template ), 1, "ROUND_ROBIN", Lists.<Criteria>newArrayList(),
                             0 ) );
             fail( "Expected PeerException" );
@@ -1190,9 +1197,9 @@ public class LocalPeerImplTest
     @Test
     public void testSetupTunnels() throws Exception
     {
-        localPeer.setupTunnels( Sets.newHashSet( IP ), ENVIRONMENT_ID );
+        localPeer.setupTunnels( peerMap, ENVIRONMENT_ID );
 
-        verify( managementHost ).setupTunnels( Sets.newHashSet( IP ), ENVIRONMENT_ID );
+        verify( managementHost ).setupTunnels( peerMap, ENVIRONMENT_ID );
     }
 
 

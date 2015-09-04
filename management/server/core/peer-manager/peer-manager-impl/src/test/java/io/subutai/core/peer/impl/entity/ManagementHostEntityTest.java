@@ -1,6 +1,8 @@
 package io.subutai.core.peer.impl.entity;
 
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -64,6 +66,7 @@ public class ManagementHostEntityTest
     private static final int VLAN = 100;
     private static final int VNI = 10000;
     private static final int TUNNEL_ID = 123;
+    private static final String N2N_IP = "10.11.0.1";
     @Mock
     Peer peer;
     @Mock
@@ -86,10 +89,14 @@ public class ManagementHostEntityTest
 
     ManagementHostEntity managementHostEntity;
 
+    Map<String, String> peerMap = new HashMap<>();
+
 
     @Before
     public void setUp() throws Exception
     {
+        peerMap = new HashMap<>();
+        peerMap.put( IP, N2N_IP );
         when( hostInfo.getId() ).thenReturn( HOST_ID );
         when( hostInfo.getHostname() ).thenReturn( HOSTNAME );
         when( hostInfo.getArch() ).thenReturn( ARCH );
@@ -250,7 +257,7 @@ public class ManagementHostEntityTest
     {
         when( future.get() ).thenReturn( new Integer( VLAN ) );
 
-        managementHostEntity.setupTunnels( Sets.newHashSet( IP ), ENV_ID );
+        managementHostEntity.setupTunnels( peerMap, ENV_ID );
 
         verify( future ).get();
 
@@ -258,7 +265,7 @@ public class ManagementHostEntityTest
 
         try
         {
-            managementHostEntity.setupTunnels( Sets.newHashSet( IP ), ENV_ID );
+            managementHostEntity.setupTunnels( peerMap, ENV_ID );
             fail( "Expected PeerException" );
         }
         catch ( PeerException e )
@@ -269,7 +276,7 @@ public class ManagementHostEntityTest
 
         try
         {
-            managementHostEntity.setupTunnels( Sets.newHashSet( IP ), ENV_ID );
+            managementHostEntity.setupTunnels( peerMap, ENV_ID );
             fail( "Expected PeerException" );
         }
         catch ( PeerException e )
@@ -280,7 +287,7 @@ public class ManagementHostEntityTest
 
         try
         {
-            managementHostEntity.setupTunnels( Sets.newHashSet( IP ), ENV_ID );
+            managementHostEntity.setupTunnels( peerMap, ENV_ID );
             fail( "Expected PeerException" );
         }
         catch ( PeerException e )

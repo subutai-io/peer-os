@@ -1,6 +1,8 @@
 package io.subutai.core.peer.impl.tasks;
 
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Before;
@@ -8,11 +10,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import static junit.framework.TestCase.fail;
@@ -30,6 +34,7 @@ public class SetupTunnelsTaskTest
 {
     private static final UUID ENV_ID = UUID.randomUUID();
     private static final String PEER_IP = "127.0.0.1";
+    private static final String N2N_IP = "10.11.0.1";
     @Mock
     NetworkManager networkManager;
     @Mock
@@ -44,7 +49,9 @@ public class SetupTunnelsTaskTest
     @Before
     public void setUp() throws Exception
     {
-        task = new SetupTunnelsTask( networkManager, managementHostEntity, ENV_ID, Sets.newHashSet( PEER_IP ) );
+        Map<String, String> m = new HashMap<>();
+        m.put( PEER_IP, N2N_IP );
+        task = new SetupTunnelsTask( networkManager, managementHostEntity, ENV_ID, m );
     }
 
 
