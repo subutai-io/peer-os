@@ -112,7 +112,6 @@ public class EnvironmentBuilder
             {
                 String n2nIp = environment.findN2nIp( peer.getId().toString() );
                 peerIps.put( peer.getPeerInfo().getIp(), n2nIp );
-                //                                peerIps.add( n2nIp );
             }
         }
 

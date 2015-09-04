@@ -57,27 +57,6 @@ public class SetupTunnelsTask implements Callable<Integer>
         //remove local IP, just in case
         peerIps.remove( managementHost.getExternalIp() );
 
-        //remove local n2n IP, just in case
-
-//        Set<Interface> intfs = managementHost.getNetInterfaces();
-//        String localN2nIp = "";
-//
-//
-//        for ( Interface i : intfs )
-//        {
-//            SubnetUtils su = new SubnetUtils( i.getIp(), "255.255.255.0" );
-//            String name = String.format( "n2n_%s", su.getInfo().getNetworkAddress().replace( ".", "_" ) );
-//
-//            if ( i.getInterfaceName().equals( name ) )
-//            {
-//                localN2nIp = i.getIp();
-//            }
-//        }
-//        String a = peerIps.remove( localN2nIp );
-//
-//        LOG.debug( String.format( "Setting up tunnel on ***********: %s removed %s", localN2nIp, a ) );
-//
-//        LOG.debug( String.format( "Setting up tunnel on : %s", peerIps.keySet().size() ) );
 
         for ( String peerIp : peerIps.keySet() )
         {
