@@ -75,6 +75,7 @@
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
+            <Import-Package>javax.jms.*;version=${org.apache.activemq.version},!javax.jms*, *</Import-Package>
           </instructions>
         </configuration>
       </plugin>
