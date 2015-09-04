@@ -49,11 +49,10 @@ public class BrokerImpl implements Broker
     private static final String VM_BROKER_URL = "vm://localhost";
 
     protected MessageRoutingListener messageRouter;
+    protected BrokerService broker;
     private final String brokerUrl;
-    private final int maxBrokerConnections;
     private final boolean isPersistent;
     private final int messageTimeout;
-    private final int idleConnectionTimeout;
     private final String keystore;
     private final String keystorePassword;
     private final String truststore;
@@ -61,24 +60,23 @@ public class BrokerImpl implements Broker
     private ByteMessagePostProcessor byteMessagePostProcessor;
     private TextMessagePostProcessor textMessagePostProcessor;
     private SslContext customSslContext;
-    private BrokerService broker;
     private ActiveMQConnectionFactory amqFactory;
 
 
-    public BrokerImpl( final String brokerUrl, final int maxBrokerConnections, final boolean isPersistent,
-                       final int messageTimeout, final int idleConnectionTimeout, final String keystore,
-                       final String keystorePassword, final String truststore, final String truststorePassword )
+    public BrokerImpl( final String brokerUrl, final boolean isPersistent, final int messageTimeout,
+                       final String keystore, final String keystorePassword, final String truststore,
+                       final String truststorePassword )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( brokerUrl ), "Invalid broker URL" );
-        Preconditions.checkArgument( maxBrokerConnections > 0, "Max broker connections number must be greater than 0" );
         Preconditions.checkArgument( messageTimeout >= 0, "Message timeout must be greater than or equal to 0" );
-        Preconditions.checkArgument( idleConnectionTimeout > 0, "Idle connection timeout must be greater than 0" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( keystore ), "Invalid keystore path" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( keystorePassword ), "Invalid keystore password" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( truststore ), "Invalid truststore path" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( truststorePassword ), "Invalid truststore password" );
 
         this.brokerUrl = brokerUrl;
-        this.maxBrokerConnections = maxBrokerConnections;
         this.isPersistent = isPersistent;
         this.messageTimeout = messageTimeout;
-        this.idleConnectionTimeout = idleConnectionTimeout;
         this.messageRouter = new MessageRoutingListener();
         //todo prefix store paths with Common.SUBUTAI_APP_DATA_PATH
         this.keystore = keystore;
@@ -224,8 +222,7 @@ public class BrokerImpl implements Broker
     {
         try
         {
-            ReloadableX509TrustManager tm =
-                    ( ReloadableX509TrustManager ) customSslContext.getTrustManagersAsArray()[0];
+            ReloadableX509TrustManager tm = ( ReloadableX509TrustManager ) getSslContext().getTrustManagersAsArray()[0];
             tm.reloadTrustManager();
         }
         catch ( Exception e )
@@ -239,80 +236,85 @@ public class BrokerImpl implements Broker
     public void init() throws BrokerException
     {
         //setup broker
-        broker = getBroker();
-
-        try
-        {
-            customSslContext = getSslContext();
-            broker.setSslContext( customSslContext );
-            broker.addConnector( "vm://localhost" );
-            broker.addConnector( brokerUrl );
-            broker.start();
-            broker.waitUntilStarted();
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error starting broker", e );
-            throw new BrokerException( e );
-        }
-
+        setupBroker();
 
         //setup client
-        amqFactory = getConnectionFactory( VM_BROKER_URL );
-        amqFactory.setWatchTopicAdvisories( false );
-        amqFactory.setCheckForDuplicates( true );
 
-        setupRouter( amqFactory );
+        setupClient();
     }
 
 
     protected BrokerService getBroker()
     {
-        return new BrokerService();
+        if ( broker == null )
+        {
+            broker = new BrokerService();
+            //tune broker
+        }
+        return broker;
     }
 
 
-    protected ActiveMQConnectionFactory getConnectionFactory( String url )
+    protected ActiveMQConnectionFactory getConnectionFactory()
     {
-        return new ActiveMQConnectionFactory( url );
+        if ( amqFactory == null )
+        {
+            amqFactory = new ActiveMQConnectionFactory( VM_BROKER_URL );
+            //tune connection factory
+            amqFactory.setWatchTopicAdvisories( false );
+            amqFactory.setCheckForDuplicates( true );
+        }
+        return amqFactory;
     }
 
 
     protected SslContext getSslContext() throws Exception
     {
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance( KeyManagerFactory.getDefaultAlgorithm() );
-        KeyStore ks = KeyStore.getInstance( "jks" );
-        KeyManager[] keystoreManagers;
+        if ( customSslContext == null )
+        {
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance( KeyManagerFactory.getDefaultAlgorithm() );
+            KeyStore ks = KeyStore.getInstance( "jks" );
+            KeyManager[] keystoreManagers;
 
-        ks.load( new FileInputStream( new File( keystore ) ), keystorePassword.toCharArray() );
-        kmf.init( ks, keystorePassword.toCharArray() );
-        keystoreManagers = kmf.getKeyManagers();
+            ks.load( new FileInputStream( new File( keystore ) ), keystorePassword.toCharArray() );
+            kmf.init( ks, keystorePassword.toCharArray() );
+            keystoreManagers = kmf.getKeyManagers();
 
-        TrustManager[] trustStoreManagers = new TrustManager[] {
-                new ReloadableX509TrustManager( truststore, truststorePassword )
-        };
+            TrustManager[] trustStoreManagers = new TrustManager[] {
+                    new ReloadableX509TrustManager( truststore, truststorePassword )
+            };
 
-        SslContext context = new SslContext( keystoreManagers, trustStoreManagers, null );
-        return context;
+            customSslContext = new SslContext( keystoreManagers, trustStoreManagers, null );
+        }
+        return customSslContext;
     }
 
 
-    public void dispose() throws Exception
+    protected void setupBroker() throws BrokerException
     {
-        if ( broker != null )
+        try
         {
-            broker.stop();
+            getBroker().setSslContext( getSslContext() );
+            getBroker().addConnector( VM_BROKER_URL );
+            getBroker().addConnector( brokerUrl );
+            getBroker().start();
+            getBroker().waitUntilStarted();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error in setupClient", e );
+            throw new BrokerException( e );
         }
     }
 
 
-    protected void setupRouter( ActiveMQConnectionFactory amqFactory ) throws BrokerException
+    protected void setupClient() throws BrokerException
     {
         try
         {
             for ( Topic topic : Topic.values() )
             {
-                Connection connection = amqFactory.createConnection();
+                Connection connection = getConnectionFactory().createConnection();
                 connection.setClientID( String.format( "%s-subutai-client", topic.name() ) );
                 connection.start();
                 Session session = connection.createSession( false, Session.CLIENT_ACKNOWLEDGE );
@@ -324,7 +326,7 @@ public class BrokerImpl implements Broker
         }
         catch ( JMSException e )
         {
-            LOG.error( "Error in setupRouter", e );
+            LOG.error( "Error in setupClient", e );
             throw new BrokerException( e );
         }
     }
@@ -338,7 +340,7 @@ public class BrokerImpl implements Broker
 
         try
         {
-            connection = amqFactory.createConnection();
+            connection = getConnectionFactory().createConnection();
             connection.start();
             session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
             Destination destination = session.createTopic( topic );
@@ -402,6 +404,15 @@ public class BrokerImpl implements Broker
                     //ignore
                 }
             }
+        }
+    }
+
+
+    public void dispose() throws Exception
+    {
+        if ( broker != null )
+        {
+            broker.stop();
         }
     }
 }

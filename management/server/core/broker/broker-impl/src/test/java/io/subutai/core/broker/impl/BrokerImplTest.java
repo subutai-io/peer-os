@@ -46,12 +46,10 @@ import static org.mockito.Mockito.when;
 public class BrokerImplTest
 {
 
-    private static final int MAX_BROKER_CONNECTIONS = 1;
     private static final String BROKER_URL = "vm://localhost";
     private static final String KEYSTORE = "path/to/keystore";
     private static final String KEYSTORE_PASSWORD = "pwd";
     private static final int MESSAGE_TIMEOUT = 10;
-    private static final int IDLE_CONNECTION_TIMEOUT = 300;
     private static final String TOPIC = "topic";
     private static final String TEXT_MESSAGE = "message";
     private static final byte[] BYTE_MESSAGE = { 0 };
@@ -91,12 +89,12 @@ public class BrokerImplTest
     @Before
     public void setUp() throws Exception
     {
-        broker =
-                spy( new BrokerImpl( BROKER_URL, MAX_BROKER_CONNECTIONS, true, MESSAGE_TIMEOUT, IDLE_CONNECTION_TIMEOUT,
-                        KEYSTORE, KEYSTORE_PASSWORD, KEYSTORE, KEYSTORE_PASSWORD ) );
+        broker = spy( new BrokerImpl( BROKER_URL, true, MESSAGE_TIMEOUT, KEYSTORE, KEYSTORE_PASSWORD, KEYSTORE,
+                KEYSTORE_PASSWORD ) );
         doReturn( sslContext ).when( broker ).getSslContext();
         doReturn( brokerService ).when( broker ).getBroker();
-//        when( pool.createConnection() ).thenReturn( connection );
+        doReturn( amqFactory ).when( broker ).getConnectionFactory();
+        when( amqFactory.createConnection() ).thenReturn( connection );
         when( connection.createSession( anyBoolean(), anyInt() ) ).thenReturn( session );
         when( session.createProducer( any( Destination.class ) ) ).thenReturn( producer );
         when( session.createConsumer( any( Destination.class ) ) ).thenReturn( consumer );
@@ -104,51 +102,9 @@ public class BrokerImplTest
         when( byteMessageListener.getTopic() ).thenReturn( Topic.RESPONSE_TOPIC );
         when( textMessageListener.getTopic() ).thenReturn( Topic.RESPONSE_TOPIC );
         broker.messageRouter = messageRouter;
-    }
-
-
-    @Test
-    public void testConstructor() throws Exception
-    {
-        //test url
-        try
-        {
-            new BrokerImpl( null, MAX_BROKER_CONNECTIONS, true, MESSAGE_TIMEOUT, IDLE_CONNECTION_TIMEOUT, KEYSTORE,
-                    KEYSTORE_PASSWORD, KEYSTORE, KEYSTORE_PASSWORD );
-            fail( "Expected IllegalArgumentException" );
-        }
-        catch ( IllegalArgumentException e )
-        {
-        }
-        //test max connections
-        try
-        {
-            new BrokerImpl( BROKER_URL, -1, true, MESSAGE_TIMEOUT, IDLE_CONNECTION_TIMEOUT, KEYSTORE, KEYSTORE_PASSWORD,
-                    KEYSTORE, KEYSTORE_PASSWORD );
-            fail( "Expected IllegalArgumentException" );
-        }
-        catch ( IllegalArgumentException e )
-        {
-        }
-        //check message timeout
-        try
-        {
-            new BrokerImpl( BROKER_URL, MAX_BROKER_CONNECTIONS, true, -1, IDLE_CONNECTION_TIMEOUT, KEYSTORE,
-                    KEYSTORE_PASSWORD, KEYSTORE, KEYSTORE_PASSWORD );
-            fail( "Expected IllegalArgumentException" );
-        }
-        catch ( IllegalArgumentException e )
-        {
-        }        //check message timeout
-        try
-        {
-            new BrokerImpl( BROKER_URL, MAX_BROKER_CONNECTIONS, true, MESSAGE_TIMEOUT, -1, KEYSTORE, KEYSTORE_PASSWORD,
-                    KEYSTORE, KEYSTORE_PASSWORD );
-            fail( "Expected IllegalArgumentException" );
-        }
-        catch ( IllegalArgumentException e )
-        {
-        }
+        broker.broker = brokerService;
+        doReturn( topicSubscriber ).when( session )
+                                   .createDurableSubscriber( any( javax.jms.Topic.class ), anyString() );
     }
 
 
@@ -177,14 +133,14 @@ public class BrokerImplTest
         verify( producer ).send( any( Message.class ) );
     }
 
-//
-//    @Test( expected = BrokerException.class )
-//    public void testSendMessageException() throws Exception
-//    {
-//        doThrow( new JMSException( null ) ).when( pool ).createConnection();
-//
-//        broker.sendTextMessage( TOPIC, TEXT_MESSAGE );
-//    }
+
+    @Test( expected = BrokerException.class )
+    public void testSendMessageException() throws Exception
+    {
+        doThrow( new JMSException( null ) ).when( amqFactory ).createConnection();
+
+        broker.sendTextMessage( TOPIC, TEXT_MESSAGE );
+    }
 
 
     @Test
@@ -216,13 +172,13 @@ public class BrokerImplTest
     }
 
 
-//    @Test
-//    public void testDispose() throws Exception
-//    {
-//        broker.dispose();
-//
-//        verify( pool ).stop();
-//    }
+    @Test
+    public void testDispose() throws Exception
+    {
+        broker.dispose();
+
+        verify( brokerService ).stop();
+    }
 
 
     @Test
@@ -233,13 +189,12 @@ public class BrokerImplTest
 
 
     @Test
-    public void testSetupRouter() throws Exception
+    public void testSetupClient() throws Exception
     {
         when( amqFactory.createConnection() ).thenReturn( connection );
-        when( session.createDurableSubscriber( any( javax.jms.Topic.class ), anyString() ) )
-                .thenReturn( topicSubscriber );
 
-        broker.setupRouter( amqFactory );
+
+        broker.setupClient();
 
         verify( connection, times( Topic.values().length ) ).createSession( anyBoolean(), anyInt() );
         verify( topicSubscriber, times( Topic.values().length ) ).setMessageListener( messageRouter );
@@ -249,7 +204,7 @@ public class BrokerImplTest
 
         try
         {
-            broker.setupRouter( amqFactory );
+            broker.setupClient();
             fail( "Expected BrokerException" );
         }
         catch ( BrokerException e )
