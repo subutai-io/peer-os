@@ -152,7 +152,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected CommandUtil commandUtil = new CommandUtil();
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
     protected Set<RequestListener> requestListeners = Sets.newHashSet();
-    private PeerInfo peerInfo;
+    protected PeerInfo peerInfo;
     private HttpContextManager httpContextManager;
 
     protected boolean initialized = false;
@@ -982,9 +982,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder(
-                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
-                    bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
+                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
