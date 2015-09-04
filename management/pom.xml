@@ -35,7 +35,6 @@
       <url>http://repository.springsource.com/maven/bundles/external</url>
     </repository>
 
-
   </repositories>
 
   <properties>
@@ -1013,6 +1012,11 @@
       <dependency>
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcprov-ext-jdk15on</artifactId>
+        <version>${org.bouncycastle.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcpkix-jdk15on</artifactId>
         <version>${org.bouncycastle.version}</version>
       </dependency>
 

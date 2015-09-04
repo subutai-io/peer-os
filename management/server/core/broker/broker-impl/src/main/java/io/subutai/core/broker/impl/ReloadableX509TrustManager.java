@@ -120,7 +120,7 @@ public class ReloadableX509TrustManager implements X509TrustManager
     }
 
 
-    protected synchronized void addServerCertAndReload( X509Certificate cert ) throws Exception
+    protected synchronized void addServerCertAndReload( String alias, X509Certificate cert ) throws Exception
     {
 
         // import the cert into file trust store
@@ -147,7 +147,7 @@ public class ReloadableX509TrustManager implements X509TrustManager
             fis.close();
         }
 
-        ts.setCertificateEntry( "", cert );
+        ts.setCertificateEntry( alias, cert );
 
         ts.store( new FileOutputStream( this.trustStorePath ), keystorePass );
 

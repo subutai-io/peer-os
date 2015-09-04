@@ -282,7 +282,7 @@ public class BrokerImpl implements Broker
     {
         KeyManagerFactory kmf = KeyManagerFactory.getInstance( KeyManagerFactory.getDefaultAlgorithm() );
         KeyStore ks = KeyStore.getInstance( "jks" );
-        KeyManager[] keystoreManagers = null;
+        KeyManager[] keystoreManagers;
 
         ks.load( new FileInputStream( new File( keystore ) ), keystorePassword.toCharArray() );
         kmf.init( ks, keystorePassword.toCharArray() );
