@@ -18,24 +18,25 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.broker.BrokerService;
+import org.apache.activemq.broker.SslContext;
+
 import io.subutai.core.broker.api.BrokerException;
 import io.subutai.core.broker.api.ByteMessageListener;
 import io.subutai.core.broker.api.TextMessageListener;
 import io.subutai.core.broker.api.Topic;
-
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.pool.PooledConnectionFactory;
-
-import io.subutai.core.broker.impl.BrokerImpl;
-import io.subutai.core.broker.impl.MessageRoutingListener;
 
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,18 +46,16 @@ import static org.mockito.Mockito.when;
 public class BrokerImplTest
 {
 
-    private static final int MAX_BROKER_CONNECTIONS = 1;
     private static final String BROKER_URL = "vm://localhost";
+    private static final String KEYSTORE = "path/to/keystore";
+    private static final String CA_CERTIFICATE = "path/to/cert";
+    private static final String KEYSTORE_PASSWORD = "pwd";
     private static final int MESSAGE_TIMEOUT = 10;
-    private static final int IDLE_CONNECTION_TIMEOUT = 300;
     private static final String TOPIC = "topic";
     private static final String TEXT_MESSAGE = "message";
     private static final byte[] BYTE_MESSAGE = { 0 };
     @Mock
     MessageRoutingListener messageRouter;
-
-    @Mock
-    PooledConnectionFactory pool;
 
     @Mock
     Connection connection;
@@ -80,6 +79,10 @@ public class BrokerImplTest
 
     @Mock
     TopicSubscriber topicSubscriber;
+    @Mock
+    SslContext sslContext;
+    @Mock
+    BrokerService brokerService;
 
     BrokerImpl broker;
 
@@ -87,57 +90,22 @@ public class BrokerImplTest
     @Before
     public void setUp() throws Exception
     {
-        broker = new BrokerImpl( BROKER_URL, MAX_BROKER_CONNECTIONS, true, MESSAGE_TIMEOUT, IDLE_CONNECTION_TIMEOUT );
-        when( pool.createConnection() ).thenReturn( connection );
+        broker = spy( new BrokerImpl( BROKER_URL, true, MESSAGE_TIMEOUT, KEYSTORE, KEYSTORE_PASSWORD, KEYSTORE,
+                KEYSTORE_PASSWORD, CA_CERTIFICATE ) );
+        doReturn( sslContext ).when( broker ).getSslContext();
+        doReturn( brokerService ).when( broker ).getBroker();
+        doReturn( amqFactory ).when( broker ).getConnectionFactory();
+        when( amqFactory.createConnection() ).thenReturn( connection );
         when( connection.createSession( anyBoolean(), anyInt() ) ).thenReturn( session );
         when( session.createProducer( any( Destination.class ) ) ).thenReturn( producer );
         when( session.createConsumer( any( Destination.class ) ) ).thenReturn( consumer );
         when( session.createBytesMessage() ).thenReturn( mock( BytesMessage.class ) );
         when( byteMessageListener.getTopic() ).thenReturn( Topic.RESPONSE_TOPIC );
         when( textMessageListener.getTopic() ).thenReturn( Topic.RESPONSE_TOPIC );
-        broker.pool = pool;
         broker.messageRouter = messageRouter;
-    }
-
-
-    @Test
-    public void testConstructor() throws Exception
-    {
-        //test url
-        try
-        {
-            new BrokerImpl( null, MAX_BROKER_CONNECTIONS, true, MESSAGE_TIMEOUT, IDLE_CONNECTION_TIMEOUT );
-            fail( "Expected IllegalArgumentException" );
-        }
-        catch ( IllegalArgumentException e )
-        {
-        }
-        //test max connections
-        try
-        {
-            new BrokerImpl( BROKER_URL, -1, true, MESSAGE_TIMEOUT, IDLE_CONNECTION_TIMEOUT );
-            fail( "Expected IllegalArgumentException" );
-        }
-        catch ( IllegalArgumentException e )
-        {
-        }
-        //check message timeout
-        try
-        {
-            new BrokerImpl( BROKER_URL, MAX_BROKER_CONNECTIONS, true, -1, IDLE_CONNECTION_TIMEOUT );
-            fail( "Expected IllegalArgumentException" );
-        }
-        catch ( IllegalArgumentException e )
-        {
-        }        //check message timeout
-        try
-        {
-            new BrokerImpl( BROKER_URL, MAX_BROKER_CONNECTIONS, true, MESSAGE_TIMEOUT, -1 );
-            fail( "Expected IllegalArgumentException" );
-        }
-        catch ( IllegalArgumentException e )
-        {
-        }
+        broker.broker = brokerService;
+        doReturn( topicSubscriber ).when( session )
+                                   .createDurableSubscriber( any( javax.jms.Topic.class ), anyString() );
     }
 
 
@@ -170,7 +138,7 @@ public class BrokerImplTest
     @Test( expected = BrokerException.class )
     public void testSendMessageException() throws Exception
     {
-        doThrow( new JMSException( null ) ).when( pool ).createConnection();
+        doThrow( new JMSException( null ) ).when( amqFactory ).createConnection();
 
         broker.sendTextMessage( TOPIC, TEXT_MESSAGE );
     }
@@ -210,7 +178,7 @@ public class BrokerImplTest
     {
         broker.dispose();
 
-        verify( pool ).stop();
+        verify( brokerService ).stop();
     }
 
 
@@ -222,15 +190,14 @@ public class BrokerImplTest
 
 
     @Test
-    public void testSetupRouter() throws Exception
+    public void testSetupClient() throws Exception
     {
         when( amqFactory.createConnection() ).thenReturn( connection );
-        when( session.createDurableSubscriber( any( javax.jms.Topic.class ), anyString() ) )
-                .thenReturn( topicSubscriber );
 
-        broker.setupRouter( amqFactory );
 
-        verify( connection, times( Topic.values().length ) ).createSession(anyBoolean(), anyInt());
+        broker.setupClient();
+
+        verify( connection, times( Topic.values().length ) ).createSession( anyBoolean(), anyInt() );
         verify( topicSubscriber, times( Topic.values().length ) ).setMessageListener( messageRouter );
 
         JMSException exception = mock( JMSException.class );
@@ -238,7 +205,7 @@ public class BrokerImplTest
 
         try
         {
-            broker.setupRouter( amqFactory );
+            broker.setupClient();
             fail( "Expected BrokerException" );
         }
         catch ( BrokerException e )

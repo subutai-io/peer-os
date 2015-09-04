@@ -152,7 +152,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected CommandUtil commandUtil = new CommandUtil();
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
     protected Set<RequestListener> requestListeners = Sets.newHashSet();
-    private PeerInfo peerInfo;
+    protected PeerInfo peerInfo;
     private HttpContextManager httpContextManager;
 
     protected boolean initialized = false;
@@ -1290,6 +1290,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 {
                     ( ( AbstractSubutaiHost ) managementHost ).setNetInterfaces( resourceHostInfo.getInterfaces() );
                     managementHostDataService.update( ( ManagementHostEntity ) managementHost );
+                    peerInfo.setIp( managementHost.getIpByInterfaceName( externalIpInterface ) );
                 }
                 ( ( AbstractSubutaiHost ) managementHost ).updateHostInfo( resourceHostInfo );
             }
