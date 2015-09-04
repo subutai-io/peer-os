@@ -53,28 +53,6 @@ public class RegistrationManagerImpl implements RegistrationManager
     {
         containerTokenDataService = new ContainerTokenDataService( daoManager );
         requestDataService = new RequestDataService( daoManager );
-
-        //        HostInterface interfaceModel = new HostInterface();
-        //        interfaceModel.setMac( UUID.randomUUID().toString() );
-        //        interfaceModel.setIp( "Some ip" );
-        //        interfaceModel.setInterfaceName( "Some i-name" );
-        //        Set<Interface> ifaces = Sets.newHashSet();
-        //        ifaces.addAll( Sets.newHashSet( interfaceModel ) );
-        //
-        //        RequestedHostImpl temp =
-        //                new RequestedHostImpl( UUID.randomUUID().toString(), "hostname", HostArchitecture.AMD64,
-        // "secret",
-        //                        "some rest hook", "some key", RegistrationStatus.REQUESTED, ifaces );
-
-        //                        requestDataService.persist( temp );
-        //        queueRequest( temp );
-
-        //        LOGGER.info( "Started RegistrationManagerImpl" );
-        //        List<RequestedHostImpl> requestedHosts = ( List<RequestedHostImpl> ) requestDataService.getAll();
-        //        for ( final RequestedHostImpl requestedHost : requestedHosts )
-        //        {
-        //            LOGGER.error( requestedHost.toString() );
-        //        }
     }
 
 
@@ -169,25 +147,15 @@ public class RegistrationManagerImpl implements RegistrationManager
         RequestedHostImpl registrationRequest = requestDataService.find( requestId );
         registrationRequest.setStatus( RegistrationStatus.APPROVED );
         requestDataService.update( registrationRequest );
-
         WebClient client = RestUtil.createWebClient( registrationRequest.getRestHook() );
-
-        EncryptionTool encryptionTool = securityManager.getEncryptionTool();
-        KeyManager keyManager = securityManager.getKeyManager();
-
-        String message = RegistrationStatus.APPROVED.name();
-        PGPPublicKey publicKey = keyManager.getPublicKey( registrationRequest.getId() );
-        byte[] encodedArray = encryptionTool.encrypt( message.getBytes(), publicKey, true );
-        String encoded = message;
         try
         {
-            encoded = new String( encodedArray, "UTF-8" );
+            client.post( "Accepted" );
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error approving new connections request", e );
         }
-        client.post( "Accepted" );
     }
 
 
@@ -223,7 +191,6 @@ public class RegistrationManagerImpl implements RegistrationManager
     {
 
         ContainerTokenImpl containerToken = containerTokenDataService.find( token );
-
         if ( containerToken == null )
         {
             throw new NodeRegistrationException( "Couldn't verify container token" );
@@ -233,7 +200,6 @@ public class RegistrationManagerImpl implements RegistrationManager
         {
             throw new NodeRegistrationException( "Container token expired" );
         }
-
         try
         {
             securityManager.getKeyManager().savePublicKeyRing( containerHostId, publicKey );
