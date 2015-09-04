@@ -2,6 +2,7 @@ package io.subutai.common.environment;
 
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -11,7 +12,7 @@ import io.subutai.common.protocol.Template;
 
 public class CreateContainerGroupRequest
 {
-    private final Set<String> peerIps;
+    private final Map<String, String> peerIps;
     private final UUID environmentId;
     private final UUID initiatorPeerId;
     private final UUID ownerId;
@@ -23,7 +24,7 @@ public class CreateContainerGroupRequest
     private final int ipAddressOffset;
 
 
-    public CreateContainerGroupRequest( final Set<String> peerIps, final UUID environmentId, final UUID initiatorPeerId,
+    public CreateContainerGroupRequest( final Map<String, String> peerIps, final UUID environmentId, final UUID initiatorPeerId,
                                         final UUID ownerId, final String subnetCidr, final List<Template> templates,
                                         final int numberOfContainers, final String strategyId,
                                         final List<Criteria> criteria, final int ipAddressOffset )
@@ -41,7 +42,7 @@ public class CreateContainerGroupRequest
     }
 
 
-    public Set<String> getPeerIps()
+    public Map<String, String> getPeerIps()
     {
         return peerIps;
     }

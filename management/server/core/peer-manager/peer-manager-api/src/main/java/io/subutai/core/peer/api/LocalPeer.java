@@ -1,6 +1,7 @@
 package io.subutai.core.peer.api;
 
 
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -137,7 +138,7 @@ public interface LocalPeer extends Peer
     /**
      * Sets up tunnels on the local peer to the specified remote peers
      */
-    public int setupTunnels( Set<String> peerIps, UUID environmentId ) throws PeerException;
+    public int setupTunnels( Map<String, String> peerIps, UUID environmentId ) throws PeerException;
 
 
     public void addRequestListener( RequestListener listener );

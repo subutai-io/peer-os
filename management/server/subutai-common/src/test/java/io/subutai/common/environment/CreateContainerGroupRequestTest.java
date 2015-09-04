@@ -2,8 +2,10 @@ package io.subutai.common.environment;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -13,8 +15,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.environment.CreateContainerGroupRequest;
-import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.protocol.Criteria;
 import io.subutai.common.protocol.Template;
 
@@ -25,7 +25,7 @@ import static org.junit.Assert.assertNotNull;
 public class CreateContainerGroupRequestTest
 {
     private CreateContainerGroupRequest containerGroupRequest;
-    private Set<String> mySet;
+    private Map<String, String> myMap;
     private List<Template> myList;
     private List<Criteria> myListCriteria;
 
@@ -38,8 +38,8 @@ public class CreateContainerGroupRequestTest
     @Before
     public void setUp() throws Exception
     {
-        mySet = new HashSet<>();
-        mySet.add( "test" );
+        myMap = new HashMap<>();
+        myMap.put( "test", "test" );
 
         myList = new ArrayList<>();
         myList.add( template );
@@ -48,7 +48,7 @@ public class CreateContainerGroupRequestTest
         myListCriteria.add( criteria );
 
         containerGroupRequest =
-                new CreateContainerGroupRequest( mySet, UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), "555",
+                new CreateContainerGroupRequest( myMap, UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), "555",
                         myList, 5, "Round Robin", myListCriteria, 555 );
     }
 

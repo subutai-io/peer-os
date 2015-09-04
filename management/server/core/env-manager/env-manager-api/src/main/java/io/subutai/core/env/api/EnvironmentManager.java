@@ -1,6 +1,7 @@
 package io.subutai.core.env.api;
 
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -12,6 +13,7 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Peer;
+import io.subutai.common.protocol.N2NConfig;
 import io.subutai.core.env.api.exception.EnvironmentCreationException;
 import io.subutai.core.env.api.exception.EnvironmentDestructionException;
 import io.subutai.core.env.api.exception.EnvironmentManagerException;
@@ -28,7 +30,7 @@ public interface EnvironmentManager
      *
      * @return - set of {@code Environment}
      */
-    public Set<Environment> getEnvironments();
+    Set<Environment> getEnvironments();
 
     /**
      * Returns environment by id
@@ -39,7 +41,7 @@ public interface EnvironmentManager
      *
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
-    public Environment findEnvironment( UUID environmentId ) throws EnvironmentNotFoundException;
+    Environment findEnvironment( UUID environmentId ) throws EnvironmentNotFoundException;
 
     /**
      * Creates environment based on a passed topology
@@ -54,8 +56,8 @@ public interface EnvironmentManager
      *
      * @throws EnvironmentCreationException - thrown if error occurs during environment creation
      */
-    public Environment createEnvironment( String name, Topology topology, String subnetCidr, String sshKey,
-                                          boolean async ) throws EnvironmentCreationException;
+    Environment createEnvironment( String name, Topology topology, String subnetCidr, String sshKey, boolean async )
+            throws EnvironmentCreationException;
 
 
     /**
@@ -69,7 +71,7 @@ public interface EnvironmentManager
      * @throws EnvironmentDestructionException - thrown if error occurs during environment destruction
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
-    public void destroyEnvironment( UUID environmentId, boolean async, boolean forceMetadataRemoval )
+    void destroyEnvironment( UUID environmentId, boolean async, boolean forceMetadataRemoval )
             throws EnvironmentDestructionException, EnvironmentNotFoundException;
 
 
@@ -85,7 +87,7 @@ public interface EnvironmentManager
      * @throws EnvironmentModificationException - thrown if error occurs during environment modification
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
-    public Set<ContainerHost> growEnvironment( UUID environmentId, Topology topology, boolean async )
+    Set<ContainerHost> growEnvironment( UUID environmentId, Topology topology, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     /**
@@ -99,7 +101,7 @@ public interface EnvironmentManager
      * @throws EnvironmentNotFoundException - thrown if environment not found
      * @throws EnvironmentModificationException - thrown if error occurs during key insertion
      */
-    public void setSshKey( UUID environmentId, String sshKey, boolean async )
+    void setSshKey( UUID environmentId, String sshKey, boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException;
 
 
@@ -115,7 +117,7 @@ public interface EnvironmentManager
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
     //todo use containerId instead of containerHost
-    public void destroyContainer( ContainerHost containerHost, boolean async, boolean forceMetadataRemoval )
+    void destroyContainer( ContainerHost containerHost, boolean async, boolean forceMetadataRemoval )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
 
@@ -126,7 +128,7 @@ public interface EnvironmentManager
      *
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
-    public void removeEnvironment( UUID environmentId ) throws EnvironmentNotFoundException;
+    void removeEnvironment( UUID environmentId ) throws EnvironmentNotFoundException;
 
 
     /**
@@ -134,7 +136,7 @@ public interface EnvironmentManager
      *
      * @param blueprint - blueprint to save
      */
-    public void saveBlueprint( Blueprint blueprint ) throws EnvironmentManagerException;
+    void saveBlueprint( Blueprint blueprint ) throws EnvironmentManagerException;
 
 
     /**
@@ -142,7 +144,7 @@ public interface EnvironmentManager
      *
      * @param blueprintId - blueprint id to remove
      */
-    public void removeBlueprint( UUID blueprintId ) throws EnvironmentManagerException;
+    void removeBlueprint( UUID blueprintId ) throws EnvironmentManagerException;
 
 
     /**
@@ -150,7 +152,7 @@ public interface EnvironmentManager
      *
      * @return - set of blueprints
      */
-    public Set<Blueprint> getBlueprints() throws EnvironmentManagerException;
+    Set<Blueprint> getBlueprints() throws EnvironmentManagerException;
 
 
     /**
@@ -158,7 +160,7 @@ public interface EnvironmentManager
      *
      * @return - default domain name
      */
-    public String getDefaultDomainName();
+    String getDefaultDomainName();
 
 
     /**
@@ -166,7 +168,7 @@ public interface EnvironmentManager
      *
      * @param environmentId - target environment Id
      */
-    public void updateEnvironmentContainersMetadata( UUID environmentId ) throws EnvironmentManagerException;
+    void updateEnvironmentContainersMetadata( UUID environmentId ) throws EnvironmentManagerException;
 
     /**
      * Removes an assigned domain if any from the environment
@@ -174,7 +176,7 @@ public interface EnvironmentManager
      * @param environmentId - id of the environment which domain to remove
      * @param async - indicates whether operation is done synchronously or asynchronously to the calling party
      */
-    public void removeDomain( UUID environmentId, boolean async )
+    void removeDomain( UUID environmentId, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     /**
@@ -185,7 +187,7 @@ public interface EnvironmentManager
      * @param newDomain - domain url
      * @param async - indicates whether operation is done synchronously or asynchronously to the calling party
      */
-    public void assignDomain( UUID environmentId, String newDomain, boolean async )
+    void assignDomain( UUID environmentId, String newDomain, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     /**
@@ -195,20 +197,20 @@ public interface EnvironmentManager
      *
      * @return - domain url or null if not assigned
      */
-    public String getDomain( UUID environmentId ) throws EnvironmentManagerException, EnvironmentNotFoundException;
+    String getDomain( UUID environmentId ) throws EnvironmentManagerException, EnvironmentNotFoundException;
 
 
-    public boolean isContainerInDomain( UUID containerHostId, UUID environmentId )
+    boolean isContainerInDomain( UUID containerHostId, UUID environmentId )
             throws EnvironmentManagerException, EnvironmentNotFoundException;
 
 
-    public void addContainerToDomain( UUID containerHostId, UUID environmentId, boolean async )
+    void addContainerToDomain( UUID containerHostId, UUID environmentId, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
 
-    public void removeContainerFromDomain( UUID containerHostId, UUID environmentId, boolean async )
+    void removeContainerFromDomain( UUID containerHostId, UUID environmentId, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
 
-    public String createN2NTunnel( Set<Peer> peers ) throws EnvironmentManagerException;
+    List<N2NConfig> createN2NTunnel( Set<Peer> peers ) throws EnvironmentManagerException;
 }

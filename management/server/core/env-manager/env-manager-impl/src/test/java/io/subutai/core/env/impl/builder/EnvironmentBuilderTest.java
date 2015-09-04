@@ -36,6 +36,7 @@ import com.google.common.collect.Sets;
 
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.reset;
@@ -159,7 +160,7 @@ public class EnvironmentBuilderTest
 
         when( nodeGroup.getNumberOfContainers() ).thenReturn( TestUtil.NUMBER_OF_CONTAINERS );
 
-        doThrow( peerException ).when( localPeer ).setupTunnels( anySet(), any( UUID.class ) );
+        doThrow( peerException ).when( localPeer ).setupTunnels( anyMap(), any( UUID.class ) );
 
         try
         {

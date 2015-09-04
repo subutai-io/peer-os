@@ -1,6 +1,7 @@
 package io.subutai.core.env.impl.builder;
 
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletionService;
@@ -10,6 +11,9 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
@@ -35,7 +39,7 @@ import com.google.common.collect.Sets;
  */
 public class EnvironmentBuilder
 {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger( EnvironmentBuilder.class );
     private final TemplateRegistry templateRegistry;
     private final PeerManager peerManager;
     private final String defaultDomain;
@@ -100,13 +104,15 @@ public class EnvironmentBuilder
         //setup tunnels to all participating peers on local peer in case local peer is not included as provider peer
         LocalPeer localPeer = peerManager.getLocalPeer();
 
-        Set<String> peerIps = Sets.newHashSet();
+        Map<String, String> peerIps = new HashMap();
 
         for ( Peer peer : allPeers )
         {
             if ( !peer.getId().equals( localPeer.getId() ) )
             {
-                peerIps.add( peer.getPeerInfo().getIp() );
+                String n2nIp = environment.findN2nIp( peer.getId().toString() );
+                peerIps.put( peer.getPeerInfo().getIp(), n2nIp );
+                //                                peerIps.add( n2nIp );
             }
         }
 

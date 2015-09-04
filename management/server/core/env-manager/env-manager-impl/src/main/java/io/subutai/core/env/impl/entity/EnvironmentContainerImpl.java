@@ -261,7 +261,8 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     @Override
     public Peer getPeer()
     {
-        return this.peer;
+        return peer;
+//        return environment.getPeer( this.peerId );
     }
 
 
