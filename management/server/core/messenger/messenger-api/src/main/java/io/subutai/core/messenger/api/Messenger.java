@@ -29,9 +29,9 @@ public interface Messenger
      * @param peer - target peer
      * @param message - message to send
      * @param recipient - recipient of message
-     * @param timeToLive - time-to-live (in seconds) of message within which message is retried to be sent to
-     * recipient.
-     * @param headers - optional HTTP request headers After ttl expires and message is still not sent, it expires
+     * @param timeToLive - time-to-live (in seconds) of message within which message is retried to be sent to recipient.
+     * After ttl expires and message is still not sent, it expires
+     * @param headers - optional HTTP request headers
      */
     public void sendMessage( final Peer peer, final Message message, final String recipient, final int timeToLive,
                              final Map<String, String> headers ) throws MessageException;
