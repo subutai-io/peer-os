@@ -9,6 +9,7 @@ import java.util.concurrent.Callable;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.Common;
+import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import org.slf4j.Logger;
@@ -57,9 +58,9 @@ public class RemotePeerMessageSender implements Callable<Boolean>
                 String port = String.valueOf( targetPeerPort );
 
                 String url = "";
-                String alias = //SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-                        String.format( "env_%s_%s", localPeerId.toString(),
-                                envelope.getHeaders().get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
+                String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
+                      //  String.format( "env_%s_%s", localPeerId.toString(),
+                               // envelope.getHeaders().get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
 
                 switch ( port )
                 {

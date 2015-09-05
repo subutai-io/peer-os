@@ -63,7 +63,6 @@ import io.subutai.core.env.impl.dao.EnvironmentDataService;
 import io.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.EnvironmentBuildException;
-import io.subutai.core.env.impl.exception.EnvironmentTunnelException;
 import io.subutai.core.env.impl.exception.ResultHolder;
 import io.subutai.core.env.impl.tasks.Awaitable;
 import io.subutai.core.env.impl.tasks.CreateEnvironmentTask;
@@ -77,10 +76,11 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.User;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.tracker.api.Tracker;
+
 
 
 /**
@@ -98,6 +98,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     protected ExecutorService executor = SubutaiExecutors.newCachedThreadPool();
     private final String defaultDomain;
     private final IdentityManager identityManager;
+    private final SecurityManager securityManager;
     private final Tracker tracker;
 
     protected Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
@@ -108,6 +109,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     protected EnvironmentDataService environmentDataService;
     protected EnvironmentContainerDataService environmentContainerDataService;
     protected BlueprintDataService blueprintDataService;
+
 
 
     @Override
@@ -267,6 +269,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
         final EnvironmentImpl environment = createEmptyEnvironment( name, subnetCidr, sshKey );
+
 
         TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
                 String.format( "Creating environment %s ", environment.getId() ) );
@@ -561,35 +564,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         notifyOnEnvironmentDestroyed( environmentId );
     }
 
-
-    public void setupEnvironmentTunnel( final UUID environmentId, Set<Peer> peers ) throws EnvironmentTunnelException
-    {
-        String localEnvAlias =
-                String.format( "env_%s_%s", peerManager.getLocalPeer().getId().toString(), environmentId.toString() );
-        Set<Peer> remotePeers = Sets.newHashSet( peers );
-        LocalPeer localPeer = peerManager.getLocalPeer();
-        remotePeers.remove( localPeer );
-        if ( !remotePeers.isEmpty() )
-        {
-            try
-            {
-                String localPeerCert = localPeer.exportEnvironmentCertificate( environmentId );
-
-                for ( Peer remotePeer : remotePeers )
-                {
-                    String remotePeerCert = remotePeer.exportEnvironmentCertificate( environmentId );
-                    String remoteEnvAlias =
-                            String.format( "env_%s_%s", remotePeer.getId().toString(), environmentId.toString() );
-                    localPeer.importCertificate( remotePeerCert, remoteEnvAlias );
-                    remotePeer.importCertificate( localPeerCert, localEnvAlias );
-                }
-            }
-            catch ( Exception e )
-            {
-                throw new EnvironmentTunnelException( "Error exchanging environment certificates ", e );
-            }
-        }
-    }
 
 
     public Map<Peer, Set<Gateway>> getUsedGateways( final Set<Peer> peers ) throws EnvironmentManagerException
@@ -1032,7 +1006,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager,
                                    final NetworkManager networkManager, final DaoManager daoManager,
                                    final String defaultDomain, final IdentityManager identityManager,
-                                   final Tracker tracker )
+                                   final Tracker tracker, final SecurityManager securityManager )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
@@ -1049,6 +1023,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         this.environmentBuilder = new EnvironmentBuilder( templateRegistry, peerManager, defaultDomain );
         this.identityManager = identityManager;
         this.tracker = tracker;
+        this.securityManager = securityManager;
     }
 
 

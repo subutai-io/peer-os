@@ -5,6 +5,7 @@ import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
 
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
+import io.subutai.common.security.crypto.pgp.KeyPair;
 
 
 /**
@@ -51,6 +52,7 @@ public interface EncryptionTool
      */
     public ContentAndSignatures decryptAndReturnSignatures( final byte[] encryptedMessage ) throws PGPException;
 
+
     /**
      * Verifies the content with its signatures
      *
@@ -62,4 +64,16 @@ public interface EncryptionTool
 
     public boolean verifySignature( ContentAndSignatures contentAndSignatures, PGPPublicKey publicKey )
             throws PGPException;
+
+
+    /**
+     * Generated keypair
+     *
+     * @param userId
+     * @param secretPwd
+     * @param armored
+     *
+     * @return - KeyPair
+     */
+    public KeyPair generateKeyPair ( String userId,String secretPwd, boolean armored );
 }

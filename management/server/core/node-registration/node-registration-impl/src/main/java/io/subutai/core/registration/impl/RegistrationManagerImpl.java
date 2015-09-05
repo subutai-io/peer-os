@@ -125,7 +125,7 @@ public class RegistrationManagerImpl implements RegistrationManager
             {
                 requestDataService.persist( temp );
 
-                securityManager.getKeyManager().savePublicKeyRing( temp.getId(), temp.getPublicKey() );
+                securityManager.getKeyManager().savePublicKeyRing( temp.getId(),(short)2 , temp.getPublicKey() );
             }
             catch ( Exception ex )
             {
@@ -236,7 +236,7 @@ public class RegistrationManagerImpl implements RegistrationManager
 
         try
         {
-            securityManager.getKeyManager().savePublicKeyRing( containerHostId, publicKey );
+            securityManager.getKeyManager().savePublicKeyRing( containerHostId,(short)2 , publicKey );
         }
         catch ( Exception ex )
         {

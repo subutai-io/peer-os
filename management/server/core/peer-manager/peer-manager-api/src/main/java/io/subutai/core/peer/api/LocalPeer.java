@@ -182,4 +182,5 @@ public interface LocalPeer extends Peer
     public void addIpToVniDomain( String hostIp, Long vni ) throws PeerException;
 
     public void removeIpFromVniDomain( String hostIp, Long vni ) throws PeerException;
+
 }

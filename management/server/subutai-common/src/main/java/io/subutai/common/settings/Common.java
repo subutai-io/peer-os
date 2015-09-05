@@ -23,6 +23,7 @@ public class Common
     public static final int MAX_CONTAINER_NAME_LEN = 64;
 
     public static final String ENVIRONMENT_ID_HEADER_NAME = "ENV_ID";
+    public static final String PEER_ID_HEADER_NAME = "PEER_ID";
 
     public static final long MIN_VNI_ID = 0;
     public static final long MAX_VNI_ID = 16777216;//2^24

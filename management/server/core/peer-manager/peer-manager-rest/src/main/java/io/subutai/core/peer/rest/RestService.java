@@ -13,6 +13,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -64,10 +66,20 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getReservedVnis();
 
+    @POST
+    @Path( "vni" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response reserveVni( @FormParam( "vni" ) String vni );
+
     @GET
     @Path( "gateways" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getGateways();
+
+    @POST
+    @Path( "createpek" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response createEnvironmentKeyPair( @FormParam( "environmentId" ) String environmentId);
 
     //*************** Peer Registration Handshake REST - BEGIN ***************************
 
@@ -76,7 +88,7 @@ public interface RestService
     @POST
     @Path( "register" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response processRegisterRequest( @FormParam( "peer" ) String peer );
+    public Response processRegisterRequest( @FormParam( "peer" ) String peer);
 
 
     @POST
@@ -106,20 +118,13 @@ public interface RestService
     @PUT
     @Path( "approve" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response approveForRegistrationRequest( @FormParam( "approvedPeer" ) String approvedPeer,
-                                                   @FormParam( "root_cert_px2" ) String rootCertPx2 );
-
-
-    @PUT
-    @Path( "approve/{peerId}" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response approveForRegistrationRequest( @PathParam( "peerId" ) String peerId );
+    public Response approveForRegistrationRequest( @FormParam( "approvedPeer" ) String approvedPeer,@FormParam( "cert" ) String certHEX );
 
 
     @PUT
     @Path( "update" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response updatePeer( @FormParam( "peer" ) String peer, @FormParam( "root_cert_px2" ) String rootCertPx2 );
+    public Response updatePeer( @FormParam( "peer" ) String peer);
 
     //*************** Peer Registration Handshake REST - END ***************************
 
@@ -150,7 +155,7 @@ public interface RestService
     @GET
     @Path( "container/state" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getContainerState( @QueryParam( "containerId" ) String containerId );
+    public Response getContainerState( @QueryParam( "containerId" ) String containerId);
 
 
     @GET
@@ -240,27 +245,6 @@ public interface RestService
     @Path( "container/info" )
     Response getContainerHostInfoById( @QueryParam( "containerId" ) String containerId );
 
-    @POST
-    @Path( "vni" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    Response reserveVni( @FormParam( "vni" ) String vni );
-
-
-    @POST
-    @Path( "cert/import" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response importEnvironmentCert( @FormParam( "cert" ) String envCert, @FormParam( "alias" ) String alias );
-
-    @POST
-    @Path( "cert/export" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response exportEnvironmentCert( @FormParam( "environmentId" ) String environmentId );
-
-
-    @DELETE
-    @Path( "cert/remove" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response removeEnvironmentCert( @QueryParam( "environmentId" ) String environmentId );
 
     //*********** Environment Specific REST - END ***************
 

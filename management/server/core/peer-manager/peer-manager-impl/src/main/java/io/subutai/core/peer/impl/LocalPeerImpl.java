@@ -8,11 +8,6 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -70,13 +65,7 @@ import io.subutai.common.quota.QuotaException;
 import io.subutai.common.quota.QuotaInfo;
 import io.subutai.common.quota.QuotaType;
 import io.subutai.common.quota.RamQuota;
-import io.subutai.common.security.SecurityProvider;
-import io.subutai.common.security.crypto.certificate.CertificateData;
-import io.subutai.common.security.crypto.certificate.CertificateManager;
-import io.subutai.common.security.crypto.key.KeyManager;
-import io.subutai.common.security.crypto.key.KeyPairType;
-import io.subutai.common.security.crypto.keystore.KeyStoreData;
-import io.subutai.common.security.crypto.keystore.KeyStoreManager;
+import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
@@ -117,6 +106,8 @@ import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.entity.ResourceHostEntity;
 import io.subutai.core.registry.api.RegistryException;
 import io.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.security.api.SecurityManager;
+import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.strategy.api.StrategyNotFoundException;
@@ -154,13 +145,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected Set<RequestListener> requestListeners = Sets.newHashSet();
     protected PeerInfo peerInfo;
     private HttpContextManager httpContextManager;
+    private SecurityManager securityManager;
 
     protected boolean initialized = false;
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
                           StrategyManager strategyManager, CommandExecutor commandExecutor, HostRegistry hostRegistry,
-                          Monitor monitor, HttpContextManager httpContextManager )
+                          Monitor monitor, HttpContextManager httpContextManager, SecurityManager securityManager)
 
     {
         this.strategyManager = strategyManager;
@@ -171,6 +163,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         this.commandExecutor = commandExecutor;
         this.hostRegistry = hostRegistry;
         this.httpContextManager = httpContextManager;
+        this.securityManager = securityManager;
     }
 
 
@@ -1735,154 +1728,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void importCertificate( final String cert, final String alias ) throws PeerException
-    {
-        //************ Save Trust SSL Cert **************************************
-        try
-        {
-            KeyStoreData keyStoreData = new KeyStoreData();
-
-            keyStoreData.setupTrustStorePx2();
-            keyStoreData.setHEXCert( cert );
-            keyStoreData.setAlias( alias );
-
-            KeyStoreManager keyStoreManager = new KeyStoreManager();
-            KeyStore keyStore = keyStoreManager.load( keyStoreData );
-            List<String> aliasList = Collections.list( keyStore.aliases() );
-            if ( !aliasList.contains( alias ) )
-            {
-                keyStoreData.setAlias( alias );
-
-                keyStoreManager.importCertificateHEXString( keyStore, keyStoreData );
-                //***********************************************************************
-                LOG.debug( String.format( "Importing new certificate to trustStore with alias: %s", alias ) );
-                httpContextManager.reloadTrustStore();
-            }
-        }
-        catch ( KeyStoreException e )
-        {
-            LOG.error( "Error getting aliases", e );
-        }
-    }
-
-
-    /**
-     * Exports certificate with alias passed and returns cert in HEX String format. And stores new certificate in
-     * keyStore.
-     *
-     * @param environmentId - environmentId to generate cert for
-     *
-     * @return - certificate in HEX format
-     */
-    @Override
-    public String exportEnvironmentCertificate( final UUID environmentId ) throws PeerException
-    {
-        String alias = String.format( "env_%s_%s", getPeerInfo().getId().toString(), environmentId.toString() );
-
-        KeyStoreData environmentKeyStoreData = new KeyStoreData();
-        environmentKeyStoreData.setupKeyStorePx2();
-        environmentKeyStoreData.setAlias( alias );
-
-        KeyStoreManager keyStoreManager = new KeyStoreManager();
-        KeyStore keyStore = keyStoreManager.load( environmentKeyStoreData );
-
-        try
-        {
-            List<String> aliasList = Collections.list( keyStore.aliases() );
-            if ( !aliasList.contains( alias ) )
-            {
-                KeyManager keyManager = new KeyManager();
-                KeyPairGenerator keyPairGenerator = keyManager.prepareKeyPairGeneration( KeyPairType.RSA, 1024 );
-                KeyPair keyPair = keyManager.generateKeyPair( keyPairGenerator );
-
-                CertificateData certData = new CertificateData();
-                //TODO Instead of envId CN Will be gpg fingerprint.
-                certData.setCommonName( alias );
-
-                CertificateManager certManager = new CertificateManager();
-                certManager.setDateParamaters();
-
-                X509Certificate cert = certManager
-                        .generateSelfSignedCertificate( keyStore, keyPair, SecurityProvider.BOUNCY_CASTLE, certData );
-
-                keyStoreManager.saveX509Certificate( keyStore, environmentKeyStoreData, cert, keyPair );
-
-                httpContextManager.reloadKeyStore();
-                LOG.debug( String.format( "Saving new certificate to keyStore with alias: %s", alias ) );
-            }
-        }
-        catch ( KeyStoreException e )
-        {
-            LOG.error( "Error getting environment", e );
-        }
-        LOG.debug( String.format( "Returning certificate for alias %s", alias ) );
-        return keyStoreManager.exportCertificateHEXString( keyStore, environmentKeyStoreData );
-    }
-
-
-    /**
-     * Remove specific environment related certificates from trustStore of local peer.
-     *
-     * @param environmentId - environment whose certificates need to be removed
-     */
-    @Override
-    public void removeEnvironmentCertificates( final UUID environmentId ) throws PeerException
-    {
-        KeyStoreData storeData = new KeyStoreData();
-
-        storeData.setupTrustStorePx2();
-        removeEnvironmentCertificateFromStore( environmentId, storeData );
-        LOG.debug( "clearing up trustStore" );
-
-
-        storeData.setupKeyStorePx2();
-        removeEnvironmentCertificateFromStore( environmentId, storeData );
-        LOG.debug( "clearing up keyStore" );
-    }
-
-
-    private void removeEnvironmentCertificateFromStore( UUID environmentId, KeyStoreData storeData )
-    {
-        try
-        {
-            //************ Delete Trust SSL Cert **************************************
-            KeyStore trustStore;
-            KeyStoreManager trustStoreManager;
-
-            trustStoreManager = new KeyStoreManager();
-
-            trustStore = trustStoreManager.load( storeData );
-
-            List<String> aliasList = Collections.list( trustStore.aliases() );
-            for ( final String alias : aliasList )
-            {
-                String[] parseId = alias.split( "_" );
-                LOG.info( String.format( "Parsing alias: %s", alias ) );
-                UUID envIdFromAlias = parseId.length == 2 ? UUID.fromString( parseId[2] ) : null;
-                if ( envIdFromAlias != null && envIdFromAlias.equals( environmentId ) )
-                {
-                    LOG.debug( String.format( "Removing environment certificate with alias: %s", alias ) );
-                    storeData.setAlias( alias );
-                    KeyStore keyStoreToRemove = trustStoreManager.load( storeData );
-                    trustStoreManager.deleteEntry( keyStoreToRemove, storeData );
-                }
-            }
-
-            //***********************************************************************
-            httpContextManager.reloadTrustStore();
-        }
-        catch ( KeyStoreException e )
-        {
-            LOG.error( "Error removing environment certificate.", e );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error in #removeEnvironmentCertificateFromStore", e );
-        }
-    }
-
-
-    @Override
     public int setupTunnels( final Map<String, String> peerIps, final UUID environmentId ) throws PeerException
     {
         //        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
@@ -2037,6 +1882,35 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    /* ***********************************************
+     *  Create PEK
+     */
+    @Override
+    public int createEnvironmentKeyPair(String environmentId) throws PeerException
+    {
+        KeyManager keyManager = securityManager.getKeyManager();
+
+        try
+        {
+            KeyPair keyPair = keyManager.generateKeyPair( environmentId, false );
+
+            if ( keyPair != null )
+            {
+                keyManager.saveKeyPair( environmentId, ( short ) 2, keyPair );
+
+                return 1;
+            }
+            else
+            {
+                LOG.error( "**** Error creating PEK Keys for Environmnet ****" );
+                return 0;
+            }
+        }
+        catch ( Exception ex )
+        {
+            throw ex;
+        }
+    }
     private Set<Interface> getInterfacesByIp( final String pattern )
     {
         LOG.debug( pattern );
@@ -2153,5 +2027,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         return getId().hashCode();
     }
+
 }
 

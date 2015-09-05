@@ -30,6 +30,7 @@
   <bean id="peerRestServiceImpl" class="io.subutai.core.peer.rest.RestServiceImpl">
     <argument ref="peerManager" />
     <argument ref="httpContextManager" />
+    <argument ref="securityManager" />
   </bean>
 
   <reference id="peerManager" availability="mandatory"
@@ -37,6 +38,9 @@
 
   <reference id="httpContextManager" availability="mandatory"
              interface="io.subutai.core.http.manager.api.HttpContextManager" />
+
+  <reference id="securityManager" availability="mandatory"
+             interface="io.subutai.core.security.api.SecurityManager" />
 
 
 </blueprint>

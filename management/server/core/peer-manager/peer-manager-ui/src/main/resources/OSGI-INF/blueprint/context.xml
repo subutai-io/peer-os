@@ -12,6 +12,8 @@
              interface="io.subutai.core.env.api.EnvironmentManager" />
   <reference id="httpContextManager" availability="mandatory"
              interface="io.subutai.core.http.manager.api.HttpContextManager" />
+  <reference id="securityManager" availability="mandatory"
+             interface="io.subutai.core.security.api.SecurityManager" />
 
   <bean id="module" scope="singleton" class="io.subutai.core.peer.ui.PeerManagerPortalModule"
         init-method="init" destroy-method="destroy">
@@ -21,6 +23,7 @@
 
     <property name="httpContextManager" ref="httpContextManager" />
     <property name="environmentManager" ref="environmentManager" />
+    <property name="securityManager"    ref="securityManager" />
 
   </bean>
 

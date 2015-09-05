@@ -173,6 +173,7 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
     private void collectAndStartCreationProcess( final LocalPeer localPeer, final Set<NodeGroupBuildResult> results )
     {
         int currentIpAddressOffset = 0;
+
         for ( NodeGroup nodeGroup : nodeGroups )
         {
             NodeGroupBuildException exception = null;

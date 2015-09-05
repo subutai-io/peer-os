@@ -45,7 +45,6 @@
     <argument value="$[subutaiAppDataPath]/keystores/${secretKeyringFile}" />
     <argument value="$[subutaiAppDataPath]/keystores/${publicKeyringFile}" />
     <argument value="${secretKeyringPwd}" />
-    <argument value="${managementHostKeyFingerprint}" />
 
     <property name="daoManager" ref="daoSecurityManager" />
     <property name="keyServer" ref="keyServer" />

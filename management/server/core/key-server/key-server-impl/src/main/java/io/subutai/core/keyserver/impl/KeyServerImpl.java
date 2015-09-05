@@ -5,9 +5,9 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.core.keyserver.api.KeyServer;
 import io.subutai.core.keyserver.api.dao.KeyServerDAO;
-import io.subutai.core.keyserver.api.model.SecurityKey;
+import io.subutai.core.keyserver.api.model.PublicKeyStore;
 import io.subutai.core.keyserver.impl.dao.KeyServerDAOImpl;
-import io.subutai.core.keyserver.impl.model.SecurityKeyEntity;
+import io.subutai.core.keyserver.impl.model.PublicKeyStoreEntity;
 import io.subutai.core.keyserver.impl.utils.SecurityKeyUtil;
 
 import java.io.IOException;
@@ -71,7 +71,7 @@ public class KeyServerImpl implements KeyServer
      *
      */
     @Override
-    public SecurityKey getSecurityKeyByFingerprint( String fingerprint )
+    public PublicKeyStore getPublicKeyByFingerprint( String fingerprint )
     {
         return keyServerDAO.findByFingerprint( fingerprint );
     }
@@ -81,7 +81,7 @@ public class KeyServerImpl implements KeyServer
      *
      */
     @Override
-    public SecurityKey getSecurityKeyByShortKeyId( String shortKeyId )
+    public PublicKeyStore getPublicKeyByShortKeyId( String shortKeyId )
     {
         return keyServerDAO.findByShortKeyId( shortKeyId );
     }
@@ -91,7 +91,7 @@ public class KeyServerImpl implements KeyServer
      *
      */
     @Override
-    public SecurityKey getSecurityKeyByKeyId( String keyId )
+    public PublicKeyStore getPublicKeyByKeyId( String keyId )
     {
         return keyServerDAO.findByKeyId( keyId );
     }
@@ -101,7 +101,7 @@ public class KeyServerImpl implements KeyServer
      *
      */
     @Override
-    public SecurityKey getSecurityKey( String keyId )
+    public PublicKeyStore getPublicKey( String keyId )
     {
         return keyServerDAO.find( keyId );
     }
@@ -111,7 +111,7 @@ public class KeyServerImpl implements KeyServer
      *
      */
     @Override
-    public List<SecurityKey> getSecurityKeyList()
+    public List<PublicKeyStore> getPublicKeyList()
     {
         return keyServerDAO.findAll();
     }
@@ -121,10 +121,10 @@ public class KeyServerImpl implements KeyServer
      *
      */
     @Override
-    public void addSecurityKey( String key ) throws PGPException, IOException
+    public void addPublicKey( String key ) throws PGPException, IOException
     {
         PGPPublicKey publicKey  = PGPKeyUtil.readPublicKey( key );
-        SecurityKey securityKey = SecurityKeyUtil.convert( publicKey );
+        PublicKeyStore securityKey = SecurityKeyUtil.convert( publicKey );
 
         keyServerDAO.save( securityKey );
     }
@@ -134,9 +134,9 @@ public class KeyServerImpl implements KeyServer
      *
      */
     @Override
-    public void addSecurityKey( PGPPublicKeyRing publicRing ) throws PGPException, IOException
+    public void addPublicKey( PGPPublicKeyRing publicRing ) throws PGPException, IOException
     {
-        SecurityKey securityKey = SecurityKeyUtil.convert( publicRing );
+        PublicKeyStore securityKey = SecurityKeyUtil.convert( publicRing );
 
         keyServerDAO.save( securityKey );
     }
@@ -149,9 +149,9 @@ public class KeyServerImpl implements KeyServer
     public PGPPublicKeyRing addPublicKeyRing( String keyRing ) throws PGPException, IOException
     {
         PGPPublicKeyRing publicKeyRing = PGPKeyUtil.readPublicKeyRing( keyRing );
-        SecurityKey securityKey    = SecurityKeyUtil.convert( publicKeyRing );
+        PublicKeyStore publicKeyStore  = SecurityKeyUtil.convert( publicKeyRing );
 
-        keyServerDAO.save( securityKey );
+        keyServerDAO.save( publicKeyStore );
 
         return publicKeyRing;
     }
@@ -161,9 +161,9 @@ public class KeyServerImpl implements KeyServer
      *
      */
     @Override
-    public void saveSecurityKey( SecurityKey securityKey )
+    public void savePublicKey( PublicKeyStore publicKey )
     {
-        keyServerDAO.save( securityKey );
+        keyServerDAO.save( publicKey );
     }
 
 
@@ -171,16 +171,16 @@ public class KeyServerImpl implements KeyServer
      *
      */
     @Override
-    public void saveSecurityKey( String keyId, String fingerprint, short keyType, byte[] keyData )
+    public void savePublicKey( String keyId, String fingerprint, short keyType, byte[] keyData )
     {
-        SecurityKey securityKey = new SecurityKeyEntity();
+        PublicKeyStore publicKeyStore = new PublicKeyStoreEntity();
 
-        securityKey.setKeyId( keyId );
-        securityKey.setFingerprint( fingerprint );
-        securityKey.setKeyType( keyType );
-        securityKey.setKeyData( keyData );
+        publicKeyStore.setKeyId( keyId );
+        publicKeyStore.setFingerprint( fingerprint );
+        publicKeyStore.setKeyType( keyType );
+        publicKeyStore.setKeyData( keyData );
 
-        keyServerDAO.save( securityKey );
+        keyServerDAO.save( publicKeyStore );
     }
 
 
@@ -188,7 +188,7 @@ public class KeyServerImpl implements KeyServer
      *
      */
     @Override
-    public void removeSecurityKey( SecurityKey securityKey )
+    public void removePublicKey( PublicKeyStore securityKey )
     {
         keyServerDAO.delete( securityKey );
     }
@@ -198,7 +198,7 @@ public class KeyServerImpl implements KeyServer
      *
      */
     @Override
-    public void removeSecurityKeyByKeyId( String keyId )
+    public void removePublicKeyByKeyId( String keyId )
     {
         keyServerDAO.deleteByKeyId( keyId );
     }
