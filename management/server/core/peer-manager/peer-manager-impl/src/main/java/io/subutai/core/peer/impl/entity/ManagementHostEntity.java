@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.UUID;
@@ -30,6 +31,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandUtil;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.Interface;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.network.Gateway;
@@ -37,6 +41,7 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.Disposable;
+import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.NumUtil;
@@ -71,6 +76,8 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     protected ExecutorService singleThreadExecutorService = SubutaiExecutors.newSingleThreadExecutor();
     @Transient
     protected ServiceLocator serviceLocator = new ServiceLocator();
+    @Transient
+    protected CommandUtil commandUtil = new CommandUtil();
 
 
     protected ManagementHostEntity()
@@ -100,6 +107,90 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     public String getExternalIp()
     {
         return getPeer().getPeerInfo().getIp();
+    }
+
+
+    @Override
+    public String getVlanDomain( final int vlan ) throws PeerException
+    {
+        try
+        {
+            return getNetworkManager().getVlanDomain( vlan );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( String.format( "Error obtaining domain by vlan %d", vlan ), e );
+        }
+    }
+
+
+    @Override
+    public void removeVlanDomain( final int vlan ) throws PeerException
+    {
+        try
+        {
+            getNetworkManager().removeVlanDomain( vlan );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( String.format( "Error removing domain by vlan %d", vlan ), e );
+        }
+    }
+
+
+    @Override
+    public void setVlanDomain( final int vlan, final String domain ) throws PeerException
+    {
+        try
+        {
+            getNetworkManager().setVlanDomain( vlan, domain );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( String.format( "Error setting domain by vlan %d", vlan ), e );
+        }
+    }
+
+
+    @Override
+    public boolean isIpInVlanDomain( final String hostIp, final int vlan ) throws PeerException
+    {
+        try
+        {
+            return getNetworkManager().isIpInVlanDomain( hostIp, vlan );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( String.format( "Error checking domain by ip %s and vlan %d", hostIp, vlan ), e );
+        }
+    }
+
+
+    @Override
+    public void addIpToVlanDomain( final String hostIp, final int vlan ) throws PeerException
+    {
+        try
+        {
+            getNetworkManager().addIpToVlanDomain( hostIp, vlan );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( String.format( "Error adding ip %s to domain by vlan %d", hostIp, vlan ), e );
+        }
+    }
+
+
+    @Override
+    public void removeIpFromVlanDomain( final String hostIp, final int vlan ) throws PeerException
+    {
+        try
+        {
+            getNetworkManager().removeIpFromVlanDomain( hostIp, vlan );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( String.format( "Error removing ip %s from domain by vlan %d", hostIp, vlan ), e );
+        }
     }
 
 
@@ -345,9 +436,9 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
-    public int setupTunnels( final Set<String> peerIps, final UUID environmentId ) throws PeerException
+    public int setupTunnels( final Map<String, String> peerIps, final UUID environmentId ) throws PeerException
     {
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
+//        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         //need to execute sequentially since other parallel executions can setup the same tunnel
@@ -459,5 +550,26 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         }
 
         throw new PeerException( "No available vlan found" );
+    }
+
+    //todo low level command to Network Manager
+    @Override
+    public void addToTunnel( final N2NConfig config ) throws PeerException
+    {
+        //subutai management_network -N 127.0.0.1 5000 n2n15 timur15 10.1.15.1 string secret
+
+        RequestBuilder requestBuilder = new RequestBuilder(
+                String.format( "subutai management_network -N %s %d %s %s %s string %s", config.getSuperNodeIp(),
+                        config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress(),
+                        config.getSharedKey() ) ).withTimeout( 15 ).daemon();
+
+        try
+        {
+            commandUtil.execute( requestBuilder, this );
+        }
+        catch ( CommandException e )
+        {
+            throw new PeerException( "Could not add peer to subnet", e );
+        }
     }
 }

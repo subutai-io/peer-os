@@ -33,7 +33,6 @@ public class MessageDecryptor implements ByteMessagePreProcessor
     @Override
     public byte[] process( final String topic, final byte[] message )
     {
-        LOG.info( String.format( "INCOMING:%s", new String( message ) ) );
 
         //process incoming heartbeats and responses
         if ( encryptionEnabled && ( Topic.RESPONSE_TOPIC.name().equalsIgnoreCase( topic ) || Topic.HEARTBEAT_TOPIC
@@ -73,9 +72,6 @@ public class MessageDecryptor implements ByteMessagePreProcessor
 
                 if ( encryptionTool.verifySignature( contentAndSignatures, hostKeyForVerifying ) )
                 {
-                    LOG.info( String.format( "Verification succeeded%nDecrypted Message: %s",
-                            new String( contentAndSignatures.getDecryptedContent() ) ) );
-
                     return contentAndSignatures.getDecryptedContent();
                 }
                 else

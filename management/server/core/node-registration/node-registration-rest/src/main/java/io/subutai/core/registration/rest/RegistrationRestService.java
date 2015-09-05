@@ -20,4 +20,9 @@ public interface RegistrationRestService
     @Path( "public-key" )
 
     public Response registerPublicKey( String message );
+
+    @POST
+    @Path( "verify/container-token" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response verifyContainerToken( String message );
 }

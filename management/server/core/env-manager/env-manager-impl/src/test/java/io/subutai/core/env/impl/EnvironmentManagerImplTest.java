@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.ContainerHostNotFoundException;
@@ -447,7 +448,8 @@ public class EnvironmentManagerImplTest
     @Test
     public void testSetContainersTransientFields() throws Exception
     {
-        environmentManager.setContainersTransientFields( Sets.<ContainerHost>newHashSet( environmentContainer ) );
+        environment.addContainers( Sets.newHashSet( environmentContainer ) );
+        environmentManager.setContainersTransientFields( environment );
 
         verify( environmentContainer ).setEnvironmentManager( environmentManager );
     }

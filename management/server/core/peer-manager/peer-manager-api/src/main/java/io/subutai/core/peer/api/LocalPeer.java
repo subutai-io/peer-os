@@ -1,6 +1,7 @@
 package io.subutai.core.peer.api;
 
 
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -86,6 +87,7 @@ public interface LocalPeer extends Peer
      */
     public Set<ResourceHost> getResourceHosts();
 
+    //todo remove this method
     public void cleanDb();
 
     /**
@@ -136,7 +138,7 @@ public interface LocalPeer extends Peer
     /**
      * Sets up tunnels on the local peer to the specified remote peers
      */
-    public int setupTunnels( Set<String> peerIps, UUID environmentId ) throws PeerException;
+    public int setupTunnels( Map<String, String> peerIps, UUID environmentId ) throws PeerException;
 
 
     public void addRequestListener( RequestListener listener );
@@ -144,5 +146,41 @@ public interface LocalPeer extends Peer
     public void removeRequestListener( RequestListener listener );
 
     public Set<RequestListener> getRequestListeners();
+
+    /**
+     * Returns domain assigned to vni if any
+     *
+     * @param vni - vni
+     *
+     * @return - domain or null if no domain assigned to the vni
+     */
+    public String getVniDomain( Long vni ) throws PeerException;
+
+    /**
+     * Removes domain from vni if any
+     *
+     * @param vni -vni
+     */
+    public void removeVniDomain( Long vni ) throws PeerException;
+
+    /**
+     * Assigns domain to vni
+     *
+     * @param vni - vni
+     * @param domain -  domain to assign
+     */
+    public void setVniDomain( Long vni, String domain ) throws PeerException;
+
+    /**
+     * Returns true if hostIp is added to domain by vni
+     *
+     * @param hostIp - ip of host to check
+     * @param vni - vni
+     */
+    public boolean isIpInVniDomain( String hostIp, Long vni ) throws PeerException;
+
+    public void addIpToVniDomain( String hostIp, Long vni ) throws PeerException;
+
+    public void removeIpFromVniDomain( String hostIp, Long vni ) throws PeerException;
 
 }

@@ -1,6 +1,8 @@
 package io.subutai.core.channel.impl.interceptor;
 
 
+import java.net.URL;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +38,14 @@ public class CXFOutInterceptor  extends AbstractPhaseInterceptor<Message>
     @Override
     public void handleMessage( final Message message ) throws Fault
     {
+        try
+        {
+            URL url = new URL( ( String ) message.get( Message.REQUEST_URL ) );
+            LOG.info( "OUT INTERCEPTOR " + message.getDestination());
+        }
+        catch(Exception ex)
+        {
 
+        }
     }
 }

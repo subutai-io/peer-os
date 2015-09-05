@@ -1,24 +1,22 @@
 package io.subutai.core.registration.rest;
 
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.transport.http.AbstractHTTPDestination;
-
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.registration.api.RegistrationManager;
-import io.subutai.core.registration.api.resource.host.RequestedHost;
+import io.subutai.core.registration.api.service.RequestedHost;
+import io.subutai.core.registration.rest.transitional.HostRequest;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
-import io.subutai.core.security.api.crypto.KeyManager;
 
 
+/**
+ * Created by talas on 8/25/15.
+ */
 public class RegistrationRestServiceImpl implements RegistrationRestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RegistrationRestServiceImpl.class );
@@ -45,7 +43,6 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     public Response registerPublicKey( final String message )
     {
         EncryptionTool encryptionTool = securityManager.getEncryptionTool();
-        KeyManager keyManager = securityManager.getKeyManager();
 
         try
         {
@@ -53,18 +50,46 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
             String decryptedMessage = new String( decrypted, "UTF-8" );
             RequestedHost temp = JsonUtil.fromJson( decryptedMessage, HostRequest.class );
 
-            Message interceptor = PhaseInterceptorChain.getCurrentMessage();
-            HttpServletRequest request = ( HttpServletRequest ) interceptor.get( AbstractHTTPDestination.HTTP_REQUEST );
-            temp.setRestHook( String.format( "%s:%s", request.getRemoteAddr(), temp.getRestHook() ) );
-
             registrationManager.queueRequest( temp );
-            keyManager.savePublicKeyRing( temp.getId(),(short)3, temp.getPublicKey() );
+
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error decrypting file.", e );
+            return Response.serverError().build();
         }
 
         return Response.ok().build();
+    }
+
+
+    @Override
+    public Response verifyContainerToken( final String message )
+    {
+        EncryptionTool encryptionTool = securityManager.getEncryptionTool();
+
+        try
+        {
+            byte[] decrypted = encryptionTool.decrypt( message.getBytes() );
+            String decryptedMessage = new String( decrypted, "UTF-8" );
+            String lineSeparator = System.getProperty( "line.separator" );
+
+            String token = decryptedMessage.substring( 0, decryptedMessage.indexOf( lineSeparator ) );
+            decryptedMessage = decryptedMessage.substring( decryptedMessage.indexOf( lineSeparator ) + 1 );
+
+            String containerId = decryptedMessage.substring( 0, decryptedMessage.indexOf( lineSeparator ) );
+            //decryptedMessage = decryptedMessage.substring( decryptedMessage.indexOf( lineSeparator ) + 1 );
+
+            String publicKey = decryptedMessage.substring( decryptedMessage.indexOf( lineSeparator ) + 1 );
+
+            registrationManager.verifyToken( token, containerId, publicKey );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error decrypting file.", e );
+            return Response.serverError().build();
+        }
+
+        return Response.ok( "Accepted" ).build();
     }
 }

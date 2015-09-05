@@ -1,6 +1,14 @@
 package io.subutai.core.broker.impl;
 
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.KeyPair;
+import java.security.KeyStore;
+import java.security.cert.X509Certificate;
+
 import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
@@ -10,21 +18,27 @@ import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TopicSubscriber;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.TrustManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.pool.PooledConnectionFactory;
+import org.apache.activemq.broker.BrokerService;
+import org.apache.activemq.broker.SslContext;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import io.subutai.common.security.crypto.certificate.CertificateData;
 import io.subutai.core.broker.api.Broker;
 import io.subutai.core.broker.api.BrokerException;
 import io.subutai.core.broker.api.ByteMessageListener;
 import io.subutai.core.broker.api.ByteMessagePostProcessor;
 import io.subutai.core.broker.api.ByteMessagePreProcessor;
+import io.subutai.core.broker.api.ClientCredentials;
 import io.subutai.core.broker.api.MessageListener;
 import io.subutai.core.broker.api.TextMessageListener;
 import io.subutai.core.broker.api.TextMessagePostProcessor;
@@ -38,32 +52,71 @@ import io.subutai.core.broker.api.Topic;
 public class BrokerImpl implements Broker
 {
     private static final Logger LOG = LoggerFactory.getLogger( BrokerImpl.class.getName() );
+    private static final String VM_BROKER_URL = "vm://localhost";
 
     protected MessageRoutingListener messageRouter;
-    protected PooledConnectionFactory pool;
+    protected BrokerService broker;
     private final String brokerUrl;
-    private final int maxBrokerConnections;
     private final boolean isPersistent;
     private final int messageTimeout;
-    private final int idleConnectionTimeout;
+    private final String keystore;
+    private final String keystorePassword;
+    private final String truststore;
+    private final String truststorePassword;
+    private final String caCertificate;
     private ByteMessagePostProcessor byteMessagePostProcessor;
     private TextMessagePostProcessor textMessagePostProcessor;
+    private SslContext customSslContext;
+    private ActiveMQConnectionFactory amqFactory;
+    private SslUtil sslUtil = new SslUtil();
 
 
-    public BrokerImpl( final String brokerUrl, final int maxBrokerConnections, final boolean isPersistent,
-                       final int messageTimeout, final int idleConnectionTimeout )
+    public BrokerImpl( final String brokerUrl, final boolean isPersistent, final int messageTimeout,
+                       final String keystore, final String keystorePassword, final String truststore,
+                       final String truststorePassword, final String caCertificate )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( brokerUrl ), "Invalid broker URL" );
-        Preconditions.checkArgument( maxBrokerConnections > 0, "Max broker connections number must be greater than 0" );
         Preconditions.checkArgument( messageTimeout >= 0, "Message timeout must be greater than or equal to 0" );
-        Preconditions.checkArgument( idleConnectionTimeout > 0, "Idle connection timeout must be greater than 0" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( keystore ), "Invalid keystore path" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( keystorePassword ), "Invalid keystore password" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( truststore ), "Invalid truststore path" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( truststorePassword ), "Invalid truststore password" );
 
         this.brokerUrl = brokerUrl;
-        this.maxBrokerConnections = maxBrokerConnections;
         this.isPersistent = isPersistent;
         this.messageTimeout = messageTimeout;
-        this.idleConnectionTimeout = idleConnectionTimeout;
         this.messageRouter = new MessageRoutingListener();
+        //todo prefix store paths with Common.SUBUTAI_APP_DATA_PATH
+        this.keystore = keystore;
+        this.keystorePassword = keystorePassword;
+        this.truststore = truststore;
+        this.truststorePassword = truststorePassword;
+        this.caCertificate = caCertificate;
+    }
+
+
+    @Override
+    public ClientCredentials createNewClientCredentials( String clientId ) throws BrokerException
+    {
+        try
+        {
+            KeyPair keyPair = sslUtil.generateKeyPair( "RSA", 2048 );
+            CertificateData certData = new CertificateData();
+            certData.setCommonName( String.format( "client-%s", clientId ) );
+            X509Certificate certificate = sslUtil.generateSelfSignedCertificate( keyPair, certData );
+            String clientCert = sslUtil.convertToPem( certificate );
+            String clientKey = sslUtil.convertToPem( keyPair.getPrivate() );
+            String caCert = new String( Files.readAllBytes( Paths.get( caCertificate ) ) );
+            //add client certificate to broker truststore
+            registerClientCertificateWithBroker( String.format( "client-%s", clientId ), certificate );
+
+            return new ClientCredentials( clientCert, clientKey, caCert );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error in createNewClientCredentials", e );
+            throw new BrokerException( e );
+        }
     }
 
 
@@ -199,33 +252,104 @@ public class BrokerImpl implements Broker
     }
 
 
-    public void init() throws BrokerException
+    public synchronized void registerClientCertificateWithBroker( String alias, X509Certificate certificate )
+            throws BrokerException
     {
-        ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory( brokerUrl );
-        amqFactory.setWatchTopicAdvisories( false );
-        amqFactory.setCheckForDuplicates( true );
-
-        setupConnectionPool( amqFactory );
-        setupRouter( amqFactory );
-    }
-
-
-    public void dispose()
-    {
-        if ( pool != null )
+        try
         {
-            pool.stop();
+            ReloadableX509TrustManager tm = ( ReloadableX509TrustManager ) getSslContext().getTrustManagersAsArray()[0];
+            tm.addServerCertAndReload( alias, certificate );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error in registerClientCertificateWithBroker", e );
+            throw new BrokerException( e );
         }
     }
 
 
-    protected void setupRouter( ActiveMQConnectionFactory amqFactory ) throws BrokerException
+    public void init() throws BrokerException
+    {
+        //setup broker
+        setupBroker();
+
+        //setup client
+
+        setupClient();
+    }
+
+
+    protected BrokerService getBroker()
+    {
+        if ( broker == null )
+        {
+            broker = new BrokerService();
+            //tune broker
+        }
+        return broker;
+    }
+
+
+    protected ActiveMQConnectionFactory getConnectionFactory()
+    {
+        if ( amqFactory == null )
+        {
+            amqFactory = new ActiveMQConnectionFactory( VM_BROKER_URL );
+            //tune connection factory
+            amqFactory.setWatchTopicAdvisories( false );
+            amqFactory.setCheckForDuplicates( true );
+        }
+        return amqFactory;
+    }
+
+
+    protected SslContext getSslContext() throws Exception
+    {
+        if ( customSslContext == null )
+        {
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance( KeyManagerFactory.getDefaultAlgorithm() );
+            KeyStore ks = KeyStore.getInstance( "jks" );
+            KeyManager[] keystoreManagers;
+
+            ks.load( new FileInputStream( new File( keystore ) ), keystorePassword.toCharArray() );
+            kmf.init( ks, keystorePassword.toCharArray() );
+            keystoreManagers = kmf.getKeyManagers();
+
+            TrustManager[] trustStoreManagers = new TrustManager[] {
+                    new ReloadableX509TrustManager( truststore, truststorePassword )
+            };
+
+            customSslContext = new SslContext( keystoreManagers, trustStoreManagers, null );
+        }
+        return customSslContext;
+    }
+
+
+    protected void setupBroker() throws BrokerException
+    {
+        try
+        {
+            getBroker().setSslContext( getSslContext() );
+            getBroker().addConnector( VM_BROKER_URL );
+            getBroker().addConnector( brokerUrl );
+            getBroker().start();
+            getBroker().waitUntilStarted();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error in setupClient", e );
+            throw new BrokerException( e );
+        }
+    }
+
+
+    protected void setupClient() throws BrokerException
     {
         try
         {
             for ( Topic topic : Topic.values() )
             {
-                Connection connection = amqFactory.createConnection();
+                Connection connection = getConnectionFactory().createConnection();
                 connection.setClientID( String.format( "%s-subutai-client", topic.name() ) );
                 connection.start();
                 Session session = connection.createSession( false, Session.CLIENT_ACKNOWLEDGE );
@@ -237,18 +361,9 @@ public class BrokerImpl implements Broker
         }
         catch ( JMSException e )
         {
-            LOG.error( "Error in setupRouter", e );
+            LOG.error( "Error in setupClient", e );
             throw new BrokerException( e );
         }
-    }
-
-
-    private void setupConnectionPool( ActiveMQConnectionFactory amqFactory )
-    {
-        pool = new PooledConnectionFactory( amqFactory );
-        pool.setMaxConnections( maxBrokerConnections );
-        pool.setIdleTimeout( idleConnectionTimeout * 1000 );
-        pool.start();
     }
 
 
@@ -260,7 +375,7 @@ public class BrokerImpl implements Broker
 
         try
         {
-            connection = pool.createConnection();
+            connection = getConnectionFactory().createConnection();
             connection.start();
             session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
             Destination destination = session.createTopic( topic );
@@ -324,6 +439,15 @@ public class BrokerImpl implements Broker
                     //ignore
                 }
             }
+        }
+    }
+
+
+    public void dispose() throws Exception
+    {
+        if ( broker != null )
+        {
+            broker.stop();
         }
     }
 }

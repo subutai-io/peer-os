@@ -4,6 +4,12 @@ package io.subutai.core.env.impl.tasks;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
+
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
@@ -14,11 +20,6 @@ import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.env.impl.EnvironmentManagerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.ResultHolder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -29,7 +30,7 @@ import com.google.common.collect.Sets;
  * @see io.subutai.common.environment.Topology
  * @see io.subutai.common.peer.ContainerHost
  */
-public class GrowEnvironmentTask implements Runnable
+public class GrowEnvironmentTask implements Awaitable
 {
     private static final Logger LOG = LoggerFactory.getLogger( GrowEnvironmentTask.class.getName() );
 
@@ -83,7 +84,7 @@ public class GrowEnvironmentTask implements Runnable
 
                 newContainers.removeAll( oldContainers );
 
-                environmentManager.setContainersTransientFields( newContainers );
+                environmentManager.setContainersTransientFields( environment );
 
                 op.addLog( "Configuring /etc/hosts..." );
 
@@ -133,6 +134,7 @@ public class GrowEnvironmentTask implements Runnable
     }
 
 
+    @Override
     public void waitCompletion() throws InterruptedException
     {
         semaphore.acquire();

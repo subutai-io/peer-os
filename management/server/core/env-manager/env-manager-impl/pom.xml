@@ -11,8 +11,8 @@
 
   <artifactId>env-manager-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Environment Manager Impl</name>
-  <description>Subutai Environment Manager Impl</description>
+  <name>Subutai Env Manager Impl</name>
+  <description>Subutai Env Manager Impl</description>
 
   <dependencies>
     <dependency>

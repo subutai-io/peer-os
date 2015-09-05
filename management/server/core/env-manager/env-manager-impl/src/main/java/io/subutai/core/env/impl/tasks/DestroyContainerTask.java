@@ -3,6 +3,11 @@ package io.subutai.core.env.impl.tasks;
 
 import java.util.concurrent.Semaphore;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
@@ -14,16 +19,12 @@ import io.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.ResultHolder;
 import io.subutai.core.peer.api.HostNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 
 /**
  * Environment Container host destroy task. This destroys, removes {@link io.subutai.core.env.impl.entity
- * .EnvironmentContainerImpl} from {@link io.subutai.core.env.impl.entity.EnvironmentImpl} metadata. And
- * consequently destroys container host on existing Peer#ResourceHost
+ * .EnvironmentContainerImpl} from {@link io.subutai.core.env.impl.entity.EnvironmentImpl} metadata. And consequently
+ * destroys container host on existing Peer#ResourceHost
  *
  * @see io.subutai.core.env.impl.EnvironmentManagerImpl
  * @see io.subutai.core.env.impl.entity.EnvironmentImpl
@@ -31,7 +32,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
  * @see io.subutai.core.env.impl.exception.ResultHolder
  * @see java.lang.Runnable
  */
-public class DestroyContainerTask implements Runnable
+public class DestroyContainerTask implements Awaitable
 {
     private static final Logger LOG = LoggerFactory.getLogger( DestroyContainerTask.class.getName() );
 
@@ -138,6 +139,7 @@ public class DestroyContainerTask implements Runnable
     }
 
 
+    @Override
     public void waitCompletion() throws InterruptedException
     {
         semaphore.acquire();

@@ -12,9 +12,11 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateContainerGroupRequest;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.Interface;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
+import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.CpuQuotaInfo;
 import io.subutai.common.quota.DiskPartition;
@@ -366,4 +368,14 @@ public interface Peer
      *
      */
     public int createEnvironmentKeyPair( String environmentId) throws PeerException;
+
+
+    /**
+     * Gets network interfaces by given field name and regexp pattern. Allowed field names are "id" and "name".
+     */
+
+    Set<Interface> getNetworkInterfaces( InterfacePattern pattern );
+
+    void addToN2NTunnel( N2NConfig config ) throws PeerException;
+
 }

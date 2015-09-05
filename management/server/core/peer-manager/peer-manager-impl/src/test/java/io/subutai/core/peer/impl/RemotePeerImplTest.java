@@ -2,6 +2,7 @@ package io.subutai.core.peer.impl;
 
 
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -93,6 +94,7 @@ public class RemotePeerImplTest
     private static final Object REQUEST = new Object();
     private static final String SUBNET = "192.168.1.0/24";
     private static final String RESPONSE = "RESPONSE";
+    private static final String N2N_IP = "10.11.0.1";
     @Mock
     LocalPeer localPeer;
     @Mock
@@ -127,10 +129,13 @@ public class RemotePeerImplTest
 
     RemotePeerImpl remotePeer;
 
+    Map<String, String> peerMap = new HashMap<>();
 
     @Before
     public void setUp() throws Exception
     {
+        peerMap = new HashMap<>();
+        peerMap.put( IP, N2N_IP );
         requestBuilder = new RequestBuilder( "pwd" );
         params = Maps.newHashMap();
         params.put( PARAM_NAME, PARAM_VALUE );
@@ -743,13 +748,13 @@ public class RemotePeerImplTest
         when( payload.getMessage( any( Class.class ) ) ).thenReturn( response ).thenReturn( null );
 
         remotePeer.createContainerGroup(
-                new CreateContainerGroupRequest( Sets.newHashSet( IP ), ENV_ID, UUID.randomUUID(), UUID.randomUUID(),
+                new CreateContainerGroupRequest( peerMap, ENV_ID, UUID.randomUUID(), UUID.randomUUID(),
                         SUBNET, Lists.newArrayList( template ), 1, "ROUND_ROBIN", Lists.<Criteria>newArrayList(), 0 ) );
 
         verify( response ).getHosts();
 
         remotePeer.createContainerGroup(
-                new CreateContainerGroupRequest( Sets.newHashSet( IP ), ENV_ID, UUID.randomUUID(), UUID.randomUUID(),
+                new CreateContainerGroupRequest( peerMap, ENV_ID, UUID.randomUUID(), UUID.randomUUID(),
                         SUBNET, Lists.newArrayList( template ), 1, "ROUND_ROBIN", Lists.<Criteria>newArrayList(), 0 ) );
     }
 

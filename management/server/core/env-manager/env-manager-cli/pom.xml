@@ -10,8 +10,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>env-manager-cli</artifactId>
-  <name>Subutai Environment Manager CLI</name>
-  <description>Subutai Environment Manager CLI</description>
+  <name>Subutai Env Manager CLI</name>
+  <description>Subutai Env Manager CLI</description>
   <packaging>bundle</packaging>
 
   <dependencies>

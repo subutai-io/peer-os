@@ -10,8 +10,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>env-manager-rest</artifactId>
-  <name>Subutai Environment Manager REST</name>
-  <description>Subutai Environment Manager REST</description>
+  <name>Subutai Env Manager REST</name>
+  <description>Subutai Env Manager REST</description>
   <packaging>bundle</packaging>
 
   <dependencies>

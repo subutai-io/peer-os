@@ -1,9 +1,8 @@
 package io.subutai.core.registration.impl;
 
 
-import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
@@ -14,18 +13,18 @@ import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
-import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.Interface;
-import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
+import io.subutai.common.dao.DaoManager;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
-import io.subutai.core.registration.api.resource.host.RequestedHost;
-import io.subutai.core.registration.impl.resource.RequestDataService;
-import io.subutai.core.registration.impl.resource.entity.HostInterface;
-import io.subutai.core.registration.impl.resource.entity.RequestedHostImpl;
+import io.subutai.core.registration.api.exception.NodeRegistrationException;
+import io.subutai.core.registration.api.service.ContainerToken;
+import io.subutai.core.registration.api.service.RequestedHost;
+import io.subutai.core.registration.impl.dao.ContainerTokenDataService;
+import io.subutai.core.registration.impl.dao.RequestDataService;
+import io.subutai.core.registration.impl.entity.ContainerTokenImpl;
+import io.subutai.core.registration.impl.entity.RequestedHostImpl;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -39,29 +38,37 @@ public class RegistrationManagerImpl implements RegistrationManager
     private static final Logger LOGGER = LoggerFactory.getLogger( RegistrationManagerImpl.class );
     private RequestDataService requestDataService;
     private SecurityManager securityManager;
+    private ContainerTokenDataService containerTokenDataService;
+    private DaoManager daoManager;
 
 
-    public RegistrationManagerImpl( final SecurityManager securityManager )
+    public RegistrationManagerImpl( final SecurityManager securityManager, final DaoManager daoManager )
     {
         this.securityManager = securityManager;
+        this.daoManager = daoManager;
     }
 
 
     public void init()
     {
-        HostInterface interfaceModel = new HostInterface();
-        interfaceModel.setMac( UUID.randomUUID().toString() );
-        interfaceModel.setIp( "Some ip" );
-        interfaceModel.setInterfaceName( "Some i-name" );
-        Set<Interface> ifaces = Sets.newHashSet();
-        ifaces.addAll( Sets.newHashSet( interfaceModel ) );
+        containerTokenDataService = new ContainerTokenDataService( daoManager );
+        requestDataService = new RequestDataService( daoManager );
 
-        RequestedHostImpl temp =
-                new RequestedHostImpl( UUID.randomUUID().toString(), "hostname", HostArchitecture.AMD64, "secret",
-                        "some rest hook", "some key", RegistrationStatus.REQUESTED, ifaces );
+        //        HostInterface interfaceModel = new HostInterface();
+        //        interfaceModel.setMac( UUID.randomUUID().toString() );
+        //        interfaceModel.setIp( "Some ip" );
+        //        interfaceModel.setInterfaceName( "Some i-name" );
+        //        Set<Interface> ifaces = Sets.newHashSet();
+        //        ifaces.addAll( Sets.newHashSet( interfaceModel ) );
         //
-        //                requestDataService.persist( temp );
-        queueRequest( temp );
+        //        RequestedHostImpl temp =
+        //                new RequestedHostImpl( UUID.randomUUID().toString(), "hostname", HostArchitecture.AMD64,
+        // "secret",
+        //                        "some rest hook", "some key", RegistrationStatus.REQUESTED, ifaces );
+
+        //                        requestDataService.persist( temp );
+        //        queueRequest( temp );
+
         //        LOGGER.info( "Started RegistrationManagerImpl" );
         //        List<RequestedHostImpl> requestedHosts = ( List<RequestedHostImpl> ) requestDataService.getAll();
         //        for ( final RequestedHostImpl requestedHost : requestedHosts )
@@ -102,7 +109,7 @@ public class RegistrationManagerImpl implements RegistrationManager
 
 
     @Override
-    public void queueRequest( final RequestedHost requestedHost )
+    public void queueRequest( final RequestedHost requestedHost ) throws NodeRegistrationException
     {
         if ( requestDataService.find( UUID.fromString( requestedHost.getId() ) ) != null )
         {
@@ -114,7 +121,16 @@ public class RegistrationManagerImpl implements RegistrationManager
                     new RequestedHostImpl( requestedHost.getId(), requestedHost.getHostname(), requestedHost.getArch(),
                             requestedHost.getSecret(), requestedHost.getPublicKey(), requestedHost.getRestHook(),
                             RegistrationStatus.REQUESTED, requestedHost.getInterfaces() );
-            requestDataService.persist( temp );
+            try
+            {
+                requestDataService.persist( temp );
+
+                securityManager.getKeyManager().savePublicKeyRing( temp.getId(),(short)2 , temp.getPublicKey() );
+            }
+            catch ( Exception ex )
+            {
+                throw new NodeRegistrationException( "Failed adding resource host registration request to queue", ex );
+            }
         }
     }
 
@@ -179,5 +195,53 @@ public class RegistrationManagerImpl implements RegistrationManager
     public void removeRequest( final UUID requestId )
     {
         requestDataService.remove( requestId );
+    }
+
+
+    @Override
+    public ContainerToken generateContainerTTLToken( final Long ttl )
+    {
+        ContainerTokenImpl token =
+                new ContainerTokenImpl( UUID.randomUUID().toString(), new Timestamp( System.currentTimeMillis() ),
+                        ttl );
+        try
+        {
+            containerTokenDataService.persist( token );
+        }
+        catch ( Exception ex )
+        {
+            LOGGER.error( "Error persisting container token", ex );
+        }
+
+        return token;
+    }
+
+
+    @Override
+    public ContainerToken verifyToken( final String token, String containerHostId, String publicKey )
+            throws NodeRegistrationException
+    {
+
+        ContainerTokenImpl containerToken = containerTokenDataService.find( token );
+
+        if ( containerToken == null )
+        {
+            throw new NodeRegistrationException( "Couldn't verify container token" );
+        }
+
+        if ( containerToken.getDateCreated().getTime() + containerToken.getTtl() < System.currentTimeMillis() )
+        {
+            throw new NodeRegistrationException( "Container token expired" );
+        }
+
+        try
+        {
+            securityManager.getKeyManager().savePublicKeyRing( containerHostId,(short)2 , publicKey );
+        }
+        catch ( Exception ex )
+        {
+            throw new NodeRegistrationException( "Failed to store container pubkey", ex );
+        }
+        return containerToken;
     }
 }

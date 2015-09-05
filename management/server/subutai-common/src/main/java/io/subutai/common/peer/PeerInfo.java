@@ -208,5 +208,24 @@ public class PeerInfo
         }
         return null;
     }
+
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer( "PeerInfo{" );
+        sb.append( "ip='" ).append( ip ).append( '\'' );
+        sb.append( ", gatewayIp='" ).append( gatewayIp ).append( '\'' );
+        sb.append( ", status=" ).append( status );
+        sb.append( ", peerPolicies=" ).append( peerPolicies );
+        sb.append( ", name='" ).append( name ).append( '\'' );
+        sb.append( ", id=" ).append( id );
+        sb.append( ", ownerId=" ).append( ownerId );
+        sb.append( ", port=" ).append( port );
+        sb.append( ", lastUsedVlanId=" ).append( lastUsedVlanId );
+        sb.append( ", keyId='" ).append( keyId ).append( '\'' );
+        sb.append( '}' );
+        return sb.toString();
+    }
 }
 

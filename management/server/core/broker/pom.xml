@@ -17,6 +17,7 @@
   <modules>
     <module>broker-api</module>
     <module>broker-impl</module>
+    <module>activemq-wrapper</module>
   </modules>
 
 </project>

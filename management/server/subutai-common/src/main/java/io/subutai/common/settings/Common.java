@@ -6,7 +6,7 @@ public class Common
     public static final String SUBUTAI_APP_DATA_PATH = System.getProperty( "subutaiAppDataPath" );
     public static final String DEFAULT_CONTAINER_INTERFACE = "eth0";
     public static final String MANAGEMENT_HOST_EXTERNAL_IP_INTERFACE = "eth1";
-
+    public static final int WAIT_CONTAINER_CONNECTION_SEC = 300;
     public static final int REFRESH_UI_SEC = 3;
     public static final int MIN_COMMAND_TIMEOUT_SEC = 1;
     public static final int MAX_COMMAND_TIMEOUT_SEC = 100 * 60 * 60; // 100 hours

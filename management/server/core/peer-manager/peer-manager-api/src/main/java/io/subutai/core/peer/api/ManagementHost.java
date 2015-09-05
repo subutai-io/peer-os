@@ -2,6 +2,7 @@ package io.subutai.core.peer.api;
 
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -9,6 +10,7 @@ import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.protocol.N2NConfig;
 
 
 /**
@@ -37,7 +39,7 @@ public interface ManagementHost extends Host
      * @param peerIps - remote peer ips
      * @param environmentId -  context environment
      */
-    public int setupTunnels( Set<String> peerIps, UUID environmentId ) throws PeerException;
+    public int setupTunnels( Map<String, String> peerIps, UUID environmentId ) throws PeerException;
 
     /**
      * Returns reserved vnis
@@ -50,7 +52,7 @@ public interface ManagementHost extends Host
     public int reserveVni( Vni vni ) throws PeerException;
 
     /**
-     * Retursn all existing gateways
+     * Returns all existing gateways
      */
     public Set<Gateway> getGateways() throws PeerException;
 
@@ -79,4 +81,54 @@ public interface ManagementHost extends Host
      * Returns external IP of mgmt host
      */
     public String getExternalIp();
+
+    void addToTunnel( N2NConfig config ) throws PeerException;
+
+    /**
+     * Returns reverse proxy environment domain assigned to vlan if any
+     *
+     * @param vlan - vlan id
+     *
+     * @return - domain or null if no domain assigned to the vlan
+     */
+    public String getVlanDomain( int vlan ) throws PeerException;
+
+    /**
+     * Removes domain from vlan if any
+     *
+     * @param vlan - vlan id
+     */
+    public void removeVlanDomain( int vlan ) throws PeerException;
+
+    /**
+     * Assigns reverse proxy environment domain  to vlan
+     *
+     * @param vlan - vlan id
+     * @param domain - domain to assign
+     */
+    public void setVlanDomain( int vlan, String domain ) throws PeerException;
+
+    /**
+     * Returns true if hostIp is added to reverse proxy environment domain  by vni
+     *
+     * @param hostIp - ip of host to check
+     * @param vlan - vlan id
+     */
+    public boolean isIpInVlanDomain( String hostIp, int vlan ) throws PeerException;
+
+    /**
+     * Adds ip to reverse proxy environment domain
+     *
+     * @param hostIp - ip to remove
+     * @param vlan - vlan id
+     */
+    public void addIpToVlanDomain( String hostIp, int vlan ) throws PeerException;
+
+    /**
+     * Removes ip from reverse proxy environment domain
+     *
+     * @param hostIp - ip to remove
+     * @param vlan - vlan id
+     */
+    public void removeIpFromVlanDomain( String hostIp, int vlan ) throws PeerException;
 }

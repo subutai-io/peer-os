@@ -28,6 +28,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -42,6 +43,7 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.CreateContainerGroupRequest;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.Interface;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.Gateway;
@@ -50,9 +52,11 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostInfoModel;
+import io.subutai.common.peer.InterfacePattern;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.Disposable;
+import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.CpuQuotaInfo;
 import io.subutai.common.quota.DiskPartition;
@@ -73,6 +77,7 @@ import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
@@ -106,7 +111,6 @@ import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.strategy.api.StrategyNotFoundException;
-import io.subutai.core.http.manager.api.HttpContextManager;
 
 
 /**
@@ -122,7 +126,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     // 5 min
     private static final long HOST_INACTIVE_TIME = 5 * 1000 * 60;
 
-    private static final int WAIT_CONTAINER_CONNECTION_SEC = 300;
+
     private DaoManager daoManager;
     private TemplateRegistry templateRegistry;
     protected ManagementHost managementHost;
@@ -139,7 +143,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected CommandUtil commandUtil = new CommandUtil();
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
     protected Set<RequestListener> requestListeners = Sets.newHashSet();
-    private PeerInfo peerInfo;
+    protected PeerInfo peerInfo;
     private HttpContextManager httpContextManager;
     private SecurityManager securityManager;
 
@@ -481,7 +485,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 taskFutures.add( executorService.submit(
                         new CreateContainerWrapperTask( resourceHostEntity, templateName, /*request.getTemplates(),*/
                                 hostname, String.format( "%s/%s", ipAddress, networkPrefix ), vlan, gateway,
-                                WAIT_CONTAINER_CONNECTION_SEC ) ) );
+                                Common.WAIT_CONTAINER_CONNECTION_SEC ) ) );
 
                 currentIpAddressOffset++;
             }
@@ -971,9 +975,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder(
-                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
-                    bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
+                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1000,7 +1003,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( PeerException | HostDisconnectedException e )
         {
-            LOG.error( "Error checking host connected status #isConnected", e );
+            //            LOG.error( "Error checking host connected status #isConnected", e );
             return false;
         }
     }
@@ -1280,6 +1283,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 {
                     ( ( AbstractSubutaiHost ) managementHost ).setNetInterfaces( resourceHostInfo.getInterfaces() );
                     managementHostDataService.update( ( ManagementHostEntity ) managementHost );
+                    peerInfo.setIp( managementHost.getIpByInterfaceName( externalIpInterface ) );
                 }
                 ( ( AbstractSubutaiHost ) managementHost ).updateHostInfo( resourceHostInfo );
             }
@@ -1724,12 +1728,130 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public int setupTunnels( final Set<String> peerIps, final UUID environmentId ) throws PeerException
+    public int setupTunnels( final Map<String, String> peerIps, final UUID environmentId ) throws PeerException
     {
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
+//        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         return managementHost.setupTunnels( peerIps, environmentId );
+    }
+
+
+    @Override
+    public String getVniDomain( final Long vni ) throws PeerException
+    {
+        Integer vlan = getVlanByVni( vni );
+
+        if ( vlan != null )
+        {
+            return getManagementHost().getVlanDomain( vlan );
+        }
+        else
+        {
+
+            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+        }
+    }
+
+
+    @Override
+    public void removeVniDomain( final Long vni ) throws PeerException
+    {
+        Integer vlan = getVlanByVni( vni );
+
+        if ( vlan != null )
+        {
+            getManagementHost().removeVlanDomain( vlan );
+        }
+        else
+        {
+
+            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+        }
+    }
+
+
+    @Override
+    public void setVniDomain( final Long vni, final String domain ) throws PeerException
+    {
+        Integer vlan = getVlanByVni( vni );
+
+        if ( vlan != null )
+        {
+            getManagementHost().setVlanDomain( vlan, domain );
+        }
+        else
+        {
+
+            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+        }
+    }
+
+
+    @Override
+    public boolean isIpInVniDomain( final String hostIp, final Long vni ) throws PeerException
+    {
+        Integer vlan = getVlanByVni( vni );
+
+        if ( vlan != null )
+        {
+            return getManagementHost().isIpInVlanDomain( hostIp, vlan );
+        }
+        else
+        {
+
+            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+        }
+    }
+
+
+    @Override
+    public void addIpToVniDomain( final String hostIp, final Long vni ) throws PeerException
+    {
+        Integer vlan = getVlanByVni( vni );
+
+        if ( vlan != null )
+        {
+            getManagementHost().addIpToVlanDomain( hostIp, vlan );
+        }
+        else
+        {
+
+            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+        }
+    }
+
+
+    @Override
+    public void removeIpFromVniDomain( final String hostIp, final Long vni ) throws PeerException
+    {
+        Integer vlan = getVlanByVni( vni );
+
+        if ( vlan != null )
+        {
+            getManagementHost().removeIpFromVlanDomain( hostIp, vlan );
+        }
+        else
+        {
+
+            throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
+        }
+    }
+
+
+    protected Integer getVlanByVni( long vni ) throws PeerException
+    {
+        Set<Vni> reservedVnis = getManagementHost().getReservedVnis();
+
+        for ( Vni reservedVni : reservedVnis )
+        {
+            if ( reservedVni.getVni() == vni )
+            {
+                return reservedVni.getVlan();
+            }
+        }
+
+        return null;
     }
 
 
@@ -1760,7 +1882,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-
     /* ***********************************************
      *  Create PEK
      */
@@ -1775,7 +1896,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             if ( keyPair != null )
             {
-                keyManager.saveKeyPair( environmentId,(short)2, keyPair );
+                keyManager.saveKeyPair( environmentId, ( short ) 2, keyPair );
 
                 return 1;
             }
@@ -1785,10 +1906,92 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 return 0;
             }
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
             throw ex;
         }
+    }
+    private Set<Interface> getInterfacesByIp( final String pattern )
+    {
+        LOG.debug( pattern );
+        Set<Interface> result = new HashSet<>();
+        try
+        {
+            if ( LOG.isDebugEnabled() )
+            {
+                for ( Interface i : getManagementHost().getNetInterfaces() )
+                {
+                    LOG.debug( String.format( "%s %s %s", i.getInterfaceName(), i.getIp(), i.getMac() ) );
+                }
+            }
+            result = Sets.filter( getManagementHost().getNetInterfaces(), new Predicate<Interface>()
+            {
+                @Override
+                public boolean apply( final Interface anInterface )
+                {
+                    if ( LOG.isDebugEnabled() )
+                    {
+                        LOG.debug( String.format( "%s match %s = %s", anInterface.getIp(), pattern,
+                                anInterface.getIp().matches( pattern ) ) );
+                    }
+                    return anInterface.getIp().matches( pattern );
+                }
+            } );
+        }
+        catch ( HostNotFoundException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        return Collections.unmodifiableSet( result );
+    }
+
+
+    private Set<Interface> getInterfacesByName( final String pattern )
+    {
+        LOG.debug( pattern );
+        Set<Interface> result = new HashSet<>();
+        try
+        {
+            result = Sets.filter( getManagementHost().getNetInterfaces(), new Predicate<Interface>()
+            {
+                @Override
+                public boolean apply( final Interface anInterface )
+                {
+                    return anInterface.getInterfaceName().matches( pattern );
+                }
+            } );
+        }
+        catch ( HostNotFoundException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        return result;
+    }
+
+
+    @Override
+    public Set<Interface> getNetworkInterfaces( final InterfacePattern pattern )
+    {
+        if ( "ip".equals( pattern.getField() ) )
+        {
+            return getInterfacesByIp( pattern.getPattern() );
+        }
+        else if ( "name".equals( pattern.getField() ) )
+        {
+            return getInterfacesByName( pattern.getPattern() );
+        }
+        throw new IllegalArgumentException( "Unknown field." );
+    }
+
+
+    @Override
+    public void addToN2NTunnel( final N2NConfig config ) throws PeerException
+    {
+        LOG.debug( String.format( "Adding local peer to n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
+                config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
+
+
+        getManagementHost().addToTunnel( config );
     }
 
 

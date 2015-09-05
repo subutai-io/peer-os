@@ -3,17 +3,19 @@ package io.subutai.core.env.impl.tasks;
 
 import java.util.concurrent.Semaphore;
 
-import io.subutai.common.environment.EnvironmentModificationException;
-import io.subutai.common.environment.EnvironmentStatus;
-import io.subutai.common.tracker.TrackerOperation;
-import io.subutai.core.env.impl.entity.EnvironmentImpl;
-import io.subutai.core.env.impl.exception.ResultHolder;
-import io.subutai.core.network.api.NetworkManager;
-import io.subutai.core.network.api.NetworkManagerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
+
+import io.subutai.common.environment.EnvironmentModificationException;
+import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.util.ExceptionUtil;
+import io.subutai.core.env.impl.entity.EnvironmentImpl;
+import io.subutai.core.env.impl.exception.ResultHolder;
+import io.subutai.core.network.api.NetworkManager;
+import io.subutai.core.network.api.NetworkManagerException;
 
 
 /**
@@ -24,7 +26,7 @@ import com.google.common.base.Strings;
  * @see io.subutai.core.network.api.NetworkManager
  * @see java.lang.Runnable
  */
-public class SetSshKeyTask implements Runnable
+public class SetSshKeyTask implements Awaitable
 {
     private static final Logger LOG = LoggerFactory.getLogger( SetSshKeyTask.class.getName() );
 
@@ -34,6 +36,7 @@ public class SetSshKeyTask implements Runnable
     private final String sshKey;
     private final TrackerOperation op;
     protected Semaphore semaphore;
+    protected ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
     public SetSshKeyTask( final EnvironmentImpl environment, final NetworkManager networkManager,
@@ -84,8 +87,9 @@ public class SetSshKeyTask implements Runnable
         {
             LOG.error( String.format( "Error setting ssh key to environment %s", environment.getName() ), e );
             environment.setStatus( EnvironmentStatus.UNHEALTHY );
-            resultHolder.setResult( new EnvironmentModificationException( e ) );
-            op.addLogFailed( String.format( "Error setting environment ssh key: %s", e.getMessage() ) );
+            resultHolder.setResult( new EnvironmentModificationException( exceptionUtil.getRootCause( e ) ) );
+            op.addLogFailed(
+                    String.format( "Error setting environment ssh key: %s", exceptionUtil.getRootCauseMessage( e ) ) );
         }
         finally
         {
@@ -94,6 +98,7 @@ public class SetSshKeyTask implements Runnable
     }
 
 
+    @Override
     public void waitCompletion() throws InterruptedException
     {
         semaphore.acquire();

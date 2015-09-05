@@ -1,52 +1,44 @@
-package io.subutai.core.registration.impl.resource;
+package io.subutai.core.registration.impl.dao;
 
 
 import java.util.Collection;
-import java.util.UUID;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
+import io.subutai.common.dao.DaoManager;
 import io.subutai.common.protocol.api.DataService;
-import io.subutai.core.registration.impl.resource.entity.RequestedHostImpl;
+import io.subutai.core.registration.impl.entity.ContainerTokenImpl;
 
 
 /**
- * Created by talas on 8/24/15.
+ * Created by talas on 8/28/15.
  */
-public class RequestDataService implements DataService<UUID, RequestedHostImpl>
+public class ContainerTokenDataService implements DataService<String, ContainerTokenImpl>
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( RequestDataService.class );
-    private EntityManagerFactory emf;
+    private static final Logger LOGGER = LoggerFactory.getLogger( ContainerTokenDataService.class );
+    private DaoManager daoManager;
 
 
-    public EntityManagerFactory getEmf()
+    public ContainerTokenDataService( final DaoManager daoManager )
     {
-        return emf;
-    }
-
-
-    public void setEmf( final EntityManagerFactory emf )
-    {
-        this.emf = emf;
+        this.daoManager = daoManager;
     }
 
 
     @Override
-    public Collection<RequestedHostImpl> getAll()
+    public Collection<ContainerTokenImpl> getAll()
     {
-        Collection<RequestedHostImpl> result = Lists.newArrayList();
-        EntityManager em = emf.createEntityManager();
+        Collection<ContainerTokenImpl> result = Lists.newArrayList();
+        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             em.getTransaction().begin();
-            result = em.createQuery( "select h from RequestedHostImpl h", RequestedHostImpl.class )
-                       .getResultList();
+            result = em.createQuery( "select h from ContainerTokenImpl h", ContainerTokenImpl.class ).getResultList();
             em.getTransaction().commit();
         }
         catch ( Exception e )
@@ -66,14 +58,14 @@ public class RequestDataService implements DataService<UUID, RequestedHostImpl>
 
 
     @Override
-    public RequestedHostImpl find( final UUID id )
+    public ContainerTokenImpl find( final String id )
     {
-        RequestedHostImpl result = null;
-        EntityManager em = emf.createEntityManager();
+        ContainerTokenImpl result = null;
+        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             em.getTransaction().begin();
-            result = em.find( RequestedHostImpl.class, id.toString() );
+            result = em.find( ContainerTokenImpl.class, id );
             em.getTransaction().commit();
         }
         catch ( Exception e )
@@ -93,9 +85,9 @@ public class RequestDataService implements DataService<UUID, RequestedHostImpl>
 
 
     @Override
-    public void persist( final RequestedHostImpl item )
+    public void persist( final ContainerTokenImpl item )
     {
-        EntityManager em = emf.createEntityManager();
+        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             em.getTransaction().begin();
@@ -119,13 +111,13 @@ public class RequestDataService implements DataService<UUID, RequestedHostImpl>
 
 
     @Override
-    public void remove( final UUID id )
+    public void remove( final String id )
     {
-        EntityManager em = emf.createEntityManager();
+        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             em.getTransaction().begin();
-            RequestedHostImpl item = em.find( RequestedHostImpl.class, id.toString() );
+            ContainerTokenImpl item = em.find( ContainerTokenImpl.class, id );
             em.remove( item );
             em.getTransaction().commit();
         }
@@ -145,9 +137,9 @@ public class RequestDataService implements DataService<UUID, RequestedHostImpl>
 
 
     @Override
-    public void update( final RequestedHostImpl item )
+    public void update( final ContainerTokenImpl item )
     {
-        EntityManager em = emf.createEntityManager();
+        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             em.getTransaction().begin();

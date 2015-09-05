@@ -1,6 +1,9 @@
 package io.subutai.core.peer.rest;
 
 
+import java.util.Set;
+
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -14,6 +17,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import io.subutai.common.host.Interface;
+import io.subutai.common.peer.InterfacePattern;
+import io.subutai.common.protocol.N2NConfig;
 
 
 public interface RestService
@@ -239,5 +246,17 @@ public interface RestService
     Response getContainerHostInfoById( @QueryParam( "containerId" ) String containerId );
 
 
-  //*********** Environment Specific REST - END ***************
+    //*********** Environment Specific REST - END ***************
+
+    @POST
+    @Path( "interfaces" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    @Consumes( { MediaType.APPLICATION_JSON } )
+    Set<Interface> getNetworkInterfaces( InterfacePattern pattern );
+
+    @POST
+    @Path( "n2ntunnel" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    @Consumes( { MediaType.APPLICATION_JSON } )
+    Response addToTunnel( N2NConfig config );
 }

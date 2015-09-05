@@ -1,4 +1,4 @@
-package io.subutai.core.registration.impl.resource.entity;
+package io.subutai.core.registration.impl.entity;
 
 
 import javax.persistence.Access;

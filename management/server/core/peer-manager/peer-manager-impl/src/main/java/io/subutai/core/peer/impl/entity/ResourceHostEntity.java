@@ -102,7 +102,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    //TODO remove all system specific command and paths, use a dedicated binding for this
     @Override
     public ContainerState getContainerHostState( final ContainerHost containerHost ) throws ResourceHostException
     {
