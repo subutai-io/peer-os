@@ -8,11 +8,17 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.core.keyserver.api.KeyServer;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.core.security.api.crypto.CertificateManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
+import io.subutai.core.security.api.crypto.KeyStoreManager;
+import io.subutai.core.security.api.dao.SecretKeyStoreDAO;
 import io.subutai.core.security.api.dao.SecurityManagerDAO;
+import io.subutai.core.security.impl.crypto.CertificateManagerImpl;
 import io.subutai.core.security.impl.crypto.EncryptionToolImpl;
 import io.subutai.core.security.impl.crypto.KeyManagerImpl;
+import io.subutai.core.security.impl.crypto.KeyStoreManagerImpl;
+import io.subutai.core.security.impl.dao.SecretKeyStoreDAOImpl;
 import io.subutai.core.security.impl.dao.SecurityManagerDAOImpl;
 import io.subutai.core.security.impl.model.SecurityKeyData;
 
@@ -31,6 +37,9 @@ public class SecurityManagerImpl implements SecurityManager
     private KeyServer keyServer = null;
     private PeerManager peerManager = null;
     private SecurityKeyData keyData= null;
+    private SecretKeyStoreDAO secretKeyStoreDAO = null;
+    private KeyStoreManager keyStoreManager= null;
+    private CertificateManager certificateManager= null;
 
     /* *****************************
      *
@@ -45,12 +54,10 @@ public class SecurityManagerImpl implements SecurityManager
      */
     public SecurityManagerImpl( String secretKeyringFile,
                                 String publicKeyringFile,
-                                String secretKeyringPwd,
-                                String manHostKeyFingerprint)
+                                String secretKeyringPwd)
     {
         keyData = new SecurityKeyData();
 
-        keyData.setManHostKeyFingerprint( manHostKeyFingerprint );
         keyData.setSecretKeyringFile( secretKeyringFile );
         keyData.setPublicKeyringFile( publicKeyringFile);
         keyData.setSecretKeyringPwd( secretKeyringPwd );
@@ -65,8 +72,12 @@ public class SecurityManagerImpl implements SecurityManager
         keyData.setManHostId( peerManager.getLocalPeerInfo().getId().toString());
 
         securityManagerDAO = new SecurityManagerDAOImpl( daoManager );
-        keyManager = new KeyManagerImpl( securityManagerDAO, keyServer, keyData );
+        secretKeyStoreDAO  = new SecretKeyStoreDAOImpl( daoManager );
+        keyManager = new KeyManagerImpl( securityManagerDAO,secretKeyStoreDAO, keyServer, keyData );
         encryptionTool = new EncryptionToolImpl( ( KeyManagerImpl ) keyManager );
+        keyStoreManager    = new KeyStoreManagerImpl();
+        certificateManager = new CertificateManagerImpl();
+
     }
 
 
@@ -194,5 +205,43 @@ public class SecurityManagerImpl implements SecurityManager
     public void setPeerManager( final PeerManager peerManager )
     {
         this.peerManager = peerManager;
+    }
+
+
+    /* *****************************
+     *
+     */
+    @Override
+    public KeyStoreManager getKeyStoreManager()
+    {
+        return keyStoreManager;
+    }
+
+
+    /* *****************************
+     *
+     */
+    public void setKeyStoreManager( final KeyStoreManager keyStoreManager )
+    {
+        this.keyStoreManager = keyStoreManager;
+    }
+
+
+    /* *****************************
+     *
+     */
+    @Override
+    public CertificateManager getCertificateManager()
+    {
+        return certificateManager;
+    }
+
+
+    /* *****************************
+     *
+     */
+    public void setCertificateManager( final CertificateManager certificateManager )
+    {
+        this.certificateManager = certificateManager;
     }
 }

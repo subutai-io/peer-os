@@ -11,9 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.keyserver.api.dao.KeyServerDAO;
-import io.subutai.core.keyserver.api.model.SecurityKey;
-import io.subutai.core.keyserver.impl.model.SecurityKeyEntity;
-
+import io.subutai.core.keyserver.api.model.PublicKeyStore;
 
 /**
  * Manages Data Storage
@@ -39,15 +37,15 @@ public class KeyServerDAOImpl implements KeyServerDAO
      *
      */
     @Override
-    public SecurityKey findByFingerprint( final String fingerprint )
+    public PublicKeyStore findByFingerprint( final String fingerprint )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
         try
         {
-            Query query = em.createQuery( "select SK from SecurityKeyEntity as SK where SK.fingerprint=:fingerprint" );
+            Query query = em.createQuery( "select SK from PublicKeyStoreEntity as SK where SK.fingerprint=:fingerprint" );
             query.setParameter( "fingerprint", fingerprint);
-            SecurityKey securityKey  = (SecurityKey)query.getSingleResult();
+            PublicKeyStore securityKey  = (PublicKeyStore)query.getSingleResult();
 
             return securityKey;
         }
@@ -66,15 +64,15 @@ public class KeyServerDAOImpl implements KeyServerDAO
      *
      */
     @Override
-    public SecurityKey findByShortKeyId( final String shortKeyId )
+    public PublicKeyStore findByShortKeyId( final String shortKeyId )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
         try
         {
-            Query query = em.createQuery( "select SK from SecurityKeyEntity as SK where SK.shortKeyId=:shortKeyId" );
+            Query query = em.createQuery( "select SK from PublicKeyStoreEntity as SK where SK.shortKeyId=:shortKeyId" );
             query.setParameter( "shortKeyId", shortKeyId);
-            List<SecurityKey> securityKeyList  = query.getResultList();
+            List<PublicKeyStore> securityKeyList  = query.getResultList();
 
             if(securityKeyList!=null)
             {
@@ -101,7 +99,7 @@ public class KeyServerDAOImpl implements KeyServerDAO
      *
      */
     @Override
-    public SecurityKey find( final String keyId )
+    public PublicKeyStore find( final String keyId )
     {
         return findByKeyId( keyId );
     }
@@ -111,13 +109,13 @@ public class KeyServerDAOImpl implements KeyServerDAO
      *
      */
     @Override
-    public SecurityKey findByKeyId( final String keyId )
+    public PublicKeyStore findByKeyId( final String keyId )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
         try
         {
-            SecurityKey securityKey  = em.find(SecurityKeyEntity.class,keyId);
+            PublicKeyStore securityKey  = em.find(PublicKeyStore.class,keyId);
 
             return securityKey;
         }
@@ -137,14 +135,14 @@ public class KeyServerDAOImpl implements KeyServerDAO
      *
      */
     @Override
-    public List<SecurityKey> findAll()
+    public List<PublicKeyStore> findAll()
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
         try
         {
-            Query query = em.createQuery( "select SK from SecurityKeyEntity as SK" );
-            List<SecurityKey> securityKeyList  = query.getResultList();
+            Query query = em.createQuery( "select SK from PublicKeyStoreEntity as SK" );
+            List<PublicKeyStore> securityKeyList  = query.getResultList();
 
             return securityKeyList;
         }
@@ -164,14 +162,14 @@ public class KeyServerDAOImpl implements KeyServerDAO
      *
      */
     @Override
-    public void save( final SecurityKey securityKey )
+    public void save( final PublicKeyStore keyStore )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
         try
         {
             daoManager.startTransaction( em );
-            em.persist( securityKey );
+            em.persist( keyStore );
             daoManager.commitTransaction( em );
 
         }
@@ -191,14 +189,14 @@ public class KeyServerDAOImpl implements KeyServerDAO
      *
      */
     @Override
-    public void delete( final SecurityKey securityKey )
+    public void delete( final PublicKeyStore keyStore )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
         try
         {
             daoManager.startTransaction( em );
-            em.remove ( securityKey );
+            em.remove ( keyStore );
             daoManager.commitTransaction( em );
 
         }
@@ -226,7 +224,7 @@ public class KeyServerDAOImpl implements KeyServerDAO
         {
             daoManager.startTransaction( em );
 
-            Query query = em.createQuery( "delete from SecurityKeyEntity as SK where SK.keyId=:keyId" );
+            Query query = em.createQuery( "delete from PublicKeyStoreEntity as SK where SK.keyId=:keyId" );
             query.setParameter( "keyId", keyId );
             query.executeUpdate();
 

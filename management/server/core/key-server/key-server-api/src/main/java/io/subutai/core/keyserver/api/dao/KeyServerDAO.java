@@ -3,7 +3,7 @@ package io.subutai.core.keyserver.api.dao;
 
 import java.util.List;
 
-import io.subutai.core.keyserver.api.model.SecurityKey;
+import io.subutai.core.keyserver.api.model.PublicKeyStore;
 
 
 /**
@@ -18,7 +18,7 @@ public interface KeyServerDAO
      * @param fingerprint hex encoded fingerprint to search
      * @return public key if the key with given fingerprint exists; {@code null} otherwise
      */
-    public SecurityKey findByFingerprint( String fingerprint );
+    public PublicKeyStore findByFingerprint( String fingerprint );
 
 
     /********************************
@@ -27,7 +27,7 @@ public interface KeyServerDAO
      * @param shortKeyId hex encoded shortKeyId to search
      * @return public key if the key with given fingerprint exists; {@code null} otherwise
      */
-    SecurityKey findByShortKeyId( String shortKeyId );
+    PublicKeyStore findByShortKeyId( String shortKeyId );
 
 
     /********************************
@@ -36,7 +36,7 @@ public interface KeyServerDAO
      * @param keyId hex encoded fingerprint to search
      * @return public key if the key with given keyId exists; {@code null} otherwise
      */
-    public SecurityKey findByKeyId( String keyId );
+    public PublicKeyStore findByKeyId( String keyId );
 
 
     /********************************
@@ -45,7 +45,7 @@ public interface KeyServerDAO
      * @param keyId hex encoded fingerprint to search
      * @return public key if the key with given keyId exists; {@code null} otherwise
      */
-    public SecurityKey find( String keyId );
+    public PublicKeyStore find( String keyId );
 
 
     /********************************
@@ -53,7 +53,7 @@ public interface KeyServerDAO
      *
      * @return all public keys
      */
-    public List<SecurityKey> findAll();
+    public List<PublicKeyStore> findAll();
 
 
     /********************************
@@ -61,7 +61,7 @@ public interface KeyServerDAO
      *
      * @param securityKey to save
      */
-    public void save( SecurityKey securityKey );
+    public void save( PublicKeyStore securityKey );
 
 
     /********************************
@@ -69,7 +69,7 @@ public interface KeyServerDAO
      *
      * @param securityKey key to delete
      */
-    public void delete( SecurityKey securityKey );
+    public void delete( PublicKeyStore securityKey );
 
 
     /********************************

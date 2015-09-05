@@ -9,9 +9,8 @@ import org.bouncycastle.openpgp.PGPPublicKeyRing;
 
 import org.apache.commons.codec.binary.Hex;
 
-import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
-import io.subutai.core.keyserver.api.model.SecurityKey;
-import io.subutai.core.keyserver.impl.model.SecurityKeyEntity;
+import io.subutai.core.keyserver.api.model.PublicKeyStore;
+import io.subutai.core.keyserver.impl.model.PublicKeyStoreEntity;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 
 /**
@@ -27,11 +26,11 @@ public class SecurityKeyUtil
      * @return
      * @throws IOException
      */
-    public static SecurityKey convert( PGPPublicKey pgpKey ) throws IOException
+    public static PublicKeyStore convert( PGPPublicKey pgpKey ) throws IOException
     {
         String fingerprint = new String( Hex.encodeHex( pgpKey.getFingerprint(), false ) );
 
-        SecurityKey pk = new SecurityKeyEntity();
+        PublicKeyStore pk = new PublicKeyStoreEntity();
 
         pk.setFingerprint( fingerprint );
         pk.setKeyId( PGPKeyUtil.getKeyId( fingerprint ) );
@@ -50,7 +49,7 @@ public class SecurityKeyUtil
      * @return
      * @throws IOException
      */
-    public static SecurityKey convert( PGPPublicKeyRing pgpKeyRing ) throws IOException
+    public static PublicKeyStore convert( PGPPublicKeyRing pgpKeyRing ) throws IOException
     {
         try
         {
@@ -60,7 +59,7 @@ public class SecurityKeyUtil
             {
                 String fingerprint = new String( Hex.encodeHex( pgpKey.getFingerprint(), false ) );
 
-                SecurityKey pk = new SecurityKeyEntity();
+                PublicKeyStore pk = new PublicKeyStoreEntity();
 
                 pk.setFingerprint( fingerprint );
                 pk.setKeyId( PGPKeyUtil.getKeyId( fingerprint ) );
@@ -88,7 +87,7 @@ public class SecurityKeyUtil
      * @return
      * @throws PGPException
      */
-    public static PGPPublicKey convert( SecurityKey publicKey ) throws PGPException
+    public static PGPPublicKey convert( PublicKeyStore publicKey ) throws PGPException
     {
         return PGPKeyUtil.readPublicKey( new ByteArrayInputStream( publicKey.getKeyData() ) );
     }
@@ -102,7 +101,7 @@ public class SecurityKeyUtil
      * @throws PGPException
      */
 
-    public static String exportAscii( SecurityKey securityKey ) throws PGPException
+    public static String exportAscii( PublicKeyStore securityKey ) throws PGPException
     {
         PGPPublicKey pgpKey = convert( securityKey );
         return PGPKeyUtil.exportAscii( pgpKey );

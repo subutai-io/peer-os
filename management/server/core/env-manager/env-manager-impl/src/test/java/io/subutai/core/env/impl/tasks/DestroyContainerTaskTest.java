@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -74,7 +75,7 @@ public class DestroyContainerTaskTest
         verify( semaphore ).acquire();
     }
 
-
+    @Ignore
     @Test
     public void testRun() throws Exception
     {

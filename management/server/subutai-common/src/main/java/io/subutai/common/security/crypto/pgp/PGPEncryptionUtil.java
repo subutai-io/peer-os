@@ -384,6 +384,7 @@ public class PGPEncryptionUtil
         {
             Iterator<PGPPublicKeyEncryptedData> it = getEncryptedObjects( encryptedMessage );
             PGPPrivateKey sKey = null;
+
             PGPPublicKeyEncryptedData pbe = null;
             final PGPSecretKeyRingCollection keys =
                     new PGPSecretKeyRingCollection( secretKeyRing, new JcaKeyFingerprintCalculator() );
@@ -1021,6 +1022,32 @@ public class PGPEncryptionUtil
         throw new PGPException( "Key not found" );
     }
 
+    private static PGPSecretKey findSecretKey( InputStream secretKeyRing)
+            throws IOException, PGPException
+    {
+        PGPSecretKeyRingCollection keyrings = new PGPSecretKeyRingCollection( PGPUtil.getDecoderStream( secretKeyRing ),
+                new JcaKeyFingerprintCalculator() );
+
+        Iterator<PGPSecretKeyRing> it = keyrings.getKeyRings();
+        while ( it.hasNext() )
+        {
+            PGPSecretKeyRing keyRing = it.next();
+
+            Iterator<PGPSecretKey> pkIt = keyRing.getSecretKeys();
+
+            while ( pkIt.hasNext() )
+            {
+                PGPSecretKey secretKey = pkIt.next();
+
+                if ( secretKey.isSigningKey() )
+                {
+                    return secretKey;
+                }
+            }
+        }
+
+        throw new PGPException( "Key not found" );
+    }
 
     private static PGPSecretKey findSecretKey( InputStream secretKeyRing, String id, boolean fingerprint )
             throws IOException, PGPException

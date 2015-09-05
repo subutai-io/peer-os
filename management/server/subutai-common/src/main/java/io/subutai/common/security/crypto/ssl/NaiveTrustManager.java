@@ -13,6 +13,7 @@ public class NaiveTrustManager implements X509TrustManager
    * Doesn't throw an exception, so this is how it approves a certificate.
    * @see javax.net.ssl.X509TrustManager#checkClientTrusted(java.security.cert.X509Certificate[], String)
    **/
+  @Override
   public void checkClientTrusted ( X509Certificate[] cert, String authType )
               throws CertificateException 
   {
@@ -22,6 +23,7 @@ public class NaiveTrustManager implements X509TrustManager
    * Doesn't throw an exception, so this is how it approves a certificate.
    * @see javax.net.ssl.X509TrustManager#checkServerTrusted(java.security.cert.X509Certificate[], String)
    **/
+  @Override
   public void checkServerTrusted ( X509Certificate[] cert, String authType ) 
      throws CertificateException 
   {
@@ -30,6 +32,7 @@ public class NaiveTrustManager implements X509TrustManager
   /**
    * @see javax.net.ssl.X509TrustManager#getAcceptedIssuers()
    **/
+  @Override
   public X509Certificate[] getAcceptedIssuers ()
   {
     return null;  // I've seen someone return new X509Certificate[ 0 ]; 

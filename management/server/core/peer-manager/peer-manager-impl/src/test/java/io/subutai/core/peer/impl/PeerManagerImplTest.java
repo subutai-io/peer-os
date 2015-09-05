@@ -33,7 +33,7 @@ import io.subutai.core.peer.impl.request.MessageRequestListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.strategy.api.StrategyManager;
-
+import io.subutai.core.security.api.SecurityManager;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
@@ -88,6 +88,8 @@ public class PeerManagerImplTest
     @Mock
     IdentityManager identityManager;
     @Mock
+    SecurityManager securityManager;
+    @Mock
     ManagementHostEntity managementHost;
     @Mock
     Set<RequestListener> requestListeners;
@@ -98,7 +100,7 @@ public class PeerManagerImplTest
     @Before
     public void setUp() throws Exception
     {
-        peerManager = spy( new PeerManagerImpl( messenger, localPeer, daoManager , messageResponseListener) );
+        peerManager = spy( new PeerManagerImpl( messenger, localPeer, daoManager , messageResponseListener , securityManager) );
 
 
         peerManager.commandResponseListener = commandResponseListener;

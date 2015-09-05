@@ -12,7 +12,7 @@ import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.keyserver.api.KeyServer;
-import io.subutai.core.keyserver.api.model.SecurityKey;
+import io.subutai.core.keyserver.api.model.PublicKeyStore;
 
 
 /**
@@ -48,7 +48,7 @@ public class KeyServerRestImpl implements KeyServerRest
             {
                 for ( String keyText : keyTexts )
                 {
-                    keyServer.addSecurityKey( keyText );
+                    keyServer.addPublicKey( keyText );
                 }
 
                 return Response.ok().build();
@@ -109,7 +109,7 @@ public class KeyServerRestImpl implements KeyServerRest
     @Override
     public Response saveSecurityKey( String keyId, String fingerprint, short keyType, String keyData )
     {
-        keyServer.saveSecurityKey( keyId, fingerprint, keyType, keyData.getBytes() );
+        keyServer.savePublicKey( keyId, fingerprint, keyType, keyData.getBytes() );
 
         return Response.ok().build();
     }
@@ -121,7 +121,7 @@ public class KeyServerRestImpl implements KeyServerRest
     @Override
     public Response getSecurityKey( String keyId )
     {
-        SecurityKey securityKey = keyServer.getSecurityKey( keyId );
+        PublicKeyStore securityKey = keyServer.getPublicKey( keyId );
 
         return Response.ok( JsonUtil.toJson( securityKey ) ).build();
     }
@@ -133,7 +133,7 @@ public class KeyServerRestImpl implements KeyServerRest
     @Override
     public Response getSecurityKeys()
     {
-        List<SecurityKey> securityKeyList = keyServer.getSecurityKeyList();
+        List<PublicKeyStore> securityKeyList = keyServer.getPublicKeyList();
 
         return Response.ok( JsonUtil.toJson( securityKeyList ) ).build();
     }
@@ -145,7 +145,7 @@ public class KeyServerRestImpl implements KeyServerRest
     @Override
     public Response removeSecurityKey( String keyId )
     {
-        keyServer.removeSecurityKeyByKeyId( keyId );
+        keyServer.removePublicKeyByKeyId( keyId );
 
         return Response.ok().build();
     }
@@ -216,21 +216,21 @@ public class KeyServerRestImpl implements KeyServerRest
      */
     private Response getKey( String keyId,short searchBy )
     {
-        SecurityKey securityKey = null;
+        PublicKeyStore securityKey = null;
 
         try
         {
             if(searchBy == 1)
             {
-                securityKey = keyServer.getSecurityKey( keyId );
+                securityKey = keyServer.getPublicKey( keyId );
             }
             else if(searchBy == 2)
             {
-                securityKey = keyServer.getSecurityKeyByFingerprint( keyId );
+                securityKey = keyServer.getPublicKeyByFingerprint( keyId );
             }
             else if(searchBy == 3)
             {
-                securityKey = keyServer.getSecurityKeyByShortKeyId( keyId );
+                securityKey = keyServer.getPublicKeyByShortKeyId( keyId );
             }
             else
             {

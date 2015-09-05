@@ -5,11 +5,11 @@ import java.io.IOException;
 import java.util.List;
 
 import org.bouncycastle.openpgp.PGPException;
-import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 
 import io.subutai.core.keyserver.api.dao.KeyServerDAO;
-import io.subutai.core.keyserver.api.model.SecurityKey;
+import io.subutai.core.keyserver.api.model.PublicKeyStore;
+
 
 
 /**
@@ -30,7 +30,7 @@ public interface KeyServer
      * @param fingerprint hex encoded fingerprint to search
      * @return public key if the key with given fingerprint exists; {@code null} otherwise
      */
-    public SecurityKey getSecurityKeyByFingerprint( String fingerprint );
+    public PublicKeyStore getPublicKeyByFingerprint( String fingerprint );
 
 
     /********************************
@@ -39,7 +39,7 @@ public interface KeyServer
      * @param shortKeyId hex encoded shortKeyId to search
      * @return public key if the key with given fingerprint exists; {@code null} otherwise
      */
-    public SecurityKey getSecurityKeyByShortKeyId( String shortKeyId );
+    public PublicKeyStore getPublicKeyByShortKeyId( String shortKeyId );
 
 
     /********************************
@@ -48,7 +48,7 @@ public interface KeyServer
      * @param keyId hex encoded fingerprint to search
      * @return public key if the key with given keyId exists; {@code null} otherwise
      */
-    public SecurityKey getSecurityKeyByKeyId( String keyId );
+    public PublicKeyStore getPublicKeyByKeyId( String keyId );
 
 
     /********************************
@@ -57,7 +57,7 @@ public interface KeyServer
      * @param keyId hex encoded fingerprint to search
      * @return public key if the key with given keyId exists; {@code null} otherwise
      */
-    public SecurityKey getSecurityKey( String keyId );
+    public PublicKeyStore getPublicKey( String keyId );
 
 
     /********************************
@@ -65,7 +65,7 @@ public interface KeyServer
      *
      * @return all public keys
      */
-    public List<SecurityKey> getSecurityKeyList();
+    public List<PublicKeyStore> getPublicKeyList();
 
 
     /********************************
@@ -73,7 +73,7 @@ public interface KeyServer
      *
      * @param key to save
      */
-    public void addSecurityKey( String key ) throws PGPException, IOException;
+    public void addPublicKey( String key ) throws PGPException, IOException;
 
 
     /********************************
@@ -81,7 +81,7 @@ public interface KeyServer
      *
      * @param publicKeyRing to save
      */
-    public void addSecurityKey( PGPPublicKeyRing publicKeyRing ) throws PGPException, IOException;
+    public void addPublicKey( PGPPublicKeyRing publicKeyRing ) throws PGPException, IOException;
 
 
     /********************************
@@ -98,15 +98,15 @@ public interface KeyServer
      * @param fingerprint to save
      * @param keyRingData to save
      */
-    public void saveSecurityKey( String keyId,String fingerprint,short keyType,byte[] keyRingData);
+    public void savePublicKey( String keyId,String fingerprint,short keyType,byte[] keyRingData);
 
 
     /********************************
      * Saves the given public key.
      *
-     * @param securityKey to save
+     * @param publicKey to save
      */
-    public void saveSecurityKey( SecurityKey securityKey );
+    public void savePublicKey( PublicKeyStore publicKey );
 
 
     /********************************
@@ -114,7 +114,7 @@ public interface KeyServer
      *
      * @param securityKey key to delete
      */
-    public void removeSecurityKey( SecurityKey securityKey );
+    public void removePublicKey( PublicKeyStore securityKey );
 
 
     /********************************
@@ -122,7 +122,7 @@ public interface KeyServer
      *
      * @param keyId key ID of a public key to delete
      */
-    public void removeSecurityKeyByKeyId( String keyId );
+    public void removePublicKeyByKeyId( String keyId );
 
 
 }

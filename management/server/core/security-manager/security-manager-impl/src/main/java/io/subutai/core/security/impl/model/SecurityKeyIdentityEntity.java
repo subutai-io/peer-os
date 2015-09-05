@@ -25,7 +25,8 @@ public class SecurityKeyIdentityEntity implements SecurityKeyIdentity
     /********* column names *******/
 
     public static final String HOST_ID = "peer_id";
-    public static final String KEY_FINGERPRINT  = "kfingerprint";
+    public static final String PUBLIC_KEY_FINGERPRINT  = "pkfingerprint";
+    public static final String SECRET_KEY_FINGERPRINT  = "skfingerprint";
     public static final String STATUS  = "status";
     public static final String TYPE    = "type";
 
@@ -34,8 +35,11 @@ public class SecurityKeyIdentityEntity implements SecurityKeyIdentity
     @Column( name = HOST_ID )
     private String hostId;
 
-    @Column( name = KEY_FINGERPRINT )
-    private String keyFingerprint;
+    @Column( name = PUBLIC_KEY_FINGERPRINT )
+    private String publicKeyFingerprint;
+
+    @Column( name = SECRET_KEY_FINGERPRINT )
+    private String secretKeyFingerprint;
 
     @Column( name = STATUS )
     private short status;
@@ -54,20 +58,6 @@ public class SecurityKeyIdentityEntity implements SecurityKeyIdentity
     public void setHostId( final String hostId )
     {
         this.hostId = hostId;
-    }
-
-
-    @Override
-    public String getKeyFingerprint()
-    {
-        return keyFingerprint;
-    }
-
-
-    @Override
-    public void setKeyFingerprint( final String keyFingerprint )
-    {
-        this.keyFingerprint = keyFingerprint;
     }
 
 
@@ -96,5 +86,33 @@ public class SecurityKeyIdentityEntity implements SecurityKeyIdentity
     public void setType( final short type )
     {
         this.type = type;
+    }
+
+
+    @Override
+    public String getPublicKeyFingerprint()
+    {
+        return publicKeyFingerprint;
+    }
+
+
+    @Override
+    public void setPublicKeyFingerprint( final String publicKeyFingerprint )
+    {
+        this.publicKeyFingerprint = publicKeyFingerprint;
+    }
+
+
+    @Override
+    public String getSecretKeyFingerprint()
+    {
+        return secretKeyFingerprint;
+    }
+
+
+    @Override
+    public void setSecretKeyFingerprint( final String secretKeyFingerprint )
+    {
+        this.secretKeyFingerprint = secretKeyFingerprint;
     }
 }
