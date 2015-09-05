@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -110,7 +111,7 @@ public class EnvironmentBuilderTest
         when( nodeGroupBuildResult.getContainers() ).thenReturn( Sets.newHashSet( environmentContainer ) );
     }
 
-
+    @Ignore
     @Test
     public void testBuild() throws Exception
     {

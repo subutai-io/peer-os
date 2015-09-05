@@ -16,6 +16,7 @@ public class PeerInfo
 {
     private String ip = "127.0.0.1";
     private String gatewayIp;
+    private String keyPhrase = "";
 
     private PeerStatus status;
     private Set<PeerPolicy> peerPolicies = new HashSet<>();
@@ -112,7 +113,6 @@ public class PeerInfo
         return port;
     }
 
-
     public int getLastUsedVlanId()
     {
         return lastUsedVlanId;
@@ -134,6 +134,18 @@ public class PeerInfo
     public void setKeyId( final String keyId )
     {
         this.keyId = keyId;
+    }
+
+
+    public String getKeyPhrase()
+    {
+        return keyPhrase;
+    }
+
+
+    public void setKeyPhrase( final String keyPhrase )
+    {
+        this.keyPhrase = keyPhrase;
     }
 
 

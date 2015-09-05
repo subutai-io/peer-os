@@ -146,12 +146,10 @@ public class DestroyEnvironmentTaskTest
         reset( future );
         when( future.get() ).thenReturn( result );
         when( result.getDestroyedContainersIds() ).thenReturn( Sets.newHashSet( TestUtil.CONTAINER_ID ) );
-        doThrow( peerException ).when( peer ).removeEnvironmentCertificates( TestUtil.ENV_ID );
         when( exceptionUtil.getRootCause( peerException ) ).thenReturn( peerException );
         when( peerException.getMessage() ).thenReturn( TestUtil.ERR_MSG );
         when( peer.getName() ).thenReturn( TestUtil.PEER_NAME );
         task.forceMetadataRemoval = true;
-        doThrow( peerException ).when( localPeer ).removeEnvironmentCertificates( TestUtil.ENV_ID );
 
         task.run();
 

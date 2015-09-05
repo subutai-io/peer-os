@@ -75,8 +75,6 @@ public class GrowEnvironmentTask implements Runnable
 
                 op.addLog( "Ensuring secure channel..." );
 
-                environmentManager.setupEnvironmentTunnel( environment.getId(), newRemotePeers );
-
                 op.addLog( "Cloning containers..." );
 
                 environmentManager.build( environment, topology );

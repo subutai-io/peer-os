@@ -13,7 +13,7 @@ public interface SecurityManagerDAO
     /******************************************
      * Store Public key in the DB
      */
-    public void saveKeyIdentityData( String hostId, String keyId , short type );
+    public void saveKeyIdentityData( String hostId ,String sKeyId,String pKeyId, short type );
 
 
     /******************************************
@@ -31,6 +31,12 @@ public interface SecurityManagerDAO
     /******************************************
      * Get Security KeyId from DB
      */
-    public String getKeyFingerprint( String hostId );
+    public String getPublicKeyFingerprint( String hostId );
+
+
+    /******************************************
+     * Get SecretKey from DB
+     */
+    public String getSecretKeyFingerprint( String hostId );
 
 }

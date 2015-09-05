@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.security.SecurityProvider;
 import io.subutai.common.security.crypto.certificate.CertificateData;
-import io.subutai.common.security.crypto.certificate.CertificateManager;
+import io.subutai.common.security.crypto.certificate.CertificateTool;
 import io.subutai.common.security.crypto.key.KeyManager;
 import io.subutai.common.security.crypto.key.KeyPairType;
 
@@ -20,9 +20,9 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith( MockitoJUnitRunner.class )
-public class CertificateManagerTest
+public class CertificateToolTest
 {
-    private CertificateManager certificateManager;
+    private CertificateTool certificateTool;
     private KeyManager keyManager;
     private KeyPairGenerator generator;
     private KeyPair keyPair;
@@ -37,8 +37,8 @@ public class CertificateManagerTest
     public void setUp() throws Exception
     {
         keyManager = new KeyManager();
-        certificateManager = new CertificateManager();
-        certificateManager.setDateParamaters();
+        certificateTool = new CertificateTool();
+        certificateTool.setDateParamaters();
         generator = keyManager.prepareKeyPairGeneration( KeyPairType.RSA, 1024 );
         keyPair = keyManager.generateKeyPair( generator );
     }
@@ -47,7 +47,7 @@ public class CertificateManagerTest
     @Test( expected = RuntimeException.class )
     public void testGenerateSelfSignedCertificateException() throws Exception
     {
-        certificateManager
+        certificateTool
                 .generateSelfSignedCertificate( keyStore, keyPair, SecurityProvider.BOUNCY_CASTLE, certificateData );
     }
 
@@ -64,7 +64,7 @@ public class CertificateManagerTest
         when( certificateData.getEmail() ).thenReturn( "email" );
 
 
-        certificateManager
+        certificateTool
                 .generateSelfSignedCertificate( keyStore, keyPair, SecurityProvider.BOUNCY_CASTLE, certificateData );
     }
 

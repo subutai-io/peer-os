@@ -11,7 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
-import io.subutai.core.keyserver.api.model.SecurityKey;
+import io.subutai.core.keyserver.api.model.PublicKeyStore;
 
 
 /**
@@ -19,13 +19,13 @@ import io.subutai.core.keyserver.api.model.SecurityKey;
  */
 
 @Entity
-@Table( name = SecurityKeyEntity.TABLE_NAME )
+@Table( name = PublicKeyStoreEntity.TABLE_NAME )
 @Access( AccessType.FIELD )
 
-public class SecurityKeyEntity implements SecurityKey, Serializable
+public class PublicKeyStoreEntity implements PublicKeyStore, Serializable
 {
     /********* Table name *********/
-    public static final String TABLE_NAME = "security_key";
+    public static final String TABLE_NAME = "public_key_store";
 
     /********* column names *******/
     public static final String KEY_ID_SHORT = "short_key_id";

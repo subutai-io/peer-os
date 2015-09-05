@@ -17,7 +17,6 @@
       <cm:property name="publicKeyringFile" value="" />
       <cm:property name="secretKeyringFile" value="" />
       <cm:property name="secretKeyringPwd" value="" />
-      <cm:property name="managementHostKeyFingerprint" value="" />
     </cm:default-properties>
   </cm:property-placeholder>
 
@@ -43,7 +42,6 @@
     <argument value="$[subutaiAppDataPath]/keystores/${secretKeyringFile}" />
     <argument value="$[subutaiAppDataPath]/keystores/${publicKeyringFile}" />
     <argument value="${secretKeyringPwd}" />
-    <argument value="${managementHostKeyFingerprint}" />
 
     <property name="daoManager" ref="daoSecurityManager" />
     <property name="keyServer"  ref="keyServer" />

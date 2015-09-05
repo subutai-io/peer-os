@@ -34,7 +34,7 @@ import io.subutai.common.security.SecurityProvider;
 /**
  * @author nisakov
  */
-public class CertificateManager
+public class CertificateTool
 {
     private Date notBefore = null;
     private Date notAfter = null;

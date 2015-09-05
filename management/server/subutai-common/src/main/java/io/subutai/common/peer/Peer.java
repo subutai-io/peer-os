@@ -337,48 +337,22 @@ public interface Peer
 
     //networking
 
-    /**
+    /* ************************************************
      * Returns all existing gateways of the peer
      */
     public Set<Gateway> getGateways() throws PeerException;
 
-    /**
+
+    /* ************************************************
      * Reserves VNI on the peer
      */
     public int reserveVni( Vni vni ) throws PeerException;
 
-    /**
+
+    /* ************************************************
      * Returns all reserved vnis on the peer
      */
     public Set<Vni> getReservedVnis() throws PeerException;
-
-    /**
-     * Imports certificate to trustStore. Important note here is not to miss with alias
-     *
-     * @param cert - cert in HEX representation
-     * @param alias - cert alias
-     */
-    public void importCertificate( String cert, String alias ) throws PeerException;
-
-
-    /**
-     * Exports certificate with alias passed and returns cert in HEX String format. And stores new certificate in
-     * keyStore.
-     *
-     * @param environmentId - environmentId to generate cert for
-     *
-     * @return - certificate in HEX format
-     */
-    public String exportEnvironmentCertificate( UUID environmentId ) throws PeerException;
-
-
-    /**
-     * Remove specific environment related certificates from trustStore of local peer.
-     *
-     * @param environmentId - environment whose certificates need to be removed
-     */
-    public void removeEnvironmentCertificates( UUID environmentId ) throws PeerException;
-
 
     /**
      * Gets containerHost by Id specified
@@ -386,4 +360,10 @@ public interface Peer
      * @return - containerHost
      */
     public HostInfo getContainerHostInfoById( UUID containerHostId ) throws PeerException;
+
+
+    /* **************************************************************
+     *
+     */
+    public int createEnvironmentKeyPair( String environmentId) throws PeerException;
 }

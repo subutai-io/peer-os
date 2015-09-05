@@ -8,6 +8,7 @@
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/subutaiDS)
     </non-jta-data-source>
     <class>io.subutai.core.security.impl.model.SecurityKeyIdentityEntity</class>
+    <class>io.subutai.core.security.impl.model.SecretKeyStoreEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="openjpa.Log" value="DefaultLevel=WARN, Tool=INFO" />

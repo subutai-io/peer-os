@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.common.security.crypto.keystore.KeyStoreData;
-import io.subutai.common.security.crypto.keystore.KeyStoreManager;
+import io.subutai.common.security.crypto.keystore.KeyStoreTool;
 import io.subutai.common.security.crypto.keystore.KeyStoreType;
 import io.subutai.common.security.crypto.keystore.MsCapiStoreType;
 
@@ -20,9 +20,9 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith( MockitoJUnitRunner.class )
-public class KeyStoreManagerTest
+public class KeyStoreToolTest
 {
-    private KeyStoreManager keyStoreManager;
+    private KeyStoreTool keyStoreTool;
 
     @Mock
     KeyStoreData keyStoreData;
@@ -33,7 +33,7 @@ public class KeyStoreManagerTest
     @Before
     public void setUp() throws Exception
     {
-        keyStoreManager = new KeyStoreManager();
+        keyStoreTool = new KeyStoreTool();
     }
 
 
@@ -43,7 +43,7 @@ public class KeyStoreManagerTest
         when( keyStoreData.getAlias() ).thenReturn( "alias" );
         when( keyStoreData.getPassword() ).thenReturn( "password" );
 
-        keyStoreManager.getKeyPair( keyStore, keyStoreData );
+        keyStoreTool.getKeyPair( keyStore, keyStoreData );
     }
 
 

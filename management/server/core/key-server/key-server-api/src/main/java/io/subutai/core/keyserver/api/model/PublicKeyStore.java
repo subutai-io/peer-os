@@ -7,7 +7,7 @@ package io.subutai.core.keyserver.api.model;
  */
 
 
-public interface SecurityKey
+public interface PublicKeyStore
 {
 
     /* *********************************************************

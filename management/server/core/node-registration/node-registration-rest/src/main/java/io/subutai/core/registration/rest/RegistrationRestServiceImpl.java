@@ -58,7 +58,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
             temp.setRestHook( String.format( "%s:%s", request.getRemoteAddr(), temp.getRestHook() ) );
 
             registrationManager.queueRequest( temp );
-            keyManager.savePublicKeyRing( temp.getId(), temp.getPublicKey() );
+            keyManager.savePublicKeyRing( temp.getId(),(short)3, temp.getPublicKey() );
         }
         catch ( Exception e )
         {

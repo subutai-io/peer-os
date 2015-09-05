@@ -1,10 +1,16 @@
 package io.subutai.core.security.api.crypto;
 
 
+import java.io.InputStream;
+
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKey;
+import org.bouncycastle.openpgp.PGPSecretKeyRing;
+
+import io.subutai.common.security.crypto.pgp.KeyPair;
+import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 
 
 /**
@@ -22,6 +28,12 @@ public interface KeyManager
      * Gets KeyRing from the store
      */
     public PGPPublicKeyRing getPublicKeyRing( String hostId );
+
+
+    /* *****************************
+     * Gets SecretKeyRing from the store
+     */
+    public PGPSecretKeyRing getSecretKeyRing( String hostId );
 
 
     /* *****************************
@@ -45,25 +57,25 @@ public interface KeyManager
     /* *****************************
      *
      */
-    public PGPSecretKey getSecretKeyById( String keyId );
-
-
-    /* *****************************
-     *
-     */
     public PGPSecretKey getSecretKeyByFingerprint( String fingerprint );
 
 
     /* *****************************
      *
      */
-    public void savePublicKeyRing( String hostId, String keyringAsASCII );
+    public void savePublicKeyRing( String hostId, short type, String keyringAsASCII );
 
 
     /* *****************************
      *
      */
-    public void savePublicKeyRing( String hostId, PGPPublicKeyRing publicKeyRing );
+    public void savePublicKeyRing( String hostId, short type, PGPPublicKeyRing publicKeyRing );
+
+
+    /* *****************************
+     *
+     */
+    public void saveSecretKeyRing( String hostId, short type, PGPSecretKeyRing publicKeyRing );
 
 
     /* *****************************
@@ -71,5 +83,34 @@ public interface KeyManager
      */
     public void removePublicKeyRing( String hostId );
 
+
+    /* *****************************************
+     * Removes SecretKeyRing from the Store
+     */
+    public void removeSecretKeyRing( String hostId);
+
+
+    /* *****************************************
+     *
+     */
+    public KeyPair generateKeyPair ( String userId, boolean armored );
+
+
+    /* *****************************************
+     *
+     */
+    public void saveKeyPair (String hostId, short type, KeyPair keyPair );
+
+
+    /* *****************************************
+     * Removes Secret and PublicKeyrings from the Store
+     */
+    public void removeKeyRings( String hostId);
+
+
+    /* *****************************
+     *
+     */
+    public InputStream getSecretKeyRingInputStream( String hostId );
 
 }

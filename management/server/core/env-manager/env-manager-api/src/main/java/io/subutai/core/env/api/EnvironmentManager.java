@@ -21,8 +21,7 @@ import io.subutai.core.env.api.exception.EnvironmentManagerException;
 public interface EnvironmentManager
 {
 
-    /**
-     * Returns all existing environments
+    /* Returns all existing environments
      *
      * @return - set of {@code Environment}
      */

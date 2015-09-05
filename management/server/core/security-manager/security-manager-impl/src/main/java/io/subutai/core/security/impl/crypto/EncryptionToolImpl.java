@@ -7,7 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
+import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
+import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.impl.model.SecurityKeyData;
 
@@ -86,8 +88,7 @@ public class EncryptionToolImpl implements EncryptionTool
     public byte[] decrypt( final byte[] message ) throws PGPException
     {
         return PGPEncryptionUtil
-                .decrypt( message, PGPEncryptionUtil.getFileInputStream( keyManager.getSecurityKeyData().getSecretKeyringFile() ),
-                        keyManager.getSecurityKeyData().getSecretKeyringPwd() );
+                .decrypt( message,keyManager.getSecretKeyRingInputStream( null ), keyManager.getSecurityKeyData().getSecretKeyringPwd() );
     }
 
 
@@ -110,5 +111,25 @@ public class EncryptionToolImpl implements EncryptionTool
             throws PGPException
     {
         return PGPEncryptionUtil.verifySignature( contentAndSignatures, publicKey );
+    }
+
+
+    /* *****************************************
+    *
+    */
+    @Override
+    public KeyPair generateKeyPair ( String userId,String secretPwd, boolean armored )
+    {
+        KeyPair keyPair = null;
+
+        try
+        {
+            keyPair = PGPEncryptionUtil.generateKeyPair(userId,secretPwd,armored);
+            return keyPair;
+        }
+        catch(Exception ex)
+        {
+            return null;
+        }
     }
 }

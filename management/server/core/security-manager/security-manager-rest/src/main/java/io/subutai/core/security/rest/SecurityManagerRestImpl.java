@@ -37,7 +37,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     @Override
     public Response addPublicKeyRing( final String hostId,final String keyText )
     {
-        securityManager.getKeyManager().savePublicKeyRing( hostId, keyText );
+        securityManager.getKeyManager().savePublicKeyRing( hostId, (short)3, keyText );
 
         return Response.ok().build();
     }

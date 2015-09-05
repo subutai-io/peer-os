@@ -34,10 +34,10 @@ import org.slf4j.LoggerFactory;
  * Main Class for keystore management. Manages Keystores and Truststores
  *
  */
-public class KeyStoreManager
+public class KeyStoreTool
 {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger( KeyStoreManager.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( KeyStoreTool.class );
     private FileInputStream finStream = null;
     private FileOutputStream foutStream = null;
 
@@ -45,7 +45,7 @@ public class KeyStoreManager
      * KeyStoreManager constructor
      *
      */
-    public KeyStoreManager()
+    public KeyStoreTool()
     {
 
     }
