@@ -121,7 +121,7 @@ function management_network {
   local reloadN2N="false"
   local restoreN2N="false"
   shift_amount=0;
-  while getopts ":clrfspdNLRSVTDmvMEZeb:" opt; do
+  while getopts ":clrfspdNLRSVTDmvMEZe:" opt; do
      case $opt in
        c)
 	 createTunnel="true"	
@@ -398,11 +398,11 @@ function management_network {
    fi
    
    if [ "true" == "$createN2NTunnel" ]; then
-     sockdir="var/run/n2n/sockets"
-    if [ -d "$sockdir" ]; then
+     sockdir="/var/run/n2n/sockets"
+    if [ ! -d "$sockdir" ]; then
     # Control will enter here if $DIRECTORY exists.
-      mkdir -p /var/run/n2n/sockets
-      chmod 755 /var/run/n2n/sockets
+      mkdir -p $sockdir
+      chmod 755 $sockdir
     fi
       supernodeIpAddress="$1"
       supernodePort="$2"
@@ -534,9 +534,10 @@ function management_network {
    fi
 
    if [ "true" == "$listN2NTunnel" ]; then
-      result=`echo -e "LocalPeerIP \t ServerIP \t Port \t LocalInterface \t Community"`
+      result=`echo -e "LocalPeerIP \t ServerIP:Port \t LocalInterface \t Community"`
       echo $result
-      ps aux | awk 'BEGIN {FS="\n"; RS="";ORS=""}{x=1;y=1;while ( x<NF ){Array[x]=$x; x++;}for(i=0; i<NF;i++){if(Array[i] ~ /awk /){;}else if(Array[i] ~ /edge/){split(Array[i],a,"\edge\ -l ");split(a[2],b,"\ ");for (x in b){if( x == 7 ||  b[x] ~ /-/ );else if( b[x] ~ /:/ ){split(b[x],c,":");print c[1]"\t"c[2]"\t";}else{ print b[x]"\t";}}print "\n";}}}'
+#      ps aux | awk 'BEGIN {FS="\n"; RS="";ORS=""}{x=1;y=1;while ( x<NF ){Array[x]=$x; x++;}for(i=0; i<NF;i++){if(Array[i] ~ /awk /){;}else if(Array[i] ~ /edge/){split(Array[i],a,"\edge\ -l ");split(a[2],b,"\ ");for (x in b){if( x == 7 ||  b[x] ~ /-/ );else if( b[x] ~ /:/ ){split(b[x],c,":");print c[1]"\t"c[2]"\t";}else{ print b[x]"\t";}}print "\n";}}}'
+     ps -ax | grep edge | grep "\-l" | awk -F" " '{print $16"\t"$7"\t"$9"\t"$11}' | column -t
    fi
 
    if [ "true" == "$removeN2NTunnel" ]; then
@@ -550,6 +551,10 @@ function management_network {
         msg_error "Removing Tunnel Failed!"
         show_usage "`management_network_usage`"
       fi
+         edgePorts="/var/subutai-network/edgePorts.txt"
+#        edgePorts="/var/lib/apps/n2n/edgePorts.txt"
+        cat $edgePorts | grep "$1,$2" | awk -v path="$edgePorts" '{print " sed  -i \"/"$1"/d\" "path}' | bash
+
       msg_ok "N2N Tunnel Removed!"
    fi
 
