@@ -1885,7 +1885,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public int setupTunnels( final Map<String, String> peerIps, final UUID environmentId ) throws PeerException
     {
-//        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
+        //        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         return managementHost.setupTunnels( peerIps, environmentId );
@@ -2118,6 +2118,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
         getManagementHost().addToTunnel( config );
+    }
+
+
+    @Override
+    public void removeFromTunnel( final N2NConfig config ) throws PeerException
+    {
+        LOG.debug( String.format( "Removing local peer to n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
+                config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
+        getManagementHost().removeFromTunnel( config );
     }
 
 

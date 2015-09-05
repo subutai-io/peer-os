@@ -1116,4 +1116,20 @@ public class RestServiceImpl implements RestService
             throw new WebApplicationException( e );
         }
     }
+
+
+    @Override
+    public Response removeFromTunnel( final String interfaceName, final String communityName )
+    {
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        try
+        {
+            localPeer.removeFromTunnel( new N2NConfig( interfaceName, communityName ) );
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            throw new WebApplicationException( e );
+        }
+    }
 }

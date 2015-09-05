@@ -31,8 +31,8 @@ import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
@@ -678,12 +678,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
             String peerId = containerHost.getPeerId();
             Peer peer = peerManager.getPeer( peerId );
-//
-//            String n2nIp = environment.findN2nIp( peerId );
-//            if ( n2nIp != null )
-//            {
-//                peer.getPeerInfo().setIp( n2nIp );
-//            }
+            //
+            //            String n2nIp = environment.findN2nIp( peerId );
+            //            if ( n2nIp != null )
+            //            {
+            //                peer.getPeerInfo().setIp( n2nIp );
+            //            }
 
             ( ( EnvironmentContainerImpl ) containerHost ).setPeer( peer );
         }
@@ -1143,6 +1143,25 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             throw new EnvironmentManagerException( "Could not create n2n tunnel.", e );
         }
     }
+
+
+    @Override
+    public void removeN2NTunnel( final Environment environment ) throws EnvironmentManagerException
+    {
+        try
+        {
+            for ( PeerConf peerConf : environment.getPeerConfs() )
+            {
+                Peer peer = peerManager.getPeer( peerConf.getN2NConfig().getPeerId() );
+                peer.removeFromTunnel( peerConf.getN2NConfig() );
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new EnvironmentManagerException( "Unable remove n2n tunnel.", e );
+        }
+    }
+
 
     private String generateCommunityName( final String freeSubnet )
     {

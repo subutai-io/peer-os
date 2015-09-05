@@ -275,4 +275,10 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     @Consumes( { MediaType.APPLICATION_JSON } )
     Response addToTunnel( N2NConfig config );
+
+    @DELETE
+    @Path( "n2ntunnel/{interfaceName}/{communityName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response removeFromTunnel( @PathParam( "interfaceName" ) String interfaceName,
+                               @PathParam( "communityName" ) String communityName );
 }
