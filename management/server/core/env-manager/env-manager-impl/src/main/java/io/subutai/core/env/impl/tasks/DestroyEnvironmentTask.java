@@ -212,10 +212,8 @@ public class DestroyEnvironmentTask implements Awaitable
                     try
                     {
                         op.addLog( String.format( "Removing environment certificate on peer %s...", peer.getName() ) );
-
-                        peer.removeEnvironmentCertificates( environment.getId() );
                     }
-                    catch ( PeerException e )
+                    catch ( Exception e )
                     {
                         Throwable cause = exceptionUtil.getRootCause( e );
 
@@ -233,10 +231,8 @@ public class DestroyEnvironmentTask implements Awaitable
                 try
                 {
                     op.addLog( "Removing environment certificate on local peer..." );
-
-                    localPeer.removeEnvironmentCertificates( environment.getId() );
                 }
-                catch ( PeerException e )
+                catch ( Exception e )
                 {
                     op.addLog( String.format( "Error removing environment certificate on local peer: %s",
                             e.getMessage() ) );

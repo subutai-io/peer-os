@@ -51,6 +51,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
             RequestedHost temp = JsonUtil.fromJson( decryptedMessage, HostRequest.class );
 
             registrationManager.queueRequest( temp );
+
         }
         catch ( Exception e )
         {

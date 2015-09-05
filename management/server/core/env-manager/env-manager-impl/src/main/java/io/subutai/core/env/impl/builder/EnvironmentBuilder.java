@@ -137,14 +137,33 @@ public class EnvironmentBuilder
         //submit parallel environment part creation tasks across peers
         for ( Map.Entry<Peer, Set<NodeGroup>> peerPlacement : placement.entrySet() )
         {
+            Peer peer = peerPlacement.getKey();
+
             taskCompletionService.submit(
-                    new NodeGroupBuilder( environment, templateRegistry, peerManager, peerPlacement.getKey(),
+                    new NodeGroupBuilder( environment, templateRegistry, peerManager, peer,
                             peerPlacement.getValue(), allPeers, defaultDomain, currentLastUsedIpIndex + 1 ) );
 
             for ( NodeGroup nodeGroup : peerPlacement.getValue() )
             {
                 currentLastUsedIpIndex += nodeGroup.getNumberOfContainers();
             }
+
+            //**** Create Key Pair *****************************************
+            try
+            {
+                if(peer != localPeer)
+                {
+                    peer.createEnvironmentKeyPair(peer.getId().toString()+"-"+ environment.getId().toString() );
+                }
+            }
+            catch(Exception ex)
+            {
+                throw new EnvironmentBuildException(
+                        String.format( "There were errors during creation of PEKs:  %s", ex.toString() ), null );
+            }
+
+            //**************************************************************
+
 
             environment.setLastUsedIpIndex( currentLastUsedIpIndex );
         }

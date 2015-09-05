@@ -45,6 +45,11 @@
   <reference id="httpContextManager" availability="mandatory"
              interface="io.subutai.core.http.manager.api.HttpContextManager" />
 
+  <reference id="securityManager" availability="optional"
+             interface="io.subutai.core.security.api.SecurityManager"/>
+
+
+
 
   <bean id="localPeer" class="io.subutai.core.peer.impl.LocalPeerImpl" init-method="init"
         destroy-method="dispose" scope="singleton" activation="eager">
@@ -56,6 +61,7 @@
     <argument ref="hostRegistry" />
     <argument ref="monitor" />
     <argument ref="httpContextManager" />
+    <argument ref="securityManager" />
 
     <property name="peerIdPath" value="$[subutaiAppDataPath]/id" />
     <property name="peerIdFile" value="${peerIdFile}" />
@@ -74,6 +80,7 @@
     <argument ref="localPeer" />
     <argument ref="daoManagerPeer" />
     <argument ref="messageResponseListener" />
+    <argument ref="securityManager" />
   </bean>
 
   <bean id="messageRequestListener" class="io.subutai.core.peer.impl.request.MessageRequestListener"

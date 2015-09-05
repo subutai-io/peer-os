@@ -27,6 +27,7 @@ import io.subutai.core.peer.impl.container.DestroyEnvironmentContainersRequestLi
 import io.subutai.core.peer.impl.dao.PeerDAO;
 import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
+import io.subutai.core.security.api.SecurityManager;
 
 
 /**
@@ -44,15 +45,17 @@ public class PeerManagerImpl implements PeerManager
     protected CommandResponseListener commandResponseListener;
     private MessageResponseListener messageResponseListener;
     private DaoManager daoManager;
+    private SecurityManager securityManager;
 
 
     public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
-                            MessageResponseListener messageResponseListener )
+                            MessageResponseListener messageResponseListener,  SecurityManager securityManager )
     {
         this.messenger = messenger;
         this.localPeer = localPeer;
         this.daoManager = daoManager;
         this.messageResponseListener = messageResponseListener;
+        this.securityManager = securityManager;
     }
 
 
@@ -84,6 +87,13 @@ public class PeerManagerImpl implements PeerManager
     public void destroy()
     {
         commandResponseListener.dispose();
+    }
+
+
+
+    public SecurityManager getSecurityManager()
+    {
+        return this.securityManager;
     }
 
 

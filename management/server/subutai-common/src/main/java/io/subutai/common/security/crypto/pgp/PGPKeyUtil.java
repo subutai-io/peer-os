@@ -16,6 +16,7 @@ import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
+import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.bouncycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -338,6 +339,9 @@ public class PGPKeyUtil
     }
 
 
+    /* *******************************************
+     *
+     */
     public static PGPPublicKeyRing readPublicKeyRing( String key ) throws PGPException
     {
         return readPublicKeyRing( new ByteArrayInputStream( key.getBytes( StandardCharsets.UTF_8 ) ) );
@@ -361,6 +365,52 @@ public class PGPKeyUtil
         }
 
         return pgpPub;
+    }
+
+
+    /* *****************************************
+     *
+     */
+    public static PGPSecretKeyRing readSecretKeyRing( byte[] keyMaterial ) throws PGPException
+    {
+        return readSecretKeyRing( new ByteArrayInputStream( keyMaterial ) );
+    }
+
+
+    /* *****************************************
+     *
+     */
+    public static ByteArrayInputStream readSecretKeyRingInputStream( byte[] keyMaterial ) throws PGPException
+    {
+        return  new ByteArrayInputStream( keyMaterial );
+    }
+
+    /* *******************************************
+     *
+     */
+    public static PGPSecretKeyRing readSecretKeyRing( String key ) throws PGPException
+    {
+        return readSecretKeyRing( new ByteArrayInputStream( key.getBytes( StandardCharsets.UTF_8 ) ) );
+    }
+
+
+    /* *******************************************
+     *
+     */
+    public static PGPSecretKeyRing readSecretKeyRing( InputStream instr ) throws PGPException
+    {
+        PGPSecretKeyRing pgpSecRing;
+        try
+        {
+            instr = org.bouncycastle.openpgp.PGPUtil.getDecoderStream( instr );
+            pgpSecRing = new PGPSecretKeyRing( instr, new JcaKeyFingerprintCalculator() );
+        }
+        catch ( IOException ex )
+        {
+            throw new PGPException( "Failed to init secret key ring", ex );
+        }
+
+        return pgpSecRing;
     }
 
 

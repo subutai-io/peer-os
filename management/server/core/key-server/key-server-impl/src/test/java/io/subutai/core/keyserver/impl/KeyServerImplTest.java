@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 
 
 /**
- * Created by nisakov on 8/12/15.
+ *
  */
 public class KeyServerImplTest extends TestCase
 {

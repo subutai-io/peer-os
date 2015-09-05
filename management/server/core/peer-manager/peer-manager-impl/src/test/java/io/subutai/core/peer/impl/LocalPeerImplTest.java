@@ -75,6 +75,8 @@ import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.entity.ResourceHostEntity;
 import io.subutai.core.registry.api.RegistryException;
 import io.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.security.api.*;
+import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.strategy.api.StrategyNotFoundException;
@@ -189,6 +191,9 @@ public class LocalPeerImplTest
     @Mock
     HttpContextManager httpContextManager;
 
+    @Mock
+    SecurityManager securityManager;
+
     LocalPeerImpl localPeer;
 
     Map<String, String> peerMap = new HashMap<>();
@@ -201,7 +206,7 @@ public class LocalPeerImplTest
         peerMap.put( IP, N2N_IP );
         localPeer =
                 spy( new LocalPeerImpl( daoManager, templateRegistry, quotaManager, strategyManager, commandExecutor,
-                        hostRegistry, monitor, httpContextManager ) );
+                        hostRegistry, monitor,httpContextManager,securityManager  ) );
 
         localPeer.containerHostDataService = containerHostDataService;
         localPeer.containerGroupDataService = containerGroupDataService;
@@ -1203,27 +1208,4 @@ public class LocalPeerImplTest
     }
 
 
-    @Test
-    public void testImportCertificate() throws Exception
-    {
-        localPeer.importCertificate( CERT, ALIAS );
-
-        verify( httpContextManager ).reloadTrustStore();
-    }
-
-
-    @Test
-    public void testExportEnvironmentCertificate() throws Exception
-    {
-        localPeer.exportEnvironmentCertificate( ENVIRONMENT_ID );
-
-        verify( httpContextManager ).reloadKeyStore();
-    }
-
-
-    @Test
-    public void testRemoveEnvironmentCertificates() throws Exception
-    {
-        localPeer.removeEnvironmentCertificates( ENVIRONMENT_ID );
-    }
 }
