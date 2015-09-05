@@ -10,12 +10,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.ext.form.Form;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.util.RestUtil;
+import io.subutai.core.broker.api.Broker;
+import io.subutai.core.broker.api.ClientCredentials;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.exception.NodeRegistrationException;
@@ -40,6 +43,7 @@ public class RegistrationManagerImpl implements RegistrationManager
     private SecurityManager securityManager;
     private ContainerTokenDataService containerTokenDataService;
     private DaoManager daoManager;
+    private Broker broker;
 
 
     public RegistrationManagerImpl( final SecurityManager securityManager, final DaoManager daoManager )
@@ -53,6 +57,18 @@ public class RegistrationManagerImpl implements RegistrationManager
     {
         containerTokenDataService = new ContainerTokenDataService( daoManager );
         requestDataService = new RequestDataService( daoManager );
+    }
+
+
+    public Broker getBroker()
+    {
+        return broker;
+    }
+
+
+    public void setBroker( final Broker broker )
+    {
+        this.broker = broker;
     }
 
 
@@ -147,10 +163,16 @@ public class RegistrationManagerImpl implements RegistrationManager
         RequestedHostImpl registrationRequest = requestDataService.find( requestId );
         registrationRequest.setStatus( RegistrationStatus.APPROVED );
         requestDataService.update( registrationRequest );
+
         WebClient client = RestUtil.createWebClient( registrationRequest.getRestHook() );
+        Form form = new Form();
         try
         {
-            client.post( "Accepted" );
+            ClientCredentials clientCredentials = broker.createNewClientCredentials( requestId.toString() );
+            form.set( "ca", clientCredentials.getCaCertificate() );
+            form.set( "crt", clientCredentials.getClientCertificate() );
+            form.set( "key", clientCredentials.getClientKey() );
+            client.form( form );
         }
         catch ( Exception e )
         {
