@@ -11,7 +11,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1126,15 +1130,36 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             final String[] addresses = subnetInfo.getAllAddresses();
             int counter = 0;
 
+            ExecutorService taskExecutor = Executors.newFixedThreadPool( peers.size() );
+
+            ExecutorCompletionService<N2NConfig> executorCompletionService =
+                    new ExecutorCompletionService<>( taskExecutor );
+
+
             List<N2NConfig> result = new ArrayList<>( peers.size() );
             for ( Peer peer : peers )
             {
                 N2NConfig config = new N2NConfig( peer.getId(), superNodeIp, N2N_PORT, interfaceName, communityName,
                         addresses[counter], sharedKey );
-                peer.addToN2NTunnel( config );
+                executorCompletionService.submit( new AddToTunnelTask( peer, config ) );
+
+                //                peer.addToN2NTunnel( config );
+//                result.add( config );
+                counter++;
+            }
+
+            for ( Peer peer : peers )
+            {
+                final Future<N2NConfig> f = executorCompletionService.take();
+                N2NConfig config = f.get();
+
+                //                peer.addToN2NTunnel( config );
                 result.add( config );
                 counter++;
             }
+
+            taskExecutor.shutdown();
+
             return result;
         }
         catch ( Exception e )
@@ -1225,5 +1250,27 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
 
         return allSubnets;
+    }
+
+
+    private class AddToTunnelTask implements Callable<N2NConfig>
+    {
+        private Peer peer;
+        private N2NConfig n2NConfig;
+
+
+        public AddToTunnelTask( final Peer peer, final N2NConfig config )
+        {
+            this.peer = peer;
+            this.n2NConfig = config;
+        }
+
+
+        @Override
+        public N2NConfig call() throws Exception
+        {
+            peer.addToN2NTunnel( n2NConfig );
+            return n2NConfig;
+        }
     }
 }
