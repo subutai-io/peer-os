@@ -1358,6 +1358,30 @@ public class RemotePeerImpl implements RemotePeer
         client.accept( MediaType.APPLICATION_JSON );
 
         Response response = client.post( config );
+    }
+
+
+    @Override
+    public void removeFromTunnel( final N2NConfig config ) throws PeerException
+    {
+        LOG.debug( String.format( "Removing remote peer from n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
+                config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
+
+        String path = String.format( "peer/n2ntunnel/%s/%s", config.getInterfaceName(), config.getCommunityName() );
+        LOG.debug( String.format( "%s %s %s", peerInfo.getIp(), peerInfo.getPort(), baseUrl ) );
+
+
+        //TODO: implement as singleton
+        List<Object> providers = new ArrayList<Object>();
+        providers.add( new JacksonJaxbJsonProvider() );
+
+        WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
+                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, providers );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+
+        Response response = client.delete();
         LOG.debug( String.format( "%s", response ) );
     }
 

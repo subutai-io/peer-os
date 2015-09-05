@@ -98,7 +98,7 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
             <!--<Set name="TrustStore">etc/keystores/truststore_server_px2.jks</Set>-->
             <Set name="TrustStore"><SystemProperty name="subutaiAppDataPath" />/keystores/truststore_server_px2.jks</Set>
             <Set name="TrustStorePassword">subutai</Set>
-            <Set name="needClientAuth">true</Set>
+            <Set name="needClientAuth">false</Set>
           </New>
         </Arg>
         <Set name="port">8544</Set>

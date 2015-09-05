@@ -57,7 +57,7 @@ public class Commands
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
                 Lists.newArrayList( "-N", superNodeIp, String.valueOf( superNodePort ), interfaceName, communityName,
-                        localIp, "file", keyType, pathToKeyFile ) );
+                        localIp, keyType, pathToKeyFile ) ).withTimeout( 15 ).daemon();
     }
 
 

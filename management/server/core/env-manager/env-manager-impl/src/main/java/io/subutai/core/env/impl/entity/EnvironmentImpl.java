@@ -22,7 +22,7 @@ import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.environment.EnvironmentPeer;
+import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerHost;
@@ -78,9 +78,9 @@ public class EnvironmentImpl implements Environment, Serializable
             cascade = CascadeType.ALL, orphanRemoval = true )
     private Set<ContainerHost> containers = Sets.newHashSet();
 
-    @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = EnvironmentPeerImpl.class,
+    @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = PeerConfImpl.class,
             cascade = CascadeType.ALL, orphanRemoval = true )
-    private Set<EnvironmentPeer> environmentPeers = Sets.newHashSet();
+    private Set<PeerConf> peerConfs = Sets.newHashSet();
 
     @Enumerated( EnumType.STRING )
     private EnvironmentStatus status;
@@ -120,15 +120,15 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public Set<EnvironmentPeer> getEnvironmentPeers()
+    public Set<PeerConf> getPeerConfs()
     {
-        return environmentPeers;
+        return peerConfs;
     }
 
 
-    public void setEnvironmentPeers( final Set<EnvironmentPeer> environmentPeers )
+    public void setPeerConfs( final Set<PeerConf> peerConfs )
     {
-        this.environmentPeers = environmentPeers;
+        this.peerConfs = peerConfs;
     }
 
 
@@ -240,37 +240,34 @@ public class EnvironmentImpl implements Environment, Serializable
     public String findN2nIp( final String peerId )
     {
         String result = null;
-        for ( EnvironmentPeer p : environmentPeers )
+        LOG.debug( "Finding n2n ip for " + peerId );
+        for ( PeerConf p : peerConfs )
         {
-            if ( p.getPeerId().equals( peerId ) )
+            LOG.debug( String.format( "%s %s", p.getN2NConfig().getPeerId(), p.getN2NConfig().getAddress() ) );
+            if ( p.getN2NConfig().getPeerId().toString().equals( peerId ) )
             {
-                result = p.getIp();
+                result = p.getN2NConfig().getAddress();
                 break;
             }
         }
-        LOG.debug( String.format( "N2N ip for %s: %s", peerId, result == null ? "not found" : result ) );
+
+        LOG.debug( "N2N ip for " + peerId + ":" + result );
+
         return result;
     }
 
 
     @Override
-    public void addEnvironmentPeer( final EnvironmentPeer environmentPeer )
+    public void addEnvironmentPeer( final PeerConf peerConf )
     {
-        if ( environmentPeer == null )
+        if ( peerConf == null )
         {
             throw new IllegalArgumentException( "Environment peer could not be null." );
         }
 
-        environmentPeer.setEnvironment( this );
-        environmentPeers.add( environmentPeer );
+        peerConf.setEnvironment( this );
+        peerConfs.add( peerConf );
     }
-
-
-    //    @Override
-    //    public Peer getPeer( final String peerId )
-    //    {
-    //        return environmentManager.getPeer(peerId, findN2nIp( peerId ));
-    //    }
 
 
     @Override
