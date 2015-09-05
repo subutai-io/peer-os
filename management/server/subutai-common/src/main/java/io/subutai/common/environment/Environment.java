@@ -40,7 +40,7 @@ public interface Environment
      */
     public long getCreationTimestamp();
 
-    Set<EnvironmentPeer> getEnvironmentPeers();
+    Set<PeerConf> getPeerConfs();
 
     /**
      * Returns ssh key if any of environment
@@ -126,7 +126,5 @@ public interface Environment
 
     String findN2nIp( String peerId );
 
-    void addEnvironmentPeer( EnvironmentPeer environmentPeer );
-
-
+    void addEnvironmentPeer( PeerConf peerConf );
 }

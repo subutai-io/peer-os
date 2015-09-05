@@ -15,6 +15,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.peer.ContainerHost;
@@ -25,6 +26,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.env.api.exception.EnvironmentDestructionException;
+import io.subutai.core.env.api.exception.EnvironmentManagerException;
 import io.subutai.core.env.impl.EnvironmentManagerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.ResultHolder;
@@ -111,6 +113,18 @@ public class DestroyEnvironmentTask implements Awaitable
                 {
                     LOG.error( "Error cleaning up environment network settings", e );
                 }
+            }
+
+            op.addLog( "Destroying n2n tunnel..." );
+
+            try
+            {
+                environmentManager.removeN2NTunnel( environment );
+                op.addLog( "N2N tunnel destroyed successfully." );
+            }
+            catch ( EnvironmentManagerException e )
+            {
+                op.addLogFailed( e.getMessage() );
             }
 
             ExecutorService executorService = getExecutor( environmentPeers.size() );

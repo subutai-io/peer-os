@@ -12,9 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.net.util.SubnetUtils;
 
-import com.google.common.collect.Sets;
-
-import io.subutai.common.environment.EnvironmentPeer;
+import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
@@ -26,7 +24,7 @@ import io.subutai.core.env.api.exception.EnvironmentCreationException;
 import io.subutai.core.env.impl.EnvironmentManagerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.EnvironmentBuildException;
-import io.subutai.core.env.impl.entity.EnvironmentPeerImpl;
+import io.subutai.core.env.impl.entity.PeerConfImpl;
 import io.subutai.core.env.impl.exception.ResultHolder;
 import io.subutai.core.peer.api.LocalPeer;
 
@@ -73,11 +71,8 @@ public class CreateEnvironmentTask implements Awaitable
 
             for ( N2NConfig config : tunnels )
             {
-                final EnvironmentPeer p = new EnvironmentPeerImpl();
-                p.setIp( config.getAddress() );
-                String peerId = config.getPeerId().toString();
-                p.setPeerId( peerId );
-
+                final PeerConf p = new PeerConfImpl();
+                p.setN2NConfig( config );
                 environment.addEnvironmentPeer( p );
             }
 

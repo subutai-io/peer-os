@@ -4,7 +4,7 @@ package io.subutai.core.env.cli;
 import java.util.Date;
 
 import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.EnvironmentPeer;
+import io.subutai.common.environment.PeerConf;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
@@ -45,9 +45,11 @@ public class ListEnvironmentsCommand extends SubutaiShellCommandSupport
             System.out.println( String.format( "Subnet CIDR %s", environment.getSubnetCidr() ) );
             System.out.println( String.format( "N2N config:", environment.getSubnetCidr() ) );
 
-            for ( EnvironmentPeer environmentPeer : environment.getEnvironmentPeers() )
+            for ( PeerConf peerConf : environment.getPeerConfs() )
             {
-                System.out.println( String.format( "\t%s\t%s", environmentPeer.getPeerId(), environmentPeer.getIp() ) );
+                System.out.println( String.format( "\t%s\t%s\t%s\t%s", peerConf.getN2NConfig().getPeerId(),
+                        peerConf.getN2NConfig().getAddress(), peerConf.getN2NConfig().getInterfaceName(),
+                        peerConf.getN2NConfig().getCommunityName() ) );
             }
 
             System.out.println( "-----------------------------------------------------------------" );

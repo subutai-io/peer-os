@@ -11,8 +11,11 @@ import io.subutai.common.peer.ContainerHost;
 
 public interface NetworkManager
 {
-    public static final String TUNNEL_PREFIX = "tunnel";
-    public static final String TUNNEL_TYPE = "vxlan";
+    String TUNNEL_PREFIX = "tunnel";
+    String TUNNEL_TYPE = "vxlan";
+    String N2N_STRING_KEY = "string";
+    String N2N_FILE_KEY = "file";
+
 
     /**
      * Sets up an N2N connection to super node on management host

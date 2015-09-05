@@ -438,7 +438,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     @Override
     public int setupTunnels( final Map<String, String> peerIps, final UUID environmentId ) throws PeerException
     {
-//        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
+        //        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         //need to execute sequentially since other parallel executions can setup the same tunnel
@@ -552,24 +552,34 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         throw new PeerException( "No available vlan found" );
     }
 
-    //todo low level command to Network Manager
+
     @Override
     public void addToTunnel( final N2NConfig config ) throws PeerException
     {
-        //subutai management_network -N 127.0.0.1 5000 n2n15 timur15 10.1.15.1 string secret
-
-        RequestBuilder requestBuilder = new RequestBuilder(
-                String.format( "subutai management_network -N %s %d %s %s %s string %s", config.getSuperNodeIp(),
-                        config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress(),
-                        config.getSharedKey() ) ).withTimeout( 15 ).daemon();
-
         try
         {
-            commandUtil.execute( requestBuilder, this );
+            getNetworkManager()
+                    .setupN2NConnection( config.getSuperNodeIp(), config.getN2NPort(), config.getInterfaceName(),
+                            config.getCommunityName(), config.getAddress(), NetworkManager.N2N_STRING_KEY,
+                            config.getSharedKey() );
         }
-        catch ( CommandException e )
+        catch ( NetworkManagerException e )
         {
-            throw new PeerException( "Could not add peer to subnet", e );
+            throw new PeerException( "Unable add host to n2n tunnel.", e );
+        }
+    }
+
+
+    @Override
+    public void removeFromTunnel( final N2NConfig config ) throws PeerException
+    {
+        try
+        {
+            getNetworkManager().removeN2NConnection( config.getInterfaceName(), config.getCommunityName() );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( "Unable remove host from n2n tunnel.", e );
         }
     }
 }
