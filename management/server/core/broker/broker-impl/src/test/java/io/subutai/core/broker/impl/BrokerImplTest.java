@@ -22,6 +22,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.SslContext;
+import org.apache.activemq.broker.region.policy.PolicyMap;
+import org.apache.activemq.usage.MemoryUsage;
+import org.apache.activemq.usage.StoreUsage;
+import org.apache.activemq.usage.SystemUsage;
+import org.apache.activemq.usage.TempUsage;
 
 import io.subutai.core.broker.api.BrokerException;
 import io.subutai.core.broker.api.ByteMessageListener;
@@ -83,6 +88,16 @@ public class BrokerImplTest
     SslContext sslContext;
     @Mock
     BrokerService brokerService;
+    @Mock
+    SystemUsage systemUsage;
+    @Mock
+    MemoryUsage  memoryUsage;
+    @Mock
+    TempUsage tempUsage;
+    @Mock
+    StoreUsage storeUsage;
+    @Mock
+    PolicyMap policyMap;
 
     BrokerImpl broker;
 
@@ -92,6 +107,11 @@ public class BrokerImplTest
     {
         broker = spy( new BrokerImpl( BROKER_URL, true, MESSAGE_TIMEOUT, KEYSTORE, KEYSTORE_PASSWORD, KEYSTORE,
                 KEYSTORE_PASSWORD, CA_CERTIFICATE ) );
+        doReturn( systemUsage ).when( brokerService ).getSystemUsage();
+        doReturn( memoryUsage ).when( systemUsage ).getMemoryUsage();
+        doReturn( tempUsage ).when( systemUsage ).getTempUsage();
+        doReturn( storeUsage ).when( systemUsage ).getStoreUsage();
+        doReturn( policyMap ).when( brokerService ).getDestinationPolicy();
         doReturn( sslContext ).when( broker ).getSslContext();
         doReturn( brokerService ).when( broker ).getBroker();
         doReturn( amqFactory ).when( broker ).getConnectionFactory();
