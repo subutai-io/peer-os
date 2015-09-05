@@ -52,6 +52,8 @@ public class MessageEncryptor implements TextMessagePostProcessor
     @Override
     public String process( final String topic, final String message )
     {
+        LOG.debug( String.format( "OUTGOING %s", message ) );
+
         //assume this is a host  topic
         if ( encryptionEnabled && UUIDUtil.isStringAUuid( topic ) )
         {
