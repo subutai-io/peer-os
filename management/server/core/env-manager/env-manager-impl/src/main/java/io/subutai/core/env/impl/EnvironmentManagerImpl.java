@@ -1077,7 +1077,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public List<N2NConfig> createN2NTunnel( final Set<Peer> peers ) throws EnvironmentManagerException
+    public List<N2NConfig> setupN2NConnection( final Set<Peer> peers ) throws EnvironmentManagerException
     {
         Set<String> allSubnets = getSubnets( peers );
         if ( LOGGER.isDebugEnabled() )
@@ -1116,10 +1116,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 N2NConfig config = new N2NConfig( peer.getId(), superNodeIp, N2N_PORT, interfaceName, communityName,
                         addresses[counter], sharedKey );
-                executorCompletionService.submit( new AddToTunnelTask( peer, config ) );
-
-                //                peer.addToN2NTunnel( config );
-//                result.add( config );
+                executorCompletionService.submit( new SetupN2NConnectionTask( peer, config ) );
                 counter++;
             }
 
@@ -1127,8 +1124,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 final Future<N2NConfig> f = executorCompletionService.take();
                 N2NConfig config = f.get();
-
-                //                peer.addToN2NTunnel( config );
                 result.add( config );
                 counter++;
             }
@@ -1146,14 +1141,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void removeN2NTunnel( final Environment environment ) throws EnvironmentManagerException
+    public void removeN2NConnection( final Environment environment ) throws EnvironmentManagerException
     {
         try
         {
             for ( PeerConf peerConf : environment.getPeerConfs() )
             {
                 Peer peer = peerManager.getPeer( peerConf.getN2NConfig().getPeerId() );
-                peer.removeFromTunnel( peerConf.getN2NConfig() );
+                peer.removeN2NConnection( peerConf.getN2NConfig() );
             }
         }
         catch ( Exception e )
@@ -1228,13 +1223,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    private class AddToTunnelTask implements Callable<N2NConfig>
+    private class SetupN2NConnectionTask implements Callable<N2NConfig>
     {
         private Peer peer;
         private N2NConfig n2NConfig;
 
 
-        public AddToTunnelTask( final Peer peer, final N2NConfig config )
+        public SetupN2NConnectionTask( final Peer peer, final N2NConfig config )
         {
             this.peer = peer;
             this.n2NConfig = config;
@@ -1244,7 +1239,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         @Override
         public N2NConfig call() throws Exception
         {
-            peer.addToN2NTunnel( n2NConfig );
+            peer.setupN2NConnection( n2NConfig );
             return n2NConfig;
         }
     }

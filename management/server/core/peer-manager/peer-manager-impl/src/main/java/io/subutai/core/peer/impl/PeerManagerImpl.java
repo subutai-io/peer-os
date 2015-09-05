@@ -49,7 +49,7 @@ public class PeerManagerImpl implements PeerManager
 
 
     public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
-                            MessageResponseListener messageResponseListener,  SecurityManager securityManager )
+                            MessageResponseListener messageResponseListener, SecurityManager securityManager )
     {
         this.messenger = messenger;
         this.localPeer = localPeer;
@@ -90,7 +90,6 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-
     public SecurityManager getSecurityManager()
     {
         return this.securityManager;
@@ -112,7 +111,7 @@ public class PeerManagerImpl implements PeerManager
         UUID remotePeerId = UUID.fromString( uuid );
         PeerInfo p = getPeerInfo( remotePeerId );
         managementHost.removeRepository( p.getId().toString(), p.getIp() );
-        managementHost.removeTunnel( p.getIp() );
+        //        managementHost.removeTunnel( p.getIp() );
 
         PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( remotePeerId );
         // Remove peer policy of the target remote peer from the local peer
