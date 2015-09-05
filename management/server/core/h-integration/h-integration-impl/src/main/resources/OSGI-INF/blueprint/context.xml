@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint default-activation="eager"
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <bean id="hIntegrationImpl" scope="singleton" init-method="init"
+        class="io.subutai.core.hintegration.impl.HIntegrationImpl">
+
+  </bean>
+
+</blueprint>

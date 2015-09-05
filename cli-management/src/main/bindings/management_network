@@ -554,7 +554,7 @@ function management_network {
          edgePorts="/var/subutai-network/edgePorts.txt"
 #        edgePorts="/var/lib/apps/n2n/edgePorts.txt"
         cat $edgePorts | grep "$1,$2" | awk -v path="$edgePorts" '{print " sed  -i \"/"$1"/d\" "path}' | bash
-
+        subutai management_network -V $1
       msg_ok "N2N Tunnel Removed!"
    fi
 
