@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.UUID;
@@ -435,9 +436,9 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
-    public int setupTunnels( final Set<String> peerIps, final UUID environmentId ) throws PeerException
+    public int setupTunnels( final Map<String, String> peerIps, final UUID environmentId ) throws PeerException
     {
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
+//        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         //need to execute sequentially since other parallel executions can setup the same tunnel
@@ -551,7 +552,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         throw new PeerException( "No available vlan found" );
     }
 
-
+    //todo low level command to Network Manager
     @Override
     public void addToTunnel( final N2NConfig config ) throws PeerException
     {

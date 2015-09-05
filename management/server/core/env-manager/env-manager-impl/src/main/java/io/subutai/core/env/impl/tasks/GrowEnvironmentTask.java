@@ -86,7 +86,7 @@ public class GrowEnvironmentTask implements Awaitable
 
                 newContainers.removeAll( oldContainers );
 
-                environmentManager.setContainersTransientFields( newContainers );
+                environmentManager.setContainersTransientFields( environment );
 
                 op.addLog( "Configuring /etc/hosts..." );
 

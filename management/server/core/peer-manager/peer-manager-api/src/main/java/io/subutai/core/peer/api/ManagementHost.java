@@ -2,6 +2,7 @@ package io.subutai.core.peer.api;
 
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -38,7 +39,7 @@ public interface ManagementHost extends Host
      * @param peerIps - remote peer ips
      * @param environmentId -  context environment
      */
-    public int setupTunnels( Set<String> peerIps, UUID environmentId ) throws PeerException;
+    public int setupTunnels( Map<String, String> peerIps, UUID environmentId ) throws PeerException;
 
     /**
      * Returns reserved vnis

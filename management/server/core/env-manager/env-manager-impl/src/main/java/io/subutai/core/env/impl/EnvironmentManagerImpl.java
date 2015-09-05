@@ -2,9 +2,11 @@ package io.subutai.core.env.impl;
 
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -29,6 +31,7 @@ import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInfo;
@@ -179,7 +182,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         for ( Environment environment : environments )
         {
             setEnvironmentTransientFields( environment );
-            setContainersTransientFields( environment.getContainerHosts() );
+            setContainersTransientFields( environment );
         }
 
         if ( !isUserAdmin() )
@@ -228,7 +231,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         setEnvironmentTransientFields( environment );
 
         //set container's transient fields
-        setContainersTransientFields( environment.getContainerHosts() );
+        setContainersTransientFields( environment );
 
         return environment;
     }
@@ -665,13 +668,24 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void setContainersTransientFields( final Set<ContainerHost> containers )
+    public void setContainersTransientFields( final Environment environment/*, final Set<ContainerHost> containers */ )
     {
-        for ( ContainerHost containerHost : containers )
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
         {
             ( ( EnvironmentContainerImpl ) containerHost ).setDataService( environmentContainerDataService );
             ( ( EnvironmentContainerImpl ) containerHost ).setEnvironmentManager( this );
-            ( ( EnvironmentContainerImpl ) containerHost ).setPeer( peerManager.getPeer( containerHost.getPeerId() ) );
+
+
+            String peerId = containerHost.getPeerId();
+            Peer peer = peerManager.getPeer( peerId );
+//
+//            String n2nIp = environment.findN2nIp( peerId );
+//            if ( n2nIp != null )
+//            {
+//                peer.getPeerInfo().setIp( n2nIp );
+//            }
+
+            ( ( EnvironmentContainerImpl ) containerHost ).setPeer( peer );
         }
     }
 
@@ -1084,7 +1098,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public String createN2NTunnel( final Set<Peer> peers ) throws EnvironmentManagerException
+    public List<N2NConfig> createN2NTunnel( final Set<Peer> peers ) throws EnvironmentManagerException
     {
         Set<String> allSubnets = getSubnets( peers );
         if ( LOGGER.isDebugEnabled() )
@@ -1111,14 +1125,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeSubnet, PEER_SUBNET_MASK ).getInfo();
             final String[] addresses = subnetInfo.getAllAddresses();
             int counter = 0;
+
+            List<N2NConfig> result = new ArrayList<>( peers.size() );
             for ( Peer peer : peers )
             {
-                peer.addToN2NTunnel(
-                        new N2NConfig( superNodeIp, N2N_PORT, interfaceName, communityName, addresses[counter],
-                                sharedKey ) );
+                N2NConfig config = new N2NConfig( peer.getId(), superNodeIp, N2N_PORT, interfaceName, communityName,
+                        addresses[counter], sharedKey );
+                peer.addToN2NTunnel( config );
+                result.add( config );
                 counter++;
             }
-            return freeSubnet;
+            return result;
         }
         catch ( Exception e )
         {
@@ -1127,16 +1144,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
     }
 
-
     private String generateCommunityName( final String freeSubnet )
     {
-        return String.format( "com-%s", freeSubnet.replace( ".", "-" ) );
+        return String.format( "com_%s", freeSubnet.replace( ".", "_" ) );
     }
 
 
     private String generateInterfaceName( final String freeSubnet )
     {
-        return String.format( "n2n-%s", freeSubnet.replace( ".", "-" ) );
+        return String.format( "n2n_%s", freeSubnet.replace( ".", "_" ) );
     }
 
 

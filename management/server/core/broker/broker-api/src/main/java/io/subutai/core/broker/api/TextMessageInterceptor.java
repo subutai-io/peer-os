@@ -4,7 +4,7 @@ package io.subutai.core.broker.api;
 /**
  * Allows clients to intercept messages before they are dispatched to message listeners or sent to destinations.
  *
- * Messages can be altered by clients.
+ * Messages can be altered by interceptors.
  */
 public interface TextMessageInterceptor
 {

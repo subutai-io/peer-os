@@ -9,6 +9,7 @@
     </non-jta-data-source>
     <class>io.subutai.core.env.impl.entity.HostInterface</class>
     <class>io.subutai.core.env.impl.entity.EnvironmentImpl</class>
+    <class>io.subutai.core.env.impl.entity.EnvironmentPeerImpl</class>
     <class>io.subutai.core.env.impl.entity.EnvironmentContainerImpl</class>
     <class>io.subutai.core.env.impl.entity.EnvironmentBlueprintEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>

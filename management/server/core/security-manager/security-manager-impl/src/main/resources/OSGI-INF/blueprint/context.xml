@@ -18,6 +18,8 @@
       <cm:property name="secretKeyringFile" value="" />
       <cm:property name="secretKeyringPwd" value="" />
       <cm:property name="managementHostKeyFingerprint" value="" />
+      <!-- broker security -->
+      <cm:property name="encryptionEnabled" value="false" />
     </cm:default-properties>
   </cm:property-placeholder>
 
@@ -46,9 +48,8 @@
     <argument value="${managementHostKeyFingerprint}" />
 
     <property name="daoManager" ref="daoSecurityManager" />
-    <property name="keyServer"  ref="keyServer" />
-    <property name="peerManager"  ref="peerManager" />
-
+    <property name="keyServer" ref="keyServer" />
+    <property name="peerManager" ref="peerManager" />
 
   </bean>
 
@@ -58,4 +59,18 @@
 
   <!-- ************************************************************************************************** -->
 
+  <!-- broker security start -->
+  <bean id="encryptor" scope="singleton" class="io.subutai.core.security.broker.MessageEncryptor">
+    <argument value="${encryptionEnabled}" />
+  </bean>
+
+  <bean id="decryptor" scope="singleton" class="io.subutai.core.security.broker.MessageDecryptor">
+    <argument value="${encryptionEnabled}" />
+  </bean>
+
+  <service ref="encryptor" interface="io.subutai.core.broker.api.TextMessagePostProcessor" />
+
+  <service ref="decryptor" interface="io.subutai.core.broker.api.ByteMessagePreProcessor" />
+
+  <!-- broker security end -->
 </blueprint>
