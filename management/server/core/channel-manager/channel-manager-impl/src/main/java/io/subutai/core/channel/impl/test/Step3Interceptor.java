@@ -1,22 +1,20 @@
 package io.subutai.core.channel.impl.test;
 
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 
-/**
- * Created by dilshat on 9/6/15.
- */
 public class Step3Interceptor extends AbstractPhaseInterceptor<Message>
 {
     private static final Logger LOG = LoggerFactory.getLogger( Step3Interceptor.class );
@@ -33,37 +31,36 @@ public class Step3Interceptor extends AbstractPhaseInterceptor<Message>
     {
         if ( StepUtil.isActive( message, Step.THREE ) )
         {
-            LOG.debug( "STEP 3" );
+            OutputStream out = message.getContent( OutputStream.class );
+            final CacheAndWriteOutputStream newOut = new CacheAndWriteOutputStream( out );
+            message.setContent( OutputStream.class, newOut );
+            newOut.registerCallback( new LoggingCallback() );
+        }
+    }
 
-            OutputStream os = message.getContent( OutputStream.class );
 
-            CachedStream cs = new CachedStream();
-            message.setContent( OutputStream.class, cs );
+    public class LoggingCallback implements CachedOutputStreamCallback
+    {
 
-            message.getInterceptorChain().doIntercept( message );
+        @Override
+        public void onFlush( CachedOutputStream cos )
+        {
+        }
 
+
+        @Override
+        public void onClose( CachedOutputStream cos )
+        {
             try
             {
-                cs.flush();
-                CachedOutputStream csnew = ( CachedOutputStream ) message.getContent( OutputStream.class );
-
-                if ( csnew.getBytes() != null )
-                {
-                    LOG.debug( new String( csnew.getBytes() ) );
-                }
-                //                GZIPOutputStream zipOutput = new GZIPOutputStream( os );
-                //                CachedOutputStream.copyStream( csnew.getInputStream(), zipOutput, 1024 );
-                //
-                //                cs.close();
-                //                zipOutput.close();
-                //                os.flush();
-
-                message.setContent( OutputStream.class, os );
+                StringBuilder builder = new StringBuilder();
+                cos.writeCacheTo( builder );
+                String out = builder.toString();
+                System.out.println( String.format( "STEP 3%n%s", out ) );
             }
-            catch ( IOException ioe )
+            catch ( Exception e )
             {
-                LOG.warn( "Unable to perform change.", ioe );
-                throw new RuntimeException( ioe );
+                LOG.error( "STEP 3 error", e );
             }
         }
     }
