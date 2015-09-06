@@ -7,7 +7,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
-import io.subutai.core.channel.impl.interceptor.CXFInInterceptor;
 
 import org.apache.cxf.message.Message;
 
@@ -16,9 +15,9 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith( MockitoJUnitRunner.class )
-public class CXFInterceptorTest
+public class ServerInInterceptorTest
 {
-    private CXFInInterceptor cxfInterceptor;
+    private ServerInInterceptor cxfInterceptor;
 
 
     @Mock
@@ -31,7 +30,7 @@ public class CXFInterceptorTest
     @Before
     public void setUp() throws Exception
     {
-        cxfInterceptor = new CXFInInterceptor( channelManager );
+        cxfInterceptor = new ServerInInterceptor( channelManager );
     }
 
 

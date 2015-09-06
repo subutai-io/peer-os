@@ -11,6 +11,7 @@ import io.subutai.core.channel.api.token.ChannelTokenManager;
 import io.subutai.core.channel.impl.token.ChannelTokenController;
 import io.subutai.core.channel.impl.token.ChannelTokenManagerImpl;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.security.api.SecurityManager;
 
 
 /**
@@ -21,6 +22,7 @@ public class ChannelManagerImpl implements ChannelManager
     private DaoManager daoManager = null;
     private ChannelTokenManager channelTokenManager = null;
     private IdentityManager identityManager = null;
+    private SecurityManager securityManager = null;
     private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
 
@@ -79,6 +81,30 @@ public class ChannelManagerImpl implements ChannelManager
     public void setIdentityManager( final IdentityManager identityManager )
     {
         this.identityManager = identityManager;
+    }
+
+
+    public SecurityManager getSecurityManager()
+    {
+        return securityManager;
+    }
+
+
+    public void setSecurityManager( final SecurityManager securityManager )
+    {
+        this.securityManager = securityManager;
+    }
+
+
+    public ScheduledExecutorService getExecutorService()
+    {
+        return executorService;
+    }
+
+
+    public void setExecutorService( final ScheduledExecutorService executorService )
+    {
+        this.executorService = executorService;
     }
 }
 

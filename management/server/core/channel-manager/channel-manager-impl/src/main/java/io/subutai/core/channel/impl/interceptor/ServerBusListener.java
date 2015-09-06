@@ -13,9 +13,9 @@ import org.apache.cxf.feature.AbstractFeature;
 /**
  * Bus listener class
  */
-public class CXFBusListener extends AbstractFeature
+public class ServerBusListener extends AbstractFeature
 {
-    private final static Logger LOG = LoggerFactory.getLogger( CXFBusListener.class );
+    private final static Logger LOG = LoggerFactory.getLogger( ServerBusListener.class );
     private ChannelManagerImpl channelManagerImpl = null;
 
 
@@ -24,8 +24,8 @@ public class CXFBusListener extends AbstractFeature
         LOG.info( "Adding LoggingFeature interceptor on bus: " + bus );
 
         // initialise the feature on the bus, which will add the interceptors
-        bus.getInInterceptors().add( new CXFInInterceptor(channelManagerImpl) );
-        bus.getOutInterceptors().add( new CXFOutInterceptor(channelManagerImpl) );
+        bus.getInInterceptors().add( new ServerInInterceptor(channelManagerImpl) );
+        bus.getInInterceptors().add( new ServerOutInterceptor(channelManagerImpl) );
 
         LOG.info( "Successfully added LoggingFeature interceptor on bus: " + bus );
     }

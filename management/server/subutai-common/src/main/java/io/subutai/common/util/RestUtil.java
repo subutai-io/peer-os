@@ -10,6 +10,8 @@ import java.util.Map;
 import javax.ws.rs.core.Response;
 
 import io.subutai.common.exception.HTTPException;
+import io.subutai.common.interceptor.ClientInInterceptor;
+import io.subutai.common.interceptor.ClientOutInterceptor;
 import io.subutai.common.security.crypto.keystore.KeyStoreData;
 import io.subutai.common.security.crypto.keystore.KeyStoreTool;
 import io.subutai.common.security.crypto.ssl.SSLManager;
@@ -36,11 +38,22 @@ public class RestUtil
     private static int defaultMaxRetransmits = 3;
 
 
+    private static void setCustomInterceptors( WebClient client )
+    {
+        WebClient.getConfig( client ).getBus().getInInterceptors().add( new ClientInInterceptor() );
+        WebClient.getConfig( client ).getBus().getInInterceptors().add( new ClientOutInterceptor() );
+    }
+
+
     public WebClient createTrustedWebClientWithAuthAndProviders( final String url, final String alias,
                                                      final List<Object> providers )
     {
         WebClient client = WebClient.create( url, providers );
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
+
+        //****************************
+        //setCustomInterceptors( client );
+        //****************************
 
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
         httpClientPolicy.setConnectionTimeout( defaultConnectionTimeout );
@@ -150,6 +163,7 @@ public class RestUtil
             throws MalformedURLException, HTTPException
     {
         WebClient client = null;
+
         try
         {
             URL urlObject = new URL( url );
@@ -229,6 +243,10 @@ public class RestUtil
     public static WebClient createWebClient( String url )
     {
         WebClient client = WebClient.create( url );
+        //****************************
+        //setCustomInterceptors( client );
+        //****************************
+
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
 
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
@@ -250,6 +268,10 @@ public class RestUtil
     public static WebClient createTrustedWebClient( String url )
     {
         WebClient client = WebClient.create( url );
+        //****************************
+        //setCustomInterceptors( client );
+        //****************************
+
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
 
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
@@ -274,6 +296,10 @@ public class RestUtil
     public static WebClient createTrustedWebClientWithAuth( String url, String alias )
     {
         WebClient client = WebClient.create( url );
+        //****************************
+        setCustomInterceptors( client );
+        //****************************
+
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
 
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();

@@ -323,70 +323,25 @@ public class PeerRegisterForm extends CustomComponent
 
 
     /* *************************************************************
-     * Get Public key and save it in the local KeyServer
-     */
-    private String getAndStorePeerPublicKey( final String ip )
-    {
-        String baseUrl = String.format( "https://%s:%s/cxf", ip, ChannelSettings.SECURE_PORT_X1 );
-        WebClient client = RestUtil.createTrustedWebClient( baseUrl );
-        client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
-
-        try
-        {
-            Response response = client.path( "security/keyman/getpublickeyring" ).query( "hostid", "" ).get();
-
-            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
-            {
-                // Get Remote peer Public Key and save in the local keystore
-                String publicKeyring = response.readEntity( String.class );
-                String peerId = "";
-
-
-                WebClient clientPeerId = RestUtil.createTrustedWebClient( baseUrl );
-                clientPeerId.type( MediaType.TEXT_PLAIN ).accept( MediaType.TEXT_PLAIN );
-                response = clientPeerId.path( "peer/id" ).get();
-
-                if ( response.getStatus() == Response.Status.OK.getStatusCode() )
-                {
-                    peerId = response.readEntity( String.class );
-
-                    module.getSecurityManager().getKeyManager().savePublicKeyRing( peerId,(short)3, publicKeyring );
-                }
-                return peerId;
-            }
-
-            return "";
-        }
-        catch ( Exception ex )
-        {
-            return "";
-        }
-    }
-
-
-    /* *************************************************************
      *
      */
     private void registrationRequest( final PeerInfo peerToRegister, final String ip )
     {
-        String peerId = getAndStorePeerPublicKey( ip );
+        KeyManager keyManager = module.getSecurityManager().getKeyManager();
+        PGPPublicKey pkey = keyManager.getRemoteHostPublicKey(null, ip ); //Get PublicKey from KeyServer
 
-        if ( !Strings.isNullOrEmpty( peerId ) )
+        if ( pkey!=null )
         {
             String baseUrl = String.format( "https://%s:%s/cxf", ip, ChannelSettings.SECURE_PORT_X1 );
             WebClient client = RestUtil.createTrustedWebClient( baseUrl );
             client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
             Form form = new Form();
 
-
-            EncryptionTool encTool = module.getSecurityManager().getEncryptionTool();
-            KeyManager keyManager = module.getSecurityManager().getKeyManager();
-            PGPPublicKey pkey = keyManager.getPublicKey( peerId ); //Get PublicKey from KeyServer
-
             try
             {
                 // Encrypt Payload, Save as Hex String
                 //********************************************************
+                EncryptionTool encTool = module.getSecurityManager().getEncryptionTool();
                 String jsonData = gson.toJson( peerToRegister );
                 byte[] data = encTool.encrypt( jsonData.getBytes(), pkey, false );
                 //********************************************************
@@ -694,11 +649,9 @@ public class PeerRegisterForm extends CustomComponent
                                                          updateViewListener )
     {
         //************ Send Trust SSL Cert **************************************
-        getAndStorePeerPublicKey( remotePeer.getIp() );
-
         KeyManager keyMan = module.getSecurityManager().getKeyManager();
         EncryptionTool encTool = module.getSecurityManager().getEncryptionTool();
-        PGPPublicKey pkey = keyMan.getPublicKey( remotePeer.getId().toString() );
+        PGPPublicKey pkey = keyMan.getRemoteHostPublicKey ( remotePeer.getId().toString(),remotePeer.getIp() );
         //***********************************************************************
 
         // Encrypt Payload and Certificate, Save as Hex String
