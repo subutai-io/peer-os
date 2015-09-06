@@ -7,6 +7,9 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -36,6 +39,7 @@ import io.subutai.core.peer.api.ResourceHost;
  */
 public class NetworkManagerImpl implements NetworkManager
 {
+    private static final Logger LOG = LoggerFactory.getLogger( NetworkManagerImpl.class );
     private static final String LINE_DELIMITER = "\n";
     private final PeerManager peerManager;
     protected Commands commands = new Commands();
@@ -158,10 +162,12 @@ public class NetworkManagerImpl implements NetworkManager
 
             if ( m.find() && m.groupCount() == 2 )
             {
+                LOG.debug( String.format( "Adding new tunnel: %s %s", m.group( 1 ), m.group( 2 ) ) );
                 tunnels.add( new TunnelImpl( m.group( 1 ), m.group( 2 ) ) );
             }
         }
 
+        LOG.debug( String.format( "Total count of tunnel: %d", tunnels.size() ) );
         return tunnels;
     }
 

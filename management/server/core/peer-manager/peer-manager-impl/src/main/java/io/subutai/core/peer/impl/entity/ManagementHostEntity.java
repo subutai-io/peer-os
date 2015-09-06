@@ -303,16 +303,14 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         {
             SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( tunnelIp, "255.255.255.0" ).getInfo();
             Set<Tunnel> tunnels = listTunnels();
+            LOG.debug( String.format( "Found %d tunnels.", tunnels.size() ) );
             for ( final Tunnel tunnel : tunnels )
             {
-                LOG.debug( String.format( "%s %d %s %s", tunnelIp, tunnel.getTunnelId(), tunnel.getTunnelIp(),
-                        tunnel.getTunnelName() ) );
-
                 //                if ( tunnel.getTunnelIp().equalsIgnoreCase( tunnelIp ) )
                 if ( subnetInfo.isInRange( tunnel.getTunnelIp() ) )
                 {
                     getNetworkManager().removeTunnel( tunnel.getTunnelId() );
-                    break;
+                    LOG.debug( String.format( "Tunnel '%s' destroyed successfully.", tunnel.getTunnelName() ) );
                 }
             }
         }
