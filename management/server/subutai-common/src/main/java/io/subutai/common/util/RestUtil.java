@@ -40,8 +40,8 @@ public class RestUtil
 
     private static void setCustomInterceptors( WebClient client )
     {
-        WebClient.getConfig( client ).getBus().getInInterceptors().add( new ClientInInterceptor() );
-        WebClient.getConfig( client ).getBus().getInInterceptors().add( new ClientOutInterceptor() );
+        //WebClient.getConfig( client ).getInInterceptors().add( new ClientInInterceptor() );
+        //WebClient.getConfig( client ).getBus().getInInterceptors().add( new ClientOutInterceptor() );
     }
 
 
@@ -243,8 +243,9 @@ public class RestUtil
     public static WebClient createWebClient( String url )
     {
         WebClient client = WebClient.create( url );
+
         //****************************
-        //setCustomInterceptors( client );
+        setCustomInterceptors( client );
         //****************************
 
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
@@ -269,7 +270,7 @@ public class RestUtil
     {
         WebClient client = WebClient.create( url );
         //****************************
-        //setCustomInterceptors( client );
+        setCustomInterceptors( client );
         //****************************
 
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();

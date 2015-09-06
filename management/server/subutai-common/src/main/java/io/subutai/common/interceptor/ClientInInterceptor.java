@@ -34,14 +34,17 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
 
 
     @Override
-    public void handleMessage( final Message message ) throws Fault
+    public void handleMessage( final Message message )
     {
         LOG.info( " ********* Client InInterceptor invoked *********** " );
 
         try
         {
-            URL url = new URL( ( String ) message.get( Message.REQUEST_URL ) );
-            HttpHeaders headers = new HttpHeadersImpl(message.getExchange().getInMessage());
+            if(message.get( Message.REQUEST_URL )!=null)
+            {
+                URL url = new URL( ( String ) message.get( Message.REQUEST_URL ) );
+                HttpHeaders headers = new HttpHeadersImpl(message.getExchange().getInMessage());
+            }
 
 
 

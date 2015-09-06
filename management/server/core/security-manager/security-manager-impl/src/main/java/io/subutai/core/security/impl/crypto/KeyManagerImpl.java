@@ -574,16 +574,16 @@ public class KeyManagerImpl implements KeyManager
                 WebClient client = RestUtil.createTrustedWebClient( baseUrl );
                 client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
 
-                    Response response = client.path( "security/keyman/getpublickeyring" ).query( "hostid", "" ).get();
+                Response response = client.path( "security/keyman/getpublickeyring" ).query( "hostid", "" ).get();
 
-                    if ( response.getStatus() == Response.Status.OK.getStatusCode() )
-                    {
-                        // Get Remote peer Public Key and save in the local keystore
-                        String publicKeyring = response.readEntity( String.class );
-                        savePublicKeyRing( remoteHostId, ( short ) 3, publicKeyring );
-                    }
+                if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+                {
+                    String publicKeyring = response.readEntity( String.class );
+                    remoteHostId = getRemoteHostId( ip );
+                    savePublicKeyRing( remoteHostId, ( short ) 3, publicKeyring );
+                }
+                return getPublicKey( remoteHostId );
 
-                    return getPublicKey( remoteHostId );
             }
             else
             {
@@ -594,5 +594,28 @@ public class KeyManagerImpl implements KeyManager
         {
             return null;
         }
+    }
+
+
+    /* *************************************************************
+     * Get HOST ID key
+     */
+    private String getRemoteHostId( String ip )
+    {
+        // Get Remote peer Public Key and save in the local keystore
+
+        String peerId = "";
+
+        String baseUrl = String.format( "https://%s:%s/cxf", ip, ChannelSettings.SECURE_PORT_X1 );
+        WebClient clientPeerId = RestUtil.createTrustedWebClient( baseUrl );
+        clientPeerId.type( MediaType.TEXT_PLAIN ).accept( MediaType.TEXT_PLAIN );
+        Response response = clientPeerId.path( "peer/id" ).get();
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            peerId = response.readEntity( String.class );
+        }
+
+        return peerId;
     }
 }
