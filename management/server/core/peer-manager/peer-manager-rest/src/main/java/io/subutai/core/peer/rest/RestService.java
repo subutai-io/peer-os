@@ -79,7 +79,7 @@ public interface RestService
     @POST
     @Path( "createpek" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response createEnvironmentKeyPair( @FormParam( "environmentId" ) String environmentId);
+    public Response createEnvironmentKeyPair( @FormParam( "environmentId" ) String environmentId );
 
     //*************** Peer Registration Handshake REST - BEGIN ***************************
 
@@ -88,7 +88,7 @@ public interface RestService
     @POST
     @Path( "register" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response processRegisterRequest( @FormParam( "peer" ) String peer);
+    public Response processRegisterRequest( @FormParam( "peer" ) String peer );
 
 
     @POST
@@ -118,13 +118,14 @@ public interface RestService
     @PUT
     @Path( "approve" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response approveForRegistrationRequest( @FormParam( "approvedPeer" ) String approvedPeer,@FormParam( "cert" ) String certHEX );
+    public Response approveForRegistrationRequest( @FormParam( "approvedPeer" ) String approvedPeer,
+                                                   @FormParam( "cert" ) String certHEX );
 
 
     @PUT
     @Path( "update" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response updatePeer( @FormParam( "peer" ) String peer);
+    public Response updatePeer( @FormParam( "peer" ) String peer );
 
     //*************** Peer Registration Handshake REST - END ***************************
 
@@ -155,7 +156,7 @@ public interface RestService
     @GET
     @Path( "container/state" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getContainerState( @QueryParam( "containerId" ) String containerId);
+    public Response getContainerState( @QueryParam( "containerId" ) String containerId );
 
 
     @GET
@@ -263,6 +264,6 @@ public interface RestService
     @DELETE
     @Path( "n2ntunnel/{interfaceName}/{communityName}" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response removeFromTunnel( @PathParam( "interfaceName" ) String interfaceName,
-                               @PathParam( "communityName" ) String communityName );
+    Response removeN2NConnection( @PathParam( "interfaceName" ) String interfaceName,
+                                  @PathParam( "communityName" ) String communityName );
 }

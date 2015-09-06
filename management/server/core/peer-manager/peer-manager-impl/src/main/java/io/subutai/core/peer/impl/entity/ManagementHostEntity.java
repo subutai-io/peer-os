@@ -27,6 +27,8 @@ import javax.persistence.Transient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.net.util.SubnetUtils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -295,17 +297,20 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
-    public void removeTunnel( final String peerIp ) throws PeerException
+    public void removeTunnel( final String tunnelIp ) throws PeerException
     {
         try
         {
+            SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( tunnelIp, "255.255.255.0" ).getInfo();
             Set<Tunnel> tunnels = listTunnels();
+            LOG.debug( String.format( "Found %d tunnels.", tunnels.size() ) );
             for ( final Tunnel tunnel : tunnels )
             {
-                if ( tunnel.getTunnelIp().equalsIgnoreCase( peerIp ) )
+                //                if ( tunnel.getTunnelIp().equalsIgnoreCase( tunnelIp ) )
+                if ( subnetInfo.isInRange( tunnel.getTunnelIp() ) )
                 {
                     getNetworkManager().removeTunnel( tunnel.getTunnelId() );
-                    break;
+                    LOG.debug( String.format( "Tunnel '%s' destroyed successfully.", tunnel.getTunnelName() ) );
                 }
             }
         }
@@ -554,7 +559,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
-    public void addToTunnel( final N2NConfig config ) throws PeerException
+    public void setupN2NConnection( final N2NConfig config ) throws PeerException
     {
         try
         {
@@ -571,7 +576,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
-    public void removeFromTunnel( final N2NConfig config ) throws PeerException
+    public void removeN2NConnection( final N2NConfig config ) throws PeerException
     {
         try
         {

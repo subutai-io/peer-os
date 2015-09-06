@@ -212,7 +212,7 @@ public interface EnvironmentManager
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
 
-    List<N2NConfig> createN2NTunnel( Set<Peer> peers ) throws EnvironmentManagerException;
+    List<N2NConfig> setupN2NConnection( Set<Peer> peers ) throws EnvironmentManagerException;
 
-    void removeN2NTunnel( Environment environment ) throws EnvironmentManagerException;
+    void removeN2NConnection( Environment environment ) throws EnvironmentManagerException;
 }

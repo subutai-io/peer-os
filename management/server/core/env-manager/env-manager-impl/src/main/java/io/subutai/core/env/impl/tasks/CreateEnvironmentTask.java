@@ -67,7 +67,7 @@ public class CreateEnvironmentTask implements Awaitable
 
             op.addLog( "Setting up n2n tunnel..." );
 
-            List<N2NConfig> tunnels = environmentManager.createN2NTunnel( allPeers );
+            List<N2NConfig> tunnels = environmentManager.setupN2NConnection( allPeers );
 
             for ( N2NConfig config : tunnels )
             {

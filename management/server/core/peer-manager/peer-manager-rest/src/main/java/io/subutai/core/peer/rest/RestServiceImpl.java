@@ -54,6 +54,7 @@ import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 
+
 public class RestServiceImpl implements RestService
 {
 
@@ -122,7 +123,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getPeerPolicy( final String peerId)
+    public Response getPeerPolicy( final String peerId )
     {
         try
         {
@@ -171,6 +172,7 @@ public class RestServiceImpl implements RestService
         return Response.ok().build();
     }
 
+
     /* *************************************************************
      * Get Public key and save it in the local KeyServer
      */
@@ -189,7 +191,7 @@ public class RestServiceImpl implements RestService
                 // Get Remote peer Public Key and save in the local keystore
                 String publicKeyring = response.readEntity( String.class );
 
-                securityManager.getKeyManager().savePublicKeyRing( peerId,(short)3, publicKeyring );
+                securityManager.getKeyManager().savePublicKeyRing( peerId, ( short ) 3, publicKeyring );
 
                 return peerId;
             }
@@ -210,7 +212,7 @@ public class RestServiceImpl implements RestService
         {
             // ******* Convert HexString to Byte Array ****** Decrypt data
             EncryptionTool encTool = securityManager.getEncryptionTool();
-            KeyManager     keyManager  = securityManager.getKeyManager();
+            KeyManager keyManager = securityManager.getKeyManager();
 
             byte[] data = HexUtil.hexStringToByteArray( peer );
             data = encTool.decrypt( data );
@@ -227,11 +229,11 @@ public class RestServiceImpl implements RestService
             else
             {
                 //Encrypt Local Peer
-                getAndStorePeerPublicKey(p.getId().toString(),p.getIp());
-                PGPPublicKey   pkey = keyManager.getPublicKey( p.getId().toString() );
+                getAndStorePeerPublicKey( p.getId().toString(), p.getIp() );
+                PGPPublicKey pkey = keyManager.getPublicKey( p.getId().toString() );
                 PeerInfo localPeer = peerManager.getLocalPeerInfo();
 
-                if(pkey!=null)
+                if ( pkey != null )
                 {
                     localPeer.setKeyPhrase( p.getKeyPhrase() );
                     String jsonData = jsonUtil.to( localPeer );
@@ -242,10 +244,9 @@ public class RestServiceImpl implements RestService
                     p.setName( String.format( "Peer %s", p.getId() ) );
                     peerManager.register( p );
 
-                    return Response.ok( HexUtil.byteArrayToHexString( data )).build();
+                    return Response.ok( HexUtil.byteArrayToHexString( data ) ).build();
                 }
                 return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-
             }
         }
         catch ( Exception e )
@@ -300,8 +301,7 @@ public class RestServiceImpl implements RestService
             String responseString = response.readEntity( String.class );
             LOGGER.info( response.toString() );
             PeerInfo remotePeerInfo = jsonUtil.from( responseString, new TypeToken<PeerInfo>()
-            {
-            }.getType() );
+            {}.getType() );
             if ( remotePeerInfo != null )
             {
                 remotePeerInfo.setStatus( PeerStatus.REQUEST_SENT );
@@ -337,8 +337,7 @@ public class RestServiceImpl implements RestService
             if ( result )
             {
                 //************ Delete Trust SSL Cert **************************************
-                securityManager.getKeyStoreManager()
-                               .removeCertFromTrusted( ChannelSettings.SECURE_PORT_X2, peerId );
+                securityManager.getKeyStoreManager().removeCertFromTrusted( ChannelSettings.SECURE_PORT_X2, peerId );
                 httpContextManager.reloadTrustStore();
                 //***********************************************************************
 
@@ -416,7 +415,7 @@ public class RestServiceImpl implements RestService
                 // Get Remote peer Public Key and save in the local keystore
                 String publicKeyring = response.readEntity( String.class );
 
-                securityManager.getKeyManager().savePublicKeyRing( peerId,(short)3, publicKeyring );
+                securityManager.getKeyManager().savePublicKeyRing( peerId, ( short ) 3, publicKeyring );
             }
             return peerId;
         }
@@ -428,13 +427,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response approveForRegistrationRequest( final String approvedPeer,final String certHEX )
+    public Response approveForRegistrationRequest( final String approvedPeer, final String certHEX )
     {
         try
         {
             // ******* Convert HexString to Byte Array ****** Decrypt data
             EncryptionTool encTool = securityManager.getEncryptionTool();
-            KeyManager keyManager  = securityManager.getKeyManager();
+            KeyManager keyManager = securityManager.getKeyManager();
 
             byte data[] = HexUtil.hexStringToByteArray( approvedPeer );
             byte cert[] = HexUtil.hexStringToByteArray( certHEX );
@@ -443,7 +442,7 @@ public class RestServiceImpl implements RestService
             cert = encTool.decrypt( cert );
             //*************************************************************
 
-            PeerInfo p = jsonUtil.from( new String(data), PeerInfo.class );
+            PeerInfo p = jsonUtil.from( new String( data ), PeerInfo.class );
             p.setStatus( PeerStatus.APPROVED );
             peerManager.update( p );
 
@@ -452,7 +451,7 @@ public class RestServiceImpl implements RestService
             managementHost.addRepository( p.getIp() );
 
             //************ Save Trust SSL Cert **************************************
-            String rootCertPx2 = new String(cert);
+            String rootCertPx2 = new String( cert );
 
             securityManager.getKeyStoreManager()
                            .importCertAsTrusted( ChannelSettings.SECURE_PORT_X2, p.getId().toString(), rootCertPx2 );
@@ -461,16 +460,17 @@ public class RestServiceImpl implements RestService
             //************ Export Current Cert **************************************
             String localPeerCert = "";
 
-            localPeerCert = securityManager.getKeyStoreManager().exportCertificate( ChannelSettings.SECURE_PORT_X2, ""  );
+            localPeerCert =
+                    securityManager.getKeyStoreManager().exportCertificate( ChannelSettings.SECURE_PORT_X2, "" );
 
             //***********************************************************************
 
             httpContextManager.reloadTrustStore();
 
             PGPPublicKey pkey = keyManager.getPublicKey( p.getId().toString() ); //Get PublicKey from KeyServer
-            byte certRes[] = encTool.encrypt(localPeerCert.getBytes(),pkey,false);
+            byte certRes[] = encTool.encrypt( localPeerCert.getBytes(), pkey, false );
 
-            return Response.ok(HexUtil.byteArrayToHexString( certRes )).build();
+            return Response.ok( HexUtil.byteArrayToHexString( certRes ) ).build();
         }
         catch ( Exception e )
         {
@@ -593,6 +593,7 @@ public class RestServiceImpl implements RestService
         return request.getRemoteAddr();
     }
 
+
     //*************************************************************************************
     @Override
     public Response destroyContainer( final String containerId )
@@ -687,30 +688,30 @@ public class RestServiceImpl implements RestService
     }
 
 
-    private String encryptData(String dataSTR,HttpHeaders headers)
+    private String encryptData( String dataSTR, HttpHeaders headers )
     {
-        String hostId   = headers.getHeaderString( Common.ENVIRONMENT_ID_HEADER_NAME  );
-        String remoteIp = headers.getHeaderString( "PEER_IP"  );
+        String hostId = headers.getHeaderString( Common.ENVIRONMENT_ID_HEADER_NAME );
+        String remoteIp = headers.getHeaderString( "PEER_IP" );
 
 
         EncryptionTool encTool = securityManager.getEncryptionTool();
-        KeyManager keyManager  = securityManager.getKeyManager();
-        PGPPublicKey pubkey    = keyManager.getPublicKey(hostId  );
+        KeyManager keyManager = securityManager.getKeyManager();
+        PGPPublicKey pubkey = keyManager.getPublicKey( hostId );
 
-        if(pubkey == null)
+        if ( pubkey == null )
         {
-            getAndStorePeerPublicKey( hostId,remoteIp );
-            pubkey    = keyManager.getPublicKey(hostId  );
+            getAndStorePeerPublicKey( hostId, remoteIp );
+            pubkey = keyManager.getPublicKey( hostId );
         }
 
-        byte[] data  = encTool.encrypt(dataSTR.getBytes(),pubkey,false);
+        byte[] data = encTool.encrypt( dataSTR.getBytes(), pubkey, false );
 
-        return HexUtil.byteArrayToHexString( data ) ;
+        return HexUtil.byteArrayToHexString( data );
     }
 
 
     @Override
-    public Response getContainerState( final String containerId)
+    public Response getContainerState( final String containerId )
     {
         try
         {
@@ -808,8 +809,7 @@ public class RestServiceImpl implements RestService
                                                       .getAvailableDiskQuota(
                                                               jsonUtil.<DiskPartition>from( diskPartition,
                                                                       new TypeToken<DiskPartition>()
-                                                                      {
-                                                                      }.getType() ) ) ) ).build();
+                                                                      {}.getType() ) ) ) ).build();
         }
         catch ( Exception e )
         {
@@ -906,8 +906,7 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.getContainerHostById( UUID.fromString( containerId ) )
                      .setRamQuota( jsonUtil.<RamQuota>from( ramQuota, new TypeToken<RamQuota>()
-                     {
-                     }.getType() ) );
+                     {}.getType() ) );
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -1005,8 +1004,7 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.getContainerHostById( UUID.fromString( containerId ) )
                      .setCpuSet( jsonUtil.<Set<Integer>>from( cpuSet, new TypeToken<Set<Integer>>()
-                     {
-                     }.getType() ) );
+                     {}.getType() ) );
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -1028,8 +1026,7 @@ public class RestServiceImpl implements RestService
             return Response.ok( jsonUtil.to( localPeer.getContainerHostById( UUID.fromString( containerId ) )
                                                       .getDiskQuota( JsonUtil.<DiskPartition>fromJson( diskPartition,
                                                               new TypeToken<DiskPartition>()
-                                                              {
-                                                              }.getType() ) ) ) ).build();
+                                                              {}.getType() ) ) ) ).build();
         }
         catch ( Exception e )
         {
@@ -1049,8 +1046,7 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.getContainerHostById( UUID.fromString( containerId ) )
                      .setDiskQuota( jsonUtil.<DiskQuota>from( diskQuota, new TypeToken<DiskQuota>()
-                     {
-                     }.getType() ) );
+                     {}.getType() ) );
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -1141,11 +1137,11 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.createEnvironmentKeyPair( environmentId );
 
-            return Response.ok().status( Response.Status.CREATED).build();
+            return Response.ok().status( Response.Status.CREATED ).build();
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
-            return Response.status( Response.Status.NOT_FOUND).build();
+            return Response.status( Response.Status.NOT_FOUND ).build();
         }
     }
 
@@ -1193,7 +1189,7 @@ public class RestServiceImpl implements RestService
         LocalPeer localPeer = peerManager.getLocalPeer();
         try
         {
-            localPeer.addToN2NTunnel( config );
+            localPeer.setupN2NConnection( config );
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -1204,12 +1200,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response removeFromTunnel( final String interfaceName, final String communityName )
+    public Response removeN2NConnection( final String interfaceName, final String communityName )
     {
         LocalPeer localPeer = peerManager.getLocalPeer();
         try
         {
-            localPeer.removeFromTunnel( new N2NConfig( interfaceName, communityName ) );
+            String address = interfaceName.replace( "n2n_", "" ).replace( "_", "." );
+            localPeer.removeN2NConnection( new N2NConfig( address, interfaceName, communityName ) );
             return Response.ok().build();
         }
         catch ( Exception e )

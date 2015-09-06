@@ -152,7 +152,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     public LocalPeerImpl( DaoManager daoManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
                           StrategyManager strategyManager, CommandExecutor commandExecutor, HostRegistry hostRegistry,
-                          Monitor monitor, HttpContextManager httpContextManager, SecurityManager securityManager)
+                          Monitor monitor, HttpContextManager httpContextManager, SecurityManager securityManager )
 
     {
         this.strategyManager = strategyManager;
@@ -975,8 +975,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
-                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder(
+                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
+                    bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1886,7 +1887,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
      *  Create PEK
      */
     @Override
-    public int createEnvironmentKeyPair(String environmentId) throws PeerException
+    public int createEnvironmentKeyPair( String environmentId ) throws PeerException
     {
         KeyManager keyManager = securityManager.getKeyManager();
 
@@ -1911,6 +1912,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             throw ex;
         }
     }
+
+
     private Set<Interface> getInterfacesByIp( final String pattern )
     {
         LOG.debug( pattern );
@@ -1985,22 +1988,24 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void addToN2NTunnel( final N2NConfig config ) throws PeerException
+    public void setupN2NConnection( final N2NConfig config ) throws PeerException
     {
         LOG.debug( String.format( "Adding local peer to n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
                 config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
 
 
-        getManagementHost().addToTunnel( config );
+        getManagementHost().setupN2NConnection( config );
     }
 
 
     @Override
-    public void removeFromTunnel( final N2NConfig config ) throws PeerException
+    public void removeN2NConnection( final N2NConfig config ) throws PeerException
     {
         LOG.debug( String.format( "Removing local peer to n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
                 config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
-        getManagementHost().removeFromTunnel( config );
+        getManagementHost().removeN2NConnection( config );
+        //TODO: decouple remove tunnel process
+        getManagementHost().removeTunnel( config.getAddress() );
     }
 
 
@@ -2027,6 +2032,5 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         return getId().hashCode();
     }
-
 }
 
