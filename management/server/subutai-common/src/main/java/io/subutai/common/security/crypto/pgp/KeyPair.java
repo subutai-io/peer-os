@@ -5,7 +5,8 @@ import com.google.common.base.Objects;
 
 
 /**
- * Represents a PGP keypair. The subkey should be used for signing, encrypting, verifying and decrypting.
+ * Represents a PGP keypair. The key is generated similarly to when using gpg commmand utility and selecting RSA & RSA
+ * with key size 2048
  */
 public class KeyPair
 {
