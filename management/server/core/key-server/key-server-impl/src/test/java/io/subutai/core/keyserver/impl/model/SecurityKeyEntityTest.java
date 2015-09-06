@@ -13,7 +13,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith( MockitoJUnitRunner.class)
 public class SecurityKeyEntityTest
 {
-    private SecurityKeyEntity securityKeyEntity;
+    private PublicKeyStoreEntity securityKeyEntity;
 
     private String fingerprint = "1EB4A4CCADF438434450BF1F364CD558014A08B4";
     private String keyId       = "364CD558014A08B4";
@@ -24,7 +24,7 @@ public class SecurityKeyEntityTest
     @Before
     public void setUp() throws Exception
     {
-        securityKeyEntity = new SecurityKeyEntity();
+        securityKeyEntity = new PublicKeyStoreEntity();
 
         securityKeyEntity.setFingerprint(fingerprint );
         securityKeyEntity.setKeyId( keyId );

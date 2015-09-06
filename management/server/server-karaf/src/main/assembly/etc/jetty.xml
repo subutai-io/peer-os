@@ -42,7 +42,7 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
         <Set name="maxIdleTime">300000</Set>
         <Set name="Acceptors">2</Set>
         <Set name="statsOn">false</Set>
-        <Set name="confidentialPort">8543</Set>
+        <Set name="confidentialPort">8443</Set>
         <Set name="lowResourcesConnections">20000</Set>
         <Set name="lowResourcesMaxIdleTime">5000</Set>
       </New>
@@ -55,7 +55,7 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
           <Property name="jetty.host" />
         </Set>
         <Set name="port">
-          <Property name="jetty.port" default="8542" />
+          <Property name="jetty.port" default="8551" />
         </Set>
         <Set name="maxIdleTime">300000</Set>
         <Set name="Acceptors">2</Set>
@@ -71,7 +71,7 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
     <Arg>
       <New class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
         <Arg>
-          <New class="org.eclipse.jetty.http.ssl.SslContextFactory">
+          <New class="org.eclipse.jetty.util.ssl.SslContextFactory">
             <!--<Set name="KeyStore">etc/keystores/keystore_server_px1.jks</Set>-->
             <Set name="KeyStore"><SystemProperty name="subutaiAppDataPath" />/keystores/keystore_server_px1.jks</Set>
             <Set name="certAlias">root_server_px1</Set>
@@ -79,7 +79,7 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
             <Set name="needClientAuth">false</Set>
           </New>
         </Arg>
-        <Set name="port">8543</Set>
+        <Set name="port">8443</Set>
         <Set name="maxIdleTime">30000</Set>
       </New>
     </Arg>
@@ -95,36 +95,17 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
             <Set name="KeyStore"><SystemProperty name="subutaiAppDataPath" />/keystores/keystore_server_px2.jks</Set>
             <Set name="KeyStorePassword">subutai</Set>
             <Set name="certAlias">root_server_px2</Set>
-            <!--<Set name="TrustStore">etc/keystores/truststore_server_px2.jks</Set>-->
             <Set name="TrustStore"><SystemProperty name="subutaiAppDataPath" />/keystores/truststore_server_px2.jks</Set>
             <Set name="TrustStorePassword">subutai</Set>
-            <Set name="needClientAuth">true</Set>
+            <Set name="needClientAuth">false</Set>
           </New>
         </Arg>
-        <Set name="port">8544</Set>
+        <Set name="port">8444</Set>
         <Set name="maxIdleTime">30000</Set>
       </New>
     </Arg>
   </Call>
 
-  <!-- =========================================================== -->
-  <!-- One way SSL for user tokens channel -->
-  <Call name="addConnector">
-    <Arg>
-      <New class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
-        <Arg>
-          <New class="org.eclipse.jetty.http.ssl.SslContextFactory">
-            <Set name="KeyStore"><SystemProperty name="subutaiAppDataPath" />/keystores/keystore_special_px1.jks</Set>
-            <Set name="certAlias">root_special_px1</Set>
-            <Set name="KeyStorePassword">subutai</Set>
-            <Set name="needClientAuth">false</Set>
-          </New>
-        </Arg>
-        <Set name="port">8552</Set>
-        <Set name="maxIdleTime">30000</Set>
-      </New>
-    </Arg>
-  </Call>
 
   <!-- =========================================================== -->
   <!-- Configure Authentication Realms -->

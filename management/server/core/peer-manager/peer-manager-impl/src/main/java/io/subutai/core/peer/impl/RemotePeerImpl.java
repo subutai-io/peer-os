@@ -76,6 +76,17 @@ import io.subutai.core.peer.impl.entity.HostInterface;
 import io.subutai.core.peer.impl.request.MessageRequest;
 import io.subutai.core.peer.impl.request.MessageResponse;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
+import io.subutai.core.peer.impl.command.CommandRequest;
+import io.subutai.core.peer.impl.container.DestroyEnvironmentContainersResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
+import com.google.common.reflect.TypeToken;
 
 
 /**
@@ -93,6 +104,7 @@ public class RemotePeerImpl implements RemotePeer
     protected RestUtil restUtil = new RestUtil();
     protected JsonUtil jsonUtil = new JsonUtil();
     private String baseUrl;
+    private SecurityManager securityManager;
 
 
     public RemotePeerImpl( LocalPeer localPeer, final PeerInfo peerInfo, final Messenger messenger,
@@ -264,7 +276,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", localPeer.getId(), host.getEnvironmentId() );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             post( path, alias, params, headers );
         }
         catch ( Exception e )
@@ -289,7 +301,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", localPeer.getId(), host.getEnvironmentId() );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             post( path, alias, params, headers );
         }
         catch ( Exception e )
@@ -314,7 +326,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", localPeer.getId(), host.getEnvironmentId() );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             post( path, alias, params, headers );
         }
         catch ( Exception e )
@@ -342,7 +354,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", localPeer.getId(), host.getEnvironmentId() );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             post( path, alias, params, headers );
         }
         catch ( Exception e )
@@ -368,8 +380,8 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias =
-                    String.format( "env_%s_%s", localPeer.getId(), headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
+
             return jsonUtil.from( post( path, alias, params, headers ), Boolean.class );
         }
         catch ( Exception e )
@@ -398,12 +410,12 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias =
-                    String.format( "env_%s_%s", localPeer.getId(), headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             String response = get( path, alias, params, headers );
 
             return jsonUtil.from( response, new TypeToken<ProcessResourceUsage>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -427,8 +439,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
-                    headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             String response = get( path, alias, params, headers );
 
             return jsonUtil.from( response, ContainerHostState.class );
@@ -455,8 +466,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
-                    headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             String response = get( path, alias, params, headers );
 
             return jsonUtil.from( response, Integer.class );
@@ -483,8 +493,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
-                    headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             String response = get( path, alias, params, headers );
 
             return jsonUtil.from( response, RamQuota.class );
@@ -513,7 +522,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", localPeer.getId(), host.getEnvironmentId() );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             post( path, alias, params, headers );
         }
         catch ( Exception e )
@@ -538,8 +547,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
-                    headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             String response = get( path, alias, params, headers );
 
             return jsonUtil.from( response, Integer.class );
@@ -566,8 +574,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
-                    headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             String response = get( path, alias, params, headers );
 
             return jsonUtil.from( response, CpuQuotaInfo.class );
@@ -596,7 +603,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", localPeer.getId(), host.getEnvironmentId() );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             post( path, alias, params, headers );
         }
         catch ( Exception e )
@@ -621,12 +628,12 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
-                    headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             String response = get( path, alias, params, headers );
 
             return jsonUtil.from( response, new TypeToken<Set<Integer>>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -652,7 +659,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", localPeer.getId(), host.getEnvironmentId() );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             post( path, alias, params, headers );
         }
         catch ( Exception e )
@@ -680,12 +687,12 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
-                    headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             String response = get( path, alias, params, headers );
 
             return jsonUtil.from( response, new TypeToken<DiskQuota>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -711,7 +718,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", localPeer.getId(), host.getEnvironmentId() );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             post( path, alias, params, headers );
         }
         catch ( Exception e )
@@ -738,7 +745,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", peerInfo.getId(), host.getEnvironmentId() );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             post( path, alias, params, headers );
         }
         catch ( Exception e )
@@ -763,8 +770,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
-                    headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             String response = get( path, alias, params, headers );
 
             return jsonUtil.from( response, Integer.class );
@@ -791,8 +797,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
-                    headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             String response = get( path, alias, params, headers );
 
             return jsonUtil.from( response, Integer.class );
@@ -822,12 +827,12 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
-                    headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             String response = get( path, alias, params, headers );
 
             return jsonUtil.from( response, new TypeToken<DiskQuota>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -853,12 +858,12 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", localPeer.getId().toString(),
-                    headers.get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             String response = get( path, alias, params, headers );
 
             return jsonUtil.from( response, new TypeToken<QuotaInfo>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -885,7 +890,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            String alias = String.format( "env_%s_%s", localPeer.getId(), host.getEnvironmentId() );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             post( path, alias, params, headers );
         }
         catch ( Exception e )
@@ -1131,122 +1136,6 @@ public class RemotePeerImpl implements RemotePeer
             throw new PeerException( String.format( "Error reserving vni %s on peer %s", vni, getName() ), e );
         }
     }
-
-
-    /**
-     * Imports certificate to trustStore. Important note here is to restart servlet after trustStore update.
-     *
-     * @param cert - cert in HEX representation
-     * @param alias - cert alias
-     */
-    @Override
-    public void importCertificate( final String cert, final String alias ) throws PeerException
-    {
-        Preconditions.checkNotNull( cert, "Invalid cert" );
-        Preconditions.checkNotNull( alias, "Invalid alias" );
-
-        String path = "peer/cert/import";
-        String envId = alias.split( "_" )[2];
-
-        try
-        {
-
-            Map<String, String> params = Maps.newHashMap();
-            params.put( "cert", cert );
-            params.put( "alias", alias );
-
-            Map<String, String> headers = Maps.newHashMap();
-            headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, envId );
-
-            post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException(
-                    String.format( "Error importing environment certificate %s on peer %s", alias, getName() ), e );
-        }
-    }
-
-
-    /**
-     * Exports certificate with alias passed and returns cert in HEX String format. And stores new certificate in
-     * keyStore.
-     *
-     * @param environmentId - environmentId to generate cert for
-     *
-     * @return - certificate in HEX format
-     */
-    @Override
-    public String exportEnvironmentCertificate( final UUID environmentId ) throws PeerException
-    {
-        Preconditions.checkNotNull( environmentId, "Invalid parameter environmentId" );
-
-        String path = "peer/cert/export";
-        String envId = environmentId.toString();
-
-        try
-        {
-            String url = String.format( "https://%s:%s/cxf", peerInfo.getIp(), ChannelSettings.SECURE_PORT_X2 );
-            WebClient client = RestUtil.createTrustedWebClientWithAuth( url, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS );
-            client.path( path );
-
-            Map<String, String> params = Maps.newHashMap();
-            params.put( "environmentId", envId );
-
-            Map<String, String> headers = Maps.newHashMap();
-            headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, envId );
-
-            String response = post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
-            if ( response != null && !"".equals( response ) )
-            {
-                return response;
-            }
-            else
-            {
-                throw new Exception( "Invalid status code." );
-            }
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException(
-                    String.format( "Error exporting environment certificate %s on peer %s", envId, getName() ), e );
-        }
-    }
-
-
-    /**
-     * Remove specific environment related certificates from trustStore of local peer.
-     *
-     * @param environmentId - environment whose certificates need to be removed
-     */
-    @Override
-    public void removeEnvironmentCertificates( final UUID environmentId ) throws PeerException
-    {
-        Preconditions.checkNotNull( environmentId, "Invalid parameter environmentId" );
-
-        String path = "peer/cert/remove";
-        String envId = environmentId.toString();
-
-        try
-        {
-            String environmentRequestAlias = String.format( "env_%s_%s", localPeer.getId().toString(), envId );
-
-            Map<String, String> params = Maps.newHashMap();
-            params.put( "environmentId", jsonUtil.to( environmentId ) );
-
-            Map<String, String> headers = Maps.newHashMap();
-            headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, envId );
-
-            delete( path, environmentRequestAlias, params, headers );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException(
-                    String.format( "Error removing environment certificate %s on peer %s", envId, getName() ), e );
-        }
-    }
-
-
     //************ END ENVIRONMENT SPECIFIC REST
 
 
@@ -1278,7 +1167,8 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, null );
 
             return jsonUtil.from( response, new TypeToken<Set<Gateway>>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -1297,7 +1187,8 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, null );
 
             return jsonUtil.from( response, new TypeToken<Set<Vni>>()
-            {}.getType() );
+            {
+            }.getType() );
         }
         catch ( Exception e )
         {
@@ -1306,6 +1197,38 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+
+    /* ***************************************************
+     *
+     */
+    @Override
+    public int createEnvironmentKeyPair( String environmentId) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environmentId" );
+
+        String path = "peer/createpek";
+
+        try
+        {
+            Map<String, String> params = Maps.newHashMap();
+
+            params.put( "environmentId", environmentId);
+
+            String response = post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, null );
+
+            return 1;
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( String.format( "Error creating PEK on peer %s",  getName() ), e );
+        }
+    }
+
+
+
+    /* ***************************************************
+     *
+     */
     private String buildPath( String path )
     {
         return String.format( "%s/%s", baseUrl, path.startsWith( "/" ) ? path.substring( 1 ) : path );
@@ -1338,7 +1261,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void addToN2NTunnel( final N2NConfig config )
+    public void setupN2NConnection( final N2NConfig config )
     {
         LOG.debug( String.format( "Adding remote peer to n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
                 config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
@@ -1358,6 +1281,30 @@ public class RemotePeerImpl implements RemotePeer
         client.accept( MediaType.APPLICATION_JSON );
 
         Response response = client.post( config );
+    }
+
+
+    @Override
+    public void removeN2NConnection( final N2NConfig config ) throws PeerException
+    {
+        LOG.debug( String.format( "Removing remote peer from n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
+                config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
+
+        String path = String.format( "peer/n2ntunnel/%s/%s", config.getInterfaceName(), config.getCommunityName() );
+        LOG.debug( String.format( "%s %s %s", peerInfo.getIp(), peerInfo.getPort(), baseUrl ) );
+
+
+        //TODO: implement as singleton
+        List<Object> providers = new ArrayList<Object>();
+        providers.add( new JacksonJaxbJsonProvider() );
+
+        WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
+                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, providers );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+
+        Response response = client.delete();
         LOG.debug( String.format( "%s", response ) );
     }
 
@@ -1385,4 +1332,5 @@ public class RemotePeerImpl implements RemotePeer
     {
         return getId().hashCode();
     }
+
 }

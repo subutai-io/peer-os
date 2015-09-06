@@ -11,7 +11,7 @@ import javax.ws.rs.core.Response;
 
 import io.subutai.common.exception.HTTPException;
 import io.subutai.common.security.crypto.keystore.KeyStoreData;
-import io.subutai.common.security.crypto.keystore.KeyStoreManager;
+import io.subutai.common.security.crypto.keystore.KeyStoreTool;
 import io.subutai.common.security.crypto.ssl.SSLManager;
 import io.subutai.common.settings.ChannelSettings;
 
@@ -49,7 +49,7 @@ public class RestUtil
 
         httpConduit.setClient( httpClientPolicy );
 
-        KeyStoreManager keyStoreManager = new KeyStoreManager();
+        KeyStoreTool keyStoreManager = new KeyStoreTool();
         KeyStoreData keyStoreData = new KeyStoreData();
         keyStoreData.setupKeyStorePx2();
         keyStoreData.setAlias( alias );
@@ -283,7 +283,7 @@ public class RestUtil
 
         httpConduit.setClient( httpClientPolicy );
 
-        KeyStoreManager keyStoreManager = new KeyStoreManager();
+        KeyStoreTool keyStoreManager = new KeyStoreTool();
         KeyStoreData keyStoreData = new KeyStoreData();
         keyStoreData.setupKeyStorePx2();
         keyStoreData.setAlias( alias );

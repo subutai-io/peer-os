@@ -76,8 +76,6 @@ public class GrowEnvironmentTask implements Awaitable
 
                 op.addLog( "Ensuring secure channel..." );
 
-                environmentManager.setupEnvironmentTunnel( environment.getId(), newRemotePeers );
-
                 op.addLog( "Cloning containers..." );
 
                 environmentManager.build( environment, topology );

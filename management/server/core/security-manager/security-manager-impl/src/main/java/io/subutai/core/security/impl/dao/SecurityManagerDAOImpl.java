@@ -6,6 +6,8 @@ import javax.persistence.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
+
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.security.api.dao.SecurityManagerDAO;
 import io.subutai.core.security.api.model.SecurityKeyIdentity;
@@ -61,37 +63,69 @@ public class SecurityManagerDAOImpl implements SecurityManagerDAO
      * Get PublicKey from DB
      */
     @Override
-    public String getKeyFingerprint( String hostId )
+    public String getPublicKeyFingerprint( String hostId )
     {
         SecurityKeyIdentity securityKeyIdentity = getKeyIdentityData( hostId );
 
         if(securityKeyIdentity!=null)
-            return securityKeyIdentity.getKeyFingerprint();
+            return securityKeyIdentity.getPublicKeyFingerprint();
         else
             return "";
     }
 
 
     /******************************************
+     * Get SecretKey from DB
+     */
+    @Override
+    public String getSecretKeyFingerprint( String hostId )
+    {
+        SecurityKeyIdentity securityKeyIdentity = getKeyIdentityData( hostId );
+
+        if(securityKeyIdentity!=null)
+            return securityKeyIdentity.getSecretKeyFingerprint();
+        else
+            return "";
+    }
+
+
+
+    /******************************************
      *
      */
     @Override
-    public void saveKeyIdentityData( String hostId ,String keyId, short type )
+    public void saveKeyIdentityData( String hostId ,String sKeyId,String pKeyId, short type )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
         try
         {
-            SecurityKeyIdentity securityKeyIdentity = new SecurityKeyIdentityEntity();
+
+            SecurityKeyIdentity securityKeyIdentity = getKeyIdentityData( hostId );
+
+            if(securityKeyIdentity == null)
+            {
+                securityKeyIdentity = new SecurityKeyIdentityEntity();
+                securityKeyIdentity.setHostId( hostId );
+                securityKeyIdentity.setType( type );
+                securityKeyIdentity.setPublicKeyFingerprint( pKeyId );
+                securityKeyIdentity.setSecretKeyFingerprint( sKeyId );
+            }
+            else
+            {
+                if ( Strings.isNullOrEmpty( pKeyId ) )
+                {
+                    securityKeyIdentity.setSecretKeyFingerprint( sKeyId );
+                }
+
+                if ( Strings.isNullOrEmpty( sKeyId ) )
+                {
+                    securityKeyIdentity.setPublicKeyFingerprint( pKeyId );
+                }
+            }
 
             daoManager.startTransaction( em );
-
-            securityKeyIdentity.setHostId( hostId );
-            securityKeyIdentity.setKeyFingerprint( keyId );
-            securityKeyIdentity.setType( type );
-
             em.merge( securityKeyIdentity );
-
             daoManager.commitTransaction( em );
 
         }
@@ -133,5 +167,6 @@ public class SecurityManagerDAOImpl implements SecurityManagerDAO
             daoManager.closeEntityManager( em );
         }
     }
+
 
 }

@@ -12,9 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.net.util.SubnetUtils;
 
-import com.google.common.collect.Sets;
-
-import io.subutai.common.environment.EnvironmentPeer;
+import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
@@ -25,7 +23,8 @@ import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.env.api.exception.EnvironmentCreationException;
 import io.subutai.core.env.impl.EnvironmentManagerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
-import io.subutai.core.env.impl.entity.EnvironmentPeerImpl;
+import io.subutai.core.env.impl.exception.EnvironmentBuildException;
+import io.subutai.core.env.impl.entity.PeerConfImpl;
 import io.subutai.core.env.impl.exception.ResultHolder;
 import io.subutai.core.peer.api.LocalPeer;
 
@@ -68,22 +67,34 @@ public class CreateEnvironmentTask implements Awaitable
 
             op.addLog( "Setting up n2n tunnel..." );
 
-            List<N2NConfig> tunnels = environmentManager.createN2NTunnel( allPeers );
+            List<N2NConfig> tunnels = environmentManager.setupN2NConnection( allPeers );
 
             for ( N2NConfig config : tunnels )
             {
-                final EnvironmentPeer p = new EnvironmentPeerImpl();
-                p.setIp( config.getAddress() );
-                String peerId = config.getPeerId().toString();
-                p.setPeerId( peerId );
-
+                final PeerConf p = new PeerConfImpl();
+                p.setN2NConfig( config );
                 environment.addEnvironmentPeer( p );
             }
 
-            op.addLog( "Setting up secure channel..." );
 
-            //exchange environment certificates
-            environmentManager.setupEnvironmentTunnel( environment.getId(), allPeers );
+            //**** Create Key Pair *****************************************
+
+            op.addLog( "Creating PEKs ..." );
+
+            try
+            {
+                localPeer.createEnvironmentKeyPair(localPeer.getId().toString()+"-"+ environment.getId().toString() );
+            }
+            catch(Exception ex)
+            {
+                throw new EnvironmentBuildException(
+                        String.format( "There were errors during creation of PEKs:  %s", ex.toString() ), null );
+            }
+
+            //**************************************************************
+
+
+            op.addLog( "Setting up secure channel..." );
 
             //check availability of subnet
             Map<Peer, Set<Gateway>> usedGateways = environmentManager.getUsedGateways( allPeers );
@@ -119,7 +130,7 @@ public class CreateEnvironmentTask implements Awaitable
             op.addLog( "Creating gateway on local peer..." );
 
             //setup gateway on mgmt host
-            localPeer.getManagementHost().createGateway( environmentGatewayIp, vlan );
+            //localPeer.getManagementHost().createGateway( environmentGatewayIp, vlan );
 
             //reserve VNI on remote getPeerInfos
             allPeers.remove( localPeer );

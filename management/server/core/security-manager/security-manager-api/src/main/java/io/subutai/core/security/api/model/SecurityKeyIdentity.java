@@ -22,18 +22,6 @@ public interface SecurityKeyIdentity
     /********************************
      *
      */
-    public String getKeyFingerprint();
-
-
-    /********************************
-     *
-     */
-    public void setKeyFingerprint( final String keyFingerprint );
-
-
-    /********************************
-     *
-     */
     public short getStatus();
 
 
@@ -54,4 +42,27 @@ public interface SecurityKeyIdentity
      */
     public void setType( final short type );
 
+
+    /********************************
+     *
+     */
+    String getPublicKeyFingerprint();
+
+
+    /********************************
+     *
+     */
+    void setPublicKeyFingerprint( String publicKeyFingerprint );
+
+
+    /********************************
+     *
+     */
+    String getSecretKeyFingerprint();
+
+
+    /********************************
+     *
+     */
+    void setSecretKeyFingerprint( String secretKeyFingerprint );
 }

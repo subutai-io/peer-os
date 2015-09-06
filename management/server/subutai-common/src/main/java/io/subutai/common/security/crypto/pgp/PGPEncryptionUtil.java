@@ -384,6 +384,7 @@ public class PGPEncryptionUtil
         {
             Iterator<PGPPublicKeyEncryptedData> it = getEncryptedObjects( encryptedMessage );
             PGPPrivateKey sKey = null;
+
             PGPPublicKeyEncryptedData pbe = null;
             final PGPSecretKeyRingCollection keys =
                     new PGPSecretKeyRingCollection( secretKeyRing, new JcaKeyFingerprintCalculator() );
@@ -1022,6 +1023,33 @@ public class PGPEncryptionUtil
     }
 
 
+    private static PGPSecretKey findSecretKey( InputStream secretKeyRing ) throws IOException, PGPException
+    {
+        PGPSecretKeyRingCollection keyrings = new PGPSecretKeyRingCollection( PGPUtil.getDecoderStream( secretKeyRing ),
+                new JcaKeyFingerprintCalculator() );
+
+        Iterator<PGPSecretKeyRing> it = keyrings.getKeyRings();
+        while ( it.hasNext() )
+        {
+            PGPSecretKeyRing keyRing = it.next();
+
+            Iterator<PGPSecretKey> pkIt = keyRing.getSecretKeys();
+
+            while ( pkIt.hasNext() )
+            {
+                PGPSecretKey secretKey = pkIt.next();
+
+                if ( secretKey.isSigningKey() )
+                {
+                    return secretKey;
+                }
+            }
+        }
+
+        throw new PGPException( "Key not found" );
+    }
+
+
     private static PGPSecretKey findSecretKey( InputStream secretKeyRing, String id, boolean fingerprint )
             throws IOException, PGPException
     {
@@ -1213,6 +1241,69 @@ public class PGPEncryptionUtil
         catch ( Exception e )
         {
             throw new PGPException( "Error loading keyring", e );
+        }
+    }
+
+
+    /**
+     * Signs a public key
+     *
+     * @param publicKeyRing a public key ring containing the single public key to sign
+     * @param id the id we are certifying against the public key
+     * @param secretKey the signing key
+     * @param secretKeyPassword the signing key password
+     *
+     * @return a public key ring with the signed public key
+     */
+    public static PGPPublicKeyRing signPublicKey( PGPPublicKeyRing publicKeyRing, String id, PGPSecretKey secretKey,
+                                                  String secretKeyPassword )
+    {
+        try
+        {
+            PGPPublicKey oldKey = publicKeyRing.getPublicKey();
+            PGPPrivateKey pgpPrivKey = secretKey.extractPrivateKey(
+                    new JcePBESecretKeyDecryptorBuilder().setProvider( "BC" )
+                                                         .build( secretKeyPassword.toCharArray() ) );
+            PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(
+                    new JcaPGPContentSignerBuilder( secretKey.getPublicKey().getAlgorithm(), PGPUtil.SHA512 ) );
+            signatureGenerator.init( PGPSignature.DIRECT_KEY, pgpPrivKey );
+
+            PGPSignature signature = signatureGenerator.generateCertification( id, oldKey );
+
+            PGPPublicKey newKey = PGPPublicKey.addCertification( oldKey, signature );
+
+            PGPPublicKeyRing newPublicKeyRing = PGPPublicKeyRing.removePublicKey( publicKeyRing, oldKey );
+            return PGPPublicKeyRing.insertPublicKey( newPublicKeyRing, newKey );
+        }
+        catch ( Exception e )
+        {
+            //throw custom  exception
+            throw new RuntimeException( e );
+        }
+    }
+
+
+    /**
+     * Verifies that a public key is signed with another public key
+     *
+     * @param keyToVerify the public key to verify
+     * @param id the id we are verifying against the public key
+     * @param keyToVerifyWith the key to verify with
+     *
+     * @return true if verified, false otherwise
+     */
+    public static boolean verifyPublicKey( PGPPublicKey keyToVerify, String id, PGPPublicKey keyToVerifyWith )
+    {
+        try
+        {
+            PGPSignature signature = ( PGPSignature ) keyToVerify.getSignatures().next();
+            signature.init( new JcaPGPContentVerifierBuilderProvider().setProvider( "BC" ), keyToVerifyWith );
+            return signature.verifyCertification( id.getBytes(), keyToVerify );
+        }
+        catch ( Exception e )
+        {
+            //throw custom  exception
+            throw new RuntimeException( e );
         }
     }
 }

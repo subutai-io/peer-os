@@ -10,6 +10,7 @@ import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Peer;
@@ -25,8 +26,7 @@ import io.subutai.core.env.api.exception.EnvironmentManagerException;
 public interface EnvironmentManager
 {
 
-    /**
-     * Returns all existing environments
+    /* Returns all existing environments
      *
      * @return - set of {@code Environment}
      */
@@ -212,5 +212,7 @@ public interface EnvironmentManager
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
 
-    List<N2NConfig> createN2NTunnel( Set<Peer> peers ) throws EnvironmentManagerException;
+    List<N2NConfig> setupN2NConnection( Set<Peer> peers ) throws EnvironmentManagerException;
+
+    void removeN2NConnection( Environment environment ) throws EnvironmentManagerException;
 }

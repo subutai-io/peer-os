@@ -27,6 +27,8 @@ import javax.persistence.Transient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.net.util.SubnetUtils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -295,17 +297,20 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
-    public void removeTunnel( final String peerIp ) throws PeerException
+    public void removeTunnel( final String tunnelIp ) throws PeerException
     {
         try
         {
+            SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( tunnelIp, "255.255.255.0" ).getInfo();
             Set<Tunnel> tunnels = listTunnels();
+            LOG.debug( String.format( "Found %d tunnels.", tunnels.size() ) );
             for ( final Tunnel tunnel : tunnels )
             {
-                if ( tunnel.getTunnelIp().equalsIgnoreCase( peerIp ) )
+                //                if ( tunnel.getTunnelIp().equalsIgnoreCase( tunnelIp ) )
+                if ( subnetInfo.isInRange( tunnel.getTunnelIp() ) )
                 {
                     getNetworkManager().removeTunnel( tunnel.getTunnelId() );
-                    break;
+                    LOG.debug( String.format( "Tunnel '%s' destroyed successfully.", tunnel.getTunnelName() ) );
                 }
             }
         }
@@ -438,7 +443,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     @Override
     public int setupTunnels( final Map<String, String> peerIps, final UUID environmentId ) throws PeerException
     {
-//        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
+        //        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         //need to execute sequentially since other parallel executions can setup the same tunnel
@@ -552,24 +557,34 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         throw new PeerException( "No available vlan found" );
     }
 
-    //todo low level command to Network Manager
+
     @Override
-    public void addToTunnel( final N2NConfig config ) throws PeerException
+    public void setupN2NConnection( final N2NConfig config ) throws PeerException
     {
-        //subutai management_network -N 127.0.0.1 5000 n2n15 timur15 10.1.15.1 string secret
-
-        RequestBuilder requestBuilder = new RequestBuilder(
-                String.format( "subutai management_network -N %s %d %s %s %s string %s", config.getSuperNodeIp(),
-                        config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress(),
-                        config.getSharedKey() ) ).withTimeout( 15 ).daemon();
-
         try
         {
-            commandUtil.execute( requestBuilder, this );
+            getNetworkManager()
+                    .setupN2NConnection( config.getSuperNodeIp(), config.getN2NPort(), config.getInterfaceName(),
+                            config.getCommunityName(), config.getAddress(), NetworkManager.N2N_STRING_KEY,
+                            config.getSharedKey() );
         }
-        catch ( CommandException e )
+        catch ( NetworkManagerException e )
         {
-            throw new PeerException( "Could not add peer to subnet", e );
+            throw new PeerException( "Unable add host to n2n tunnel.", e );
+        }
+    }
+
+
+    @Override
+    public void removeN2NConnection( final N2NConfig config ) throws PeerException
+    {
+        try
+        {
+            getNetworkManager().removeN2NConnection( config.getInterfaceName(), config.getCommunityName() );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( "Unable remove host from n2n tunnel.", e );
         }
     }
 }

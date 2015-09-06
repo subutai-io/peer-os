@@ -25,6 +25,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.env.api.exception.EnvironmentDestructionException;
+import io.subutai.core.env.api.exception.EnvironmentManagerException;
 import io.subutai.core.env.impl.EnvironmentManagerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.ResultHolder;
@@ -113,6 +114,18 @@ public class DestroyEnvironmentTask implements Awaitable
                 }
             }
 
+            op.addLog( "Destroying n2n tunnel..." );
+
+            try
+            {
+                environmentManager.removeN2NConnection( environment );
+                op.addLog( "N2N tunnel destroyed successfully." );
+            }
+            catch ( EnvironmentManagerException e )
+            {
+                op.addLogFailed( e.getMessage() );
+            }
+
             ExecutorService executorService = getExecutor( environmentPeers.size() );
 
             Set<Future<ContainersDestructionResult>> futures = Sets.newHashSet();
@@ -198,10 +211,8 @@ public class DestroyEnvironmentTask implements Awaitable
                     try
                     {
                         op.addLog( String.format( "Removing environment certificate on peer %s...", peer.getName() ) );
-
-                        peer.removeEnvironmentCertificates( environment.getId() );
                     }
-                    catch ( PeerException e )
+                    catch ( Exception e )
                     {
                         Throwable cause = exceptionUtil.getRootCause( e );
 
@@ -219,10 +230,8 @@ public class DestroyEnvironmentTask implements Awaitable
                 try
                 {
                     op.addLog( "Removing environment certificate on local peer..." );
-
-                    localPeer.removeEnvironmentCertificates( environment.getId() );
                 }
-                catch ( PeerException e )
+                catch ( Exception e )
                 {
                     op.addLog( String.format( "Error removing environment certificate on local peer: %s",
                             e.getMessage() ) );

@@ -11,7 +11,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +35,8 @@ import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
@@ -59,7 +63,6 @@ import io.subutai.core.env.impl.dao.EnvironmentDataService;
 import io.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
 import io.subutai.core.env.impl.exception.EnvironmentBuildException;
-import io.subutai.core.env.impl.exception.EnvironmentTunnelException;
 import io.subutai.core.env.impl.exception.ResultHolder;
 import io.subutai.core.env.impl.tasks.Awaitable;
 import io.subutai.core.env.impl.tasks.CreateEnvironmentTask;
@@ -73,10 +76,11 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.User;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.tracker.api.Tracker;
+
 
 
 /**
@@ -94,6 +98,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     protected ExecutorService executor = SubutaiExecutors.newCachedThreadPool();
     private final String defaultDomain;
     private final IdentityManager identityManager;
+    private final SecurityManager securityManager;
     private final Tracker tracker;
 
     protected Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
@@ -104,6 +109,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     protected EnvironmentDataService environmentDataService;
     protected EnvironmentContainerDataService environmentContainerDataService;
     protected BlueprintDataService blueprintDataService;
+
 
 
     @Override
@@ -263,6 +269,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
         final EnvironmentImpl environment = createEmptyEnvironment( name, subnetCidr, sshKey );
+
 
         TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
                 String.format( "Creating environment %s ", environment.getId() ) );
@@ -558,35 +565,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void setupEnvironmentTunnel( final UUID environmentId, Set<Peer> peers ) throws EnvironmentTunnelException
-    {
-        String localEnvAlias =
-                String.format( "env_%s_%s", peerManager.getLocalPeer().getId().toString(), environmentId.toString() );
-        Set<Peer> remotePeers = Sets.newHashSet( peers );
-        LocalPeer localPeer = peerManager.getLocalPeer();
-        remotePeers.remove( localPeer );
-        if ( !remotePeers.isEmpty() )
-        {
-            try
-            {
-                String localPeerCert = localPeer.exportEnvironmentCertificate( environmentId );
-
-                for ( Peer remotePeer : remotePeers )
-                {
-                    String remotePeerCert = remotePeer.exportEnvironmentCertificate( environmentId );
-                    String remoteEnvAlias =
-                            String.format( "env_%s_%s", remotePeer.getId().toString(), environmentId.toString() );
-                    localPeer.importCertificate( remotePeerCert, remoteEnvAlias );
-                    remotePeer.importCertificate( localPeerCert, localEnvAlias );
-                }
-            }
-            catch ( Exception e )
-            {
-                throw new EnvironmentTunnelException( "Error exchanging environment certificates ", e );
-            }
-        }
-    }
-
 
     public Map<Peer, Set<Gateway>> getUsedGateways( final Set<Peer> peers ) throws EnvironmentManagerException
     {
@@ -678,12 +656,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
             String peerId = containerHost.getPeerId();
             Peer peer = peerManager.getPeer( peerId );
-//
-//            String n2nIp = environment.findN2nIp( peerId );
-//            if ( n2nIp != null )
-//            {
-//                peer.getPeerInfo().setIp( n2nIp );
-//            }
+            //
+            //            String n2nIp = environment.findN2nIp( peerId );
+            //            if ( n2nIp != null )
+            //            {
+            //                peer.getPeerInfo().setIp( n2nIp );
+            //            }
 
             ( ( EnvironmentContainerImpl ) containerHost ).setPeer( peer );
         }
@@ -1028,7 +1006,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager,
                                    final NetworkManager networkManager, final DaoManager daoManager,
                                    final String defaultDomain, final IdentityManager identityManager,
-                                   final Tracker tracker )
+                                   final Tracker tracker, final SecurityManager securityManager )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
@@ -1045,6 +1023,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         this.environmentBuilder = new EnvironmentBuilder( templateRegistry, peerManager, defaultDomain );
         this.identityManager = identityManager;
         this.tracker = tracker;
+        this.securityManager = securityManager;
     }
 
 
@@ -1098,7 +1077,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public List<N2NConfig> createN2NTunnel( final Set<Peer> peers ) throws EnvironmentManagerException
+    public List<N2NConfig> setupN2NConnection( final Set<Peer> peers ) throws EnvironmentManagerException
     {
         Set<String> allSubnets = getSubnets( peers );
         if ( LOGGER.isDebugEnabled() )
@@ -1126,15 +1105,31 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             final String[] addresses = subnetInfo.getAllAddresses();
             int counter = 0;
 
+            ExecutorService taskExecutor = Executors.newFixedThreadPool( peers.size() );
+
+            ExecutorCompletionService<N2NConfig> executorCompletionService =
+                    new ExecutorCompletionService<>( taskExecutor );
+
+
             List<N2NConfig> result = new ArrayList<>( peers.size() );
             for ( Peer peer : peers )
             {
                 N2NConfig config = new N2NConfig( peer.getId(), superNodeIp, N2N_PORT, interfaceName, communityName,
                         addresses[counter], sharedKey );
-                peer.addToN2NTunnel( config );
+                executorCompletionService.submit( new SetupN2NConnectionTask( peer, config ) );
+                counter++;
+            }
+
+            for ( Peer peer : peers )
+            {
+                final Future<N2NConfig> f = executorCompletionService.take();
+                N2NConfig config = f.get();
                 result.add( config );
                 counter++;
             }
+
+            taskExecutor.shutdown();
+
             return result;
         }
         catch ( Exception e )
@@ -1143,6 +1138,25 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             throw new EnvironmentManagerException( "Could not create n2n tunnel.", e );
         }
     }
+
+
+    @Override
+    public void removeN2NConnection( final Environment environment ) throws EnvironmentManagerException
+    {
+        try
+        {
+            for ( PeerConf peerConf : environment.getPeerConfs() )
+            {
+                Peer peer = peerManager.getPeer( peerConf.getN2NConfig().getPeerId() );
+                peer.removeN2NConnection( peerConf.getN2NConfig() );
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new EnvironmentManagerException( "Unable remove n2n tunnel.", e );
+        }
+    }
+
 
     private String generateCommunityName( final String freeSubnet )
     {
@@ -1206,5 +1220,27 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
 
         return allSubnets;
+    }
+
+
+    private class SetupN2NConnectionTask implements Callable<N2NConfig>
+    {
+        private Peer peer;
+        private N2NConfig n2NConfig;
+
+
+        public SetupN2NConnectionTask( final Peer peer, final N2NConfig config )
+        {
+            this.peer = peer;
+            this.n2NConfig = config;
+        }
+
+
+        @Override
+        public N2NConfig call() throws Exception
+        {
+            peer.setupN2NConnection( n2NConfig );
+            return n2NConfig;
+        }
     }
 }

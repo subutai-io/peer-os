@@ -22,7 +22,6 @@
     <module>lxc-quota-manager</module>
     <module>network-manager</module>
     <module>peer-manager</module>
-    <module>communication-manager</module>
     <module>strategy-manager</module>
     <module>template-registry</module>
     <module>tracker</module>
@@ -47,6 +46,7 @@
     <module>node-registration</module>
     <module>http-context-factory</module>
     <module>gateway</module>
+    <module>h-integration</module>
   </modules>
 
 </project>
