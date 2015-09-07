@@ -36,6 +36,7 @@ import io.subutai.common.security.utils.io.HexUtil;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.Common;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
+import io.subutai.core.channel.impl.test.CachedStream;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 
@@ -78,11 +79,11 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
                     String envId = headers.getHeaderString( Common.ENVIRONMENT_ID_HEADER_NAME );
                     String peerId = headers.getHeaderString( Common.PEER_ID_HEADER_NAME );
 
+                    encryptData( envId,"" ,message);
 
                     if ( !Strings.isNullOrEmpty( envId ) )
                     {
                         //String outData = getData(message);
-                        //String encryptedData = encryptData( envId, "", outData);
                     }
                     else if ( !Strings.isNullOrEmpty( peerId ) )
                     {
@@ -106,50 +107,43 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
      */
     private void encryptData(String hostId, String ip,Message message)
     {
+        OutputStream os = message.getContent( OutputStream.class );
+
+        CachedStream cs = new CachedStream();
+        message.setContent( OutputStream.class, cs );
+
+        message.getInterceptorChain().doIntercept( message );
+
         try
         {
-            OutputStream out = message.getContent( OutputStream.class );
-            final CacheAndWriteOutputStream newOut = new CacheAndWriteOutputStream( out );
+            cs.flush();
+            org.apache.commons.io.IOUtils.closeQuietly( cs );
+            CachedOutputStream csnew = ( CachedOutputStream ) message.getContent( OutputStream.class );
+
+            byte[] originalMessage = org.apache.commons.io.IOUtils.toByteArray( csnew.getInputStream() );
+            csnew.flush();
+            org.apache.commons.io.IOUtils.closeQuietly( csnew );
+
+            //do something with original message to produce finalMessage
+            byte[] finalMessage  = encryptData( hostId, ip, originalMessage );
+
+           // = new byte[100];
 
 
-            CachedOutputStream csnew = (CachedOutputStream) message .getContent(OutputStream.class);
-            String currentEnvelopeMessage = IOUtils.toString( csnew.getInputStream(), (String) message.get(Message.ENCODING));
+            InputStream replaceInStream = new ByteArrayInputStream( finalMessage );
 
-
-            res = res != null ? res : currentEnvelopeMessage;
-            InputStream replaceInStream = IOUtils.tolnputStream(res, (String) message.get(Message.ENCODING));
-            IOUtils.copy(replaceInStream, os);
+            org.apache.commons.io.IOUtils.copy( replaceInStream, os );
             replaceInStream.close();
-            IOUtils.closeQuietly(replaceInStream);
-            message.setContent(OutputStream.class, os);
-        } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
+            org.apache.commons.io.IOUtils.closeQuietly( replaceInStream );
 
-
-            OutputStream out = message.getContent( OutputStream.class );
-
-            if(out == null)
-            {
-            }
-            else
-            {
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                IOUtils.copy( out, os );
-                is.close();
-
-                byte []outData = encryptData( hostId, ip, os.toByteArray() );
-                os.close();
-
-//                os.write( outData );
-//                os.flush();
-
-                message.setContent(OutputStream.class, os);
-
-            }
+            os.flush();
+            message.setContent( OutputStream.class, os );
+            org.apache.commons.io.IOUtils.closeQuietly( os );
         }
-        catch ( IOException e )
+        catch ( IOException ioe )
         {
-            LOG.error( " ******** Error encrypting data OutServer data :", e );
+            LOG.warn( "Unable to perform change.", ioe );
+            throw new RuntimeException( ioe );
         }
     }
 
