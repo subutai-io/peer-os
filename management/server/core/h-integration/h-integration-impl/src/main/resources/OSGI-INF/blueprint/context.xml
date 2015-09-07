@@ -5,11 +5,16 @@
   <reference id="securityManager"
              interface="io.subutai.core.security.api.SecurityManager" />
 
+  <reference id="peerManager"
+             interface="io.subutai.core.peer.api.PeerManager" />
 
   <bean id="hIntegrationImpl" scope="singleton" init-method="init"
-        class="io.subutai.core.hintegration.impl.HIntegrationImpl">
+        class="io.subutai.core.hintegration.impl.IntegrationImpl">
     <property name="securityManager" ref="securityManager" />
-    <property name="bundleContext" ref="blueprintBundleContext"/>
+    <property name="peerManager" ref="peerManager" />
+    <property name="bundleContext" ref="blueprintBundleContext" />
   </bean>
+
+  <service ref="hIntegrationImpl" interface="io.subutai.core.hintegration.api.Integration" />
 
 </blueprint>
