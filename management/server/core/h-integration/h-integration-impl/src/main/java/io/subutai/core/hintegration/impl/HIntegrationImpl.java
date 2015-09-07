@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
@@ -14,9 +13,12 @@ import javax.net.ssl.SSLContext;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
+import org.bouncycastle.openpgp.PGPUtil;
+import org.bouncycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -228,7 +230,8 @@ public class HIntegrationImpl
         }
     }
 
-    public void httpRequestOwnerPubKey()
+
+    public void httpRequestOwnerPubKey() throws IOException, PGPException
     {
         String baseUrl = String.format( "https://%s:%s/", HSettings.IP, HSettings.SECURE_PORT_X1 );
         WebClient client = io.subutai.core.hintegration.impl.HttpClient.createTrustedWebClient( baseUrl );
@@ -236,58 +239,26 @@ public class HIntegrationImpl
         client.type( MediaType.APPLICATION_FORM_URLENCODED ).accept( MediaType.APPLICATION_JSON );
 
         Form form = new Form();
-        form.set( "keytext", getOwnerPubKeyRing() );
+        form.set( "keytext", PGPEncryptionUtil.armorByteArrayToString( getOwnerPubKeyRing().getEncoded()) );
 
         Response response = client.path( "pks/add" ).put( form );
-
     }
 
 
-    public PGPPublicKeyRing getOwnerPubKeyRing()
+    public PGPPublicKeyRing getOwnerPubKeyRing() throws IOException
     {
         InputStream in = PGPEncryptionUtil.getFileInputStream( HSettings.PEER_OWNER_PUB_KEY );
-        PGPPublicKeyRing ownerPubKeyRing = null;
-        ObjectInputStream ois = null;
-        try
-        {
-            ois = new ObjectInputStream( in );
-        }
-        catch ( IOException e )
-        {
-            e.printStackTrace();
-        }
-        try
-        {
-            ownerPubKeyRing = (PGPPublicKeyRing) ois.readObject();
-        }
-        catch ( IOException | ClassNotFoundException e )
-        {
-            e.printStackTrace();
-        }
+        PGPPublicKeyRing ownerPubKeyRing =
+                new PGPPublicKeyRing( PGPUtil.getDecoderStream( in ), new JcaKeyFingerprintCalculator() );
         return ownerPubKeyRing;
     }
 
-    public PGPPublicKeyRing getPeerPubKeyRing()
+
+    public PGPPublicKeyRing getPeerPubKeyRing() throws IOException
     {
         InputStream in = PGPEncryptionUtil.getFileInputStream( HSettings.PEER_PUB_KEY );
-        PGPPublicKeyRing peerPubKeyRing = null;
-        ObjectInputStream ois = null;
-        try
-        {
-            ois = new ObjectInputStream( in );
-        }
-        catch ( IOException e )
-        {
-            e.printStackTrace();
-        }
-        try
-        {
-            peerPubKeyRing = (PGPPublicKeyRing) ois.readObject();
-        }
-        catch ( IOException | ClassNotFoundException e )
-        {
-            e.printStackTrace();
-        }
+        PGPPublicKeyRing peerPubKeyRing =
+                new PGPPublicKeyRing( PGPUtil.getDecoderStream( in ), new JcaKeyFingerprintCalculator() );
         return peerPubKeyRing;
     }
 }
