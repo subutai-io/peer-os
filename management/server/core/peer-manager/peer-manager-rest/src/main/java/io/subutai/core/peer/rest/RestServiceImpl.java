@@ -171,6 +171,38 @@ public class RestServiceImpl implements RestService
         return Response.ok().build();
     }
 
+    /* *************************************************************
+     * Get Public key and save it in the local KeyServer
+     */
+    private String getAndStorePeerPublicKey( final String peerId, final String ip )
+    {
+        String baseUrl = String.format( "https://%s:%s/cxf", ip, ChannelSettings.SECURE_PORT_X1 );
+        WebClient client = RestUtil.createTrustedWebClient( baseUrl );
+        client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
+
+        try
+        {
+            Response response = client.path( "security/keyman/getpublickeyring" ).query( "hostid", "" ).get();
+
+            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+            {
+                // Get Remote peer Public Key and save in the local keystore
+                String publicKeyring = response.readEntity( String.class );
+
+                securityManager.getKeyManager().savePublicKeyRing( peerId,(short)3, publicKeyring );
+
+                return peerId;
+            }
+
+            return "";
+        }
+        catch ( Exception ex )
+        {
+            return "";
+        }
+    }
+
+
     @Override
     public Response processRegisterRequest( String peer )
     {
@@ -195,7 +227,8 @@ public class RestServiceImpl implements RestService
             else
             {
                 //Encrypt Local Peer
-                PGPPublicKey   pkey = keyManager.getRemoteHostPublicKey( p.getId().toString(),p.getIp() );
+                getAndStorePeerPublicKey(p.getId().toString(),p.getIp());
+                PGPPublicKey   pkey = keyManager.getPublicKey( p.getId().toString() );
                 PeerInfo localPeer = peerManager.getLocalPeerInfo();
 
                 if(pkey!=null)
@@ -653,6 +686,29 @@ public class RestServiceImpl implements RestService
         }
     }
 
+
+    private String encryptData(String dataSTR,HttpHeaders headers)
+    {
+        String hostId   = headers.getHeaderString( Common.ENVIRONMENT_ID_HEADER_NAME  );
+        String remoteIp = headers.getHeaderString( "PEER_IP"  );
+
+
+        EncryptionTool encTool = securityManager.getEncryptionTool();
+        KeyManager keyManager  = securityManager.getKeyManager();
+        PGPPublicKey pubkey    = keyManager.getPublicKey(hostId  );
+
+        if(pubkey == null)
+        {
+            getAndStorePeerPublicKey( hostId,remoteIp );
+            pubkey    = keyManager.getPublicKey(hostId  );
+        }
+
+        byte[] data  = encTool.encrypt(dataSTR.getBytes(),pubkey,false);
+
+        return HexUtil.byteArrayToHexString( data ) ;
+    }
+
+
     @Override
     public Response getContainerState( final String containerId)
     {
@@ -665,6 +721,10 @@ public class RestServiceImpl implements RestService
                     localPeer.getContainerHostById( UUID.fromString( containerId ) ).getState();
 
             String jsonData = jsonUtil.to( containerHostState );
+
+            //***** ENC  ************************************
+            //String output = encryptData( jsonData, headers );
+            //***********************************************
 
             return Response.ok( jsonData ).build();
         }

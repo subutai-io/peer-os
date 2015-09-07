@@ -1367,7 +1367,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void addToN2NTunnel( final N2NConfig config )
+    public void setupN2NConnection( final N2NConfig config )
     {
         LOG.debug( String.format( "Adding remote peer to n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
                 config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
@@ -1391,7 +1391,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void removeFromTunnel( final N2NConfig config ) throws PeerException
+    public void removeN2NConnection( final N2NConfig config ) throws PeerException
     {
         LOG.debug( String.format( "Removing remote peer from n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
                 config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );

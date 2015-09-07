@@ -54,7 +54,7 @@ public class CreateTunnelCommand extends OsgiCommandSupport
             System.out.println( String.format( "\tAdding peer %s to tunnel...", peerId ) );
             peerSet.add( peerManager.getPeer( peerId ) );
         }
-        List<N2NConfig> tunnelNetwork = environmentManager.createN2NTunnel( peerSet );
+        List<N2NConfig> tunnelNetwork = environmentManager.setupN2NConnection( peerSet );
         System.out.println( "Tunnel created successfully: " + tunnelNetwork.size() );
         for ( N2NConfig config : tunnelNetwork )
         {

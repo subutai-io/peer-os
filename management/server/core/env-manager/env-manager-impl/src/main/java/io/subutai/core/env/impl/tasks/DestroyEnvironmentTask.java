@@ -15,7 +15,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.peer.ContainerHost;
@@ -119,7 +118,7 @@ public class DestroyEnvironmentTask implements Awaitable
 
             try
             {
-                environmentManager.removeN2NTunnel( environment );
+                environmentManager.removeN2NConnection( environment );
                 op.addLog( "N2N tunnel destroyed successfully." );
             }
             catch ( EnvironmentManagerException e )

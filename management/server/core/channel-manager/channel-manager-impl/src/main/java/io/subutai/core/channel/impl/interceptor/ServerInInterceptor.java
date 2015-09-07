@@ -50,63 +50,66 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
     {
         try
         {
-            URL url = new URL( ( String ) message.get( Message.REQUEST_URL ) );
-
-            String basePath = url.getPath();
-            int status = 0;
-
-            status = checkUrlAccessibility( status, url, basePath, message );
-            //----------------------------------------------------------------------------------------------
-            //--------------- if error occurs --------------------------------------------------------------
-            if ( status != 0 )
+            if ( InterceptorState.isActive( message, InterceptorState.SERVER_IN ) )
             {
-                String error = "";
-                int errorStatus = 0;
-                HttpServletResponse response = ( HttpServletResponse ) message.getExchange().getInMessage()
-                                                                              .get( AbstractHTTPDestination
-                                                                                      .HTTP_RESPONSE );
-                if ( status == 1 )
-                {
-                    errorStatus = 403;
-                    error = "*********  Access to " + basePath + "  is blocked (403) **********************";
-                }
-                else if ( status == 2 )
-                {
-                    errorStatus = 404;
-                    error = "*********  Access to " + basePath + "  is blocked (404) **********************";
-                }
+                URL url = new URL( ( String ) message.get( Message.REQUEST_URL ) );
 
-                try
-                {
-                    response.setStatus( errorStatus );
-                    response.getOutputStream().write( error.getBytes( Charset.forName( "UTF-8" ) ) );
-                    response.getOutputStream().flush();
-                }
-                catch ( Exception e )
-                {
-                    LOG.error( "Error writing to response: " + e.toString(), e );
-                }
-                LOG.warn( error );
-                message.getInterceptorChain().abort();
-            }
-            else
-            {
-                if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ))
-                {
-                    HttpHeaders headers = new HttpHeadersImpl(message.getExchange().getInMessage());
+                String basePath = url.getPath();
+                int status = 0;
 
-                    if( !Strings.isNullOrEmpty(headers.getHeaderString( Common.SECURED_HEADER_NAME )))
+                status = checkUrlAccessibility( status, url, basePath, message );
+                //----------------------------------------------------------------------------------------------
+                //--------------- if error occurs --------------------------------------------------------------
+                if ( status != 0 )
+                {
+                    String error = "";
+                    int errorStatus = 0;
+                    HttpServletResponse response = ( HttpServletResponse ) message.getExchange().getInMessage()
+                                                                                  .get( AbstractHTTPDestination
+                                                                                          .HTTP_RESPONSE );
+                    if ( status == 1 )
                     {
-                        String envId  = headers.getHeaderString( Common.ENVIRONMENT_ID_HEADER_NAME );
-                        String peerId = headers.getHeaderString( Common.PEER_ID_HEADER_NAME);
+                        errorStatus = 403;
+                        error = "*********  Access to " + basePath + "  is blocked (403) **********************";
+                    }
+                    else if ( status == 2 )
+                    {
+                        errorStatus = 404;
+                        error = "*********  Access to " + basePath + "  is blocked (404) **********************";
+                    }
 
-                        if(!Strings.isNullOrEmpty( envId ))
+                    try
+                    {
+                        response.setStatus( errorStatus );
+                        response.getOutputStream().write( error.getBytes( Charset.forName( "UTF-8" ) ) );
+                        response.getOutputStream().flush();
+                    }
+                    catch ( Exception e )
+                    {
+                        LOG.error( "Error writing to response: " + e.toString(), e );
+                    }
+                    LOG.warn( error );
+                    message.getInterceptorChain().abort();
+                }
+                else
+                {
+                    if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
+                    {
+                        HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
+
+                        if ( !Strings.isNullOrEmpty( headers.getHeaderString( Common.SECURED_HEADER_NAME ) ) )
                         {
+                            String envId = headers.getHeaderString( Common.ENVIRONMENT_ID_HEADER_NAME );
+                            String peerId = headers.getHeaderString( Common.PEER_ID_HEADER_NAME );
 
-                        }
-                        else if(!Strings.isNullOrEmpty( peerId ))
-                        {
+                            if ( !Strings.isNullOrEmpty( envId ) )
+                            {
 
+                            }
+                            else if ( !Strings.isNullOrEmpty( peerId ) )
+                            {
+
+                            }
                         }
                     }
                 }
@@ -148,5 +151,4 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
         }
         return status;
     }
-
 }

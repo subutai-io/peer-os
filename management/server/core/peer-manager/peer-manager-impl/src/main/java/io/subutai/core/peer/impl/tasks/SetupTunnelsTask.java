@@ -51,8 +51,6 @@ public class SetupTunnelsTask implements Callable<Integer>
                             environmentId ) );
         }
 
-        //setup tunnels to each remote peer
-        Set<Tunnel> tunnels = networkManager.listTunnels();
 
         //remove local IP, just in case
         peerIps.remove( managementHost.getExternalIp() );
@@ -61,6 +59,10 @@ public class SetupTunnelsTask implements Callable<Integer>
         for ( String peerIp : peerIps.keySet() )
         {
             LOG.debug( String.format( "Setting up tunnel on : %s", peerIp ) );
+
+            //setup tunnels to each remote peer
+            Set<Tunnel> tunnels = networkManager.listTunnels();
+
             String tunnelIp = peerIps.get( peerIp );
             int tunnelId = managementHost.findTunnel( tunnelIp, tunnels );
             //tunnel not found, create new one

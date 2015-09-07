@@ -75,14 +75,14 @@ public interface ManagementHost extends Host
     /**
      * Removes a tunnel to remote peer
      */
-    void removeTunnel( String peerIp ) throws PeerException;
+    void removeTunnel( String tunnelIp ) throws PeerException;
 
     /**
      * Returns external IP of mgmt host
      */
     String getExternalIp();
 
-    void addToTunnel( N2NConfig config ) throws PeerException;
+    void setupN2NConnection( N2NConfig config ) throws PeerException;
 
     /**
      * Returns reverse proxy environment domain assigned to vlan if any
@@ -132,5 +132,5 @@ public interface ManagementHost extends Host
      */
     void removeIpFromVlanDomain( String hostIp, int vlan ) throws PeerException;
 
-    void removeFromTunnel( N2NConfig config ) throws PeerException;
+    void removeN2NConnection( N2NConfig config ) throws PeerException;
 }

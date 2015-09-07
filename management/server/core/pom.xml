@@ -46,6 +46,7 @@
     <module>node-registration</module>
     <module>http-context-factory</module>
     <module>gateway</module>
+    <module>h-integration</module>
   </modules>
 
 </project>

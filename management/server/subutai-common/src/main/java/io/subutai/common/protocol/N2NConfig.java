@@ -50,8 +50,9 @@ public class N2NConfig
     }
 
 
-    public N2NConfig( final String interfaceName, final String communityName )
+    public N2NConfig( final String address, final String interfaceName, final String communityName )
     {
+        this.address = address;
         this.interfaceName = interfaceName;
         this.communityName = communityName;
     }

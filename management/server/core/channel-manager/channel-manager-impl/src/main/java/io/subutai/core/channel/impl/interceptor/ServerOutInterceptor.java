@@ -1,7 +1,10 @@
 package io.subutai.core.channel.impl.interceptor;
 
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -14,7 +17,10 @@ import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.io.CacheAndWriteOutputStream;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -37,7 +43,7 @@ import io.subutai.core.security.api.crypto.KeyManager;
 /**
  * Out Interceptor
  */
-public class ServerOutInterceptor  extends AbstractPhaseInterceptor<Message>
+public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( ServerOutInterceptor.class );
@@ -46,95 +52,125 @@ public class ServerOutInterceptor  extends AbstractPhaseInterceptor<Message>
 
     public ServerOutInterceptor( ChannelManagerImpl channelManagerImpl )
     {
-        super( Phase.POST_INVOKE );
+        super( Phase.PRE_STREAM );
         this.channelManagerImpl = channelManagerImpl;
     }
 
 
     /**
-     * Intercepts a message.
-     * interceptor chain will take care of this.
+     * Intercepts a message. interceptor chain will take care of this.
      */
     @Override
     public void handleMessage( final Message message )
     {
         try
         {
-            LOG.info( "Server OutInterceptor invoked ");
-            boolean requestor = MessageUtils. isRequestor( message );
+            if ( InterceptorState.isActive( message, InterceptorState.SERVER_OUT ) )
+            {
+                LOG.info( "Server OutInterceptor invoked " );
 
+                HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
 
-            //int responseCode = (Integer) message.get(Message.RESPONSE_CODE);
+                String secured = headers.getHeaderString( Common.SECURED_HEADER_NAME );
 
-            //URL url = new URL( ( String ) message.get( Message. REQUEST_URL ) );
-
-
-            //***********************************************************************
-            //if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X1 ))
-            //{
-                HttpHeaders headers = new HttpHeadersImpl(message.getExchange().getInMessage());
-
-                HttpServletResponse res = (HttpServletResponse) message.get(AbstractHTTPDestination.HTTP_RESPONSE);
-                HttpServletRequest  req = (HttpServletRequest) message.get(AbstractHTTPDestination.HTTP_REQUEST);
-
-                 Object endpointAddress = message.getExchange().get( Message.ENDPOINT_ADDRESS );
-            String clientAddress = req.getRemoteAddr();
-
-            String remoteIp = headers.getHeaderString( Common.SECURED_HEADER_NAME );
-
-                if( !Strings.isNullOrEmpty( remoteIp ))
+                if ( !Strings.isNullOrEmpty( secured ) )
                 {
-                    String envId  = headers.getHeaderString( Common.ENVIRONMENT_ID_HEADER_NAME );
-                    String peerId = headers.getHeaderString( Common.PEER_ID_HEADER_NAME);
-
-                    //OutputStream os = message.getContent(OutputStream.class);
-                    //OutputStream os2 = message.getExchange().getOutMessage().getContent( OutputStream.class );
-                    //ByteArrayOutputStream bt = new ByteArrayOutputStream( os);
-                    //String out = os.toString();
+                    String envId = headers.getHeaderString( Common.ENVIRONMENT_ID_HEADER_NAME );
+                    String peerId = headers.getHeaderString( Common.PEER_ID_HEADER_NAME );
 
 
-
-                    //responseCode = (Integer) message.get(Message.RESPONSE_CODE);
-                    if(message.get(Message.INBOUND_MESSAGE)!=null)
+                    if ( !Strings.isNullOrEmpty( envId ) )
                     {
-                        String  str  = (String)message.get(Message.INBOUND_MESSAGE);
+                        //String outData = getData(message);
+                        //String encryptedData = encryptData( envId, "", outData);
                     }
-
-
-                    if(!Strings.isNullOrEmpty( envId ))
+                    else if ( !Strings.isNullOrEmpty( peerId ) )
                     {
-                        String encryptedData = encryptData( envId,remoteIp,"ENCRYPTED_DATA TEST");
-                    }
-                    else if(!Strings.isNullOrEmpty( peerId ))
-                    {
-                        String encryptedData = encryptData( peerId,remoteIp,"ENCRYPTED_DATA TEST");
+                        //String outData = getData(message);
+                        //String encryptedData = encryptData( peerId, "", outData );
                     }
                 }
-            //}
-            //***********************************************************************
-
-
+                //}
+                //***********************************************************************
+            }
         }
         catch ( Exception ignore )
         {
             LOG.debug( "MalformedURLException", ignore.toString() );
         }
-
     }
 
 
     /* ******************************************************
      *
      */
-    private String encryptData(String hostId,String ip,String dataStr)
+    private void encryptData(String hostId, String ip,Message message)
     {
-        EncryptionTool encTool = channelManagerImpl.getSecurityManager().getEncryptionTool();
-        KeyManager keyMan      = channelManagerImpl.getSecurityManager().getKeyManager();
-        PGPPublicKey pubKey    = keyMan.getRemoteHostPublicKey ( hostId , ip );
+        try
+        {
+            OutputStream out = message.getContent( OutputStream.class );
+            final CacheAndWriteOutputStream newOut = new CacheAndWriteOutputStream( out );
 
-        byte[]data = encTool.encrypt(dataStr.getBytes(),pubKey,false );
 
-        return HexUtil.byteArrayToHexString( data );
+            CachedOutputStream csnew = (CachedOutputStream) message .getContent(OutputStream.class);
+            String currentEnvelopeMessage = IOUtils.toString( csnew.getInputStream(), (String) message.get(Message.ENCODING));
+
+
+            res = res != null ? res : currentEnvelopeMessage;
+            InputStream replaceInStream = IOUtils.tolnputStream(res, (String) message.get(Message.ENCODING));
+            IOUtils.copy(replaceInStream, os);
+            replaceInStream.close();
+            IOUtils.closeQuietly(replaceInStream);
+            message.setContent(OutputStream.class, os);
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+
+
+            OutputStream out = message.getContent( OutputStream.class );
+
+            if(out == null)
+            {
+            }
+            else
+            {
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                IOUtils.copy( out, os );
+                is.close();
+
+                byte []outData = encryptData( hostId, ip, os.toByteArray() );
+                os.close();
+
+//                os.write( outData );
+//                os.flush();
+
+                message.setContent(OutputStream.class, os);
+
+            }
+        }
+        catch ( IOException e )
+        {
+            LOG.error( " ******** Error encrypting data OutServer data :", e );
+        }
+    }
+
+
+    /* ******************************************************
+     *
+     */
+    private byte[] encryptData( String hostId, String ip, byte[] data )
+    {
+        if(data == null)
+            return null;
+        else
+        {
+            EncryptionTool encTool = channelManagerImpl.getSecurityManager().getEncryptionTool();
+            KeyManager keyMan = channelManagerImpl.getSecurityManager().getKeyManager();
+            PGPPublicKey pubKey = keyMan.getRemoteHostPublicKey( hostId, ip );
+
+            byte[] outData = encTool.encrypt( data, pubKey, false );
+
+            return outData;
+        }
     }
 
 
