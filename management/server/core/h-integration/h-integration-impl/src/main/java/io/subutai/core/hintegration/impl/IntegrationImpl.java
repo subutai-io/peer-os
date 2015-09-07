@@ -223,8 +223,8 @@ public class IntegrationImpl implements Integration
 
             LOG.debug( "Is encryption key of owner?:" + ownerSecretKeyRing.getPublicKey().isEncryptionKey() );
             LOG.debug( "Is encryption key of peer?:" + publicKeyRing.getPublicKey().isEncryptionKey() );
-            LOG.debug( "Is signed: " + PGPKeyHelper
-                    .isSignedBy( publicKeyRing.getPublicKey(), ownerSecretKeyRing.getPublicKey() ) );
+            LOG.debug( "Is signed: " + PGPEncryptionUtil.verifyPublicKey( publicKeyRing.getPublicKey(), OWNER_USER_ID,
+                    ownerSecretKeyRing.getPublicKey() ) );
             //
             //            //****************Loading hub key from resources ****************************************
             //            InputStream is = bundleContext.getBundle().getEntry( "keys/hub.public.gpg" ).openStream();
