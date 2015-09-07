@@ -56,7 +56,7 @@ public class Step3Interceptor extends AbstractPhaseInterceptor<Message>
                 StringBuilder builder = new StringBuilder();
                 cos.writeCacheTo( builder );
                 String out = builder.toString();
-                System.out.println( String.format( "STEP 3%n%s", out ) );
+                LOG.warn( String.format( "STEP 3%n%s", out ) );
             }
             catch ( Exception e )
             {

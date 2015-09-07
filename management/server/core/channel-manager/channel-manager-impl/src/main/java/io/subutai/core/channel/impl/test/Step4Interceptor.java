@@ -39,7 +39,7 @@ public class Step4Interceptor extends AbstractPhaseInterceptor<Message>
                 os.flush();
                 message.setContent( InputStream.class, os.getInputStream() );
                 is.close();
-                System.out.println( String.format( "STEP 4%n%s", IOUtils.toString( os.getInputStream() ) ) );
+                LOG.warn( String.format( "STEP 4%n%s", IOUtils.toString( os.getInputStream() ) ) );
             }
             catch ( IOException e )
             {
