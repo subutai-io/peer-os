@@ -3,6 +3,7 @@ package io.subutai.core.security.api.crypto;
 
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
 import io.subutai.common.security.crypto.pgp.KeyPair;
@@ -76,4 +77,8 @@ public interface EncryptionTool
      * @return - KeyPair
      */
     public KeyPair generateKeyPair ( String userId,String secretPwd, boolean armored );
+
+
+
+    public byte[] decrypt( final byte[] message, PGPSecretKeyRing keyRing , String pwd) throws PGPException;
 }

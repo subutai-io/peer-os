@@ -66,20 +66,25 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
     {
         try
         {
-            if ( InterceptorState.isActive( message, InterceptorState.SERVER_OUT ) )
+            if ( InterceptorState.SERVER_OUT.isActive( message ) )
             {
                 LOG.info( "Server OutInterceptor invoked " );
+
+                URL url = new URL( ( String ) message.getExchange().getInMessage().get( Message.REQUEST_URL ) );
 
                 HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
 
                 String secured = headers.getHeaderString( Common.SECURED_HEADER_NAME );
 
-                if ( !Strings.isNullOrEmpty( secured ) )
+
+                if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
                 {
+                    HttpServletRequest req = ( HttpServletRequest ) message.getExchange().getInMessage().get( AbstractHTTPDestination.HTTP_REQUEST );
+                    String remoteIp = req.getRemoteAddr();
                     String envId = headers.getHeaderString( Common.ENVIRONMENT_ID_HEADER_NAME );
                     String peerId = headers.getHeaderString( Common.PEER_ID_HEADER_NAME );
 
-                    encryptData( envId,"" ,message);
+                    encryptData( envId,remoteIp,message);
 
                     if ( !Strings.isNullOrEmpty( envId ) )
                     {

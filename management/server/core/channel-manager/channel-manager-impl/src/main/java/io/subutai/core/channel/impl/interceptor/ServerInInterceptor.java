@@ -50,7 +50,7 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
     {
         try
         {
-            if ( InterceptorState.isActive( message, InterceptorState.SERVER_IN ) )
+            if ( InterceptorState.SERVER_IN.isActive( message ) )
             {
                 URL url = new URL( ( String ) message.get( Message.REQUEST_URL ) );
 

@@ -1,14 +1,34 @@
 package io.subutai.core.channel.impl.interceptor;
 
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.HttpHeaders;
+
+import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
+import com.google.common.base.Strings;
+
+import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.settings.Common;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
+import io.subutai.core.security.api.crypto.EncryptionTool;
+import io.subutai.core.security.api.crypto.KeyManager;
 
 
 /**
@@ -34,9 +54,32 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
     {
         try
         {
-            if(InterceptorState.isActive( message,InterceptorState.CLIENT_IN ))
+            if ( InterceptorState.CLIENT_IN.isActive( message ) )
             {
                 LOG.info( " ****** Client InInterceptor invoked ******** " );
+
+                URL url = new URL( ( String ) message.getExchange().getOutMessage().get( Message.ENDPOINT_ADDRESS ) );
+
+                if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
+                {
+                    HttpHeaders headers = new HttpHeadersImpl( message);
+
+                    String envId = headers.getHeaderString( Common.ENVIRONMENT_ID_HEADER_NAME );
+                    String peerId = headers.getHeaderString( Common.PEER_ID_HEADER_NAME );
+
+                    decrData( message ,envId );
+
+                    if ( !Strings.isNullOrEmpty( envId ) )
+                    {
+                        //String outData = getData(message);
+                    }
+                    else if ( !Strings.isNullOrEmpty( peerId ) )
+                    {
+                        //String outData = getData(message);
+                        //String encryptedData = encryptData( peerId, "", outData );
+                    }
+
+                }
             }
         }
         catch(Exception ex)
@@ -44,4 +87,56 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
 
         }
     }
+
+    private void decrData( Message message, String hostId )
+    {
+
+        InputStream is = message.getContent( InputStream.class );
+        CachedOutputStream os = new CachedOutputStream();
+        try
+        {
+            IOUtils.copy( is, os );
+            os.flush();
+
+            is.close();
+
+            byte[] data = decrData(hostId,os.getBytes());
+
+            message.setContent( InputStream.class, new ByteArrayInputStream( data ));
+
+        }
+        catch ( IOException e )
+        {
+            LOG.error( "STEP 2 error", e );
+        }
+    }
+
+
+    /* ******************************************************
+     *
+     */
+    private byte[] decrData( String hostId, byte[] data )
+    {
+
+        try
+        {
+            if ( data == null ) return null;
+            else
+            {
+                EncryptionTool encTool = channelManagerImpl.getSecurityManager().getEncryptionTool();
+                KeyManager keyMan = channelManagerImpl.getSecurityManager().getKeyManager();
+                PGPSecretKeyRing secKey = keyMan.getSecretKeyRing(  hostId );
+
+                byte[] outData = encTool.decrypt( data, secKey, "12345678" );
+
+                return outData;
+            }
+        }
+        catch(Exception ex)
+        {
+            return null;
+        }
+    }
+
+    //******************************************************************
 }

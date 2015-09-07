@@ -34,7 +34,7 @@ public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
     {
         try
         {
-            if(InterceptorState.isActive( message,InterceptorState.CLIENT_OUT ))
+            if ( InterceptorState.CLIENT_OUT.isActive( message ) )
             {
                 LOG.info( " ****** Client OutInterceptor invoked ******** " );
             }

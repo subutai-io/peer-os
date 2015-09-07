@@ -89,12 +89,10 @@ public class PGPEncryptionUtil
     public static final BouncyCastleProvider provider = new BouncyCastleProvider();
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
-
     static
     {
         Security.addProvider( provider );
     }
-
 
     public static byte[] encrypt( final byte[] message, final PGPPublicKey publicKey, boolean armored )
             throws PGPException
@@ -128,6 +126,20 @@ public class PGPEncryptionUtil
         catch ( Exception e )
         {
             throw new PGPException( "Error in encrypt", e );
+        }
+    }
+
+
+    public static byte[] decrypt( final byte[] encryptedMessage, final PGPSecretKeyRing secretKeyRing,
+                                  final String secretPwd ) throws PGPException
+    {
+        try
+        {
+            return decrypt( encryptedMessage, new ByteArrayInputStream( secretKeyRing.getEncoded() ), secretPwd );
+        }
+        catch ( IOException e )
+        {
+            throw new PGPException( e.getMessage() );
         }
     }
 

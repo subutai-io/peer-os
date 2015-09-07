@@ -1,8 +1,11 @@
 package io.subutai.core.security.impl.crypto;
 
 
+import java.io.InputStream;
+
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,6 +92,17 @@ public class EncryptionToolImpl implements EncryptionTool
     {
         return PGPEncryptionUtil
                 .decrypt( message,keyManager.getSecretKeyRingInputStream( null ), keyManager.getSecurityKeyData().getSecretKeyringPwd() );
+    }
+
+
+    /* *****************************************
+     *
+     */
+    @Override
+    public byte[] decrypt( final byte[] message, PGPSecretKeyRing keyRing , String pwd) throws PGPException
+    {
+        return PGPEncryptionUtil
+                .decrypt( message,keyRing, pwd );
     }
 
 
