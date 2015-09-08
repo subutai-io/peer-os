@@ -1273,7 +1273,7 @@ public class PGPEncryptionUtil
      * @return a public key ring with the signed public key
      */
     public static PGPPublicKeyRing signPublicKey( PGPPublicKeyRing publicKeyRing, String id, PGPSecretKey secretKey,
-                                                  String secretKeyPassword )
+                                                  String secretKeyPassword ) throws PGPException
     {
         try
         {
@@ -1295,7 +1295,7 @@ public class PGPEncryptionUtil
         catch ( Exception e )
         {
             //throw custom  exception
-            throw new RuntimeException( e );
+            throw new PGPException( "Error signing public key", e );
         }
     }
 
@@ -1310,17 +1310,26 @@ public class PGPEncryptionUtil
      * @return true if verified, false otherwise
      */
     public static boolean verifyPublicKey( PGPPublicKey keyToVerify, String id, PGPPublicKey keyToVerifyWith )
+            throws PGPException
     {
         try
         {
-            PGPSignature signature = ( PGPSignature ) keyToVerify.getSignatures().next();
-            signature.init( new JcaPGPContentVerifierBuilderProvider().setProvider( "BC" ), keyToVerifyWith );
-            return signature.verifyCertification( id.getBytes(), keyToVerify );
+            Iterator<PGPSignature> signIterator = keyToVerify.getSignatures();
+            while ( signIterator.hasNext() )
+            {
+                PGPSignature signature = signIterator.next();
+                signature.init( new JcaPGPContentVerifierBuilderProvider().setProvider( "BC" ), keyToVerifyWith );
+                if ( signature.verifyCertification( id.getBytes(), keyToVerify ) )
+                {
+                    return true;
+                }
+            }
+            return false;
         }
         catch ( Exception e )
         {
             //throw custom  exception
-            throw new RuntimeException( e );
+            throw new PGPException( "Error verifying public key", e );
         }
     }
 }
