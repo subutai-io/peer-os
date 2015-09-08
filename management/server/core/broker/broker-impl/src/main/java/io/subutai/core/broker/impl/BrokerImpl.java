@@ -308,6 +308,7 @@ public class BrokerImpl implements Broker
             //tune connection factory
             amqFactory.setWatchTopicAdvisories( false );
             amqFactory.setCheckForDuplicates( true );
+            amqFactory.setUseAsyncSend( true );
         }
         return amqFactory;
     }
