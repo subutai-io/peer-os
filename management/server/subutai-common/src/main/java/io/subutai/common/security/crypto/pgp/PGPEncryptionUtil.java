@@ -1098,6 +1098,7 @@ public class PGPEncryptionUtil
         return generateKeyRingGenerator( userId, secretPwd.toCharArray(), 0xc0, 2048, keyPair );
     }
 
+
     // Note: s2kcount is a number between 0 and 0xff that controls the
     // number of times to iterate the password hash before use. More
     // iterations are useful against offline attacks, as it takes more
@@ -1110,8 +1111,6 @@ public class PGPEncryptionUtil
     // or about 1 million iterations. The maximum you can go to is
     // 0xff, or about 2 million iterations.  I'll use 0xc0 as a
     // default -- about 130,000 iterations.
-
-
     private static PGPKeyRingGenerator generateKeyRingGenerator( String id, char[] pass, int s2kcount, int keySize,
                                                                  KeyPair keyPair ) throws Exception
     {
@@ -1124,7 +1123,7 @@ public class PGPEncryptionUtil
         kpg.init( new RSAKeyGenerationParameters( BigInteger.valueOf( 0x10001 ), new SecureRandom(), keySize, 12 ) );
 
         // First create the master (signing) key with the generator.
-        PGPKeyPair rsakp_sign = new BcPGPKeyPair( PGPPublicKey.RSA_SIGN, kpg.generateKeyPair(), new Date() );
+        PGPKeyPair rsakp_sign = new BcPGPKeyPair( PGPPublicKey.RSA_GENERAL, kpg.generateKeyPair(), new Date() );
         // Then an encryption subkey.
         PGPKeyPair rsakp_enc = new BcPGPKeyPair( PGPPublicKey.RSA_GENERAL, kpg.generateKeyPair(), new Date() );
 
@@ -1135,6 +1134,7 @@ public class PGPEncryptionUtil
 
         // Add a self-signature on the id
         PGPSignatureSubpacketGenerator signhashgen = new PGPSignatureSubpacketGenerator();
+        //        signhashgen.setTrust(false, 0, 3);
 
         // Add signed metadata on the signature.
         // 1) Declare its purpose
@@ -1142,11 +1142,15 @@ public class PGPEncryptionUtil
         // 2) Set preferences for secondary crypto algorithms to use
         //    when sending messages to this key.
         signhashgen.setPreferredSymmetricAlgorithms( false, new int[] {
-                SymmetricKeyAlgorithmTags.AES_256, SymmetricKeyAlgorithmTags.AES_192, SymmetricKeyAlgorithmTags.AES_128
+                SymmetricKeyAlgorithmTags.AES_256, SymmetricKeyAlgorithmTags.AES_192, SymmetricKeyAlgorithmTags.AES_128,
+                SymmetricKeyAlgorithmTags.CAST5, SymmetricKeyAlgorithmTags.TRIPLE_DES
         } );
         signhashgen.setPreferredHashAlgorithms( false, new int[] {
                 HashAlgorithmTags.SHA256, HashAlgorithmTags.SHA1, HashAlgorithmTags.SHA384, HashAlgorithmTags.SHA512,
                 HashAlgorithmTags.SHA224,
+        } );
+        signhashgen.setPreferredCompressionAlgorithms( false, new int[] {
+                CompressionAlgorithmTags.ZLIB, CompressionAlgorithmTags.BZIP2, CompressionAlgorithmTags.ZIP
         } );
         // 3) Request senders add additional checksums to the
         //    message (useful when verifying unsigned messages.)
@@ -1157,6 +1161,7 @@ public class PGPEncryptionUtil
         // Add metadata to declare its purpose
         enchashgen.setKeyFlags( false, KeyFlags.ENCRYPT_COMMS | KeyFlags.ENCRYPT_STORAGE );
 
+        //        enchashgen.setTrust(false, 0, 3);
         // Objects used to encrypt the secret key.
         PGPDigestCalculator sha1Calc = new BcPGPDigestCalculatorProvider().get( HashAlgorithmTags.SHA1 );
         PGPDigestCalculator sha256Calc = new BcPGPDigestCalculatorProvider().get( HashAlgorithmTags.SHA256 );
@@ -1171,7 +1176,7 @@ public class PGPEncryptionUtil
         // takes parameters that allow it to generate the self
         // signature.
         PGPKeyRingGenerator keyRingGen =
-                new PGPKeyRingGenerator( PGPSignature.DEFAULT_CERTIFICATION, rsakp_sign, id, sha1Calc,
+                new PGPKeyRingGenerator( PGPSignature.POSITIVE_CERTIFICATION, rsakp_sign, id, sha1Calc,
                         signhashgen.generate(), null,
                         new BcPGPContentSignerBuilder( rsakp_sign.getPublicKey().getAlgorithm(),
                                 HashAlgorithmTags.SHA1 ), pske );
@@ -1256,7 +1261,7 @@ public class PGPEncryptionUtil
      * @return a public key ring with the signed public key
      */
     public static PGPPublicKeyRing signPublicKey( PGPPublicKeyRing publicKeyRing, String id, PGPSecretKey secretKey,
-                                                  String secretKeyPassword )
+                                                  String secretKeyPassword ) throws PGPException
     {
         try
         {
@@ -1278,7 +1283,7 @@ public class PGPEncryptionUtil
         catch ( Exception e )
         {
             //throw custom  exception
-            throw new RuntimeException( e );
+            throw new PGPException( "Error signing public key", e );
         }
     }
 
@@ -1293,17 +1298,26 @@ public class PGPEncryptionUtil
      * @return true if verified, false otherwise
      */
     public static boolean verifyPublicKey( PGPPublicKey keyToVerify, String id, PGPPublicKey keyToVerifyWith )
+            throws PGPException
     {
         try
         {
-            PGPSignature signature = ( PGPSignature ) keyToVerify.getSignatures().next();
-            signature.init( new JcaPGPContentVerifierBuilderProvider().setProvider( "BC" ), keyToVerifyWith );
-            return signature.verifyCertification( id.getBytes(), keyToVerify );
+            Iterator<PGPSignature> signIterator = keyToVerify.getSignatures();
+            while ( signIterator.hasNext() )
+            {
+                PGPSignature signature = signIterator.next();
+                signature.init( new JcaPGPContentVerifierBuilderProvider().setProvider( "BC" ), keyToVerifyWith );
+                if ( signature.verifyCertification( id.getBytes(), keyToVerify ) )
+                {
+                    return true;
+                }
+            }
+            return false;
         }
         catch ( Exception e )
         {
             //throw custom  exception
-            throw new RuntimeException( e );
+            throw new PGPException( "Error verifying public key", e );
         }
     }
 }
