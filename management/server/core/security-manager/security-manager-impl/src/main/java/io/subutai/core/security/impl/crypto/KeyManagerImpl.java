@@ -91,11 +91,12 @@ public class KeyManagerImpl implements KeyManager
     {
         try
         {
-            // Create New KeyRings;
-            LOG.info( "******** Creating Key new keyring *******" );
+            String fingerprint = securityManagerDAO.getSecretKeyFingerprint( keyData.getManHostId() );
 
-            String fingerprint = securityManagerDAO.getSecretKeyFingerprint( hostId );
+            if(Strings.isNullOrEmpty( fingerprint ))
             {
+                // Create New KeyRings;
+                LOG.info( "******** Creating Key new keyring *******" );
                 saveKeyPair( keyData.getManHostId(),(short)1, generateKeyPair( keyData.getManHostId(), false ) );
             }
         }

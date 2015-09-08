@@ -8,10 +8,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.feature.AbstractFeature;
 
 import io.subutai.core.channel.impl.ChannelManagerImpl;
-import io.subutai.core.channel.impl.test.Step1Interceptor;
-import io.subutai.core.channel.impl.test.Step2Interceptor;
-import io.subutai.core.channel.impl.test.Step3Interceptor;
-import io.subutai.core.channel.impl.test.Step4Interceptor;
 
 
 /**

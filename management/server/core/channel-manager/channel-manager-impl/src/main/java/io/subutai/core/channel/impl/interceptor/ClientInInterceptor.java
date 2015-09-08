@@ -64,12 +64,13 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
                 {
                     HttpHeaders headers = new HttpHeadersImpl( message);
 
-                    String envId   = headers.getHeaderString( Common.ENVIRONMENT_ID_HEADER_NAME );
-                    String peerId  = headers.getHeaderString( Common.PEER_ID_HEADER_NAME );
-                    String secured = headers.getHeaderString( Common.SECURED_HEADER_NAME );
+                    String spHeader = headers.getHeaderString( Common.SPECIAL_HEADER_NAME );
 
-                    if(!Strings.isNullOrEmpty( secured ))
+                    if(!Strings.isNullOrEmpty( spHeader ))
                     {
+                        String envId   = headers.getHeaderString( Common.ENVIRONMENT_ID_HEADER_NAME );
+                        String peerId  = headers.getHeaderString( Common.PEER_ID_HEADER_NAME );
+
                         if ( !Strings.isNullOrEmpty( envId ) )
                         {
                             decrData( message ,envId );

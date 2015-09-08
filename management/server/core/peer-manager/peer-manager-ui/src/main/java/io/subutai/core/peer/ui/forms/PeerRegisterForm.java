@@ -37,6 +37,7 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerStatus;
 import io.subutai.common.security.utils.io.HexUtil;
 import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
@@ -516,6 +517,12 @@ public class PeerRegisterForm extends CustomComponent
     {
         String baseUrl = String.format( "https://%s:%s/cxf", remotePeerInfo.getIp(), ChannelSettings.SECURE_PORT_X2 );
         WebClient client = RestUtil.createTrustedWebClientWithAuth( baseUrl, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS );
+
+        //*********construct Secure Header ****************************
+        client.header( Common.SPECIAL_HEADER_NAME, "ENC" );
+        client.header( Common.PEER_ID_HEADER_NAME, peerToUnregister.getId().toString() );
+        //*************************************************************
+
         try
         {
             Response response = client.path( "peer/unregister" ).type( MediaType.APPLICATION_JSON )
@@ -530,8 +537,6 @@ public class PeerRegisterForm extends CustomComponent
 
                 module.getSecurityManager().getKeyStoreManager()
                       .removeCertFromTrusted( ChannelSettings.SECURE_PORT_X2, remotePeerInfo.getId().toString() );
-
-                module.getSecurityManager().getKeyManager().getPublicKeyRing( remotePeerInfo.getId().toString()  );
 
                 module.getPeerManager().unregister( remotePeerInfo.getId().toString() );
 
