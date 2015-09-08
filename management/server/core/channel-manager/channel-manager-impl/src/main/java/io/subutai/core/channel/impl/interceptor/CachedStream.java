@@ -1,4 +1,4 @@
-package io.subutai.core.channel.impl.test;
+package io.subutai.core.channel.impl.interceptor;
 
 
 import java.io.IOException;

@@ -2,41 +2,30 @@ package io.subutai.core.channel.impl.interceptor;
 
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
-import org.apache.http.HttpResponse;
 
 import com.google.common.base.Strings;
 
-import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
-import io.subutai.common.security.utils.io.HexUtil;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.Common;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
-import io.subutai.core.channel.impl.test.CachedStream;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 
@@ -72,31 +61,31 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
 
                 URL url = new URL( ( String ) message.getExchange().getInMessage().get( Message.REQUEST_URL ) );
 
-                HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
-
-                String secured = headers.getHeaderString( Common.SECURED_HEADER_NAME );
-
-
                 if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
                 {
-                    HttpServletRequest req = ( HttpServletRequest ) message.getExchange().getInMessage().get( AbstractHTTPDestination.HTTP_REQUEST );
-                    String remoteIp = req.getRemoteAddr();
-                    String envId = headers.getHeaderString( Common.ENVIRONMENT_ID_HEADER_NAME );
-                    String peerId = headers.getHeaderString( Common.PEER_ID_HEADER_NAME );
+                    HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
 
-                    encryptData( envId,remoteIp,message);
+                    String spHeader = headers.getHeaderString( Common.SPECIAL_HEADER_NAME );
 
-                    if ( !Strings.isNullOrEmpty( envId ) )
+                    if (!Strings.isNullOrEmpty( spHeader ) )
                     {
-                        //String outData = getData(message);
-                    }
-                    else if ( !Strings.isNullOrEmpty( peerId ) )
-                    {
-                        //String outData = getData(message);
-                        //String encryptedData = encryptData( peerId, "", outData );
+                        HttpServletRequest req = ( HttpServletRequest ) message.getExchange().getInMessage()
+                                                                               .get( AbstractHTTPDestination
+                                                                                       .HTTP_REQUEST );
+                        String remoteIp = req.getRemoteAddr();
+                        String envId = headers.getHeaderString( Common.ENVIRONMENT_ID_HEADER_NAME );
+                        String peerId = headers.getHeaderString( Common.PEER_ID_HEADER_NAME );
+
+                        if ( !Strings.isNullOrEmpty( envId ) )
+                        {
+                            encryptData( envId, remoteIp, message );
+                        }
+                        else if ( !Strings.isNullOrEmpty( peerId ) )
+                        {
+                            encryptData( peerId, remoteIp, message );
+                        }
                     }
                 }
-                //}
                 //***********************************************************************
             }
         }
@@ -110,7 +99,7 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
     /* ******************************************************
      *
      */
-    private void encryptData(String hostId, String ip,Message message)
+    private void encryptData( String hostId, String ip, Message message )
     {
         OutputStream os = message.getContent( OutputStream.class );
 
@@ -130,19 +119,20 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
             org.apache.commons.io.IOUtils.closeQuietly( csnew );
 
             //do something with original message to produce finalMessage
-            byte[] finalMessage  = encryptData( hostId, ip, originalMessage );
+            byte[] finalMessage = encryptData( hostId, ip, originalMessage );
 
-           // = new byte[100];
+            if ( finalMessage != null )
+            {
+                InputStream replaceInStream = new ByteArrayInputStream( finalMessage );
 
+                org.apache.commons.io.IOUtils.copy( replaceInStream, os );
+                replaceInStream.close();
+                org.apache.commons.io.IOUtils.closeQuietly( replaceInStream );
 
-            InputStream replaceInStream = new ByteArrayInputStream( finalMessage );
+                os.flush();
+                message.setContent( OutputStream.class, os );
+            }
 
-            org.apache.commons.io.IOUtils.copy( replaceInStream, os );
-            replaceInStream.close();
-            org.apache.commons.io.IOUtils.closeQuietly( replaceInStream );
-
-            os.flush();
-            message.setContent( OutputStream.class, os );
             org.apache.commons.io.IOUtils.closeQuietly( os );
         }
         catch ( IOException ioe )
@@ -158,8 +148,10 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
      */
     private byte[] encryptData( String hostId, String ip, byte[] data )
     {
-        if(data == null)
+        if ( data == null || data.length == 0 )
+        {
             return null;
+        }
         else
         {
             EncryptionTool encTool = channelManagerImpl.getSecurityManager().getEncryptionTool();

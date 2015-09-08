@@ -330,6 +330,8 @@ public class PeerRegisterForm extends CustomComponent
         KeyManager keyManager = module.getSecurityManager().getKeyManager();
         PGPPublicKey pkey = keyManager.getRemoteHostPublicKey(null, ip ); //Get PublicKey from KeyServer
 
+
+
         if ( pkey!=null )
         {
             String baseUrl = String.format( "https://%s:%s/cxf", ip, ChannelSettings.SECURE_PORT_X1 );

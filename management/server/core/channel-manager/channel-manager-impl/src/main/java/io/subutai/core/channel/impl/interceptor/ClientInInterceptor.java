@@ -64,19 +64,20 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
                 {
                     HttpHeaders headers = new HttpHeadersImpl( message);
 
-                    String envId = headers.getHeaderString( Common.ENVIRONMENT_ID_HEADER_NAME );
-                    String peerId = headers.getHeaderString( Common.PEER_ID_HEADER_NAME );
+                    String envId   = headers.getHeaderString( Common.ENVIRONMENT_ID_HEADER_NAME );
+                    String peerId  = headers.getHeaderString( Common.PEER_ID_HEADER_NAME );
+                    String secured = headers.getHeaderString( Common.SECURED_HEADER_NAME );
 
-                    decrData( message ,envId );
-
-                    if ( !Strings.isNullOrEmpty( envId ) )
+                    if(!Strings.isNullOrEmpty( secured ))
                     {
-                        //String outData = getData(message);
-                    }
-                    else if ( !Strings.isNullOrEmpty( peerId ) )
-                    {
-                        //String outData = getData(message);
-                        //String encryptedData = encryptData( peerId, "", outData );
+                        if ( !Strings.isNullOrEmpty( envId ) )
+                        {
+                            decrData( message ,envId );
+                        }
+                        else if ( !Strings.isNullOrEmpty( peerId ) )
+                        {
+                            decrData( message ,envId );
+                        }
                     }
 
                 }
@@ -88,21 +89,29 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
         }
     }
 
+
+
+    /* ******************************************************
+     *
+     */
     private void decrData( Message message, String hostId )
     {
 
         InputStream is = message.getContent( InputStream.class );
         CachedOutputStream os = new CachedOutputStream();
+
         try
         {
-            IOUtils.copy( is, os );
+            IOUtils.copyAndCloseInput( is, os );
             os.flush();
 
-            is.close();
-
             byte[] data = decrData(hostId,os.getBytes());
+            org.apache.commons.io.IOUtils.closeQuietly( os );
 
-            message.setContent( InputStream.class, new ByteArrayInputStream( data ));
+            if(data!=null)
+            {
+                message.setContent( InputStream.class, new ByteArrayInputStream( data ));
+            }
 
         }
         catch ( IOException e )
@@ -120,7 +129,10 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
 
         try
         {
-            if ( data == null ) return null;
+            if ( data == null || data.length == 0)
+            {
+                return null;
+            }
             else
             {
                 EncryptionTool encTool = channelManagerImpl.getSecurityManager().getEncryptionTool();

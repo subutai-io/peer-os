@@ -94,7 +94,10 @@ public class KeyManagerImpl implements KeyManager
             // Create New KeyRings;
             LOG.info( "******** Creating Key new keyring *******" );
 
-            saveKeyPair( keyData.getManHostId(),(short)1, generateKeyPair( keyData.getManHostId(), false ) );
+            String fingerprint = securityManagerDAO.getSecretKeyFingerprint( hostId );
+            {
+                saveKeyPair( keyData.getManHostId(),(short)1, generateKeyPair( keyData.getManHostId(), false ) );
+            }
         }
         catch ( Exception ex )
         {
@@ -563,10 +566,12 @@ public class KeyManagerImpl implements KeyManager
         {
             PGPPublicKeyRing pubRing = null;
 
-            if(!Strings.isNullOrEmpty( remoteHostId ))
+            if(Strings.isNullOrEmpty( remoteHostId ))
             {
-                pubRing = getPublicKeyRing( remoteHostId );
+                remoteHostId = getRemoteHostId( ip );
             }
+
+            pubRing = getPublicKeyRing( remoteHostId );
 
             if(pubRing == null) // Get from HTTP
             {
@@ -579,7 +584,6 @@ public class KeyManagerImpl implements KeyManager
                 if ( response.getStatus() == Response.Status.OK.getStatusCode() )
                 {
                     String publicKeyring = response.readEntity( String.class );
-                    remoteHostId = getRemoteHostId( ip );
                     savePublicKeyRing( remoteHostId, ( short ) 3, publicKeyring );
                 }
                 return getPublicKey( remoteHostId );

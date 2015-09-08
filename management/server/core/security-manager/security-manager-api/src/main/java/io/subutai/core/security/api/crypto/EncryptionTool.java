@@ -3,6 +3,8 @@ package io.subutai.core.security.api.crypto;
 
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
+import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
@@ -79,6 +81,35 @@ public interface EncryptionTool
     public KeyPair generateKeyPair ( String userId,String secretPwd, boolean armored );
 
 
-
+    /* **********************************************
+     *
+     */
     public byte[] decrypt( final byte[] message, PGPSecretKeyRing keyRing , String pwd) throws PGPException;
+
+
+    /**
+     * Signs a public key
+     *
+     * @param publicKeyRing a public key ring containing the single public key to sign
+     * @param id the id we are certifying against the public key
+     * @param secretKey the signing key
+     * @param secretKeyPassword the signing key password
+     *
+     * @return a public key ring with the signed public key
+     */
+
+    public PGPPublicKeyRing signPublicKey( PGPPublicKeyRing publicKeyRing, String id, PGPSecretKey secretKey,String secretKeyPassword );
+
+
+    /**
+     * Verifies that a public key is signed with another public key
+     *
+     * @param keyToVerify the public key to verify
+     * @param id the id we are verifying against the public key
+     * @param keyToVerifyWith the key to verify with
+     *
+     * @return true if verified, false otherwise
+     */
+    public boolean verifyPublicKey( PGPPublicKey keyToVerify, String id, PGPPublicKey keyToVerifyWith );
+
 }

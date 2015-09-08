@@ -96,8 +96,9 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
                     if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
                     {
                         HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
+                        String spHeader =  headers.getHeaderString( Common.SPECIAL_HEADER_NAME );
 
-                        if ( !Strings.isNullOrEmpty( headers.getHeaderString( Common.SECURED_HEADER_NAME ) ) )
+                        if ( !Strings.isNullOrEmpty( spHeader ) )
                         {
                             String envId = headers.getHeaderString( Common.ENVIRONMENT_ID_HEADER_NAME );
                             String peerId = headers.getHeaderString( Common.PEER_ID_HEADER_NAME );
