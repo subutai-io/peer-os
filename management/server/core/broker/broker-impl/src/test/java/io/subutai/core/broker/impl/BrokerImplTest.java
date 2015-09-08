@@ -23,6 +23,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.SslContext;
 import org.apache.activemq.broker.region.policy.PolicyMap;
+import org.apache.activemq.broker.util.TimeStampingBrokerPlugin;
 import org.apache.activemq.usage.MemoryUsage;
 import org.apache.activemq.usage.StoreUsage;
 import org.apache.activemq.usage.SystemUsage;
@@ -98,6 +99,8 @@ public class BrokerImplTest
     StoreUsage storeUsage;
     @Mock
     PolicyMap policyMap;
+    @Mock
+    TimeStampingBrokerPlugin timeStampingBrokerPlugin;
 
     BrokerImpl broker;
 
@@ -115,6 +118,7 @@ public class BrokerImplTest
         doReturn( sslContext ).when( broker ).getSslContext();
         doReturn( brokerService ).when( broker ).getBroker();
         doReturn( amqFactory ).when( broker ).getConnectionFactory();
+        doReturn( timeStampingBrokerPlugin ).when( broker ).getTimeStampingBrokerPlugin();
         when( amqFactory.createConnection() ).thenReturn( connection );
         when( connection.createSession( anyBoolean(), anyInt() ) ).thenReturn( session );
         when( session.createProducer( any( Destination.class ) ) ).thenReturn( producer );
