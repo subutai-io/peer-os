@@ -351,7 +351,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         catch ( HostNotFoundException e )
         {
-            LOG.warn( "Error getting container host by name: " + hostname, e );
+            LOG.debug( "Error getting container host by name: " + hostname, e );
             //ignore
         }
 
