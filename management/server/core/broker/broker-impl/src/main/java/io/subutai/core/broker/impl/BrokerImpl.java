@@ -9,14 +9,11 @@ import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.LinkedList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import javax.jms.BytesMessage;
 import javax.jms.Connection;
-import javax.jms.DeliveryMode;
-import javax.jms.Destination;
 import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TopicSubscriber;
 import javax.net.ssl.KeyManager;
@@ -67,8 +64,6 @@ public class BrokerImpl implements Broker
     protected MessageRoutingListener messageRouter;
     protected BrokerService broker;
     private final String brokerUrl;
-    private final boolean isPersistent;
-    private final int messageTimeout;
     private final String keystore;
     private final String keystorePassword;
     private final String truststore;
@@ -79,22 +74,19 @@ public class BrokerImpl implements Broker
     private SslContext customSslContext;
     private ActiveMQConnectionFactory amqFactory;
     private SslUtil sslUtil = new SslUtil();
+    protected ExecutorService messageSender = Executors.newFixedThreadPool( 5 );
 
 
-    public BrokerImpl( final String brokerUrl, final boolean isPersistent, final int messageTimeout,
-                       final String keystore, final String keystorePassword, final String truststore,
-                       final String truststorePassword, final String caCertificate )
+    public BrokerImpl( final String brokerUrl, final String keystore, final String keystorePassword,
+                       final String truststore, final String truststorePassword, final String caCertificate )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( brokerUrl ), "Invalid broker URL" );
-        Preconditions.checkArgument( messageTimeout >= 0, "Message timeout must be greater than or equal to 0" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( keystore ), "Invalid keystore path" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( keystorePassword ), "Invalid keystore password" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( truststore ), "Invalid truststore path" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( truststorePassword ), "Invalid truststore password" );
 
         this.brokerUrl = brokerUrl;
-        this.isPersistent = isPersistent;
-        this.messageTimeout = messageTimeout;
         this.messageRouter = new MessageRoutingListener();
         //todo prefix store paths with Common.SUBUTAI_APP_DATA_PATH
         this.keystore = keystore;
@@ -386,7 +378,7 @@ public class BrokerImpl implements Broker
              * it's possible to do that using destination policy entries and broker attribute
              * schedulePeriodForDestinationPurge > 0
              */
-        getBroker().setSchedulePeriodForDestinationPurge( 120000 ); //2 minutes
+        getBroker().setSchedulePeriodForDestinationPurge( 300000 ); //5 minutes
 
             /* This is to set how the broker should dispatch outgoing messages:
              * At the time being, PolicyEntry items do not aggregate (see at
@@ -534,79 +526,9 @@ public class BrokerImpl implements Broker
     }
 
 
-    private void sendMessage( String topic, Object message ) throws BrokerException
+    protected void sendMessage( String topic, Object message ) throws BrokerException
     {
-        Connection connection = null;
-        Session session = null;
-        MessageProducer producer = null;
-
-        try
-        {
-            connection = getConnectionFactory().createConnection();
-            connection.start();
-            session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
-            Destination destination = session.createTopic( topic );
-            producer = session.createProducer( destination );
-            producer.setDeliveryMode( isPersistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT );
-            producer.setTimeToLive( messageTimeout * 1000 );
-
-            Message msg;
-            if ( message instanceof String )
-            {
-
-                msg = session.createTextMessage( ( String ) message );
-            }
-            else
-            {
-                msg = session.createBytesMessage();
-                ( ( BytesMessage ) msg ).writeBytes( ( byte[] ) message );
-            }
-
-            producer.send( msg );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error in sendMessage", e );
-            throw new BrokerException( e );
-        }
-        finally
-        {
-            if ( producer != null )
-            {
-                try
-                {
-                    producer.close();
-                }
-                catch ( JMSException e )
-                {
-                    //ignore
-                }
-            }
-
-            if ( session != null )
-            {
-                try
-                {
-                    session.close();
-                }
-                catch ( JMSException e )
-                {
-                    //ignore
-                }
-            }
-
-            if ( connection != null )
-            {
-                try
-                {
-                    connection.close();
-                }
-                catch ( JMSException e )
-                {
-                    //ignore
-                }
-            }
-        }
+        messageSender.execute( new SendMessageTask( getConnectionFactory(), topic, message ) );
     }
 
 
@@ -616,5 +538,7 @@ public class BrokerImpl implements Broker
         {
             broker.stop();
         }
+
+        messageSender.shutdown();
     }
 }
