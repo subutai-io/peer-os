@@ -24,6 +24,14 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="hint/send-heartbeat">
+      <action class="io.subutai.core.hintegration.cli.SendHearbeatCommand">
+        <argument ref="integrationManager" />
+      </action>
+    </command>
+  </command-bundle>
+
   <reference id="integrationManager" availability="mandatory"
              interface="io.subutai.core.hintegration.api.Integration" />
 

@@ -8,7 +8,7 @@
   <reference id="peerManager"
              interface="io.subutai.core.peer.api.PeerManager" />
 
-  <bean id="hIntegrationImpl" scope="singleton" init-method="init"
+  <bean id="hIntegrationImpl" scope="singleton" init-method="init" destroy-method="destroy"
         class="io.subutai.core.hintegration.impl.IntegrationImpl">
     <property name="securityManager" ref="securityManager" />
     <property name="peerManager" ref="peerManager" />

@@ -1,6 +1,9 @@
 package io.subutai.core.hintegration.api;
 
 
+import io.subutai.hub.common.dto.HeartbeatResponseDTO;
+
+
 public interface Integration
 {
     void registerOwnerPubKey() throws HIntegrationException;
@@ -10,4 +13,6 @@ public interface Integration
     void sendTrustData() throws HIntegrationException;
 
     void register() throws HIntegrationException;
+
+    HeartbeatResponseDTO sendHeartbeat() throws HIntegrationException;
 }
