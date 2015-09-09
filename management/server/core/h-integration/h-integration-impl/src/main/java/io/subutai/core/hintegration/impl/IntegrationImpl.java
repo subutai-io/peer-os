@@ -1,12 +1,10 @@
 package io.subutai.core.hintegration.impl;
 
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -14,7 +12,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -27,15 +24,12 @@ import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
-import org.bouncycastle.openpgp.PGPUtil;
-import org.bouncycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 
 import io.subutai.common.security.SecurityProvider;
@@ -54,11 +48,9 @@ import io.subutai.core.hintegration.impl.settings.HSettings;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
-import io.subutai.hub.common.dto.EnvironmentDTO;
 import io.subutai.hub.common.dto.RegistrationDTO;
 import io.subutai.hub.common.dto.TrustDataDto;
 import io.subutai.hub.common.json.JsonUtil;
-import io.subutai.hub.common.pgp.crypto.PGPSign;
 import io.subutai.hub.common.pgp.key.PGPKeyHelper;
 import io.subutai.hub.common.pgp.message.PGPMessenger;
 
@@ -101,28 +93,153 @@ public class IntegrationImpl implements Integration
     {
         LOG.debug( "H-INTEGRATION" );
 
-        generateKeys();
-
         this.hubPublicKey = PGPKeyHelper.readPublicKey( HSettings.HUB_PUB_KEY );
-        this.ownerPublicKey = getOwnerPubKeyRing().getPublicKey();
-        this.peerPublicKey = getPeerPubKeyRing().getPublicKey();
+        this.ownerPublicKey = PGPKeyHelper.readPublicKey( HSettings.PEER_OWNER_PUB_KEY );
+        this.peerPublicKey = PGPKeyHelper.readPublicKey( HSettings.PEER_PUB_KEY );
+
+        generateX509Certificate();
+
+
         this.hearbeatExecutorService.scheduleWithFixedDelay( processor, 10, 30, TimeUnit.SECONDS );
     }
 
 
-    private void generateKeys()
+    /*private void generateKeys()
     {
         try
         {
             final KeyManager keyManager = securityManager.getKeyManager();
 
 
-            //**************Get Peer Public keyring ******************************************
-            PGPPublicKeyRing peerPublicKeyRing = keyManager.getPublicKeyRing( null );
-            String fingerprint = PGPKeyUtil.getFingerprint( peerPublicKeyRing.getPublicKey().getFingerprint() );
+            /*//**************Get Peer Public keyring ******************************************
+ PGPPublicKeyRing peerPublicKeyRing = keyManager.getPublicKeyRing( null );
+ String fingerprint = PGPKeyUtil.getFingerprint( peerPublicKeyRing.getPublicKey().getFingerprint() );
 
 
-            //**************Saving certificate******************************************
+ /*//**************Saving certificate******************************************
+ io.subutai.common.security.crypto.key.KeyManager sslkeyMan =
+ new io.subutai.common.security.crypto.key.KeyManager();
+ KeyPairGenerator keyPairGenerator = sslkeyMan.prepareKeyPairGeneration( KeyPairType.RSA, 1024 );
+ java.security.KeyPair sslKeyPair = sslkeyMan.generateKeyPair( keyPairGenerator );
+
+ KeyStoreData keyStoreData = new KeyStoreData();
+ keyStoreData.setKeyStoreFile( HSettings.PEER_KEYSTORE );
+ keyStoreData.setAlias( "root_server_px1" );
+ keyStoreData.setPassword( "subutai" );
+ keyStoreData.setKeyStoreType( KeyStoreType.JKS );
+
+ KeyStoreTool keyStoreTool = new KeyStoreTool();
+ KeyStore sslkeyStore = keyStoreTool.load( keyStoreData );
+
+
+ CertificateData certificateData = new CertificateData();
+ certificateData.setCommonName( fingerprint );
+
+ CertificateTool certificateTool = new CertificateTool();
+ X509Certificate x509cert = certificateTool
+ .generateSelfSignedCertificate( sslkeyStore, sslKeyPair, SecurityProvider.BOUNCY_CASTLE,
+ certificateData );
+
+ keyStoreTool.saveX509Certificate( sslkeyStore, keyStoreData, x509cert, sslKeyPair );
+
+
+ /*//****************Save Owner secret key ****************************************
+ KeyPair ownerKeyPair = keyManager.generateKeyPair( OWNER_USER_ID, false );
+
+ File ownerSecretKeyFile = new File( HSettings.PEER_OWNER_SECRET_KEY );
+
+ try ( FileOutputStream fop = new FileOutputStream( ownerSecretKeyFile ) )
+ {
+ if ( !ownerSecretKeyFile.exists() )
+ {
+ ownerSecretKeyFile.createNewFile();
+ }
+
+ fop.write( ownerKeyPair.getSecKeyring() );
+ fop.flush();
+ fop.close();
+
+ LOG.debug( "owner secret key genereated" );
+ }
+ catch ( Exception ex )
+ {
+ ex.printStackTrace();
+ }
+
+
+ /*//****************Save Owner Public key ****************************************
+ File ownerPubKeyFile = new File( HSettings.PEER_OWNER_PUB_KEY );
+
+ try ( FileOutputStream fop = new FileOutputStream( ownerPubKeyFile ) )
+ {
+ if ( !ownerPubKeyFile.exists() )
+ {
+ ownerPubKeyFile.createNewFile();
+ }
+
+ fop.write( ownerKeyPair.getPubKeyring() );
+ fop.flush();
+ fop.close();
+
+ LOG.debug( "owner public key genereated" );
+ }
+ catch ( Exception ex )
+ {
+ ex.printStackTrace();
+ }
+
+
+ /*//****************Sign pub of peer with owner ****************************************
+ PGPSecretKeyRing ownerSecretKeyRing = PGPKeyUtil.readSecretKeyRing( ownerKeyPair.getSecKeyring() );
+ PGPPublicKeyRing publicKeyRing = PGPEncryptionUtil
+ .signPublicKey( peerPublicKeyRing, OWNER_USER_ID, ownerSecretKeyRing.getSecretKey(), "12345678" );
+
+
+ /*//****************Save Peer Public key ****************************************
+ File peerPubKeyFile = new File( HSettings.PEER_PUB_KEY );
+
+ try ( FileOutputStream fop = new FileOutputStream( peerPubKeyFile ) )
+ {
+ if ( !peerPubKeyFile.exists() )
+ {
+ peerPubKeyFile.createNewFile();
+ }
+
+ publicKeyRing.encode( fop );
+ fop.flush();
+ fop.close();
+
+ LOG.debug( "peer public key genereated" );
+ }
+ catch ( Exception ex )
+ {
+ ex.printStackTrace();
+ }
+
+ LOG.debug( "Is encryption key of owner?:" + ownerSecretKeyRing.getPublicKey().isEncryptionKey() );
+ LOG.debug( "Is encryption key of peer?:" + publicKeyRing.getPublicKey().isEncryptionKey() );
+ LOG.debug( "Is signed: " + PGPEncryptionUtil.verifyPublicKey( publicKeyRing.getPublicKey(), OWNER_USER_ID,
+ ownerSecretKeyRing.getPublicKey() ) );
+ //
+ //            /*/
+    /****************
+     * Loading hub key from resources **************************************** //            InputStream is =
+     * bundleContext.getBundle().getEntry( "keys/hub.public.gpg" ).openStream(); //            PGPPublicKey hPubKey =
+     * PGPKeyUtil.readPublicKey( is ); } catch ( Exception ex ) { ex.printStackTrace(); } }
+     */
+
+
+    private void generateX509Certificate()
+    {
+        try
+        {
+            final KeyManager keyManager = securityManager.getKeyManager();
+
+
+            String fingerprint = PGPKeyUtil.getFingerprint( peerPublicKey.getFingerprint() );
+
+
+            //**************Saving X509 certificate******************************************
             io.subutai.common.security.crypto.key.KeyManager sslkeyMan =
                     new io.subutai.common.security.crypto.key.KeyManager();
             KeyPairGenerator keyPairGenerator = sslkeyMan.prepareKeyPairGeneration( KeyPairType.RSA, 1024 );
@@ -147,89 +264,6 @@ public class IntegrationImpl implements Integration
                             certificateData );
 
             keyStoreTool.saveX509Certificate( sslkeyStore, keyStoreData, x509cert, sslKeyPair );
-
-
-            //****************Save Owner secret key ****************************************
-            KeyPair ownerKeyPair = keyManager.generateKeyPair( OWNER_USER_ID, false );
-
-            File ownerSecretKeyFile = new File( HSettings.PEER_OWNER_SECRET_KEY );
-
-            try ( FileOutputStream fop = new FileOutputStream( ownerSecretKeyFile ) )
-            {
-                if ( !ownerSecretKeyFile.exists() )
-                {
-                    ownerSecretKeyFile.createNewFile();
-                }
-
-                fop.write( ownerKeyPair.getSecKeyring() );
-                fop.flush();
-                fop.close();
-
-                LOG.debug( "owner secret key genereated" );
-            }
-            catch ( Exception ex )
-            {
-                ex.printStackTrace();
-            }
-
-
-            //****************Save Owner Public key ****************************************
-            File ownerPubKeyFile = new File( HSettings.PEER_OWNER_PUB_KEY );
-
-            try ( FileOutputStream fop = new FileOutputStream( ownerPubKeyFile ) )
-            {
-                if ( !ownerPubKeyFile.exists() )
-                {
-                    ownerPubKeyFile.createNewFile();
-                }
-
-                fop.write( ownerKeyPair.getPubKeyring() );
-                fop.flush();
-                fop.close();
-
-                LOG.debug( "owner public key genereated" );
-            }
-            catch ( Exception ex )
-            {
-                ex.printStackTrace();
-            }
-
-
-            //****************Sign pub of peer with owner ****************************************
-            PGPSecretKeyRing ownerSecretKeyRing = PGPKeyUtil.readSecretKeyRing( ownerKeyPair.getSecKeyring() );
-            PGPPublicKeyRing publicKeyRing = PGPEncryptionUtil
-                    .signPublicKey( peerPublicKeyRing, OWNER_USER_ID, ownerSecretKeyRing.getSecretKey(), "12345678" );
-
-
-            //****************Save Peer Public key ****************************************
-            File peerPubKeyFile = new File( HSettings.PEER_PUB_KEY );
-
-            try ( FileOutputStream fop = new FileOutputStream( peerPubKeyFile ) )
-            {
-                if ( !peerPubKeyFile.exists() )
-                {
-                    peerPubKeyFile.createNewFile();
-                }
-
-                publicKeyRing.encode( fop );
-                fop.flush();
-                fop.close();
-
-                LOG.debug( "peer public key genereated" );
-            }
-            catch ( Exception ex )
-            {
-                ex.printStackTrace();
-            }
-
-            LOG.debug( "Is encryption key of owner?:" + ownerSecretKeyRing.getPublicKey().isEncryptionKey() );
-            LOG.debug( "Is encryption key of peer?:" + publicKeyRing.getPublicKey().isEncryptionKey() );
-            LOG.debug( "Is signed: " + PGPEncryptionUtil.verifyPublicKey( publicKeyRing.getPublicKey(), OWNER_USER_ID,
-                    ownerSecretKeyRing.getPublicKey() ) );
-            //
-            //            //****************Loading hub key from resources ****************************************
-            //            InputStream is = bundleContext.getBundle().getEntry( "keys/hub.public.gpg" ).openStream();
-            //            PGPPublicKey hPubKey = PGPKeyUtil.readPublicKey( is );
         }
         catch ( Exception ex )
         {
@@ -249,7 +283,7 @@ public class IntegrationImpl implements Integration
         Form form = new Form();
         try
         {
-            form.set( "keytext", PGPEncryptionUtil.armorByteArrayToString( getOwnerPubKeyRing().getEncoded() ) );
+            form.set( "keytext", PGPEncryptionUtil.armorByteArrayToString( ownerPublicKey.getEncoded() ) );
         }
         catch ( PGPException | IOException e )
         {
@@ -280,7 +314,7 @@ public class IntegrationImpl implements Integration
         Form form = new Form();
         try
         {
-            form.set( "keytext", PGPEncryptionUtil.armorByteArrayToString( getPeerPubKeyRing().getEncoded() ) );
+            form.set( "keytext", PGPEncryptionUtil.armorByteArrayToString( peerPublicKey.getEncoded() ) );
         }
         catch ( PGPException | IOException e )
         {
@@ -307,13 +341,12 @@ public class IntegrationImpl implements Integration
 
         try
         {
-            String path = String.format( "/rest/v1/keyserver/keys/%s/trust/%s", peerPublicKey.getKeyID(),
-                    ownerPublicKey.getKeyID() );
+            String path = String.format( "/rest/v1/keyserver/keys/%s/trust/%s",
+                    PGPKeyUtil.getKeyId( peerPublicKey.getFingerprint() ),
+                    PGPKeyUtil.getKeyId( ownerPublicKey.getFingerprint() ) );
 
-            TrustDataDto trustDataDto =
-                    new TrustDataDto( String.valueOf( getPeerPubKeyRing().getPublicKey().getKeyID() ),
-                            String.valueOf( getOwnerPubKeyRing().getPublicKey().getKeyID() ),
-                            TrustDataDto.TrustLevel.FULL );
+            TrustDataDto trustDataDto = new TrustDataDto( PGPKeyUtil.getKeyId( peerPublicKey.getFingerprint() ),
+                    PGPKeyUtil.getKeyId( ownerPublicKey.getFingerprint() ), TrustDataDto.TrustLevel.FULL );
 
             byte[] serverFingerprint = hubPublicKey.getFingerprint();
 
@@ -391,7 +424,7 @@ public class IntegrationImpl implements Integration
     }
 
 
-    private PGPPublicKeyRing getOwnerPubKeyRing() throws IOException
+/*    private PGPPublicKeyRing getOwnerPubKeyRing() throws IOException
     {
         InputStream in = PGPEncryptionUtil.getFileInputStream( HSettings.PEER_OWNER_PUB_KEY );
         PGPPublicKeyRing ownerPubKeyRing =
@@ -424,5 +457,5 @@ public class IntegrationImpl implements Integration
         PGPSecretKeyRing secretKeyRing =
                 new PGPSecretKeyRing( PGPUtil.getDecoderStream( in ), new JcaKeyFingerprintCalculator() );
         return secretKeyRing;
-    }
+    }*/
 }
