@@ -6,6 +6,9 @@
 package io.subutai.common.cache;
 
 
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+
 import com.google.common.base.Preconditions;
 
 
@@ -26,7 +29,7 @@ public class CacheEntry<V>
     /**
      * creation timestamp
      */
-    private long createTimestamp;
+    private AtomicLong createTimestamp;
 
 
     /**
@@ -42,7 +45,7 @@ public class CacheEntry<V>
 
         this.value = value;
         this.ttlMs = ttlMs;
-        this.createTimestamp = System.currentTimeMillis();
+        this.createTimestamp = new AtomicLong( System.nanoTime() );
     }
 
 
@@ -62,7 +65,7 @@ public class CacheEntry<V>
      */
     public void resetCreationTimestamp()
     {
-        createTimestamp = System.currentTimeMillis();
+        createTimestamp.set( System.nanoTime() );
     }
 
 
@@ -74,6 +77,6 @@ public class CacheEntry<V>
      */
     public boolean isExpired()
     {
-        return System.currentTimeMillis() > createTimestamp + ttlMs;
+        return System.nanoTime() > createTimestamp.get() + TimeUnit.MILLISECONDS.toNanos( ttlMs );
     }
 }

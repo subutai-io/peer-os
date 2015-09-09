@@ -33,6 +33,7 @@ import org.apache.activemq.broker.region.policy.ConstantPendingMessageLimitStrat
 import org.apache.activemq.broker.region.policy.PolicyEntry;
 import org.apache.activemq.broker.region.policy.PolicyMap;
 import org.apache.activemq.broker.region.policy.StrictOrderDispatchPolicy;
+import org.apache.activemq.broker.util.TimeStampingBrokerPlugin;
 import org.apache.activemq.network.ConditionalNetworkBridgeFilterFactory;
 import org.apache.activemq.usage.StoreUsage;
 import org.apache.activemq.usage.SystemUsage;
@@ -307,6 +308,7 @@ public class BrokerImpl implements Broker
             //tune connection factory
             amqFactory.setWatchTopicAdvisories( false );
             amqFactory.setCheckForDuplicates( true );
+            amqFactory.setUseAsyncSend( true );
         }
         return amqFactory;
     }
@@ -347,12 +349,33 @@ public class BrokerImpl implements Broker
             getBroker().addConnector( brokerUrl );
             getBroker().start();
             getBroker().waitUntilStarted();
+
+            addBrokerPlugins();
         }
         catch ( Exception e )
         {
             LOG.error( "Error in setupClient", e );
             throw new BrokerException( e );
         }
+    }
+
+
+    protected void addBrokerPlugins() throws Exception
+    {
+        /* TimeStampingBrokerPlugin handles the possible miss alignments among broker and producers
+         * timestamps. Besides, it overides the zero-TTL specified by the producers
+         */
+        TimeStampingBrokerPlugin tsbp = getTimeStampingBrokerPlugin();
+        tsbp.setZeroExpirationOverride( 200000 );
+
+        tsbp.installPlugin( getBroker().getBroker() );
+        tsbp.start();
+    }
+
+
+    protected TimeStampingBrokerPlugin getTimeStampingBrokerPlugin()
+    {
+        return new TimeStampingBrokerPlugin();
     }
 
 
