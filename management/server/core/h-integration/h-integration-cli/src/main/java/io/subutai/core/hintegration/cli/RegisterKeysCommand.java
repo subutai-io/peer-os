@@ -35,6 +35,7 @@ public class RegisterKeysCommand extends OsgiCommandSupport
         catch ( Exception e )
         {
             System.out.println( "Owner key registration failed." );
+            e.printStackTrace();
         }
         try
         {

@@ -1,7 +1,6 @@
 package io.subutai.core.hintegration.impl;
 
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -31,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 
 import io.subutai.common.security.SecurityProvider;
@@ -50,11 +48,9 @@ import io.subutai.core.hintegration.impl.settings.HSettings;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
-import io.subutai.hub.common.dto.EnvironmentDTO;
 import io.subutai.hub.common.dto.RegistrationDTO;
 import io.subutai.hub.common.dto.TrustDataDto;
 import io.subutai.hub.common.json.JsonUtil;
-import io.subutai.hub.common.pgp.crypto.PGPSign;
 import io.subutai.hub.common.pgp.key.PGPKeyHelper;
 import io.subutai.hub.common.pgp.message.PGPMessenger;
 
@@ -64,6 +60,7 @@ public class IntegrationImpl implements Integration
     private static final Logger LOG = LoggerFactory.getLogger( IntegrationImpl.class.getName() );
 
     private static final String SERVER_NAME = "52.88.77.35";
+    private static final String SERVER_NAME2 = "172.16.193.239";
     private SecurityManager securityManager;
     private PeerManager peerManager;
     public static final String OWNER_USER_ID = "owner@subutai.io";
@@ -94,18 +91,27 @@ public class IntegrationImpl implements Integration
     public void init() throws IOException, PGPException
     {
         LOG.debug( "H-INTEGRATION" );
+        String pathToHubPubKey = String.format( "%s/keys/hub.public.gpg", System.getProperty( "karaf.home" ) );
+        String pathToPeerPubKey = String.format( "%s/keys/peer.public.gpg", System.getProperty( "karaf.home" ) );
+        String pathToOwnerPubKey = String.format( "%s/keys/peer.owner.public.gpg", System.getProperty( "karaf.home" ) );
 
-        //  new TrustSelfSignedStrategy();
+        LOG.debug( "Path to hub key " + pathToHubPubKey );
 
-        EnvironmentDTO environmentDTO;
 
-        LOG.debug( "DTO" + EnvironmentDTO.class.toString() );
+        hubPublicKey = PGPKeyHelper.readPublicKey( pathToHubPubKey );
+        peerPublicKey = PGPKeyHelper.readPublicKey( pathToPeerPubKey );
+        ownerPublicKey = PGPKeyHelper.readPublicKey( pathToOwnerPubKey );
 
-        generateKeys();
 
-        hubPublicKey = PGPKeyHelper.readPublicKey( HSettings.HUB_PUB_KEY );
-        ownerPublicKey = getOwnerPubKeyRing().getPublicKey();
-        peerPublicKey = getPeerPubKeyRing().getPublicKey();
+//        if ( ownerPublicKey == null )
+//        {
+//            generateKeys();
+//        }
+//        peerPublicKey = getPeerPubKeyRing().getPublicKey();
+//        ownerPublicKey = getOwnerPubKeyRing().getPublicKey();
+
+        LOG.debug( "fingerprint peer key: " + PGPKeyUtil.getFingerprint( peerPublicKey.getFingerprint() ) );
+        LOG.debug( "fingerprint owner key id: " + PGPKeyUtil.getFingerprint( ownerPublicKey.getFingerprint() ) );
     }
 
 
@@ -118,7 +124,7 @@ public class IntegrationImpl implements Integration
 
             //**************Get Peer Public keyring ******************************************
             PGPPublicKeyRing peerPublicKeyRing = keyManager.getPublicKeyRing( null );
-            String fingerprint = PGPKeyUtil.getFingerprint( peerPublicKeyRing.getPublicKey().getFingerprint() );
+            String peerPubfingerprint = PGPKeyUtil.getFingerprint( peerPublicKeyRing.getPublicKey().getFingerprint() );
 
 
             //**************Saving certificate******************************************
@@ -138,7 +144,7 @@ public class IntegrationImpl implements Integration
 
 
             CertificateData certificateData = new CertificateData();
-            certificateData.setCommonName( fingerprint );
+            certificateData.setCommonName( peerPubfingerprint );
 
             CertificateTool certificateTool = new CertificateTool();
             X509Certificate x509cert = certificateTool
@@ -240,7 +246,10 @@ public class IntegrationImpl implements Integration
     @Override
     public void registerOwnerPubKey() throws HIntegrationException
     {
-        String baseUrl = String.format( "https://test.stage-hub.net/" );
+        //        String baseUrl = String.format( "https://test.stage-hub.net/" );
+        //        String baseUrl = String.format( "https://172.16.193.239"  );
+        String baseUrl = String.format( "https://" + SERVER_NAME + "/" );
+
         WebClient client = io.subutai.core.hintegration.impl.HttpClient.createTrustedWebClient( baseUrl );
 
         client.type( MediaType.APPLICATION_FORM_URLENCODED ).accept( MediaType.APPLICATION_JSON );
@@ -248,14 +257,19 @@ public class IntegrationImpl implements Integration
         Form form = new Form();
         try
         {
-            form.set( "keytext", PGPEncryptionUtil.armorByteArrayToString( getOwnerPubKeyRing().getEncoded() ) );
+            form.set( "keytext", PGPEncryptionUtil.armorByteArrayToString( ownerPublicKey.getEncoded() ) );
         }
         catch ( PGPException | IOException e )
         {
             throw new HIntegrationException( "Could not read owner pub key", e );
         }
 
+        LOG.debug( "fingerprint peer key: " + PGPKeyUtil.getFingerprint( peerPublicKey.getFingerprint() ) );
+        LOG.debug( "fingerprint owner key id: " + PGPKeyUtil.getFingerprint( ownerPublicKey.getFingerprint() ) );
+
         Response response = client.path( "pks/add" ).post( form );
+
+        LOG.debug( "Response status: " + response.getStatus() );
 
         if ( response.getStatus() == HttpStatus.SC_CREATED )
         {
@@ -271,7 +285,10 @@ public class IntegrationImpl implements Integration
     @Override
     public void registerPeerPubKey() throws HIntegrationException
     {
-        String baseUrl = String.format( "https://test.stage-hub.net/" );
+        //        String baseUrl = String.format( "https://test.stage-hub.net/" );
+        //        String baseUrl = String.format( "https://172.16.193.239"  );
+        String baseUrl = String.format( "https://" + SERVER_NAME + "/" );
+
         WebClient client = io.subutai.core.hintegration.impl.HttpClient.createTrustedWebClient( baseUrl );
 
         client.type( MediaType.APPLICATION_FORM_URLENCODED ).accept( MediaType.APPLICATION_JSON );
@@ -279,7 +296,7 @@ public class IntegrationImpl implements Integration
         Form form = new Form();
         try
         {
-            form.set( "keytext", PGPEncryptionUtil.armorByteArrayToString( getPeerPubKeyRing().getEncoded() ) );
+            form.set( "keytext", PGPEncryptionUtil.armorByteArrayToString( peerPublicKey.getEncoded() ) );
         }
         catch ( PGPException | IOException e )
         {
@@ -306,13 +323,19 @@ public class IntegrationImpl implements Integration
 
         try
         {
-            String path = String.format( "/rest/v1/keyserver/keys/%s/trust/%s", peerPublicKey.getKeyID(),
-                    ownerPublicKey.getKeyID() );
+            String path = String.format( "/rest/v1/keyserver/keys/%s/trust/%s",
+                    PGPKeyUtil.getKeyId( peerPublicKey.getFingerprint() ),
+                    PGPKeyUtil.getKeyId( ownerPublicKey.getFingerprint() ) );
 
-            TrustDataDto trustDataDto =
-                    new TrustDataDto( String.valueOf( getPeerPubKeyRing().getPublicKey().getKeyID() ),
-                            String.valueOf( getOwnerPubKeyRing().getPublicKey().getKeyID() ),
-                            TrustDataDto.TrustLevel.FULL );
+            LOG.debug( "peer key id: " + peerPublicKey.getKeyID() );
+            LOG.debug( "owner key id: " + ownerPublicKey.getKeyID() );
+
+
+            TrustDataDto trustDataDto = new TrustDataDto( PGPKeyUtil.getKeyId( peerPublicKey.getFingerprint() ),
+                    PGPKeyUtil.getKeyId( ownerPublicKey.getFingerprint() ), TrustDataDto.TrustLevel.FULL );
+
+            LOG.debug( "HEX peer key id: " + PGPKeyUtil.getKeyId( peerPublicKey.getFingerprint() ) );
+            LOG.debug( "HEX owner key id: " + PGPKeyUtil.getKeyId( ownerPublicKey.getFingerprint() ) );
 
             byte[] serverFingerprint = hubPublicKey.getFingerprint();
 
@@ -332,6 +355,8 @@ public class IntegrationImpl implements Integration
 
             byte[] encryptedData = messenger.produce( cborData );
             Response r = client.post( encryptedData );
+
+            LOG.debug( "Response status: " + r.getStatus() );
 
             if ( r.getStatus() != HttpStatus.SC_NO_CONTENT )
             {
@@ -358,7 +383,7 @@ public class IntegrationImpl implements Integration
             RegistrationDTO registrationData = new RegistrationDTO( PGPKeyHelper.getFingerprint( ownerPublicKey ) );
             LOG.debug( "------------------> " + PGPKeyHelper.getFingerprint( ownerPublicKey ) );
 
-            byte[] serverFingerprint = getHPubKeyRing().getPublicKey().getFingerprint();
+            byte[] serverFingerprint = hubPublicKey.getFingerprint();
 
             KeyStore keyStore = KeyStore.getInstance( "JKS" );
 
