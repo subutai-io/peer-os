@@ -59,8 +59,15 @@ public class RemotePeerMessageSender implements Callable<Boolean>
 
                 String url = "";
                 String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-                      //  String.format( "env_%s_%s", localPeerId.toString(),
-                               // envelope.getHeaders().get( Common.ENVIRONMENT_ID_HEADER_NAME ) );
+
+
+                //*********construct Secure Header ****************************
+                Map<String, String> headers = Maps.newHashMap();
+
+                headers.put( Common.HEADER_SPECIAL, "ENC");
+                headers.put( Common.HEADER_ENV_ID_SOURCE,localPeerId.toString() );
+                headers.put( Common.HEADER_ENV_ID_TARGET,targetPeer.getId().toString() );
+                //*************************************************************
 
                 switch ( port )
                 {
@@ -75,7 +82,7 @@ public class RemotePeerMessageSender implements Callable<Boolean>
                         break;
                 }
 
-                restUtil.request( RestUtil.RequestType.POST, url, alias, params, envelope.getHeaders() );
+                restUtil.request( RestUtil.RequestType.POST, url, alias, params, headers );
 
                 messengerDao.markAsSent( envelope );
             }

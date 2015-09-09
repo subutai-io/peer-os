@@ -52,12 +52,14 @@ public class SecurityManagerImpl implements SecurityManager
     /* *****************************
      *
      */
-    public SecurityManagerImpl( String secretKeyringFile,
+    public SecurityManagerImpl( String ownerPublicKeyringFile,
+                                String secretKeyringFile,
                                 String publicKeyringFile,
                                 String secretKeyringPwd)
     {
         keyData = new SecurityKeyData();
 
+        keyData.setOwnerPublicKeyringFile( ownerPublicKeyringFile );
         keyData.setSecretKeyringFile( secretKeyringFile );
         keyData.setPublicKeyringFile( publicKeyringFile);
         keyData.setSecretKeyringPwd( secretKeyringPwd );

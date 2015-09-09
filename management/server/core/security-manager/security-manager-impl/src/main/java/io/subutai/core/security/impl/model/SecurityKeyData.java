@@ -11,6 +11,7 @@ public class SecurityKeyData
     private String secretKeyringPwd;
     private String manHostId;
     private String manHostKeyFingerprint;
+    private String ownerPublicKeyringFile;
 
 
     public String getPublicKeyringFile()
@@ -69,5 +70,17 @@ public class SecurityKeyData
     public void setManHostKeyFingerprint( final String manHostKeyFingerprint )
     {
         this.manHostKeyFingerprint = manHostKeyFingerprint;
+    }
+
+
+    public String getOwnerPublicKeyringFile()
+    {
+        return ownerPublicKeyringFile;
+    }
+
+
+    public void setOwnerPublicKeyringFile( final String ownerPublicKeyringFile )
+    {
+        this.ownerPublicKeyringFile = ownerPublicKeyringFile;
     }
 }

@@ -18,6 +18,8 @@ import org.bouncycastle.openpgp.operator.jcajce.JcePBESecretKeyDecryptorBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
+
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
@@ -108,10 +110,29 @@ public class EncryptionToolImpl implements EncryptionTool
      *
      */
     @Override
+    public byte[] decryptAndVerify( final byte[] message,PGPSecretKey secretKey, String pwd ,PGPPublicKey pubKey) throws PGPException
+    {
+        if( Strings.isNullOrEmpty(pwd))
+        {
+            pwd = keyManager.getSecurityKeyData().getSecretKeyringPwd();
+        }
+
+        return PGPEncryptionUtil.decryptAndVerify( message, secretKey, pwd, pubKey );
+    }
+
+
+    /* *****************************************
+     *
+     */
+    @Override
     public byte[] decrypt( final byte[] message, PGPSecretKeyRing keyRing , String pwd) throws PGPException
     {
-        return PGPEncryptionUtil
-                .decrypt( message,keyRing, pwd );
+        if( Strings.isNullOrEmpty(pwd))
+        {
+            pwd = keyManager.getSecurityKeyData().getSecretKeyringPwd();
+        }
+
+        return PGPEncryptionUtil.decrypt( message, keyRing, pwd );
     }
 
 

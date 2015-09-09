@@ -27,7 +27,9 @@ public class ChannelSettings
                 "/cxf/peer/trust_response",
                 "/cxf/peer/approve/{$}",
 
-                "/cxf/security/keyman/getpublickeyring"
+                "/cxf/security/keyman/getpublickeyring",
+
+                "/cxf/pks/{$}"
 
         };
 

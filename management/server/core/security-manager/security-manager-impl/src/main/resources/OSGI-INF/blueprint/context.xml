@@ -14,10 +14,10 @@
 
   <cm:property-placeholder persistent-id="peer" update-strategy="none">
     <cm:default-properties>
-      <cm:property name="publicKeyringFile" value="" />
-      <cm:property name="secretKeyringFile" value="" />
-      <cm:property name="secretKeyringPwd" value="" />
-      <cm:property name="managementHostKeyFingerprint" value="" />
+      <cm:property name="ownerPublicKeyringFile" value="" />
+      <cm:property name="peerPublicKeyringFile" value="" />
+      <cm:property name="peerSecretKeyringFile" value="" />
+      <cm:property name="peerSecretKeyringPwd" value="" />
       <!-- broker security -->
       <cm:property name="encryptionEnabled" value="false" />
     </cm:default-properties>
@@ -42,9 +42,10 @@
   <bean id="securityManager" scope="singleton" init-method="init" destroy-method="destroy"
         class="io.subutai.core.security.impl.SecurityManagerImpl">
 
-    <argument value="$[subutaiAppDataPath]/keystores/${secretKeyringFile}" />
-    <argument value="$[subutaiAppDataPath]/keystores/${publicKeyringFile}" />
-    <argument value="${secretKeyringPwd}" />
+    <argument value="$[subutaiAppDataPath]/keys/${ownerPublicKeyringFile}" />
+    <argument value="$[subutaiAppDataPath]/keys/${peerSecretKeyringFile}" />
+    <argument value="$[subutaiAppDataPath]/keys/${peerPublicKeyringFile}" />
+    <argument value="${peerSecretKeyringPwd}" />
 
     <property name="daoManager" ref="daoSecurityManager" />
     <property name="keyServer" ref="keyServer" />

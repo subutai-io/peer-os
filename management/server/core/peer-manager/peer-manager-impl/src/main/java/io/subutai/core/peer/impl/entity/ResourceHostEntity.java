@@ -127,6 +127,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         catch ( CommandException e )
         {
+            LOG.error( e.getMessage(),e );
             throw new ResourceHostException( "Error fetching container state", e );
         }
 

@@ -16,21 +16,32 @@ import io.subutai.common.security.crypto.pgp.KeyPair;
  */
 public interface EncryptionTool
 {
-
-    /**
-     * *****************************************
-     */
-    public byte[] encrypt( final byte[] message, final PGPPublicKey publicKey, boolean armored );
-
-
     /**
      * Decrypts message with Peer private key
      */
     public byte[] decrypt( final byte[] message ) throws PGPException;
 
 
-    /**
-     * *****************************************
+    /* *****************************************
+     *
+     */
+    public byte[] decryptAndVerify( final byte[] message,PGPSecretKey secretKey, String pwd ,PGPPublicKey pubKey) throws PGPException;
+
+
+    /* **********************************************
+     *
+     */
+    public byte[] decrypt( final byte[] message, PGPSecretKeyRing keyRing , String pwd) throws PGPException;
+
+
+    /* *****************************************
+     *
+     */
+    public byte[] encrypt( final byte[] message, final PGPPublicKey publicKey, boolean armored );
+
+
+    /* *****************************************
+     *
      */
     public boolean verify( byte[] signedMessage, PGPPublicKey publicKey );
 
@@ -79,12 +90,6 @@ public interface EncryptionTool
      * @return - KeyPair
      */
     public KeyPair generateKeyPair ( String userId,String secretPwd, boolean armored );
-
-
-    /* **********************************************
-     *
-     */
-    public byte[] decrypt( final byte[] message, PGPSecretKeyRing keyRing , String pwd) throws PGPException;
 
 
     /**

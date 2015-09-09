@@ -66,7 +66,7 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     public KeyManagerImpl( SecurityManagerDAO securityManagerDAO, KeyServer keyServer, String publicKeyringFile,
-                           String secretKeyringFile, String secretKeyringPwd, String manHostId,
+                           String ownerPublicKeyringFile,String secretKeyringFile, String secretKeyringPwd, String manHostId,
                            String manHostKeyFingerprint )
     {
         this.securityManagerDAO = securityManagerDAO;
@@ -74,6 +74,7 @@ public class KeyManagerImpl implements KeyManager
 
         keyData = new SecurityKeyData();
         keyData.setManHostId( manHostId );
+        keyData.setOwnerPublicKeyringFile( ownerPublicKeyringFile );
         keyData.setPublicKeyringFile( publicKeyringFile );
         keyData.setSecretKeyringFile( secretKeyringFile );
         keyData.setSecretKeyringPwd( secretKeyringPwd );
@@ -91,18 +92,24 @@ public class KeyManagerImpl implements KeyManager
     {
         try
         {
-            String fingerprint = securityManagerDAO.getSecretKeyFingerprint( keyData.getManHostId() );
+            InputStream ownerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getOwnerPublicKeyringFile() );
+            InputStream peerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getPublicKeyringFile() );
+            InputStream peerSecStream = PGPEncryptionUtil.getFileInputStream( keyData.getSecretKeyringFile() );
 
-            if(Strings.isNullOrEmpty( fingerprint ))
+            if(ownerPubStream == null || peerPubStream == null || peerSecStream == null  )
             {
-                // Create New KeyRings;
-                LOG.info( "******** Creating Key new keyring *******" );
-                saveKeyPair( keyData.getManHostId(),(short)1, generateKeyPair( keyData.getManHostId(), false ) );
+                LOG.info( " **** Error loading PGPPublicKeyRing/PGPSecretKeyRing files. Files not found.**** :");
+            }
+            else
+            {
+                saveSecretKeyRing( keyData.getManHostId(),(short)1, PGPKeyUtil.readSecretKeyRing( peerSecStream ) );
+                savePublicKeyRing( keyData.getManHostId(), ( short ) 1, PGPKeyUtil.readPublicKeyRing( peerPubStream ) );
+                savePublicKeyRing( "owner-" + keyData.getManHostId(), ( short ) 1, PGPKeyUtil.readPublicKeyRing( ownerPubStream ) );
             }
         }
         catch ( Exception ex )
         {
-            LOG.error( " **** Error, Creating PGPPublicKeyRing/PGPSecretKeyRing **** :" + ex.toString() );
+            LOG.error( " **** Error loading PGPPublicKeyRing/PGPSecretKeyRing **** :" + ex.toString() );
         }
     }
 
@@ -580,7 +587,7 @@ public class KeyManagerImpl implements KeyManager
                 WebClient client = RestUtil.createTrustedWebClient( baseUrl );
                 client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
 
-                Response response = client.path( "security/keyman/getpublickeyring" ).query( "hostid", "" ).get();
+                Response response = client.path( "security/keyman/getpublickeyring" ).query( "hostid", remoteHostId ).get();
 
                 if ( response.getStatus() == Response.Status.OK.getStatusCode() )
                 {

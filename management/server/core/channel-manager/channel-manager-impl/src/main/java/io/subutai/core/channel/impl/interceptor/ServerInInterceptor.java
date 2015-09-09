@@ -5,7 +5,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
 
@@ -23,6 +22,7 @@ import com.google.common.base.Strings;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.Common;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
+import io.subutai.core.channel.impl.util.MessageContentUtil;
 
 
 /**
@@ -57,7 +57,7 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
                 String basePath = url.getPath();
                 int status = 0;
 
-                status = checkUrlAccessibility( status, url, basePath, message );
+                status = MessageContentUtil.checkUrlAccessibility( status, url, basePath );
                 //----------------------------------------------------------------------------------------------
                 //--------------- if error occurs --------------------------------------------------------------
                 if ( status != 0 )
@@ -96,20 +96,22 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
                     if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
                     {
                         HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
-                        String spHeader =  headers.getHeaderString( Common.SPECIAL_HEADER_NAME );
+                        String spHeader =  headers.getHeaderString( Common.HEADER_SPECIAL );
 
                         if ( !Strings.isNullOrEmpty( spHeader ) )
                         {
-                            String envId = headers.getHeaderString( Common.ENVIRONMENT_ID_HEADER_NAME );
-                            String peerId = headers.getHeaderString( Common.PEER_ID_HEADER_NAME );
+                            String envIdOut = headers.getHeaderString( Common.HEADER_ENV_ID_TARGET );
+                            String peerIdOut = headers.getHeaderString( Common.HEADER_PEER_ID_TARGET );
 
-                            if ( !Strings.isNullOrEmpty( envId ) )
+                            if ( !Strings.isNullOrEmpty( envIdOut ) )
                             {
-
+                                MessageContentUtil.decryptMessageContent( channelManagerImpl.getSecurityManager(),
+                                        message, envIdOut );
                             }
-                            else if ( !Strings.isNullOrEmpty( peerId ) )
+                            else if ( !Strings.isNullOrEmpty( peerIdOut ) )
                             {
-
+                                MessageContentUtil.decryptMessageContent( channelManagerImpl.getSecurityManager(),
+                                        message, peerIdOut );
                             }
                         }
                     }
@@ -124,32 +126,5 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
     }
 
 
-    private int checkUrlAccessibility( final int currentStatus, final URL url, final String basePath,
-                                       final Message message )
-    {
-        int status = currentStatus;
-        if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X1 ) )
-        {
-            if ( ChannelSettings.checkURLArray( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
-            {
-                status = 1;
-            }
-        }
-        else if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
-        {
-        }
-        else if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X3 ) )
-        {
-            //----------------------------------------------------------------------
-        }
-        else if ( url.getPort() == Integer.parseInt( ChannelSettings.SPECIAL_PORT_X1 ) || url.getPort() == Integer
-                .parseInt( ChannelSettings.SPECIAL_SECURE_PORT_X1 ) )
-        {
-        }
-        else
-        {
-            status = 0;
-        }
-        return status;
-    }
+    //******************************************************************
 }
