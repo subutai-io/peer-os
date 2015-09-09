@@ -119,7 +119,7 @@ public class ReloadableX509TrustManager implements X509TrustManager
         throw new NoSuchAlgorithmException( "No X509TrustManager in TrustManagerFactory" );
     }
 
-
+    //TODO backup truststore before overwriting it
     protected synchronized void addServerCertAndReload( String alias, X509Certificate cert ) throws Exception
     {
 

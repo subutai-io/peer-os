@@ -214,7 +214,7 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
         }
         catch ( HostNotFoundException | NamingException e )
         {
-            LOG.error( "Error in filterContainerHostsByTag", e );
+            LOG.debug( "Error in filterContainerHostsByTag", e );
         }
     }
 

@@ -172,7 +172,7 @@ public class PGPEncryptionUtil
 
                 if ( publicKey != null )
                 {
-                    ops.init( new JcaPGPContentVerifierBuilderProvider().setProvider( "BC" ), publicKey );
+                    ops.init( new JcaPGPContentVerifierBuilderProvider().setProvider( provider ), publicKey );
                     ops.update( contentAndSignatures.getDecryptedContent() );
                     PGPSignature signature = contentAndSignatures.getSignatureList().get( i );
                     if ( ops.verify( signature ) )
@@ -351,7 +351,7 @@ public class PGPEncryptionUtil
 
                     if ( publicKey != null )
                     {
-                        ops.init( new JcaPGPContentVerifierBuilderProvider().setProvider( "BC" ), publicKey );
+                        ops.init( new JcaPGPContentVerifierBuilderProvider().setProvider( provider ), publicKey );
                         ops.update( output );
                         PGPSignature signature = signatureList.get( i );
                         if ( ops.verify( signature ) )
@@ -470,7 +470,7 @@ public class PGPEncryptionUtil
 
                     if ( publicKey != null )
                     {
-                        ops.init( new JcaPGPContentVerifierBuilderProvider().setProvider( "BC" ), publicKey );
+                        ops.init( new JcaPGPContentVerifierBuilderProvider().setProvider( provider ), publicKey );
                         ops.update( output );
                         PGPSignature signature = signatureList.get( i );
                         if ( ops.verify( signature ) )
@@ -622,7 +622,7 @@ public class PGPEncryptionUtil
             int ch;
 
 
-            ops.init( new JcaPGPContentVerifierBuilderProvider().setProvider( "BC" ), publicKey );
+            ops.init( new JcaPGPContentVerifierBuilderProvider().setProvider( provider ), publicKey );
 
             while ( ( ch = dIn.read() ) >= 0 )
             {
@@ -656,10 +656,10 @@ public class PGPEncryptionUtil
             OutputStream theOut = armor ? new ArmoredOutputStream( out ) : out;
 
             PGPPrivateKey pgpPrivKey = secretKey.extractPrivateKey(
-                    new JcePBESecretKeyDecryptorBuilder().setProvider( "BC" ).build( secretPwd.toCharArray() ) );
+                    new JcePBESecretKeyDecryptorBuilder().setProvider( provider ).build( secretPwd.toCharArray() ) );
             PGPSignatureGenerator sGen = new PGPSignatureGenerator(
                     new JcaPGPContentSignerBuilder( secretKey.getPublicKey().getAlgorithm(), PGPUtil.SHA1 )
-                            .setProvider( "BC" ) );
+                            .setProvider( provider ) );
 
             sGen.init( PGPSignature.BINARY_DOCUMENT, pgpPrivKey );
 
@@ -1278,18 +1278,22 @@ public class PGPEncryptionUtil
         try
         {
             PGPPublicKey oldKey = publicKeyRing.getPublicKey();
+
             PGPPrivateKey pgpPrivKey = secretKey.extractPrivateKey(
-                    new JcePBESecretKeyDecryptorBuilder().setProvider( "BC" )
+                    new JcePBESecretKeyDecryptorBuilder().setProvider( provider )
                                                          .build( secretKeyPassword.toCharArray() ) );
+
             PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(
                     new JcaPGPContentSignerBuilder( secretKey.getPublicKey().getAlgorithm(), PGPUtil.SHA512 ) );
-            signatureGenerator.init( PGPSignature.DIRECT_KEY, pgpPrivKey );
+
+            signatureGenerator.init( PGPSignature.DEFAULT_CERTIFICATION, pgpPrivKey );
 
             PGPSignature signature = signatureGenerator.generateCertification( id, oldKey );
 
             PGPPublicKey newKey = PGPPublicKey.addCertification( oldKey, signature );
 
             PGPPublicKeyRing newPublicKeyRing = PGPPublicKeyRing.removePublicKey( publicKeyRing, oldKey );
+
             return PGPPublicKeyRing.insertPublicKey( newPublicKeyRing, newKey );
         }
         catch ( Exception e )
@@ -1318,7 +1322,7 @@ public class PGPEncryptionUtil
             while ( signIterator.hasNext() )
             {
                 PGPSignature signature = signIterator.next();
-                signature.init( new JcaPGPContentVerifierBuilderProvider().setProvider( "BC" ), keyToVerifyWith );
+                signature.init( new JcaPGPContentVerifierBuilderProvider().setProvider( provider ), keyToVerifyWith );
                 if ( signature.verifyCertification( id.getBytes(), keyToVerify ) )
                 {
                     return true;

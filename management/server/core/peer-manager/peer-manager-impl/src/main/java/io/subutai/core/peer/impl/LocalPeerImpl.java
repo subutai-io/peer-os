@@ -633,7 +633,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 containerGroupDataService.persist( containerGroup );
 
-                LOG.error( "Error creating container group #createContainerGroup", e );
+                LOG.debug( "Error creating container group #createContainerGroup", e );
             }
         }
         return result;
@@ -975,9 +975,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder(
-                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
-                    bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
+                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1299,7 +1298,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 }
                 catch ( HostNotFoundException e )
                 {
-                    LOG.warn( "Host not found in #onHeartbeat", e );
+                    LOG.debug( "Host not found in #onHeartbeat", e );
                     host = new ResourceHostEntity( getId().toString(), resourceHostInfo );
                     host.init();
                     resourceHostDataService.persist( ( ResourceHostEntity ) host );
