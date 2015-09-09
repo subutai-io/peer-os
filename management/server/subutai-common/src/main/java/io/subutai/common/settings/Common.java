@@ -8,6 +8,7 @@ public class Common
     public static final String MANAGEMENT_HOST_EXTERNAL_IP_INTERFACE = "eth1";
     public static final int WAIT_CONTAINER_CONNECTION_SEC = 300;
     public static final int REFRESH_UI_SEC = 3;
+    public static final int BROKER_MESSAGE_TIMEOUT_SEC = 30;
     public static final int MIN_COMMAND_TIMEOUT_SEC = 1;
     public static final int MAX_COMMAND_TIMEOUT_SEC = 100 * 60 * 60; // 100 hours
     public static final int INACTIVE_COMMAND_DROP_TIMEOUT_SEC = 24 * 60 * 60; // 24 hours
