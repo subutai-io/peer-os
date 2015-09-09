@@ -14,6 +14,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -71,6 +75,8 @@ public class IntegrationImpl implements Integration
     private PGPPublicKey hubPublicKey;
     private PGPPublicKey ownerPublicKey;
     private PGPPublicKey peerPublicKey;
+    private ScheduledExecutorService hearbeatExecutorService = Executors.newSingleThreadScheduledExecutor();
+    private HeartbeatProcessor processor = new HeartbeatProcessor();
 
 
     public void setSecurityManager( final SecurityManager securityManager )
@@ -95,17 +101,12 @@ public class IntegrationImpl implements Integration
     {
         LOG.debug( "H-INTEGRATION" );
 
-        //  new TrustSelfSignedStrategy();
-
-        EnvironmentDTO environmentDTO;
-
-        LOG.debug( "DTO" + EnvironmentDTO.class.toString() );
-
         generateKeys();
 
-        hubPublicKey = PGPKeyHelper.readPublicKey( HSettings.HUB_PUB_KEY );
-        ownerPublicKey = getOwnerPubKeyRing().getPublicKey();
-        peerPublicKey = getPeerPubKeyRing().getPublicKey();
+        this.hubPublicKey = PGPKeyHelper.readPublicKey( HSettings.HUB_PUB_KEY );
+        this.ownerPublicKey = getOwnerPubKeyRing().getPublicKey();
+        this.peerPublicKey = getPeerPubKeyRing().getPublicKey();
+        this.hearbeatExecutorService.scheduleWithFixedDelay( processor, 10, 30, TimeUnit.SECONDS );
     }
 
 
@@ -356,9 +357,8 @@ public class IntegrationImpl implements Integration
             String path = String.format( "/rest/v1/peers/%s", peerManager.getLocalPeerInfo().getId() );
 
             RegistrationDTO registrationData = new RegistrationDTO( PGPKeyHelper.getFingerprint( ownerPublicKey ) );
-            LOG.debug( "------------------> " + PGPKeyHelper.getFingerprint( ownerPublicKey ) );
 
-            byte[] serverFingerprint = getHPubKeyRing().getPublicKey().getFingerprint();
+            byte[] serverFingerprint = hubPublicKey.getFingerprint();
 
             KeyStore keyStore = KeyStore.getInstance( "JKS" );
 
