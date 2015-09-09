@@ -74,7 +74,7 @@ public class IntegrationImpl implements Integration
     private PGPPublicKey ownerPublicKey;
     private PGPPublicKey peerPublicKey;
     private ScheduledExecutorService hearbeatExecutorService = Executors.newSingleThreadScheduledExecutor();
-    private HeartbeatProcessor processor = new HeartbeatProcessor();
+    private HeartbeatProcessor processor;
 
 
     public void setSecurityManager( final SecurityManager securityManager )
@@ -114,7 +114,7 @@ public class IntegrationImpl implements Integration
         String path = String.format( "/rest/v1/peers/%s/hearbeat", peerManager.getLocalPeerInfo().getId() );
         WebClient client = io.subutai.core.hintegration.impl.HttpClient.createTrustedWebClient( baseUrl + path );
 
-        processor.addEndpoint( client );
+        processor = new HeartbeatProcessor( this );
         this.hearbeatExecutorService.scheduleWithFixedDelay( processor, 10, 30, TimeUnit.SECONDS );
     }
 
