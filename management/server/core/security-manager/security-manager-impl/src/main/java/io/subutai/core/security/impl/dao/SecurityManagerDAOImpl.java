@@ -2,6 +2,7 @@ package io.subutai.core.security.impl.dao;
 
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,7 +154,9 @@ public class SecurityManagerDAOImpl implements SecurityManagerDAO
         {
             daoManager.startTransaction( em );
 
-            em.remove( getKeyIdentityData(hostId ));
+            Query qr = em.createQuery( "delete from SecurityKeyIdentityEntity AS ss where ss.hostId=:hostId" );
+            qr.setParameter( "hostId",hostId );
+            qr.executeUpdate();
 
             daoManager.commitTransaction( em );
         }
