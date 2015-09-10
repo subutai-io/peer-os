@@ -881,13 +881,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             resourceHost.startContainerHost( containerHost );
         }
-        catch ( ResourceHostException e )
-        {
-            throw new PeerException( String.format( "Could not start LXC container [%s]", e.toString() ) );
-        }
         catch ( Exception e )
         {
-            throw new PeerException( String.format( "Could not stop LXC container [%s]", e.toString() ) );
+            throw new PeerException( String.format( "Could not start LXC container [%s]", e.toString() ) );
         }
     }
 
@@ -980,8 +976,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
-                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder(
+                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
+                    bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1908,11 +1905,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 PGPSecretKeyRing peerSecRing = keyManager.getSecretKeyRing( null );
 
                 //************Sign Key **************************************************************
-                pubRing = encTool.signPublicKey(pubRing,getId().toString() ,peerSecRing.getSecretKey() , "" );
+                pubRing = encTool.signPublicKey( pubRing, getId().toString(), peerSecRing.getSecretKey(), "" );
 
                 //***************Save Keys *********************************************************
-                keyManager.saveSecretKeyRing(environmentId,( short ) 2, secRing );
-                keyManager.savePublicKeyRing( environmentId,( short ) 2, pubRing );
+                keyManager.saveSecretKeyRing( environmentId, ( short ) 2, secRing );
+                keyManager.savePublicKeyRing( environmentId, ( short ) 2, pubRing );
 
 
                 return 1;
