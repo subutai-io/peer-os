@@ -4,6 +4,9 @@ package io.subutai.core.security.impl.crypto;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
@@ -13,11 +16,15 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.cxf.jaxrs.client.WebClient;
+
 import com.google.common.base.Strings;
 
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.util.RestUtil;
 import io.subutai.core.keyserver.api.KeyServer;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.security.api.dao.SecretKeyStoreDAO;
@@ -59,7 +66,7 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     public KeyManagerImpl( SecurityManagerDAO securityManagerDAO, KeyServer keyServer, String publicKeyringFile,
-                           String secretKeyringFile, String secretKeyringPwd, String manHostId,
+                           String ownerPublicKeyringFile,String secretKeyringFile, String secretKeyringPwd, String manHostId,
                            String manHostKeyFingerprint )
     {
         this.securityManagerDAO = securityManagerDAO;
@@ -67,6 +74,7 @@ public class KeyManagerImpl implements KeyManager
 
         keyData = new SecurityKeyData();
         keyData.setManHostId( manHostId );
+        keyData.setOwnerPublicKeyringFile( ownerPublicKeyringFile );
         keyData.setPublicKeyringFile( publicKeyringFile );
         keyData.setSecretKeyringFile( secretKeyringFile );
         keyData.setSecretKeyringPwd( secretKeyringPwd );
@@ -84,14 +92,24 @@ public class KeyManagerImpl implements KeyManager
     {
         try
         {
-            // Create New KeyRings;
-            LOG.info( "******** Creating Key new keyring *******" );
+            InputStream ownerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getOwnerPublicKeyringFile() );
+            InputStream peerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getPublicKeyringFile() );
+            InputStream peerSecStream = PGPEncryptionUtil.getFileInputStream( keyData.getSecretKeyringFile() );
 
-            saveKeyPair( keyData.getManHostId(),(short)1, generateKeyPair( keyData.getManHostId(), false ) );
+            if(ownerPubStream == null || peerPubStream == null || peerSecStream == null  )
+            {
+                LOG.info( " **** Error loading PGPPublicKeyRing/PGPSecretKeyRing files. Files not found.**** :");
+            }
+            else
+            {
+                saveSecretKeyRing( keyData.getManHostId(),(short)1, PGPKeyUtil.readSecretKeyRing( peerSecStream ) );
+                savePublicKeyRing( keyData.getManHostId(), ( short ) 1, PGPKeyUtil.readPublicKeyRing( peerPubStream ) );
+                savePublicKeyRing( "owner-" + keyData.getManHostId(), ( short ) 1, PGPKeyUtil.readPublicKeyRing( ownerPubStream ) );
+            }
         }
         catch ( Exception ex )
         {
-            LOG.error( " **** Error, Creating PGPPublicKeyRing/PGPSecretKeyRing **** :" + ex.toString() );
+            LOG.error( " **** Error loading PGPPublicKeyRing/PGPSecretKeyRing **** :" + ex.toString() );
         }
     }
 
@@ -154,6 +172,11 @@ public class KeyManagerImpl implements KeyManager
         try
         {
             PGPPublicKey publicKey = PGPKeyUtil.readPublicKey( publicKeyRing );
+
+            if ( Strings.isNullOrEmpty( hostId ) )
+            {
+                hostId = keyData.getManHostId();
+            }
 
             if ( publicKey != null )
             {
@@ -539,5 +562,72 @@ public class KeyManagerImpl implements KeyManager
         {
 
         }
+    }
+
+    /* *************************************************************
+     * Get Public key and save it in the local KeyServer
+     */
+    @Override
+    public PGPPublicKey getRemoteHostPublicKey( String remoteHostId, String ip )
+    {
+        try
+        {
+            PGPPublicKeyRing pubRing = null;
+
+            if(Strings.isNullOrEmpty( remoteHostId ))
+            {
+                remoteHostId = getRemoteHostId( ip );
+            }
+
+            pubRing = getPublicKeyRing( remoteHostId );
+
+            if(pubRing == null) // Get from HTTP
+            {
+                String baseUrl = String.format( "https://%s:%s/cxf", ip, ChannelSettings.SECURE_PORT_X1 );
+                WebClient client = RestUtil.createTrustedWebClient( baseUrl );
+                client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
+
+                Response response = client.path( "security/keyman/getpublickeyring" ).query( "hostid", remoteHostId ).get();
+
+                if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+                {
+                    String publicKeyring = response.readEntity( String.class );
+                    savePublicKeyRing( remoteHostId, ( short ) 3, publicKeyring );
+                }
+                return getPublicKey( remoteHostId );
+
+            }
+            else
+            {
+                return PGPKeyUtil.readPublicKey(pubRing);
+            }
+        }
+        catch ( Exception ex )
+        {
+            return null;
+        }
+    }
+
+
+    /* *************************************************************
+     * Get HOST ID key
+     */
+    private String getRemoteHostId( String ip )
+    {
+        // Get Remote peer Public Key and save in the local keystore
+
+        String peerId = "";
+
+        String baseUrl = String.format( "https://%s:%s/cxf", ip, ChannelSettings.SECURE_PORT_X1 );
+        WebClient clientPeerId = RestUtil.createTrustedWebClient( baseUrl );
+        clientPeerId.type( MediaType.TEXT_PLAIN ).accept( MediaType.TEXT_PLAIN );
+        Response response = clientPeerId.path( "peer/id" ).get();
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            peerId = response.readEntity( String.class );
+        }
+
+        return peerId;
     }
 }

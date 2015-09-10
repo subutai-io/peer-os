@@ -113,4 +113,10 @@ public interface KeyManager
      */
     public InputStream getSecretKeyRingInputStream( String hostId );
 
+
+    /* *****************************
+     *
+     */
+    public PGPPublicKey getRemoteHostPublicKey( String hostId, String ip );
+
 }

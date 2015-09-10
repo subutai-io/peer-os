@@ -96,7 +96,7 @@ public class CommandRequestListenerTest
     public void testCommandRequestCallback() throws Exception
     {
         CommandRequestListener.CommandRequestCallback callback =
-                new CommandRequestListener.CommandRequestCallback( commandRequest, sourcePeer );
+                new CommandRequestListener.CommandRequestCallback( commandRequest, sourcePeer , localPeer );
         when( commandRequest.getEnvironmentId() ).thenReturn( UUID.randomUUID() );
 
         callback.onResponse( response, commandResult );

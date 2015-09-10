@@ -2,12 +2,12 @@ package io.subutai.core.broker.impl;
 
 
 import java.io.PrintStream;
+import java.util.concurrent.ExecutorService;
 
 import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
-import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
@@ -39,6 +39,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -92,7 +93,7 @@ public class BrokerImplTest
     @Mock
     SystemUsage systemUsage;
     @Mock
-    MemoryUsage  memoryUsage;
+    MemoryUsage memoryUsage;
     @Mock
     TempUsage tempUsage;
     @Mock
@@ -101,6 +102,8 @@ public class BrokerImplTest
     PolicyMap policyMap;
     @Mock
     TimeStampingBrokerPlugin timeStampingBrokerPlugin;
+    @Mock
+    ExecutorService messageSender;
 
     BrokerImpl broker;
 
@@ -108,8 +111,9 @@ public class BrokerImplTest
     @Before
     public void setUp() throws Exception
     {
-        broker = spy( new BrokerImpl( BROKER_URL, true, MESSAGE_TIMEOUT, KEYSTORE, KEYSTORE_PASSWORD, KEYSTORE,
-                KEYSTORE_PASSWORD, CA_CERTIFICATE ) );
+        broker = spy( new BrokerImpl( BROKER_URL, KEYSTORE, KEYSTORE_PASSWORD, KEYSTORE, KEYSTORE_PASSWORD,
+                CA_CERTIFICATE ) );
+        broker.messageSender = messageSender;
         doReturn( systemUsage ).when( brokerService ).getSystemUsage();
         doReturn( memoryUsage ).when( systemUsage ).getMemoryUsage();
         doReturn( tempUsage ).when( systemUsage ).getTempUsage();
@@ -138,13 +142,7 @@ public class BrokerImplTest
     {
         broker.sendTextMessage( TOPIC, TEXT_MESSAGE );
 
-        verify( session ).createTopic( TOPIC );
-        verify( session ).createTextMessage( TEXT_MESSAGE );
-        verify( producer ).send( any( Message.class ) );
-
-        verify( producer ).close();
-        verify( session ).close();
-        verify( connection ).close();
+        messageSender.execute( isA( SendMessageTask.class ) );
     }
 
 
@@ -153,18 +151,7 @@ public class BrokerImplTest
     {
         broker.sendByteMessage( TOPIC, BYTE_MESSAGE );
 
-        verify( session ).createTopic( TOPIC );
-        verify( session ).createBytesMessage();
-        verify( producer ).send( any( Message.class ) );
-    }
-
-
-    @Test( expected = BrokerException.class )
-    public void testSendMessageException() throws Exception
-    {
-        doThrow( new JMSException( null ) ).when( amqFactory ).createConnection();
-
-        broker.sendTextMessage( TOPIC, TEXT_MESSAGE );
+        messageSender.execute( isA( SendMessageTask.class ) );
     }
 
 

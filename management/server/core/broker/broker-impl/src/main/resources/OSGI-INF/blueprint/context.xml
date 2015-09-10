@@ -1,25 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <blueprint xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
-           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <!-- Allow the use of system properties -->
-  <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
-
-  <cm:property-placeholder persistent-id="broker" update-strategy="none">
-    <cm:default-properties>
-      <cm:property name="brokerUrl" value="mqtt+nio+ssl://0.0.0.0:8883?needClientAuth=true&amp;transport.enabledProtocols=TLSv1.1" />
-      <cm:property name="isPersistent" value="true" />
-      <cm:property name="messageTimeout" value="0" />
-    </cm:default-properties>
-  </cm:property-placeholder>
+  <cm:property-placeholder persistent-id="broker" update-strategy="none" />
 
   <bean id="broker"
         class="io.subutai.core.broker.impl.BrokerImpl"
         init-method="init" destroy-method="dispose" scope="singleton" activation="eager">
+
     <argument value="${brokerUrl}" />
-    <argument value="${isPersistent}" />
-    <argument value="${messageTimeout}" />
     <argument value="${keystore}" />
     <argument value="${keystorePassword}" />
     <argument value="${truststore}" />

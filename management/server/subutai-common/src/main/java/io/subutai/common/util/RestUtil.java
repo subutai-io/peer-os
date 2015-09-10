@@ -36,6 +36,8 @@ public class RestUtil
     private static int defaultMaxRetransmits = 3;
 
 
+
+
     public WebClient createTrustedWebClientWithAuthAndProviders( final String url, final String alias,
                                                      final List<Object> providers )
     {
@@ -150,6 +152,7 @@ public class RestUtil
             throws MalformedURLException, HTTPException
     {
         WebClient client = null;
+
         try
         {
             URL urlObject = new URL( url );
@@ -229,6 +232,7 @@ public class RestUtil
     public static WebClient createWebClient( String url )
     {
         WebClient client = WebClient.create( url );
+
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
 
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
@@ -250,6 +254,7 @@ public class RestUtil
     public static WebClient createTrustedWebClient( String url )
     {
         WebClient client = WebClient.create( url );
+
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
 
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
@@ -274,6 +279,7 @@ public class RestUtil
     public static WebClient createTrustedWebClientWithAuth( String url, String alias )
     {
         WebClient client = WebClient.create( url );
+
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
 
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();

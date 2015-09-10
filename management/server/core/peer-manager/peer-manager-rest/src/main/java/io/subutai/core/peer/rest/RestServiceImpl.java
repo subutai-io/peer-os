@@ -173,38 +173,6 @@ public class RestServiceImpl implements RestService
     }
 
 
-    /* *************************************************************
-     * Get Public key and save it in the local KeyServer
-     */
-    private String getAndStorePeerPublicKey( final String peerId, final String ip )
-    {
-        String baseUrl = String.format( "https://%s:%s/cxf", ip, ChannelSettings.SECURE_PORT_X1 );
-        WebClient client = RestUtil.createTrustedWebClient( baseUrl );
-        client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
-
-        try
-        {
-            Response response = client.path( "security/keyman/getpublickeyring" ).query( "hostid", "" ).get();
-
-            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
-            {
-                // Get Remote peer Public Key and save in the local keystore
-                String publicKeyring = response.readEntity( String.class );
-
-                securityManager.getKeyManager().savePublicKeyRing( peerId, ( short ) 3, publicKeyring );
-
-                return peerId;
-            }
-
-            return "";
-        }
-        catch ( Exception ex )
-        {
-            return "";
-        }
-    }
-
-
     @Override
     public Response processRegisterRequest( String peer )
     {
@@ -229,8 +197,7 @@ public class RestServiceImpl implements RestService
             else
             {
                 //Encrypt Local Peer
-                getAndStorePeerPublicKey( p.getId().toString(), p.getIp() );
-                PGPPublicKey pkey = keyManager.getPublicKey( p.getId().toString() );
+                PGPPublicKey pkey  = keyManager.getRemoteHostPublicKey( p.getId().toString(),p.getIp() );
                 PeerInfo localPeer = peerManager.getLocalPeerInfo();
 
                 if ( pkey != null )
@@ -443,34 +410,43 @@ public class RestServiceImpl implements RestService
             //*************************************************************
 
             PeerInfo p = jsonUtil.from( new String( data ), PeerInfo.class );
-            p.setStatus( PeerStatus.APPROVED );
-            peerManager.update( p );
 
-            //adding remote repository
-            ManagementHost managementHost = peerManager.getLocalPeer().getManagementHost();
-            managementHost.addRepository( p.getIp() );
+            if(p.getKeyPhrase().equals( (peerManager.getPeerInfo( p.getId()).getKeyPhrase()  ) ))
+            {
+                p.setStatus( PeerStatus.APPROVED );
+                peerManager.update( p );
 
-            //************ Save Trust SSL Cert **************************************
-            String rootCertPx2 = new String( cert );
+                //adding remote repository
+                ManagementHost managementHost = peerManager.getLocalPeer().getManagementHost();
+                managementHost.addRepository( p.getIp() );
 
-            securityManager.getKeyStoreManager()
-                           .importCertAsTrusted( ChannelSettings.SECURE_PORT_X2, p.getId().toString(), rootCertPx2 );
-            //***********************************************************************
+                //************ Save Trust SSL Cert **************************************
+                String rootCertPx2 = new String( cert );
 
-            //************ Export Current Cert **************************************
-            String localPeerCert = "";
+                securityManager.getKeyStoreManager()
+                               .importCertAsTrusted( ChannelSettings.SECURE_PORT_X2, p.getId().toString(), rootCertPx2 );
+                //***********************************************************************
 
-            localPeerCert =
-                    securityManager.getKeyStoreManager().exportCertificate( ChannelSettings.SECURE_PORT_X2, "" );
+                //************ Export Current Cert **************************************
+                String localPeerCert = "";
 
-            //***********************************************************************
+                localPeerCert =
+                        securityManager.getKeyStoreManager().exportCertificate( ChannelSettings.SECURE_PORT_X2, "" );
 
-            httpContextManager.reloadTrustStore();
+                httpContextManager.reloadTrustStore();
+                //***********************************************************************
 
-            PGPPublicKey pkey = keyManager.getPublicKey( p.getId().toString() ); //Get PublicKey from KeyServer
-            byte certRes[] = encTool.encrypt( localPeerCert.getBytes(), pkey, false );
 
-            return Response.ok( HexUtil.byteArrayToHexString( certRes ) ).build();
+                PGPPublicKey pkey = keyManager.getPublicKey( p.getId().toString() ); //Get PublicKey from KeyServer
+                byte certRes[] = encTool.encrypt( localPeerCert.getBytes(), pkey, false );
+
+                return Response.ok( HexUtil.byteArrayToHexString( certRes ) ).build();
+            }
+            else
+            {
+                return Response.status( Response.Status.FORBIDDEN ).build();
+            }
+
         }
         catch ( Exception e )
         {
@@ -478,92 +454,6 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
-
-
-
-    /*
-    @Override
-    public Response approveForRegistrationRequest( final String peerId )
-    {
-        try
-        {
-            Preconditions.checkState( UUIDUtil.isStringAUuid( peerId ) );
-
-            UUID uuid = UUID.fromString( peerId );
-            PeerInfo remotePeer = peerManager.getPeerInfo( uuid );
-            PeerInfo peerToUpdateOnRemote = peerManager.getLocalPeerInfo();
-
-            if ( remotePeer.getStatus() != PeerStatus.REQUESTED )
-            {
-                return Response.serverError().entity( "*********** Access denied *************" ).build();
-            }
-            else
-            {
-                //************ Send Trust SSL Cert **************************************
-                KeyStore keyStore;
-                KeyStoreData keyStoreData;
-                KeyStoreManager keyStoreManager;
-
-                keyStoreData = new KeyStoreData();
-                keyStoreData.setupKeyStorePx2();
-
-                keyStoreManager = new KeyStoreManager();
-                keyStore = keyStoreManager.load( keyStoreData );
-
-                String cert = keyStoreManager.exportCertificateHEXString( keyStore, keyStoreData );
-                //***********************************************************************
-
-                String baseUrl =
-                        String.format( "https://%s:%s/cxf", remotePeer.getIp(), ChannelSettings.SECURE_PORT_X1 );
-                WebClient client = restUtil.getTrustedWebClient( baseUrl );
-                client.type( MediaType.APPLICATION_FORM_URLENCODED ).accept( MediaType.APPLICATION_JSON );
-
-                Form form = new Form();
-                form.set( "approvedPeer", jsonUtil.to( peerToUpdateOnRemote ) );
-                form.set( "root_cert_px2", cert );
-
-
-                Response response = client.path( "peer/approve" ).put( form );
-                if ( response.getStatus() == Response.Status.OK.getStatusCode() )
-                {
-                    LOGGER.info( response.readEntity( String.class ) );
-                    remotePeer.setStatus( PeerStatus.APPROVED );
-                    String root_cert_px2 = response.readEntity( String.class );
-                    //************ Save Trust SSL Cert **************************************
-
-                    keyStoreData = new KeyStoreData();
-                    keyStoreData.setupTrustStorePx2();
-                    keyStoreData.setHEXCert( root_cert_px2 );
-                    keyStoreData.setAlias( remotePeer.getId().toString() );
-
-                    keyStoreManager = new KeyStoreManager();
-                    keyStore = keyStoreManager.load( keyStoreData );
-
-                    keyStoreManager.importCertificateHEXString( keyStore, keyStoreData );
-                    //***********************************************************************
-
-                    httpContextManager.reloadTrustStore();
-
-                    remotePeer.setStatus( PeerStatus.APPROVED );
-
-                    peerManager.update( remotePeer );
-                    return Response.ok( String.format( "%s registered.", remotePeer.getName() ) ).build();
-                }
-                else
-                {
-                    LOGGER.warn( "Response for registering peer: " + response.toString() );
-                    return Response.status( Response.Status.EXPECTATION_FAILED )
-                                   .entity( "Error occurred on peer to register" ).build();
-                }
-            }
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error approving peer registration request #approveForRegistrationRequest", e );
-            return Response.serverError().entity( e.toString() ).build();
-        }
-    }
-    */
 
 
     @Override
@@ -688,28 +578,6 @@ public class RestServiceImpl implements RestService
     }
 
 
-    private String encryptData( String dataSTR, HttpHeaders headers )
-    {
-        String hostId = headers.getHeaderString( Common.ENVIRONMENT_ID_HEADER_NAME );
-        String remoteIp = headers.getHeaderString( "PEER_IP" );
-
-
-        EncryptionTool encTool = securityManager.getEncryptionTool();
-        KeyManager keyManager = securityManager.getKeyManager();
-        PGPPublicKey pubkey = keyManager.getPublicKey( hostId );
-
-        if ( pubkey == null )
-        {
-            getAndStorePeerPublicKey( hostId, remoteIp );
-            pubkey = keyManager.getPublicKey( hostId );
-        }
-
-        byte[] data = encTool.encrypt( dataSTR.getBytes(), pubkey, false );
-
-        return HexUtil.byteArrayToHexString( data );
-    }
-
-
     @Override
     public Response getContainerState( final String containerId )
     {
@@ -722,10 +590,6 @@ public class RestServiceImpl implements RestService
                     localPeer.getContainerHostById( UUID.fromString( containerId ) ).getState();
 
             String jsonData = jsonUtil.to( containerHostState );
-
-            //***** ENC  ************************************
-            //String output = encryptData( jsonData, headers );
-            //***********************************************
 
             return Response.ok( jsonData ).build();
         }

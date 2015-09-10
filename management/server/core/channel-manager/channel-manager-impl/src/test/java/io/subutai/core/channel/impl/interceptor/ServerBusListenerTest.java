@@ -7,7 +7,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
-import io.subutai.core.channel.impl.interceptor.CXFBusListener;
 
 import org.slf4j.Logger;
 
@@ -17,9 +16,9 @@ import static org.junit.Assert.assertNotNull;
 
 
 @RunWith( MockitoJUnitRunner.class )
-public class CXFBusListenerTest
+public class ServerBusListenerTest
 {
-    private CXFBusListener cxfBusListener;
+    private ServerBusListener cxfBusListener;
     @Mock
     ChannelManagerImpl channelManager;
     @Mock
@@ -30,7 +29,7 @@ public class CXFBusListenerTest
     @Before
     public void setUp() throws Exception
     {
-        cxfBusListener = new CXFBusListener();
+        cxfBusListener = new ServerBusListener();
         cxfBusListener.setChannelManager( channelManager );
     }
 
