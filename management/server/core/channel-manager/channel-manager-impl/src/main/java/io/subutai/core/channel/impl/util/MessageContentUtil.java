@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 
+import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
@@ -25,9 +26,10 @@ import io.subutai.core.security.api.SecurityManager;
  */
 public class MessageContentUtil
 {
-    public static int checkUrlAccessibility( final int currentStatus, final URL url, final String basePath)
+    public static int checkUrlAccessibility( final int currentStatus, final URL url, final String basePath )
     {
         int status = currentStatus;
+
         if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X1 ) )
         {
             if ( ChannelSettings.checkURLArray( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
@@ -57,7 +59,7 @@ public class MessageContentUtil
     /* ******************************************************
      *
      */
-    public static void decryptMessageContent(SecurityManager securityManager, Message message, String hostId )
+    public static void decryptContent( SecurityManager securityManager, Message message,String hostIdSource , String hostIdTarget )
     {
 
         InputStream is = message.getContent( InputStream.class );
@@ -68,16 +70,19 @@ public class MessageContentUtil
             IOUtils.copyAndCloseInput( is, os );
             os.flush();
 
-            byte[] data = decryptData(securityManager, hostId, os.getBytes() );
+            byte[] data = decryptData( securityManager, hostIdSource, hostIdTarget, os.getBytes() );
             org.apache.commons.io.IOUtils.closeQuietly( os );
 
-            if(data!=null)
+            if ( data != null )
             {
-                message.setContent( InputStream.class, new ByteArrayInputStream( data ));
+                message.setContent( InputStream.class, new ByteArrayInputStream( data ) );
             }
-
         }
         catch ( IOException e )
+        {
+
+        }
+        catch ( PGPException pe )
         {
 
         }
@@ -87,29 +92,35 @@ public class MessageContentUtil
     /* ******************************************************
      *
      */
-    private static byte[] decryptData(SecurityManager securityManager, String hostId, byte[] data )
+    private static byte[] decryptData( SecurityManager securityManager, String hostIdSource, String hostIdTarget,
+                                       byte[] data ) throws PGPException
     {
 
         try
         {
-            if ( data == null || data.length == 0)
+            if ( data == null || data.length == 0 )
             {
                 return null;
             }
             else
             {
                 EncryptionTool encTool = securityManager.getEncryptionTool();
+
+                //encTool.
+
                 KeyManager keyMan = securityManager.getKeyManager();
-                PGPSecretKeyRing secKey = keyMan.getSecretKeyRing(  hostId );
+                PGPSecretKeyRing secKey = keyMan.getSecretKeyRing( hostIdSource );
 
                 byte[] outData = encTool.decrypt( data, secKey, "" );
+
+                //byte[] outData = encTool.decryptAndVerify();
 
                 return outData;
             }
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
-            return null;
+            throw new PGPException( ex.toString() );
         }
     }
 
@@ -117,7 +128,8 @@ public class MessageContentUtil
     /* ******************************************************
     *
     */
-    public static void encryptMessageContent(SecurityManager securityManager, String hostId, String ip, Message message )
+    public static void encryptContent( SecurityManager securityManager, String hostIdSource, String hostIdTarget,
+                                              String ip, Message message )
     {
         OutputStream os = message.getContent( OutputStream.class );
 
@@ -137,7 +149,8 @@ public class MessageContentUtil
             org.apache.commons.io.IOUtils.closeQuietly( csnew );
 
             //do something with original message to produce finalMessage
-            byte[] finalMessage = encryptData(securityManager, hostId, ip, originalMessage );
+            byte[] finalMessage =
+                    encryptData( securityManager, hostIdSource, hostIdTarget, ip, originalMessage );
 
             if ( finalMessage != null )
             {
@@ -157,27 +170,41 @@ public class MessageContentUtil
         {
             throw new RuntimeException( ioe );
         }
+        catch ( PGPException pe )
+        {
+
+        }
     }
 
 
     /* ******************************************************
      *
      */
-    private static  byte[] encryptData(SecurityManager securityManager, String hostId, String ip, byte[] data )
+    private static byte[] encryptData( SecurityManager securityManager, String hostIdSource, String hostIdTarget,
+                                       String ip, byte[] data ) throws PGPException
     {
-        if ( data == null || data.length == 0 )
+        try
         {
-            return null;
+            if ( data == null || data.length == 0 )
+            {
+                return null;
+            }
+            else
+            {
+                EncryptionTool encTool = securityManager.getEncryptionTool();
+                KeyManager keyMan = securityManager.getKeyManager();
+                PGPPublicKey pubKey = keyMan.getRemoteHostPublicKey( hostIdTarget, ip );
+
+                byte[] outData = encTool.encrypt( data, pubKey, false );
+
+                //byte[] outData = encTool.signAndEncrypt(  data, pubKey, false );
+
+                return outData;
+            }
         }
-        else
+        catch ( Exception ex )
         {
-            EncryptionTool encTool = securityManager.getEncryptionTool();
-            KeyManager keyMan = securityManager.getKeyManager();
-            PGPPublicKey pubKey = keyMan.getRemoteHostPublicKey( hostId, ip );
-
-            byte[] outData = encTool.encrypt( data, pubKey, false );
-
-            return outData;
+            throw new PGPException( ex.toString() );
         }
     }
 }
