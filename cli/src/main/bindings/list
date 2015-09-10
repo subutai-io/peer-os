@@ -290,19 +290,19 @@ function list_infoc {
 conts=`list_containers_i`
 name=$1
 if [ $name ]; then 
-     echo "name is = $name"
+#     echo "name is = $name"
      status=$(lxc-info -n $name | grep State | awk -F":" '{print $2}' | sed -e 's/^[[:space:]]*//')
      state=$(lxc-info -n $name | grep State | awk -F" " '{print $2}')
      
      if [  "$state" = "RUNNING" ]; then
-      out="$out \n NAME\tSTATE\tHWADDR\tIP\tInterface"
+      out="$out NAME\tSTATE\tHWADDR\tIP\tInterface"
       out="$out \n ---------------------------------"
       HW=$( lxc-attach -n $name -- cat /sys/class/net/eth0/address)
       IP=$( lxc-attach -n $name -- ifconfig eth0 | awk '/inet addr/{print substr($2,6)}' )
       out="$out \n $name\t $status\t $HW\t  $IP \teth0"
       echo -e $out 
      else 
-      out="$out \n NAME\tSTATE"
+      out="$out NAME\tSTATE"
       out="$out \n ---------------------------------"
       if [ -z $state ];then  
        state="NOT_EXIST"
