@@ -53,6 +53,8 @@ public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
                 {
                     HttpHeaders headers = new HttpHeadersImpl( message );
 
+                    LOG.info( " *** URL:" + url.getPath());
+
                     String spHeader = headers.getHeaderString( Common.HEADER_SPECIAL );
 
                     if ( !Strings.isNullOrEmpty( spHeader ) )

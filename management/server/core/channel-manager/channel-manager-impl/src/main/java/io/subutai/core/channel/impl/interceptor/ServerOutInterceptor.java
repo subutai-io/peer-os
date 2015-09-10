@@ -48,12 +48,14 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
         {
             if ( InterceptorState.SERVER_OUT.isActive( message ) )
             {
-                LOG.info( "Server OutInterceptor invoked " );
+                LOG.info( " *** Server OutInterceptor invoked *** ");
 
                 URL url = new URL( ( String ) message.getExchange().getInMessage().get( Message.REQUEST_URL ) );
 
                 if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
                 {
+                    LOG.info( " *** URL:" + url.getPath());
+
                     HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
 
                     String spHeader = headers.getHeaderString( Common.HEADER_SPECIAL );

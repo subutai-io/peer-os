@@ -97,6 +97,7 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
                     {
                         HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
                         String spHeader =  headers.getHeaderString( Common.HEADER_SPECIAL );
+                        LOG.info( " *** URL:" + url.getPath());
 
                         if ( !Strings.isNullOrEmpty( spHeader ) )
                         {

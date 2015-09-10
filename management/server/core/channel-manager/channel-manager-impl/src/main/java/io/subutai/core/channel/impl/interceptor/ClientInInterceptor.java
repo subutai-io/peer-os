@@ -46,6 +46,9 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
 
                 if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
                 {
+
+                    LOG.info( " *** URL:" + url.getPath());
+
                     HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getOutMessage());
 
                     String spHeader = headers.getHeaderString( Common.HEADER_SPECIAL );
