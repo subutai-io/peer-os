@@ -8,6 +8,7 @@ public class Common
     public static final String MANAGEMENT_HOST_EXTERNAL_IP_INTERFACE = "eth1";
     public static final int WAIT_CONTAINER_CONNECTION_SEC = 300;
     public static final int REFRESH_UI_SEC = 3;
+    public static final int BROKER_MESSAGE_TIMEOUT_SEC = 30;
     public static final int MIN_COMMAND_TIMEOUT_SEC = 1;
     public static final int MAX_COMMAND_TIMEOUT_SEC = 100 * 60 * 60; // 100 hours
     public static final int INACTIVE_COMMAND_DROP_TIMEOUT_SEC = 24 * 60 * 60; // 24 hours
@@ -22,8 +23,11 @@ public class Common
                     + "61}[a-zA-Z0-9]))*$";
     public static final int MAX_CONTAINER_NAME_LEN = 64;
 
-    public static final String ENVIRONMENT_ID_HEADER_NAME = "ENV_ID";
-    public static final String PEER_ID_HEADER_NAME = "PEER_ID";
+    public static final String HEADER_ENV_ID_TARGET = "ENV_ID_OUT";
+    public static final String HEADER_ENV_ID_SOURCE = "ENV_ID_IN";
+    public static final String HEADER_PEER_ID_TARGET = "PEER_ID_OUT";
+    public static final String HEADER_PEER_ID_SOURCE = "PEER_ID_IN";
+    public static final String HEADER_SPECIAL = "SECURED";
 
     public static final long MIN_VNI_ID = 0;
     public static final long MAX_VNI_ID = 16777216;//2^24

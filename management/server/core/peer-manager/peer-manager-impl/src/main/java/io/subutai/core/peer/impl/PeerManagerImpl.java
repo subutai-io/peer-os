@@ -120,6 +120,11 @@ public class PeerManagerImpl implements PeerManager
             localPeer.getPeerInfo().getPeerPolicies().remove( peerPolicy );
             peerDAO.saveInfo( SOURCE_LOCAL_PEER, localPeer.getId().toString(), localPeer );
         }
+
+        //*********Remove Security Relationship  ****************************
+        securityManager.getKeyManager().removePublicKeyRing( uuid.toString() );
+        //*******************************************************************
+
         return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, uuid );
     }
 

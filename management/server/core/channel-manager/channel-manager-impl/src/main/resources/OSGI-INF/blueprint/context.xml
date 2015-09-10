@@ -17,9 +17,13 @@
              interface="io.subutai.core.identity.api.IdentityManager" />
 
   <!-- ************************************************************************************************** -->
+  <reference id="securityManager" availability="mandatory"
+             interface="io.subutai.core.security.api.SecurityManager" />
+
+  <!-- ************************************************************************************************** -->
   <reference-list id="busListener" interface="org.apache.cxf.Bus" availability="optional">
     <reference-listener bind-method="busRegistered">
-      <bean class="io.subutai.core.channel.impl.interceptor.CXFBusListener">
+      <bean class="io.subutai.core.channel.impl.interceptor.ServerBusListener">
         <property name="channelManager" ref="channelManagerImpl" />
       </bean>
     </reference-listener>
@@ -30,6 +34,7 @@
         class="io.subutai.core.channel.impl.ChannelManagerImpl">
     <property name="daoManager" ref="daoManagerChannel" />
     <property name="identityManager" ref="identityManager" />
+    <property name="securityManager" ref="securityManager" />
   </bean>
 
   <service ref="channelManagerImpl"
