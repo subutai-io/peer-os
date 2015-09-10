@@ -23,8 +23,11 @@ public class Common
                     + "61}[a-zA-Z0-9]))*$";
     public static final int MAX_CONTAINER_NAME_LEN = 64;
 
-    public static final String ENVIRONMENT_ID_HEADER_NAME = "ENV_ID";
-    public static final String PEER_ID_HEADER_NAME = "PEER_ID";
+    public static final String HEADER_ENV_ID_TARGET = "ENV_ID_OUT";
+    public static final String HEADER_ENV_ID_SOURCE = "ENV_ID_IN";
+    public static final String HEADER_PEER_ID_TARGET = "PEER_ID_OUT";
+    public static final String HEADER_PEER_ID_SOURCE = "PEER_ID_IN";
+    public static final String HEADER_SPECIAL = "SECURED";
 
     public static final long MIN_VNI_ID = 0;
     public static final long MAX_VNI_ID = 16777216;//2^24

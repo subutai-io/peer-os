@@ -86,8 +86,18 @@ public class CommandRequestListener extends RequestListener
         {
             try
             {
+                //*********construct Secure Header ****************************
                 Map<String, String> headers = Maps.newHashMap();
-                headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, commandRequest.getEnvironmentId().toString() );
+                String envId = commandRequest.getEnvironmentId().toString();
+                String envHeaderSource = sourcePeer.getId()+"-"+envId;
+                String envHeaderTarget = commandRequest.getHostId()+"-"+envId;
+
+                headers.put( Common.HEADER_SPECIAL, "ENC");
+                headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
+                headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+                //**************************************************************************
+
+
                 sourcePeer.sendRequest(
                         new CommandResponse( commandRequest.getRequestId(), new ResponseImpl( response ),
                                 new CommandResultImpl( commandResult ) ), RecipientType.COMMAND_RESPONSE.name(),

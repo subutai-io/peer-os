@@ -215,8 +215,16 @@ public class MonitorImpl implements Monitor
             //create request for metrics
             ContainerHostMetricRequest request = new ContainerHostMetricRequest( environmentId );
 
+            //*********construct Secure Header ****************************
             Map<String, String> headers = Maps.newHashMap();
-            headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, environmentId.toString() );
+            String envId = environmentId.toString() ;
+            String envheaderTarget = peer.getId()+"-"+envId;
+            String envheaderSource = peerManager.getLocalPeer().getId()+"-"+envId;
+
+            headers.put( Common.HEADER_SPECIAL, "ENC");
+            headers.put( Common.HEADER_ENV_ID_TARGET,envheaderTarget );
+            headers.put( Common.HEADER_ENV_ID_SOURCE,envheaderSource );
+            //*************************************************************
 
             //send request and obtain metrics
             ContainerHostMetricResponse response =
@@ -527,8 +535,16 @@ public class MonitorImpl implements Monitor
 
         try
         {
+            //*********construct Secure Header ****************************
             Map<String, String> headers = Maps.newHashMap();
-            headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, environmentId.toString() );
+            String envId = environmentId.toString() ;
+            String envheaderTarget = peer.getId()+"-"+envId;
+            String envheaderSource = peerManager.getLocalPeer().getId()+"-"+envId;
+
+            headers.put( Common.HEADER_SPECIAL, "ENC");
+            headers.put( Common.HEADER_ENV_ID_TARGET,envheaderTarget );
+            headers.put( Common.HEADER_ENV_ID_SOURCE,envheaderSource );
+            //*************************************************************
 
             peer.sendRequest( new MonitoringActivationRequest( containerHosts, monitoringSettings ),
                     RecipientType.MONITORING_ACTIVATION_RECIPIENT.name(), Constants.MONITORING_ACTIVATION_TIMEOUT,
@@ -692,8 +708,19 @@ public class MonitorImpl implements Monitor
             //send metric to remote creator peer
             else
             {
+
+                //*********construct Secure Header ****************************
                 Map<String, String> headers = Maps.newHashMap();
-                headers.put( Common.ENVIRONMENT_ID_HEADER_NAME, containerGroup.getEnvironmentId().toString() );
+                String envId = containerGroup.getEnvironmentId().toString();
+                String envheaderTarget = creatorPeer.getId()+"-"+envId;
+                String envheaderSource = peerManager.getLocalPeer().getId()+"-"+envId;
+
+                headers.put( Common.HEADER_SPECIAL, "ENC");
+                headers.put( Common.HEADER_ENV_ID_TARGET,envheaderTarget );
+                headers.put( Common.HEADER_ENV_ID_SOURCE,envheaderSource );
+                //*************************************************************
+
+
                 creatorPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
                         Constants.ALERT_TIMEOUT, headers );
             }
