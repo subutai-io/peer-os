@@ -411,7 +411,7 @@ public class RestServiceImpl implements RestService
 
             PeerInfo p = jsonUtil.from( new String( data ), PeerInfo.class );
 
-            if(p.getKeyPhrase().equals( peerManager.getLocalPeerInfo().getKeyPhrase()))
+            if(p.getKeyPhrase().equals( (peerManager.getPeerInfo( p.getId()).getKeyPhrase()  ) ))
             {
                 p.setStatus( PeerStatus.APPROVED );
                 peerManager.update( p );

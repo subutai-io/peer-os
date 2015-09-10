@@ -193,20 +193,12 @@ public class EncryptionToolImpl implements EncryptionTool
     {
         try
         {
-            PGPPublicKey oldKey = publicKeyRing.getPublicKey();
-            PGPPrivateKey pgpPrivKey = secretKey.extractPrivateKey(
-                    new JcePBESecretKeyDecryptorBuilder().setProvider( "BC" )
-                                                         .build( secretKeyPassword.toCharArray() ) );
-            PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(
-                    new JcaPGPContentSignerBuilder( secretKey.getPublicKey().getAlgorithm(), PGPUtil.SHA512 ) );
-            signatureGenerator.init( PGPSignature.DIRECT_KEY, pgpPrivKey );
+            if( Strings.isNullOrEmpty(secretKeyPassword))
+            {
+                secretKeyPassword = keyManager.getSecurityKeyData().getSecretKeyringPwd();
+            }
 
-            PGPSignature signature = signatureGenerator.generateCertification( id, oldKey );
-
-            PGPPublicKey newKey = PGPPublicKey.addCertification( oldKey, signature );
-
-            PGPPublicKeyRing newPublicKeyRing = PGPPublicKeyRing.removePublicKey( publicKeyRing, oldKey );
-            return PGPPublicKeyRing.insertPublicKey( newPublicKeyRing, newKey );
+            return PGPEncryptionUtil.signPublicKey( publicKeyRing, id, secretKey, secretKeyPassword  );
         }
         catch ( Exception e )
         {
@@ -230,9 +222,7 @@ public class EncryptionToolImpl implements EncryptionTool
     {
         try
         {
-            PGPSignature signature = ( PGPSignature ) keyToVerify.getSignatures().next();
-            signature.init( new JcaPGPContentVerifierBuilderProvider().setProvider( "BC" ), keyToVerifyWith );
-            return signature.verifyCertification( id.getBytes(), keyToVerify );
+            return PGPEncryptionUtil.verifyPublicKey(  keyToVerify, id, keyToVerifyWith  );
         }
         catch ( Exception e )
         {
