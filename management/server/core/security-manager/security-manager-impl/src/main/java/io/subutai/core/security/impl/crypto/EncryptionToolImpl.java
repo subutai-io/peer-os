@@ -1,31 +1,18 @@
 package io.subutai.core.security.impl.crypto;
 
 
-import java.io.InputStream;
-
 import org.bouncycastle.openpgp.PGPException;
-import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
-import org.bouncycastle.openpgp.PGPSignature;
-import org.bouncycastle.openpgp.PGPSignatureGenerator;
-import org.bouncycastle.openpgp.PGPUtil;
-import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentSignerBuilder;
-import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentVerifierBuilderProvider;
-import org.bouncycastle.openpgp.operator.jcajce.JcePBESecretKeyDecryptorBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Strings;
-
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
-import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.core.security.api.crypto.EncryptionTool;
-import io.subutai.core.security.impl.model.SecurityKeyData;
 
 
 /**
@@ -99,10 +86,45 @@ public class EncryptionToolImpl implements EncryptionTool
      *
      */
     @Override
+    public byte[] signAndEncrypt( final byte[] message,PGPSecretKey secretKey,String secretPwd, final PGPPublicKey publicKey, final boolean armored )
+            throws PGPException
+    {
+
+        if( Strings.isNullOrEmpty(secretPwd))
+        {
+            secretPwd = keyManager.getSecurityKeyData().getSecretKeyringPwd();
+        }
+
+        return PGPEncryptionUtil
+                .signAndEncrypt( message, secretKey, secretPwd, publicKey, armored);
+    }
+
+
+    /* *****************************************
+     *
+     */
+    @Override
     public byte[] decrypt( final byte[] message ) throws PGPException
     {
         return PGPEncryptionUtil
                 .decrypt( message,keyManager.getSecretKeyRingInputStream( null ), keyManager.getSecurityKeyData().getSecretKeyringPwd() );
+    }
+
+
+    /* *****************************************
+     *
+     */
+    @Override
+    public byte[] decrypt( final byte[] message, String secretKeyHostId, String pwd ) throws PGPException
+    {
+        if( Strings.isNullOrEmpty(pwd))
+        {
+            pwd = keyManager.getSecurityKeyData().getSecretKeyringPwd();
+        }
+
+        PGPSecretKeyRing secKeyRing = keyManager.getSecretKeyRing( secretKeyHostId );
+
+        return PGPEncryptionUtil.decrypt( message, secKeyRing, pwd );
     }
 
 
@@ -229,5 +251,31 @@ public class EncryptionToolImpl implements EncryptionTool
             //throw custom  exception
             throw new RuntimeException( e );
         }
+    }
+
+
+    @Override
+    public byte[] decryptAndVerify( final byte[] message, final String secretKeyHostId, final String pwd,
+                                    final String publicKeyHostId ) throws PGPException
+    {
+        PGPSecretKey secKey = keyManager.getSecretKeyRing( secretKeyHostId ).getSecretKey();
+        PGPPublicKey pubKey = keyManager.getPublicKey( publicKeyHostId );
+
+        return PGPEncryptionUtil.decryptAndVerify( message, secKey, pwd, pubKey);
+    }
+
+
+    @Override
+    public byte[] encrypt( final byte[] message, final String publicKeyHostId, final boolean armored )
+    {
+        return new byte[0];
+    }
+
+
+    @Override
+    public byte[] signAndEncrypt( final byte[] message, final String secretKeyHostId, final String secretPwd,
+                                  final String publicKeyHostId, final boolean armored ) throws PGPException
+    {
+        return new byte[0];
     }
 }

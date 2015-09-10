@@ -101,18 +101,21 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
 
                         if ( !Strings.isNullOrEmpty( spHeader ) )
                         {
-                            String envIdOut = headers.getHeaderString( Common.HEADER_ENV_ID_TARGET );
-                            String peerIdOut = headers.getHeaderString( Common.HEADER_PEER_ID_TARGET );
+                            String envIdSource = headers.getHeaderString( Common.HEADER_ENV_ID_SOURCE );
+                            String envIdTarget = headers.getHeaderString( Common.HEADER_ENV_ID_TARGET );
 
-                            if ( !Strings.isNullOrEmpty( envIdOut ) )
+                            String peerIdSource = headers.getHeaderString( Common.HEADER_PEER_ID_SOURCE );
+                            String peerIdTarget = headers.getHeaderString( Common.HEADER_PEER_ID_TARGET );
+
+                            if ( !Strings.isNullOrEmpty( envIdSource ) )
                             {
-                                MessageContentUtil.decryptMessageContent( channelManagerImpl.getSecurityManager(),
-                                        message, envIdOut );
+                                MessageContentUtil.decryptContent( channelManagerImpl.getSecurityManager(), message,
+                                        envIdTarget,envIdSource );
                             }
-                            else if ( !Strings.isNullOrEmpty( peerIdOut ) )
+                            else if ( !Strings.isNullOrEmpty( peerIdSource ) )
                             {
-                                MessageContentUtil.decryptMessageContent( channelManagerImpl.getSecurityManager(),
-                                        message, peerIdOut );
+                                MessageContentUtil.decryptContent( channelManagerImpl.getSecurityManager(), message,
+                                        peerIdTarget,peerIdSource );
                             }
                         }
                     }

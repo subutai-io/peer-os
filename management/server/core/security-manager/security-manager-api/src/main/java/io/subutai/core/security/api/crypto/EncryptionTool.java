@@ -22,10 +22,22 @@ public interface EncryptionTool
     public byte[] decrypt( final byte[] message ) throws PGPException;
 
 
+    /**
+     * Decrypts message with Private Key found by HostId
+     */
+    public byte[] decrypt( final byte[] message,String secretKeyHostId, String pwd) throws PGPException;
+
+
     /* *****************************************
      *
      */
     public byte[] decryptAndVerify( final byte[] message,PGPSecretKey secretKey, String pwd ,PGPPublicKey pubKey) throws PGPException;
+
+
+    /* *****************************************
+     *
+     */
+    public byte[] decryptAndVerify( final byte[] message,String secretKeyHostId, String pwd ,String publicKeyHostId) throws PGPException;
 
 
     /* **********************************************
@@ -38,6 +50,12 @@ public interface EncryptionTool
      *
      */
     public byte[] encrypt( final byte[] message, final PGPPublicKey publicKey, boolean armored );
+
+
+    /* *****************************************
+     *
+     */
+    public byte[] encrypt( final byte[] message, final String publicKeyHostId, boolean armored );
 
 
     /* *****************************************
@@ -58,6 +76,26 @@ public interface EncryptionTool
 
 
     /**
+     * Signs message with peer private key and encrypts with the given pub key
+     *
+     * @param message - message
+     * @param secretKey - encryption key
+     * @param secretPwd - encryption key
+     * @param publicKey - encryption key
+     * @param armored - output in armored format
+     */
+    public byte[] signAndEncrypt( final byte[] message,PGPSecretKey secretKey,String secretPwd, final PGPPublicKey publicKey, final boolean armored )
+            throws PGPException;
+
+
+    /* *********************************************************************
+     *
+     */
+    public byte[] signAndEncrypt( final byte[] message,String secretKeyHostId, String secretPwd, final String publicKeyHostId, final boolean armored )
+            throws PGPException;
+
+
+    /**
      * Decrypts message with peer private key
      *
      * @param encryptedMessage - message
@@ -65,6 +103,7 @@ public interface EncryptionTool
      * @return - {@code ContentAndSignatures}
      */
     public ContentAndSignatures decryptAndReturnSignatures( final byte[] encryptedMessage ) throws PGPException;
+
 
 
     /**
