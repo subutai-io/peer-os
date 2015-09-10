@@ -58,8 +58,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     private static final int CONNECT_TIMEOUT = 300;
 
     private static final Logger LOG = LoggerFactory.getLogger( ResourceHostEntity.class );
-    //    private static final Pattern LXC_STATE_PATTERN = Pattern.compile( "State:(\\s*)(.*)" );
-    private static final Pattern LXC_STATE_PATTERN = Pattern.compile( "(\\S*)(\\s*)(\\S*)" );
+    private static final Pattern LXC_STATE_PATTERN = Pattern.compile( "(RUNNING|STOPPED|FROZEN)" );
     private static final String PRECONDITION_CONTAINER_IS_NULL_MSG = "Container host is null";
     private static final String CONTAINER_EXCEPTION_MSG_FORMAT = "Container with name %s does not exist";
 
@@ -127,7 +126,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         catch ( CommandException e )
         {
-            LOG.error( e.getMessage(),e );
+            LOG.error( e.getMessage(), e );
             throw new ResourceHostException( "Error fetching container state", e );
         }
 
@@ -139,7 +138,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             Matcher m = LXC_STATE_PATTERN.matcher( outputLines[2] );
             if ( m.find() )
             {
-                return ContainerState.valueOf( m.group( 3 ) );
+                return ContainerState.valueOf( m.group( 1 ) );
             }
         }
 
