@@ -1,6 +1,8 @@
 package io.subutai.core.hintegration.cli;
 
 
+import java.util.Set;
+
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
@@ -26,12 +28,17 @@ public class SendHearbeatCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        System.out.println( "Sending hearbeat..." );
+        System.out.println( "Sending heartbeat..." );
 
         try
         {
-            integration.sendHeartbeat();
+            Set<String> stateLinks = integration.sendHeartbeat();
             System.out.println( "Heartbeat sent successfully." );
+
+            for ( String link : stateLinks )
+            {
+                System.out.println( "\t" + link );
+            }
         }
         catch ( Exception e )
         {

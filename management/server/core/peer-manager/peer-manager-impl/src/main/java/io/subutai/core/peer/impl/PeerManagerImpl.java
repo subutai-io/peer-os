@@ -2,19 +2,38 @@ package io.subutai.core.peer.impl;
 
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.net.util.SubnetUtils;
+
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.PeerConf;
+import io.subutai.common.host.Interface;
+import io.subutai.common.peer.InterfacePattern;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
+import io.subutai.common.protocol.N2NConfig;
+import io.subutai.core.env.api.exception.EnvironmentManagerException;
 import io.subutai.core.messenger.api.Messenger;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
@@ -35,9 +54,10 @@ import io.subutai.core.security.api.SecurityManager;
  */
 public class PeerManagerImpl implements PeerManager
 {
-
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class.getName() );
 
+    public static final String PEER_SUBNET_MASK = "255.255.255.0";
+    private static final int N2N_PORT = 5000;
 
     protected PeerDAO peerDAO;
     protected LocalPeer localPeer;
@@ -212,6 +232,156 @@ public class PeerManagerImpl implements PeerManager
     public LocalPeer getLocalPeer()
     {
         return localPeer;
+    }
+
+
+    @Override
+    public List<N2NConfig> setupN2NConnection( final Set<Peer> peers ) throws PeerException
+    {
+        Set<String> allSubnets = getSubnets( peers );
+        if ( LOG.isDebugEnabled() )
+        {
+            LOG.debug( String.format( "Found %d peer subnets:", allSubnets.size() ) );
+            for ( String s : allSubnets )
+            {
+                LOG.debug( s );
+            }
+        }
+        String freeSubnet = findFreeSubnet( allSubnets );
+
+        LOG.debug( String.format( "Free subnet for peer: %s", freeSubnet ) );
+        try
+        {
+            if ( freeSubnet == null )
+            {
+                throw new IllegalStateException( "Could not calculate subnet." );
+            }
+            String superNodeIp = getLocalPeer().getManagementHost().getExternalIp();
+            String interfaceName = generateInterfaceName( freeSubnet );
+            String communityName = generateCommunityName( freeSubnet );
+            String sharedKey = UUID.randomUUID().toString();
+            SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeSubnet, PEER_SUBNET_MASK ).getInfo();
+            final String[] addresses = subnetInfo.getAllAddresses();
+            int counter = 0;
+
+            ExecutorService taskExecutor = Executors.newFixedThreadPool( peers.size() );
+
+            ExecutorCompletionService<N2NConfig> executorCompletionService =
+                    new ExecutorCompletionService<>( taskExecutor );
+
+
+            List<N2NConfig> result = new ArrayList<>( peers.size() );
+            for ( Peer peer : peers )
+            {
+                N2NConfig config = new N2NConfig( peer.getId(), superNodeIp, N2N_PORT, interfaceName, communityName,
+                        addresses[counter], sharedKey );
+                executorCompletionService.submit( new SetupN2NConnectionTask( peer, config ) );
+                counter++;
+            }
+
+            for ( Peer peer : peers )
+            {
+                final Future<N2NConfig> f = executorCompletionService.take();
+                N2NConfig config = f.get();
+                result.add( config );
+                counter++;
+            }
+
+            taskExecutor.shutdown();
+
+            return result;
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Could not create n2n tunnel.", e );
+        }
+    }
+
+
+    private String generateCommunityName( final String freeSubnet )
+    {
+        return String.format( "com_%s", freeSubnet.replace( ".", "_" ) );
+    }
+
+
+    private String generateInterfaceName( final String freeSubnet )
+    {
+        return String.format( "n2n_%s", freeSubnet.replace( ".", "_" ) );
+    }
+
+
+    private String findFreeSubnet( final Set<String> allSubnets )
+    {
+        String result = null;
+        int i = 11;
+        int j = 0;
+
+        while ( result == null && i < 254 )
+        {
+            String s = String.format( "10.%d.%d.0", i, j );
+            if ( !allSubnets.contains( s ) )
+            {
+                result = s;
+            }
+
+            j++;
+            if ( j > 254 )
+            {
+                i++;
+                j = 0;
+            }
+        }
+
+        return result;
+    }
+
+
+    private Set<String> getSubnets( final Set<Peer> allPeers )
+    {
+        Set<String> allSubnets = new HashSet<>();
+
+        InterfacePattern peerSubnetsPattern = new InterfacePattern( "ip", "^10.*" );
+        for ( Peer peer : allPeers )
+        {
+            Set<Interface> r = peer.getNetworkInterfaces( peerSubnetsPattern );
+
+            Collection peerSubnets = CollectionUtils.collect( r, new Transformer()
+            {
+                @Override
+                public Object transform( final Object o )
+                {
+                    Interface i = ( Interface ) o;
+                    SubnetUtils u = new SubnetUtils( i.getIp(), PEER_SUBNET_MASK );
+                    return u.getInfo().getNetworkAddress();
+                }
+            } );
+
+            allSubnets.addAll( peerSubnets );
+        }
+
+        return allSubnets;
+    }
+
+
+    private class SetupN2NConnectionTask implements Callable<N2NConfig>
+    {
+        private Peer peer;
+        private N2NConfig n2NConfig;
+
+
+        public SetupN2NConnectionTask( final Peer peer, final N2NConfig config )
+        {
+            this.peer = peer;
+            this.n2NConfig = config;
+        }
+
+
+        @Override
+        public N2NConfig call() throws Exception
+        {
+            peer.setupN2NConnection( n2NConfig );
+            return n2NConfig;
+        }
     }
 
 

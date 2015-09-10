@@ -2,6 +2,7 @@ package io.subutai.core.hintegration.impl;
 
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.ws.rs.core.Response;
@@ -44,10 +45,11 @@ public class HeartbeatProcessor implements Runnable
         LOG.debug( "Hearbeat processor started..." );
         try
         {
-            HeartbeatResponseDTO response = integration.sendHeartbeat();
+            Set<String> response = integration.sendHeartbeat();
             if ( response != null )
             {
-                for (String l :response.getStateLinks()){
+                for ( String l : response )
+                {
 
                 }
 

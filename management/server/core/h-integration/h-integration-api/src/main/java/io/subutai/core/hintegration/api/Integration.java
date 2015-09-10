@@ -1,7 +1,7 @@
 package io.subutai.core.hintegration.api;
 
 
-import io.subutai.hub.common.dto.HeartbeatResponseDTO;
+import java.util.Set;
 
 
 public interface Integration
@@ -14,5 +14,7 @@ public interface Integration
 
     void register() throws HIntegrationException;
 
-    HeartbeatResponseDTO sendHeartbeat() throws HIntegrationException;
+    Set<String> sendHeartbeat() throws HIntegrationException;
+
+    void processStateLink( String link ) throws HIntegrationException;
 }

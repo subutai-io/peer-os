@@ -2,11 +2,13 @@ package io.subutai.core.peer.api;
 
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.protocol.N2NConfig;
 
 
 public interface PeerManager
@@ -63,4 +65,6 @@ public interface PeerManager
      * Returns local peer instance
      */
     public LocalPeer getLocalPeer();
+
+    List<N2NConfig> setupN2NConnection( final Set<Peer> peers ) throws PeerException;
 }

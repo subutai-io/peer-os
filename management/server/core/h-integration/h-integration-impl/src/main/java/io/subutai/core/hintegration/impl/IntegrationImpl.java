@@ -1,11 +1,8 @@
 package io.subutai.core.hintegration.impl;
 
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyPairGenerator;
@@ -15,9 +12,14 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -25,18 +27,20 @@ import javax.ws.rs.core.Response;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
-import org.bouncycastle.openpgp.PGPPublicKeyRing;
-import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.net.util.SubnetUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import io.subutai.common.host.Interface;
+import io.subutai.common.peer.InterfacePattern;
 import io.subutai.common.security.SecurityProvider;
 import io.subutai.common.security.crypto.certificate.CertificateData;
 import io.subutai.common.security.crypto.certificate.CertificateTool;
@@ -53,6 +57,9 @@ import io.subutai.core.hintegration.impl.settings.HSettings;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
+import io.subutai.hub.common.dto.EnvironmentDTO;
+import io.subutai.hub.common.dto.EnvironmentPackageDTO;
+import io.subutai.hub.common.dto.EnvironmentPeerDataDTO;
 import io.subutai.hub.common.dto.HeartbeatResponseDTO;
 import io.subutai.hub.common.dto.RegistrationDTO;
 import io.subutai.hub.common.dto.TrustDataDto;
@@ -61,20 +68,34 @@ import io.subutai.hub.common.pgp.key.PGPKeyHelper;
 import io.subutai.hub.common.pgp.message.PGPMessenger;
 
 
-public class IntegrationImpl implements Integration
+public class IntegrationImpl implements Integration, Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger( IntegrationImpl.class.getName() );
 
-    private static final String SERVER_NAME = "52.88.77.35";
+    private static final Pattern ENVIRONMENT_DATA_PATTERN =
+            Pattern.compile( "/rest/v1/environments/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})" );
+    private static final Pattern ENVIRONMENT_PACKAGE_PATTERN = Pattern.compile(
+            "/rest/v1/environments/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/peers/"
+                    + "([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/package" );
+
+    private static final String ENVIRONMENT_SUBNET = "10.11.111.0/24";
+    //    private static final String SERVER_NAME = "52.88.77.35";
+    private static final String SERVER_NAME = "52.19.74.127";
     private SecurityManager securityManager;
     private PeerManager peerManager;
     public static final String OWNER_USER_ID = "owner@subutai.io";
+    private static String baseUrl = String.format( "https://%s:4000", SERVER_NAME );
     private BundleContext bundleContext;
     private PGPPublicKey hubPublicKey;
     private PGPPublicKey ownerPublicKey;
     private PGPPublicKey peerPublicKey;
     private ScheduledExecutorService hearbeatExecutorService = Executors.newSingleThreadScheduledExecutor();
-    private HeartbeatProcessor processor;
+    //    private HeartbeatProcessor processor;
+    private KeyStore keyStore;
+    private byte[] serverFingerprint;
+    private PGPMessenger messenger;
+    private PGPPrivateKey senderKey;
+    private UUID peerId;
 
 
     public void setSecurityManager( final SecurityManager securityManager )
@@ -95,27 +116,51 @@ public class IntegrationImpl implements Integration
     }
 
 
-    public void init() throws IOException, PGPException
+    public void init() throws HIntegrationException
     {
         LOG.debug( "H-INTEGRATION" );
 
-        this.hubPublicKey = PGPKeyHelper.readPublicKey( HSettings.HUB_PUB_KEY );
-        this.ownerPublicKey = PGPKeyHelper.readPublicKey( HSettings.PEER_OWNER_PUB_KEY );
-        this.peerPublicKey = PGPKeyHelper.readPublicKey( HSettings.PEER_PUB_KEY );
+        try
+        {
+            this.hubPublicKey = PGPKeyHelper.readPublicKey( HSettings.HUB_PUB_KEY );
+            this.ownerPublicKey = PGPKeyHelper.readPublicKey( HSettings.PEER_OWNER_PUB_KEY );
+            this.peerPublicKey = PGPKeyHelper.readPublicKey( HSettings.PEER_PUB_KEY );
 
-        LOG.debug(
-                String.format( "Peer fingerprint: %s", PGPKeyUtil.getFingerprint( peerPublicKey.getFingerprint() ) ) );
-        LOG.debug( String.format( "Hub fingerprint: %s", PGPKeyUtil.getFingerprint( hubPublicKey.getFingerprint() ) ) );
-        LOG.debug( String.format( "Owner fingerprint: %s",
-                PGPKeyUtil.getFingerprint( ownerPublicKey.getFingerprint() ) ) );
-        generateX509Certificate();
+            LOG.debug( String.format( "Peer fingerprint: %s",
+                    PGPKeyUtil.getFingerprint( peerPublicKey.getFingerprint() ) ) );
+            LOG.debug( String.format( "Hub fingerprint: %s",
+                    PGPKeyUtil.getFingerprint( hubPublicKey.getFingerprint() ) ) );
+            LOG.debug( String.format( "Owner fingerprint: %s",
+                    PGPKeyUtil.getFingerprint( ownerPublicKey.getFingerprint() ) ) );
 
-        String baseUrl = String.format( "https://%s:4000", SERVER_NAME );
-        String path = String.format( "/rest/v1/peers/%s/hearbeat", peerManager.getLocalPeerInfo().getId() );
-        WebClient client = io.subutai.core.hintegration.impl.HttpClient.createTrustedWebClient( baseUrl + path );
+            serverFingerprint = hubPublicKey.getFingerprint();
 
-        processor = new HeartbeatProcessor( this );
-        this.hearbeatExecutorService.scheduleWithFixedDelay( processor, 10, 30, TimeUnit.SECONDS );
+            senderKey = PGPKeyHelper.readPrivateKey( HSettings.PEER_SECRET_KEY, "12345678" );
+            messenger = new PGPMessenger( senderKey, hubPublicKey );
+
+            generateX509Certificate();
+
+            this.peerId = peerManager.getLocalPeerInfo().getId();
+
+            String baseUrl = String.format( "https://%s:4000", SERVER_NAME );
+            String path = String.format( "/rest/v1/peers/%s/hearbeat", peerManager.getLocalPeerInfo().getId() );
+            WebClient client = io.subutai.core.hintegration.impl.HttpClient.createTrustedWebClient( baseUrl + path );
+
+            //            processor = new HeartbeatProcessor( this );
+            this.hearbeatExecutorService.scheduleWithFixedDelay( this, 10, 30, TimeUnit.SECONDS );
+
+            keyStore = KeyStore.getInstance( "JKS" );
+
+            keyStore.load( new FileInputStream( HSettings.PEER_KEYSTORE ), "subutai".toCharArray() );
+        }
+        catch ( IOException | PGPException | CertificateException | KeyStoreException e )
+        {
+            throw new HIntegrationException( "Could not initialize integration module.", e );
+        }
+        catch ( NoSuchAlgorithmException e )
+        {
+            e.printStackTrace();
+        }
     }
 
 
@@ -124,129 +169,6 @@ public class IntegrationImpl implements Integration
         LOG.debug( "Destroying H-INTEGRATION" );
         this.hearbeatExecutorService.shutdown();
     }
-    /*private void generateKeys()
-    {
-        try
-        {
-            final KeyManager keyManager = securityManager.getKeyManager();
-
-
-            /*//**************Get Peer Public keyring ******************************************
- PGPPublicKeyRing peerPublicKeyRing = keyManager.getPublicKeyRing( null );
- String fingerprint = PGPKeyUtil.getFingerprint( peerPublicKeyRing.getPublicKey().getFingerprint() );
-
-
- /*//**************Saving certificate******************************************
- io.subutai.common.security.crypto.key.KeyManager sslkeyMan =
- new io.subutai.common.security.crypto.key.KeyManager();
- KeyPairGenerator keyPairGenerator = sslkeyMan.prepareKeyPairGeneration( KeyPairType.RSA, 1024 );
- java.security.KeyPair sslKeyPair = sslkeyMan.generateKeyPair( keyPairGenerator );
-
- KeyStoreData keyStoreData = new KeyStoreData();
- keyStoreData.setKeyStoreFile( HSettings.PEER_KEYSTORE );
- keyStoreData.setAlias( "root_server_px1" );
- keyStoreData.setPassword( "subutai" );
- keyStoreData.setKeyStoreType( KeyStoreType.JKS );
-
- KeyStoreTool keyStoreTool = new KeyStoreTool();
- KeyStore sslkeyStore = keyStoreTool.load( keyStoreData );
-
-
- CertificateData certificateData = new CertificateData();
- certificateData.setCommonName( fingerprint );
-
- CertificateTool certificateTool = new CertificateTool();
- X509Certificate x509cert = certificateTool
- .generateSelfSignedCertificate( sslkeyStore, sslKeyPair, SecurityProvider.BOUNCY_CASTLE,
- certificateData );
-
- keyStoreTool.saveX509Certificate( sslkeyStore, keyStoreData, x509cert, sslKeyPair );
-
-
- /*//****************Save Owner secret key ****************************************
- KeyPair ownerKeyPair = keyManager.generateKeyPair( OWNER_USER_ID, false );
-
- File ownerSecretKeyFile = new File( HSettings.PEER_OWNER_SECRET_KEY );
-
- try ( FileOutputStream fop = new FileOutputStream( ownerSecretKeyFile ) )
- {
- if ( !ownerSecretKeyFile.exists() )
- {
- ownerSecretKeyFile.createNewFile();
- }
-
- fop.write( ownerKeyPair.getSecKeyring() );
- fop.flush();
- fop.close();
-
- LOG.debug( "owner secret key genereated" );
- }
- catch ( Exception ex )
- {
- ex.printStackTrace();
- }
-
-
- /*//****************Save Owner Public key ****************************************
- File ownerPubKeyFile = new File( HSettings.PEER_OWNER_PUB_KEY );
-
- try ( FileOutputStream fop = new FileOutputStream( ownerPubKeyFile ) )
- {
- if ( !ownerPubKeyFile.exists() )
- {
- ownerPubKeyFile.createNewFile();
- }
-
- fop.write( ownerKeyPair.getPubKeyring() );
- fop.flush();
- fop.close();
-
- LOG.debug( "owner public key genereated" );
- }
- catch ( Exception ex )
- {
- ex.printStackTrace();
- }
-
-
- /*//****************Sign pub of peer with owner ****************************************
- PGPSecretKeyRing ownerSecretKeyRing = PGPKeyUtil.readSecretKeyRing( ownerKeyPair.getSecKeyring() );
- PGPPublicKeyRing publicKeyRing = PGPEncryptionUtil
- .signPublicKey( peerPublicKeyRing, OWNER_USER_ID, ownerSecretKeyRing.getSecretKey(), "12345678" );
-
-
- /*//****************Save Peer Public key ****************************************
- File peerPubKeyFile = new File( HSettings.PEER_PUB_KEY );
-
- try ( FileOutputStream fop = new FileOutputStream( peerPubKeyFile ) )
- {
- if ( !peerPubKeyFile.exists() )
- {
- peerPubKeyFile.createNewFile();
- }
-
- publicKeyRing.encode( fop );
- fop.flush();
- fop.close();
-
- LOG.debug( "peer public key genereated" );
- }
- catch ( Exception ex )
- {
- ex.printStackTrace();
- }
-
- LOG.debug( "Is encryption key of owner?:" + ownerSecretKeyRing.getPublicKey().isEncryptionKey() );
- LOG.debug( "Is encryption key of peer?:" + publicKeyRing.getPublicKey().isEncryptionKey() );
- LOG.debug( "Is signed: " + PGPEncryptionUtil.verifyPublicKey( publicKeyRing.getPublicKey(), OWNER_USER_ID,
- ownerSecretKeyRing.getPublicKey() ) );
- //
- //            /*/
-    /****************
-     * Loading hub key from resources **************************************** //            InputStream is =
-     * bundleContext.getBundle().getEntry( "keys/hub.public.gpg" ).openStream(); //            PGPPublicKey hPubKey =
-     * PGPKeyUtil.readPublicKey( is ); } catch ( Exception ex ) { ex.printStackTrace(); } }
-     */
 
 
     private void generateX509Certificate()
@@ -382,10 +304,6 @@ public class IntegrationImpl implements Integration
 
             byte[] cborData = JsonUtil.toCbor( trustDataDto );
 
-            KeyManager keyManager = securityManager.getKeyManager();
-            PGPPrivateKey senderKey = PGPKeyHelper.readPrivateKey( HSettings.PEER_SECRET_KEY, "12345678" );
-            PGPMessenger messenger = new PGPMessenger( senderKey, hubPublicKey );
-
             byte[] encryptedData = messenger.produce( cborData );
             Response r = client.post( encryptedData );
 
@@ -416,21 +334,12 @@ public class IntegrationImpl implements Integration
 
             LOG.debug( "HEX owner key id: " + PGPKeyUtil.getKeyId( ownerPublicKey.getFingerprint() ) );
 
-            byte[] serverFingerprint = hubPublicKey.getFingerprint();
-
-            KeyStore keyStore = KeyStore.getInstance( "JKS" );
-
-            keyStore.load( new FileInputStream( HSettings.PEER_KEYSTORE ), "subutai".toCharArray() );
 
             WebClient client = HttpClient
                     .createTrustedWebClientWithAuth( baseUrl + path, keyStore, "subutai".toCharArray(),
                             serverFingerprint );
 
             byte[] cborData = JsonUtil.toCbor( registrationData );
-
-            KeyManager keyManager = securityManager.getKeyManager();
-            PGPPrivateKey senderKey = PGPKeyHelper.readPrivateKey( HSettings.PEER_SECRET_KEY, "12345678" );
-            PGPMessenger messenger = new PGPMessenger( senderKey, hubPublicKey );
 
             byte[] encryptedData = messenger.produce( cborData );
             Response r = client.post( encryptedData );
@@ -441,8 +350,8 @@ public class IntegrationImpl implements Integration
                 throw new HIntegrationException( "Could not register local peer: " + r.readEntity( String.class ) );
             }
         }
-        catch ( PGPException | IOException | KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException |
-                CertificateException e )
+        catch ( PGPException | IOException | KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException
+                e )
         {
             throw new HIntegrationException( e.toString(), e );
         }
@@ -450,26 +359,17 @@ public class IntegrationImpl implements Integration
 
 
     @Override
-    public HeartbeatResponseDTO sendHeartbeat() throws HIntegrationException
+    public Set<String> sendHeartbeat() throws HIntegrationException
     {
-        String baseUrl = String.format( "https://%s:4000", SERVER_NAME );
-        HeartbeatResponseDTO result = null;
+
+        Set<String> result = new HashSet<>();
         try
         {
             String path = String.format( "/rest/v1/peers/%s/heartbeat", peerManager.getLocalPeerInfo().getId() );
 
-            byte[] serverFingerprint = hubPublicKey.getFingerprint();
-
-            KeyStore keyStore = KeyStore.getInstance( "JKS" );
-
-            keyStore.load( new FileInputStream( HSettings.PEER_KEYSTORE ), "subutai".toCharArray() );
-
             WebClient client = HttpClient
                     .createTrustedWebClientWithAuth( baseUrl + path, keyStore, "subutai".toCharArray(),
                             serverFingerprint );
-
-            PGPPrivateKey senderKey = PGPKeyHelper.readPrivateKey( HSettings.PEER_SECRET_KEY, "12345678" );
-            PGPMessenger messenger = new PGPMessenger( senderKey, hubPublicKey );
 
             Response r = client.put( null );
 
@@ -483,21 +383,274 @@ public class IntegrationImpl implements Integration
 
             if ( data != null )
             {
-                result = JsonUtil.fromCbor( messenger.consume( data ), HeartbeatResponseDTO.class );
-                LOG.debug( result.getStateLinks().toString() );
+                HeartbeatResponseDTO response =
+                        JsonUtil.fromCbor( messenger.consume( data ), HeartbeatResponseDTO.class );
+                LOG.debug( response.getStateLinks().toString() );
+                result.addAll( new HashSet<String>( response.getStateLinks() ) );
             }
             else
             {
                 LOG.debug( "Data is null." );
             }
         }
-        catch ( PGPException | IOException | KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException |
-                CertificateException e )
+        catch ( PGPException | IOException | KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException
+                e )
         {
-            throw new HIntegrationException( e.toString(), e );
+            LOG.error( "Could not send heartbeat.", e );
         }
 
         return result;
+    }
+
+
+    @Override
+    public void processStateLink( final String link ) throws HIntegrationException
+    {
+        // Environment Package  GET /rest/v1/environments/{environment-id}/peers/{peer-id}/package
+        // Environment Data     GET /rest/v1/environments/{environment-id}
+
+        Matcher environmentDataMatcher = ENVIRONMENT_DATA_PATTERN.matcher( link );
+        if ( environmentDataMatcher.matches() )
+        {
+            EnvironmentDTO environmentDTO = getEnvironmentData( link );
+            processEnvironmentData( environmentDTO );
+        }
+        else
+        {
+            LOG.warn( "Unknown state link: " + link );
+        }
+    }
+
+
+    private EnvironmentDTO getEnvironmentData( String link ) throws HIntegrationException
+    {
+        try
+        {
+            WebClient client = HttpClient
+                    .createTrustedWebClientWithAuth( baseUrl + link, keyStore, "subutai".toCharArray(),
+                            serverFingerprint );
+
+            Response r = client.get();
+            EnvironmentDTO result = null;
+
+            if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
+            {
+                return result;
+            }
+
+            if ( r.getStatus() != HttpStatus.SC_OK )
+            {
+                LOG.error( r.readEntity( String.class ) );
+                return result;
+            }
+
+            byte[] encryptedContent = readContent( r );
+
+            byte[] plainContent = messenger.consume( encryptedContent );
+            result = JsonUtil.fromCbor( plainContent, EnvironmentDTO.class );
+            LOG.debug( "EnvironmentDTO: " + result.toString() );
+            return result;
+        }
+        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
+                e )
+        {
+            throw new HIntegrationException( "Could not retrieve environment data", e );
+        }
+    }
+
+
+    private void processEnvironmentData( final EnvironmentDTO environmentDTO ) throws HIntegrationException
+    {
+
+        if ( environmentDTO.getState() == EnvironmentDTO.State.INITIALIZING )
+        {
+            //GET rest/v1/environments/{environment-id}/peers/{peer-id}/package
+
+            EnvironmentPeerDataDTO dto = processInitializing( environmentDTO );
+            LOG.debug( String.format( "%s", dto ) );
+            sendEnvironmentPeerData( environmentDTO.getId(), dto );
+        }
+        else if ( environmentDTO.getState() == EnvironmentDTO.State.RENDEZVOUS )
+        {
+            EnvironmentPeerDataDTO dto = processRendevouse( environmentDTO );
+            LOG.debug( String.format( "%s", dto ) );
+            //            sendEnvironmentPeerData( environmentDTO.getId(), dto );
+        }
+    }
+
+
+    private EnvironmentPeerDataDTO processRendevouse( EnvironmentDTO environmentDTO ) throws HIntegrationException
+    {
+        EnvironmentPeerDataDTO dto = new EnvironmentPeerDataDTO();
+
+        try
+        {
+            String path = String.format( "/rest/v1/environments/%s/peers/%s/package", environmentDTO.getId(), peerId );
+            EnvironmentPackageDTO packageDTO = getEnvironmentPackageData( path );
+            LOG.debug( String.format( "Environment package: %s", packageDTO ) );
+            Set<String> exceptedAddresses = new HashSet<>();
+            if ( packageDTO.getPeers() != null )
+            {
+                for ( EnvironmentPeerDataDTO peerData : packageDTO.getPeers() )
+                {
+                    exceptedAddresses.add( peerData.getCommunityIP() );
+                    LOG.debug( String.format( "%s", peerData ) );
+                }
+            }
+
+            dto.setPeerId( peerId );
+            dto.setState( EnvironmentPeerDataDTO.State.READY );
+        }
+        catch ( Exception e )
+        {
+            dto.setState( EnvironmentPeerDataDTO.State.REFUSED );
+        }
+
+        return dto;
+    }
+
+
+    private EnvironmentPeerDataDTO processInitializing( final EnvironmentDTO environmentDTO )
+            throws HIntegrationException
+    {
+        EnvironmentPeerDataDTO result = new EnvironmentPeerDataDTO();
+        result.setPeerId( peerId );
+        try
+        {
+            //            String path = String.format( "/rest/v1/environments/%s/peers/%s/package", environmentDTO
+            // .getId(), peerId );
+            //            EnvironmentPackageDTO packageDTO = getEnvironmentPackageData( path );
+            //            LOG.debug( String.format( "Environment package: %s", packageDTO ) );
+            Set<String> exceptedAddresses = new HashSet<>();
+            //            if ( packageDTO.getPeers() != null )
+            //            {
+            //                for ( EnvironmentPeerDataDTO peerData : packageDTO.getPeers() )
+            //                {
+            //                    exceptedAddresses.add( peerData.getCommunityIP() );
+            //                }
+            //            }
+
+            String address = findFreeAddress( exceptedAddresses );
+
+            TrustDataDto trustDataDto = new TrustDataDto( PGPKeyUtil.getKeyId( peerPublicKey.getFingerprint() ),
+                    PGPKeyUtil.getKeyId( ownerPublicKey.getFingerprint() ), TrustDataDto.TrustLevel.FULL );
+
+            String pekId = String.format( "%s-%s", peerId, environmentDTO.getId() );
+
+            KeyPair kp = securityManager.getKeyManager().generateKeyPair( pekId, false );
+            securityManager.getKeyManager().saveKeyPair( pekId, ( short ) 2, kp );
+
+            String pek = securityManager.getKeyManager().getPublicKeyRingAsASCII( pekId );
+
+            result.setCommunityIP( address );
+            result.setTrustData( trustDataDto );
+            result.setState( EnvironmentPeerDataDTO.State.ACCEPTED );
+            result.setPEK( pek );
+        }
+        catch ( Exception e )
+        {
+            result.setState( EnvironmentPeerDataDTO.State.REFUSED );
+            LOG.error( e.getMessage(), e );
+        }
+        return result;
+    }
+
+
+    private String findFreeAddress( Set<String> exceptedAddresses )
+    {
+        SubnetUtils.SubnetInfo info = new SubnetUtils( ENVIRONMENT_SUBNET ).getInfo();
+
+        InterfacePattern interfacePattern = new InterfacePattern( "ip", "10\\.111\\.11\\..*" );
+        Set<Interface> interfaces = peerManager.getLocalPeer().getNetworkInterfaces( interfacePattern );
+
+        String result = null;
+        Set<String> hosts = new HashSet<>( exceptedAddresses );
+
+        for ( Interface intf : interfaces )
+        {
+            hosts.add( intf.getIp() );
+        }
+
+        Integer i = 1;
+        result = null;
+        while ( i < 255 && result == null )
+        {
+            String ip = String.format( "10.11.111.%d", i );
+            if ( !hosts.contains( ip ) )
+            {
+                result = ip;
+            }
+        }
+
+        return result;
+    }
+
+
+    //    PUT rest/v1/environments/{environment-id}/peers/{peer-id}
+    private void sendEnvironmentPeerData( UUID environmentId, EnvironmentPeerDataDTO environmentPeerDataDTO )
+            throws HIntegrationException
+    {
+        LOG.debug( "Sending: " + environmentPeerDataDTO );
+        String path =
+                String.format( "/rest/v1/environments/%s/peers/%s", environmentId, environmentPeerDataDTO.getPeerId() );
+        try
+        {
+            WebClient client = HttpClient
+                    .createTrustedWebClientWithAuth( baseUrl + path, keyStore, "subutai".toCharArray(),
+                            serverFingerprint );
+
+            byte[] plainData = JsonUtil.toCbor( environmentPeerDataDTO );
+            byte[] encryptedData = messenger.produce( plainData );
+            Response r = client.put( encryptedData );
+            if ( r.getStatus() != HttpStatus.SC_NO_CONTENT )
+            {
+                LOG.warn( "Unexpected response: " + r.readEntity( String.class ) );
+            }
+        }
+        catch ( UnrecoverableKeyException | PGPException | NoSuchAlgorithmException | KeyStoreException |
+                JsonProcessingException e )
+        {
+            throw new HIntegrationException( "Could not send environment peer data.", e );
+        }
+    }
+
+
+    private EnvironmentPackageDTO getEnvironmentPackageData( String path ) throws HIntegrationException
+    {
+        EnvironmentPackageDTO result = null;
+
+        try
+        {
+            WebClient client = HttpClient
+                    .createTrustedWebClientWithAuth( baseUrl + path, keyStore, "subutai".toCharArray(),
+                            serverFingerprint );
+
+            Response r = client.get();
+
+
+            if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
+            {
+                return result;
+            }
+
+            if ( r.getStatus() != HttpStatus.SC_OK )
+            {
+                LOG.error( r.readEntity( String.class ) );
+                return result;
+            }
+
+            byte[] encryptedContent = readContent( r );
+
+            byte[] plainContent = messenger.consume( encryptedContent );
+
+            result = JsonUtil.fromCbor( plainContent, EnvironmentPackageDTO.class );
+            return result;
+        }
+        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | IOException | PGPException
+                e )
+        {
+            throw new HIntegrationException( "Could not retrieve environment package data.", e );
+        }
     }
 
 
@@ -514,5 +667,29 @@ public class IntegrationImpl implements Integration
 
         IOUtils.copy( is, bos );
         return bos.toByteArray();
+    }
+
+
+    @Override
+    public void run()
+    {
+        try
+        {
+            LOG.debug( "Heartbeat sender started..." );
+            Set<String> stateLinks = sendHeartbeat();
+
+            for ( String link : stateLinks )
+            {
+                LOG.debug( "Processing state link: " + link );
+                processStateLink( link );
+            }
+
+            LOG.debug( "Heartbeat sender finished successfully." );
+        }
+        catch ( HIntegrationException e )
+        {
+            LOG.debug( "Hearbeat sender failed." );
+            LOG.error( e.getMessage(), e );
+        }
     }
 }

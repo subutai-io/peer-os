@@ -59,7 +59,6 @@ public class FingerprintTrustManager implements X509TrustManager
             String fingerPrint = StringUtils.substringBetween( p.getName(), "CN=", "," );
             LOG.debug( "Fingerprint: " + fingerPrint );
 
-
             if ( !Arrays.equals( serverFingerprint, Hex.decodeHex( fingerPrint.toCharArray() ) ) )
             {
                 throw new CertificateException( "Invalid fingerprint" );

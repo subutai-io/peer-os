@@ -1088,7 +1088,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 LOGGER.debug( s );
             }
         }
-        String freeSubnet = findFreePeersSubnet( allSubnets );
+        String freeSubnet = findFreeEnvironmentSubnet( allSubnets );
 
         LOGGER.debug( String.format( "Free subnet for peer: %s", freeSubnet ) );
         try
@@ -1170,7 +1170,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    private String findFreePeersSubnet( final Set<String> allSubnets )
+    private String findFreeEnvironmentSubnet( final Set<String> allSubnets )
     {
         String result = null;
         int i = 11;
