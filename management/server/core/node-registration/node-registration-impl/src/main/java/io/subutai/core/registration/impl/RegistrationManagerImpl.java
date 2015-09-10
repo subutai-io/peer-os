@@ -16,9 +16,14 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.broker.api.Broker;
 import io.subutai.core.broker.api.ClientCredentials;
+import io.subutai.core.network.api.NetworkManager;
+import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.exception.NodeRegistrationException;
@@ -44,6 +49,10 @@ public class RegistrationManagerImpl implements RegistrationManager
     private ContainerTokenDataService containerTokenDataService;
     private DaoManager daoManager;
     private Broker broker;
+    private PeerManager peerManager;
+    private NetworkManager networkManager;
+
+    public static final String PEER_SUBNET_MASK = "255.255.255.0";
 
 
     public RegistrationManagerImpl( final SecurityManager securityManager, final DaoManager daoManager )
@@ -224,12 +233,43 @@ public class RegistrationManagerImpl implements RegistrationManager
         }
         try
         {
-            securityManager.getKeyManager().savePublicKeyRing( containerHostId,(short)2 , publicKey );
+            securityManager.getKeyManager().savePublicKeyRing( containerHostId, ( short ) 2, publicKey );
         }
         catch ( Exception ex )
         {
             throw new NodeRegistrationException( "Failed to store container pubkey", ex );
         }
         return containerToken;
+    }
+
+
+    @Override
+    public void importEnvironment( final Environment environment, final List<ContainerHost> containerHosts )
+            throws NodeRegistrationException
+    {
+        /**
+         * steps to perform for fully functional environment and compliance work with the rest of the system
+         * 1. setupN2n
+         * 2. add environment peers
+         * 3. create key pair
+         * 4. find free vni
+         * 5. reserve vni
+         * 6. set vni
+         */
+
+        //        networkManager.setupN2NConnection( peerManager.getLocalPeer(). );
+        //step 1
+        List<N2NConfig> tunnels =
+                Lists.newArrayList();//setupN2NConnection( Sets.newHashSet((Peer)peerManager.getLocalPeer()) );
+
+        for ( N2NConfig config : tunnels )
+        {
+            //            final PeerConf p = new PeerConfImpl();
+            //            p.setN2NConfig( config );
+            //            environment.addEnvironmentPeer( p );
+        }
+
+        //step 2
+
     }
 }
