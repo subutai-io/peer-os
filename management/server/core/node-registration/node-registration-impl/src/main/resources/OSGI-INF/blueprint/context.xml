@@ -10,11 +10,15 @@
         init-method="init">
     <argument ref="securityManagerRef" />
     <argument ref="daoManager" />
+    <property name="broker" ref="brokerRef" />
   </bean>
 
   <service ref="registrationManager" interface="io.subutai.core.registration.api.RegistrationManager" />
 
   <reference id="securityManagerRef" availability="mandatory"
              interface="io.subutai.core.security.api.SecurityManager" />
+
+  <reference id="brokerRef" availability="mandatory"
+             interface="io.subutai.core.broker.api.Broker" />
 
 </blueprint>
