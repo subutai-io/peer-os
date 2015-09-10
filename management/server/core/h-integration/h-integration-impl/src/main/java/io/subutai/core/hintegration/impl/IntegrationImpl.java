@@ -675,7 +675,7 @@ public class IntegrationImpl implements Integration, Runnable
     {
         try
         {
-            LOG.debug( "Heartbeat sender started..." );
+            LOG.debug( "Heartbeat sending started..." );
             Set<String> stateLinks = sendHeartbeat();
 
             for ( String link : stateLinks )
@@ -684,11 +684,11 @@ public class IntegrationImpl implements Integration, Runnable
                 processStateLink( link );
             }
 
-            LOG.debug( "Heartbeat sender finished successfully." );
+            LOG.debug( "Heartbeat sending finished successfully." );
         }
         catch ( HIntegrationException e )
         {
-            LOG.debug( "Hearbeat sender failed." );
+            LOG.debug( "Heartbeat sending failed." );
             LOG.error( e.getMessage(), e );
         }
     }
