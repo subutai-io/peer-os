@@ -302,7 +302,7 @@ if [ $name ]; then
       out="$out \n $name\t $status\t $HW\t  $IP \teth0"
       echo -e $out 
      else 
-      out="$out \n NAME\tSTATE"
+      out="$out NAME\tSTATE"
       out="$out \n ---------------------------------"
       if [ -z $state ];then  
        state="NOT_EXIST"
