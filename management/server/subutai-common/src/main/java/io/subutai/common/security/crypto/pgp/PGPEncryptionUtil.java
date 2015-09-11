@@ -89,10 +89,12 @@ public class PGPEncryptionUtil
     public static final BouncyCastleProvider provider = new BouncyCastleProvider();
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
+
     static
     {
         Security.addProvider( provider );
     }
+
 
     public static byte[] encrypt( final byte[] message, final PGPPublicKey publicKey, boolean armored )
             throws PGPException
@@ -1176,14 +1178,14 @@ public class PGPEncryptionUtil
         //        enchashgen.setTrust(false, 0, 3);
         // Objects used to encrypt the secret key.
         PGPDigestCalculator sha1Calc = new BcPGPDigestCalculatorProvider().get( HashAlgorithmTags.SHA1 );
-        PGPDigestCalculator sha256Calc = new BcPGPDigestCalculatorProvider().get( HashAlgorithmTags.SHA256 );
+        //        PGPDigestCalculator sha256Calc = new BcPGPDigestCalculatorProvider().get( HashAlgorithmTags.SHA256 );
 
         // bcpg 1.48 exposes this API that includes s2kcount. Earlier
         // versions use a default of 0x60.
         //        PBESecretKeyEncryptor pske = ( new BcPBESecretKeyEncryptorBuilder( PGPEncryptedData.AES_256 ) )
         // .build( pass );
         PBESecretKeyEncryptor pske =
-                ( new BcPBESecretKeyEncryptorBuilder( PGPEncryptedData.AES_256, sha256Calc, s2kcount ) ).build( pass );
+                ( new BcPBESecretKeyEncryptorBuilder( PGPEncryptedData.CAST5, sha1Calc, s2kcount ) ).build( pass );
         // Finally, create the keyring itself. The constructor
         // takes parameters that allow it to generate the self
         // signature.
