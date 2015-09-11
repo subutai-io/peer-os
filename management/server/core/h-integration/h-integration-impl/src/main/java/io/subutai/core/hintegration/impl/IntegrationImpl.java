@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,11 +65,13 @@ import io.subutai.hub.common.dto.HeartbeatResponseDTO;
 import io.subutai.hub.common.dto.RegistrationDTO;
 import io.subutai.hub.common.dto.TrustDataDto;
 import io.subutai.hub.common.json.JsonUtil;
+import io.subutai.hub.common.pgp.crypto.PGPDecrypt;
+import io.subutai.hub.common.pgp.crypto.PGPEncrypt;
 import io.subutai.hub.common.pgp.key.PGPKeyHelper;
 import io.subutai.hub.common.pgp.message.PGPMessenger;
 
 
-public class IntegrationImpl implements Integration, Runnable
+public class IntegrationImpl implements Integration
 {
     private static final Logger LOG = LoggerFactory.getLogger( IntegrationImpl.class.getName() );
 
@@ -80,7 +83,8 @@ public class IntegrationImpl implements Integration, Runnable
 
     private static final String ENVIRONMENT_SUBNET = "10.11.111.0/24";
     //    private static final String SERVER_NAME = "52.88.77.35";
-    private static final String SERVER_NAME = "52.19.74.127";
+    //    private static final String SERVER_NAME = "52.19.74.127";
+    private static final String SERVER_NAME = "52.19.101.194";
     private SecurityManager securityManager;
     private PeerManager peerManager;
     public static final String OWNER_USER_ID = "owner@subutai.io";
@@ -90,7 +94,7 @@ public class IntegrationImpl implements Integration, Runnable
     private PGPPublicKey ownerPublicKey;
     private PGPPublicKey peerPublicKey;
     private ScheduledExecutorService hearbeatExecutorService = Executors.newSingleThreadScheduledExecutor();
-    //    private HeartbeatProcessor processor;
+    private HeartbeatProcessor processor;
     private KeyStore keyStore;
     private byte[] serverFingerprint;
     private PGPMessenger messenger;
@@ -146,8 +150,8 @@ public class IntegrationImpl implements Integration, Runnable
             String path = String.format( "/rest/v1/peers/%s/hearbeat", peerManager.getLocalPeerInfo().getId() );
             WebClient client = io.subutai.core.hintegration.impl.HttpClient.createTrustedWebClient( baseUrl + path );
 
-            //            processor = new HeartbeatProcessor( this );
-            this.hearbeatExecutorService.scheduleWithFixedDelay( this, 10, 30, TimeUnit.SECONDS );
+            processor = new HeartbeatProcessor( this );
+            this.hearbeatExecutorService.scheduleWithFixedDelay( processor, 10, 30, TimeUnit.SECONDS );
 
             keyStore = KeyStore.getInstance( "JKS" );
 
@@ -486,7 +490,7 @@ public class IntegrationImpl implements Integration, Runnable
         try
         {
             String path = String.format( "/rest/v1/environments/%s/peers/%s/package", environmentDTO.getId(), peerId );
-            EnvironmentPackageDTO packageDTO = getEnvironmentPackageData( path );
+            EnvironmentPackageDTO packageDTO = getEnvironmentPackageData( path, environmentDTO );
             LOG.debug( String.format( "Environment package: %s", packageDTO ) );
             Set<String> exceptedAddresses = new HashSet<>();
             if ( packageDTO.getPeers() != null )
@@ -504,6 +508,7 @@ public class IntegrationImpl implements Integration, Runnable
         catch ( Exception e )
         {
             dto.setState( EnvironmentPeerDataDTO.State.REFUSED );
+            LOG.error( e.getMessage(), e );
         }
 
         return dto;
@@ -540,8 +545,15 @@ public class IntegrationImpl implements Integration, Runnable
             KeyPair kp = securityManager.getKeyManager().generateKeyPair( pekId, false );
             securityManager.getKeyManager().saveKeyPair( pekId, ( short ) 2, kp );
 
-            String pek = securityManager.getKeyManager().getPublicKeyRingAsASCII( pekId );
+            //            String pek = securityManager.getKeyManager().getPublicKeyRingAsASCII( pekId );
 
+            PGPPublicKey pekPublicKey = securityManager.getKeyManager().getPublicKey( pekId );
+
+            String pek = PGPKeyUtil.exportAscii( pekPublicKey );
+
+            LOG.debug( String.format( "PEK fingerprint: %s. %s",
+                    PGPKeyUtil.getFingerprint( pekPublicKey.getFingerprint() ),
+                    pek.equals( securityManager.getKeyManager().getPublicKeyRingAsASCII( pekId ) ) ) );
             result.setCommunityIP( address );
             result.setTrustData( trustDataDto );
             result.setState( EnvironmentPeerDataDTO.State.ACCEPTED );
@@ -615,7 +627,8 @@ public class IntegrationImpl implements Integration, Runnable
     }
 
 
-    private EnvironmentPackageDTO getEnvironmentPackageData( String path ) throws HIntegrationException
+    private EnvironmentPackageDTO getEnvironmentPackageData( String path, EnvironmentDTO environmentDTO )
+            throws HIntegrationException
     {
         EnvironmentPackageDTO result = null;
 
@@ -641,7 +654,31 @@ public class IntegrationImpl implements Integration, Runnable
 
             byte[] encryptedContent = readContent( r );
 
-            byte[] plainContent = messenger.consume( encryptedContent );
+            byte[] pekEncryptedContent = messenger.consume( encryptedContent );
+
+            KeyManager keyManager = securityManager.getKeyManager();
+            String pekId = String.format( "%s-%s", peerId, environmentDTO.getId() );
+
+            PGPPrivateKey pekPrivateKey = keyManager.getPrivateKey( pekId );
+            PGPPublicKey pekPublicKey = keyManager.getPublicKey( pekId );
+
+            LOG.debug( String.format( "PEK fingerprint: %s",
+                    PGPKeyUtil.getFingerprint( pekPublicKey.getFingerprint() ) ) );
+
+
+            byte[] e = PGPEncrypt.encrypt( "Timur".getBytes(), pekPublicKey );
+            byte[] d = PGPDecrypt.decrypt( e, pekPrivateKey );
+
+            LOG.debug( String.format( "-----> original text: %s", new String( d ) ) );
+            LOG.debug( String.format( "-----> PEK encrypted content length: %d", pekEncryptedContent.length ) );
+            LOG.debug( PGPEncryptionUtil.armorByteArrayToString( pekPublicKey.getPublicKeyPacket().getEncoded() ) );
+
+            PGPSecretKeyRing kr = keyManager.getSecretKeyRing( pekId );
+
+            LOG.debug(
+                    PGPEncryptionUtil.armorByteArrayToString( kr.getEncoded() ) );
+
+            byte[] plainContent = PGPDecrypt.decrypt( pekEncryptedContent, pekPrivateKey );
 
             result = JsonUtil.fromCbor( plainContent, EnvironmentPackageDTO.class );
             return result;
@@ -667,29 +704,5 @@ public class IntegrationImpl implements Integration, Runnable
 
         IOUtils.copy( is, bos );
         return bos.toByteArray();
-    }
-
-
-    @Override
-    public void run()
-    {
-        try
-        {
-            LOG.debug( "Heartbeat sending started..." );
-            Set<String> stateLinks = sendHeartbeat();
-
-            for ( String link : stateLinks )
-            {
-                LOG.debug( "Processing state link: " + link );
-                processStateLink( link );
-            }
-
-            LOG.debug( "Heartbeat sending finished successfully." );
-        }
-        catch ( HIntegrationException e )
-        {
-            LOG.debug( "Heartbeat sending failed." );
-            LOG.error( e.getMessage(), e );
-        }
     }
 }

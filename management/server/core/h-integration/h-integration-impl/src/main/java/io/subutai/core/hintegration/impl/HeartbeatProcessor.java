@@ -1,20 +1,13 @@
 package io.subutai.core.hintegration.impl;
 
 
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.http.HttpStatus;
-
+import io.subutai.core.hintegration.api.HIntegrationException;
 import io.subutai.core.hintegration.api.Integration;
-import io.subutai.hub.common.dto.HeartbeatResponseDTO;
 
 
 /**
@@ -23,7 +16,6 @@ import io.subutai.hub.common.dto.HeartbeatResponseDTO;
 public class HeartbeatProcessor implements Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger( HeartbeatProcessor.class );
-    private List<CommandProcessor> processors = new CopyOnWriteArrayList<CommandProcessor>();
     private Integration integration;
 
 
@@ -33,36 +25,28 @@ public class HeartbeatProcessor implements Runnable
     }
 
 
-    public void addProcessor( CommandProcessor commandProcessor )
-    {
-        this.processors.add( commandProcessor );
-    }
 
 
     @Override
     public void run()
     {
-        LOG.debug( "Hearbeat processor started..." );
         try
         {
-            Set<String> response = integration.sendHeartbeat();
-            if ( response != null )
+            LOG.debug( "Heartbeat sending started..." );
+            Set<String> stateLinks = integration.sendHeartbeat();
+
+            for ( String link : stateLinks )
             {
-                for ( String l : response )
-                {
-
-                }
-
-                for ( CommandProcessor processor : this.processors )
-                {
-                    // here the body of runner
-                }
+                LOG.debug( "Processing state link: " + link );
+                integration.processStateLink( link );
             }
+
+            LOG.debug( "Heartbeat sending finished successfully." );
         }
         catch ( Exception e )
         {
+            LOG.debug( "Heartbeat sending failed." );
             LOG.error( e.getMessage(), e );
         }
-        LOG.debug( "Hearbeat processor done." );
     }
 }
