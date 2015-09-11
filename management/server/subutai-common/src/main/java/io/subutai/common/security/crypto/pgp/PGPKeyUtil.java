@@ -16,6 +16,7 @@ import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
+import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.bouncycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator;
 import org.slf4j.Logger;
@@ -283,6 +284,7 @@ public class PGPKeyUtil
         return readPublicKey( new ByteArrayInputStream( keyMaterial ) );
     }
 
+
     /* *****************************************
      *
      */
@@ -382,8 +384,9 @@ public class PGPKeyUtil
      */
     public static ByteArrayInputStream readSecretKeyRingInputStream( byte[] keyMaterial ) throws PGPException
     {
-        return  new ByteArrayInputStream( keyMaterial );
+        return new ByteArrayInputStream( keyMaterial );
     }
+
 
     /* *******************************************
      *
@@ -428,6 +431,34 @@ public class PGPKeyUtil
                 PGPPublicKey key = ( PGPPublicKey ) keyIter.next();
 
                 if ( key.isEncryptionKey() )
+                {
+                    return key;
+                }
+            }
+        }
+        catch ( Exception ex )
+        {
+            return null;
+        }
+
+        return null;
+    }
+
+
+    /* *******************************************
+     *
+     */
+    public static PGPSecretKey readSecretKey( PGPSecretKeyRing keyRing ) throws PGPException
+    {
+        try
+        {
+            Iterator keyIter = keyRing.getSecretKeys();
+
+            while ( keyIter.hasNext() )
+            {
+                PGPSecretKey key = ( PGPSecretKey ) keyIter.next();
+
+                if ( key.isSigningKey() )
                 {
                     return key;
                 }
