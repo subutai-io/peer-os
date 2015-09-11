@@ -126,9 +126,15 @@ public class IntegrationImpl implements Integration
 
         try
         {
+            this.peerId = peerManager.getLocalPeerInfo().getId();
+
             this.hubPublicKey = PGPKeyHelper.readPublicKey( HSettings.HUB_PUB_KEY );
-            this.ownerPublicKey = PGPKeyHelper.readPublicKey( HSettings.PEER_OWNER_PUB_KEY );
-            this.peerPublicKey = PGPKeyHelper.readPublicKey( HSettings.PEER_PUB_KEY );
+                        this.ownerPublicKey = PGPKeyHelper.readPublicKey( HSettings.PEER_OWNER_PUB_KEY );
+                        this.peerPublicKey = PGPKeyHelper.readPublicKey( HSettings.PEER_PUB_KEY );
+
+
+//            this.ownerPublicKey = securityManager.getKeyManager().getPublicKey( "owner-" + peerId.toString() );
+//            this.peerPublicKey = securityManager.getKeyManager().getPublicKey( null );
 
             LOG.debug( String.format( "Peer fingerprint: %s",
                     PGPKeyUtil.getFingerprint( peerPublicKey.getFingerprint() ) ) );
@@ -144,7 +150,6 @@ public class IntegrationImpl implements Integration
 
             generateX509Certificate();
 
-            this.peerId = peerManager.getLocalPeerInfo().getId();
 
             String baseUrl = String.format( "https://%s:4000", SERVER_NAME );
             String path = String.format( "/rest/v1/peers/%s/hearbeat", peerManager.getLocalPeerInfo().getId() );
@@ -502,6 +507,7 @@ public class IntegrationImpl implements Integration
                 }
             }
 
+
             dto.setPeerId( peerId );
             dto.setState( EnvironmentPeerDataDTO.State.READY );
         }
@@ -654,29 +660,43 @@ public class IntegrationImpl implements Integration
 
             byte[] encryptedContent = readContent( r );
 
-            byte[] pekEncryptedContent = messenger.consume( encryptedContent );
 
+            String doc = new String( encryptedContent );
+//            LOG.debug( "DOC: " + doc );
+            byte[] cborContent = messenger.consume( encryptedContent );
+
+//            doc = new String( cborContent  );
+//            LOG.debug( "PEK encrypted content: " + doc );
             KeyManager keyManager = securityManager.getKeyManager();
             String pekId = String.format( "%s-%s", peerId, environmentDTO.getId() );
 
             PGPPrivateKey pekPrivateKey = keyManager.getPrivateKey( pekId );
+
+            if (pekPrivateKey == null) {
+                throw new KeyStoreException("PEK private key not found.");
+            }
             PGPPublicKey pekPublicKey = keyManager.getPublicKey( pekId );
 
             LOG.debug( String.format( "PEK fingerprint: %s",
                     PGPKeyUtil.getFingerprint( pekPublicKey.getFingerprint() ) ) );
 
+//
+//            byte[] e = PGPEncrypt.encrypt( "Timur".getBytes(), pekPublicKey );
+//            byte[] d = PGPDecrypt.decrypt( e, pekPrivateKey );
 
-            byte[] e = PGPEncrypt.encrypt( "Timur".getBytes(), pekPublicKey );
-            byte[] d = PGPDecrypt.decrypt( e, pekPrivateKey );
+//            LOG.debug( String.format( "-----> original text: %s", new String( d ) ) );
+//            LOG.debug( String.format( "-----> PEK encrypted content length: %d", cborContent.length ) );
+//            LOG.debug( PGPEncryptionUtil.armorByteArrayToString( pekPublicKey.getPublicKeyPacket().getEncoded() ) );
 
-            LOG.debug( String.format( "-----> original text: %s", new String( d ) ) );
-            LOG.debug( String.format( "-----> PEK encrypted content length: %d", pekEncryptedContent.length ) );
-            LOG.debug( PGPEncryptionUtil.armorByteArrayToString( pekPublicKey.getPublicKeyPacket().getEncoded() ) );
+//            PGPSecretKeyRing kr = keyManager.getSecretKeyRing( pekId );
+//
+//            LOG.debug( "PEK: " + PGPEncryptionUtil.armorByteArrayToString( kr.getEncoded() ) );
 
-            PGPSecretKeyRing kr = keyManager.getSecretKeyRing( pekId );
+//            PGPSecretKeyRing krPeer = keyManager.getSecretKeyRing( null );
 
-            LOG.debug(
-                    PGPEncryptionUtil.armorByteArrayToString( kr.getEncoded() ) );
+//            LOG.debug( "Peer: " + PGPEncryptionUtil.armorByteArrayToString( krPeer.getEncoded() ) );
+
+            byte[] pekEncryptedContent = JsonUtil.fromCbor( cborContent, byte[].class );
 
             byte[] plainContent = PGPDecrypt.decrypt( pekEncryptedContent, pekPrivateKey );
 
