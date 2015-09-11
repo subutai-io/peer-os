@@ -4,8 +4,10 @@ package io.subutai.core.channel.impl.interceptor;
 import java.net.URL;
 
 import javax.ws.rs.core.HttpHeaders;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -53,25 +55,30 @@ public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
                 {
                     HttpHeaders headers = new HttpHeadersImpl( message );
 
-                    LOG.info( " *** URL:" + url.getPath());
+                    LOG.info( " *** URL:" + url.getPath() );
 
                     String spHeader = headers.getHeaderString( Common.HEADER_SPECIAL );
 
                     if ( !Strings.isNullOrEmpty( spHeader ) )
                     {
-                        String envIdOut = headers.getHeaderString( Common.HEADER_ENV_ID_TARGET );
-                        String peerIdOut = headers.getHeaderString( Common.HEADER_PEER_ID_TARGET );
                         String ip = url.getHost();
 
-                        if ( !Strings.isNullOrEmpty( envIdOut ) )
+                        String envIdSource = headers.getHeaderString( Common.HEADER_ENV_ID_SOURCE );
+                        String envIdTarget = headers.getHeaderString( Common.HEADER_ENV_ID_TARGET );
+
+                        String peerIdSource = headers.getHeaderString( Common.HEADER_PEER_ID_SOURCE );
+                        String peerIdTarget = headers.getHeaderString( Common.HEADER_PEER_ID_TARGET );
+
+                        if ( !Strings.isNullOrEmpty( envIdSource ) )
                         {
-                            MessageContentUtil.encryptMessageContent( channelManagerImpl.getSecurityManager(), envIdOut,
-                                    ip, message );
+                            MessageContentUtil
+                                    .encryptContent( channelManagerImpl.getSecurityManager(), envIdSource, envIdTarget,
+                                            ip, message );
                         }
-                        else if ( !Strings.isNullOrEmpty( peerIdOut ) )
+                        else if ( !Strings.isNullOrEmpty( peerIdSource ) )
                         {
-                            MessageContentUtil.encryptMessageContent( channelManagerImpl.getSecurityManager(), peerIdOut,
-                                    ip, message );
+                            MessageContentUtil.encryptContent( channelManagerImpl.getSecurityManager(), peerIdSource,
+                                    peerIdTarget, ip, message );
                         }
                     }
                 }

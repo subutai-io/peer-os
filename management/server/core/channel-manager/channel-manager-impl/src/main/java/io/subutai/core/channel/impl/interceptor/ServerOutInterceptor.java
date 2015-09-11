@@ -66,17 +66,20 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
                                                                                .get( AbstractHTTPDestination
                                                                                        .HTTP_REQUEST );
                         String remoteIp = req.getRemoteAddr();
-                        String envIdIn = headers.getHeaderString( Common.HEADER_ENV_ID_SOURCE );
-                        String peerIdIn = headers.getHeaderString( Common.HEADER_PEER_ID_SOURCE );
+                        String envIdSource = headers.getHeaderString( Common.HEADER_ENV_ID_SOURCE );
+                        String envIdTarget = headers.getHeaderString( Common.HEADER_ENV_ID_TARGET );
 
-                        if ( !Strings.isNullOrEmpty( envIdIn ) )
+                        String peerIdSource = headers.getHeaderString( Common.HEADER_PEER_ID_SOURCE );
+                        String peerIdTarget = headers.getHeaderString( Common.HEADER_PEER_ID_TARGET );
+
+                        if ( !Strings.isNullOrEmpty( envIdSource ) )
                         {
-                            MessageContentUtil.encryptMessageContent( channelManagerImpl.getSecurityManager(), envIdIn,
+                            MessageContentUtil.encryptContent( channelManagerImpl.getSecurityManager(), envIdTarget, envIdSource,
                                     remoteIp, message );
                         }
-                        else if ( !Strings.isNullOrEmpty( peerIdIn ) )
+                        else if ( !Strings.isNullOrEmpty( peerIdSource ) )
                         {
-                            MessageContentUtil.encryptMessageContent( channelManagerImpl.getSecurityManager(), peerIdIn,
+                            MessageContentUtil.encryptContent( channelManagerImpl.getSecurityManager(), peerIdTarget, peerIdSource,
                                     remoteIp, message );
                         }
                     }

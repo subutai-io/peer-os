@@ -10,12 +10,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.ext.form.Form;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.util.RestUtil;
+import io.subutai.core.broker.api.Broker;
+import io.subutai.core.broker.api.ClientCredentials;
+import io.subutai.core.network.api.NetworkManager;
+import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.exception.NodeRegistrationException;
@@ -40,6 +48,11 @@ public class RegistrationManagerImpl implements RegistrationManager
     private SecurityManager securityManager;
     private ContainerTokenDataService containerTokenDataService;
     private DaoManager daoManager;
+    private Broker broker;
+    private PeerManager peerManager;
+    private NetworkManager networkManager;
+
+    public static final String PEER_SUBNET_MASK = "255.255.255.0";
 
 
     public RegistrationManagerImpl( final SecurityManager securityManager, final DaoManager daoManager )
@@ -53,28 +66,18 @@ public class RegistrationManagerImpl implements RegistrationManager
     {
         containerTokenDataService = new ContainerTokenDataService( daoManager );
         requestDataService = new RequestDataService( daoManager );
+    }
 
-        //        HostInterface interfaceModel = new HostInterface();
-        //        interfaceModel.setMac( UUID.randomUUID().toString() );
-        //        interfaceModel.setIp( "Some ip" );
-        //        interfaceModel.setInterfaceName( "Some i-name" );
-        //        Set<Interface> ifaces = Sets.newHashSet();
-        //        ifaces.addAll( Sets.newHashSet( interfaceModel ) );
-        //
-        //        RequestedHostImpl temp =
-        //                new RequestedHostImpl( UUID.randomUUID().toString(), "hostname", HostArchitecture.AMD64,
-        // "secret",
-        //                        "some rest hook", "some key", RegistrationStatus.REQUESTED, ifaces );
 
-        //                        requestDataService.persist( temp );
-        //        queueRequest( temp );
+    public Broker getBroker()
+    {
+        return broker;
+    }
 
-        //        LOGGER.info( "Started RegistrationManagerImpl" );
-        //        List<RequestedHostImpl> requestedHosts = ( List<RequestedHostImpl> ) requestDataService.getAll();
-        //        for ( final RequestedHostImpl requestedHost : requestedHosts )
-        //        {
-        //            LOGGER.error( requestedHost.toString() );
-        //        }
+
+    public void setBroker( final Broker broker )
+    {
+        this.broker = broker;
     }
 
 
@@ -171,23 +174,19 @@ public class RegistrationManagerImpl implements RegistrationManager
         requestDataService.update( registrationRequest );
 
         WebClient client = RestUtil.createWebClient( registrationRequest.getRestHook() );
-
-        EncryptionTool encryptionTool = securityManager.getEncryptionTool();
-        KeyManager keyManager = securityManager.getKeyManager();
-
-        String message = RegistrationStatus.APPROVED.name();
-        PGPPublicKey publicKey = keyManager.getPublicKey( registrationRequest.getId() );
-        byte[] encodedArray = encryptionTool.encrypt( message.getBytes(), publicKey, true );
-        String encoded = message;
+        Form form = new Form();
         try
         {
-            encoded = new String( encodedArray, "UTF-8" );
+            ClientCredentials clientCredentials = broker.createNewClientCredentials( requestId.toString() );
+            form.set( "ca", clientCredentials.getCaCertificate() );
+            form.set( "crt", clientCredentials.getClientCertificate() );
+            form.set( "key", clientCredentials.getClientKey() );
+            client.form( form );
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error approving new connections request", e );
         }
-        client.post( "Accepted" );
     }
 
 
@@ -223,7 +222,6 @@ public class RegistrationManagerImpl implements RegistrationManager
     {
 
         ContainerTokenImpl containerToken = containerTokenDataService.find( token );
-
         if ( containerToken == null )
         {
             throw new NodeRegistrationException( "Couldn't verify container token" );
@@ -233,15 +231,45 @@ public class RegistrationManagerImpl implements RegistrationManager
         {
             throw new NodeRegistrationException( "Container token expired" );
         }
-
         try
         {
-            securityManager.getKeyManager().savePublicKeyRing( containerHostId,(short)2 , publicKey );
+            securityManager.getKeyManager().savePublicKeyRing( containerHostId, ( short ) 2, publicKey );
         }
         catch ( Exception ex )
         {
             throw new NodeRegistrationException( "Failed to store container pubkey", ex );
         }
         return containerToken;
+    }
+
+
+    @Override
+    public void importEnvironment( final Environment environment, final List<ContainerHost> containerHosts )
+            throws NodeRegistrationException
+    {
+        /**
+         * steps to perform for fully functional environment and compliance work with the rest of the system
+         * 1. setupN2n
+         * 2. add environment peers
+         * 3. create key pair
+         * 4. find free vni
+         * 5. reserve vni
+         * 6. set vni
+         */
+
+        //        networkManager.setupN2NConnection( peerManager.getLocalPeer(). );
+        //step 1
+        List<N2NConfig> tunnels =
+                Lists.newArrayList();//setupN2NConnection( Sets.newHashSet((Peer)peerManager.getLocalPeer()) );
+
+        for ( N2NConfig config : tunnels )
+        {
+            //            final PeerConf p = new PeerConfImpl();
+            //            p.setN2NConfig( config );
+            //            environment.addEnvironmentPeer( p );
+        }
+
+        //step 2
+
     }
 }
