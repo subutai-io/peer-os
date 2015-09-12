@@ -135,13 +135,12 @@ public class IntegrationImpl implements Integration
             this.peerId = peerManager.getLocalPeerInfo().getId();
 
             this.hubPublicKey = PGPKeyHelper.readPublicKey( HSettings.HUB_PUB_KEY );
-            this.ownerPublicKey = PGPKeyHelper.readPublicKey( HSettings.PEER_OWNER_PUB_KEY );
-            this.peerPublicKey = PGPKeyHelper.readPublicKey( HSettings.PEER_PUB_KEY );
+            //            this.ownerPublicKey = PGPKeyHelper.readPublicKey( HSettings.PEER_OWNER_PUB_KEY );
+            //            this.peerPublicKey = PGPKeyHelper.readPublicKey( HSettings.PEER_PUB_KEY );
 
 
-            //            this.ownerPublicKey = securityManager.getKeyManager().getPublicKey( "owner-" + peerId
-            // .toString() );
-            //            this.peerPublicKey = securityManager.getKeyManager().getPublicKey( null );
+            this.ownerPublicKey = securityManager.getKeyManager().getPublicKey( "owner-" + peerId.toString() );
+            this.peerPublicKey = securityManager.getKeyManager().getPublicKey( null );
 
             LOG.debug( String.format( "Peer fingerprint: %s",
                     PGPKeyUtil.getFingerprint( peerPublicKey.getFingerprint() ) ) );
@@ -152,7 +151,8 @@ public class IntegrationImpl implements Integration
 
             serverFingerprint = hubPublicKey.getFingerprint();
 
-            senderKey = PGPKeyHelper.readPrivateKey( HSettings.PEER_SECRET_KEY, "12345678" );
+            //            senderKey = PGPKeyHelper.readPrivateKey( HSettings.PEER_SECRET_KEY, "12345678" );
+            senderKey = securityManager.getKeyManager().getPrivateKey( null );
             messenger = new PGPMessenger( senderKey, hubPublicKey );
 
             generateX509Certificate();
@@ -345,8 +345,7 @@ public class IntegrationImpl implements Integration
         {
             String path = String.format( "/rest/v1/peers/%s", peerManager.getLocalPeerInfo().getId() );
 
-            RegistrationDTO registrationData =
-                    new RegistrationDTO( PGPKeyHelper.getFingerprint( ownerPublicKey ).toUpperCase() );
+            RegistrationDTO registrationData = new RegistrationDTO( PGPKeyHelper.getFingerprint( ownerPublicKey ) );
 
             LOG.debug( "HEX owner key id: " + PGPKeyUtil.getKeyId( ownerPublicKey.getFingerprint() ) );
 
@@ -572,7 +571,16 @@ public class IntegrationImpl implements Integration
             }
             else
             {
-                address = N2NUtil.findFreeAddress( excludedAdresses );
+                String subnet = new SubnetUtils( excludedAdresses.iterator().next(), N2NUtil.N2N_SUBNET_MASK ).getInfo()
+                                                                                                              .getNetworkAddress();
+                if ( isSubnetFree( subnet ) )
+                {
+                    address = N2NUtil.findFreeAddress( excludedAdresses );
+                }
+                else
+                {
+                    throw new HIntegrationException( String.format( "Subnet %s already used.", subnet ) );
+                }
             }
 
             TrustDataDto trustDataDto = new TrustDataDto( PGPKeyUtil.getKeyId( peerPublicKey.getFingerprint() ),
@@ -603,6 +611,14 @@ public class IntegrationImpl implements Integration
             LOG.error( e.getMessage(), e );
         }
         return result;
+    }
+
+
+    private boolean isSubnetFree( final String subnet )
+    {
+        Set<String> environmentSubnets = getEnvironmentSubnets();
+
+        return environmentSubnets.contains( subnet );
     }
 
 
