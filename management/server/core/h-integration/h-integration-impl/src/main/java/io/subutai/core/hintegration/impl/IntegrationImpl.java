@@ -12,6 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -27,11 +28,12 @@ import javax.ws.rs.core.Response;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
-import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Transformer;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.util.SubnetUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -42,6 +44,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.subutai.common.host.Interface;
 import io.subutai.common.peer.InterfacePattern;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.security.SecurityProvider;
 import io.subutai.common.security.crypto.certificate.CertificateData;
 import io.subutai.common.security.crypto.certificate.CertificateTool;
@@ -52,6 +56,7 @@ import io.subutai.common.security.crypto.keystore.KeyStoreType;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import io.subutai.common.util.N2NUtil;
 import io.subutai.core.hintegration.api.HIntegrationException;
 import io.subutai.core.hintegration.api.Integration;
 import io.subutai.core.hintegration.impl.settings.HSettings;
@@ -66,7 +71,6 @@ import io.subutai.hub.common.dto.RegistrationDTO;
 import io.subutai.hub.common.dto.TrustDataDto;
 import io.subutai.hub.common.json.JsonUtil;
 import io.subutai.hub.common.pgp.crypto.PGPDecrypt;
-import io.subutai.hub.common.pgp.crypto.PGPEncrypt;
 import io.subutai.hub.common.pgp.key.PGPKeyHelper;
 import io.subutai.hub.common.pgp.message.PGPMessenger;
 
@@ -85,6 +89,8 @@ public class IntegrationImpl implements Integration
     //    private static final String SERVER_NAME = "52.88.77.35";
     //    private static final String SERVER_NAME = "52.19.74.127";
     private static final String SERVER_NAME = "52.19.101.194";
+    private static final String SUPERNODE_SERVER = "52.19.101.194";
+    private static final int SUPERNODE_PORT = 5000;
     private SecurityManager securityManager;
     private PeerManager peerManager;
     public static final String OWNER_USER_ID = "owner@subutai.io";
@@ -129,12 +135,13 @@ public class IntegrationImpl implements Integration
             this.peerId = peerManager.getLocalPeerInfo().getId();
 
             this.hubPublicKey = PGPKeyHelper.readPublicKey( HSettings.HUB_PUB_KEY );
-                        this.ownerPublicKey = PGPKeyHelper.readPublicKey( HSettings.PEER_OWNER_PUB_KEY );
-                        this.peerPublicKey = PGPKeyHelper.readPublicKey( HSettings.PEER_PUB_KEY );
+            this.ownerPublicKey = PGPKeyHelper.readPublicKey( HSettings.PEER_OWNER_PUB_KEY );
+            this.peerPublicKey = PGPKeyHelper.readPublicKey( HSettings.PEER_PUB_KEY );
 
 
-//            this.ownerPublicKey = securityManager.getKeyManager().getPublicKey( "owner-" + peerId.toString() );
-//            this.peerPublicKey = securityManager.getKeyManager().getPublicKey( null );
+            //            this.ownerPublicKey = securityManager.getKeyManager().getPublicKey( "owner-" + peerId
+            // .toString() );
+            //            this.peerPublicKey = securityManager.getKeyManager().getPublicKey( null );
 
             LOG.debug( String.format( "Peer fingerprint: %s",
                     PGPKeyUtil.getFingerprint( peerPublicKey.getFingerprint() ) ) );
@@ -483,7 +490,7 @@ public class IntegrationImpl implements Integration
         {
             EnvironmentPeerDataDTO dto = processRendevouse( environmentDTO );
             LOG.debug( String.format( "%s", dto ) );
-            //            sendEnvironmentPeerData( environmentDTO.getId(), dto );
+            sendEnvironmentPeerData( environmentDTO.getId(), dto );
         }
     }
 
@@ -497,17 +504,34 @@ public class IntegrationImpl implements Integration
             String path = String.format( "/rest/v1/environments/%s/peers/%s/package", environmentDTO.getId(), peerId );
             EnvironmentPackageDTO packageDTO = getEnvironmentPackageData( path, environmentDTO );
             LOG.debug( String.format( "Environment package: %s", packageDTO ) );
-            Set<String> exceptedAddresses = new HashSet<>();
-            if ( packageDTO.getPeers() != null )
+
+
+            EnvironmentPeerDataDTO currentPeerData = null;
+            for ( EnvironmentPeerDataDTO peerData : packageDTO.getPeers() )
             {
-                for ( EnvironmentPeerDataDTO peerData : packageDTO.getPeers() )
+                LOG.debug( String.format( "%s", peerData ) );
+
+                if ( peerData.getPeerId().equals( peerId ) )
                 {
-                    exceptedAddresses.add( peerData.getCommunityIP() );
-                    LOG.debug( String.format( "%s", peerData ) );
+                    currentPeerData = peerData;
+                    break;
                 }
             }
 
+            if ( currentPeerData == null )
+            {
+                throw new HIntegrationException( "Peer data not found." );
+            }
 
+            SubnetUtils.SubnetInfo subnetInfo =
+                    new SubnetUtils( currentPeerData.getCommunityIP(), N2NUtil.N2N_SUBNET_MASK ).getInfo();
+
+            N2NConfig config = new N2NConfig( peerId, SUPERNODE_SERVER, SUPERNODE_PORT,
+                    N2NUtil.generateInterfaceName( subnetInfo.getNetworkAddress() ),
+                    N2NUtil.generateCommunityName( subnetInfo.getNetworkAddress() ), currentPeerData.getCommunityIP(),
+                    packageDTO.getSharedSecret() );
+
+            peerManager.getLocalPeer().getManagementHost().setupN2NConnection( config );
             dto.setPeerId( peerId );
             dto.setState( EnvironmentPeerDataDTO.State.READY );
         }
@@ -528,20 +552,28 @@ public class IntegrationImpl implements Integration
         result.setPeerId( peerId );
         try
         {
-            //            String path = String.format( "/rest/v1/environments/%s/peers/%s/package", environmentDTO
-            // .getId(), peerId );
-            //            EnvironmentPackageDTO packageDTO = getEnvironmentPackageData( path );
-            //            LOG.debug( String.format( "Environment package: %s", packageDTO ) );
-            Set<String> exceptedAddresses = new HashSet<>();
-            //            if ( packageDTO.getPeers() != null )
-            //            {
-            //                for ( EnvironmentPeerDataDTO peerData : packageDTO.getPeers() )
-            //                {
-            //                    exceptedAddresses.add( peerData.getCommunityIP() );
-            //                }
-            //            }
+            Set<String> excludedAdresses = new HashSet<>();
+            for ( EnvironmentPeerDataDTO peerData : environmentDTO.getPeers() )
+            {
+                LOG.debug( String.format( "%s", peerData ) );
+                if ( peerData.getCommunityIP() != null )
+                {
+                    excludedAdresses.add( peerData.getCommunityIP() );
+                }
+            }
 
-            String address = findFreeAddress( exceptedAddresses );
+
+            String address;
+            if ( excludedAdresses.isEmpty() )
+            {
+                Set<String> excludedSubnets = getEnvironmentSubnets();
+                String freeSubnet = N2NUtil.findFreeSubnet( excludedSubnets );
+                address = freeSubnet.replaceAll( ".\\d$", ".1" );
+            }
+            else
+            {
+                address = N2NUtil.findFreeAddress( excludedAdresses );
+            }
 
             TrustDataDto trustDataDto = new TrustDataDto( PGPKeyUtil.getKeyId( peerPublicKey.getFingerprint() ),
                     PGPKeyUtil.getKeyId( ownerPublicKey.getFingerprint() ), TrustDataDto.TrustLevel.FULL );
@@ -574,33 +606,23 @@ public class IntegrationImpl implements Integration
     }
 
 
-    private String findFreeAddress( Set<String> exceptedAddresses )
+    private Set<String> getEnvironmentSubnets()
     {
-        SubnetUtils.SubnetInfo info = new SubnetUtils( ENVIRONMENT_SUBNET ).getInfo();
+        Set<Interface> r = peerManager.getLocalPeer().getNetworkInterfaces( N2NUtil.N2N_SUBNET_INTERFACES_PATTERN );
 
-        InterfacePattern interfacePattern = new InterfacePattern( "ip", "10\\.111\\.11\\..*" );
-        Set<Interface> interfaces = peerManager.getLocalPeer().getNetworkInterfaces( interfacePattern );
-
-        String result = null;
-        Set<String> hosts = new HashSet<>( exceptedAddresses );
-
-        for ( Interface intf : interfaces )
+        Collection peerSubnets = CollectionUtils.collect( r, new Transformer()
         {
-            hosts.add( intf.getIp() );
-        }
-
-        Integer i = 1;
-        result = null;
-        while ( i < 255 && result == null )
-        {
-            String ip = String.format( "10.11.111.%d", i );
-            if ( !hosts.contains( ip ) )
+            @Override
+            public Object transform( final Object o )
             {
-                result = ip;
+                Interface i = ( Interface ) o;
+                SubnetUtils u = new SubnetUtils( i.getIp(), N2NUtil.N2N_SUBNET_MASK );
+                return u.getInfo().getNetworkAddress();
             }
-        }
+        } );
 
-        return result;
+
+        return new HashSet<String>( peerSubnets );
     }
 
 
@@ -662,39 +684,41 @@ public class IntegrationImpl implements Integration
 
 
             String doc = new String( encryptedContent );
-//            LOG.debug( "DOC: " + doc );
+            //            LOG.debug( "DOC: " + doc );
             byte[] cborContent = messenger.consume( encryptedContent );
 
-//            doc = new String( cborContent  );
-//            LOG.debug( "PEK encrypted content: " + doc );
+            //            doc = new String( cborContent  );
+            //            LOG.debug( "PEK encrypted content: " + doc );
             KeyManager keyManager = securityManager.getKeyManager();
             String pekId = String.format( "%s-%s", peerId, environmentDTO.getId() );
 
             PGPPrivateKey pekPrivateKey = keyManager.getPrivateKey( pekId );
 
-            if (pekPrivateKey == null) {
-                throw new KeyStoreException("PEK private key not found.");
+            if ( pekPrivateKey == null )
+            {
+                throw new KeyStoreException( "PEK private key not found." );
             }
             PGPPublicKey pekPublicKey = keyManager.getPublicKey( pekId );
 
             LOG.debug( String.format( "PEK fingerprint: %s",
                     PGPKeyUtil.getFingerprint( pekPublicKey.getFingerprint() ) ) );
 
-//
-//            byte[] e = PGPEncrypt.encrypt( "Timur".getBytes(), pekPublicKey );
-//            byte[] d = PGPDecrypt.decrypt( e, pekPrivateKey );
+            //
+            //            byte[] e = PGPEncrypt.encrypt( "Timur".getBytes(), pekPublicKey );
+            //            byte[] d = PGPDecrypt.decrypt( e, pekPrivateKey );
 
-//            LOG.debug( String.format( "-----> original text: %s", new String( d ) ) );
-//            LOG.debug( String.format( "-----> PEK encrypted content length: %d", cborContent.length ) );
-//            LOG.debug( PGPEncryptionUtil.armorByteArrayToString( pekPublicKey.getPublicKeyPacket().getEncoded() ) );
+            //            LOG.debug( String.format( "-----> original text: %s", new String( d ) ) );
+            //            LOG.debug( String.format( "-----> PEK encrypted content length: %d", cborContent.length ) );
+            //            LOG.debug( PGPEncryptionUtil.armorByteArrayToString( pekPublicKey.getPublicKeyPacket()
+            // .getEncoded() ) );
 
-//            PGPSecretKeyRing kr = keyManager.getSecretKeyRing( pekId );
-//
-//            LOG.debug( "PEK: " + PGPEncryptionUtil.armorByteArrayToString( kr.getEncoded() ) );
+            //            PGPSecretKeyRing kr = keyManager.getSecretKeyRing( pekId );
+            //
+            //            LOG.debug( "PEK: " + PGPEncryptionUtil.armorByteArrayToString( kr.getEncoded() ) );
 
-//            PGPSecretKeyRing krPeer = keyManager.getSecretKeyRing( null );
+            //            PGPSecretKeyRing krPeer = keyManager.getSecretKeyRing( null );
 
-//            LOG.debug( "Peer: " + PGPEncryptionUtil.armorByteArrayToString( krPeer.getEncoded() ) );
+            //            LOG.debug( "Peer: " + PGPEncryptionUtil.armorByteArrayToString( krPeer.getEncoded() ) );
 
             byte[] pekEncryptedContent = JsonUtil.fromCbor( cborContent, byte[].class );
 
