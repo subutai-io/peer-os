@@ -201,20 +201,31 @@ public class PGPEncryptionUtil
 
 
     public static ContentAndSignatures decryptAndReturnSignatures( final byte[] encryptedMessage,
-                                                                   final PGPSecretKey secretKey,
+                                                                   final PGPSecretKeyRing secretKeyRing,
                                                                    final String secretPwd ) throws PGPException
     {
         try
         {
-            Iterator<PGPPublicKeyEncryptedData> it = getEncryptedObjects( encryptedMessage );
-            PGPPrivateKey sKey;
-            PGPPublicKeyEncryptedData pbe;
 
-            pbe = it.next();
-            sKey = secretKey.extractPrivateKey(
-                    new JcePBESecretKeyDecryptorBuilder().setProvider( provider ).build( secretPwd.toCharArray() ) );
-            InputStream clear = pbe.getDataStream(
-                    new JcePublicKeyDataDecryptorFactoryBuilder().setProvider( provider ).build( sKey ) );
+            PGPPrivateKey key = null;
+            final PGPSecretKeyRingCollection keys = new PGPSecretKeyRingCollection(
+                    PGPUtil.getDecoderStream( new ByteArrayInputStream( secretKeyRing.getEncoded() ) ),
+                    new JcaKeyFingerprintCalculator() );
+            PGPPublicKeyEncryptedData encrypted = null;
+            for ( final Iterator<PGPPublicKeyEncryptedData> i = getEncryptedObjects( encryptedMessage );
+                  ( key == null ) && i.hasNext(); )
+            {
+                encrypted = i.next();
+                key = getPrivateKey( keys, encrypted.getKeyID(), secretPwd );
+            }
+            if ( key == null )
+            {
+                throw new IllegalArgumentException( "secret key for message not found." );
+            }
+
+
+            InputStream clear = encrypted.getDataStream(
+                    new JcePublicKeyDataDecryptorFactoryBuilder().setProvider( provider ).build( key ) );
 
             PGPObjectFactory plainFact = new PGPObjectFactory( clear, new JcaKeyFingerprintCalculator() );
 
@@ -264,7 +275,7 @@ public class PGPEncryptionUtil
                 throw new PGPException( "Poor PGP. Signatures not found." );
             }
 
-            if ( pbe.isIntegrityProtected() && !pbe.verify() )
+            if ( encrypted.isIntegrityProtected() && !encrypted.verify() )
             {
                 throw new PGPException( "Data is integrity protected but integrity is lost." );
             }
