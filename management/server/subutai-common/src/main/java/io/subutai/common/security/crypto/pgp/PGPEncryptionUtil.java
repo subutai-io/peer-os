@@ -1286,7 +1286,7 @@ public class PGPEncryptionUtil
                                                          .build( secretKeyPassword.toCharArray() ) );
 
             PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(
-                    new JcaPGPContentSignerBuilder( secretKey.getPublicKey().getAlgorithm(), PGPUtil.SHA512 ) );
+                    new JcaPGPContentSignerBuilder( secretKey.getPublicKey().getAlgorithm(), PGPUtil.SHA1 ) );
 
             signatureGenerator.init( PGPSignature.DEFAULT_CERTIFICATION, pgpPrivKey );
 
