@@ -46,7 +46,7 @@ public abstract class N2NUtil
     public static String findFreeAddress( Set<String> excludedAddresses )
     {
         Preconditions.checkNotNull( excludedAddresses, "Excepted address set could not be null." );
-        Preconditions.checkArgument( excludedAddresses.isEmpty(),
+        Preconditions.checkArgument( !excludedAddresses.isEmpty(),
                 "Excluded address set should contains at least one address." );
 
         String fmt = excludedAddresses.iterator().next().replaceAll( ".\\d$", ".%s" );
