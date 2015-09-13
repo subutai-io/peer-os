@@ -2,9 +2,11 @@ package io.subutai.core.hintegration.impl;
 
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -29,12 +31,15 @@ import javax.ws.rs.core.Response;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.util.SubnetUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -66,6 +71,8 @@ import io.subutai.hub.common.dto.EnvironmentDto;
 import io.subutai.hub.common.dto.EnvironmentPackageDto;
 import io.subutai.hub.common.dto.EnvironmentPeerDataDto;
 import io.subutai.hub.common.dto.HeartbeatResponseDto;
+import io.subutai.hub.common.dto.PeerProductDataDto;
+import io.subutai.hub.common.dto.ProductDto;
 import io.subutai.hub.common.dto.RegistrationDto;
 import io.subutai.hub.common.dto.TrustDataDto;
 import io.subutai.hub.common.json.JsonUtil;
@@ -80,6 +87,11 @@ public class IntegrationImpl implements Integration
 
     private static final Pattern ENVIRONMENT_DATA_PATTERN =
             Pattern.compile( "/rest/v1/environments/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})" );
+    private static final Pattern PRODUCT_DATA_PATTERN = Pattern.compile(
+            "/rest/v1/peers/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/products/"
+                    + "([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})" );
+
+    private static final String PATH_TO_DEPLOY = String.format( "%s/deploy", System.getProperty( "karaf.home" ) );
 
     private static final String SERVER_NAME = "52.19.101.194";
     private static final String SUPERNODE_SERVER = "52.19.101.194";
@@ -409,9 +421,203 @@ public class IntegrationImpl implements Integration
             EnvironmentDto environmentDto = getEnvironmentData( link );
             processEnvironmentData( environmentDto );
         }
+
+        // PeerProduct Data GET /rest/v1/peers/{peer-id}/products/{product-id}
+
+        Matcher productDataMatcher = PRODUCT_DATA_PATTERN.matcher( link );
+        if ( productDataMatcher.matches() )
+        {
+            PeerProductDataDto peerProductDataDTO = getPeerProductDto( link );
+            try
+            {
+                processPeerProductData( peerProductDataDTO );
+            }
+            catch ( UnrecoverableKeyException | IOException | KeyStoreException | NoSuchAlgorithmException e )
+            {
+                e.printStackTrace();
+            }
+        }
+
         else
         {
             LOG.warn( "Unknown state link: " + link );
+        }
+    }
+
+
+    private void processPeerProductData( final PeerProductDataDto peerProductDataDTO )
+            throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, HIntegrationException,
+            IOException
+    {
+        switch ( peerProductDataDTO.getState() )
+        {
+            case INSTALL:
+                installingProcess( peerProductDataDTO );
+                break;
+
+            case REMOVE:
+                removingProcess( peerProductDataDTO );
+                break;
+            case INSTALLED:
+                break;
+        }
+    }
+
+
+    private void removingProcess( final PeerProductDataDto peerProductDataDTO )
+            throws HIntegrationException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
+    {
+        // remove file from deploy package
+        ProductDto productDTO = getProductDataDTO( peerProductDataDTO.getProductId() );
+        File file = new File( String.format( PATH_TO_DEPLOY + "/%s.kar", productDTO.getName()));
+        if ( file.delete() )
+        {
+            LOG.debug( file.getName() + " is deleted." );
+            String removePath = String.format( "/rest/v1/peers/%s/products/%s", peerId, peerProductDataDTO.getProductId() );
+            WebClient client = HttpClient
+                    .createTrustedWebClientWithAuth( baseUrl + removePath, keyStore, "subutai".toCharArray(),
+                            serverFingerprint );
+
+            Response r = client.delete();
+
+            if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
+            {
+                LOG.debug( "Status: " + "no content" );
+            }
+        }
+    }
+
+
+    private void installingProcess( final PeerProductDataDto peerProductDataDTO )
+            throws IOException, HIntegrationException, UnrecoverableKeyException, NoSuchAlgorithmException,
+            KeyStoreException
+    {
+        ProductDto productDTO = getProductDataDTO( peerProductDataDTO.getProductId() );
+        JSONObject jsonObject = null;
+        String url = null;
+        try
+        {
+            jsonObject = new JSONObject( productDTO.getMetadata() );
+            url =  jsonObject.getString( "url" );
+        }
+        catch ( JSONException e )
+        {
+            e.printStackTrace();
+        }
+
+        // downloading plugin
+        File file = new File( String.format( PATH_TO_DEPLOY + "/%s.kar", productDTO.getName()));
+        URL website = new URL(url);
+
+        FileUtils.copyURLToFile( website, file );
+
+        // update status
+        peerProductDataDTO.setState( PeerProductDataDto.State.INSTALLED );
+        updatePeerProductData( peerProductDataDTO );
+
+    }
+
+
+    private void updatePeerProductData( final PeerProductDataDto peerProductDataDTO )
+            throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, HIntegrationException
+    {
+        LOG.debug( "Sending update : " + peerProductDataDTO );
+        String updatePath = String.format( "/rest/v1/peers/%s/products/%s", peerId, peerProductDataDTO.getProductId() );
+
+        try
+        {
+            WebClient client = HttpClient
+                    .createTrustedWebClientWithAuth( baseUrl + updatePath, keyStore, "subutai".toCharArray(),
+                            serverFingerprint );
+
+            byte[] plainData = JsonUtil.toCbor( peerProductDataDTO );
+            byte[] encryptedData = messenger.produce( plainData );
+            Response r = client.put( encryptedData );
+            if ( r.getStatus() != HttpStatus.SC_NO_CONTENT )
+            {
+                LOG.warn( "Unexpected response: " + r.readEntity( String.class ) );
+            }
+        }
+        catch ( PGPException |
+                JsonProcessingException e )
+        {
+            throw new HIntegrationException( "Could not send environment peer data.", e );
+        }
+    }
+
+
+    private ProductDto getProductDataDTO( final UUID productId ) throws HIntegrationException
+    {
+        ProductDto result = null;
+        String path = String.format( "/rest/v1/marketplace/products/%s", productId );
+        try
+        {
+            WebClient client = HttpClient
+                    .createTrustedWebClientWithAuth( baseUrl + path, keyStore, "subutai".toCharArray(),
+                            serverFingerprint );
+
+            Response r = client.get();
+
+
+            if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
+            {
+                return result;
+            }
+
+            if ( r.getStatus() != HttpStatus.SC_OK )
+            {
+                LOG.error( r.readEntity( String.class ) );
+                return result;
+            }
+
+            byte[] encryptedContent = readContent( r );
+
+            byte[] plainContent = messenger.consume( encryptedContent );
+            result = JsonUtil.fromCbor( plainContent, ProductDto.class );
+            LOG.debug( "ProductDataDTO: " + result.toString() );
+            return result;
+        }
+        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
+                e )
+        {
+            throw new HIntegrationException( "Could not retrieve environment data", e );
+        }
+    }
+
+
+    private PeerProductDataDto getPeerProductDto( final String link ) throws HIntegrationException
+    {
+        try
+        {
+            WebClient client = HttpClient
+                    .createTrustedWebClientWithAuth( baseUrl + link, keyStore, "subutai".toCharArray(),
+                            serverFingerprint );
+
+            Response r = client.get();
+            PeerProductDataDto result = null;
+
+            if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
+            {
+                return result;
+            }
+
+            if ( r.getStatus() != HttpStatus.SC_OK )
+            {
+                LOG.error( r.readEntity( String.class ) );
+                return result;
+            }
+
+            byte[] encryptedContent = readContent( r );
+
+            byte[] plainContent = messenger.consume( encryptedContent );
+            result = JsonUtil.fromCbor( plainContent, PeerProductDataDto.class );
+            LOG.debug( "PeerProductDataDTO: " + result.toString() );
+            return result;
+        }
+        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
+                e )
+        {
+            throw new HIntegrationException( "Could not retrieve environment data", e );
         }
     }
 
