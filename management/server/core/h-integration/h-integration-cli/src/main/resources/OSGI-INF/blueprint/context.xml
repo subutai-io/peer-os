@@ -1,0 +1,38 @@
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="hint/register">
+      <action class="io.subutai.core.hintegration.cli.RegisterCommand">
+        <argument ref="integrationManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="hint/register-keys">
+      <action class="io.subutai.core.hintegration.cli.RegisterKeysCommand">
+        <argument ref="integrationManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="hint/send-trust-data">
+      <action class="io.subutai.core.hintegration.cli.SendTrustDataCommand">
+        <argument ref="integrationManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="hint/send-heartbeat">
+      <action class="io.subutai.core.hintegration.cli.SendHearbeatCommand">
+        <argument ref="integrationManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <reference id="integrationManager" availability="mandatory"
+             interface="io.subutai.core.hintegration.api.Integration" />
+
+</blueprint>

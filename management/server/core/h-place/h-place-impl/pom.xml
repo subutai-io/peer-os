@@ -3,42 +3,22 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <artifactId>h-integration</artifactId>
+    <artifactId>h-place</artifactId>
     <groupId>io.subutai</groupId>
     <version>2.0.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>h-integration-impl</artifactId>
-  <name>Subutai H-Integration Impl</name>
-  <description>Subutai H-Integration Impl</description>
+  <artifactId>h-place-impl</artifactId>
+  <name>Subutai H-Place Impl</name>
+  <description>Subutai H-Place Impl</description>
   <packaging>bundle</packaging>
 
   <dependencies>
 
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>io.subutai</groupId>
-      <artifactId>h-integration-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>io.subutai</groupId>
-      <artifactId>peer-manager-api</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.jaxrs</groupId>
-      <artifactId>jackson-jaxrs-json-provider</artifactId>
     </dependency>
 
     <!-- Include subutai-hub-common and it dependencies until getting that in the internal maven repo -->
@@ -50,10 +30,6 @@
       <systemPath>${project.basedir}/../../../../lib/subutai-hub-common-0.1.jar</systemPath>
     </dependency>
 
-    <dependency>
-      <groupId>commons-net</groupId>
-      <artifactId>commons-net</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -83,17 +59,6 @@
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>security-manager-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>subutai-common</artifactId>
-    </dependency>
-
   </dependencies>
 
   <build>
@@ -108,7 +73,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.core.h-integration.impl</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.h-place.impl</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>

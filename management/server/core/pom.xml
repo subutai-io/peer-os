@@ -47,6 +47,7 @@
     <module>http-context-factory</module>
     <module>gateway</module>
     <module>h-integration</module>
+    <module>h-place</module>
   </modules>
 
 </project>

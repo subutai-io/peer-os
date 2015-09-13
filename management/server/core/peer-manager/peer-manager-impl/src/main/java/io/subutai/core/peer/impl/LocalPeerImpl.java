@@ -1937,13 +1937,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Set<Interface> result = new HashSet<>();
         try
         {
-            if ( LOG.isDebugEnabled() )
-            {
-                for ( Interface i : getManagementHost().getNetInterfaces() )
-                {
-                    LOG.debug( String.format( "%s %s %s", i.getInterfaceName(), i.getIp(), i.getMac() ) );
-                }
-            }
             result = Sets.filter( getManagementHost().getNetInterfaces(), new Predicate<Interface>()
             {
                 @Override
@@ -1951,7 +1944,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 {
                     if ( LOG.isDebugEnabled() )
                     {
-                        LOG.debug( String.format( "%s match %s = %s", anInterface.getIp(), pattern,
+                        LOG.debug( String.format( "%s matches %s = %s", anInterface.getIp(), pattern,
                                 anInterface.getIp().matches( pattern ) ) );
                     }
                     return anInterface.getIp().matches( pattern );
