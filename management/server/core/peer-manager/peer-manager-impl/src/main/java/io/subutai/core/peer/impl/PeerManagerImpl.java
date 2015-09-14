@@ -24,8 +24,6 @@ import org.apache.commons.net.util.SubnetUtils;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
-import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.PeerConf;
 import io.subutai.common.host.Interface;
 import io.subutai.common.peer.InterfacePattern;
 import io.subutai.common.peer.Peer;
@@ -33,7 +31,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.protocol.N2NConfig;
-import io.subutai.core.env.api.exception.EnvironmentManagerException;
+import io.subutai.common.util.N2NUtil;
 import io.subutai.core.messenger.api.Messenger;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
@@ -238,16 +236,14 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public List<N2NConfig> setupN2NConnection( final Set<Peer> peers ) throws PeerException
     {
-        Set<String> allSubnets = getSubnets( peers );
-        if ( LOG.isDebugEnabled() )
+        Set<String> usedN2NSubnets = getN2NSubnets( peers );
+        LOG.debug( String.format( "Found %d n2n subnets:", usedN2NSubnets.size() ) );
+        for ( String s : usedN2NSubnets )
         {
-            LOG.debug( String.format( "Found %d peer subnets:", allSubnets.size() ) );
-            for ( String s : allSubnets )
-            {
-                LOG.debug( s );
-            }
+            LOG.debug( s );
         }
-        String freeSubnet = findFreeSubnet( allSubnets );
+
+        String freeSubnet = N2NUtil.findFreeSubnet( usedN2NSubnets );
 
         LOG.debug( String.format( "Free subnet for peer: %s", freeSubnet ) );
         try
@@ -257,10 +253,10 @@ public class PeerManagerImpl implements PeerManager
                 throw new IllegalStateException( "Could not calculate subnet." );
             }
             String superNodeIp = getLocalPeer().getManagementHost().getExternalIp();
-            String interfaceName = generateInterfaceName( freeSubnet );
-            String communityName = generateCommunityName( freeSubnet );
+            String interfaceName = N2NUtil.generateInterfaceName( freeSubnet );
+            String communityName = N2NUtil.generateCommunityName( freeSubnet );
             String sharedKey = UUID.randomUUID().toString();
-            SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeSubnet, PEER_SUBNET_MASK ).getInfo();
+            SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeSubnet, N2NUtil.N2N_SUBNET_MASK ).getInfo();
             final String[] addresses = subnetInfo.getAllAddresses();
             int counter = 0;
 
@@ -298,52 +294,20 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    private String generateCommunityName( final String freeSubnet )
+    /**
+     * Returns set of currently used n2n subnets of given peers.
+     *
+     * @param peers set of peers
+     *
+     * @return set of currently used n2n subnets.
+     */
+    private Set<String> getN2NSubnets( final Set<Peer> peers )
     {
-        return String.format( "com_%s", freeSubnet.replace( ".", "_" ) );
-    }
+        Set<String> result = new HashSet<>();
 
-
-    private String generateInterfaceName( final String freeSubnet )
-    {
-        return String.format( "n2n_%s", freeSubnet.replace( ".", "_" ) );
-    }
-
-
-    private String findFreeSubnet( final Set<String> allSubnets )
-    {
-        String result = null;
-        int i = 11;
-        int j = 0;
-
-        while ( result == null && i < 254 )
+        for ( Peer peer : peers )
         {
-            String s = String.format( "10.%d.%d.0", i, j );
-            if ( !allSubnets.contains( s ) )
-            {
-                result = s;
-            }
-
-            j++;
-            if ( j > 254 )
-            {
-                i++;
-                j = 0;
-            }
-        }
-
-        return result;
-    }
-
-
-    private Set<String> getSubnets( final Set<Peer> allPeers )
-    {
-        Set<String> allSubnets = new HashSet<>();
-
-        InterfacePattern peerSubnetsPattern = new InterfacePattern( "ip", "^10.*" );
-        for ( Peer peer : allPeers )
-        {
-            Set<Interface> r = peer.getNetworkInterfaces( peerSubnetsPattern );
+            Set<Interface> r = peer.getNetworkInterfaces( N2NUtil.N2N_SUBNET_INTERFACES_PATTERN );
 
             Collection peerSubnets = CollectionUtils.collect( r, new Transformer()
             {
@@ -356,10 +320,10 @@ public class PeerManagerImpl implements PeerManager
                 }
             } );
 
-            allSubnets.addAll( peerSubnets );
+            result.addAll( peerSubnets );
         }
 
-        return allSubnets;
+        return result;
     }
 
 
