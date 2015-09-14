@@ -469,11 +469,12 @@ public class IntegrationImpl implements Integration
     {
         // remove file from deploy package
         ProductDto productDTO = getProductDataDTO( peerProductDataDTO.getProductId() );
-        File file = new File( String.format( PATH_TO_DEPLOY + "/%s.kar", productDTO.getName()));
+        File file = new File( String.format( PATH_TO_DEPLOY + "/%s.kar", productDTO.getName() ) );
         if ( file.delete() )
         {
             LOG.debug( file.getName() + " is deleted." );
-            String removePath = String.format( "/rest/v1/peers/%s/products/%s", peerId, peerProductDataDTO.getProductId() );
+            String removePath =
+                    String.format( "/rest/v1/peers/%s/products/%s", peerId, peerProductDataDTO.getProductId() );
             WebClient client = HttpClient
                     .createTrustedWebClientWithAuth( baseUrl + removePath, keyStore, "subutai".toCharArray(),
                             serverFingerprint );
@@ -498,7 +499,7 @@ public class IntegrationImpl implements Integration
         try
         {
             jsonObject = new JSONObject( productDTO.getMetadata() );
-            url =  jsonObject.getString( "url" );
+            url = jsonObject.getString( "url" );
         }
         catch ( JSONException e )
         {
@@ -506,15 +507,14 @@ public class IntegrationImpl implements Integration
         }
 
         // downloading plugin
-        File file = new File( String.format( PATH_TO_DEPLOY + "/%s.kar", productDTO.getName()));
-        URL website = new URL(url);
+        File file = new File( String.format( PATH_TO_DEPLOY + "/%s.kar", productDTO.getName() ) );
+        URL website = new URL( url );
 
         FileUtils.copyURLToFile( website, file );
 
         // update status
         peerProductDataDTO.setState( PeerProductDataDto.State.INSTALLED );
         updatePeerProductData( peerProductDataDTO );
-
     }
 
 
@@ -718,7 +718,7 @@ public class IntegrationImpl implements Integration
                     N2NUtil.generateCommunityName( subnetInfo.getNetworkAddress() ), currentPeerData.getCommunityIP(),
                     packageDto.getSharedSecret() );
 
-            peerManager.getLocalPeer().getManagementHost().setupN2NConnection( config );
+            peerManager.getLocalPeer().setupN2NConnection( config );
             dto.setPeerId( peerId );
             dto.setState( EnvironmentPeerDataDto.State.READY );
         }
