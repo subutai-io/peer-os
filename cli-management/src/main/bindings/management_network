@@ -241,19 +241,65 @@ function management_network {
      net_check_tunnelPortName $tunnelPortName
      net_check_ip_validation $tunnelIpAddress
      net_check_tunnel_type $tunnelType
-  
-     ovs-vsctl --may-exist add-port br-tun $tunnelPortName
+     getOctet=$(echo $tunnelIpAddress | awk -F"." '{print $1"."$2"."$3}')
+     getTun=$(subutai management_network -l all | grep "$getOctet" | awk -F" " '{print $1}' | head -n 1 )
+     echo "getTun=$getTun"
+     if [ "$getTun" ]; then 
+       #$getTun
+     ovs-vsctl --may-exist add-port br-$getTun $tunnelPortName
      ovs-vsctl set Interface $tunnelPortName type=$tunnelType options:key=flow \
      options:remote_ip=$tunnelIpAddress
+
+     else 
+     ovs-vsctl --may-exist add-br br-$tunnelPortName
+     ovs-vsctl set bridge br-$tunnelPortName stp_enable=true
+
+      ovs-vsctl add-port br-$tunnelPortName "$tunnelPortName"toint
+      ovs-vsctl set interface "$tunnelPortName"toint type=patch
+      ovs-vsctl set interface "$tunnelPortName"toint options:peer=intto"$tunnelPortName"
+      ovs-vsctl add-port br-int intto"$tunnelPortName"
+      ovs-vsctl set interface intto"$tunnelPortName" type=patch
+      ovs-vsctl set interface intto"$tunnelPortName" options:peer="$tunnelPortName"toint
+     # ovs-vsctl set port br-$tunnelPortName tag=$tunnelPortName
+
+
+     ovs-vsctl --may-exist add-port br-$tunnelPortName $tunnelPortName
+     ovs-vsctl set Interface $tunnelPortName type=$tunnelType options:key=flow \
+     options:remote_ip=$tunnelIpAddress
+     fi
      msg_info "A port of $tunnelPortName is opened type=$tunnelType and IP=$tunnelIpAddress in br-tun bridge."
    fi
    
    if [ "true" == "$listTunnel" ]; then
+     option=$2
+     if [ "$option" = "all" ]; then
+         echo -e "List of Tunnels"
+      echo -e "--------"
+     ovs-vsctl show | awk 'BEGIN {FS="\n"; RS="";ORS=""}{x=1;y=1;while ( x<NF ) { Array[x]=$x; x++;} 
+     for(i=0; i<NF;i++){ 
+      if(Array[i] ~ /Port/ && Array[i+4] ~ /remote_ip/){ split(Array[i],a,"\"");
+      split(Array[i+4],b,"\"");  print a[2]" "b[4]" "b[2]"\n"; }
+
+      if(Array[i] ~ /Port/ && Array[i+3] ~ /remote_ip/){ split(Array[i],a,"\"");
+      split(Array[i+3],b,"\""); print a[2]" "b[2]"\n"; }
+
+
+ }}'    
+     
+     else 
       echo -e "List of Tunnels"
       echo -e "--------"
      ovs-vsctl show | awk 'BEGIN {FS="\n"; RS="";ORS=""}{x=1;y=1;while ( x<NF ) { Array[x]=$x; x++;} 
-     for(i=0; i<NF;i++){ if(Array[i] ~ /Port/ && Array[i+3] ~ /remote_ip/){ split(Array[i],a,"\"");
-      split(Array[i+3],b,"\""); print a[2]"-"b[2]"\n"; } }}'
+     for(i=0; i<NF;i++){ 
+      if(Array[i] ~ /Port/ && Array[i+4] ~ /remote_ip/){ split(Array[i],a,"\"");
+      split(Array[i+4],b,"\""); print a[2]"-"b[4]"\n"; }
+
+      if(Array[i] ~ /Port/ && Array[i+3] ~ /remote_ip/){ split(Array[i],a,"\"");
+      split(Array[i+3],b,"\""); print a[2]"-"b[2]"\n"; }
+
+
+ }}'
+    fi
       # ovs-vsctl show | grep remote_ip | awk '{ print $3 }'
    fi
 
@@ -270,10 +316,15 @@ function management_network {
          msg_error "extra Parameter provided. Aborting ..."
          show_usage "`management_network_usage`"
       fi  
+      rm -f /var/subutai-network/"$tunnelPortName"_vni_vlan
+
       net_check_tunnelPortName_exist $tunnelPortName
  
       ovs-vsctl del-port $tunnelPortName
-      rm /var/subutai-network/"$tunnelPortName"_vni_vlan
+      ovs-vsctl del-br br-$tunnelPortName
+      ovs-vsctl del-port br-int intto$tunnelPortName
+
+#      rm /var/subutai-network/"$tunnelPortName"_vni_vlan
       msg_info "$tunnelPortName is deleted from br-tun."
    fi
 
@@ -502,10 +553,10 @@ function management_network {
              net_create_tap_device $interfaceName $localPeerIpAddress 
              sleep 10
             if [ $keyType = "string" ]; then 
-               edge -l $supernodeIpAddress:$supernodePort -d $interfaceName -c $communityName -k $keyFile -r -a $localPeerIpAddress -t $mgmtport
+               edge -l $supernodeIpAddress:$supernodePort -d $interfaceName -c $communityName -k $keyFile -r  -a $localPeerIpAddress -t $mgmtport
             elif [ $keyType = "file" ]; then 
               net_check_keyFile $keyFile
-              edge -l $supernodeIpAddress:$supernodePort -d $interfaceName -c $communityName -K $keyFile -r -a $localPeerIpAddress -t $mgmtport
+              edge -l $supernodeIpAddress:$supernodePort -d $interfaceName -c $communityName -K $keyFile -r  -a $localPeerIpAddress -t $mgmtport
             fi
 
            fi
@@ -520,10 +571,10 @@ function management_network {
       net_create_tap_device $interfaceName $localPeerIpAddress 
       sleep 10
       if [ $keyType = "string" ]; then 
-         edge -l $supernodeIpAddress:$supernodePort -d $interfaceName -c $communityName -k $keyFile -r -a $localPeerIpAddress -t $mgmtport
+         edge -l $supernodeIpAddress:$supernodePort -d $interfaceName -c $communityName -k $keyFile -r  -a $localPeerIpAddress -t $mgmtport
       elif [ $keyType = "file" ]; then 
          net_check_keyFile $keyFile
-         edge -l $supernodeIpAddress:$supernodePort -d $interfaceName -c $communityName -K $keyFile -r -a $localPeerIpAddress -t $mgmtport
+         edge -l $supernodeIpAddress:$supernodePort -d $interfaceName -c $communityName -K $keyFile -r  -a $localPeerIpAddress -t $mgmtport
       fi
        
      settingsN2N="$supernodeIpAddress,$supernodePort,$interfaceName,$communityName,$localPeerIpAddress,$keyType,$keyFile,$mgmtport"
@@ -554,7 +605,7 @@ function management_network {
          edgePorts="/var/subutai-network/edgePorts.txt"
 #        edgePorts="/var/lib/apps/n2n/edgePorts.txt"
         cat $edgePorts | grep "$1,$2" | awk -v path="$edgePorts" '{print " sed  -i \"/"$1"/d\" "path}' | bash
-        subutai management_network -V $1
+     subutai management_network -V $1
       msg_ok "N2N Tunnel Removed!"
    fi
 
@@ -912,13 +963,15 @@ if   [ "$status" == "deleteall" ]; then
         msg_error "extra Parameter provided. Aborting ..."
         show_usage "`management_network_usage`"
     fi
-    tunnel_port=`ovs-ofctl show br-tun|grep $tunnelName|cut -d"(" -f1 | cut -d" " -f2`
-    if [[ -z "$tunnel_port" ]]
-    then
-      msg_fail "Tunnel:$tunnelName not exist! Aborting..."
-      exit 1
-    fi
-    peer_port=`ovs-ofctl show br-tun|grep tunTOint|cut -d"(" -f1 |cut -d" " -f2`
+
+#    tunnel_port=`ovs-ofctl show br-$tunnelName|grep $tunnelName|cut -d"(" -f1 | cut -d" " -f2`
+#    if [[ -z "$tunnel_port" ]]
+#    then
+#      msg_fail "Tunnel:$tunnelName not exist! Aborting..."
+#      exit 1
+#    fi
+#    peer_port=`ovs-ofctl show br-$tunnelName|grep tunTOint|cut -d"(" -f1 |cut -d" " -f2`
+
     file_name="/var/subutai-network/"$tunnelName"_vni_vlan"
     if [ ! -d '/var/subutai-network' ]
     then
@@ -941,10 +994,15 @@ if   [ "$status" == "deleteall" ]; then
       msg_ok "Vlan ID: $vlan_id or VNI: $vni_id is already in use!"
       exit 0
     fi
-    ovs-ofctl add-flow br-tun "in_port=$peer_port,dl_vlan=$vlan_id,actions=set_field:$vni_id->tun_id,output:$tunnel_port"
-    sed -i '/Re-init OVS flows/i \ovs-ofctl add-flow br-tun "in_port='$peer_port',dl_vlan='$vlan_id',actions=set_field:'$vni_id'->tun_id,output:'$tunnel_port'"' /etc/init.d/service-interface
-    ovs-ofctl add-flow br-tun "in_port=$tunnel_port,tun_id=$vni_id,actions=set_field:$vlan_id->vlan_vid,output:$peer_port"
-    sed -i '/Re-init OVS flows/i \ovs-ofctl add-flow br-tun "in_port='$tunnel_port',tun_id='$vni_id',actions=set_field:'$vlan_id'->vlan_vid,output:'$peer_port'"' /etc/init.d/service-interface
+
+   ovs-vsctl set interface $tunnelName options:key=$vni_id 
+   ovs-vsctl set port $tunnelName tag=$vlan_id
+  #   ovs-vsctl add-flow br-tun "action=NORMAL"
+
+#    ovs-ofctl add-flow br-tun "in_port=$peer_port,dl_vlan=$vlan_id,actions=set_field:$vni_id->tun_id,output:$tunnel_port"
+#    sed -i '/Re-init OVS flows/i \ovs-ofctl add-flow br-tun "in_port='$peer_port',dl_vlan='$vlan_id',actions=set_field:'$vni_id'->tun_id,output:'$tunnel_port'"' /etc/init.d/service-interface
+#    ovs-ofctl add-flow br-tun "in_port=$tunnel_port,tun_id=$vni_id,actions=set_field:$vlan_id->vlan_vid,output:$peer_port"
+#    sed -i '/Re-init OVS flows/i \ovs-ofctl add-flow br-tun "in_port='$tunnel_port',tun_id='$vni_id',actions=set_field:'$vlan_id'->vlan_vid,output:'$peer_port'"' /etc/init.d/service-interface
     echo "$vni_id $vlan_id $ENV_ID" >> $file_name 
     msg_ok "Tunnel: $tunnelName VNI: $vni_id VLAN: $vlan_id ENV_ID: $ENV_ID"
     exit 0

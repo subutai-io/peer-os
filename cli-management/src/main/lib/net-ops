@@ -99,7 +99,8 @@ function net_check_tunnel_type {
 
 function net_check_tunnelPortName_exist {
   local tunnelPortName="$1"
-  local list=$(ovs-vsctl list-ports br-tun)
+#  local list=$(ovs-vsctl list-ports br-$tunnelPortName)
+  local list=$(ovs-vsctl show | grep "Interface \"tunnel*" | awk -F" " '{print $2}' | tr -d '"')
   local result=$(echo $list | grep $tunnelPortName)
 
   #checking TunnelPortname is exist or not 
