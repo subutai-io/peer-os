@@ -352,9 +352,20 @@ public class RequestBuilder
                             final Integer timeout, final Integer isDaemon, final Set<String> configPoints,
                             final int pid )
         {
+            this( type, id, UUID.randomUUID(), workingDirectory, command, args, environment, stdOut, stdErr, runAs,
+                    timeout, isDaemon, configPoints, pid );
+        }
+
+
+        public RequestImpl( final RequestType type, final UUID id, final UUID commandId, final String workingDirectory,
+                            final String command, final List<String> args, final Map<String, String> environment,
+                            final OutputRedirection stdOut, final OutputRedirection stdErr, final String runAs,
+                            final Integer timeout, final Integer isDaemon, final Set<String> configPoints,
+                            final int pid )
+        {
             this.type = type;
             this.id = id;
-            this.commandId = UUID.randomUUID();
+            this.commandId = commandId;
             this.workingDirectory = workingDirectory;
             this.command = command;
             this.args = args;
