@@ -94,7 +94,7 @@ public class RestServiceImpl implements RestService
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            return localPeer.getId().toString();
+            return localPeer.getId();
         }
         catch ( Exception e )
         {
@@ -194,7 +194,7 @@ public class RestServiceImpl implements RestService
             else
             {
                 //Encrypt Local Peer
-                PGPPublicKey pkey = keyManager.getRemoteHostPublicKey( p.getId().toString(), p.getIp() );
+                PGPPublicKey pkey = keyManager.getRemoteHostPublicKey( p.getId(), p.getIp() );
                 PeerInfo localPeer = peerManager.getLocalPeerInfo();
 
                 if ( pkey != null )
@@ -293,7 +293,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );;
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
 
             UUID id = UUID.fromString( peerId );
 
@@ -421,8 +421,7 @@ public class RestServiceImpl implements RestService
                 String rootCertPx2 = new String( cert );
 
                 securityManager.getKeyStoreManager()
-                               .importCertAsTrusted( ChannelSettings.SECURE_PORT_X2, p.getId().toString(),
-                                       rootCertPx2 );
+                               .importCertAsTrusted( ChannelSettings.SECURE_PORT_X2, p.getId(), rootCertPx2 );
                 //***********************************************************************
 
                 //************ Export Current Cert **************************************
@@ -435,7 +434,7 @@ public class RestServiceImpl implements RestService
                 //***********************************************************************
 
 
-                PGPPublicKey pkey = keyManager.getPublicKey( p.getId().toString() ); //Get PublicKey from KeyServer
+                PGPPublicKey pkey = keyManager.getPublicKey( p.getId() ); //Get PublicKey from KeyServer
                 byte certRes[] = encTool.encrypt( localPeerCert.getBytes(), pkey, false );
 
                 return Response.ok( HexUtil.byteArrayToHexString( certRes ) ).build();
@@ -869,7 +868,6 @@ public class RestServiceImpl implements RestService
         try
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-            ;
 
             LocalPeer localPeer = peerManager.getLocalPeer();
             return Response.ok( jsonUtil.to( localPeer.getContainerHostById( containerId ).getDiskQuota(
