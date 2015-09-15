@@ -21,6 +21,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
 import io.subutai.core.registration.api.service.ContainerInfo;
 
@@ -31,7 +32,7 @@ import io.subutai.core.registration.api.service.ContainerInfo;
 @Entity
 @Access( AccessType.FIELD )
 @Table( name = "node_container_host_model" )
-public class ContainerInfoImpl implements ContainerInfo, Serializable
+public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
 {
     @Id
     @Column( name = "id" )
@@ -159,16 +160,16 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
     }
 
 
-    public void setVlan( final Integer vlan )
+    @Override
+    public int compareTo( final HostInfo o )
     {
-        this.vlan = vlan;
+        return hostname.compareTo( o.getHostname() );
     }
 
 
-    @Override
-    public int compareTo( final ContainerInfo o )
+    public void setVlan( final Integer vlan )
     {
-        return hostname.compareTo( o.getHostname() );
+        this.vlan = vlan;
     }
 
 

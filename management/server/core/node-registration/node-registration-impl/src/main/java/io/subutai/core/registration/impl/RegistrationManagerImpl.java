@@ -3,6 +3,8 @@ package io.subutai.core.registration.impl;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
@@ -14,19 +16,28 @@ import org.apache.cxf.jaxrs.ext.form.Form;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Topology;
+import io.subutai.common.host.HostInfo;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.broker.api.Broker;
 import io.subutai.core.broker.api.ClientCredentials;
-import io.subutai.core.network.api.NetworkManager;
+import io.subutai.core.env.api.EnvironmentManager;
+import io.subutai.core.env.api.exception.EnvironmentCreationException;
+import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.exception.NodeRegistrationException;
+import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.ContainerToken;
 import io.subutai.core.registration.api.service.RequestedHost;
 import io.subutai.core.registration.impl.dao.ContainerTokenDataService;
@@ -50,7 +61,7 @@ public class RegistrationManagerImpl implements RegistrationManager
     private DaoManager daoManager;
     private Broker broker;
     private PeerManager peerManager;
-    private NetworkManager networkManager;
+    private EnvironmentManager environmentManager;
 
     public static final String PEER_SUBNET_MASK = "255.255.255.0";
 
@@ -81,6 +92,30 @@ public class RegistrationManagerImpl implements RegistrationManager
         //                        Sets.newHashSet( hostInterface ), Sets.newHashSet( containerHostInfoModel ) );
         //
         //        requestDataService.update( requestedHost );
+    }
+
+
+    public EnvironmentManager getEnvironmentManager()
+    {
+        return environmentManager;
+    }
+
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
+        this.environmentManager = environmentManager;
+    }
+
+
+    public PeerManager getPeerManager()
+    {
+        return peerManager;
+    }
+
+
+    public void setPeerManager( final PeerManager peerManager )
+    {
+        this.peerManager = peerManager;
     }
 
 
@@ -197,6 +232,65 @@ public class RegistrationManagerImpl implements RegistrationManager
         catch ( Exception e )
         {
             LOGGER.error( "Error approving new connections request", e );
+        }
+
+        //TODO move the rest of code to separate function where approval process done selectively
+        Map<Integer, Map<String, Set<ContainerInfo>>> groupedContainersByVlan = Maps.newHashMap();
+
+        for ( final ContainerInfo containerInfo : registrationRequest.getHostInfoSet() )
+        {
+            //Group containers by environment relation
+            // and group into node groups.
+            Map<String, Set<ContainerInfo>> groupedContainers = groupedContainersByVlan.get( containerInfo.getVlan() );
+            if ( groupedContainers == null )
+            {
+                groupedContainers = Maps.newHashMap();
+            }
+
+            Set<ContainerInfo> group = groupedContainers.get( containerInfo.getTemplateName() );
+            if ( group != null )
+            {
+                group.add( containerInfo );
+            }
+            else
+            {
+                group = Sets.newHashSet( containerInfo );
+            }
+            groupedContainers.put( containerInfo.getTemplateName(), group );
+
+            groupedContainersByVlan.put( containerInfo.getVlan(), groupedContainers );
+        }
+
+        LocalPeer localPeer = peerManager.getLocalPeer();
+
+
+        for ( final Map.Entry<Integer, Map<String, Set<ContainerInfo>>> mapEntry : groupedContainersByVlan.entrySet() )
+        {
+            Topology topology = new Topology();
+            Map<String, Set<ContainerInfo>> rawNodeGroup = mapEntry.getValue();
+            Map<NodeGroup, Set<HostInfo>> classification = Maps.newHashMap();
+
+            for ( final Map.Entry<String, Set<ContainerInfo>> entry : rawNodeGroup.entrySet() )
+            {
+                //place where to create node groups
+                NodeGroup nodeGroup = new NodeGroup( String.format( "%s_group", entry.getKey() ), entry.getKey(),
+                        entry.getValue().size(), 1, 1, new PlacementStrategy( "ROUND_ROBIN" ) );
+                topology.addNodeGroupPlacement( localPeer, nodeGroup );
+
+                Set<HostInfo> converter = Sets.newHashSet();
+                converter.addAll( entry.getValue() );
+                classification.put( nodeGroup, converter );
+            }
+            //trigger environment import task
+            try
+            {
+                environmentManager.importEnvironment( String.format( "environment_%d", mapEntry.getKey() ), topology,
+                        classification, "", mapEntry.getKey(), requestId );
+            }
+            catch ( EnvironmentCreationException e )
+            {
+                LOGGER.error( "Error importing environment", e );
+            }
         }
     }
 
