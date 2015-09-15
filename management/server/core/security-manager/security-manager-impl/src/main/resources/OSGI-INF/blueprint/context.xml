@@ -42,9 +42,9 @@
   <bean id="securityManager" scope="singleton" init-method="init" destroy-method="destroy"
         class="io.subutai.core.security.impl.SecurityManagerImpl">
 
-    <argument value="$[subutaiAppDataPath]/keys/${ownerPublicKeyringFile}" />
-    <argument value="$[subutaiAppDataPath]/keys/${peerSecretKeyringFile}" />
-    <argument value="$[subutaiAppDataPath]/keys/${peerPublicKeyringFile}" />
+    <argument value="$[subutaiKeystorePath]/${ownerPublicKeyringFile}" />
+    <argument value="$[subutaiKeystorePath]/${peerSecretKeyringFile}" />
+    <argument value="$[subutaiKeystorePath]/${peerPublicKeyringFile}" />
     <argument value="${peerSecretKeyringPwd}" />
 
     <property name="daoManager" ref="daoSecurityManager" />
