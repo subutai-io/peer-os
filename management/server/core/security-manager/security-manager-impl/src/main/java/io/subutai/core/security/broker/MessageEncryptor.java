@@ -73,7 +73,7 @@ public class MessageEncryptor implements TextMessagePostProcessor
                     //add token for container creation
                     originalRequest =
                             new RequestBuilder.RequestImpl( originalRequest.getType(), originalRequest.getId(),
-                                    originalRequest.getWorkingDirectory(),
+                                    originalRequest.getCommandId(), originalRequest.getWorkingDirectory(),
                                     String.format( "%s -t %s", originalRequest.getCommand(), getRegistrationManager()
                                             .generateContainerTTLToken( ( originalRequest.getTimeout()
                                                     + Common.WAIT_CONTAINER_CONNECTION_SEC + 10 ) * 1000L )
