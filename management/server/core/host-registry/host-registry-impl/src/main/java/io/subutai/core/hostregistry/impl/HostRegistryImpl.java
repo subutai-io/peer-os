@@ -15,12 +15,12 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.host.HostInfo;
-import io.subutai.core.hostregistry.api.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.hostregistry.api.HostRegistryException;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 
 
 /**

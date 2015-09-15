@@ -1,8 +1,4 @@
-package io.subutai.core.hostregistry.api;
-
-
-import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.host.HostInfo;
+package io.subutai.common.host;
 
 
 /**
@@ -16,4 +12,9 @@ public interface ContainerHostInfo extends HostInfo
      * Returns status/state of container
      */
     public ContainerHostState getStatus();
+
+    /**
+     * Returns lxc container name
+     */
+    public String getContainerName();
 }

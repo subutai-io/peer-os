@@ -10,8 +10,8 @@ import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
 import io.subutai.common.util.CollectionUtil;
-import io.subutai.core.hostregistry.api.ContainerHostInfo;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 
 
 /**

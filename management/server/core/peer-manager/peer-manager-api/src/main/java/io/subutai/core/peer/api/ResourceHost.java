@@ -3,6 +3,7 @@ package io.subutai.core.peer.api;
 
 import java.util.Set;
 
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
@@ -11,7 +12,7 @@ import io.subutai.common.peer.Host;
 /**
  * Resource host interface.
  */
-public interface ResourceHost extends Host
+public interface ResourceHost extends Host, ResourceHostInfo
 {
     /**
      * Returns resource usage metric of the resource host

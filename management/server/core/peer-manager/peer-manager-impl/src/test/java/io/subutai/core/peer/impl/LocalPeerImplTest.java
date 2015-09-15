@@ -47,10 +47,10 @@ import io.subutai.common.quota.RamQuota;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.executor.api.CommandExecutor;
-import io.subutai.core.hostregistry.api.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
@@ -323,7 +323,7 @@ public class LocalPeerImplTest
     {
         localPeer.getContainerHostState( containerHost );
 
-        verify( containerHost ).getState();
+        verify( containerHost ).getStatus();
     }
 
 

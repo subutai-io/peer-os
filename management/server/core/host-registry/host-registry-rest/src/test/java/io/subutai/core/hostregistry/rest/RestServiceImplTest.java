@@ -16,7 +16,7 @@ import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.core.hostregistry.impl.ResourceHostInfoImpl;
 
 import com.google.common.collect.Sets;

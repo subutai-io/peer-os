@@ -13,7 +13,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
+import io.subutai.common.host.HostInfo;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.Host;
@@ -15,7 +16,7 @@ import io.subutai.common.protocol.N2NConfig;
 /**
  * Management host interface.
  */
-public interface ManagementHost extends Host
+public interface ManagementHost extends Host, HostInfo
 {
     /**
      * Adds remote apt repository to local apt sources

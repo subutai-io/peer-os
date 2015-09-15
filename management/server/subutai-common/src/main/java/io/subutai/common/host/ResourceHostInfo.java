@@ -1,9 +1,7 @@
-package io.subutai.core.hostregistry.api;
+package io.subutai.common.host;
 
 
 import java.util.Set;
-
-import io.subutai.common.host.HostInfo;
 
 
 /**

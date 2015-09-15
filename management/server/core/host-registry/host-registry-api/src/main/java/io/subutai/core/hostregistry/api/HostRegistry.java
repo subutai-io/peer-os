@@ -3,7 +3,9 @@ package io.subutai.core.hostregistry.api;
 
 import java.util.Set;
 
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 
 
 /**

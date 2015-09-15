@@ -72,7 +72,7 @@ public class HostsCommandTest extends SystemOutRedirectTest
         when( managementHost.getId() ).thenReturn( ID );
         when( resourceHost.getId() ).thenReturn( ID );
         when( containerHost.getId() ).thenReturn( ID );
-        when( containerHost.getState() ).thenReturn( ContainerHostState.RUNNING );
+        when( containerHost.getStatus() ).thenReturn( ContainerHostState.RUNNING );
     }
 
 

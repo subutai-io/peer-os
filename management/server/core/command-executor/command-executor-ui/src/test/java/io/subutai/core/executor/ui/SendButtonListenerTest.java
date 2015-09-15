@@ -27,10 +27,10 @@ import io.subutai.common.command.Response;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
 import io.subutai.core.executor.api.CommandExecutor;
-import io.subutai.core.hostregistry.api.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.server.ui.component.HostTree;
 
 import static org.junit.Assert.assertEquals;

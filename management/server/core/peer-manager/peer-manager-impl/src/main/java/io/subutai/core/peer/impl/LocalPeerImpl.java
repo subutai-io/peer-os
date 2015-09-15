@@ -75,11 +75,11 @@ import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.executor.api.CommandExecutor;
-import io.subutai.core.hostregistry.api.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
@@ -213,7 +213,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 managementHost = ( ManagementHost ) allManagementHostEntity.iterator().next();
                 ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
-                managementHost.init();
+                ( ( ManagementHostEntity ) managementHost ).init();
             }
 
             resourceHostDataService = getResourceHostDataService();
@@ -383,7 +383,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         if ( ahost instanceof ContainerHost )
         {
             ContainerHost containerHost = ( ContainerHost ) ahost;
-            return containerHost.getState();
+            return containerHost.getStatus();
         }
         else
         {
@@ -1263,7 +1263,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
                     try
                     {
-                        managementHost.init();
+                        ( ( ManagementHostEntity ) managementHost ).init();
                     }
                     catch ( Exception e )
                     {
@@ -1291,8 +1291,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 catch ( HostNotFoundException e )
                 {
                     LOG.debug( "Host not found in #onHeartbeat", e );
-                    host = new ResourceHostEntity( getId().toString(), resourceHostInfo );
-                    host.init();
+                    host = new ResourceHostEntity( getId(), resourceHostInfo );
+                    ( ( ResourceHostEntity ) host ).init();
                     resourceHostDataService.persist( ( ResourceHostEntity ) host );
                     addResourceHost( host );
                     setResourceHostTransientFields( Sets.newHashSet( host ) );
@@ -1927,7 +1927,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Set<Interface> result = new HashSet<>();
         try
         {
-            result = Sets.filter( getManagementHost().getNetInterfaces(), new Predicate<Interface>()
+            result = Sets.filter( getManagementHost().getInterfaces(), new Predicate<Interface>()
             {
                 @Override
                 public boolean apply( final Interface anInterface )
@@ -1955,7 +1955,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Set<Interface> result = new HashSet<>();
         try
         {
-            result = Sets.filter( getManagementHost().getNetInterfaces(), new Predicate<Interface>()
+            result = Sets.filter( getManagementHost().getInterfaces(), new Predicate<Interface>()
             {
                 @Override
                 public boolean apply( final Interface anInterface )

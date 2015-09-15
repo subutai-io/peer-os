@@ -138,7 +138,7 @@ public class EnvironmentContainerImplTest
     {
         when( peer.getContainerHostState( environmentContainer ) ).thenReturn( ContainerHostState.RUNNING );
 
-        assertEquals( ContainerHostState.RUNNING, environmentContainer.getState() );
+        assertEquals( ContainerHostState.RUNNING, environmentContainer.getStatus() );
     }
 
 
@@ -311,7 +311,7 @@ public class EnvironmentContainerImplTest
     @Test
     public void testGetNetInterfaces() throws Exception
     {
-        assertFalse( environmentContainer.getNetInterfaces().isEmpty() );
+        assertFalse( environmentContainer.getInterfaces().isEmpty() );
     }
 
 
@@ -332,7 +332,7 @@ public class EnvironmentContainerImplTest
     @Test
     public void testGetHostArchitecture() throws Exception
     {
-        assertEquals( HostArchitecture.AMD64, environmentContainer.getHostArchitecture() );
+        assertEquals( HostArchitecture.AMD64, environmentContainer.getArch() );
     }
 
 

@@ -11,8 +11,8 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.core.hostregistry.api.ContainerHostInfo;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 
 import com.google.common.collect.Maps;
 

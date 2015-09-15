@@ -3,7 +3,7 @@ package io.subutai.common.peer;
 
 import java.util.Set;
 
-import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.CpuQuotaInfo;
@@ -15,13 +15,12 @@ import io.subutai.common.quota.RamQuota;
 /**
  * Container host interface.
  */
-public interface ContainerHost extends Host
+public interface ContainerHost extends Host, ContainerHostInfo
 {
+
     public String getEnvironmentId();
 
     public String getNodeGroupName();
-
-    public ContainerHostState getState() throws PeerException;
 
     public void dispose() throws PeerException;
 

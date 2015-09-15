@@ -1,6 +1,9 @@
 package io.subutai.core.hostregistry.api;
 
 
+import io.subutai.common.host.ResourceHostInfo;
+
+
 /**
  * Notifies listener on host heartbeat
  */

@@ -75,7 +75,7 @@ public class RestServiceImplTest
         when( containerHost.getHostname() ).thenReturn( TestUtil.HOSTNAME );
         when( containerHost.getIpByInterfaceName( anyString() ) ).thenReturn( TestUtil.IP );
         when( containerHost.getTemplateName() ).thenReturn( TestUtil.TEMPLATE_NAME );
-        when( containerHost.getState() ).thenReturn( TestUtil.CONTAINER_STATE );
+        when( containerHost.getStatus() ).thenReturn( TestUtil.CONTAINER_STATE );
         when( environmentManager.getEnvironments() ).thenReturn( Sets.newHashSet( environment ) );
         when( environmentManager.findEnvironment( TestUtil.ENV_ID ) ).thenReturn( environment );
         when( environment.getContainerHostById( TestUtil.CONTAINER_ID ) ).thenReturn( containerHost );

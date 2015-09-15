@@ -39,8 +39,8 @@ public class HostInfoModelTest
 
         when( containerHost.getId() ).thenReturn( UUID.randomUUID().toString() );
         when( containerHost.getHostname() ).thenReturn( "testHostName" );
-        when( containerHost.getHostArchitecture() ).thenReturn( null );
-        when( containerHost.getNetInterfaces() ).thenReturn( mySet );
+        when( containerHost.getArch() ).thenReturn( null );
+        when( containerHost.getInterfaces() ).thenReturn( mySet );
         when( anInterface.getInterfaceName() ).thenReturn( "testInterFace" );
         when( anInterface.getIp() ).thenReturn( "testIp" );
         when( anInterface.getMac() ).thenReturn( "testMac" );

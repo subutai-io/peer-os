@@ -66,7 +66,6 @@ public abstract class AbstractSubutaiHost implements Host
     private Peer peer;
 
 
-    @Override
     public void init()
     {
         // Empty method
@@ -179,7 +178,7 @@ public abstract class AbstractSubutaiHost implements Host
 
 
     @Override
-    public Set<Interface> getNetInterfaces()
+    public Set<Interface> getInterfaces()
     {
         return Collections.unmodifiableSet( this.interfaces );
     }
@@ -241,7 +240,7 @@ public abstract class AbstractSubutaiHost implements Host
 
 
     @Override
-    public HostArchitecture getHostArchitecture()
+    public HostArchitecture getArch()
     {
         return this.hostArchitecture;
     }
@@ -279,5 +278,16 @@ public abstract class AbstractSubutaiHost implements Host
                 "peerId=" + peerId +
                 ", lastHeartbeat=" + lastHeartbeat +
                 '}';
+    }
+
+
+    @Override
+    public int compareTo( final HostInfo o )
+    {
+        if ( hostname != null && o != null )
+        {
+            return hostname.compareTo( o.getHostname() );
+        }
+        return -1;
     }
 }

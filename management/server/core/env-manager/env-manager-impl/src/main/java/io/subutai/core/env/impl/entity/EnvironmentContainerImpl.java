@@ -33,6 +33,7 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerHost;
@@ -108,7 +109,6 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     }
 
 
-    @Override
     public void init()
     {
         // Empty method
@@ -127,7 +127,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
 
         this.peer = peer;
-        this.creatorPeerId = localPeerId.toString();
+        this.creatorPeerId = localPeerId;
         this.peerId = peer.getId();
         this.hostId = hostInfo.getId();
         this.hostname = hostInfo.getHostname();
@@ -217,9 +217,24 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
 
     @Override
-    public ContainerHostState getState() throws PeerException
+    public ContainerHostState getStatus()
     {
-        return getPeer().getContainerHostState( this );
+        try
+        {
+            return getPeer().getContainerHostState( this );
+        }
+        catch ( PeerException e )
+        {
+            return ContainerHostState.UNKNOWN;
+        }
+    }
+
+
+    @Override
+    public String getContainerName()
+    {
+        //todo implement me
+        return null;
     }
 
 
@@ -376,7 +391,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
 
     @Override
-    public Set<Interface> getNetInterfaces()
+    public Set<Interface> getInterfaces()
     {
         return interfaces;
     }
@@ -413,7 +428,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
 
     @Override
-    public HostArchitecture getHostArchitecture()
+    public HostArchitecture getArch()
     {
         return this.hostArchitecture;
     }
@@ -595,20 +610,24 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     @Override
     public String toString()
     {
-        ContainerHostState state = ContainerHostState.UNKNOWN;
-        try
-        {
-            state = getState();
-        }
-        catch ( PeerException e )
-        {
+        ContainerHostState state = getStatus();
 
-        }
         return Objects.toStringHelper( this ).add( "hostId", hostId ).add( "hostname", hostname )
                       .add( "nodeGroupName", nodeGroupName ).add( "creatorPeerId", creatorPeerId )
                       .add( "templateName", templateName ).add( "environmentId", environment.getId() )
                       .add( "sshGroupId", sshGroupId ).add( "hostsGroupId", hostsGroupId )
                       .add( "domainName", domainName ).add( "tags", tags ).add( "templateArch", templateArch )
                       .add( "hostArchitecture", hostArchitecture ).add( "state", state ).toString();
+    }
+
+
+    @Override
+    public int compareTo( final HostInfo o )
+    {
+        if ( hostname != null && o != null )
+        {
+            return hostname.compareTo( o.getHostname() );
+        }
+        return -1;
     }
 }

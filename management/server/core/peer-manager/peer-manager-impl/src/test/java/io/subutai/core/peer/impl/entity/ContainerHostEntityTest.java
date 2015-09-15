@@ -17,7 +17,7 @@ import io.subutai.common.protocol.api.DataService;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.RamQuota;
-import io.subutai.core.hostregistry.api.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.core.peer.api.ContainerGroup;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ResourceHost;
@@ -165,7 +165,7 @@ public class ContainerHostEntityTest
     {
         containerHostEntity.updateHostInfo( containerHostInfo );
 
-        assertEquals( CONTAINER_HOST_STATE, containerHostEntity.getState() );
+        assertEquals( CONTAINER_HOST_STATE, containerHostEntity.getStatus() );
     }
 
 
@@ -210,7 +210,7 @@ public class ContainerHostEntityTest
     {
         containerHostEntity.updateHostInfo( containerHostInfo );
 
-        assertEquals( CONTAINER_HOST_STATE, containerHostEntity.getState() );
+        assertEquals( CONTAINER_HOST_STATE, containerHostEntity.getStatus() );
     }
 
 

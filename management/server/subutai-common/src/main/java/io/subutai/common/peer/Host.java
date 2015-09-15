@@ -2,20 +2,18 @@ package io.subutai.common.peer;
 
 
 import java.io.Serializable;
-import java.util.Set;
 
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInfo;
 
 
 /**
  * Base Host interface.
  */
-public interface Host extends Serializable
+public interface Host extends HostInfo, Serializable
 {
 
 
@@ -27,8 +25,6 @@ public interface Host extends Serializable
     public Peer getPeer();
 
     public String getPeerId();
-
-    public String getId();
 
     @Deprecated
     public String getHostId();
@@ -47,13 +43,8 @@ public interface Host extends Serializable
 
     public long getLastHeartbeat();
 
-    void init();
-
-    public Set<Interface> getNetInterfaces();
 
     public String getIpByInterfaceName( String interfaceName );
 
     public String getMacByInterfaceName( String interfaceName );
-
-    public HostArchitecture getHostArchitecture();
 }

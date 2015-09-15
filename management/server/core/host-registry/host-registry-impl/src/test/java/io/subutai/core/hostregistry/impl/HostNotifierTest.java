@@ -9,8 +9,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.core.hostregistry.api.HostListener;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
-import io.subutai.core.hostregistry.impl.HostNotifier;
+import io.subutai.common.host.ResourceHostInfo;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;

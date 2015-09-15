@@ -17,6 +17,7 @@ import javax.persistence.Transient;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -29,7 +30,6 @@ import io.subutai.common.quota.CpuQuotaInfo;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.RamQuota;
-import io.subutai.core.hostregistry.api.ContainerHostInfo;
 import io.subutai.core.peer.api.ContainerGroup;
 import io.subutai.core.peer.api.ContainerGroupNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
@@ -65,6 +65,14 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     protected ContainerHostEntity()
     {
+    }
+
+
+    @Override
+    public String getContainerName()
+    {
+        //TODO return container name from containerHostInfo
+        return null;
     }
 
 
@@ -142,7 +150,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    public ContainerHostState getState()
+    public ContainerHostState getStatus()
     {
         return state;
     }

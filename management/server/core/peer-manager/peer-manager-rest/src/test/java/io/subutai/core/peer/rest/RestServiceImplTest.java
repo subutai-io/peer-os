@@ -429,7 +429,7 @@ public class RestServiceImplTest
     @Test
     public void testGetContainerState() throws Exception
     {
-        when( containerHost.getState() ).thenReturn( ContainerHostState.RUNNING );
+        when( containerHost.getStatus() ).thenReturn( ContainerHostState.RUNNING );
 
         restService.getContainerState( CONTAINER_ID.toString() );
 

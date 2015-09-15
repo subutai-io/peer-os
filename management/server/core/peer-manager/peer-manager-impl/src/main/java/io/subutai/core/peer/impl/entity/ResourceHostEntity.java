@@ -29,6 +29,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
@@ -85,6 +86,14 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public ResourceHostEntity( final String peerId, final HostInfo resourceHostInfo )
     {
         super( peerId, resourceHostInfo );
+    }
+
+
+    @Override
+    public Set<ContainerHostInfo> getContainers()
+    {
+        //todo implement me
+        return null;
     }
 
 

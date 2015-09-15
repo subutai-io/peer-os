@@ -77,7 +77,7 @@ public class HostsCommand extends SubutaiShellCommandSupport
         if ( host instanceof ContainerHost )
         {
             ContainerHost c = ( ContainerHost ) host;
-            containerInfo += c.getState();
+            containerInfo += c.getStatus();
         }
 
         System.out

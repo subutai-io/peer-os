@@ -43,7 +43,6 @@ import io.subutai.common.security.utils.io.HexUtil;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
-import io.subutai.common.util.UUIDUtil;
 import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
@@ -584,7 +583,7 @@ public class RestServiceImpl implements RestService
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
 
             LocalPeer localPeer = peerManager.getLocalPeer();
-            ContainerHostState containerHostState = localPeer.getContainerHostById( containerId ).getState();
+            ContainerHostState containerHostState = localPeer.getContainerHostById( containerId ).getStatus();
 
             String jsonData = jsonUtil.to( containerHostState );
 

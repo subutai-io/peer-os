@@ -23,10 +23,10 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.executor.api.CommandExecutor;
-import io.subutai.core.hostregistry.api.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 
 
 /**

@@ -34,6 +34,7 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.host.Interface;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
@@ -44,7 +45,6 @@ import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.network.api.Tunnel;

@@ -11,7 +11,7 @@ import com.google.common.base.Preconditions;
 
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 

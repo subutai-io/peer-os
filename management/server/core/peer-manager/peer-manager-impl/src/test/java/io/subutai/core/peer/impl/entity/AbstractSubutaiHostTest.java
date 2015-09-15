@@ -8,14 +8,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Sets;
+
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
 import io.subutai.common.peer.Peer;
-
-import com.google.common.collect.Sets;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
@@ -62,6 +63,13 @@ public class AbstractSubutaiHostTest
         public HostImpl( final String peerId, final HostInfo hostInfo )
         {
             super( peerId, hostInfo );
+        }
+
+
+        @Override
+        public int compareTo( final HostInfo o )
+        {
+            return 0;
         }
     }
 
@@ -180,7 +188,7 @@ public class AbstractSubutaiHostTest
     @Test
     public void testGetInterfaces() throws Exception
     {
-        assertFalse( host.getNetInterfaces().isEmpty() );
+        assertFalse( host.getInterfaces().isEmpty() );
     }
 
 
@@ -218,7 +226,7 @@ public class AbstractSubutaiHostTest
 
         verify( hostInterface ).setHost( host );
 
-        assertTrue( host.getNetInterfaces().contains( hostInterface ) );
+        assertTrue( host.getInterfaces().contains( hostInterface ) );
     }
 
 
@@ -232,14 +240,14 @@ public class AbstractSubutaiHostTest
 
         host.setNetInterfaces( Sets.newHashSet( anInterface ) );
 
-        assertTrue( host.getNetInterfaces().size() == 1 );
+        assertTrue( host.getInterfaces().size() == 1 );
     }
 
 
     @Test
     public void testGetHostArchitecture() throws Exception
     {
-        assertEquals( ARCH, host.getHostArchitecture() );
+        assertEquals( ARCH, host.getArch() );
     }
 
 

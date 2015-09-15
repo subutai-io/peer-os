@@ -16,10 +16,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.google.common.cache.Cache;
 import com.google.common.collect.Sets;
 
-import io.subutai.core.hostregistry.api.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;

@@ -389,9 +389,9 @@ public class RestServiceImpl implements RestService
             {
                 ContainerHost containerHost = environment.getContainerHostById( containerId );
 
-                return Response.ok().entity( JsonUtil.toJson( "STATE", containerHost.getState() ) ).build();
+                return Response.ok().entity( JsonUtil.toJson( "STATE", containerHost.getStatus() ) ).build();
             }
-            catch ( ContainerHostNotFoundException | PeerException e )
+            catch ( ContainerHostNotFoundException  e )
             {
                 LOG.error( "Error getting container state", e );
                 return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
@@ -536,16 +536,8 @@ public class RestServiceImpl implements RestService
         Set<ContainerJson> jsonSet = Sets.newHashSet();
         for ( ContainerHost containerHost : containerHosts )
         {
-            ContainerHostState state = ContainerHostState.UNKNOWN;
+            ContainerHostState state = containerHost.getStatus();
 
-            try
-            {
-                state = containerHost.getState();
-            }
-            catch ( PeerException e )
-            {
-                LOG.error( "Failed to obtain container state", e );
-            }
 
             jsonSet.add( new ContainerJson( containerHost.getId(), containerHost.getEnvironmentId(),
                     containerHost.getHostname(), state,
