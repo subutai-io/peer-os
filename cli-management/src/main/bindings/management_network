@@ -316,15 +316,13 @@ function management_network {
          msg_error "extra Parameter provided. Aborting ..."
          show_usage "`management_network_usage`"
       fi  
-      rm -f /var/subutai-network/"$tunnelPortName"_vni_vlan
-
       net_check_tunnelPortName_exist $tunnelPortName
  
       ovs-vsctl del-port $tunnelPortName
       ovs-vsctl del-br br-$tunnelPortName
       ovs-vsctl del-port br-int intto$tunnelPortName
 
-#      rm /var/subutai-network/"$tunnelPortName"_vni_vlan
+      rm /var/subutai-network/"$tunnelPortName"_vni_vlan
       msg_info "$tunnelPortName is deleted from br-tun."
    fi
 
@@ -752,9 +750,12 @@ if   [ "$status" == "deleteall" ]; then
 #    file_name3="/var/subutai_network/$"
        check2=$( ls /var/subutai-network/tunnel* 2>/dev/null )
     if [ "$check2" ];then
-       check_tun=$( ls /var/subutai-network/tunnel* | awk -F" " '{ system("cat " $1) }' | awk -F " " -v v1="$vni_id" -v v2="$VLAN_ID"  -v v3="$ENV_ID" '{if ( $1 == v1  &&  $2 == v2  &&  $3 ==v3 ) print $1 " " $2 " " $3 }' )
+       check_tun=$( ls /var/subutai-network/tunnel* | awk -F" " '{ system("cat " $1) }' | awk -F " " -v v1="$vni_id" -v v2="$VLAN_ID"  -v v3="$ENV_ID" '{if ( $1 == v1  &&  $2 == v2  &&  $3 ==v3 ) print $2}' )
        if [  "$check_tun"   ];then
-          msg_info "delete tunnel first" >&2
+#          msg_info "delete tunnel first" >&2
+             tunname=$(subutai management_network -v | awk -F "," -v var="$check_tun" '{if ( $3 == var ) print $1}' )
+             echo " subutai management_network -r $tunname"
+             subutai management_network -r $tunname
           exit 0
        fi
     fi
@@ -994,7 +995,7 @@ if   [ "$status" == "deleteall" ]; then
       msg_ok "Vlan ID: $vlan_id or VNI: $vni_id is already in use!"
       exit 0
     fi
-
+   ovs-vsctl --if-exists set port br-$tunnelName tag=$vlan_id
    ovs-vsctl set interface $tunnelName options:key=$vni_id 
    ovs-vsctl set port $tunnelName tag=$vlan_id
   #   ovs-vsctl add-flow br-tun "action=NORMAL"
