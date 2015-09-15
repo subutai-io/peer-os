@@ -64,6 +64,8 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     private String hostId;
     @Column( name = "hostname" )
     private String hostname;
+    @Column( name = "containerName" )
+    private String containerName;
     @Column( name = "node_group_name" )
     private String nodeGroupName;
     @Column( name = "creator_peer_id" )
@@ -131,6 +133,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
         this.peerId = peer.getId();
         this.hostId = hostInfo.getId();
         this.hostname = hostInfo.getHostname();
+        this.containerName = hostInfo.getContainerName();
         this.hostArchitecture = hostInfo.getArch();
         this.nodeGroupName = nodeGroupName;
         this.templateName = template.getTemplateName();
@@ -233,8 +236,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     @Override
     public String getContainerName()
     {
-        //todo implement me: add peer.getContainerName(String containerId)
-        return null;
+        return containerName;
     }
 
 

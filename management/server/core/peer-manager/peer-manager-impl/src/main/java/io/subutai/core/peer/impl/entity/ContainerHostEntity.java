@@ -6,6 +6,7 @@ import java.util.Set;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -49,6 +50,8 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @JoinColumn( name = "parent_id" )
     private ResourceHost parent;
 
+    @Column( name = "containerName" )
+    private String containerName;
 
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
     private Set<String> tags = new HashSet<>();
@@ -71,8 +74,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Override
     public String getContainerName()
     {
-        //TODO return container name from containerHostInfo
-        return null;
+        return containerName;
     }
 
 
@@ -93,6 +95,8 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         super( peerId, hostInfo );
 
         updateHostInfo( hostInfo );
+
+        this.containerName = ( ( ContainerHostInfo ) hostInfo ).getContainerName();
     }
 
 

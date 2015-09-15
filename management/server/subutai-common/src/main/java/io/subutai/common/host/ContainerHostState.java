@@ -6,6 +6,6 @@ package io.subutai.common.host;
  */
 public enum ContainerHostState
 {
-    STARTING, RUNNING, STOPPING, STOPPED, ABORTING, FREEZING, FROZEN, UNKNOWN
+    STARTING, RUNNING, STOPPING, STOPPED, ABORTING, FREEZING, FROZEN, status, UNKNOWN
 
 }

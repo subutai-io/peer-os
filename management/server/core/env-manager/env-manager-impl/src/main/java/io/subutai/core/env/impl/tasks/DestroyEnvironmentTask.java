@@ -117,7 +117,7 @@ public class DestroyEnvironmentTask implements Awaitable
 
             try
             {
-                environmentManager.removeN2NConnection( environment );
+                environmentManager.removeN2NConnection( environment.getId() );
                 op.addLog( "N2N tunnel destroyed successfully." );
             }
             catch ( EnvironmentManagerException e )

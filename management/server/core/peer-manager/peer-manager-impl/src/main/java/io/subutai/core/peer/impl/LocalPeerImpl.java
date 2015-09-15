@@ -966,9 +966,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder(
-                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
-                    bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
+                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1230,7 +1229,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         if ( initialized )
         {
-            //todo put updating host fields logic to updateHostInfo method
             if ( resourceHostInfo.getHostname().equals( "management" ) )
             {
                 if ( managementHost == null )
@@ -1239,7 +1237,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
                     try
                     {
-                        ( ( ManagementHostEntity ) managementHost ).init();
+                        ( ( AbstractSubutaiHost ) managementHost ).init();
                     }
                     catch ( Exception e )
                     {
@@ -1268,7 +1266,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 {
                     LOG.debug( "Host not found in #onHeartbeat", e );
                     host = new ResourceHostEntity( getId(), resourceHostInfo );
-                    ( ( ResourceHostEntity ) host ).init();
+                    ( ( AbstractSubutaiHost ) host ).init();
                     resourceHostDataService.persist( ( ResourceHostEntity ) host );
                     addResourceHost( host );
                     setResourceHostTransientFields( Sets.newHashSet( host ) );

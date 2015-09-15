@@ -1144,10 +1144,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void removeN2NConnection( final Environment environment ) throws EnvironmentManagerException
+    public void removeN2NConnection( final String environmentId )
+            throws EnvironmentNotFoundException, EnvironmentManagerException
     {
         try
         {
+
+            Environment environment = findEnvironment( environmentId );
             for ( PeerConf peerConf : environment.getPeerConfs() )
             {
                 Peer peer = peerManager.getPeer( peerConf.getN2NConfig().getPeerId() );

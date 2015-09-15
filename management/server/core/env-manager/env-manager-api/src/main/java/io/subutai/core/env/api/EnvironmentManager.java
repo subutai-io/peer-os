@@ -86,7 +86,6 @@ public interface EnvironmentManager
      * @throws EnvironmentModificationException - thrown if error occurs during environment modification
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
-    //TODO return ContainerHostInfo instead of ContainerHost
     Set<ContainerHost> growEnvironment( String environmentId, Topology topology, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
@@ -214,6 +213,5 @@ public interface EnvironmentManager
 
     List<N2NConfig> setupN2NConnection( Set<Peer> peers ) throws EnvironmentManagerException;
 
-    //TODO use environmentId instead of Environment
-    void removeN2NConnection( Environment environment ) throws EnvironmentManagerException;
+    void removeN2NConnection( String environmentId ) throws EnvironmentNotFoundException, EnvironmentManagerException;
 }
