@@ -3,10 +3,28 @@ package io.subutai.core.environment.impl.workflow;
 
 import org.apache.servicemix.beanflow.Workflow;
 
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.Topology;
+import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.core.peer.api.PeerManager;
+
 
 public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWorkflow.EnvironmentCreationPhase>
 {
-    private String subnetCidr;
+    private final PeerManager peerManager;
+    private final Environment environment;
+    private final Topology topology;
+    private final String subnetCidr;
+    private final String sshKey;
+    private final TrackerOperation operationTracker;
+
+    private Throwable error;
+
+
+    public Throwable getError()
+    {
+        return error;
+    }
 
 
     //environment creation phases
@@ -22,17 +40,17 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     }
 
 
-    public EnvironmentCreationWorkflow( String subnetCidr )
+    public EnvironmentCreationWorkflow( PeerManager peerManager, Environment environment, Topology topology,
+                                        String subnetCidr, String sshKey, TrackerOperation operationTracker )
     {
         super( EnvironmentCreationPhase.INIT );
 
+        this.peerManager = peerManager;
+        this.environment = environment;
+        this.topology = topology;
+        this.sshKey = sshKey;
+        this.operationTracker = operationTracker;
         this.subnetCidr = subnetCidr;
-    }
-
-
-    public String getSubnetCidr()
-    {
-        return subnetCidr;
     }
 
 
@@ -42,15 +60,16 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     public EnvironmentCreationPhase INIT()
     {
         System.out.println( "INIT" );
-        System.out.println(getSubnetCidr());
 
         return EnvironmentCreationPhase.GENERATE_KEYS;
     }
 
 
-    public EnvironmentCreationPhase GENERATE_KEYS()
+    public EnvironmentCreationPhase GENERATE_KEYS() throws InterruptedException
     {
         System.out.println( "GENERATE_KEYS" );
+
+        Thread.sleep( 3000 );
 
         return EnvironmentCreationPhase.SETUP_N2N;
     }
