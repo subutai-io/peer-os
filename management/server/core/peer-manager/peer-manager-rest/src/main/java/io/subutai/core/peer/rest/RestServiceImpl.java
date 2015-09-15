@@ -982,6 +982,8 @@ public class RestServiceImpl implements RestService
     {
         try
         {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
+
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.createEnvironmentKeyPair( environmentId );
 
