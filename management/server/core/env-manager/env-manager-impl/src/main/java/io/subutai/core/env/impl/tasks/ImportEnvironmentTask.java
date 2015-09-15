@@ -68,16 +68,17 @@ public class ImportEnvironmentTask implements Awaitable
         {
             Set<Peer> allPeers = new HashSet<>( topology.getAllPeers() );
 
-            op.addLog( "Setting up n2n tunnel..." );
+//            op.addLog( "Setting up n2n tunnel..." );
 
-            List<N2NConfig> tunnels = environmentManager.setupN2NConnection( allPeers );
+            /*List<N2NConfig> tunnels = */
+//            environmentManager.setupN2NConnection( environment, allPeers );
 
-            for ( N2NConfig config : tunnels )
-            {
-                final PeerConf p = new PeerConfImpl();
-                p.setN2NConfig( config );
-                environment.addEnvironmentPeer( p );
-            }
+            //            for ( N2NConfig config : tunnels )
+            //            {
+            //                final PeerConf p = new PeerConfImpl();
+            //                p.setN2NConfig( config );
+            //                environment.addEnvironmentPeer( p );
+            //            }
 
 
             //**** Create Key Pair *****************************************

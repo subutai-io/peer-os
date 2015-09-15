@@ -65,16 +65,16 @@ public class CreateEnvironmentTask implements Awaitable
         {
             Set<Peer> allPeers = new HashSet<>( topology.getAllPeers() );
 
-            op.addLog( "Setting up n2n tunnel..." );
-
-            List<N2NConfig> tunnels = environmentManager.setupN2NConnection( allPeers );
-
-            for ( N2NConfig config : tunnels )
-            {
-                final PeerConf p = new PeerConfImpl();
-                p.setN2NConfig( config );
-                environment.addEnvironmentPeer( p );
-            }
+//            op.addLog( "Setting up n2n tunnel..." );
+//
+//            List<N2NConfig> tunnels = environmentManager.setupN2NConnection( allPeers );
+//
+//            for ( N2NConfig config : tunnels )
+//            {
+//                final PeerConf p = new PeerConfImpl();
+//                p.setN2NConfig( config );
+//                environment.addEnvironmentPeer( p );
+//            }
 
 
             //**** Create Key Pair *****************************************
