@@ -6,7 +6,6 @@ import java.util.UUID;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
 import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.environment.impl.creation.EnvironmentCreationPhase;
 import io.subutai.core.environment.impl.creation.EnvironmentCreationWorkflow;
 
 
@@ -20,14 +19,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         String environmentId = UUID.randomUUID().toString();
 
         //launch environment creation workflow
-        EnvironmentCreationWorkflow<EnvironmentCreationPhase> environmentCreationPhaseWorkflow =
-                new EnvironmentCreationWorkflow<>( EnvironmentCreationPhase.class, subnetCidr );
+        EnvironmentCreationWorkflow environmentCreationWorkflow = new EnvironmentCreationWorkflow( subnetCidr );
 
-        environmentCreationPhaseWorkflow.start();
+        environmentCreationWorkflow.start();
 
-        environmentCreationPhaseWorkflow.join();
+        //this call makes the method synchronous, otherwise we can just return the environment id
+        environmentCreationWorkflow.join();
 
-        System.out.println( environmentCreationPhaseWorkflow.isCompleted() );
 
         return environmentId;
     }
