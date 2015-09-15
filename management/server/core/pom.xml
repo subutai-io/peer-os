@@ -36,9 +36,7 @@
     <module>plugin-manager</module>
     <module>env-manager</module>
     <module>identity-manager</module>
-    <module>template-wizard</module>
     <module>channel-manager</module>
-    <module>test</module>
     <module>http-context-manager</module>
     <module>subutai-cli-rbac</module>
     <module>key-server</module>

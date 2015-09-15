@@ -6,6 +6,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Sets;
+
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.Environment;
@@ -24,10 +27,7 @@ import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.QuotaInfo;
 import io.subutai.common.quota.RamQuota;
 import io.subutai.core.env.api.EnvironmentManager;
-
 import io.subutai.core.env.impl.TestUtil;
-
-import com.google.common.collect.Sets;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertEquals;
@@ -121,7 +121,7 @@ public class EnvironmentContainerImplTest
     {
         when( environment.getId() ).thenReturn( TestUtil.ENV_ID );
 
-        assertEquals( TestUtil.ENV_ID.toString(), environmentContainer.getEnvironmentId() );
+        assertEquals( TestUtil.ENV_ID, environmentContainer.getEnvironmentId() );
     }
 
 
@@ -236,14 +236,14 @@ public class EnvironmentContainerImplTest
     @Test
     public void testGetPeerId() throws Exception
     {
-        assertEquals( TestUtil.PEER_ID.toString(), environmentContainer.getPeerId() );
+        assertEquals( TestUtil.PEER_ID, environmentContainer.getPeerId() );
     }
 
 
     @Test
     public void testGetHostId() throws Exception
     {
-        assertEquals( TestUtil.CONTAINER_ID.toString(), environmentContainer.getHostId() );
+        assertEquals( TestUtil.CONTAINER_ID, environmentContainer.getHostId() );
     }
 
 
@@ -489,13 +489,6 @@ public class EnvironmentContainerImplTest
     }
 
 
-    @Test( expected = UnsupportedOperationException.class )
-    public void testGetLastHeartBeat() throws Exception
-    {
-        environmentContainer.getLastHeartbeat();
-    }
-
-
     @Test
     public void testEquals() throws Exception
     {
@@ -526,6 +519,6 @@ public class EnvironmentContainerImplTest
 
         verify( peer ).getContainerHostState( environmentContainer );
 
-        assertThat( toString, containsString( TestUtil.CONTAINER_ID.toString() ) );
+        assertThat( toString, containsString( TestUtil.CONTAINER_ID ) );
     }
 }

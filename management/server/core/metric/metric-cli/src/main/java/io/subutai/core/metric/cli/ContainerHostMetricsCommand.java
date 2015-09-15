@@ -12,7 +12,7 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-import io.subutai.core.metric.api.ContainerHostMetric;
+import io.subutai.common.metric.ContainerHostMetric;
 import io.subutai.core.metric.api.Monitor;
 
 

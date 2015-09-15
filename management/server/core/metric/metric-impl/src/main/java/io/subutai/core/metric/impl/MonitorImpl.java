@@ -45,7 +45,7 @@ import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.User;
 import io.subutai.core.metric.api.AlertListener;
-import io.subutai.core.metric.api.ContainerHostMetric;
+import io.subutai.common.metric.ContainerHostMetric;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.metric.api.MonitoringSettings;

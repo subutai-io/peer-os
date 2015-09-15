@@ -30,6 +30,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
@@ -38,7 +39,6 @@ import io.subutai.common.protocol.Template;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
-import io.subutai.core.peer.api.ContainerState;
 import io.subutai.core.peer.api.HostNotFoundException;
 import io.subutai.core.peer.api.ResourceHost;
 import io.subutai.core.peer.api.ResourceHostException;
@@ -110,7 +110,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public ContainerState getContainerHostState( final ContainerHost containerHost ) throws ResourceHostException
+    public ContainerHostState getContainerHostState( final ContainerHost containerHost ) throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
 
@@ -146,11 +146,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             Matcher m = LXC_STATE_PATTERN.matcher( outputLines[2] );
             if ( m.find() )
             {
-                return ContainerState.valueOf( m.group( 1 ) );
+                return ContainerHostState.valueOf( m.group( 1 ) );
             }
         }
 
-        return ContainerState.UNKNOWN;
+        return ContainerHostState.UNKNOWN;
     }
 
 
@@ -223,7 +223,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
         }
 
-        if ( !ContainerState.RUNNING.equals( getContainerHostState( containerHost ) ) )
+        if ( !ContainerHostState.RUNNING.equals( getContainerHostState( containerHost ) ) )
         {
             throw new ResourceHostException(
                     String.format( "Error starting container %s", containerHost.getHostname() ) );

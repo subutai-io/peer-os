@@ -4,6 +4,8 @@ package io.subutai.core.peer.cli;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import org.apache.karaf.shell.commands.Command;
+
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
@@ -14,8 +16,6 @@ import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.ResourceHost;
-
-import org.apache.karaf.shell.commands.Command;
 
 
 @Command( scope = "peer", name = "hosts" )
@@ -71,9 +71,7 @@ public class HostsCommand extends SubutaiShellCommandSupport
 
     protected void print( Host host, String padding ) throws PeerException
     {
-        String lastHeartbeat = fmt.format( host.getLastHeartbeat() );
-        String containerInfo =
-                String.format( "%s\t(%s) ", host.isConnected() ? " CONNECTED" : " DISCONNECTED", lastHeartbeat );
+        String containerInfo = String.format( "%s ", host.isConnected() ? " CONNECTED" : " DISCONNECTED" );
         if ( host instanceof ContainerHost )
         {
             ContainerHost c = ( ContainerHost ) host;

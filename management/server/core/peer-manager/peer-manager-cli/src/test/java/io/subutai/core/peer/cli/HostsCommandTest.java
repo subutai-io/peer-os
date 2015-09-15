@@ -66,9 +66,6 @@ public class HostsCommandTest extends SystemOutRedirectTest
         when( resourceHost.getHostname() ).thenReturn( RESOURCE_HOST_HOSTNAME );
         when( containerHost.getHostname() ).thenReturn( CONTAINER_HOST_HOSTNAME );
         when( user.getUsername() ).thenReturn( USERNAME );
-        when( managementHost.getLastHeartbeat() ).thenReturn( LAST_HEARTBEAT );
-        when( resourceHost.getLastHeartbeat() ).thenReturn( LAST_HEARTBEAT );
-        when( containerHost.getLastHeartbeat() ).thenReturn( LAST_HEARTBEAT );
         when( managementHost.getId() ).thenReturn( ID );
         when( resourceHost.getId() ).thenReturn( ID );
         when( containerHost.getId() ).thenReturn( ID );

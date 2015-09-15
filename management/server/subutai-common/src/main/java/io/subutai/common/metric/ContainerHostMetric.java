@@ -1,15 +1,11 @@
-package io.subutai.core.metric.api;
+package io.subutai.common.metric;
 
 
 import com.google.common.base.Objects;
 
-import io.subutai.common.metric.Metric;
-
 
 /**
  * Interface for ContainerHostMetric
- *
- * TODO move this class to common.metric & update all plugins
  */
 public abstract class ContainerHostMetric extends Metric
 {

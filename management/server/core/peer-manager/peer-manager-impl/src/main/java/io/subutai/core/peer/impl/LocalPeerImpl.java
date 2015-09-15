@@ -44,9 +44,11 @@ import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.CreateContainerGroupRequest;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.Gateway;
@@ -75,11 +77,9 @@ import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.executor.api.CommandExecutor;
-import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
@@ -991,7 +991,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
 
             Host h = bindHost( host.getId() );
-            return !isTimedOut( h.getLastHeartbeat(), HOST_INACTIVE_TIME );
+            return !isTimedOut( ( ( AbstractSubutaiHost ) h ).getLastHeartbeat(), HOST_INACTIVE_TIME );
         }
         catch ( PeerException | HostDisconnectedException e )
         {

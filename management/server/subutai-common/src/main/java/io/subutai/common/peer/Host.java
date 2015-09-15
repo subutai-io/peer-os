@@ -41,8 +41,6 @@ public interface Host extends HostInfo, Serializable
 
     public boolean isConnected();
 
-    public long getLastHeartbeat();
-
 
     public String getIpByInterfaceName( String interfaceName );
 

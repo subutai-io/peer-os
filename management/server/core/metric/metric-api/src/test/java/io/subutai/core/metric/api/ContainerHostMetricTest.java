@@ -9,18 +9,29 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.core.metric.api.ContainerHostMetric;
-import io.subutai.core.metric.api.MonitorException;
+import com.google.common.base.Objects;
+
+import io.subutai.common.metric.ContainerHostMetric;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 
 
 @RunWith( MockitoJUnitRunner.class )
 public class ContainerHostMetricTest
 {
-    private static final class ContainerHostMetricImpl extends ContainerHostMetric {}
+    private static class ContainerHostMetricImpl extends ContainerHostMetric
+    {
+        @Override
+        public String toString()
+        {
+            return Objects.toStringHelper( this ).add( "metric", super.toString() ).add( "hostId", hostId )
+                          .add( "environmentId", getEnvironmentId() ).toString();
+        }
+    }
 
 
     private ContainerHostMetric metric;
@@ -32,9 +43,9 @@ public class ContainerHostMetricTest
     public void setUp() throws Exception
     {
 
-        metric = new ContainerHostMetricImpl();
+        metric = spy( new ContainerHostMetricImpl() );
 
-        metric.environmentId = envId;
+        doReturn( envId ).when( metric ).getEnvironmentId();
     }
 
 
@@ -51,7 +62,7 @@ public class ContainerHostMetricTest
     public void testToString() throws Exception
     {
 
-        assertThat( metric.toString(), containsString( envId.toString() ) );
+        assertThat( metric.toString(), containsString( envId ) );
     }
 
 

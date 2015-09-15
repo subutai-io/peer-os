@@ -538,19 +538,6 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
         return getPeer().getAvailableDiskQuota( this, diskPartition );
     }
 
-    //unsupported  START
-    //TODO remove these methods from ContainerHost
-
-
-    @Override
-    public long getLastHeartbeat()
-    {
-        throw new UnsupportedOperationException( "Unsupported operation." );
-    }
-
-
-    //unsupported END
-
 
     public int getSshGroupId()
     {

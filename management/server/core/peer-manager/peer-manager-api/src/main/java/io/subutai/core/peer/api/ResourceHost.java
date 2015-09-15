@@ -3,6 +3,7 @@ package io.subutai.core.peer.api;
 
 import java.util.Set;
 
+import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
@@ -52,7 +53,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
     /**
      * Returns state of hosted container
      */
-    public ContainerState getContainerHostState( final ContainerHost container ) throws ResourceHostException;
+    public ContainerHostState getContainerHostState( final ContainerHost container ) throws ResourceHostException;
 
     /**
      * Creates container on the resource host

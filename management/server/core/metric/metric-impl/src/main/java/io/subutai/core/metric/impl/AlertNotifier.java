@@ -1,7 +1,7 @@
 package io.subutai.core.metric.impl;
 
 
-import io.subutai.core.metric.api.ContainerHostMetric;
+import io.subutai.common.metric.ContainerHostMetric;
 import io.subutai.core.metric.api.AlertListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

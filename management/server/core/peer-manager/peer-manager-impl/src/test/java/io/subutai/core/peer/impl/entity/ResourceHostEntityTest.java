@@ -20,6 +20,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
@@ -29,7 +30,6 @@ import io.subutai.common.protocol.Template;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
-import io.subutai.core.peer.api.ContainerState;
 import io.subutai.core.peer.api.HostNotFoundException;
 import io.subutai.core.peer.api.ResourceHostException;
 import io.subutai.core.registry.api.TemplateRegistry;
@@ -168,16 +168,16 @@ public class ResourceHostEntityTest
         when( commandResult.getStdOut() ).thenReturn( CONTAINER_STATUS_STARTED );
         resourceHostEntity.addContainerHost( containerHost );
 
-        ContainerState state = resourceHostEntity.getContainerHostState( containerHost );
+        ContainerHostState state = resourceHostEntity.getContainerHostState( containerHost );
 
-        assertEquals( ContainerState.RUNNING, state );
+        assertEquals( ContainerHostState.RUNNING, state );
 
 
         when( commandResult.getStdOut() ).thenReturn( "" );
 
         state = resourceHostEntity.getContainerHostState( containerHost );
 
-        assertEquals( ContainerState.UNKNOWN, state );
+        assertEquals( ContainerHostState.UNKNOWN, state );
 
         doThrow( new CommandException( "" ) ).when( commandUtil )
                                              .execute( any( RequestBuilder.class ), eq( resourceHostEntity ) );
@@ -238,7 +238,7 @@ public class ResourceHostEntityTest
 
         verify( commandUtil, atLeastOnce() ).execute( any( RequestBuilder.class ), eq( resourceHostEntity ) );
 
-        when( commandResult.getStdOut() ).thenReturn( CONTAINER_STATUS_STOPPED);
+        when( commandResult.getStdOut() ).thenReturn( CONTAINER_STATUS_STOPPED );
 
         try
         {

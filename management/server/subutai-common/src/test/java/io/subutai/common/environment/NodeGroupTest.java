@@ -7,7 +7,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.protocol.PlacementStrategy;
 
 import static org.junit.Assert.assertNotNull;
@@ -17,7 +16,6 @@ import static org.junit.Assert.assertNotNull;
 public class NodeGroupTest
 {
     private NodeGroup nodeGroup;
-    private NodeGroup nodeGroupDeprecated;
 
     @Mock
     PlacementStrategy placementStrategy;
@@ -27,7 +25,6 @@ public class NodeGroupTest
     public void setUp() throws Exception
     {
         nodeGroup = new NodeGroup( "test", "testTeplate", 5, 5, 5, placementStrategy );
-        nodeGroupDeprecated = new NodeGroup( "test", "testTemplate", "testDomain", 5, 5, 5, placementStrategy );
     }
 
 

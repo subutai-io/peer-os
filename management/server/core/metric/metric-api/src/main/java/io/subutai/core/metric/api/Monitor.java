@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import io.subutai.common.environment.Environment;
+import io.subutai.common.metric.ContainerHostMetric;
 import io.subutai.common.metric.HistoricalMetric;
 import io.subutai.common.metric.MetricType;
 import io.subutai.common.metric.OwnerResourceUsage;

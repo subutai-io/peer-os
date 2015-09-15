@@ -2,9 +2,8 @@ package io.subutai.core.metric.impl;
 
 
 import org.junit.Test;
-import io.subutai.core.metric.api.ContainerHostMetric;
+import io.subutai.common.metric.ContainerHostMetric;
 import io.subutai.core.metric.api.AlertListener;
-import io.subutai.core.metric.impl.AlertNotifier;
 
 import org.slf4j.Logger;
 
