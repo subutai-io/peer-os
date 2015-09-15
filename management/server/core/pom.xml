@@ -46,6 +46,7 @@
     <module>gateway</module>
     <module>h-integration</module>
     <module>h-place</module>
+    <module>environment-manager</module>
   </modules>
 
 </project>
