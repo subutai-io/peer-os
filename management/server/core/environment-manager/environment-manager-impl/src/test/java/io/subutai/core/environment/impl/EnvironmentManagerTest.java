@@ -78,7 +78,7 @@ public class EnvironmentManagerTest
                                .createEmptyEnvironment( anyString(), anyString(), anyString() );
         doReturn( environmentCreationWorkflow ).when( environmentManager )
                                                .getEnvironmentCreationWorkflow( any( EnvironmentImpl.class ),
-                                                       any( Topology.class ), anyString(), anyString(),
+                                                       any( Topology.class ), anyString(),
                                                        any( TrackerOperation.class ) );
         environmentManager.environmentDataService = environmentDataService;
         doReturn( user ).when( identityManager ).getUser();

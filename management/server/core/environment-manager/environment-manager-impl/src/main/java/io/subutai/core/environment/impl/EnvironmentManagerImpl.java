@@ -6,6 +6,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -41,6 +44,8 @@ import io.subutai.core.tracker.api.Tracker;
 
 public class EnvironmentManagerImpl implements EnvironmentManager
 {
+    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerImpl.class );
+
     private static final String TRACKER_SOURCE = "Environment Manager";
 
     private final IdentityManager identityManager;
@@ -86,6 +91,22 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         //start environment creation workflow
         environmentCreationWorkflow.start();
+
+        environmentCreationWorkflow.onStop( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    notifyOnEnvironmentCreated( findEnvironment( environment.getId() ) );
+                }
+                catch ( EnvironmentNotFoundException e )
+                {
+                    LOG.error( "Error notifying environment event listeners", e );
+                }
+            }
+        } );
 
         //wait
         if ( !async )
@@ -246,6 +267,54 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 public void run()
                 {
                     listener.onEnvironmentCreated( environment );
+                }
+            } );
+        }
+    }
+
+
+    public void notifyOnEnvironmentGrown( final Environment environment, final Set<ContainerHost> containers )
+    {
+        for ( final EnvironmentEventListener listener : listeners )
+        {
+            executor.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    listener.onEnvironmentGrown( environment, containers );
+                }
+            } );
+        }
+    }
+
+
+    public void notifyOnContainerDestroyed( final Environment environment, final String containerId )
+    {
+        for ( final EnvironmentEventListener listener : listeners )
+        {
+            executor.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    listener.onContainerDestroyed( environment, containerId );
+                }
+            } );
+        }
+    }
+
+
+    public void notifyOnEnvironmentDestroyed( final String environmentId )
+    {
+        for ( final EnvironmentEventListener listener : listeners )
+        {
+            executor.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    listener.onEnvironmentDestroyed( environmentId );
                 }
             } );
         }
