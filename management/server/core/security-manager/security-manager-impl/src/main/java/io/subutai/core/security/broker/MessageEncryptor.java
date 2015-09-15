@@ -76,8 +76,8 @@ public class MessageEncryptor implements TextMessagePostProcessor
                                     originalRequest.getWorkingDirectory(),
                                     String.format( "%s -t %s", originalRequest.getCommand(), getRegistrationManager()
                                             .generateContainerTTLToken( ( originalRequest.getTimeout()
-                                                    + Common.WAIT_CONTAINER_CONNECTION_SEC + 10 ) * 1000L ) ),
-                                    originalRequest.getArgs(), originalRequest.getEnvironment(),
+                                                    + Common.WAIT_CONTAINER_CONNECTION_SEC + 10 ) * 1000L )
+                                            .getToken() ), originalRequest.getArgs(), originalRequest.getEnvironment(),
                                     originalRequest.getStdOut(), originalRequest.getStdErr(),
                                     originalRequest.getRunAs(), originalRequest.getTimeout(),
                                     originalRequest.isDaemon(), originalRequest.getConfigPoints(),
