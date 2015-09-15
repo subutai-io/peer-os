@@ -21,7 +21,7 @@ import io.subutai.common.host.Interface;
  * Created by talas on 8/25/15.
  */
 @Entity
-@Table( name = "host_interface" )
+@Table( name = "node_net_interfaces" )
 @Access( AccessType.FIELD )
 public class HostInterface implements Interface, Serializable
 {
@@ -42,6 +42,14 @@ public class HostInterface implements Interface, Serializable
     public HostInterface()
     {
 
+    }
+
+
+    public HostInterface( final String interfaceName, final String ip, final String mac )
+    {
+        this.interfaceName = interfaceName;
+        this.ip = ip;
+        this.mac = mac;
     }
 
 

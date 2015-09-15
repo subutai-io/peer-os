@@ -23,7 +23,6 @@ import javax.persistence.Table;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
-import io.subutai.common.peer.ContainerHost;
 
 
 /**
@@ -31,7 +30,7 @@ import io.subutai.common.peer.ContainerHost;
  */
 @Entity
 @Access( AccessType.FIELD )
-@Table( name = "container_host_model" )
+@Table( name = "node_container_host_model" )
 public class ContainerHostInfoModel implements HostInfo, Serializable
 {
     @Id
@@ -42,11 +41,11 @@ public class ContainerHostInfoModel implements HostInfo, Serializable
     private String hostname;
 
 
-    @JoinColumn( name = "host_interfaces" )
-    @OneToMany( cascade = CascadeType.ALL,
-            fetch = FetchType.EAGER,
-            orphanRemoval = true,
-            targetEntity = HostInterface.class )
+    @JoinColumn( name = "net_interfaces" )
+    @OneToMany( orphanRemoval = true,
+            targetEntity = HostInterface.class,
+            cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER )
     private Set<Interface> netInterfaces = new HashSet<>();
 
     @Column( name = "arch" )
@@ -56,6 +55,24 @@ public class ContainerHostInfoModel implements HostInfo, Serializable
     @ManyToOne
     @JoinColumn( name = "requested_host" )
     private RequestedHostImpl requestedHost;
+
+
+    public ContainerHostInfoModel( final String id, final String hostname, final Set<Interface> netInterfaces,
+                                   final HostArchitecture hostArchitecture )
+    {
+        this.id = id;
+        this.hostname = hostname;
+        this.netInterfaces = netInterfaces;
+        for ( final Interface netInterface : netInterfaces )
+        {
+            this.netInterfaces.add( new HostInterface( netInterface ) );
+        }
+        this.hostArchitecture = hostArchitecture;
+        if ( hostArchitecture == null )
+        {
+            this.hostArchitecture = HostArchitecture.AMD64;
+        }
+    }
 
 
     public ContainerHostInfoModel( HostInfo hostInfo )
@@ -68,22 +85,6 @@ public class ContainerHostInfoModel implements HostInfo, Serializable
             hostArchitecture = HostArchitecture.AMD64;
         }
         for ( Interface anInterface : hostInfo.getInterfaces() )
-        {
-            this.netInterfaces.add( new HostInterface( anInterface ) );
-        }
-    }
-
-
-    public ContainerHostInfoModel( final ContainerHost containerHost )
-    {
-        this.id = containerHost.getId().toString();
-        this.hostname = containerHost.getHostname();
-        this.hostArchitecture = containerHost.getHostArchitecture();
-        if ( hostArchitecture == null )
-        {
-            hostArchitecture = HostArchitecture.AMD64;
-        }
-        for ( Interface anInterface : containerHost.getNetInterfaces() )
         {
             this.netInterfaces.add( new HostInterface( anInterface ) );
         }
@@ -164,5 +165,17 @@ public class ContainerHostInfoModel implements HostInfo, Serializable
         result = 31 * result + netInterfaces.hashCode();
         result = 31 * result + hostArchitecture.hashCode();
         return result;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "ContainerHostInfoModel{" +
+                "id='" + id + '\'' +
+                ", hostname='" + hostname + '\'' +
+                ", netInterfaces=" + netInterfaces +
+                ", hostArchitecture=" + hostArchitecture +
+                '}';
     }
 }

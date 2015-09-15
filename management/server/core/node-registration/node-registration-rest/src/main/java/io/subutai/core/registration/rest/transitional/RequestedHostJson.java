@@ -57,7 +57,7 @@ public class RequestedHostJson implements RequestedHost
     }
 
 
-    public Set<Interface> getInterfaces()
+    public Set<Interface> getNetInterfaces()
     {
         Set<Interface> temp = Sets.newHashSet();
         temp.addAll( interfaces );

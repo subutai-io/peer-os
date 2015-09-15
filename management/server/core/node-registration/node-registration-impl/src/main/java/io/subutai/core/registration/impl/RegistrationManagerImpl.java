@@ -66,6 +66,21 @@ public class RegistrationManagerImpl implements RegistrationManager
     {
         containerTokenDataService = new ContainerTokenDataService( daoManager );
         requestDataService = new RequestDataService( daoManager );
+
+        //        Interface hostInterface = new HostInterface( "iName1", "ip", "mac" );
+        //        Interface hostInterface1 = new HostInterface( "iName2", "ip", "mac" );
+        //        HostInfo containerHostInfoModel =
+        //                new ContainerHostInfoModel( UUID.randomUUID().toString(), "hostname", Sets.newHashSet(
+        // hostInterface1 ),
+        //                        HostArchitecture.AMD64 );
+        //
+        //        RequestedHostImpl requestedHost =
+        //                new RequestedHostImpl( UUID.randomUUID().toString(), UUID.randomUUID().toString(),
+        //                        HostArchitecture.AMD64, "secret", "publicKey", "restHook", RegistrationStatus
+        // .REQUESTED,
+        //                        Sets.newHashSet( hostInterface ), Sets.newHashSet( containerHostInfoModel ) );
+        //
+        //        requestDataService.update( requestedHost );
     }
 
 
@@ -123,12 +138,12 @@ public class RegistrationManagerImpl implements RegistrationManager
             RequestedHostImpl temp =
                     new RequestedHostImpl( requestedHost.getId(), requestedHost.getHostname(), requestedHost.getArch(),
                             requestedHost.getSecret(), requestedHost.getPublicKey(), requestedHost.getRestHook(),
-                            RegistrationStatus.REQUESTED, requestedHost.getInterfaces() );
+                            RegistrationStatus.REQUESTED, requestedHost.getNetInterfaces() );
             try
             {
                 requestDataService.persist( temp );
 
-                securityManager.getKeyManager().savePublicKeyRing( temp.getId(),(short)2 , temp.getPublicKey() );
+                securityManager.getKeyManager().savePublicKeyRing( temp.getId(), ( short ) 2, temp.getPublicKey() );
             }
             catch ( Exception ex )
             {

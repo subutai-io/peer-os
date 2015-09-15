@@ -1,6 +1,7 @@
 package io.subutai.core.registration.impl.entity.entity;
 
 
+import java.util.HashSet;
 import java.util.UUID;
 
 import org.junit.Before;
@@ -33,8 +34,8 @@ public class RequestedHostImplTest
     public void setUp() throws Exception
     {
         requestedHost =
-                new RequestedHostImpl( uuid.toString(), "hostname", HostArchitecture.AMD64, "publicKey", "restHook",
-                        RegistrationStatus.REQUESTED );
+                new RequestedHostImpl( uuid.toString(), "hostname", HostArchitecture.AMD64, "secret", "publicKey",
+                        "restHook", RegistrationStatus.REQUESTED, new HashSet<Interface>() );
     }
 
 
@@ -55,15 +56,15 @@ public class RequestedHostImplTest
     @Test
     public void testGetInterfaces() throws Exception
     {
-        assertArrayEquals( Sets.newHashSet().toArray(), requestedHost.getInterfaces().toArray() );
+        assertArrayEquals( Sets.newHashSet().toArray(), requestedHost.getNetInterfaces().toArray() );
     }
 
 
     @Test
     public void testSetInterfaces() throws Exception
     {
-        requestedHost.setInterfaces( Sets.newHashSet( mock( Interface.class ) ) );
-        assertEquals( 1, requestedHost.getInterfaces().size() );
+        requestedHost.setNetInterfaces( Sets.newHashSet( mock( Interface.class ) ) );
+        assertEquals( 1, requestedHost.getNetInterfaces().size() );
     }
 
 

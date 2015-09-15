@@ -17,7 +17,7 @@ public interface RequestedHost
 
     public String getHostname();
 
-    public Set<Interface> getInterfaces();
+    public Set<Interface> getNetInterfaces();
 
     public HostArchitecture getArch();
 

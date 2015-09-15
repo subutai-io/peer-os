@@ -18,7 +18,7 @@ import io.subutai.core.registration.api.service.ContainerToken;
  * Created by talas on 8/28/15.
  */
 @Entity
-@Table( name = "containers_token" )
+@Table( name = "node_containers_token" )
 @Access( AccessType.FIELD )
 public class ContainerTokenImpl implements ContainerToken, Serializable
 {
