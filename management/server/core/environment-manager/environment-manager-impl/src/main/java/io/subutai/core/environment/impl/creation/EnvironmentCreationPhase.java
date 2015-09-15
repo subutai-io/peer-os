@@ -20,14 +20,19 @@ public enum EnvironmentCreationPhase implements WorkflowStep<EnvironmentCreation
 
                     System.out.println( environmentCreationWorkflow.getSubnetCidr() );
 
-                    return EXCHANGE_KEYS;
+
+                    //TODO initialize environment here
+
+                    return GENERATE_KEYS;
                 }
             },
-    EXCHANGE_KEYS
+    GENERATE_KEYS
             {
                 public EnvironmentCreationPhase execute( Workflow<EnvironmentCreationPhase> workflow )
                 {
-                    System.out.println( "EXCHANGE_KEYS" );
+                    System.out.println( "GENERATE_KEYS" );
+
+                    //TODO generate & exchange PEKs here
 
                     return SETUP_N2N;
                 }
@@ -38,6 +43,9 @@ public enum EnvironmentCreationPhase implements WorkflowStep<EnvironmentCreation
                 {
                     System.out.println( "SETUP_N2N" );
 
+
+                    //TODO setup N2N here
+
                     return SETUP_VNI;
                 }
             },
@@ -46,6 +54,8 @@ public enum EnvironmentCreationPhase implements WorkflowStep<EnvironmentCreation
                 public EnvironmentCreationPhase execute( Workflow<EnvironmentCreationPhase> workflow )
                 {
                     System.out.println( "SETUP_VNI" );
+
+                    //TODO clone containers here
 
                     return CLONE_CONTAINERS;
                 }
@@ -64,9 +74,13 @@ public enum EnvironmentCreationPhase implements WorkflowStep<EnvironmentCreation
                 public EnvironmentCreationPhase execute( Workflow<EnvironmentCreationPhase> workflow )
                 {
                     System.out.println( "FINALIZE" );
+
+                    //TODO finalize environment creation here, e.g. save env/container metadata to database
+
                     EnvironmentCreationWorkflow environmentCreationWorkflow = ( EnvironmentCreationWorkflow ) workflow;
 
                     environmentCreationWorkflow.setCompleted( true );
+
 
                     workflow.stop();
                     return null;

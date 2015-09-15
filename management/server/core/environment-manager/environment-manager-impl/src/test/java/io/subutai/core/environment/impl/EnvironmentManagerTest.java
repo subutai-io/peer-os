@@ -1,4 +1,4 @@
-package io.subutai.core.environment.api;
+package io.subutai.core.environment.impl;
 
 
 import org.junit.Before;
@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.common.environment.Topology;
-import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 
 
 @RunWith( MockitoJUnitRunner.class )
