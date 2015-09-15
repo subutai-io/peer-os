@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
 import org.slf4j.Logger;
@@ -42,6 +43,8 @@ public class ImportEnvironmentTask implements Awaitable
     private final Topology topology;
     private final ResultHolder<EnvironmentCreationException> resultHolder;
     private final TrackerOperation op;
+    private final UUID resourceHostId;
+    private final Integer envVlan;
     protected Semaphore semaphore;
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
 
@@ -49,7 +52,7 @@ public class ImportEnvironmentTask implements Awaitable
     public ImportEnvironmentTask( final LocalPeer localPeer, final EnvironmentManagerImpl environmentManager,
                                   final EnvironmentImpl environment, final Topology topology,
                                   final ResultHolder<EnvironmentCreationException> resultHolder,
-                                  final TrackerOperation op )
+                                  final TrackerOperation op, Integer envVlan, final UUID resourceHostId )
     {
         this.localPeer = localPeer;
         this.environmentManager = environmentManager;
@@ -58,6 +61,8 @@ public class ImportEnvironmentTask implements Awaitable
         this.resultHolder = resultHolder;
         this.op = op;
         this.semaphore = new Semaphore( 0 );
+        this.envVlan = envVlan;
+        this.resourceHostId = resourceHostId;
     }
 
 
@@ -125,7 +130,7 @@ public class ImportEnvironmentTask implements Awaitable
             long vni = environmentManager.findFreeVni( allPeers );
 
             //reserve VNI on local peer
-            Vni newVni = new Vni( vni, environment.getId() );
+            Vni newVni = new Vni( vni, envVlan, environment.getId() );
 
             op.addLog( "Reserving new vni on local peer..." );
 
@@ -148,7 +153,7 @@ public class ImportEnvironmentTask implements Awaitable
             //save environment VNI
             environment.setVni( vni );
 
-            environmentManager.growEnvironment( environment.getId(), topology, false, false, op );
+            environmentManager.configureEnvironment( environment.getId(), resourceHostId, op );
 
             op.addLogDone( "Environment created successfully" );
         }
