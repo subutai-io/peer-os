@@ -7,9 +7,9 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.Interface;
-import io.subutai.common.peer.HostInfoModel;
 import io.subutai.common.peer.InterfaceModel;
 import io.subutai.core.registration.api.RegistrationStatus;
+import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.RequestedHost;
 
 
@@ -25,7 +25,7 @@ public class RequestedHostJson implements RequestedHost
     private String restHook;
     private RegistrationStatus status;
 
-    private Set<HostInfoModel> hostInfoModelSet = Sets.newHashSet();
+    private Set<ContainerInfoJson> hostInfoSet = Sets.newHashSet();
 
 
     public RequestedHostJson()
@@ -69,6 +69,15 @@ public class RequestedHostJson implements RequestedHost
     public void setInterfaces( final Set<InterfaceModel> interfaces )
     {
         this.interfaces = interfaces;
+    }
+
+
+    @Override
+    public Set<ContainerInfo> getHostInfoSet()
+    {
+        Set<ContainerInfo> result = Sets.newHashSet();
+        result.addAll( hostInfoSet );
+        return result;
     }
 
 
@@ -157,10 +166,13 @@ public class RequestedHostJson implements RequestedHost
                 "id='" + id + '\'' +
                 ", hostname='" + hostname + '\'' +
                 ", interfaces=" + interfaces +
+                ", hostInfoSet=" + hostInfoSet +
                 ", arch=" + arch +
+                ", secret='" + secret + '\'' +
                 ", publicKey='" + publicKey + '\'' +
                 ", restHook='" + restHook + '\'' +
                 ", status=" + status +
+                ", hostInfoSet=" + hostInfoSet +
                 '}';
     }
 }

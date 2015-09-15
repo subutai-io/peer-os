@@ -19,6 +19,8 @@ public interface RequestedHost
 
     public Set<Interface> getNetInterfaces();
 
+    public Set<ContainerInfo> getHostInfoSet();
+
     public HostArchitecture getArch();
 
     public RegistrationStatus getStatus();

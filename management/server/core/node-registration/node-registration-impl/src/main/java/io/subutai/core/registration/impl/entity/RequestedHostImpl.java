@@ -22,9 +22,9 @@ import javax.persistence.Table;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
 import io.subutai.core.registration.api.RegistrationStatus;
+import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.RequestedHost;
 
 
@@ -43,11 +43,6 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     @Column( name = "hostname" )
     private String hostname;
 
-    //    private InterfaceModel interfaceModel;
-
-
-    //    @Column( name = "interface_model" )
-    //    @OneToOne( fetch = FetchType.EAGER, cascade = CascadeType.ALL )
     @JoinColumn( name = "net_interfaces" )
     @OneToMany( orphanRemoval = true,
             targetEntity = HostInterface.class,
@@ -73,16 +68,41 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     @Enumerated( EnumType.STRING )
     private RegistrationStatus status;
 
-    @OneToMany( targetEntity = ContainerHostInfoModel.class,
+    @OneToMany( targetEntity = ContainerInfoImpl.class,
             mappedBy = "requestedHost",
             cascade = CascadeType.ALL,
             fetch = FetchType.EAGER,
             orphanRemoval = true )
-    private Set<HostInfo> hostInfoSet = Sets.newHashSet();
+    private Set<ContainerInfo> hostInfoSet = Sets.newHashSet();
 
 
     public RequestedHostImpl()
     {
+    }
+
+
+    public RequestedHostImpl( final RequestedHost requestedHost )
+    {
+        this.id = requestedHost.getId();
+        this.hostname = requestedHost.getHostname();
+        this.arch = requestedHost.getArch();
+        this.secret = requestedHost.getSecret();
+        this.publicKey = requestedHost.getPublicKey();
+        this.restHook = requestedHost.getRestHook();
+        this.status = requestedHost.getStatus();
+        Set<Interface> netInterfaces = requestedHost.getNetInterfaces();
+        for ( final Interface netInterface : netInterfaces )
+        {
+            this.netInterfaces.add( netInterface );
+        }
+
+        Set<ContainerInfo> hostInfoSet = requestedHost.getHostInfoSet();
+        for ( final ContainerInfo containerInfo : hostInfoSet )
+        {
+            ContainerInfoImpl containerInfoImpl = new ContainerInfoImpl( containerInfo );
+            containerInfoImpl.setRequestedHost( this );
+            this.hostInfoSet.add( containerInfoImpl );
+        }
     }
 
 
@@ -107,7 +127,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
 
     public RequestedHostImpl( final String id, final String hostname, final HostArchitecture arch, final String secret,
                               final String publicKey, final String restHook, final RegistrationStatus status,
-                              final HashSet<Interface> netInterfaces, final HashSet<HostInfo> hostInfoSet )
+                              final HashSet<Interface> netInterfaces, final HashSet<ContainerInfo> hostInfoSet )
     {
         this.id = id;
         this.hostname = hostname;
@@ -120,11 +140,11 @@ public class RequestedHostImpl implements RequestedHost, Serializable
         {
             this.netInterfaces.add( new HostInterface( anInterface ) );
         }
-        for ( final HostInfo hostInfo : hostInfoSet )
+        for ( final ContainerInfo hostInfo : hostInfoSet )
         {
-            ContainerHostInfoModel containerHostInfoModel = new ContainerHostInfoModel( hostInfo );
-            containerHostInfoModel.setRequestedHost( this );
-            this.hostInfoSet.add( containerHostInfoModel );
+            ContainerInfoImpl containerInfoImpl = new ContainerInfoImpl( hostInfo );
+            containerInfoImpl.setRequestedHost( this );
+            this.hostInfoSet.add( containerInfoImpl );
         }
     }
 
@@ -136,13 +156,14 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     }
 
 
-    public Set<HostInfo> getHostInfoSet()
+    @Override
+    public Set<ContainerInfo> getHostInfoSet()
     {
         return hostInfoSet;
     }
 
 
-    public void setHostInfoSet( final Set<HostInfo> hostInfoSet )
+    public void setHostInfoSet( final Set<ContainerInfo> hostInfoSet )
     {
         this.hostInfoSet = hostInfoSet;
     }

@@ -70,7 +70,7 @@ public class RegistrationManagerImpl implements RegistrationManager
         //        Interface hostInterface = new HostInterface( "iName1", "ip", "mac" );
         //        Interface hostInterface1 = new HostInterface( "iName2", "ip", "mac" );
         //        HostInfo containerHostInfoModel =
-        //                new ContainerHostInfoModel( UUID.randomUUID().toString(), "hostname", Sets.newHashSet(
+        //                new ContainerInfoImpl( UUID.randomUUID().toString(), "hostname", Sets.newHashSet(
         // hostInterface1 ),
         //                        HostArchitecture.AMD64 );
         //
@@ -135,14 +135,10 @@ public class RegistrationManagerImpl implements RegistrationManager
         }
         else
         {
-            RequestedHostImpl temp =
-                    new RequestedHostImpl( requestedHost.getId(), requestedHost.getHostname(), requestedHost.getArch(),
-                            requestedHost.getSecret(), requestedHost.getPublicKey(), requestedHost.getRestHook(),
-                            RegistrationStatus.REQUESTED, requestedHost.getNetInterfaces() );
+            RequestedHostImpl temp = new RequestedHostImpl( requestedHost );
             try
             {
                 requestDataService.persist( temp );
-
                 securityManager.getKeyManager().savePublicKeyRing( temp.getId(), ( short ) 2, temp.getPublicKey() );
             }
             catch ( Exception ex )

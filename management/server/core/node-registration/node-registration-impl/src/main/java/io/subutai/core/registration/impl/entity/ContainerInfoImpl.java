@@ -21,8 +21,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
+import io.subutai.core.registration.api.service.ContainerInfo;
 
 
 /**
@@ -31,7 +31,7 @@ import io.subutai.common.host.Interface;
 @Entity
 @Access( AccessType.FIELD )
 @Table( name = "node_container_host_model" )
-public class ContainerHostInfoModel implements HostInfo, Serializable
+public class ContainerInfoImpl implements ContainerInfo, Serializable
 {
     @Id
     @Column( name = "id" )
@@ -39,6 +39,12 @@ public class ContainerHostInfoModel implements HostInfo, Serializable
 
     @Column( name = "hostname" )
     private String hostname;
+
+    @Column( name = "vlan" )
+    private Integer vlan;
+
+    @Column( name = "templateName" )
+    private String templateName;
 
 
     @JoinColumn( name = "net_interfaces" )
@@ -57,8 +63,8 @@ public class ContainerHostInfoModel implements HostInfo, Serializable
     private RequestedHostImpl requestedHost;
 
 
-    public ContainerHostInfoModel( final String id, final String hostname, final Set<Interface> netInterfaces,
-                                   final HostArchitecture hostArchitecture )
+    public ContainerInfoImpl( final String id, final String hostname, final Set<Interface> netInterfaces,
+                              final HostArchitecture hostArchitecture )
     {
         this.id = id;
         this.hostname = hostname;
@@ -75,10 +81,12 @@ public class ContainerHostInfoModel implements HostInfo, Serializable
     }
 
 
-    public ContainerHostInfoModel( HostInfo hostInfo )
+    public ContainerInfoImpl( ContainerInfo hostInfo )
     {
         this.id = hostInfo.getId().toString();
         this.hostname = hostInfo.getHostname();
+        this.templateName = hostInfo.getTemplateName();
+        this.vlan = hostInfo.getVlan();
         this.hostArchitecture = hostInfo.getArch();
         if ( hostArchitecture == null )
         {
@@ -132,7 +140,33 @@ public class ContainerHostInfoModel implements HostInfo, Serializable
 
 
     @Override
-    public int compareTo( final HostInfo o )
+    public String getTemplateName()
+    {
+        return templateName;
+    }
+
+
+    public void setTemplateName( final String templateName )
+    {
+        this.templateName = templateName;
+    }
+
+
+    @Override
+    public Integer getVlan()
+    {
+        return vlan;
+    }
+
+
+    public void setVlan( final Integer vlan )
+    {
+        this.vlan = vlan;
+    }
+
+
+    @Override
+    public int compareTo( final ContainerInfo o )
     {
         return hostname.compareTo( o.getHostname() );
     }
@@ -145,12 +179,12 @@ public class ContainerHostInfoModel implements HostInfo, Serializable
         {
             return true;
         }
-        if ( !( o instanceof ContainerHostInfoModel ) )
+        if ( !( o instanceof ContainerInfoImpl ) )
         {
             return false;
         }
 
-        final ContainerHostInfoModel that = ( ContainerHostInfoModel ) o;
+        final ContainerInfoImpl that = ( ContainerInfoImpl ) o;
 
         return hostArchitecture == that.hostArchitecture && hostname.equals( that.hostname ) && id.equals( that.id )
                 && netInterfaces.equals( that.netInterfaces );
@@ -171,7 +205,7 @@ public class ContainerHostInfoModel implements HostInfo, Serializable
     @Override
     public String toString()
     {
-        return "ContainerHostInfoModel{" +
+        return "ContainerInfoImpl{" +
                 "id='" + id + '\'' +
                 ", hostname='" + hostname + '\'' +
                 ", netInterfaces=" + netInterfaces +
