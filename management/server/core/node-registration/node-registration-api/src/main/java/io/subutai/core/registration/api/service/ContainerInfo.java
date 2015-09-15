@@ -5,13 +5,14 @@ import java.util.Set;
 import java.util.UUID;
 
 import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
 
 
 /**
  * Created by talas on 9/15/15.
  */
-public interface ContainerInfo extends Comparable<ContainerInfo>
+public interface ContainerInfo extends HostInfo
 {
     /**
      * Returns id of host
@@ -45,4 +46,10 @@ public interface ContainerInfo extends Comparable<ContainerInfo>
      * Returns container vlan
      */
     public Integer getVlan();
+
+
+    /**
+     * Container host public key
+     */
+    public String getPublicKey();
 }

@@ -16,6 +16,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -37,6 +38,10 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
     @Id
     @Column( name = "id" )
     private String id;
+
+    @Lob
+    @Column
+    private String publicKey;
 
     @Column( name = "hostname" )
     private String hostname;
@@ -64,8 +69,13 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
     private RequestedHostImpl requestedHost;
 
 
+    public ContainerInfoImpl()
+    {
+    }
+
+
     public ContainerInfoImpl( final String id, final String hostname, final Set<Interface> netInterfaces,
-                              final HostArchitecture hostArchitecture )
+                              final HostArchitecture hostArchitecture, String publicKey )
     {
         this.id = id;
         this.hostname = hostname;
@@ -75,6 +85,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
             this.netInterfaces.add( new HostInterface( netInterface ) );
         }
         this.hostArchitecture = hostArchitecture;
+        this.publicKey = publicKey;
         if ( hostArchitecture == null )
         {
             this.hostArchitecture = HostArchitecture.AMD64;
@@ -89,6 +100,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
         this.templateName = hostInfo.getTemplateName();
         this.vlan = hostInfo.getVlan();
         this.hostArchitecture = hostInfo.getArch();
+        this.publicKey = hostInfo.getPublicKey();
         if ( hostArchitecture == null )
         {
             hostArchitecture = HostArchitecture.AMD64;
@@ -150,6 +162,19 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
     public void setTemplateName( final String templateName )
     {
         this.templateName = templateName;
+    }
+
+
+    @Override
+    public String getPublicKey()
+    {
+        return publicKey;
+    }
+
+
+    public void setPublicKey( final String publicKey )
+    {
+        this.publicKey = publicKey;
     }
 
 

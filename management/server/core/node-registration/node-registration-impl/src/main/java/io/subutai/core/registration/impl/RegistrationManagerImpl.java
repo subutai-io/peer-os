@@ -170,11 +170,10 @@ public class RegistrationManagerImpl implements RegistrationManager
         }
         else
         {
-            RequestedHostImpl temp = new RequestedHostImpl( requestedHost );
+            RequestedHostImpl registrationRequest = new RequestedHostImpl( requestedHost );
             try
             {
-                requestDataService.persist( temp );
-                securityManager.getKeyManager().savePublicKeyRing( temp.getId(), ( short ) 2, temp.getPublicKey() );
+                requestDataService.persist( registrationRequest );
             }
             catch ( Exception ex )
             {
@@ -218,6 +217,8 @@ public class RegistrationManagerImpl implements RegistrationManager
         RequestedHostImpl registrationRequest = requestDataService.find( requestId );
         registrationRequest.setStatus( RegistrationStatus.APPROVED );
         requestDataService.update( registrationRequest );
+        KeyManager keyManager = securityManager.getKeyManager();
+        keyManager.savePublicKeyRing( registrationRequest.getId(), ( short ) 2, registrationRequest.getPublicKey() );
 
         WebClient client = RestUtil.createWebClient( registrationRequest.getRestHook() );
         Form form = new Form();
@@ -259,6 +260,9 @@ public class RegistrationManagerImpl implements RegistrationManager
             groupedContainers.put( containerInfo.getTemplateName(), group );
 
             groupedContainersByVlan.put( containerInfo.getVlan(), groupedContainers );
+
+            //save container hosts' public keys
+            keyManager.savePublicKeyRing( containerInfo.getId().toString(), ( short ) 2, containerInfo.getPublicKey() );
         }
 
         LocalPeer localPeer = peerManager.getLocalPeer();

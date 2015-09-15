@@ -8,6 +8,7 @@ import java.util.UUID;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
 import io.subutai.common.peer.InterfaceModel;
 import io.subutai.core.registration.api.service.ContainerInfo;
@@ -24,6 +25,7 @@ public class ContainerInfoJson implements ContainerInfo
     private String templateName;
     private Set<InterfaceModel> netInterfaces = new HashSet<>();
     private HostArchitecture hostArchitecture;
+    private String publicKey;
 
 
     public ContainerInfoJson()
@@ -38,6 +40,7 @@ public class ContainerInfoJson implements ContainerInfo
         this.templateName = hostInfo.getTemplateName();
         this.vlan = hostInfo.getVlan();
         this.hostArchitecture = hostInfo.getArch();
+        this.publicKey = hostInfo.getPublicKey();
         if ( hostArchitecture == null )
         {
             hostArchitecture = HostArchitecture.AMD64;
@@ -106,7 +109,20 @@ public class ContainerInfoJson implements ContainerInfo
 
 
     @Override
-    public int compareTo( final ContainerInfo o )
+    public String getPublicKey()
+    {
+        return publicKey;
+    }
+
+
+    public void setPublicKey( final String publicKey )
+    {
+        this.publicKey = publicKey;
+    }
+
+
+    @Override
+    public int compareTo( final HostInfo o )
     {
         return hostname.compareTo( o.getHostname() );
     }
