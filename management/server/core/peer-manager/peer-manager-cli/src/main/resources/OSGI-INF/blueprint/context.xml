@@ -68,14 +68,6 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="peer/clean">
-      <action class="io.subutai.core.peer.cli.CleanCommand">
-        <property name="peerManager" ref="peerManager" />
-      </action>
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="peer/tag-container">
       <action class="io.subutai.core.peer.cli.TagCommand">
         <property name="peerManager" ref="peerManager" />

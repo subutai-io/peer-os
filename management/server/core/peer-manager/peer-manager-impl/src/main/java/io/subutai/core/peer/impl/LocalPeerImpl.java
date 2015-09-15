@@ -883,7 +883,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( host, "Cannot operate on null container host" );
 
-        ContainerHostEntity containerHost = ( ContainerHostEntity ) bindHost( host.getHostId() );
+        ContainerHostEntity containerHost = ( ContainerHostEntity ) bindHost( host.getId() );
         ResourceHost resourceHost = containerHost.getParent();
         try
         {
@@ -906,7 +906,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             ContainerHostEntity entity = ( ContainerHostEntity ) bindHost( host.getId() );
             ResourceHost resourceHost = entity.getParent();
             resourceHost.destroyContainerHost( host );
-            containerHostDataService.remove( host.getHostId() );
+            containerHostDataService.remove( host.getId() );
             ( ( ResourceHostEntity ) entity.getParent() ).removeContainerHost( entity );
 
             //update container group
@@ -942,7 +942,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     protected void cleanupEnvironmentNetworkSettings( final ContainerGroupEntity containerGroup )
     {
-        containerGroupDataService.remove( containerGroup.getEnvironmentId().toString() );
+        containerGroupDataService.remove( containerGroup.getEnvironmentId() );
 
         //cleanup environment network settings
         try
@@ -1027,7 +1027,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         try
         {
-            Host c = bindHost( host.getHostId() );
+            Host c = bindHost( host.getId() );
             quotaManager.setQuota( c.getHostname(), quota );
         }
         catch ( QuotaException e )
@@ -1102,11 +1102,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( callback == null )
         {
-            result = commandExecutor.execute( host.getId().toString(), requestBuilder );
+            result = commandExecutor.execute( host.getId(), requestBuilder );
         }
         else
         {
-            result = commandExecutor.execute( host.getId().toString(), requestBuilder, callback );
+            result = commandExecutor.execute( host.getId(), requestBuilder, callback );
         }
 
         return result;
@@ -1137,11 +1137,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( callback == null )
         {
-            commandExecutor.executeAsync( host.getId().toString(), requestBuilder );
+            commandExecutor.executeAsync( host.getId(), requestBuilder );
         }
         else
         {
-            commandExecutor.executeAsync( host.getId().toString(), requestBuilder, callback );
+            commandExecutor.executeAsync( host.getId(), requestBuilder, callback );
         }
     }
 
@@ -1157,30 +1157,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public boolean isLocal()
     {
         return true;
-    }
-
-
-    public void cleanDb()
-    {
-        if ( managementHost != null && managementHost.getId() != null )
-        {
-            managementHostDataService.remove( managementHost.getHostId() );
-            managementHost = null;
-        }
-
-        for ( ResourceHost resourceHost : getResourceHosts() )
-        {
-            for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
-            {
-                containerHostDataService.remove( containerHost.getHostId() );
-                ( ( ResourceHostEntity ) resourceHost ).removeContainerHost( containerHost );
-            }
-            resourceHostDataService.remove( resourceHost.getHostId() );
-        }
-        synchronized ( resourceHosts )
-        {
-            resourceHosts.clear();
-        }
     }
 
 
@@ -1259,7 +1235,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 if ( managementHost == null )
                 {
-                    managementHost = new ManagementHostEntity( getId().toString(), resourceHostInfo );
+                    managementHost = new ManagementHostEntity( getId(), resourceHostInfo );
                     ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
                     try
                     {
@@ -1313,7 +1289,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             newContainerIds.add( containerHostInfo.getId() );
 
-            ContainerHost containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
+            ContainerHost containerHost = new ContainerHostEntity( getId(), containerHostInfo );
             setContainersTransientFields( Sets.newHashSet( containerHost ) );
             ( ( ResourceHostEntity ) resourceHost ).addContainerHost( containerHost );
 
@@ -1332,7 +1308,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             if ( !newContainerIds.contains( oldHost.getId() ) )
             {
                 //remove container which is missing in heartbeat
-                containerHostDataService.remove( oldHost.getHostId() );
+                containerHostDataService.remove( oldHost.getId() );
                 ( ( ResourceHostEntity ) resourceHost ).removeContainerHost( oldHost );
             }
         }
@@ -1895,7 +1871,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 PGPSecretKeyRing peerSecRing = keyManager.getSecretKeyRing( null );
 
                 //************Sign Key **************************************************************
-                pubRing = encTool.signPublicKey( pubRing, getId().toString(), peerSecRing.getSecretKey(), "" );
+                pubRing = encTool.signPublicKey( pubRing, getId(), peerSecRing.getSecretKey(), "" );
 
                 //***************Save Keys *********************************************************
                 keyManager.saveSecretKeyRing( environmentId, ( short ) 2, secRing );
@@ -1913,10 +1889,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         catch ( PGPException ex )
         {
             return 0;
-        }
-        catch ( Exception ex )
-        {
-            throw ex;
         }
     }
 

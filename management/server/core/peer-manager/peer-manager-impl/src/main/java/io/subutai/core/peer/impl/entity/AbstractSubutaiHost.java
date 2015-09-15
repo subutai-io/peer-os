@@ -260,7 +260,7 @@ public abstract class AbstractSubutaiHost implements Host
 
         final AbstractSubutaiHost that = ( AbstractSubutaiHost ) o;
 
-        return getHostId().equals( that.getHostId() );
+        return getId().equals( that.getId() );
     }
 
 

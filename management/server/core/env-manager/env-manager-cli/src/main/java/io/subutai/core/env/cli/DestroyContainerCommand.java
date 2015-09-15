@@ -66,7 +66,8 @@ public class DestroyContainerCommand extends SubutaiShellCommandSupport
             {
                 if ( containerHost.getId().equals( containerIdStr ) )
                 {
-                    environmentManager.destroyContainer( containerHost, async, forceMetadataRemoval );
+                    environmentManager.destroyContainer( environment.getId(), containerHost.getId(), async,
+                            forceMetadataRemoval );
 
                     System.out.println( "Container destroyed" );
 

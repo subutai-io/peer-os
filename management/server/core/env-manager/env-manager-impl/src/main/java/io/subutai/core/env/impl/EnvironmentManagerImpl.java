@@ -431,28 +431,30 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void destroyContainer( final ContainerHost containerHost, final boolean async,
+    public void destroyContainer( final String environmentId, final String containerId, final boolean async,
                                   final boolean forceMetadataRemoval )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        Preconditions.checkNotNull( containerHost, "Invalid container host" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
 
         TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
-                String.format( "Destroying container %s", containerHost.getHostname() ) );
+                String.format( "Destroying container %s", containerId ) );
 
-        destroyContainer( containerHost, async, forceMetadataRemoval, true, op );
+        destroyContainer( environmentId, containerId, async, forceMetadataRemoval, true, op );
     }
 
 
-    public void destroyContainer( final ContainerHost containerHost, final boolean async,
+    public void destroyContainer( final String environmentId, final String containerId, final boolean async,
                                   final boolean forceMetadataRemoval, final boolean checkAccess,
                                   final TrackerOperation op )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        Preconditions.checkNotNull( containerHost, "Invalid container host" );
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
 
-        final EnvironmentImpl environment =
-                ( EnvironmentImpl ) findEnvironment( containerHost.getEnvironmentId(), checkAccess );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
         {
@@ -465,7 +467,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         ContainerHost environmentContainer;
         try
         {
-            environmentContainer = environment.getContainerHostById( containerHost.getId() );
+            environmentContainer = environment.getContainerHostById( containerId );
         }
         catch ( ContainerHostNotFoundException e )
         {
@@ -800,7 +802,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public String getDomain( final String environmentId ) throws EnvironmentManagerException, EnvironmentNotFoundException
+    public String getDomain( final String environmentId )
+            throws EnvironmentManagerException, EnvironmentNotFoundException
     {
         return getDomain( environmentId, true );
     }

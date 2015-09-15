@@ -6,12 +6,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Sets;
+
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.env.api.EnvironmentManager;
-
-import com.google.common.collect.Sets;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -36,7 +37,7 @@ public class DestroyContainerCommandTest extends SystemOutRedirectTest
     {
         command = new DestroyContainerCommand( environmentManager );
         command.async = TestUtil.ASYNC;
-        command.containerIdStr = TestUtil.CONTAINER_ID.toString();
+        command.containerIdStr = TestUtil.CONTAINER_ID;
         command.forceMetadataRemoval = TestUtil.FORCE;
         when( containerHost.getId() ).thenReturn( TestUtil.CONTAINER_ID );
         when( environmentManager.getEnvironments() ).thenReturn( Sets.newHashSet( environment ) );
@@ -49,7 +50,8 @@ public class DestroyContainerCommandTest extends SystemOutRedirectTest
     {
         command.doExecute();
 
-        verify( environmentManager ).destroyContainer( containerHost, TestUtil.ASYNC, TestUtil.FORCE );
+        verify( environmentManager )
+                .destroyContainer( environment.getId(), containerHost.getId(), TestUtil.ASYNC, TestUtil.FORCE );
 
         when( environment.getContainerHosts() ).thenReturn( Sets.<ContainerHost>newHashSet() );
 

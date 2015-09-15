@@ -4,7 +4,6 @@ package io.subutai.core.env.impl;
 import java.io.PrintStream;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import org.junit.Before;
@@ -13,6 +12,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Blueprint;
@@ -54,10 +57,6 @@ import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.tracker.api.Tracker;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.fail;
@@ -69,6 +68,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 
 @Ignore
 @RunWith( MockitoJUnitRunner.class )
@@ -163,8 +163,7 @@ public class EnvironmentManagerImplTest
         when( environmentContainer.getPeer() ).thenReturn( peer );
         when( environmentContainer.getId() ).thenReturn( TestUtil.CONTAINER_ID );
         when( peer.getContainerHostInfoById( TestUtil.CONTAINER_ID ) ).thenReturn( hostInfo );
-        when( environmentContainerDataService.find( TestUtil.CONTAINER_ID.toString() ) )
-                .thenReturn( environmentContainer );
+        when( environmentContainerDataService.find( TestUtil.CONTAINER_ID ) ).thenReturn( environmentContainer );
         when( environmentDataService.getAll() ).thenReturn( Sets.newHashSet( environment ) );
         Map<Peer, Set<NodeGroup>> nodeGroupPlacement = Maps.newHashMap();
         nodeGroupPlacement.put( peer, Sets.newHashSet( nodeGroup ) );
@@ -182,7 +181,7 @@ public class EnvironmentManagerImplTest
         when( nodeGroup.getContainerPlacementStrategy() ).thenReturn( placementStrategy );
         when( placementStrategy.getStrategyId() ).thenReturn( "ROUND-ROBIN" );
         when( placementStrategy.getCriteriaAsList() ).thenReturn( Lists.<Criteria>newArrayList() );
-        when( environmentContainer.getEnvironmentId() ).thenReturn( TestUtil.ENV_ID.toString() );
+        when( environmentContainer.getEnvironmentId() ).thenReturn( TestUtil.ENV_ID );
         when( vni.getVni() ).thenReturn( TestUtil.VNI );
     }
 
@@ -342,7 +341,7 @@ public class EnvironmentManagerImplTest
     @Test( expected = EnvironmentModificationException.class )
     public void testDestroyContainer() throws Exception
     {
-        environmentManager.destroyContainer( environmentContainer, false, false );
+        environmentManager.destroyContainer( environment.getId(), environmentContainer.getId(), false, false );
 
         verify( environmentContainer ).destroy();
 
@@ -350,7 +349,7 @@ public class EnvironmentManagerImplTest
 
         try
         {
-            environmentManager.destroyContainer( environmentContainer, false, false );
+            environmentManager.destroyContainer( environment.getId(), environmentContainer.getId(), false, false );
             fail( "Expected EnvironmentModificationException" );
         }
         catch ( EnvironmentModificationException e )
@@ -362,7 +361,7 @@ public class EnvironmentManagerImplTest
         doThrow( new ContainerHostNotFoundException( null ) ).when( environment )
                                                              .getContainerHostById( any( String.class ) );
 
-        environmentManager.destroyContainer( environmentContainer, false, false );
+        environmentManager.destroyContainer( environment.getId(), environmentContainer.getId(), false, false );
     }
 
 
@@ -380,9 +379,8 @@ public class EnvironmentManagerImplTest
     {
         environmentManager.removeEnvironment( TestUtil.ENV_ID );
 
-        verify( environmentDataService ).remove( TestUtil.ENV_ID.toString() );
+        verify( environmentDataService ).remove( TestUtil.ENV_ID );
     }
-
 
 
     @Test( expected = EnvironmentManagerException.class )

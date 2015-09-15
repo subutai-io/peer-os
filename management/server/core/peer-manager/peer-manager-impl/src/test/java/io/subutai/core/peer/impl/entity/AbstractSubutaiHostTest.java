@@ -211,13 +211,6 @@ public class AbstractSubutaiHostTest
 
 
     @Test
-    public void testGetHostId() throws Exception
-    {
-        assertEquals( HOST_ID.toString(), host.getHostId() );
-    }
-
-
-    @Test
     public void testAddInterface() throws Exception
     {
         HostInterface hostInterface = mock( HostInterface.class );

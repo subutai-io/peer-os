@@ -219,7 +219,7 @@ public class EnvironmentImplTest
     {
         environment.destroyContainer( environmentContainer, false );
 
-        verify( environmentManager ).destroyContainer( environmentContainer, false, false );
+        verify( environmentManager ).destroyContainer( environment.getId(), environmentContainer.getId(), false, false );
     }
 
 

@@ -10,6 +10,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Sets;
+
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
@@ -22,11 +25,8 @@ import io.subutai.common.protocol.Template;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.env.api.exception.EnvironmentCreationException;
 import io.subutai.core.env.api.exception.EnvironmentDestructionException;
-
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
-
-import com.google.common.collect.Sets;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Matchers.any;
@@ -71,7 +71,7 @@ public class RestServiceImplTest
         when( environment.getStatus() ).thenReturn( EnvironmentStatus.HEALTHY );
         when( environment.getContainerHosts() ).thenReturn( Sets.newHashSet( containerHost ) );
         when( containerHost.getId() ).thenReturn( TestUtil.CONTAINER_ID );
-        when( containerHost.getEnvironmentId() ).thenReturn( TestUtil.ENV_ID.toString() );
+        when( containerHost.getEnvironmentId() ).thenReturn( TestUtil.ENV_ID );
         when( containerHost.getHostname() ).thenReturn( TestUtil.HOSTNAME );
         when( containerHost.getIpByInterfaceName( anyString() ) ).thenReturn( TestUtil.IP );
         when( containerHost.getTemplateName() ).thenReturn( TestUtil.TEMPLATE_NAME );
@@ -103,7 +103,7 @@ public class RestServiceImplTest
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
 
         response = restService.createEnvironment( TestUtil.ENV_NAME,
-                TestUtil.TOPOLOGY_JSON.replace( TestUtil.PEER_ID.toString(), "" ), TestUtil.SUBNET, TestUtil.SSH_KEY );
+                TestUtil.TOPOLOGY_JSON.replace( TestUtil.PEER_ID, "" ), TestUtil.SUBNET, TestUtil.SSH_KEY );
 
         assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
 
@@ -119,7 +119,7 @@ public class RestServiceImplTest
     @Test
     public void testGetContainerEnvironmentId() throws Exception
     {
-        Response response = restService.getContainerEnvironmentId( TestUtil.CONTAINER_ID.toString() );
+        Response response = restService.getContainerEnvironmentId( TestUtil.CONTAINER_ID );
 
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
 
@@ -156,7 +156,7 @@ public class RestServiceImplTest
     @Test
     public void testViewEnvironment() throws Exception
     {
-        Response response = restService.viewEnvironment( TestUtil.ENV_ID.toString() );
+        Response response = restService.viewEnvironment( TestUtil.ENV_ID );
 
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
 
@@ -166,7 +166,7 @@ public class RestServiceImplTest
 
         throwEnvironmentException();
 
-        response = restService.viewEnvironment( TestUtil.ENV_ID.toString() );
+        response = restService.viewEnvironment( TestUtil.ENV_ID );
 
         assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getStatus() );
     }
@@ -175,7 +175,7 @@ public class RestServiceImplTest
     @Test
     public void testDestroyEnvironment() throws Exception
     {
-        Response response = restService.destroyEnvironment( TestUtil.ENV_ID.toString() );
+        Response response = restService.destroyEnvironment( TestUtil.ENV_ID );
 
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
 
@@ -187,7 +187,7 @@ public class RestServiceImplTest
                                                          .destroyEnvironment( any( String.class ), anyBoolean(),
                                                                  anyBoolean() );
 
-        response = restService.destroyEnvironment( TestUtil.ENV_ID.toString() );
+        response = restService.destroyEnvironment( TestUtil.ENV_ID );
 
         assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getStatus() );
 
@@ -195,7 +195,7 @@ public class RestServiceImplTest
                                                             .destroyEnvironment( any( String.class ), anyBoolean(),
                                                                     anyBoolean() );
 
-        response = restService.destroyEnvironment( TestUtil.ENV_ID.toString() );
+        response = restService.destroyEnvironment( TestUtil.ENV_ID );
 
         assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus() );
     }
@@ -205,7 +205,7 @@ public class RestServiceImplTest
     public void testDestroyContainer() throws Exception
     {
 
-        Response response = restService.destroyContainer( TestUtil.CONTAINER_ID.toString() );
+        Response response = restService.destroyContainer( TestUtil.CONTAINER_ID );
 
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
 
@@ -218,10 +218,10 @@ public class RestServiceImplTest
         assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getStatus() );
 
         doThrow( new EnvironmentNotFoundException( "" ) ).when( environmentManager )
-                                                         .destroyContainer( any( ContainerHost.class ), anyBoolean(),
-                                                                 anyBoolean() );
+                                                         .destroyContainer( any( String.class ), any( String.class ),
+                                                                 anyBoolean(), anyBoolean() );
 
-        response = restService.destroyContainer( TestUtil.CONTAINER_ID.toString() );
+        response = restService.destroyContainer( TestUtil.CONTAINER_ID );
 
         assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus() );
     }
@@ -230,7 +230,7 @@ public class RestServiceImplTest
     @Test
     public void testGrowEnvironment() throws Exception
     {
-        Response response = restService.growEnvironment( TestUtil.ENV_ID.toString(), TestUtil.TOPOLOGY_JSON );
+        Response response = restService.growEnvironment( TestUtil.ENV_ID, TestUtil.TOPOLOGY_JSON );
 
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
 
@@ -238,8 +238,8 @@ public class RestServiceImplTest
 
         assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
 
-        response = restService.growEnvironment( TestUtil.ENV_ID.toString(),
-                TestUtil.TOPOLOGY_JSON.replace( TestUtil.PEER_ID.toString(), "" ) );
+        response = restService.growEnvironment( TestUtil.ENV_ID,
+                TestUtil.TOPOLOGY_JSON.replace( TestUtil.PEER_ID, "" ) );
 
         assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
 
@@ -247,15 +247,15 @@ public class RestServiceImplTest
                                                          .growEnvironment( any( String.class ), any( Topology.class ),
                                                                  anyBoolean() );
 
-        response = restService.growEnvironment( TestUtil.ENV_ID.toString(), TestUtil.TOPOLOGY_JSON );
+        response = restService.growEnvironment( TestUtil.ENV_ID, TestUtil.TOPOLOGY_JSON );
 
         assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getStatus() );
 
         doThrow( new EnvironmentModificationException( "" ) ).when( environmentManager )
-                                                             .growEnvironment( any( String.class ), any( Topology.class ),
-                                                                     anyBoolean() );
+                                                             .growEnvironment( any( String.class ),
+                                                                     any( Topology.class ), anyBoolean() );
 
-        response = restService.growEnvironment( TestUtil.ENV_ID.toString(), TestUtil.TOPOLOGY_JSON );
+        response = restService.growEnvironment( TestUtil.ENV_ID, TestUtil.TOPOLOGY_JSON );
 
         assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus() );
     }
@@ -264,7 +264,7 @@ public class RestServiceImplTest
     @Test
     public void testGetContainerState() throws Exception
     {
-        Response response = restService.getContainerState( TestUtil.CONTAINER_ID.toString() );
+        Response response = restService.getContainerState( TestUtil.CONTAINER_ID );
 
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
 
@@ -276,7 +276,7 @@ public class RestServiceImplTest
         doThrow( new ContainerHostNotFoundException( "" ) ).when( environment )
                                                            .getContainerHostById( TestUtil.CONTAINER_ID );
 
-        response = restService.getContainerState( TestUtil.CONTAINER_ID.toString() );
+        response = restService.getContainerState( TestUtil.CONTAINER_ID );
 
         assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus() );
 
@@ -289,7 +289,7 @@ public class RestServiceImplTest
     @Test
     public void testStartContainer() throws Exception
     {
-        Response response = restService.startContainer( TestUtil.CONTAINER_ID.toString() );
+        Response response = restService.startContainer( TestUtil.CONTAINER_ID );
 
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
 
@@ -300,7 +300,7 @@ public class RestServiceImplTest
         doThrow( new ContainerHostNotFoundException( "" ) ).when( environment )
                                                            .getContainerHostById( TestUtil.CONTAINER_ID );
 
-        response = restService.startContainer( TestUtil.CONTAINER_ID.toString() );
+        response = restService.startContainer( TestUtil.CONTAINER_ID );
 
         assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus() );
 
@@ -313,7 +313,7 @@ public class RestServiceImplTest
     @Test
     public void testStopContainer() throws Exception
     {
-        Response response = restService.stopContainer( TestUtil.CONTAINER_ID.toString() );
+        Response response = restService.stopContainer( TestUtil.CONTAINER_ID );
 
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
 
@@ -324,7 +324,7 @@ public class RestServiceImplTest
         doThrow( new ContainerHostNotFoundException( "" ) ).when( environment )
                                                            .getContainerHostById( TestUtil.CONTAINER_ID );
 
-        response = restService.stopContainer( TestUtil.CONTAINER_ID.toString() );
+        response = restService.stopContainer( TestUtil.CONTAINER_ID );
 
         assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus() );
 
@@ -337,21 +337,22 @@ public class RestServiceImplTest
     @Test
     public void testSetSshKey() throws Exception
     {
-        Response response = restService.setSshKey( TestUtil.ENV_ID.toString(), TestUtil.SSH_KEY );
+        Response response = restService.setSshKey( TestUtil.ENV_ID, TestUtil.SSH_KEY );
 
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
 
         doThrow( new EnvironmentNotFoundException( "" ) ).when( environmentManager )
                                                          .setSshKey( any( String.class ), anyString(), anyBoolean() );
 
-        response = restService.setSshKey( TestUtil.ENV_ID.toString(), TestUtil.SSH_KEY );
+        response = restService.setSshKey( TestUtil.ENV_ID, TestUtil.SSH_KEY );
 
         assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getStatus() );
 
         doThrow( new EnvironmentModificationException( "" ) ).when( environmentManager )
-                                                             .setSshKey( any( String.class ), anyString(), anyBoolean() );
+                                                             .setSshKey( any( String.class ), anyString(),
+                                                                     anyBoolean() );
 
-        response = restService.setSshKey( TestUtil.ENV_ID.toString(), TestUtil.SSH_KEY );
+        response = restService.setSshKey( TestUtil.ENV_ID, TestUtil.SSH_KEY );
 
         assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus() );
 
@@ -359,7 +360,7 @@ public class RestServiceImplTest
 
         assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
 
-        response = restService.setSshKey( TestUtil.ENV_ID.toString(), null );
+        response = restService.setSshKey( TestUtil.ENV_ID, null );
 
         assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
     }
@@ -368,7 +369,7 @@ public class RestServiceImplTest
     @Test
     public void testRemoveSshKey() throws Exception
     {
-        Response response = restService.removeSshKey( TestUtil.ENV_ID.toString() );
+        Response response = restService.removeSshKey( TestUtil.ENV_ID );
 
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
 
@@ -379,14 +380,15 @@ public class RestServiceImplTest
         doThrow( new EnvironmentNotFoundException( "" ) ).when( environmentManager )
                                                          .setSshKey( any( String.class ), anyString(), anyBoolean() );
 
-        response = restService.removeSshKey( TestUtil.ENV_ID.toString() );
+        response = restService.removeSshKey( TestUtil.ENV_ID );
 
         assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getStatus() );
 
         doThrow( new EnvironmentModificationException( "" ) ).when( environmentManager )
-                                                             .setSshKey( any( String.class ), anyString(), anyBoolean() );
+                                                             .setSshKey( any( String.class ), anyString(),
+                                                                     anyBoolean() );
 
-        response = restService.removeSshKey( TestUtil.ENV_ID.toString() );
+        response = restService.removeSshKey( TestUtil.ENV_ID );
 
         assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus() );
     }

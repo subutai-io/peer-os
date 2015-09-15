@@ -233,7 +233,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     @Override
     public String getContainerName()
     {
-        //todo implement me
+        //todo implement me: add peer.getContainerName(String containerId)
         return null;
     }
 
@@ -243,7 +243,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     {
         try
         {
-            environmentManager.destroyContainer( this, false, false );
+            environmentManager.destroyContainer( environment.getId(), this.getId(), false, false );
         }
         catch ( EnvironmentNotFoundException | EnvironmentModificationException e )
         {
@@ -330,13 +330,6 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public String getId()
     {
         return hostId;
-    }
-
-
-    @Override
-    public String getHostId()
-    {
-        return this.hostId;
     }
 
 
@@ -578,7 +571,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
         final EnvironmentContainerImpl container = ( EnvironmentContainerImpl ) o;
 
-        if ( hostId != null ? !hostId.equals( container.getHostId() ) : container.getHostId() != null )
+        if ( hostId != null ? !hostId.equals( container.getId() ) : container.getId() != null )
         {
             return false;
         }

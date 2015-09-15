@@ -86,6 +86,7 @@ public interface EnvironmentManager
      * @throws EnvironmentModificationException - thrown if error occurs during environment modification
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
+    //TODO return ContainerHostInfo instead of ContainerHost
     Set<ContainerHost> growEnvironment( String environmentId, Topology topology, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
@@ -107,7 +108,8 @@ public interface EnvironmentManager
     /**
      * Destroys container. If this is the last container, the associated environment will be removed too
      *
-     * @param containerHost - container to destroy
+     * @param environmentId - id of container environment
+     * @param containerId - id of container to destroy
      * @param async - indicates whether container is destroyed synchronously or asynchronously to the calling party
      * @param forceMetadataRemoval - if true, the call will remove container metadata from database even if container
      * was not destroyed due to some error, otherwise an exception is thrown
@@ -115,8 +117,7 @@ public interface EnvironmentManager
      * @throws EnvironmentModificationException - thrown if error occurs during environment modification
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
-    //todo use containerId instead of containerHost
-    void destroyContainer( ContainerHost containerHost, boolean async, boolean forceMetadataRemoval )
+    void destroyContainer( String environmentId, String containerId, boolean async, boolean forceMetadataRemoval )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
 

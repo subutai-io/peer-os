@@ -26,8 +26,10 @@ import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.CreateContainerGroupRequest;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
@@ -47,10 +49,8 @@ import io.subutai.common.quota.RamQuota;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.executor.api.CommandExecutor;
-import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
@@ -217,11 +217,8 @@ public class LocalPeerImplTest
         localPeer.managementHost = managementHost;
         localPeer.requestListeners = Sets.newHashSet( requestListener );
         when( managementHost.getId() ).thenReturn( MANAGEMENT_HOST_ID );
-        when( managementHost.getHostId() ).thenReturn( MANAGEMENT_HOST_ID.toString() );
         when( resourceHost.getId() ).thenReturn( RESOURCE_HOST_ID );
-        when( resourceHost.getHostId() ).thenReturn( RESOURCE_HOST_ID.toString() );
         when( containerHost.getId() ).thenReturn( CONTAINER_HOST_ID );
-        when( containerHost.getHostId() ).thenReturn( CONTAINER_HOST_ID.toString() );
         when( resourceHost.getContainerHostById( CONTAINER_HOST_ID ) ).thenReturn( containerHost );
         when( resourceHost.getHostname() ).thenReturn( RESOURCE_HOST_NAME );
         when( localPeer.getPeerInfo() ).thenReturn( peerInfo );
@@ -238,7 +235,7 @@ public class LocalPeerImplTest
         when( hostRegistry.getHostInfoById( CONTAINER_HOST_ID ) ).thenReturn( containerHostInfo );
         when( containerHostInfo.getId() ).thenReturn( CONTAINER_HOST_ID );
         when( containerHost.getHostname() ).thenReturn( CONTAINER_NAME );
-        when( containerHost.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID.toString() );
+        when( containerHost.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
         when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( CONTAINER_HOST_ID ) );
         when( containerGroup.getOwnerId() ).thenReturn( OWNER_ID );
         when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
@@ -848,19 +845,6 @@ public class LocalPeerImplTest
     public void testIsOnline() throws Exception
     {
         assertTrue( localPeer.isOnline() );
-    }
-
-
-    @Test
-    public void testCleanDb() throws Exception
-    {
-        localPeer.cleanDb();
-
-        verify( managementHostDataService ).remove( MANAGEMENT_HOST_ID.toString() );
-
-        verify( resourceHostDataService ).remove( RESOURCE_HOST_ID.toString() );
-
-        verify( containerHostDataService ).remove( CONTAINER_HOST_ID.toString() );
     }
 
 

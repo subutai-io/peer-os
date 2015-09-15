@@ -280,7 +280,7 @@ public class RestServiceImpl implements RestService
             {
                 ContainerHost containerHost = environment.getContainerHostById( containerId );
 
-                environmentManager.destroyContainer( containerHost, false, false );
+                environmentManager.destroyContainer( environment.getId(), containerHost.getId(), false, false );
 
                 return Response.ok().build();
             }
@@ -391,7 +391,7 @@ public class RestServiceImpl implements RestService
 
                 return Response.ok().entity( JsonUtil.toJson( "STATE", containerHost.getStatus() ) ).build();
             }
-            catch ( ContainerHostNotFoundException  e )
+            catch ( ContainerHostNotFoundException e )
             {
                 LOG.error( "Error getting container state", e );
                 return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();

@@ -291,7 +291,7 @@ public class EnvironmentImpl implements Environment, Serializable
     public void destroyContainer( ContainerHost containerHost, boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
-        environmentManager.destroyContainer( containerHost, async, false );
+        environmentManager.destroyContainer( getId(), containerHost.getId(), async, false );
     }
 
 

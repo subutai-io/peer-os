@@ -34,6 +34,7 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -95,6 +96,7 @@ public class EnvironmentContainerImplTest
         environmentContainer.setPeer( peer );
         environmentContainer.setEnvironmentManager( environmentManager );
         environmentContainer.setEnvironment( environment );
+        doReturn( TestUtil.ENV_ID ).when( environment ).getId();
     }
 
 
@@ -147,10 +149,11 @@ public class EnvironmentContainerImplTest
     {
         environmentContainer.dispose();
 
-        verify( environmentManager ).destroyContainer( environmentContainer, false, false );
+        verify( environmentManager ).destroyContainer( TestUtil.ENV_ID, TestUtil.CONTAINER_ID, false, false );
 
         doThrow( environmentNotFoundException ).when( environmentManager )
-                                               .destroyContainer( environmentContainer, false, false );
+                                               .destroyContainer( TestUtil.ENV_ID, TestUtil.CONTAINER_ID, false,
+                                                       false );
 
         environmentContainer.dispose();
     }
@@ -243,7 +246,7 @@ public class EnvironmentContainerImplTest
     @Test
     public void testGetHostId() throws Exception
     {
-        assertEquals( TestUtil.CONTAINER_ID, environmentContainer.getHostId() );
+        assertEquals( TestUtil.CONTAINER_ID, environmentContainer.getId() );
     }
 
 

@@ -112,7 +112,6 @@ public class DestroyContainerTask implements Awaitable
             {
                 try
                 {
-                    //TODO either cleanup environment networking settings on each peer or leave empty environment
                     environmentManager.removeEnvironment( environment.getId(), false );
                 }
                 catch ( EnvironmentNotFoundException e )

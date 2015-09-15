@@ -36,6 +36,7 @@ import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.Template;
+import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
@@ -92,8 +93,16 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public Set<ContainerHostInfo> getContainers()
     {
-        //todo implement me
-        return null;
+        try
+        {
+            return hostRegistry.getResourceHostInfoById( getId() ).getContainers();
+        }
+        catch ( HostDisconnectedException e )
+        {
+            LOG.warn( "Error in getContainers", e );
+        }
+
+        return Sets.newHashSet();
     }
 
 

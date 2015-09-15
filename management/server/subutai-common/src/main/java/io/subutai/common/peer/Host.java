@@ -26,9 +26,6 @@ public interface Host extends HostInfo, Serializable
 
     public String getPeerId();
 
-    @Deprecated
-    public String getHostId();
-
     public String getHostname();
 
     public CommandResult execute( RequestBuilder requestBuilder ) throws CommandException;

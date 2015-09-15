@@ -78,8 +78,6 @@ public interface LocalPeer extends Peer
      */
     public Set<ResourceHost> getResourceHosts();
 
-    //todo remove this method
-    public void cleanDb();
 
     /**
      * Creates container on the local peer

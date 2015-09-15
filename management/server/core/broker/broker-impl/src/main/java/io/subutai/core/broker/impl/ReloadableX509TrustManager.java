@@ -5,6 +5,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -119,15 +122,18 @@ public class ReloadableX509TrustManager implements X509TrustManager
         throw new NoSuchAlgorithmException( "No X509TrustManager in TrustManagerFactory" );
     }
 
-    //TODO backup truststore before overwriting it
+
     protected synchronized void addServerCertAndReload( String alias, X509Certificate cert ) throws Exception
     {
 
         // import the cert into file trust store
         File tsfile = new File( this.trustStorePath );
-        java.io.FileInputStream fis = null;
+        java.io.FileInputStream fis;
         if ( tsfile.exists() )
         {
+            Files.copy( Paths.get( this.trustStorePath ),
+                    Paths.get( String.format( "%s.backup_%d", this.trustStorePath, System.currentTimeMillis() ) ),
+                    StandardCopyOption.REPLACE_EXISTING );
             fis = new FileInputStream( tsfile );
         }
         else
