@@ -6,7 +6,7 @@ import java.util.UUID;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
 import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.environment.impl.creation.EnvironmentCreationWorkflow;
+import io.subutai.core.environment.impl.workflow.EnvironmentCreationWorkflow;
 
 
 public class EnvironmentManagerImpl implements EnvironmentManager

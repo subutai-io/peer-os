@@ -1,4 +1,4 @@
-package io.subutai.core.environment.impl.creation;
+package io.subutai.core.environment.impl.workflow;
 
 
 import org.apache.servicemix.beanflow.Workflow;
