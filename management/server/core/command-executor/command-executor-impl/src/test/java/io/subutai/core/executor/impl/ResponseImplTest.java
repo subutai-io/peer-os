@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import io.subutai.common.command.ResponseType;
 import io.subutai.common.util.JsonUtil;
 
@@ -16,11 +17,12 @@ import static org.junit.Assert.assertThat;
 
 public class ResponseImplTest
 {
-    private static final UUID ID = UUID.randomUUID();
+    private static final String ID = UUID.randomUUID().toString();
+    private static final UUID CMD_ID = UUID.randomUUID();
     private static final String RESPONSE_JSON = String.format(
             "  {" + "      \"type\":\"EXECUTE_RESPONSE\"," + "      \"id\":\"%s\"," + "      \"commandId\":\"%s\","
                     + "      \"pid\":123," + "      \"responseNumber\":2," + "      \"stdOut\":\"output\","
-                    + "      \"stdErr\":\"err\"," + "      \"exitCode\" : 0" + "  }", ID.toString(), ID.toString() );
+                    + "      \"stdErr\":\"err\"," + "      \"exitCode\" : 0" + "  }", ID, CMD_ID );
 
 
     ResponseImpl response;
@@ -39,7 +41,7 @@ public class ResponseImplTest
 
         assertEquals( ResponseType.EXECUTE_RESPONSE, response.getType() );
         assertEquals( ID, response.getId() );
-        assertEquals( ID, response.getCommandId() );
+        assertEquals( CMD_ID, response.getCommandId() );
         assertEquals( 123, ( int ) response.getPid() );
         assertEquals( 2, ( int ) response.getResponseNumber() );
         assertEquals( "output", response.getStdOut() );

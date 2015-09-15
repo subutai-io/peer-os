@@ -42,7 +42,9 @@ public class GetContainerHostInfoCommandTest extends SystemOutRedirectTest
     {
         command = new GetContainerHostInfoCommand( hostRegistry );
         when( hostRegistry.getContainerHostInfoByHostname( HOSTNAME ) ).thenReturn( containerHostInfo );
+        when( hostRegistry.getContainerHostInfoByHostname( ID ) ).thenReturn( containerHostInfo );
         when( hostRegistry.getContainerHostInfoById( ID ) ).thenReturn( containerHostInfo );
+        when( hostRegistry.getContainerHostInfoById( HOSTNAME ) ).thenReturn( containerHostInfo );
     }
 
 
@@ -64,7 +66,7 @@ public class GetContainerHostInfoCommandTest extends SystemOutRedirectTest
         assertThat( getSysOut(), containsString( containerHostInfo.toString() ) );
 
         //check by id
-        command.identifier = ID.toString();
+        command.identifier = ID;
 
         command.doExecute();
 
@@ -74,6 +76,7 @@ public class GetContainerHostInfoCommandTest extends SystemOutRedirectTest
 
         HostDisconnectedException exception = mock( HostDisconnectedException.class );
         doThrow( exception ).when( hostRegistry ).getContainerHostInfoById( ID );
+        doThrow( exception ).when( hostRegistry ).getContainerHostInfoByHostname( ID );
         resetSysOut();
 
         command.doExecute();

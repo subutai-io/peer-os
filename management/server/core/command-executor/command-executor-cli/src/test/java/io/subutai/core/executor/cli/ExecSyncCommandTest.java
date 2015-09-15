@@ -60,14 +60,5 @@ public class ExecSyncCommandTest extends SystemOutRedirectTest
         verify( commandExecutor ).execute( any( String.class ), any( RequestBuilder.class ) );
 
         assertThat( getSysOut(), containsString( commandResult.toString() ) );
-
-
-        //test invalid id
-
-        command.hostId = "invalid id";
-
-        command.doExecute();
-
-        assertThat( getSysOut(), containsString( "Invalid host id" ) );
     }
 }

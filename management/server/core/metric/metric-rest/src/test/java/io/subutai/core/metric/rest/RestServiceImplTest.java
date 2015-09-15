@@ -166,11 +166,9 @@ public class RestServiceImplTest
     }
 
 
-    @Test
+    @Test( expected = IllegalArgumentException.class )
     public void testGetContainerHostMetricsWithIllegalEnvironmentId() throws Exception
     {
-        Response response = restService.getContainerHostsMetrics( null );
-
-        assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
+        restService.getContainerHostsMetrics( null );
     }
 }

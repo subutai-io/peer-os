@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
@@ -42,7 +43,9 @@ public class GetResourceHostInfoCommandTest extends SystemOutRedirectTest
     {
         command = new GetResourceHostInfoCommand( hostRegistry );
         when( hostRegistry.getResourceHostInfoById( ID ) ).thenReturn( resourceHostInfo );
+        when( hostRegistry.getResourceHostInfoById( HOSTNAME ) ).thenReturn( resourceHostInfo );
         when( hostRegistry.getResourceHostInfoByHostname( HOSTNAME ) ).thenReturn( resourceHostInfo );
+        when( hostRegistry.getResourceHostInfoByHostname( ID ) ).thenReturn( resourceHostInfo );
     }
 
 
@@ -64,7 +67,7 @@ public class GetResourceHostInfoCommandTest extends SystemOutRedirectTest
         assertThat( getSysOut(), containsString( resourceHostInfo.toString() ) );
 
         //check by id
-        command.identifier = ID.toString();
+        command.identifier = ID;
 
         command.doExecute();
 
@@ -74,6 +77,7 @@ public class GetResourceHostInfoCommandTest extends SystemOutRedirectTest
 
         HostDisconnectedException exception = mock( HostDisconnectedException.class );
         doThrow( exception ).when( hostRegistry ).getResourceHostInfoById( ID );
+        doThrow( exception ).when( hostRegistry ).getResourceHostInfoByHostname( ID );
         resetSysOut();
 
         command.doExecute();
