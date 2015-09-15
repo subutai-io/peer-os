@@ -48,9 +48,9 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class ResourceHostEntityTest
 {
-    private static final UUID PEER_ID = UUID.randomUUID();
-    private static final UUID HOST_ID = UUID.randomUUID();
-    private static final UUID CONTAINER_HOST_ID = UUID.randomUUID();
+    private static final String PEER_ID = UUID.randomUUID().toString();
+    private static final String HOST_ID = UUID.randomUUID().toString();
+    private static final String CONTAINER_HOST_ID = UUID.randomUUID().toString();
     private static final String CONTAINER_HOST_NAME = "hostname";
     private static final String TEMPLATE_NAME = "master";
     private static final String GATEWAY = "192.168.1.1";

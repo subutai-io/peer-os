@@ -85,7 +85,7 @@ public class NodeGroupBuilderTest
                 new NodeGroupBuilder( environment, templateRegistry, peerManager, peer, Sets.newHashSet( nodeGroup ),
                         Sets.newHashSet( peer, peer2 ), TestUtil.DEFAULT_DOMAIN, 0 );
         when( peer.getId() ).thenReturn( TestUtil.PEER_ID );
-        when( peer2.getId() ).thenReturn( UUID.randomUUID() );
+        when( peer2.getId() ).thenReturn( UUID.randomUUID().toString() );
         when( peer.getPeerInfo() ).thenReturn( peerInfo );
         when( peer2.getPeerInfo() ).thenReturn( peerInfo );
         when( peerInfo.getIp() ).thenReturn( TestUtil.IP );
@@ -176,8 +176,7 @@ public class NodeGroupBuilderTest
     @Test( expected = NodeGroupBuildException.class )
     public void testCallWithException4() throws Exception
     {
-        UUID id = UUID.randomUUID();
-        when( vni.getEnvironmentId() ).thenReturn( TestUtil.ENV_ID, id );
+        when( vni.getEnvironmentId() ).thenReturn( TestUtil.ENV_ID);
         doThrow( peerException ).when( peer ).reserveVni( any( Vni.class ) );
 
         nodeGroupBuilder.call();

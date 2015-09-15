@@ -43,7 +43,7 @@ public class ContainerJsonTest
     @Test
     public void testSetters() throws Exception
     {
-        UUID uuid = UUID.randomUUID();
+        String uuid = UUID.randomUUID().toString();
 
         containerJson.setEnvironmentId( uuid );
 

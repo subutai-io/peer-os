@@ -18,19 +18,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import io.subutai.common.environment.ContainerHostNotFoundException;
-import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.EnvironmentModificationException;
-import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.environment.PeerConf;
-import io.subutai.common.environment.EnvironmentStatus;
-import io.subutai.common.environment.Topology;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.Peer;
-import io.subutai.common.util.CollectionUtil;
-import io.subutai.core.env.api.EnvironmentManager;
-import io.subutai.core.env.impl.dao.EnvironmentDataService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +27,19 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+
+import io.subutai.common.environment.ContainerHostNotFoundException;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentModificationException;
+import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.environment.PeerConf;
+import io.subutai.common.environment.Topology;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.util.CollectionUtil;
+import io.subutai.core.env.api.EnvironmentManager;
+import io.subutai.core.env.impl.dao.EnvironmentDataService;
 
 
 /**
@@ -191,7 +191,7 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public ContainerHost getContainerHostById( UUID id ) throws ContainerHostNotFoundException
+    public ContainerHost getContainerHostById( String id ) throws ContainerHostNotFoundException
     {
         Preconditions.checkNotNull( id, "Invalid id" );
 
@@ -223,12 +223,12 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public Set<ContainerHost> getContainerHostsByIds( Set<UUID> ids ) throws ContainerHostNotFoundException
+    public Set<ContainerHost> getContainerHostsByIds( Set<String> ids ) throws ContainerHostNotFoundException
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( ids ), "Invalid id set" );
 
         Set<ContainerHost> hosts = Sets.newHashSet();
-        for ( UUID id : ids )
+        for ( String id : ids )
         {
             hosts.add( getContainerHostById( id ) );
         }
@@ -271,9 +271,9 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public UUID getId()
+    public String getId()
     {
-        return UUID.fromString( environmentId );
+        return environmentId;
     }
 
 
@@ -326,7 +326,7 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public void removeContainer( UUID containerId )
+    public void removeContainer( String containerId )
     {
         Preconditions.checkNotNull( containerId );
 
@@ -392,11 +392,11 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    protected void setEnvironmentId( UUID environmentId )
+    protected void setEnvironmentId( String environmentId )
     {
         Preconditions.checkNotNull( environmentId );
 
-        this.environmentId = environmentId.toString();
+        this.environmentId = environmentId;
     }
 
 

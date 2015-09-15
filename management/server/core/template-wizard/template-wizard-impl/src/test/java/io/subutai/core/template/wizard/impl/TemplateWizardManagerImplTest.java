@@ -41,7 +41,7 @@ public class TemplateWizardManagerImplTest
     TemplateWizardManagerImpl wizardManager;
     String templateName = "templateName";
     String newTemplateName = "newTemplateName";
-    UUID uuid = UUID.randomUUID();
+    String uuid = UUID.randomUUID().toString();
     List<String> postInstallationScripts = Lists.newArrayList();
     List<String> preInstallationScripts = Lists.newArrayList();
     List<String> products = Lists.newArrayList( "product1", "product2" );

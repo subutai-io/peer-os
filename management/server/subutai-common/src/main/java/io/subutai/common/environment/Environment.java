@@ -21,7 +21,7 @@ public interface Environment
     /**
      * Returns id of environment
      */
-    public UUID getId();
+    public String getId();
 
     /**
      * Returns name of environment
@@ -111,7 +111,7 @@ public interface Environment
      * @return - found container host
      */
 
-    public ContainerHost getContainerHostById( UUID id ) throws ContainerHostNotFoundException;
+    public ContainerHost getContainerHostById( String id ) throws ContainerHostNotFoundException;
 
     /**
      * Searches container by its hostname withing this environment
@@ -122,7 +122,7 @@ public interface Environment
      */
     public ContainerHost getContainerHostByHostname( String hostname ) throws ContainerHostNotFoundException;
 
-    public Set<ContainerHost> getContainerHostsByIds( Set<UUID> ids ) throws ContainerHostNotFoundException;
+    public Set<ContainerHost> getContainerHostsByIds( Set<String> ids ) throws ContainerHostNotFoundException;
 
     String findN2nIp( String peerId );
 

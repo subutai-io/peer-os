@@ -2,9 +2,13 @@ package io.subutai.core.metric.rest;
 
 
 import java.util.Set;
-import java.util.UUID;
 
 import javax.ws.rs.core.Response;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentNotFoundException;
@@ -14,10 +18,6 @@ import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.metric.api.ContainerHostMetric;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
 
 
 /**
@@ -58,11 +58,10 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getContainerHostsMetrics( final String uuid )
+    public Response getContainerHostsMetrics( final String environmentId )
     {
         try
         {
-            UUID environmentId = UUID.fromString( uuid );
 
             Environment environment;
             try
@@ -72,7 +71,7 @@ public class RestServiceImpl implements RestService
             catch ( EnvironmentNotFoundException e )
             {
                 return Response.status( Response.Status.NOT_FOUND )
-                               .entity( String.format( "Environment %s is not found", uuid ) ).build();
+                               .entity( String.format( "Environment %s is not found", environmentId ) ).build();
             }
 
             Set<ContainerHostMetric> metrics = monitor.getContainerHostsMetrics( environment );

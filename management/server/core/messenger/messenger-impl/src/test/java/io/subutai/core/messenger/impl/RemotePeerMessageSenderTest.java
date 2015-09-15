@@ -9,19 +9,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
 import io.subutai.common.exception.HTTPException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.util.RestUtil;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -31,12 +31,11 @@ public class RemotePeerMessageSenderTest
 {
     private static final String IP = "1.1.1.1";
     private static final Object PAYLOAD = new Object();
-    private static final UUID SOURCE_PEER_ID = UUID.randomUUID();
-    private static final UUID TARGET_PEER_ID = UUID.randomUUID();
+    private static final String SOURCE_PEER_ID = UUID.randomUUID().toString();
+    private static final String TARGET_PEER_ID = UUID.randomUUID().toString();
     private static final String RECIPIENT = "sender";
     private static final int TIME_TO_LIVE = 5;
     private static final Map<String, String> HEADERS = Maps.newHashMap();
-
 
 
     @Mock
@@ -51,7 +50,7 @@ public class RemotePeerMessageSenderTest
 
     RemotePeerMessageSender remotePeerMessageSender;
     Envelope envelope;
-    UUID uuid = UUID.randomUUID();
+    String uuid = UUID.randomUUID().toString();
 
 
     @Before

@@ -1,23 +1,21 @@
 package io.subutai.common.network;
 
 
-import java.util.UUID;
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
-
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 
 
 public class Vni
 {
     private final long vni;
-    private final UUID environmentId;
+    private final String environmentId;
     private int vlan = Common.MIN_VLAN_ID - 1;
 
 
-    public Vni( final long vni, final int vlan, final UUID environmentId )
+    public Vni( final long vni, final int vlan, final String environmentId )
     {
         this( vni, environmentId );
 
@@ -28,7 +26,7 @@ public class Vni
     }
 
 
-    public Vni( final long vni, final UUID environmentId )
+    public Vni( final long vni, final String environmentId )
     {
         Preconditions.checkArgument( NumUtil.isLongBetween( vni, Common.MIN_VNI_ID, Common.MAX_VNI_ID ),
                 String.format( "Vni id must be in range %d - %d", Common.MIN_VNI_ID, Common.MAX_VNI_ID ) );
@@ -51,7 +49,7 @@ public class Vni
     }
 
 
-    public UUID getEnvironmentId()
+    public String getEnvironmentId()
     {
         return environmentId;
     }

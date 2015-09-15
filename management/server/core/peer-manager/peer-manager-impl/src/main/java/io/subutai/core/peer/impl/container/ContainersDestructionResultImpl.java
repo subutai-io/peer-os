@@ -2,21 +2,20 @@ package io.subutai.core.peer.impl.container;
 
 
 import java.util.Set;
-import java.util.UUID;
-
-import io.subutai.common.peer.ContainersDestructionResult;
 
 import com.google.common.base.Preconditions;
+
+import io.subutai.common.peer.ContainersDestructionResult;
 
 
 public class ContainersDestructionResultImpl implements ContainersDestructionResult
 {
-    private final UUID peerId;
-    private final Set<UUID> destroyedContainersIds;
+    private final String peerId;
+    private final Set<String> destroyedContainersIds;
     private final String exception;
 
 
-    public ContainersDestructionResultImpl( final UUID peerId, final Set<UUID> destroyedContainersIds,
+    public ContainersDestructionResultImpl( final String peerId, final Set<String> destroyedContainersIds,
                                             final String exception )
     {
         Preconditions.checkNotNull( peerId );
@@ -29,14 +28,14 @@ public class ContainersDestructionResultImpl implements ContainersDestructionRes
 
 
     @Override
-    public UUID peerId()
+    public String peerId()
     {
         return peerId;
     }
 
 
     @Override
-    public Set<UUID> getDestroyedContainersIds()
+    public Set<String> getDestroyedContainersIds()
     {
         return destroyedContainersIds;
     }

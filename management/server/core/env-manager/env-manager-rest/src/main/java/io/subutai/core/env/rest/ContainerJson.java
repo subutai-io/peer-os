@@ -1,8 +1,6 @@
 package io.subutai.core.env.rest;
 
 
-import java.util.UUID;
-
 import io.subutai.common.host.ContainerHostState;
 
 
@@ -11,15 +9,15 @@ import io.subutai.common.host.ContainerHostState;
  */
 public class ContainerJson
 {
-    private UUID id;
-    private UUID environmentId;
+    private String id;
+    private String environmentId;
     private String hostname;
     private ContainerHostState state;
     private String ip;
     private String templateName;
 
 
-    public ContainerJson( final UUID id, final UUID environmentId, final String hostname,
+    public ContainerJson( final String id, final String environmentId, final String hostname,
                           final ContainerHostState state, final String ip, final String templateName )
     {
         this.id = id;
@@ -31,25 +29,25 @@ public class ContainerJson
     }
 
 
-    public UUID getId()
+    public String getId()
     {
         return id;
     }
 
 
-    public void setId( final UUID id )
+    public void setId( final String id )
     {
         this.id = id;
     }
 
 
-    public UUID getEnvironmentId()
+    public String getEnvironmentId()
     {
         return environmentId;
     }
 
 
-    public void setEnvironmentId( final UUID environmentId )
+    public void setEnvironmentId( final String environmentId )
     {
         this.environmentId = environmentId;
     }

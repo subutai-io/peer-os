@@ -4,7 +4,6 @@ package io.subutai.core.peer.api;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
@@ -39,7 +38,7 @@ public interface ManagementHost extends Host
      * @param peerIps - remote peer ips
      * @param environmentId -  context environment
      */
-    int setupTunnels( Map<String, String> peerIps, UUID environmentId ) throws PeerException;
+    int setupTunnels( Map<String, String> peerIps, String environmentId ) throws PeerException;
 
     /**
      * Returns reserved vnis
@@ -70,7 +69,7 @@ public interface ManagementHost extends Host
      * Cleans up environment networking settings. This method is called when an environment is being destroyed to clean
      * up its settings on the local peer.
      */
-    void cleanupEnvironmentNetworkSettings( final UUID environmentId ) throws PeerException;
+    void cleanupEnvironmentNetworkSettings( final String environmentId ) throws PeerException;
 
     /**
      * Removes a tunnel to remote peer

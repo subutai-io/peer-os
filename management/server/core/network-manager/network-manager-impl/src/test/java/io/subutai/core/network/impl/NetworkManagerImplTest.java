@@ -9,6 +9,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Sets;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
@@ -26,9 +29,6 @@ import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.ResourceHost;
-
-import com.google.common.collect.Sets;
-
 import junit.framework.TestCase;
 
 import static junit.framework.Assert.assertFalse;
@@ -63,7 +63,7 @@ public class NetworkManagerImplTest
     private static final String GATEWAY_IP = "gateway.ip";
     private static final int VLAN_ID = 100;
     private static final int VNI = 100;
-    private static final UUID ENVIRONMENT_ID = UUID.randomUUID();
+    private static final String ENVIRONMENT_ID = UUID.randomUUID().toString();
     private static final String CONTAINER_NAME = "container";
     private static final int NET_MASK = 24;
     private static final String CONTAINER_IP_OUTPUT =

@@ -3,7 +3,6 @@ package io.subutai.common.peer;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
@@ -35,7 +34,7 @@ public interface Peer
     /**
      * Returns id of peer
      */
-    public UUID getId();
+    public String getId();
 
     /**
      * Returns name of peer
@@ -45,7 +44,7 @@ public interface Peer
     /**
      * Returns owner id of peer
      */
-    public UUID getOwnerId();
+    public String getOwnerId();
 
     /**
      * Returns metadata object of peer
@@ -335,7 +334,7 @@ public interface Peer
      *
      * @return {@code ContainersDestructionResult}
      */
-    public ContainersDestructionResult destroyEnvironmentContainers( UUID environmentId ) throws PeerException;
+    public ContainersDestructionResult destroyEnvironmentContainers( String environmentId ) throws PeerException;
 
     //networking
 
@@ -361,13 +360,13 @@ public interface Peer
      *
      * @return - containerHost
      */
-    public HostInfo getContainerHostInfoById( UUID containerHostId ) throws PeerException;
+    public HostInfo getContainerHostInfoById( String containerHostId ) throws PeerException;
 
 
     /* **************************************************************
      *
      */
-    public int createEnvironmentKeyPair( String environmentId) throws PeerException;
+    public int createEnvironmentKeyPair( String environmentId ) throws PeerException;
 
 
     /**

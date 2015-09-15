@@ -1,8 +1,6 @@
 package io.subutai.common.network;
 
 
-import java.util.UUID;
-
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
@@ -12,10 +10,10 @@ public class VniVlanMapping
     private final int tunnelId;
     private final long vni;
     private final int vlan;
-    private final UUID environmentId;
+    private final String environmentId;
 
 
-    public VniVlanMapping( final int tunnelId, final long vni, final int vlan, final UUID environmentId )
+    public VniVlanMapping( final int tunnelId, final long vni, final int vlan, final String environmentId )
     {
         Preconditions.checkNotNull( environmentId );
 
@@ -44,7 +42,7 @@ public class VniVlanMapping
     }
 
 
-    public UUID getEnvironmentId()
+    public String getEnvironmentId()
     {
         return environmentId;
     }

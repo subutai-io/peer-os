@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 public class GetResourceHostInfoCommandTest extends SystemOutRedirectTest
 {
     private static final String HOSTNAME = "hostname";
-    private static final UUID ID = UUID.randomUUID();
+    private static final String ID = UUID.randomUUID().toString();
     @Mock
     HostRegistry hostRegistry;
     @Mock

@@ -17,13 +17,13 @@ import javax.persistence.Lob;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
 
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.impl.Envelope;
-
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 
 
 /**
@@ -96,9 +96,9 @@ public class MessageEntity implements Message
 
 
     @Override
-    public UUID getSourcePeerId()
+    public String getSourcePeerId()
     {
-        return UUID.fromString( sourcePeerId );
+        return sourcePeerId;
     }
 
 
@@ -173,9 +173,9 @@ public class MessageEntity implements Message
     }
 
 
-    public UUID getTargetPeerId()
+    public String getTargetPeerId()
     {
-        return UUID.fromString( this.targetPeerId );
+        return this.targetPeerId;
     }
 
 

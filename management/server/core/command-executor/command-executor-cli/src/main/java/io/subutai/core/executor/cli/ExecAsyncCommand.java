@@ -1,16 +1,6 @@
 package io.subutai.core.executor.cli;
 
 
-import java.util.UUID;
-
-import io.subutai.common.command.CommandCallback;
-import io.subutai.common.command.CommandException;
-import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.command.Response;
-import io.subutai.common.util.UUIDUtil;
-import io.subutai.core.executor.api.CommandExecutor;
-import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,14 +9,19 @@ import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.common.command.CommandCallback;
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.command.Response;
+import io.subutai.core.executor.api.CommandExecutor;
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+
 
 /**
- * Karaf CLI command support for command executor bundle
- * Executes command asynchronously with parameters passed:
- * hostId: id of target host to execute command
- * command: command to execute
- * timeout: optional parameter to kill a process executing the command
- * daemon: specify command execution as a daemon or not
+ * Karaf CLI command support for command executor bundle Executes command asynchronously with parameters passed: hostId:
+ * id of target host to execute command command: command to execute timeout: optional parameter to kill a process
+ * executing the command daemon: specify command execution as a daemon or not
  */
 @Command( scope = "command", name = "exec-async", description = "Executes command asynchronously" )
 public class ExecAsyncCommand extends SubutaiShellCommandSupport
@@ -59,24 +54,16 @@ public class ExecAsyncCommand extends SubutaiShellCommandSupport
     protected Object doExecute() throws CommandException
     {
 
-        if ( UUIDUtil.isStringAUuid( hostId ) )
-        {
-            UUID id = UUIDUtil.generateUUIDFromString( hostId );
 
-            RequestBuilder requestBuilder = new RequestBuilder( command ).withTimeout( timeout );
-            executor.executeAsync( id, daemon ? requestBuilder.daemon() : requestBuilder, new CommandCallback()
-            {
-                @Override
-                public void onResponse( final Response response, final CommandResult commandResult )
-                {
-                    LOG.info( response.toString() );
-                }
-            } );
-        }
-        else
+        RequestBuilder requestBuilder = new RequestBuilder( command ).withTimeout( timeout );
+        executor.executeAsync( hostId, daemon ? requestBuilder.daemon() : requestBuilder, new CommandCallback()
         {
-            System.out.println( "Invalid host id" );
-        }
+            @Override
+            public void onResponse( final Response response, final CommandResult commandResult )
+            {
+                LOG.info( response.toString() );
+            }
+        } );
 
         return null;
     }

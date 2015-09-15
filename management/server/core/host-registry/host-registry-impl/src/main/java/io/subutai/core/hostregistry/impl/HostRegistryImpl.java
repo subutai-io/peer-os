@@ -3,7 +3,6 @@ package io.subutai.core.hostregistry.impl;
 
 import java.util.Collections;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,7 +35,7 @@ public class HostRegistryImpl implements HostRegistry
     protected Set<HostListener> hostListeners =
             Collections.newSetFromMap( new ConcurrentHashMap<HostListener, Boolean>() );
     protected ExecutorService notifier = Executors.newCachedThreadPool();
-    protected Cache<UUID, ResourceHostInfo> hosts;
+    protected Cache<String, ResourceHostInfo> hosts;
 
 
     public HostRegistryImpl( final int hostExpiration )
@@ -48,7 +47,7 @@ public class HostRegistryImpl implements HostRegistry
 
 
     @Override
-    public ContainerHostInfo getContainerHostInfoById( final UUID id ) throws HostDisconnectedException
+    public ContainerHostInfo getContainerHostInfoById( final String id ) throws HostDisconnectedException
     {
         Preconditions.checkNotNull( id, "Id is null" );
 
@@ -102,7 +101,7 @@ public class HostRegistryImpl implements HostRegistry
 
 
     @Override
-    public ResourceHostInfo getResourceHostInfoById( final UUID id ) throws HostDisconnectedException
+    public ResourceHostInfo getResourceHostInfoById( final String id ) throws HostDisconnectedException
     {
         Preconditions.checkNotNull( id, "Id is null" );
 
@@ -164,7 +163,7 @@ public class HostRegistryImpl implements HostRegistry
 
 
     @Override
-    public HostInfo getHostInfoById( final UUID hostId ) throws HostDisconnectedException
+    public HostInfo getHostInfoById( final String hostId ) throws HostDisconnectedException
     {
         try
         {

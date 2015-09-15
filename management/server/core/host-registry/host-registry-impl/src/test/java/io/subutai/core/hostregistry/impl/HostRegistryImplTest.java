@@ -12,16 +12,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.cache.Cache;
+import com.google.common.collect.Sets;
+
 import io.subutai.core.hostregistry.api.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.ResourceHostInfo;
-import io.subutai.core.hostregistry.impl.HeartBeatListener;
-import io.subutai.core.hostregistry.impl.HostNotifier;
-import io.subutai.core.hostregistry.impl.HostRegistryImpl;
-
-import com.google.common.cache.Cache;
-import com.google.common.collect.Sets;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
@@ -37,9 +35,9 @@ import static org.mockito.Mockito.when;
 public class HostRegistryImplTest
 {
 
-    private static final UUID HOST_ID = UUID.randomUUID();
+    private static final String HOST_ID = UUID.randomUUID().toString();
     private static final String HOST_HOSTNAME = "host";
-    private static final UUID CONTAINER_ID = UUID.randomUUID();
+    private static final String CONTAINER_ID = UUID.randomUUID().toString();
     private static final String CONTAINER_HOSTNAME = "container";
     private static final String DUMMY_HOSTNAME = "dummy";
     private static final int HOST_EXPIRATION = 30;
@@ -54,7 +52,7 @@ public class HostRegistryImplTest
     HeartBeatListener heartBeatListener;
 
     @Mock
-    Cache<UUID, ResourceHostInfo> hosts;
+    Cache<String, ResourceHostInfo> hosts;
 
     @Mock
     ConcurrentMap map;
@@ -108,7 +106,7 @@ public class HostRegistryImplTest
 
         try
         {
-            registry.getContainerHostInfoById( UUID.randomUUID() );
+            registry.getContainerHostInfoById( UUID.randomUUID().toString() );
             fail( "Expected HostDisconnectedException" );
         }
         catch ( HostDisconnectedException e )
@@ -126,7 +124,7 @@ public class HostRegistryImplTest
 
         try
         {
-            registry.getHostInfoById( UUID.randomUUID() );
+            registry.getHostInfoById( UUID.randomUUID().toString() );
             fail( "Expected HostDisconnectedException" );
         }
         catch ( HostDisconnectedException e )
@@ -171,7 +169,7 @@ public class HostRegistryImplTest
 
         try
         {
-            registry.getResourceHostInfoById( UUID.randomUUID() );
+            registry.getResourceHostInfoById( UUID.randomUUID().toString() );
             fail( "Expected HostDisconnectedException" );
         }
         catch ( HostDisconnectedException e )
@@ -217,7 +215,7 @@ public class HostRegistryImplTest
 
 
         ContainerHostInfo containerHostInfo1 = mock( ContainerHostInfo.class );
-        when( containerHostInfo1.getId() ).thenReturn( UUID.randomUUID() );
+        when( containerHostInfo1.getId() ).thenReturn( UUID.randomUUID().toString() );
         try
         {
             registry.getResourceHostByContainerHost( containerHostInfo1 );

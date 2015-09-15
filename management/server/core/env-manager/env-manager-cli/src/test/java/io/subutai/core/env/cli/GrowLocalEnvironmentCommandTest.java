@@ -51,7 +51,7 @@ public class GrowLocalEnvironmentCommandTest extends SystemOutRedirectTest
         command.numberOfContainers = TestUtil.NUMBER_OF_CONTAINERS;
         command.templateName = TestUtil.TEMPLATE_NAME;
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
-        when( environmentManager.growEnvironment( any( UUID.class ), any( Topology.class ), anyBoolean() ) )
+        when( environmentManager.growEnvironment( any( String.class ), any( Topology.class ), anyBoolean() ) )
                 .thenReturn( Sets.newHashSet( containerHost ) );
         when( containerHost.getId() ).thenReturn( TestUtil.CONTAINER_ID );
         when( containerHost.getHostname() ).thenReturn( TestUtil.HOSTNAME );

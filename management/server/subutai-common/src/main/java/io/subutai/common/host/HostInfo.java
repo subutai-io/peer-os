@@ -2,7 +2,6 @@ package io.subutai.common.host;
 
 
 import java.util.Set;
-import java.util.UUID;
 
 
 /**
@@ -13,7 +12,7 @@ public interface HostInfo extends Comparable<HostInfo>
     /**
      * Returns id of host
      */
-    public UUID getId();
+    public String getId();
 
 
     /**

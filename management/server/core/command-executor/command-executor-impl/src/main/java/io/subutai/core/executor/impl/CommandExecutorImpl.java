@@ -1,7 +1,7 @@
 package io.subutai.core.executor.impl;
 
 
-import java.util.UUID;
+import com.google.common.base.Preconditions;
 
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
@@ -9,8 +9,6 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.Request;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.core.executor.api.CommandExecutor;
-
-import com.google.common.base.Preconditions;
 
 
 /**
@@ -31,14 +29,14 @@ public class CommandExecutorImpl implements CommandExecutor
 
 
     @Override
-    public CommandResult execute( final UUID hostId, final RequestBuilder requestBuilder ) throws CommandException
+    public CommandResult execute( final String hostId, final RequestBuilder requestBuilder ) throws CommandException
     {
         return execute( hostId, requestBuilder, new DummyCallback() );
     }
 
 
     @Override
-    public CommandResult execute( final UUID hostId, final RequestBuilder requestBuilder,
+    public CommandResult execute( final String hostId, final RequestBuilder requestBuilder,
                                   final CommandCallback callback ) throws CommandException
     {
         Preconditions.checkNotNull( hostId, "Invalid host id" );
@@ -54,14 +52,14 @@ public class CommandExecutorImpl implements CommandExecutor
 
 
     @Override
-    public void executeAsync( final UUID hostId, final RequestBuilder requestBuilder ) throws CommandException
+    public void executeAsync( final String hostId, final RequestBuilder requestBuilder ) throws CommandException
     {
         executeAsync( hostId, requestBuilder, new DummyCallback() );
     }
 
 
     @Override
-    public void executeAsync( final UUID hostId, final RequestBuilder requestBuilder, final CommandCallback callback )
+    public void executeAsync( final String hostId, final RequestBuilder requestBuilder, final CommandCallback callback )
             throws CommandException
     {
         Preconditions.checkNotNull( hostId, "Invalid host id" );

@@ -2,7 +2,12 @@ package io.subutai.core.template.wizard.impl;
 
 
 import java.util.List;
-import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -17,11 +22,6 @@ import io.subutai.core.peer.api.ResourceHostException;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.template.wizard.api.InstallationPhase;
 import io.subutai.core.template.wizard.api.TemplateWizardManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 
 
 public class TemplateWizardManagerImpl implements TemplateWizardManager
@@ -71,7 +71,7 @@ public class TemplateWizardManagerImpl implements TemplateWizardManager
     @Override
     public void createTemplate( final String newTemplateName, final String templateName,
                                 final List<String> postInstallationScripts, final List<String> products,
-                                final List<String> preInstallationScripts, final UUID resourceHostId,
+                                final List<String> preInstallationScripts, final String resourceHostId,
                                 final TrackerOperation trackerOperation )
     {
         Preconditions.checkNotNull( newTemplateName, "Invalid parameter value for newTemplateName" );
@@ -104,8 +104,8 @@ public class TemplateWizardManagerImpl implements TemplateWizardManager
 
 
     @Override
-    public void createContainerHost( final String newTemplateName, final String templateName, final UUID resourceHostId,
-                                     TrackerOperation trackerOperation )
+    public void createContainerHost( final String newTemplateName, final String templateName,
+                                     final String resourceHostId, TrackerOperation trackerOperation )
     {
         Preconditions.checkNotNull( newTemplateName, "Invalid parameter value for newTemplateName" );
         Preconditions.checkNotNull( templateName, "Invalid parameter value for templateName" );
@@ -130,7 +130,7 @@ public class TemplateWizardManagerImpl implements TemplateWizardManager
 
 
     @Override
-    public void installProducts( final List<String> products, final UUID containerHostId,
+    public void installProducts( final List<String> products, final String containerHostId,
                                  final TrackerOperation trackerOperation )
     {
         Preconditions.checkNotNull( products, "Products cannot be null" );

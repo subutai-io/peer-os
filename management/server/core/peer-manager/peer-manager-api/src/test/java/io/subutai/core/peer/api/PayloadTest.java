@@ -17,16 +17,16 @@ public class PayloadTest
 
     Payload payload;
 
-    UUID peerId = UUID.randomUUID();
+    String peerId = UUID.randomUUID().toString();
     Request request = new Request( peerId );
 
 
     static class Request
     {
-        private UUID peerId;
+        private String peerId;
 
 
-        public Request( final UUID peerId )
+        public Request( final String peerId )
         {
             this.peerId = peerId;
         }

@@ -87,10 +87,10 @@ public class EnvironmentImplTest
     {
         environment.setSshKey( TestUtil.SSH_KEY, false );
 
-        verify( environmentManager ).setSshKey( any( UUID.class ), eq( TestUtil.SSH_KEY ), anyBoolean() );
+        verify( environmentManager ).setSshKey( any( String.class ), eq( TestUtil.SSH_KEY ), anyBoolean() );
 
         doThrow( environmentNotFoundException ).when( environmentManager )
-                                               .setSshKey( any( UUID.class ), eq( TestUtil.SSH_KEY ), anyBoolean() );
+                                               .setSshKey( any( String.class ), eq( TestUtil.SSH_KEY ), anyBoolean() );
 
         environment.setSshKey( TestUtil.SSH_KEY, false );
     }
@@ -261,7 +261,7 @@ public class EnvironmentImplTest
 
         EnvironmentImpl environmentSpy = spy( environment );
 
-        doThrow( containerHostNotFoundException ).when( environmentSpy ).getContainerHostById( any( UUID.class ) );
+        doThrow( containerHostNotFoundException ).when( environmentSpy ).getContainerHostById( any( String.class ) );
 
         environmentSpy.removeContainer( TestUtil.CONTAINER_ID );
 

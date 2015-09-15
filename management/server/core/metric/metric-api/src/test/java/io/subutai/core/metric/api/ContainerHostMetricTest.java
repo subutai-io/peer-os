@@ -24,7 +24,7 @@ public class ContainerHostMetricTest
 
 
     private ContainerHostMetric metric;
-    private UUID envId = UUID.randomUUID();
+    private String envId = UUID.randomUUID().toString();
     private static final String ERR_MSG = "ERR";
 
 

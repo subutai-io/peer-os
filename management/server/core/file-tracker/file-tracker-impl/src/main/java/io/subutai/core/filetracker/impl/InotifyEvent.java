@@ -1,8 +1,6 @@
 package io.subutai.core.filetracker.impl;
 
 
-import java.util.UUID;
-
 import io.subutai.core.filetracker.api.InotifyEventType;
 
 
@@ -22,13 +20,13 @@ public class InotifyEvent
 
     static class EventDetails
     {
-        private UUID id;
+        private String id;
         private String configPoint;
         private InotifyEventType eventType;
         private String dateTime;
 
 
-        public UUID getId()
+        public String getId()
         {
             return id;
         }

@@ -4,7 +4,6 @@ package io.subutai.core.peer.impl.entity;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -19,6 +18,8 @@ import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
+import com.google.common.base.Preconditions;
+
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -28,8 +29,6 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.Peer;
-
-import com.google.common.base.Preconditions;
 
 
 /**
@@ -140,9 +139,9 @@ public abstract class AbstractSubutaiHost implements Host
 
 
     @Override
-    public UUID getId()
+    public String getId()
     {
-        return UUID.fromString( hostId );
+        return hostId;
     }
 
 

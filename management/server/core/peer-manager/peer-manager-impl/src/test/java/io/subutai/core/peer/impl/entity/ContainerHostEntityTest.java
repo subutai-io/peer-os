@@ -35,9 +35,9 @@ import static org.mockito.Mockito.when;
 public class ContainerHostEntityTest
 {
     private static final ContainerHostState CONTAINER_HOST_STATE = ContainerHostState.RUNNING;
-    private static final UUID ENVIRONMENT_ID = UUID.randomUUID();
-    private static final UUID PEER_ID = UUID.randomUUID();
-    private static final UUID HOST_ID = UUID.randomUUID();
+    private static final String ENVIRONMENT_ID = UUID.randomUUID().toString();
+    private static final String PEER_ID = UUID.randomUUID().toString();
+    private static final String HOST_ID = UUID.randomUUID().toString();
     private static final String HOSTNAME = "hostname";
     private static final HostArchitecture ARCH = HostArchitecture.AMD64;
     private static final String INTERFACE_NAME = "eth0";

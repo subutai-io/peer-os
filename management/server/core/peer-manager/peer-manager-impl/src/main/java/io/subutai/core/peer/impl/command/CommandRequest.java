@@ -9,12 +9,12 @@ import io.subutai.common.command.RequestBuilder;
 public class CommandRequest
 {
     private RequestBuilder requestBuilder;
-    private UUID hostId;
+    private String hostId;
     private UUID requestId;
-    private UUID environmentId;
+    private String environmentId;
 
 
-    public CommandRequest( final RequestBuilder requestBuilder, final UUID hostId, final UUID environmentId )
+    public CommandRequest( final RequestBuilder requestBuilder, final String hostId, final String environmentId )
     {
         this.requestBuilder = requestBuilder;
         this.hostId = hostId;
@@ -35,13 +35,13 @@ public class CommandRequest
     }
 
 
-    public UUID getHostId()
+    public String getHostId()
     {
         return hostId;
     }
 
 
-    public UUID getEnvironmentId()
+    public String getEnvironmentId()
     {
         return environmentId;
     }

@@ -82,7 +82,6 @@ import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.tracker.api.Tracker;
 
 
-
 /**
  * Environment manager implementation
  */
@@ -109,7 +108,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     protected EnvironmentDataService environmentDataService;
     protected EnvironmentContainerDataService environmentContainerDataService;
     protected BlueprintDataService blueprintDataService;
-
 
 
     @Override
@@ -145,7 +143,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void updateEnvironmentContainersMetadata( final UUID environmentId ) throws EnvironmentManagerException
+    public void updateEnvironmentContainersMetadata( final String environmentId ) throws EnvironmentManagerException
     {
         try
         {
@@ -159,7 +157,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     HostInfo hostInfo = containerHost.getPeer().getContainerHostInfoById( containerHost.getId() );
 
                     EnvironmentContainerImpl environmentContainer =
-                            environmentContainerDataService.find( containerHost.getId().toString() );
+                            environmentContainerDataService.find( containerHost.getId() );
                     environmentContainer.setHostname( hostInfo.getHostname() );
                     environmentContainer.setNetInterfaces( hostInfo.getInterfaces() );
 
@@ -174,7 +172,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         catch ( EnvironmentNotFoundException e )
         {
             throw new EnvironmentManagerException(
-                    String.format( "Couldn't find environment by id: %s", environmentId.toString() ), e );
+                    String.format( "Couldn't find environment by id: %s", environmentId ), e );
         }
     }
 
@@ -209,18 +207,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public Environment findEnvironment( final UUID environmentId ) throws EnvironmentNotFoundException
+    public Environment findEnvironment( final String environmentId ) throws EnvironmentNotFoundException
     {
         return findEnvironment( environmentId, false );
     }
 
 
-    protected Environment findEnvironment( final UUID environmentId, boolean checkAccess )
+    protected Environment findEnvironment( final String environmentId, boolean checkAccess )
             throws EnvironmentNotFoundException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        EnvironmentImpl environment = environmentDataService.find( environmentId.toString() );
+        EnvironmentImpl environment = environmentDataService.find( environmentId );
 
         if ( environment == null )
         {
@@ -311,7 +309,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void destroyEnvironment( final UUID environmentId, final boolean async, final boolean forceMetadataRemoval )
+    public void destroyEnvironment( final String environmentId, final boolean async,
+                                    final boolean forceMetadataRemoval )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
         TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
@@ -321,7 +320,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void destroyEnvironment( final UUID environmentId, boolean async, final boolean forceMetadataRemoval,
+    public void destroyEnvironment( final String environmentId, boolean async, final boolean forceMetadataRemoval,
                                     final boolean checkAccess, final TrackerOperation op )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
@@ -372,7 +371,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public Set<ContainerHost> growEnvironment( final UUID environmentId, final Topology topology, final boolean async )
+    public Set<ContainerHost> growEnvironment( final String environmentId, final Topology topology,
+                                               final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
@@ -382,7 +382,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public Set<ContainerHost> growEnvironment( final UUID environmentId, final Topology topology, final boolean async,
+    public Set<ContainerHost> growEnvironment( final String environmentId, final Topology topology, final boolean async,
                                                final boolean checkAccess, final TrackerOperation op )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
@@ -452,7 +452,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         Preconditions.checkNotNull( containerHost, "Invalid container host" );
 
         final EnvironmentImpl environment =
-                ( EnvironmentImpl ) findEnvironment( UUID.fromString( containerHost.getEnvironmentId() ), checkAccess );
+                ( EnvironmentImpl ) findEnvironment( containerHost.getEnvironmentId(), checkAccess );
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
         {
@@ -502,7 +502,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void setSshKey( final UUID environmentId, final String sshKey, final boolean async )
+    public void setSshKey( final String environmentId, final String sshKey, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
         TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
@@ -512,7 +512,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void setSshKey( final UUID environmentId, final String sshKey, final boolean async,
+    public void setSshKey( final String environmentId, final String sshKey, final boolean async,
                            final boolean checkAccess, final TrackerOperation op )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
@@ -546,7 +546,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void removeEnvironment( final UUID environmentId ) throws EnvironmentNotFoundException
+    public void removeEnvironment( final String environmentId ) throws EnvironmentNotFoundException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
@@ -554,16 +554,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void removeEnvironment( final UUID environmentId, final boolean checkAccess )
+    public void removeEnvironment( final String environmentId, final boolean checkAccess )
             throws EnvironmentNotFoundException
     {
         findEnvironment( environmentId, checkAccess );
 
-        environmentDataService.remove( environmentId.toString() );
+        environmentDataService.remove( environmentId );
 
         notifyOnEnvironmentDestroyed( environmentId );
     }
-
 
 
     public Map<Peer, Set<Gateway>> getUsedGateways( final Set<Peer> peers ) throws EnvironmentManagerException
@@ -742,7 +741,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     /** reverse proxy domain functions ** */
 
     @Override
-    public void removeDomain( final UUID environmentId, final boolean async )
+    public void removeDomain( final String environmentId, final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
@@ -753,7 +752,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void assignDomain( final UUID environmentId, final String newDomain, final boolean async )
+    public void assignDomain( final String environmentId, final String newDomain, final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
 
@@ -767,7 +766,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void toggleEnvironmentDomain( final UUID environmentId, final String domain, final TrackerOperation op,
+    public void toggleEnvironmentDomain( final String environmentId, final String domain, final TrackerOperation op,
                                          final boolean async, boolean checkAccess )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
@@ -801,13 +800,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public String getDomain( final UUID environmentId ) throws EnvironmentManagerException, EnvironmentNotFoundException
+    public String getDomain( final String environmentId ) throws EnvironmentManagerException, EnvironmentNotFoundException
     {
         return getDomain( environmentId, true );
     }
 
 
-    public String getDomain( final UUID environmentId, final boolean checkAccess )
+    public String getDomain( final String environmentId, final boolean checkAccess )
             throws EnvironmentManagerException, EnvironmentNotFoundException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
@@ -826,7 +825,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public boolean isContainerInDomain( final UUID containerHostId, final UUID environmentId )
+    public boolean isContainerInDomain( final String containerHostId, final String environmentId )
             throws EnvironmentManagerException, EnvironmentNotFoundException
     {
 
@@ -834,7 +833,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public boolean isContainerInDomain( final UUID containerHostId, final UUID environmentId,
+    public boolean isContainerInDomain( final String containerHostId, final String environmentId,
                                         final boolean checkAccess )
             throws EnvironmentManagerException, EnvironmentNotFoundException
     {
@@ -858,7 +857,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void addContainerToDomain( final UUID containerHostId, final UUID environmentId, final boolean async )
+    public void addContainerToDomain( final String containerHostId, final String environmentId, final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
         TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
@@ -869,7 +868,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void removeContainerFromDomain( final UUID containerHostId, final UUID environmentId, final boolean async )
+    public void removeContainerFromDomain( final String containerHostId, final String environmentId,
+                                           final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
         TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
@@ -879,7 +879,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void toggleContainerDomain( final UUID containerHostId, final UUID environmentId, final boolean add,
+    public void toggleContainerDomain( final String containerHostId, final String environmentId, final boolean add,
                                        final TrackerOperation op, final boolean async, final boolean checkAccess )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
@@ -971,7 +971,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void notifyOnContainerDestroyed( final Environment environment, final UUID containerId )
+    public void notifyOnContainerDestroyed( final Environment environment, final String containerId )
     {
         for ( final EnvironmentEventListener listener : listeners )
         {
@@ -987,7 +987,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void notifyOnEnvironmentDestroyed( final UUID environmentId )
+    public void notifyOnEnvironmentDestroyed( final String environmentId )
     {
         for ( final EnvironmentEventListener listener : listeners )
         {

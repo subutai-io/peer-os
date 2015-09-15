@@ -25,7 +25,6 @@ import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.host.Interface;
-import io.subutai.common.peer.InterfacePattern;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
@@ -122,11 +121,10 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public boolean unregister( final String uuid ) throws PeerException
+    public boolean unregister( final String remotePeerId ) throws PeerException
     {
         ManagementHost mgmHost = getLocalPeer().getManagementHost();
         ManagementHostEntity managementHost = ( ManagementHostEntity ) mgmHost;
-        UUID remotePeerId = UUID.fromString( uuid );
         PeerInfo p = getPeerInfo( remotePeerId );
         managementHost.removeRepository( p.getId().toString(), p.getIp() );
         //        managementHost.removeTunnel( p.getIp() );
@@ -140,10 +138,10 @@ public class PeerManagerImpl implements PeerManager
         }
 
         //*********Remove Security Relationship  ****************************
-        securityManager.getKeyManager().removePublicKeyRing( uuid.toString() );
+        securityManager.getKeyManager().removePublicKeyRing( remotePeerId );
         //*******************************************************************
 
-        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, uuid );
+        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, remotePeerId );
     }
 
 
@@ -186,10 +184,10 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public PeerInfo getPeerInfo( UUID uuid )
+    public PeerInfo getPeerInfo( String id )
     {
         String source;
-        if ( uuid.compareTo( localPeer.getId() ) == 0 )
+        if ( id.compareTo( localPeer.getId() ) == 0 )
         {
             source = SOURCE_LOCAL_PEER;
         }
@@ -197,12 +195,12 @@ public class PeerManagerImpl implements PeerManager
         {
             source = SOURCE_REMOTE_PEER;
         }
-        return peerDAO.getInfo( source, uuid.toString(), PeerInfo.class );
+        return peerDAO.getInfo( source, id, PeerInfo.class );
     }
 
 
     @Override
-    public Peer getPeer( final UUID peerId )
+    public Peer getPeer( final String peerId )
     {
         if ( localPeer.getId().equals( peerId ) )
         {
@@ -216,13 +214,6 @@ public class PeerManagerImpl implements PeerManager
             return new RemotePeerImpl( localPeer, pi, messenger, commandResponseListener, messageResponseListener );
         }
         return null;
-    }
-
-
-    @Override
-    public Peer getPeer( final String peerId )
-    {
-        return getPeer( UUID.fromString( peerId ) );
     }
 
 

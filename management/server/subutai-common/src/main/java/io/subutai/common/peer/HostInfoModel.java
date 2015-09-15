@@ -3,7 +3,6 @@ package io.subutai.common.peer;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
@@ -12,7 +11,7 @@ import io.subutai.common.host.Interface;
 
 public class HostInfoModel implements HostInfo
 {
-    private UUID id;
+    private String id;
     private String hostname;
     private Set<InterfaceModel> netInterfaces = new HashSet<>();
     private HostArchitecture hostArchitecture;
@@ -51,7 +50,7 @@ public class HostInfoModel implements HostInfo
 
 
     @Override
-    public UUID getId()
+    public String getId()
     {
         return id;
     }

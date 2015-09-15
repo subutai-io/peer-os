@@ -2,7 +2,9 @@ package io.subutai.core.hostregistry.impl;
 
 
 import java.util.Set;
-import java.util.UUID;
+
+import com.google.common.base.Objects;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
@@ -11,16 +13,13 @@ import io.subutai.common.host.Interface;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.hostregistry.api.ContainerHostInfo;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.Sets;
-
 
 /**
  * Implementation of ContainerHostInfo
  */
 public class ContainerHostInfoImpl implements ContainerHostInfo
 {
-    private UUID id;
+    private String id;
     private String hostname;
     private Set<InterfaceImpl> interfaces;
     private ContainerHostState status;
@@ -28,7 +27,7 @@ public class ContainerHostInfoImpl implements ContainerHostInfo
 
 
     @Override
-    public UUID getId()
+    public String getId()
     {
         return id;
     }

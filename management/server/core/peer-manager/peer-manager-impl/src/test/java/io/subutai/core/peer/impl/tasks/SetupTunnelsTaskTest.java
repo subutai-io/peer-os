@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class SetupTunnelsTaskTest
 {
-    private static final UUID ENV_ID = UUID.randomUUID();
+    private static final String ENV_ID = UUID.randomUUID().toString();
     private static final String PEER_IP = "127.0.0.1";
     private static final String N2N_IP = "10.11.0.1";
     @Mock
@@ -73,6 +73,6 @@ public class SetupTunnelsTaskTest
 
         task.call();
 
-        verify( managementHostEntity ).setupVniVlanMapping( anyInt(), anyLong(), anyInt(), any( UUID.class ) );
+        verify( managementHostEntity ).setupVniVlanMapping( anyInt(), anyLong(), anyInt(), any( String.class ) );
     }
 }

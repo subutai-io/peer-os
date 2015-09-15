@@ -1,22 +1,19 @@
 package io.subutai.core.peer.impl.container;
 
 
-import java.util.UUID;
-
-
 public class DestroyEnvironmentContainersRequest
 {
-    private final UUID environmentId;
+    private final String environmentId;
 
 
-    public DestroyEnvironmentContainersRequest( final UUID environmentId )
+    public DestroyEnvironmentContainersRequest( final String environmentId )
     {
 
         this.environmentId = environmentId;
     }
 
 
-    public UUID getEnvironmentId()
+    public String getEnvironmentId()
     {
         return environmentId;
     }

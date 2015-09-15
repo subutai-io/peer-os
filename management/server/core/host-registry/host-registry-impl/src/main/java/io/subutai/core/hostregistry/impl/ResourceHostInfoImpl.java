@@ -2,7 +2,9 @@ package io.subutai.core.hostregistry.impl;
 
 
 import java.util.Set;
-import java.util.UUID;
+
+import com.google.common.base.Objects;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
@@ -11,16 +13,13 @@ import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.hostregistry.api.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.ResourceHostInfo;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.Sets;
-
 
 /**
  * Implementation of ResourceHostInfo
  */
 public class ResourceHostInfoImpl implements ResourceHostInfo
 {
-    private UUID id;
+    private String id;
     private String hostname;
     private Set<InterfaceImpl> interfaces;
     private Set<ContainerHostInfoImpl> containers;
@@ -28,7 +27,7 @@ public class ResourceHostInfoImpl implements ResourceHostInfo
 
 
     @Override
-    public UUID getId()
+    public String getId()
     {
         return id;
     }

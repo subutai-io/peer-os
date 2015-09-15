@@ -2,7 +2,6 @@ package io.subutai.core.peer.api;
 
 
 import java.util.Set;
-import java.util.UUID;
 
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
@@ -32,7 +31,7 @@ public interface ResourceHost extends Host
     /**
      * Returns hosted container by its id
      */
-    public ContainerHost getContainerHostById( UUID id ) throws HostNotFoundException;
+    public ContainerHost getContainerHostById( String id ) throws HostNotFoundException;
 
     /**
      * Starts hosted container

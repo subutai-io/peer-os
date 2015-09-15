@@ -23,7 +23,7 @@ public interface Message
      *
      * @return - source peer id
      */
-    public UUID getSourcePeerId();
+    public String getSourcePeerId();
 
     /**
      * Returns original payload

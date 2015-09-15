@@ -44,16 +44,16 @@ public class DestroyEnvironmentContainersRequestListenerTest
     public void testOnRequest() throws Exception
     {
         when( payload.getMessage( DestroyEnvironmentContainersRequest.class ) ).thenReturn( request );
-        when( localPeer.destroyEnvironmentContainers( any( UUID.class ) ) ).thenReturn( result );
+        when( localPeer.destroyEnvironmentContainers( any( String.class ) ) ).thenReturn( result );
 
         listener.onRequest( payload );
 
-        verify( localPeer ).destroyEnvironmentContainers( any( UUID.class ) );
+        verify( localPeer ).destroyEnvironmentContainers( any( String.class ) );
 
 
         when( payload.getMessage( DestroyEnvironmentContainersRequest.class ) ).thenReturn( null );
 
-        verify( localPeer ).destroyEnvironmentContainers( any( UUID.class ) );
+        verify( localPeer ).destroyEnvironmentContainers( any( String.class ) );
 
     }
 }

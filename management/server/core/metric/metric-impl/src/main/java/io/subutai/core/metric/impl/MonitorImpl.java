@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -207,7 +206,7 @@ public class MonitorImpl implements Monitor
     }
 
 
-    protected Set<ContainerHostMetricImpl> getRemoteContainerHostsMetrics( UUID environmentId, Peer peer )
+    protected Set<ContainerHostMetricImpl> getRemoteContainerHostsMetrics( String environmentId, Peer peer )
     {
         Set<ContainerHostMetricImpl> metrics = Sets.newHashSet();
         try
@@ -217,13 +216,13 @@ public class MonitorImpl implements Monitor
 
             //*********construct Secure Header ****************************
             Map<String, String> headers = Maps.newHashMap();
-            String envId = environmentId.toString() ;
-            String envheaderTarget = peer.getId()+"-"+envId;
-            String envheaderSource = peerManager.getLocalPeer().getId()+"-"+envId;
+            String envId = environmentId.toString();
+            String envheaderTarget = peer.getId() + "-" + envId;
+            String envheaderSource = peerManager.getLocalPeer().getId() + "-" + envId;
 
-            headers.put( Common.HEADER_SPECIAL, "ENC");
-            headers.put( Common.HEADER_ENV_ID_TARGET,envheaderTarget );
-            headers.put( Common.HEADER_ENV_ID_SOURCE,envheaderSource );
+            headers.put( Common.HEADER_SPECIAL, "ENC" );
+            headers.put( Common.HEADER_ENV_ID_TARGET, envheaderTarget );
+            headers.put( Common.HEADER_ENV_ID_SOURCE, envheaderSource );
             //*************************************************************
 
             //send request and obtain metrics
@@ -246,7 +245,7 @@ public class MonitorImpl implements Monitor
     }
 
 
-    protected Set<ContainerHostMetricImpl> getLocalContainerHostsMetrics( UUID environmentId )
+    protected Set<ContainerHostMetricImpl> getLocalContainerHostsMetrics( String environmentId )
     {
 
         Set<ContainerHostMetricImpl> metrics = Sets.newHashSet();
@@ -257,7 +256,7 @@ public class MonitorImpl implements Monitor
             ContainerGroup containerGroup = localPeer.findContainerGroupByEnvironmentId( environmentId );
 
             //obtain environment containers
-            Set<UUID> containerIds = containerGroup.getContainerIds();
+            Set<String> containerIds = containerGroup.getContainerIds();
             retrieveContainerHostMetrics( containerIds, localPeer, environmentId, metrics );
         }
         catch ( ContainerGroupNotFoundException e )
@@ -268,10 +267,10 @@ public class MonitorImpl implements Monitor
     }
 
 
-    private void retrieveContainerHostMetrics( final Set<UUID> containerIds, final LocalPeer localPeer,
-                                               final UUID environmentId, Set<ContainerHostMetricImpl> metrics )
+    private void retrieveContainerHostMetrics( final Set<String> containerIds, final LocalPeer localPeer,
+                                               final String environmentId, Set<ContainerHostMetricImpl> metrics )
     {
-        for ( UUID containerId : containerIds )
+        for ( String containerId : containerIds )
         {
             try
             {
@@ -290,7 +289,7 @@ public class MonitorImpl implements Monitor
     }
 
 
-    protected void addLocalContainerHostMetric( final UUID environmentId, final ResourceHost resourceHost,
+    protected void addLocalContainerHostMetric( final String environmentId, final ResourceHost resourceHost,
                                                 final ContainerHost localContainer,
                                                 Set<ContainerHostMetricImpl> metrics )
     {
@@ -427,12 +426,11 @@ public class MonitorImpl implements Monitor
         //make sure subscriber id is truncated to 100 characters
         String trimmedSubscriberId = StringUtil.trimToSize( subscriberId, Constants.MAX_SUBSCRIBER_ID_LEN );
 
-        UUID environmentId = UUID.fromString( containerHost.getEnvironmentId() );
 
         //save subscription to database
         try
         {
-            monitorDao.addSubscription( environmentId, trimmedSubscriberId );
+            monitorDao.addSubscription( containerHost.getEnvironmentId(), trimmedSubscriberId );
         }
         catch ( DaoException e )
         {
@@ -441,7 +439,7 @@ public class MonitorImpl implements Monitor
         }
 
         //activate monitoring
-        activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings, environmentId );
+        activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings, containerHost.getEnvironmentId() );
     }
 
 
@@ -475,13 +473,12 @@ public class MonitorImpl implements Monitor
         Preconditions.checkNotNull( containerHost, CONTAINER_IS_NULL_MSG );
         Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
 
-        activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings,
-                UUID.fromString( containerHost.getEnvironmentId() ) );
+        activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings, containerHost.getEnvironmentId() );
     }
 
 
     protected void activateMonitoring( Set<ContainerHost> containerHosts, MonitoringSettings monitoringSettings,
-                                       UUID environmentId ) throws MonitorException
+                                       String environmentId ) throws MonitorException
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
         Map<Peer, Set<ContainerHost>> peersContainers = Maps.newHashMap();
@@ -528,7 +525,7 @@ public class MonitorImpl implements Monitor
 
 
     protected void activateMonitoringAtRemoteContainers( Peer peer, Set<ContainerHost> containerHosts,
-                                                         MonitoringSettings monitoringSettings, UUID environmentId )
+                                                         MonitoringSettings monitoringSettings, String environmentId )
     {
         Preconditions.checkNotNull( peer );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
@@ -537,13 +534,13 @@ public class MonitorImpl implements Monitor
         {
             //*********construct Secure Header ****************************
             Map<String, String> headers = Maps.newHashMap();
-            String envId = environmentId.toString() ;
-            String envheaderTarget = peer.getId()+"-"+envId;
-            String envheaderSource = peerManager.getLocalPeer().getId()+"-"+envId;
+            String envId = environmentId;
+            String envheaderTarget = peer.getId() + "-" + envId;
+            String envheaderSource = peerManager.getLocalPeer().getId() + "-" + envId;
 
-            headers.put( Common.HEADER_SPECIAL, "ENC");
-            headers.put( Common.HEADER_ENV_ID_TARGET,envheaderTarget );
-            headers.put( Common.HEADER_ENV_ID_SOURCE,envheaderSource );
+            headers.put( Common.HEADER_SPECIAL, "ENC" );
+            headers.put( Common.HEADER_ENV_ID_TARGET, envheaderTarget );
+            headers.put( Common.HEADER_ENV_ID_SOURCE, envheaderSource );
             //*************************************************************
 
             peer.sendRequest( new MonitoringActivationRequest( containerHosts, monitoringSettings ),
@@ -615,7 +612,7 @@ public class MonitorImpl implements Monitor
 
 
     @Override
-    public OwnerResourceUsage getOwnerResourceUsage( final UUID ownerId ) throws MonitorException
+    public OwnerResourceUsage getOwnerResourceUsage( final String ownerId ) throws MonitorException
     {
         Preconditions.checkNotNull( ownerId, "'Invalid owner id" );
 
@@ -625,7 +622,7 @@ public class MonitorImpl implements Monitor
         Set<ContainerHost> ownerContainers = Sets.newHashSet();
         for ( ContainerGroup containerGroup : containerGroups )
         {
-            for ( UUID containerId : containerGroup.getContainerIds() )
+            for ( String containerId : containerGroup.getContainerIds() )
             {
                 try
                 {
@@ -712,12 +709,12 @@ public class MonitorImpl implements Monitor
                 //*********construct Secure Header ****************************
                 Map<String, String> headers = Maps.newHashMap();
                 String envId = containerGroup.getEnvironmentId().toString();
-                String envheaderTarget = creatorPeer.getId()+"-"+envId;
-                String envheaderSource = peerManager.getLocalPeer().getId()+"-"+envId;
+                String envheaderTarget = creatorPeer.getId() + "-" + envId;
+                String envheaderSource = peerManager.getLocalPeer().getId() + "-" + envId;
 
-                headers.put( Common.HEADER_SPECIAL, "ENC");
-                headers.put( Common.HEADER_ENV_ID_TARGET,envheaderTarget );
-                headers.put( Common.HEADER_ENV_ID_SOURCE,envheaderSource );
+                headers.put( Common.HEADER_SPECIAL, "ENC" );
+                headers.put( Common.HEADER_ENV_ID_TARGET, envheaderTarget );
+                headers.put( Common.HEADER_ENV_ID_SOURCE, envheaderSource );
                 //*************************************************************
 
 
@@ -897,10 +894,10 @@ public class MonitorImpl implements Monitor
 
 
     @Override
-    public Map<UUID, List<HistoricalMetric>> getHistoricalMetrics( final Collection<Host> hosts,
-                                                                   final MetricType metricType )
+    public Map<String, List<HistoricalMetric>> getHistoricalMetrics( final Collection<Host> hosts,
+                                                                     final MetricType metricType )
     {
-        final Map<UUID, List<HistoricalMetric>> historicalMetrics = new ConcurrentHashMap<>();
+        final Map<String, List<HistoricalMetric>> historicalMetrics = new ConcurrentHashMap<>();
 
         for ( Host host : hosts )
         {

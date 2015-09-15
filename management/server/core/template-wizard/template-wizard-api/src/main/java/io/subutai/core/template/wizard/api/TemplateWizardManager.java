@@ -17,15 +17,15 @@ public interface TemplateWizardManager
 
     public void createTemplate( final String newTemplateName, final String templateName,
                                 List<String> postInstallationScripts, List<String> products,
-                                List<String> preInstallationScripts, UUID resourceHostId,
+                                List<String> preInstallationScripts, String resourceHostId,
                                 final TrackerOperation trackerOperation );
 
     public void preInstallationScripts( List<String> scripts );
 
     public void postInstallationScripts( List<String> scripts );
 
-    public void createContainerHost( String newTemplateName, String templateName, final UUID uuid,
+    public void createContainerHost( String newTemplateName, String templateName, final String uuid,
                                      final TrackerOperation trackerOperation );
 
-    public void installProducts( List<String> products, UUID containerHostId, TrackerOperation trackerOperation );
+    public void installProducts( List<String> products, String containerHostId, TrackerOperation trackerOperation );
 }

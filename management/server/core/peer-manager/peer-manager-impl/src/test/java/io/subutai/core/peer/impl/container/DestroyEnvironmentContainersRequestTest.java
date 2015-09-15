@@ -13,7 +13,7 @@ import static junit.framework.TestCase.assertEquals;
 
 public class DestroyEnvironmentContainersRequestTest
 {
-    private static final UUID ENV_ID = UUID.randomUUID();
+    private static final String ENV_ID = UUID.randomUUID().toString();
 
     DestroyEnvironmentContainersRequest request;
 

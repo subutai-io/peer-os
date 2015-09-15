@@ -4,7 +4,6 @@ package io.subutai.core.env.impl.entity;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -20,6 +19,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
@@ -43,10 +46,6 @@ import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.RamQuota;
 import io.subutai.core.env.api.EnvironmentManager;
-
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 
 /**
@@ -116,7 +115,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     }
 
 
-    public EnvironmentContainerImpl( final UUID localPeerId, final Peer peer, final String nodeGroupName,
+    public EnvironmentContainerImpl( final String localPeerId, final Peer peer, final String nodeGroupName,
                                      final HostInfoModel hostInfo, final Template template, int sshGroupId,
                                      int hostsGroupId, String domainName )
     {
@@ -129,8 +128,8 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
         this.peer = peer;
         this.creatorPeerId = localPeerId.toString();
-        this.peerId = peer.getId().toString();
-        this.hostId = hostInfo.getId().toString();
+        this.peerId = peer.getId();
+        this.hostId = hostInfo.getId();
         this.hostname = hostInfo.getHostname();
         this.hostArchitecture = hostInfo.getArch();
         this.nodeGroupName = nodeGroupName;
@@ -206,7 +205,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     @Override
     public String getEnvironmentId()
     {
-        return environment.getId().toString();
+        return environment.getId();
     }
 
 
@@ -262,7 +261,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public Peer getPeer()
     {
         return peer;
-//        return environment.getPeer( this.peerId );
+        //        return environment.getPeer( this.peerId );
     }
 
 
@@ -313,9 +312,9 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
 
     @Override
-    public UUID getId()
+    public String getId()
     {
-        return UUID.fromString( hostId );
+        return hostId;
     }
 
 
@@ -556,10 +555,10 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     }
 
 
-    protected void setHostId( UUID id )
+    protected void setHostId( String id )
     {
-        Preconditions.checkNotNull( id );
-        this.hostId = id.toString();
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( id ) );
+        this.hostId = id;
     }
 
 

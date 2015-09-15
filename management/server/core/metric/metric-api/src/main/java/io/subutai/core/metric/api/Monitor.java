@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.metric.HistoricalMetric;
@@ -116,7 +115,7 @@ public interface Monitor
      *
      * @return - {@code OwnerResourceUsage}
      */
-    public OwnerResourceUsage getOwnerResourceUsage( UUID ownerId ) throws MonitorException;
+    public OwnerResourceUsage getOwnerResourceUsage( String ownerId ) throws MonitorException;
 
     /**
      * This method is called by REST endpoint from local peer indicating that some container hosted locally is under
@@ -141,5 +140,5 @@ public interface Monitor
      * @param hosts physical or container hosts to be monitored
      * @param metricType to be retrieved for historical data
      */
-    public Map<UUID, List<HistoricalMetric>> getHistoricalMetrics( Collection<Host> hosts, MetricType metricType );
+    public Map<String, List<HistoricalMetric>> getHistoricalMetrics( Collection<Host> hosts, MetricType metricType );
 }

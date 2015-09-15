@@ -13,7 +13,7 @@ import static org.junit.Assert.assertEquals;
 
 public class InotifyTest
 {
-    private static final  UUID ID = UUIDUtil.generateRandomUUID();
+    private static final  String ID = UUIDUtil.generateRandomUUID().toString();
     private static final String CONFIG_POINT = "/etc/approx";
     private static final InotifyEventType EVENT_TYPE= InotifyEventType.CREATE_FOLDER;
     private static final String INOTIFY_RESPONSE = String.format(

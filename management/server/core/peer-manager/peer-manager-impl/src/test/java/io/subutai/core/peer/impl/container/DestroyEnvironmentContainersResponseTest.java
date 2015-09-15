@@ -18,7 +18,7 @@ import static junit.framework.TestCase.assertEquals;
 @RunWith( MockitoJUnitRunner.class )
 public class DestroyEnvironmentContainersResponseTest
 {
-    private static final UUID CONTAINER_ID = UUID.randomUUID();
+    private static final String CONTAINER_ID = UUID.randomUUID().toString();
     private static final String EXCEPTION = "exception";
 
     DestroyEnvironmentContainersResponse response;

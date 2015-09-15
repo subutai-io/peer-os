@@ -15,8 +15,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
-import io.subutai.common.exception.DaoException;
 
+import io.subutai.common.exception.DaoException;
 import io.subutai.core.metric.impl.model.Subscriber;
 import io.subutai.core.metric.impl.model.SubscriberPK;
 
@@ -35,7 +35,7 @@ public class MonitorDaoTest
 {
 
     private final static String SUBSCRIBER_ID = "subscriber";
-    private final static UUID ENVIRONMENT_ID = UUID.randomUUID();
+    private final static String ENVIRONMENT_ID = UUID.randomUUID().toString();
 
     MonitorDaoExt monitorDao;
 
@@ -142,7 +142,7 @@ public class MonitorDaoTest
     {
         Subscriber subscriber = new Subscriber( ENVIRONMENT_ID.toString(), SUBSCRIBER_ID );
 
-        assertEquals( ENVIRONMENT_ID, UUID.fromString( subscriber.getEnvironmentId() ) );
+        assertEquals( ENVIRONMENT_ID, subscriber.getEnvironmentId() );
         assertEquals( SUBSCRIBER_ID, subscriber.getSubscriberId() );
     }
 
@@ -154,7 +154,7 @@ public class MonitorDaoTest
         subscriberPK.setSubscriberId( SUBSCRIBER_ID );
         subscriberPK.setEnvironmentId( ENVIRONMENT_ID.toString() );
 
-        assertEquals( ENVIRONMENT_ID, UUID.fromString( subscriberPK.getEnvironmentId() ) );
+        assertEquals( ENVIRONMENT_ID, subscriberPK.getEnvironmentId() );
         assertEquals( SUBSCRIBER_ID, subscriberPK.getSubscriberId() );
 
         SubscriberPK subscriberPK2 = new SubscriberPK();

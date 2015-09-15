@@ -122,16 +122,16 @@ public class DestroyEnvironmentTaskTest
 
         task.run();
 
-        verify( environmentManager ).removeEnvironment( any( UUID.class ), anyBoolean() );
+        verify( environmentManager ).removeEnvironment( any( String.class ), anyBoolean() );
 
         when( environment.getStatus() ).thenReturn( EnvironmentStatus.HEALTHY );
         when( environment.getContainerHosts() ).thenReturn( Sets.<ContainerHost>newHashSet( environmentContainer ) );
         when( result.getException() ).thenReturn( DestroyEnvironmentTask.CONTAINER_GROUP_NOT_FOUND );
-        doThrow( peerException ).when( managementHost ).cleanupEnvironmentNetworkSettings( any( UUID.class ) );
+        doThrow( peerException ).when( managementHost ).cleanupEnvironmentNetworkSettings( any( String.class ) );
 
         task.run();
 
-        verify( managementHost ).cleanupEnvironmentNetworkSettings( any( UUID.class ) );
+        verify( managementHost ).cleanupEnvironmentNetworkSettings( any( String.class ) );
         verify( peerException ).printStackTrace( any( PrintStream.class ) );
 
 

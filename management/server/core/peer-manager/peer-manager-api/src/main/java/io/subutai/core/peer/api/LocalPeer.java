@@ -3,7 +3,6 @@ package io.subutai.core.peer.api;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
@@ -26,14 +25,6 @@ public interface LocalPeer extends Peer
      */
     public Host bindHost( String id ) throws HostNotFoundException;
 
-    /**
-     * Binds host with given ID
-     *
-     * @param id ID of the host
-     *
-     * @return if host is registered and connected returns implementation of this host, otherwise throws exception.
-     */
-    public Host bindHost( UUID id ) throws HostNotFoundException;
 
     /**
      * Returns implementation of ResourceHost interface.
@@ -49,7 +40,7 @@ public interface LocalPeer extends Peer
     /**
      * Returns resource host instance by its id
      */
-    public ResourceHost getResourceHostById( UUID hostId ) throws HostNotFoundException;
+    public ResourceHost getResourceHostById( String hostId ) throws HostNotFoundException;
 
     /**
      * Returns resource host instance by hostname of its container
@@ -59,7 +50,7 @@ public interface LocalPeer extends Peer
     /**
      * Returns resource host instance by id ot its container
      */
-    public ResourceHost getResourceHostByContainerId( UUID hostId ) throws HostNotFoundException;
+    public ResourceHost getResourceHostByContainerId( String hostId ) throws HostNotFoundException;
 
 
     /**
@@ -75,7 +66,7 @@ public interface LocalPeer extends Peer
      *
      * @param hostId ID of the container
      */
-    public ContainerHost getContainerHostById( UUID hostId ) throws HostNotFoundException;
+    public ContainerHost getContainerHostById( String hostId ) throws HostNotFoundException;
 
     /**
      * Returns instance of management host
@@ -110,7 +101,7 @@ public interface LocalPeer extends Peer
      *
      * @throws ContainerGroupNotFoundException - thrown if container is created not as a part of environment
      */
-    public ContainerGroup findContainerGroupByContainerId( UUID containerId ) throws ContainerGroupNotFoundException;
+    public ContainerGroup findContainerGroupByContainerId( String containerId ) throws ContainerGroupNotFoundException;
 
     /**
      * Returns container group by environment id
@@ -121,7 +112,7 @@ public interface LocalPeer extends Peer
      *
      * @throws ContainerGroupNotFoundException - thrown if group is not found
      */
-    public ContainerGroup findContainerGroupByEnvironmentId( UUID environmentId )
+    public ContainerGroup findContainerGroupByEnvironmentId( String environmentId )
             throws ContainerGroupNotFoundException;
 
     /**
@@ -131,14 +122,14 @@ public interface LocalPeer extends Peer
      *
      * @return - set of {@code ContainerGroup}
      */
-    public Set<ContainerGroup> findContainerGroupsByOwnerId( UUID ownerId );
+    public Set<ContainerGroup> findContainerGroupsByOwnerId( String ownerId );
 
     //networking
 
     /**
      * Sets up tunnels on the local peer to the specified remote peers
      */
-    public int setupTunnels( Map<String, String> peerIps, UUID environmentId ) throws PeerException;
+    public int setupTunnels( Map<String, String> peerIps, String environmentId ) throws PeerException;
 
 
     public void addRequestListener( RequestListener listener );
@@ -182,5 +173,4 @@ public interface LocalPeer extends Peer
     public void addIpToVniDomain( String hostIp, Long vni ) throws PeerException;
 
     public void removeIpFromVniDomain( String hostIp, Long vni ) throws PeerException;
-
 }

@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class SendButtonListenerTest
 {
-    private static final UUID ID = UUID.randomUUID();
+    private static final String ID = UUID.randomUUID().toString();
     private static final String STRING_VALUE = "VALUE";
 
     @Mock

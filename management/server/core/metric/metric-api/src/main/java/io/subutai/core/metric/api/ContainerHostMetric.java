@@ -1,11 +1,9 @@
 package io.subutai.core.metric.api;
 
 
-import java.util.UUID;
+import com.google.common.base.Objects;
 
 import io.subutai.common.metric.Metric;
-
-import com.google.common.base.Objects;
 
 
 /**
@@ -15,10 +13,10 @@ import com.google.common.base.Objects;
  */
 public abstract class ContainerHostMetric extends Metric
 {
-    protected UUID environmentId;
+    protected String environmentId;
 
 
-    public UUID getEnvironmentId()
+    public String getEnvironmentId()
     {
         return environmentId;
     }

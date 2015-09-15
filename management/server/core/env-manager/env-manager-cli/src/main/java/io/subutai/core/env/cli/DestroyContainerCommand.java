@@ -1,18 +1,16 @@
 package io.subutai.core.env.cli;
 
 
-import java.util.UUID;
-
-import io.subutai.common.environment.Environment;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.util.UUIDUtil;
-import io.subutai.core.env.api.EnvironmentManager;
-import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
+import io.subutai.common.environment.Environment;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.core.env.api.EnvironmentManager;
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 
 /**
@@ -59,15 +57,14 @@ public class DestroyContainerCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Preconditions.checkArgument( UUIDUtil.isStringAUuid( containerIdStr ), "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIdStr ), "Invalid container id" );
 
-        UUID containerId = UUID.fromString( containerIdStr );
 
         for ( Environment environment : environmentManager.getEnvironments() )
         {
             for ( ContainerHost containerHost : environment.getContainerHosts() )
             {
-                if ( containerHost.getId().equals( containerId ) )
+                if ( containerHost.getId().equals( containerIdStr ) )
                 {
                     environmentManager.destroyContainer( containerHost, async, forceMetadataRemoval );
 

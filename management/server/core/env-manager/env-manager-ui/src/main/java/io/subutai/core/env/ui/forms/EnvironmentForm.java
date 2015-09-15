@@ -3,7 +3,6 @@ package io.subutai.core.env.ui.forms;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -292,7 +291,7 @@ public class EnvironmentForm
     private Table createEnvironmentsTable( String caption )
     {
         Table table = new Table( caption );
-        table.addContainerProperty( ID, UUID.class, null );
+        table.addContainerProperty( ID, String.class, null );
         table.addContainerProperty( NAME, String.class, null );
         table.addContainerProperty( DATE, String.class, null );
         table.addContainerProperty( STATUS, Embedded.class, null );

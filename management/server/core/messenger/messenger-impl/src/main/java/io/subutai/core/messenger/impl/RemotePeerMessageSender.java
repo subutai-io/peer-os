@@ -3,8 +3,12 @@ package io.subutai.core.messenger.impl;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.Callable;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Maps;
 
 import io.subutai.common.peer.Peer;
 import io.subutai.common.settings.ChannelSettings;
@@ -12,10 +16,6 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Maps;
 
 
 /**
@@ -29,11 +29,11 @@ public class RemotePeerMessageSender implements Callable<Boolean>
     private Set<Envelope> envelopes;
     private RestUtil restUtil;
     private MessengerDao messengerDao;
-    private UUID localPeerId;
+    private String localPeerId;
 
 
     public RemotePeerMessageSender( RestUtil restUtil, MessengerDao messengerDao, final Peer targetPeer,
-                                    final Set<Envelope> envelopes, UUID localPeerId )
+                                    final Set<Envelope> envelopes, String localPeerId )
     {
         this.targetPeer = targetPeer;
         this.envelopes = envelopes;
@@ -64,9 +64,9 @@ public class RemotePeerMessageSender implements Callable<Boolean>
                 //*********construct Secure Header ****************************
                 Map<String, String> headers = Maps.newHashMap();
 
-                headers.put( Common.HEADER_SPECIAL, "ENC");
-                headers.put( Common.HEADER_ENV_ID_SOURCE,localPeerId.toString() );
-                headers.put( Common.HEADER_ENV_ID_TARGET,targetPeer.getId().toString() );
+                headers.put( Common.HEADER_SPECIAL, "ENC" );
+                headers.put( Common.HEADER_ENV_ID_SOURCE, localPeerId );
+                headers.put( Common.HEADER_ENV_ID_TARGET, targetPeer.getId() );
                 //*************************************************************
 
                 switch ( port )

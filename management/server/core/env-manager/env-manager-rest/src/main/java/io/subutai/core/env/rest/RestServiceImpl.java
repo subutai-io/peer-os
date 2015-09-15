@@ -3,10 +3,15 @@ package io.subutai.core.env.rest;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
@@ -20,18 +25,11 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.common.util.UUIDUtil;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.env.api.exception.EnvironmentCreationException;
 import io.subutai.core.env.api.exception.EnvironmentDestructionException;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 
 
 public class RestServiceImpl implements RestService
@@ -82,7 +80,7 @@ public class RestServiceImpl implements RestService
         {
             Topology topology = new Topology();
 
-            for ( Map.Entry<UUID, Set<NodeGroup>> placementEntry : topologyJson.getNodeGroupPlacement().entrySet() )
+            for ( Map.Entry<String, Set<NodeGroup>> placementEntry : topologyJson.getNodeGroupPlacement().entrySet() )
             {
                 Peer peer = peerManager.getPeer( placementEntry.getKey() );
                 for ( NodeGroup nodeGroup : placementEntry.getValue() )
@@ -115,7 +113,7 @@ public class RestServiceImpl implements RestService
         }
         else
         {
-            for ( Map.Entry<UUID, Set<NodeGroup>> placementKey : topologyJson.getNodeGroupPlacement().entrySet() )
+            for ( Map.Entry<String, Set<NodeGroup>> placementKey : topologyJson.getNodeGroupPlacement().entrySet() )
             {
                 checkNodeGroup( placementKey );
             }
@@ -123,10 +121,10 @@ public class RestServiceImpl implements RestService
     }
 
 
-    private void checkNodeGroup( final Map.Entry<UUID, Set<NodeGroup>> placementKey )
+    private void checkNodeGroup( final Map.Entry<String, Set<NodeGroup>> placementKey )
             throws EnvironmentCreationException
     {
-        UUID peerId = placementKey.getKey();
+        String peerId = placementKey.getKey();
         Set<NodeGroup> nodeGroups = placementKey.getValue();
         if ( peerId == null )
         {
@@ -166,19 +164,18 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getContainerEnvironmentId( final String containerId )
     {
-        if ( !UUIDUtil.isStringAUuid( containerId ) )
+        if ( Strings.isNullOrEmpty( containerId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
         }
 
-        UUID hostId = UUID.fromString( containerId );
 
-        Environment environment = findEnvironmentByContainerId( hostId );
+        Environment environment = findEnvironmentByContainerId( containerId );
 
         if ( environment != null )
         {
-            return Response.ok( environment.getId().toString() ).build();
+            return Response.ok( environment.getId() ).build();
         }
 
         return Response.status( Response.Status.NOT_FOUND ).build();
@@ -214,17 +211,16 @@ public class RestServiceImpl implements RestService
     @Override
     public Response viewEnvironment( final String environmentId )
     {
-        if ( !UUIDUtil.isStringAUuid( environmentId ) )
+        if ( Strings.isNullOrEmpty( environmentId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
         }
 
-        UUID envId = UUID.fromString( environmentId );
 
         try
         {
-            Environment environment = environmentManager.findEnvironment( envId );
+            Environment environment = environmentManager.findEnvironment( environmentId );
 
             return Response.ok( JsonUtil.toJson(
                     new EnvironmentJson( environment.getId(), environment.getName(), environment.getStatus(),
@@ -232,7 +228,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( EnvironmentNotFoundException e )
         {
-            LOG.warn( "Error getting environment by id", envId );
+            LOG.warn( "Error getting environment by id", environmentId );
             return Response.status( Response.Status.NOT_FOUND ).build();
         }
     }
@@ -241,23 +237,22 @@ public class RestServiceImpl implements RestService
     @Override
     public Response destroyEnvironment( final String environmentId )
     {
-        if ( !UUIDUtil.isStringAUuid( environmentId ) )
+        if ( Strings.isNullOrEmpty( environmentId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
         }
 
-        UUID envId = UUID.fromString( environmentId );
 
         try
         {
-            environmentManager.destroyEnvironment( envId, false, false );
+            environmentManager.destroyEnvironment( environmentId, false, false );
 
             return Response.ok().build();
         }
         catch ( EnvironmentNotFoundException e )
         {
-            LOG.warn( "Error getting environment by id {}", envId );
+            LOG.warn( "Error getting environment by id {}", environmentId );
             return Response.status( Response.Status.NOT_FOUND ).build();
         }
         catch ( EnvironmentDestructionException e )
@@ -271,20 +266,19 @@ public class RestServiceImpl implements RestService
     @Override
     public Response destroyContainer( final String containerId )
     {
-        if ( !UUIDUtil.isStringAUuid( containerId ) )
+        if ( Strings.isNullOrEmpty( containerId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
         }
-        UUID hostId = UUID.fromString( containerId );
 
-        Environment environment = findEnvironmentByContainerId( hostId );
+        Environment environment = findEnvironmentByContainerId( containerId );
 
         if ( environment != null )
         {
             try
             {
-                ContainerHost containerHost = environment.getContainerHostById( hostId );
+                ContainerHost containerHost = environment.getContainerHostById( containerId );
 
                 environmentManager.destroyContainer( containerHost, false, false );
 
@@ -301,7 +295,7 @@ public class RestServiceImpl implements RestService
     }
 
 
-    private Environment findEnvironmentByContainerId( UUID containerId )
+    private Environment findEnvironmentByContainerId( String containerId )
     {
         for ( Environment environment : environmentManager.getEnvironments() )
         {
@@ -321,7 +315,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response growEnvironment( final String environmentId, final String topologyJsonString )
     {
-        if ( !UUIDUtil.isStringAUuid( environmentId ) )
+        if ( Strings.isNullOrEmpty( environmentId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
@@ -343,11 +337,9 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            UUID envId = UUID.fromString( environmentId );
-
             Topology topology = buildTopology( topologyJson );
 
-            Set<ContainerHost> newContainers = environmentManager.growEnvironment( envId, topology, false );
+            Set<ContainerHost> newContainers = environmentManager.growEnvironment( environmentId, topology, false );
 
             return Response.ok( JsonUtil.toJson( convertContainersToContainerJson( newContainers ) ) ).build();
         }
@@ -367,7 +359,7 @@ public class RestServiceImpl implements RestService
     private Topology buildTopology( final TopologyJson topologyJson )
     {
         Topology topology = new Topology();
-        for ( Map.Entry<UUID, Set<NodeGroup>> placementEntry : topologyJson.getNodeGroupPlacement().entrySet() )
+        for ( Map.Entry<String, Set<NodeGroup>> placementEntry : topologyJson.getNodeGroupPlacement().entrySet() )
         {
             Peer peer = peerManager.getPeer( placementEntry.getKey() );
             for ( NodeGroup nodeGroup : placementEntry.getValue() )
@@ -382,21 +374,20 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getContainerState( final String containerId )
     {
-        if ( !UUIDUtil.isStringAUuid( containerId ) )
+        if ( Strings.isNullOrEmpty( containerId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
         }
 
-        UUID hostId = UUID.fromString( containerId );
 
-        Environment environment = findEnvironmentByContainerId( hostId );
+        Environment environment = findEnvironmentByContainerId( containerId );
 
         if ( environment != null )
         {
             try
             {
-                ContainerHost containerHost = environment.getContainerHostById( hostId );
+                ContainerHost containerHost = environment.getContainerHostById( containerId );
 
                 return Response.ok().entity( JsonUtil.toJson( "STATE", containerHost.getState() ) ).build();
             }
@@ -414,21 +405,20 @@ public class RestServiceImpl implements RestService
     @Override
     public Response startContainer( final String containerId )
     {
-        if ( !UUIDUtil.isStringAUuid( containerId ) )
+        if ( Strings.isNullOrEmpty( containerId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
         }
 
-        UUID hostId = UUID.fromString( containerId );
 
-        Environment environment = findEnvironmentByContainerId( hostId );
+        Environment environment = findEnvironmentByContainerId( containerId );
 
         if ( environment != null )
         {
             try
             {
-                ContainerHost containerHost = environment.getContainerHostById( hostId );
+                ContainerHost containerHost = environment.getContainerHostById( containerId );
 
                 containerHost.start();
 
@@ -448,21 +438,20 @@ public class RestServiceImpl implements RestService
     @Override
     public Response stopContainer( final String containerId )
     {
-        if ( !UUIDUtil.isStringAUuid( containerId ) )
+        if ( Strings.isNullOrEmpty( containerId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
         }
 
-        UUID hostId = UUID.fromString( containerId );
 
-        Environment environment = findEnvironmentByContainerId( hostId );
+        Environment environment = findEnvironmentByContainerId( containerId );
 
         if ( environment != null )
         {
             try
             {
-                ContainerHost containerHost = environment.getContainerHostById( hostId );
+                ContainerHost containerHost = environment.getContainerHostById( containerId );
 
                 containerHost.stop();
 
@@ -482,7 +471,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response setSshKey( final String environmentId, final String key )
     {
-        if ( !UUIDUtil.isStringAUuid( environmentId ) )
+        if ( Strings.isNullOrEmpty( environmentId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
@@ -493,17 +482,16 @@ public class RestServiceImpl implements RestService
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid ssh key" ) ).build();
         }
 
-        UUID envId = UUID.fromString( environmentId );
 
         try
         {
-            environmentManager.setSshKey( envId, key, false );
+            environmentManager.setSshKey( environmentId, key, false );
 
             return Response.ok().build();
         }
         catch ( EnvironmentNotFoundException e )
         {
-            LOG.warn( "Environment not found by id {}", envId );
+            LOG.warn( "Environment not found by id {}", environmentId );
             return Response.status( Response.Status.NOT_FOUND ).build();
         }
         catch ( EnvironmentModificationException e )
@@ -517,23 +505,22 @@ public class RestServiceImpl implements RestService
     @Override
     public Response removeSshKey( final String environmentId )
     {
-        if ( !UUIDUtil.isStringAUuid( environmentId ) )
+        if ( Strings.isNullOrEmpty( environmentId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
         }
 
-        UUID envId = UUID.fromString( environmentId );
 
         try
         {
-            environmentManager.setSshKey( envId, null, false );
+            environmentManager.setSshKey( environmentId, null, false );
 
             return Response.ok().build();
         }
         catch ( EnvironmentNotFoundException e )
         {
-            LOG.warn( "Exception getting environment by id {}", envId );
+            LOG.warn( "Exception getting environment by id {}", environmentId );
             return Response.status( Response.Status.NOT_FOUND ).build();
         }
         catch ( EnvironmentModificationException e )
@@ -560,7 +547,7 @@ public class RestServiceImpl implements RestService
                 LOG.error( "Failed to obtain container state", e );
             }
 
-            jsonSet.add( new ContainerJson( containerHost.getId(), UUID.fromString( containerHost.getEnvironmentId() ),
+            jsonSet.add( new ContainerJson( containerHost.getId(), containerHost.getEnvironmentId(),
                     containerHost.getHostname(), state,
                     containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ),
                     containerHost.getTemplateName() ) );

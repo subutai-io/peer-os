@@ -12,7 +12,6 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.common.util.UUIDUtil;
 import io.subutai.core.broker.api.TextMessagePostProcessor;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.security.api.SecurityManager;
@@ -55,7 +54,7 @@ public class MessageEncryptor implements TextMessagePostProcessor
         LOG.debug( String.format( "OUTGOING %s", message ) );
 
         //assume this is a host  topic
-        if ( encryptionEnabled && UUIDUtil.isStringAUuid( topic ) )
+        if ( encryptionEnabled )
         {
             try
             {

@@ -1,11 +1,9 @@
 package io.subutai.core.metric.impl;
 
 
-import java.util.UUID;
+import com.google.common.base.Preconditions;
 
 import io.subutai.core.metric.api.ContainerHostMetric;
-
-import com.google.common.base.Preconditions;
 
 
 /**
@@ -14,7 +12,7 @@ import com.google.common.base.Preconditions;
 public class ContainerHostMetricImpl extends ContainerHostMetric
 {
 
-    protected void setEnvironmentId( final UUID environmentId )
+    protected void setEnvironmentId( final String environmentId )
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
@@ -22,7 +20,7 @@ public class ContainerHostMetricImpl extends ContainerHostMetric
     }
 
 
-    protected void setHostId( final UUID hostId )
+    protected void setHostId( final String hostId )
     {
 
         Preconditions.checkNotNull( host, "Invalid host id" );

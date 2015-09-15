@@ -3,7 +3,6 @@ package io.subutai.common.peer;
 
 import java.io.Serializable;
 import java.util.Set;
-import java.util.UUID;
 
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
@@ -29,8 +28,9 @@ public interface Host extends Serializable
 
     public String getPeerId();
 
-    public UUID getId();
+    public String getId();
 
+    @Deprecated
     public String getHostId();
 
     public String getHostname();

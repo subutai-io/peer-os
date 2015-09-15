@@ -8,7 +8,6 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -33,9 +32,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandUtil;
-import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.Interface;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.network.Gateway;
@@ -45,7 +42,6 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.settings.Common;
-import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.hostregistry.api.ResourceHostInfo;
@@ -267,7 +263,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    public void cleanupEnvironmentNetworkSettings( final UUID environmentId ) throws PeerException
+    public void cleanupEnvironmentNetworkSettings( final String environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
@@ -441,7 +437,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
-    public int setupTunnels( final Map<String, String> peerIps, final UUID environmentId ) throws PeerException
+    public int setupTunnels( final Map<String, String> peerIps, final String environmentId ) throws PeerException
     {
         //        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
@@ -469,7 +465,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    public Vni findVniByEnvironmentId( UUID environmentId ) throws PeerException
+    public Vni findVniByEnvironmentId( String environmentId ) throws PeerException
     {
         //check if vni is already reserved
         for ( Vni aVni : getReservedVnis() )
@@ -484,7 +480,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    public void setupVniVlanMapping( final int tunnelId, final long vni, final int vlanId, final UUID environmentId )
+    public void setupVniVlanMapping( final int tunnelId, final long vni, final int vlanId, final String environmentId )
             throws PeerException
     {
         try

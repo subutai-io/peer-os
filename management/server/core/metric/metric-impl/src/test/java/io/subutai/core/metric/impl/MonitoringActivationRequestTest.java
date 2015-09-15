@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class MonitoringActivationRequestTest
 {
-    private static final UUID ID = UUID.randomUUID();
+    private static final String ID = UUID.randomUUID().toString();
     @Mock
     MonitoringSettings monitoringSettings;
     @Mock

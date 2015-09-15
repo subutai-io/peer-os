@@ -26,7 +26,7 @@ public interface RestService
     @GET
     @Path( "metrics/containers-hosts/{environmentId}" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getContainerHostsMetrics( @PathParam( "environmentId" ) String uuid );
+    public Response getContainerHostsMetrics( @PathParam( "environmentId" ) String id );
 
     @POST
     @Path( "alert" )

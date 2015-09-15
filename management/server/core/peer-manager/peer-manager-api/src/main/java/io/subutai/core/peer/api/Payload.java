@@ -1,20 +1,18 @@
 package io.subutai.core.peer.api;
 
 
-import java.util.UUID;
+import com.google.common.base.Strings;
 
 import io.subutai.common.util.JsonUtil;
-
-import com.google.common.base.Strings;
 
 
 public class Payload
 {
     protected String request;
-    private UUID sourcePeerId;
+    private String sourcePeerId;
 
 
-    public Payload( final Object request, UUID sourcePeerId )
+    public Payload( final Object request, String sourcePeerId )
     {
         this.request = JsonUtil.toJson( request );
         this.sourcePeerId = sourcePeerId;
@@ -31,7 +29,7 @@ public class Payload
     }
 
 
-    public UUID getSourcePeerId()
+    public String getSourcePeerId()
     {
         return sourcePeerId;
     }

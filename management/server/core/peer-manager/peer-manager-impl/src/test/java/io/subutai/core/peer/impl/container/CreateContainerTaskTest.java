@@ -65,7 +65,7 @@ public class CreateContainerTaskTest
         when( commandResult.getStdOut() ).thenReturn( OUT );
         when( template.getTemplateName() ).thenReturn( TEMPLATE_NAME );
         when( template.isRemote() ).thenReturn( true );
-        when( template.getPeerId() ).thenReturn( UUID.randomUUID() );
+        when( template.getPeerId() ).thenReturn( UUID.randomUUID().toString() );
         when( resourceHost.getContainerHostByName( HOSTNAME ) ).thenReturn( containerHost );
         when( containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ) ).thenReturn( IP );
     }

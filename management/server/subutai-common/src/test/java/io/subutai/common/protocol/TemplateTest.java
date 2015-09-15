@@ -82,7 +82,7 @@ public class TemplateTest
         assertNotNull( template3.getParentTemplateName() );
         assertNotNull( template.getTemplateVersion() );
         assertNotNull( template.isRemote() );
-        assertNotNull( template.getRemoteClone( UUID.randomUUID() ) );
+        assertNotNull( template.getRemoteClone( UUID.randomUUID().toString() ) );
         template.getPeerId();
         template.hashCode();
         template.equals( "test" );

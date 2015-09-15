@@ -13,6 +13,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.RequestBuilder;
@@ -47,10 +52,6 @@ import io.subutai.core.peer.impl.request.MessageRequest;
 import io.subutai.core.peer.impl.request.MessageResponse;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
@@ -79,9 +80,9 @@ public class RemotePeerImplTest
     private static final String HEADER_NAME = "header";
     private static final String HEADER_VALUE = "header value";
     private static final String TEMPLATE_NAME = "master";
-    private static final UUID CONTAINER_ID = UUID.randomUUID();
-    private static final UUID ENV_ID = UUID.randomUUID();
-    private static final UUID PEER_ID = UUID.randomUUID();
+    private static final String CONTAINER_ID = UUID.randomUUID().toString();
+    private static final String ENV_ID = UUID.randomUUID().toString();
+    private static final String PEER_ID = UUID.randomUUID().toString();
     private static final String IP = "127.0.0.1";
     private static final int PID = 123;
     private static final int VLAN = 123;
@@ -130,6 +131,7 @@ public class RemotePeerImplTest
     RemotePeerImpl remotePeer;
 
     Map<String, String> peerMap = new HashMap<>();
+
 
     @Before
     public void setUp() throws Exception
@@ -221,7 +223,7 @@ public class RemotePeerImplTest
         when( restUtil.request( eq( RestUtil.RequestType.GET ), anyString(), anyString(), anyMap(), anyMap() ) )
                 .thenReturn( ID );
 
-        UUID id = remotePeer.getRemoteId();
+        String id = remotePeer.getRemoteId();
 
         assertEquals( ID, id.toString() );
 
@@ -237,7 +239,7 @@ public class RemotePeerImplTest
         UUID ID = UUID.randomUUID();
         when( restUtil.request( eq( RestUtil.RequestType.GET ), anyString(), anyString(), anyMap(), anyMap() ) )
                 .thenReturn( ID.toString() );
-        when( peerInfo.getId() ).thenReturn( ID );
+        when( peerInfo.getId() ).thenReturn( ID.toString() );
 
         assertTrue( remotePeer.isOnline() );
 
@@ -747,15 +749,15 @@ public class RemotePeerImplTest
         when( messageResponse.getPayload() ).thenReturn( payload );
         when( payload.getMessage( any( Class.class ) ) ).thenReturn( response ).thenReturn( null );
 
-        remotePeer.createContainerGroup(
-                new CreateContainerGroupRequest( peerMap, ENV_ID, UUID.randomUUID(), UUID.randomUUID(),
-                        SUBNET, Lists.newArrayList( template ), 1, "ROUND_ROBIN", Lists.<Criteria>newArrayList(), 0 ) );
+        remotePeer.createContainerGroup( new CreateContainerGroupRequest( peerMap, ENV_ID, UUID.randomUUID().toString(),
+                        UUID.randomUUID().toString(), SUBNET, Lists.newArrayList( template ), 1, "ROUND_ROBIN",
+                        Lists.<Criteria>newArrayList(), 0 ) );
 
         verify( response ).getHosts();
 
-        remotePeer.createContainerGroup(
-                new CreateContainerGroupRequest( peerMap, ENV_ID, UUID.randomUUID(), UUID.randomUUID(),
-                        SUBNET, Lists.newArrayList( template ), 1, "ROUND_ROBIN", Lists.<Criteria>newArrayList(), 0 ) );
+        remotePeer.createContainerGroup( new CreateContainerGroupRequest( peerMap, ENV_ID, UUID.randomUUID().toString(),
+                        UUID.randomUUID().toString(), SUBNET, Lists.newArrayList( template ), 1, "ROUND_ROBIN",
+                        Lists.<Criteria>newArrayList(), 0 ) );
     }
 
 

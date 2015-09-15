@@ -4,7 +4,6 @@ package io.subutai.core.env.impl.exception;
 /**
  * NodeGroup specific error exceptions.
  *
- * @see io.subutai.core.env.impl.builder.NodeGroupBuilder#fetchRequiredTemplates(java.util.UUID, String)
  * @see io.subutai.core.env.impl.builder.NodeGroupBuilder#call()
  */
 public class NodeGroupBuildException extends Exception

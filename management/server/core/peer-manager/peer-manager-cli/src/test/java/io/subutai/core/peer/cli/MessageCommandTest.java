@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class MessageCommandTest
 {
-    private static final UUID PEER_ID = UUID.randomUUID();
+    private static final String PEER_ID = UUID.randomUUID().toString();
     @Mock
     PeerManager peerManager;
     @Mock

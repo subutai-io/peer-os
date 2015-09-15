@@ -3,13 +3,13 @@ package io.subutai.core.env.rest;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.environment.NodeGroup;
 
 import static junit.framework.TestCase.assertEquals;
@@ -20,7 +20,7 @@ public class TopologyJsonTest
 {
 
     @Mock
-    Map<UUID, Set<NodeGroup>> placement;
+    Map<String, Set<NodeGroup>> placement;
 
     TopologyJson topologyJson;
 

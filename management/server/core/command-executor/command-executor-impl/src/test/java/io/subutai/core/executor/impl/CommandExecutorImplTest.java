@@ -8,18 +8,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.Request;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.core.broker.api.Broker;
-
 import io.subutai.core.hostregistry.api.HostRegistry;
 
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -27,7 +26,7 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class CommandExecutorImplTest
 {
-    private static final UUID HOST_ID = UUID.randomUUID();
+    private static final String HOST_ID = UUID.randomUUID().toString();
     @Mock
     Broker broker;
     @Mock
@@ -48,7 +47,7 @@ public class CommandExecutorImplTest
     public void setUp() throws Exception
     {
         commandExecutor = new CommandExecutorImpl( commandProcessor );
-//        commandExecutor.commandProcessor = commandProcessor;
+        //        commandExecutor.commandProcessor = commandProcessor;
         when( requestBuilder.build( HOST_ID ) ).thenReturn( request );
     }
 
@@ -64,44 +63,44 @@ public class CommandExecutorImplTest
         catch ( NullPointerException e )
         {
         }
-//        try
-//        {
-//            new CommandExecutorImpl( broker, null );
-//            fail( "Expected NullPointerException" );
-//        }
-//        catch ( NullPointerException e )
-//        {
-//        }
+        //        try
+        //        {
+        //            new CommandExecutorImpl( broker, null );
+        //            fail( "Expected NullPointerException" );
+        //        }
+        //        catch ( NullPointerException e )
+        //        {
+        //        }
     }
 
 
-//    @Test
-//    public void testInit() throws Exception
-//    {
-//        commandExecutor.init();
-//
-//        verify( broker ).addByteMessageListener( commandProcessor );
-//
-//        doThrow( new BrokerException( "" ) ).when( broker ).addByteMessageListener( commandProcessor );
-//
-//        try
-//        {
-//            commandExecutor.init();
-//            fail( "Expected CommandExecutorException" );
-//        }
-//        catch ( CommandExecutorException e )
-//        {
-//        }
-//    }
+    //    @Test
+    //    public void testInit() throws Exception
+    //    {
+    //        commandExecutor.init();
+    //
+    //        verify( broker ).addByteMessageListener( commandProcessor );
+    //
+    //        doThrow( new BrokerException( "" ) ).when( broker ).addByteMessageListener( commandProcessor );
+    //
+    //        try
+    //        {
+    //            commandExecutor.init();
+    //            fail( "Expected CommandExecutorException" );
+    //        }
+    //        catch ( CommandExecutorException e )
+    //        {
+    //        }
+    //    }
 
 
-//    @Test
-//    public void testDispose() throws Exception
-//    {
-//        commandExecutor.dispose();
-//
-//        verify( broker ).removeMessageListener( commandProcessor );
-//    }
+    //    @Test
+    //    public void testDispose() throws Exception
+    //    {
+    //        commandExecutor.dispose();
+    //
+    //        verify( broker ).removeMessageListener( commandProcessor );
+    //    }
 
 
     @Test

@@ -19,7 +19,7 @@ import static junit.framework.TestCase.assertTrue;
 @RunWith( MockitoJUnitRunner.class )
 public class EnvironmentJsonTest
 {
-    private static final UUID ID = UUID.randomUUID();
+    private static final String ID = UUID.randomUUID().toString();
     private static final String NAME = "name";
     private static final EnvironmentStatus STATUS = EnvironmentStatus.UNDER_MODIFICATION;
 

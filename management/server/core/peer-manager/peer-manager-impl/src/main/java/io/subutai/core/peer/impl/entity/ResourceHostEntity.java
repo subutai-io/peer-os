@@ -2,7 +2,6 @@ package io.subutai.core.peer.impl.entity;
 
 
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -313,7 +312,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    public ContainerHost getContainerHostById( final UUID id ) throws HostNotFoundException
+    public ContainerHost getContainerHostById( final String id ) throws HostNotFoundException
     {
         Preconditions.checkNotNull( id, "Invalid container id" );
 

@@ -18,7 +18,7 @@ public class RejectRequest extends SubutaiShellCommandSupport
 {
 
     @Argument( index = 0, name = "request Id", multiValued = false, required = true, description = "Request Id" )
-    private String hostId;
+    private String requestId;
 
     private RegistrationManager registrationManager;
 
@@ -32,7 +32,7 @@ public class RejectRequest extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        UUID requestId = UUID.fromString( hostId );
+        UUID requestId = UUID.fromString( this.requestId );
         registrationManager.rejectRequest( requestId );
 
         System.out.println( registrationManager.getRequest( requestId ).toString() );

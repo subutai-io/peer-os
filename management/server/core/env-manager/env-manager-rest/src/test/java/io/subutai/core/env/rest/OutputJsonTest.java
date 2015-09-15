@@ -24,7 +24,7 @@ public class OutputJsonTest
         TopologyJson topology = new TopologyJson();
 
 
-        Map<UUID, Set<NodeGroup>> placement = Maps.newHashMap();
+        Map<String, Set<NodeGroup>> placement = Maps.newHashMap();
 
         NodeGroup nodeGroup =
                 new NodeGroup( "Node Group 1", "hadoop", 4, 1, 1, new PlacementStrategy( "ROUND_ROBIN" ) );
@@ -35,8 +35,8 @@ public class OutputJsonTest
                 new NodeGroup( "Node Group 3", "master", 4, 1, 1, new PlacementStrategy( "ROUND_ROBIN" ) );
         Set<NodeGroup> nodeGroups2 = Sets.newHashSet( nodeGroup3 );
 
-        placement.put( UUID.randomUUID(), nodeGroups1 );
-        placement.put( UUID.randomUUID(), nodeGroups2 );
+        placement.put( UUID.randomUUID().toString(), nodeGroups1 );
+        placement.put( UUID.randomUUID().toString(), nodeGroups2 );
 
         topology.setNodeGroupPlacement( placement );
 

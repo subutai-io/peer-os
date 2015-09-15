@@ -2,14 +2,13 @@ package io.subutai.common.peer;
 
 
 import java.util.Objects;
-import java.util.UUID;
 
 
 @SuppressWarnings( "unused" )
 public class PeerPolicy
 {
 
-    private UUID remotePeerId;
+    private String remotePeerId;
     private int diskUsagePercentageLimit;
     private int cpuUsagePercentageLimit;
     private int memoryUsagePercentageLimit;
@@ -18,7 +17,7 @@ public class PeerPolicy
     private int containerCountLimit;
 
 
-    public PeerPolicy( UUID remotePeerId )
+    public PeerPolicy( String remotePeerId )
     {
         this.remotePeerId = remotePeerId;
     }
@@ -142,7 +141,7 @@ public class PeerPolicy
     }
 
 
-    public UUID getRemotePeerId()
+    public String getRemotePeerId()
     {
         return remotePeerId;
     }

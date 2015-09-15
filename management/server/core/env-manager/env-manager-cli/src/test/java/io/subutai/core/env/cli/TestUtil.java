@@ -11,8 +11,8 @@ public class TestUtil
     public static final String SUBNET = "192.168.1.0/24";
     public static final boolean ASYNC = true;
     public static final boolean FORCE = true;
-    public static final UUID ENV_ID = UUID.randomUUID();
-    public static final UUID CONTAINER_ID = UUID.randomUUID();
+    public static final String ENV_ID = UUID.randomUUID().toString();
+    public static final String CONTAINER_ID = UUID.randomUUID().toString();
     public static final String HOSTNAME = "hostname";
     public static final String NODE_GROUP_NAME = "node group";
     public static final boolean IS_CONNECTED = true;

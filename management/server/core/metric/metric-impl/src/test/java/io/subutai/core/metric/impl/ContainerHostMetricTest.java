@@ -20,7 +20,7 @@ public class ContainerHostMetricTest
     @Test
     public void testSetEnvironmentId() throws Exception
     {
-        UUID environmentId = UUID.randomUUID();
+        String environmentId = UUID.randomUUID().toString();
         ContainerHostMetricImpl containerHostMetric = new ContainerHostMetricImpl();
 
         containerHostMetric.setEnvironmentId( environmentId );
@@ -32,7 +32,7 @@ public class ContainerHostMetricTest
     @Test
     public void testToString() throws Exception
     {
-        UUID environmentId = UUID.randomUUID();
+        String environmentId = UUID.randomUUID().toString();
         ContainerHostMetricImpl containerHostMetric = new ContainerHostMetricImpl();
 
         containerHostMetric.setEnvironmentId( environmentId );

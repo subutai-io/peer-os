@@ -1,8 +1,6 @@
 package io.subutai.common.metric;
 
 
-import java.util.UUID;
-
 import com.google.common.base.Objects;
 
 
@@ -19,7 +17,7 @@ public abstract class Metric
 {
 
     protected String host;
-    protected UUID hostId;
+    protected String hostId;
     protected Double totalRam;
     protected Double availableRam;
     protected Double usedRam;
@@ -156,7 +154,7 @@ public abstract class Metric
     }
 
 
-    public UUID getHostId()
+    public String getHostId()
     {
         return hostId;
     }

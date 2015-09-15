@@ -1,19 +1,17 @@
 package io.subutai.core.env.cli;
 
 
-import java.util.UUID;
-
-import io.subutai.common.environment.Environment;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.settings.Common;
-import io.subutai.common.util.UUIDUtil;
-import io.subutai.core.env.api.EnvironmentManager;
-import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
+import io.subutai.common.environment.Environment;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.settings.Common;
+import io.subutai.core.env.api.EnvironmentManager;
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 
 /**
@@ -45,9 +43,9 @@ public class ViewEnvironmentCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Preconditions.checkArgument( UUIDUtil.isStringAUuid( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        Environment environment = environmentManager.findEnvironment( UUID.fromString( environmentId ) );
+        Environment environment = environmentManager.findEnvironment( environmentId );
 
         System.out.println( String.format( "Environment name %s", environment.getName() ) );
 

@@ -161,7 +161,7 @@ public class EnvironmentBuilderTest
 
         when( nodeGroup.getNumberOfContainers() ).thenReturn( TestUtil.NUMBER_OF_CONTAINERS );
 
-        doThrow( peerException ).when( localPeer ).setupTunnels( anyMap(), any( UUID.class ) );
+        doThrow( peerException ).when( localPeer ).setupTunnels( anyMap(), any( String.class ) );
 
         try
         {

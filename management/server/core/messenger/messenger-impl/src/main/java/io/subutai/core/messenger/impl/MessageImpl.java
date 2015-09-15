@@ -3,12 +3,12 @@ package io.subutai.core.messenger.impl;
 
 import java.util.UUID;
 
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.messenger.api.Message;
-
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 
 
 /**
@@ -18,7 +18,7 @@ public class MessageImpl implements Message
 {
     public static final int MAX_SENDER_LEN = 50;
     private final UUID id;
-    private final UUID sourcePeerId;
+    private final String sourcePeerId;
     private String sender;
     private String payloadString;
 
@@ -32,7 +32,7 @@ public class MessageImpl implements Message
     }
 
 
-    public MessageImpl( UUID sourcePeerId, Object payload )
+    public MessageImpl( String sourcePeerId, Object payload )
     {
         Preconditions.checkNotNull( sourcePeerId, "Source peer id is null" );
         Preconditions.checkNotNull( payload, "Payload is null" );
@@ -44,7 +44,7 @@ public class MessageImpl implements Message
 
 
     @Override
-    public UUID getSourcePeerId()
+    public String getSourcePeerId()
     {
         return sourcePeerId;
     }

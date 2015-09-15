@@ -27,7 +27,7 @@ public class SetQuotaTest
 
     private String containerName = "containerName";
     private String quotaValue = "50";
-    private UUID uuid = UUID.randomUUID();
+    private String uuid = UUID.randomUUID().toString();
 
     @Mock
     QuotaManager quotaManager;

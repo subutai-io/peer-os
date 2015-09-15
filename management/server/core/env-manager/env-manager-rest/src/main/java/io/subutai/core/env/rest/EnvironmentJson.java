@@ -2,7 +2,6 @@ package io.subutai.core.env.rest;
 
 
 import java.util.Set;
-import java.util.UUID;
 
 import io.subutai.common.environment.EnvironmentStatus;
 
@@ -12,13 +11,13 @@ import io.subutai.common.environment.EnvironmentStatus;
  */
 public class EnvironmentJson
 {
-    private UUID id;
+    private String id;
     private String name;
     private EnvironmentStatus status;
     private Set<ContainerJson> containers;
 
 
-    public EnvironmentJson( final UUID id, final String name, final EnvironmentStatus status,
+    public EnvironmentJson( final String id, final String name, final EnvironmentStatus status,
                             final Set<ContainerJson> containers )
     {
         this.id = id;
@@ -28,13 +27,13 @@ public class EnvironmentJson
     }
 
 
-    public UUID getId()
+    public String getId()
     {
         return id;
     }
 
 
-    public void setId( final UUID id )
+    public void setId( final String id )
     {
         this.id = id;
     }

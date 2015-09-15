@@ -4,7 +4,6 @@ package io.subutai.common.peer;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 
 import io.subutai.common.settings.ChannelSettings;
 
@@ -22,21 +21,21 @@ public class PeerInfo
     private Set<PeerPolicy> peerPolicies = new HashSet<>();
 
     private String name;
-    private UUID id;
-    private UUID ownerId;
+    private String id;
+    private String ownerId;
     private int port = Integer.valueOf( ChannelSettings.SECURE_PORT_X2 );
 
     private int lastUsedVlanId = 100;
     private String keyId;
 
 
-    public UUID getId()
+    public String getId()
     {
         return id;
     }
 
 
-    public void setId( final UUID id )
+    public void setId( final String id )
     {
         this.id = id;
     }
@@ -60,13 +59,13 @@ public class PeerInfo
     }
 
 
-    public UUID getOwnerId()
+    public String getOwnerId()
     {
         return ownerId;
     }
 
 
-    public void setOwnerId( final UUID ownerId )
+    public void setOwnerId( final String ownerId )
     {
         this.ownerId = ownerId;
     }
@@ -112,6 +111,7 @@ public class PeerInfo
     {
         return port;
     }
+
 
     public int getLastUsedVlanId()
     {
@@ -193,7 +193,7 @@ public class PeerInfo
     }
 
 
-    public PeerPolicy getPeerPolicy( final UUID remotePeerId )
+    public PeerPolicy getPeerPolicy( final String remotePeerId )
     {
         if ( peerPolicies == null )
         {

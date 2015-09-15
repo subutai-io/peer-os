@@ -31,11 +31,11 @@ public class RestServiceImplTest
 {
 
     private static final String HOST_HOSTNAME = "host";
-    private static final UUID HOST_ID = UUID.randomUUID();
+    private static final String HOST_ID = UUID.randomUUID().toString();
     private static final String HOST_IP = "127.0.0.2";
     private static final String HOST_MAC_ADDRESS = "0c:8b:fd:c0:ea:fe";
     private static final String CONTAINER_HOSTNAME = "container";
-    private static final UUID CONTAINER_ID = UUID.randomUUID();
+    private static final String CONTAINER_ID = UUID.randomUUID().toString();
     private static final String CONTAINER_IP = "127.0.0.1";
     private static final String CONTAINER_INTERFACE = "eth0";
     private static final String CONTAINER_MAC_ADDRESS = "0c:8b:fd:c0:ea:fe";

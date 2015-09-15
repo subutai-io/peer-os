@@ -16,7 +16,7 @@ import com.google.common.base.Preconditions;
 public class ResponseImpl implements Response
 {
     private ResponseType type;
-    private UUID id;
+    private String id;
     private UUID commandId;
     private Integer pid;
     private Integer responseNumber;
@@ -50,7 +50,7 @@ public class ResponseImpl implements Response
 
 
     @Override
-    public UUID getId()
+    public String getId()
     {
         return id;
     }

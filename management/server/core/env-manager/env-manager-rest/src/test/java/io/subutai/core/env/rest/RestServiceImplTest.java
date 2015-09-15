@@ -90,7 +90,7 @@ public class RestServiceImplTest
                                                                  anyString(), anyString(), anyBoolean() );
 
         doThrow( new EnvironmentNotFoundException( "" ) ).when( environmentManager )
-                                                         .findEnvironment( any( UUID.class ) );
+                                                         .findEnvironment( any( String.class ) );
     }
 
 
@@ -184,7 +184,7 @@ public class RestServiceImplTest
         assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
 
         doThrow( new EnvironmentNotFoundException( "" ) ).when( environmentManager )
-                                                         .destroyEnvironment( any( UUID.class ), anyBoolean(),
+                                                         .destroyEnvironment( any( String.class ), anyBoolean(),
                                                                  anyBoolean() );
 
         response = restService.destroyEnvironment( TestUtil.ENV_ID.toString() );
@@ -192,7 +192,7 @@ public class RestServiceImplTest
         assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getStatus() );
 
         doThrow( new EnvironmentDestructionException( "" ) ).when( environmentManager )
-                                                            .destroyEnvironment( any( UUID.class ), anyBoolean(),
+                                                            .destroyEnvironment( any( String.class ), anyBoolean(),
                                                                     anyBoolean() );
 
         response = restService.destroyEnvironment( TestUtil.ENV_ID.toString() );
@@ -244,7 +244,7 @@ public class RestServiceImplTest
         assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
 
         doThrow( new EnvironmentNotFoundException( "" ) ).when( environmentManager )
-                                                         .growEnvironment( any( UUID.class ), any( Topology.class ),
+                                                         .growEnvironment( any( String.class ), any( Topology.class ),
                                                                  anyBoolean() );
 
         response = restService.growEnvironment( TestUtil.ENV_ID.toString(), TestUtil.TOPOLOGY_JSON );
@@ -252,7 +252,7 @@ public class RestServiceImplTest
         assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getStatus() );
 
         doThrow( new EnvironmentModificationException( "" ) ).when( environmentManager )
-                                                             .growEnvironment( any( UUID.class ), any( Topology.class ),
+                                                             .growEnvironment( any( String.class ), any( Topology.class ),
                                                                      anyBoolean() );
 
         response = restService.growEnvironment( TestUtil.ENV_ID.toString(), TestUtil.TOPOLOGY_JSON );
@@ -342,14 +342,14 @@ public class RestServiceImplTest
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
 
         doThrow( new EnvironmentNotFoundException( "" ) ).when( environmentManager )
-                                                         .setSshKey( any( UUID.class ), anyString(), anyBoolean() );
+                                                         .setSshKey( any( String.class ), anyString(), anyBoolean() );
 
         response = restService.setSshKey( TestUtil.ENV_ID.toString(), TestUtil.SSH_KEY );
 
         assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getStatus() );
 
         doThrow( new EnvironmentModificationException( "" ) ).when( environmentManager )
-                                                             .setSshKey( any( UUID.class ), anyString(), anyBoolean() );
+                                                             .setSshKey( any( String.class ), anyString(), anyBoolean() );
 
         response = restService.setSshKey( TestUtil.ENV_ID.toString(), TestUtil.SSH_KEY );
 
@@ -377,14 +377,14 @@ public class RestServiceImplTest
         assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
 
         doThrow( new EnvironmentNotFoundException( "" ) ).when( environmentManager )
-                                                         .setSshKey( any( UUID.class ), anyString(), anyBoolean() );
+                                                         .setSshKey( any( String.class ), anyString(), anyBoolean() );
 
         response = restService.removeSshKey( TestUtil.ENV_ID.toString() );
 
         assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getStatus() );
 
         doThrow( new EnvironmentModificationException( "" ) ).when( environmentManager )
-                                                             .setSshKey( any( UUID.class ), anyString(), anyBoolean() );
+                                                             .setSshKey( any( String.class ), anyString(), anyBoolean() );
 
         response = restService.removeSshKey( TestUtil.ENV_ID.toString() );
 

@@ -1,8 +1,6 @@
 package io.subutai.core.peer.api;
 
 
-import java.util.UUID;
-
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 
@@ -12,5 +10,5 @@ import io.subutai.common.peer.PeerException;
  */
 public interface RemotePeer extends Peer
 {
-    public UUID getRemoteId() throws PeerException;
+    public String getRemoteId() throws PeerException;
 }

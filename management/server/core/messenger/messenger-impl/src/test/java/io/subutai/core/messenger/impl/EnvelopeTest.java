@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class EnvelopeTest
 {
-    private static final UUID TARGET_PEER_ID = UUID.randomUUID();
+    private static final String TARGET_PEER_ID = UUID.randomUUID().toString();
     private static final String RECIPIENT = "recipient";
     private static final int TIME_TO_LIVE = 5;
     private static final Map<String, String> HEADERS = Maps.newHashMap();

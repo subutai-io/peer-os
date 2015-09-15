@@ -1,8 +1,6 @@
 package io.subutai.common.protocol;
 
 
-import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Transient;
@@ -37,10 +35,10 @@ public class N2NConfig
     }
 
 
-    public N2NConfig( final UUID peerId, final String superNodeIp, final int n2nPort, final String interfaceName,
+    public N2NConfig( final String peerId, final String superNodeIp, final int n2nPort, final String interfaceName,
                       final String communityName, final String address, final String sharedKey )
     {
-        this.peerId = peerId.toString();
+        this.peerId = peerId;
         this.superNodeIp = superNodeIp;
         this.n2NPort = n2nPort;
         this.interfaceName = interfaceName;
@@ -58,15 +56,15 @@ public class N2NConfig
     }
 
 
-    public UUID getPeerId()
+    public String getPeerId()
     {
-        return UUID.fromString( peerId );
+        return peerId;
     }
 
 
-    public void setPeerId( final UUID peerId )
+    public void setPeerId( final String peerId )
     {
-        this.peerId = peerId.toString();
+        this.peerId = peerId;
     }
 
 

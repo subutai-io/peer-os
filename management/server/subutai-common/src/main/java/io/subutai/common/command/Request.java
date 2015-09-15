@@ -14,7 +14,7 @@ public interface Request
 {
     public RequestType getType();
 
-    public UUID getId();
+    public String getId();
 
     public UUID getCommandId();
 

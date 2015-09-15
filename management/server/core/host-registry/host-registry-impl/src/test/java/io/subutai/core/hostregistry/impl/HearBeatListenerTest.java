@@ -29,11 +29,11 @@ import static org.mockito.Mockito.verify;
 public class HearBeatListenerTest
 {
     private static final String HOST_HOSTNAME = "host";
-    private static final UUID HOST_ID = UUID.randomUUID();
+    private static final String HOST_ID = UUID.randomUUID().toString();
     private static final String HOST_IP = "127.0.0.2";
     private static final String HOST_MAC_ADDRESS = "0c:8b:fd:c0:ea:fe";
     private static final String CONTAINER_HOSTNAME = "container";
-    private static final UUID CONTAINER_ID = UUID.randomUUID();
+    private static final String CONTAINER_ID = UUID.randomUUID().toString();
     private static final String CONTAINER_IP = "127.0.0.1";
     private static final ContainerHostState CONTAINER_STATUS = ContainerHostState.FROZEN;
     private static final String INFO_JSON = String.format(

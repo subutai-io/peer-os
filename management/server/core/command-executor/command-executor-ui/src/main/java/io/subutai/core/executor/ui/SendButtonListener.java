@@ -2,7 +2,14 @@ package io.subutai.core.executor.ui;
 
 
 import java.util.Set;
-import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
+import com.vaadin.ui.Button;
 
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
@@ -20,13 +27,6 @@ import io.subutai.core.hostregistry.api.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.hostregistry.api.ResourceHostInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
-import com.vaadin.ui.Button;
 
 
 /**
@@ -212,7 +212,7 @@ public class SendButtonListener implements Button.ClickListener, CommandCallback
     }
 
 
-    protected HostInfo getHostById( UUID hostId )
+    protected HostInfo getHostById( String hostId )
     {
         try
         {

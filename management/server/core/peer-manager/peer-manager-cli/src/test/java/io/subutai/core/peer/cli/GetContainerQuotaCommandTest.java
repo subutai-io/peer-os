@@ -46,7 +46,7 @@ public class GetContainerQuotaCommandTest extends SystemOutRedirectTest
     {
         command = new GetContainerQuotaCommand( peerManager, environmentManager );
         when( peerManager.getPeer( anyString() ) ).thenReturn( peer );
-        when( environmentManager.findEnvironment( any( UUID.class ) ) ).thenReturn( environment );
+        when( environmentManager.findEnvironment( any( String.class ) ) ).thenReturn( environment );
         when( environment.getContainerHostByHostname( anyString() ) ).thenReturn( containerHost );
         command.environmentId = UUID.randomUUID().toString();
         command.quotaType = QuotaType.QUOTA_TYPE_CPU.getKey();

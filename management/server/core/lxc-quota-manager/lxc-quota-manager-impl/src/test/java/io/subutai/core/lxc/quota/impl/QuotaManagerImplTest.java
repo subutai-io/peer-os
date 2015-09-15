@@ -42,7 +42,7 @@ public class QuotaManagerImplTest
     private QuotaManagerImpl quotaManager;
     private Commands commands = new Commands();
 
-    private UUID uuid = UUID.randomUUID();
+    private String uuid = UUID.randomUUID().toString();
     private String containerName = "containerName";
     private String containerHostname = "containerHostname";
     private String quotaResult = "100";

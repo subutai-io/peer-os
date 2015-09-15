@@ -2,7 +2,6 @@ package io.subutai.core.lxc.quota.api;
 
 
 import java.util.Set;
-import java.util.UUID;
 
 import io.subutai.common.quota.CpuQuotaInfo;
 import io.subutai.common.quota.DiskPartition;
@@ -34,7 +33,7 @@ public interface QuotaManager
      *
      * @return - brief description of quota requested
      */
-    public QuotaInfo getQuotaInfo( UUID containerId, QuotaType quotaType ) throws QuotaException;
+    public QuotaInfo getQuotaInfo( String containerId, QuotaType quotaType ) throws QuotaException;
 
 
     /**
@@ -44,7 +43,7 @@ public interface QuotaManager
      *
      * @return - quota in mb
      */
-    public int getRamQuota( UUID containerId ) throws QuotaException;
+    public int getRamQuota( String containerId ) throws QuotaException;
 
 
     /**
@@ -54,7 +53,7 @@ public interface QuotaManager
      *
      * @return - quota object
      */
-    public RamQuota getRamQuotaInfo( UUID containerId ) throws QuotaException;
+    public RamQuota getRamQuotaInfo( String containerId ) throws QuotaException;
 
 
     /**
@@ -63,7 +62,7 @@ public interface QuotaManager
      * @param containerId - id of container
      * @param ramInMb - quota in mb
      */
-    public void setRamQuota( UUID containerId, int ramInMb ) throws QuotaException;
+    public void setRamQuota( String containerId, int ramInMb ) throws QuotaException;
 
 
     /**
@@ -73,7 +72,7 @@ public interface QuotaManager
      *
      * @return - cpu quota on container in percent
      */
-    public int getCpuQuota( UUID containerId ) throws QuotaException;
+    public int getCpuQuota( String containerId ) throws QuotaException;
 
 
     /**
@@ -83,7 +82,7 @@ public interface QuotaManager
      *
      * @return - cpu quota object on container
      */
-    public CpuQuotaInfo getCpuQuotaInfo( UUID containerId ) throws QuotaException;
+    public CpuQuotaInfo getCpuQuotaInfo( String containerId ) throws QuotaException;
 
 
     /**
@@ -92,7 +91,7 @@ public interface QuotaManager
      * @param containerId - id of container
      * @param cpuPercent - cpu quota in percent
      */
-    public void setCpuQuota( UUID containerId, int cpuPercent ) throws QuotaException;
+    public void setCpuQuota( String containerId, int cpuPercent ) throws QuotaException;
 
     /**
      * Returns allowed cpus/cores ids on container
@@ -101,7 +100,7 @@ public interface QuotaManager
      *
      * @return - allowed cpu set
      */
-    public Set<Integer> getCpuSet( UUID containerId ) throws QuotaException;
+    public Set<Integer> getCpuSet( String containerId ) throws QuotaException;
 
     /**
      * Sets allowed cpus/cores on container
@@ -109,7 +108,7 @@ public interface QuotaManager
      * @param containerId - id of container
      * @param cpuSet - allowed cpu set
      */
-    public void setCpuSet( UUID containerId, Set<Integer> cpuSet ) throws QuotaException;
+    public void setCpuSet( String containerId, Set<Integer> cpuSet ) throws QuotaException;
 
     /**
      * Returns disk partition quota on container
@@ -119,7 +118,7 @@ public interface QuotaManager
      *
      * @return {@code DiskQuota}
      */
-    public DiskQuota getDiskQuota( UUID containerId, DiskPartition diskPartition ) throws QuotaException;
+    public DiskQuota getDiskQuota( String containerId, DiskPartition diskPartition ) throws QuotaException;
 
 
     /**
@@ -128,7 +127,7 @@ public interface QuotaManager
      * @param containerId - id of container
      * @param diskQuota - disk quota to set
      */
-    public void setDiskQuota( UUID containerId, DiskQuota diskQuota ) throws QuotaException;
+    public void setDiskQuota( String containerId, DiskQuota diskQuota ) throws QuotaException;
 
     /**
      * Sets ram quota on container
@@ -136,7 +135,7 @@ public interface QuotaManager
      * @param containerId - id of container
      * @param ramQuota - ram quota to set
      */
-    public void setRamQuota( final UUID containerId, final RamQuota ramQuota ) throws QuotaException;
+    public void setRamQuota( final String containerId, final RamQuota ramQuota ) throws QuotaException;
 
     /**
      * Returns max available RAM quota in MB on container
@@ -145,7 +144,7 @@ public interface QuotaManager
      *
      * @return - max available ram quota in MB
      */
-    public int getAvailableRamQuota( UUID containerId ) throws QuotaException;
+    public int getAvailableRamQuota( String containerId ) throws QuotaException;
 
     /**
      * Returns max available CPU quota in percent on container
@@ -154,7 +153,7 @@ public interface QuotaManager
      *
      * @return - max available cpu quota in percent
      */
-    public int getAvailableCpuQuota( UUID containerId ) throws QuotaException;
+    public int getAvailableCpuQuota( String containerId ) throws QuotaException;
 
     /**
      * Returns max available disk quota on container
@@ -163,5 +162,5 @@ public interface QuotaManager
      *
      * @return - max available ram disk quota {@code DiskQuota}
      */
-    public DiskQuota getAvailableDiskQuota( UUID containerId, DiskPartition diskPartition ) throws QuotaException;
+    public DiskQuota getAvailableDiskQuota( String containerId, DiskPartition diskPartition ) throws QuotaException;
 }

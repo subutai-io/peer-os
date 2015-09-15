@@ -239,7 +239,7 @@ public class RequestBuilder
     }
 
 
-    public Request build( UUID id )
+    public Request build( String id )
     {
         return new RequestImpl( type, id, cwd, command, cmdArgs, envVars, outputRedirection, errRedirection, runAs,
                 timeout, isDaemon, configPoints, pid );
@@ -331,7 +331,7 @@ public class RequestBuilder
     public static class RequestImpl implements Request
     {
         private RequestType type;
-        private UUID id;
+        private String id;
         private UUID commandId;
         private String workingDirectory;
         private String command;
@@ -346,8 +346,8 @@ public class RequestBuilder
         private Set<String> configPoints;
 
 
-        public RequestImpl( final RequestType type, final UUID id, final String workingDirectory, final String command,
-                            final List<String> args, final Map<String, String> environment,
+        public RequestImpl( final RequestType type, final String id, final String workingDirectory,
+                            final String command, final List<String> args, final Map<String, String> environment,
                             final OutputRedirection stdOut, final OutputRedirection stdErr, final String runAs,
                             final Integer timeout, final Integer isDaemon, final Set<String> configPoints,
                             final int pid )
@@ -377,7 +377,7 @@ public class RequestBuilder
 
 
         @Override
-        public UUID getId()
+        public String getId()
         {
             return id;
         }

@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 public class ResponseImplTest
 {
     private static final ResponseType RESPONSE_TYPE = ResponseType.EXECUTE_RESPONSE;
-    private static final UUID ID = UUID.randomUUID();
+    private static final String ID = UUID.randomUUID().toString();
     private static final UUID COMMAND_ID = UUID.randomUUID();
     private static final Integer PID = 123;
     private static final Integer RES_NO = 1;

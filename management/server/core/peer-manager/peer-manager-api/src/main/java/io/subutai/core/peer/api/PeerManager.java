@@ -3,7 +3,6 @@ package io.subutai.core.peer.api;
 
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -39,22 +38,18 @@ public interface PeerManager
     /**
      * Returns peer metadata by peer id
      */
-    public PeerInfo getPeerInfo( UUID uuid );
+    public PeerInfo getPeerInfo( String id );
 
     /**
      * Unregisters peer
      */
-    boolean unregister( String uuid ) throws PeerException;
-
-    /**
-     * Returns peer instance by peer id
-     */
-    public Peer getPeer( UUID peerId );
+    boolean unregister( String id ) throws PeerException;
 
     /**
      * Returns peer instance by peer id
      */
     public Peer getPeer( String peerId );
+
 
     /**
      * Returns all peer instances

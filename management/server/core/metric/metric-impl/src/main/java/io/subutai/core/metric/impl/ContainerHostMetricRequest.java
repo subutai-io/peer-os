@@ -1,24 +1,21 @@
 package io.subutai.core.metric.impl;
 
 
-import java.util.UUID;
-
-
 /**
  * Remote containers host metric request
  */
 public class ContainerHostMetricRequest
 {
-    private UUID environmentId;
+    private String environmentId;
 
 
-    public ContainerHostMetricRequest( final UUID environmentId )
+    public ContainerHostMetricRequest( final String environmentId )
     {
         this.environmentId = environmentId;
     }
 
 
-    public UUID getEnvironmentId()
+    public String getEnvironmentId()
     {
         return environmentId;
     }

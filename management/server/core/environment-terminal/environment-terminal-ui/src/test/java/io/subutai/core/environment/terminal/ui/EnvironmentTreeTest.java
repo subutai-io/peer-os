@@ -27,9 +27,9 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class EnvironmentTreeTest
 {
-    private static final UUID PEER_ID = UUID.randomUUID();
-    private static UUID CONTAINER_A_ID = UUID.randomUUID();
-    private static UUID CONTAINER_B_ID = UUID.randomUUID();
+    private static final String PEER_ID = UUID.randomUUID().toString();
+    private static String CONTAINER_A_ID = UUID.randomUUID().toString();
+    private static String CONTAINER_B_ID = UUID.randomUUID().toString();
     @Mock
     EnvironmentManager environmentManager;
 

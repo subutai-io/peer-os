@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class GetIdCommandTest extends SystemOutRedirectTest
 {
-    private static final UUID ID = UUID.randomUUID();
+    private static final String ID = UUID.randomUUID().toString();
     @Mock
     PeerManager peerManager;
     @Mock

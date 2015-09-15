@@ -48,7 +48,7 @@ public class CreateContainerGroupRequestTest
         myListCriteria.add( criteria );
 
         containerGroupRequest =
-                new CreateContainerGroupRequest( myMap, UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), "555",
+                new CreateContainerGroupRequest( myMap, UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), "555",
                         myList, 5, "Round Robin", myListCriteria, 555 );
     }
 

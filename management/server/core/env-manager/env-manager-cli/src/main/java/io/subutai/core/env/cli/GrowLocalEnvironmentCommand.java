@@ -2,22 +2,21 @@ package io.subutai.core.env.cli;
 
 
 import java.util.Set;
-import java.util.UUID;
+
+import org.apache.karaf.shell.commands.Argument;
+import org.apache.karaf.shell.commands.Command;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.common.settings.Common;
-import io.subutai.common.util.UUIDUtil;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
-
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
-
-import com.google.common.base.Preconditions;
 
 
 /**
@@ -79,7 +78,7 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Preconditions.checkArgument( UUIDUtil.isStringAUuid( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
         Topology topology = new Topology();
         NodeGroup nodeGroup = new NodeGroup( String.format( "NodeGroup%s", System.currentTimeMillis() ), templateName,
@@ -87,8 +86,7 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
 
         topology.addNodeGroupPlacement( peerManager.getLocalPeer(), nodeGroup );
 
-        Set<ContainerHost> newContainers =
-                environmentManager.growEnvironment( UUID.fromString( environmentId ), topology, async );
+        Set<ContainerHost> newContainers = environmentManager.growEnvironment( environmentId, topology, async );
 
         System.out.println( "New containers created:" );
 

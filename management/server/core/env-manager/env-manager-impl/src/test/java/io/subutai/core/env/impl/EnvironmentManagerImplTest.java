@@ -178,7 +178,7 @@ public class EnvironmentManagerImplTest
         when( peerInfo.getIp() ).thenReturn( TestUtil.IP );
         when( nodeGroup.getTemplateName() ).thenReturn( TestUtil.TEMPLATE_NAME );
         when( templateRegistry.getTemplate( TestUtil.TEMPLATE_NAME ) ).thenReturn( template );
-        when( template.getRemoteClone( any( UUID.class ) ) ).thenReturn( template );
+        when( template.getRemoteClone( any( String.class ) ) ).thenReturn( template );
         when( nodeGroup.getContainerPlacementStrategy() ).thenReturn( placementStrategy );
         when( placementStrategy.getStrategyId() ).thenReturn( "ROUND-ROBIN" );
         when( placementStrategy.getCriteriaAsList() ).thenReturn( Lists.<Criteria>newArrayList() );
@@ -360,7 +360,7 @@ public class EnvironmentManagerImplTest
         when( environment.getStatus() ).thenReturn( EnvironmentStatus.HEALTHY );
 
         doThrow( new ContainerHostNotFoundException( null ) ).when( environment )
-                                                             .getContainerHostById( any( UUID.class ) );
+                                                             .getContainerHostById( any( String.class ) );
 
         environmentManager.destroyContainer( environmentContainer, false, false );
     }

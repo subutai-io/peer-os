@@ -2,7 +2,6 @@ package io.subutai.core.env.impl.tasks;
 
 
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -189,7 +188,7 @@ public class DestroyEnvironmentTask implements Awaitable
                 }
                 else if ( !CollectionUtil.isCollectionEmpty( result.getDestroyedContainersIds() ) )
                 {
-                    for ( UUID containerId : result.getDestroyedContainersIds() )
+                    for ( String containerId : result.getDestroyedContainersIds() )
                     {
                         environment.removeContainer( containerId );
 

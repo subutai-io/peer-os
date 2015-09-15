@@ -34,21 +34,21 @@ public class PeerInfoTest
     @Before
     public void setUp() throws Exception
     {
-        when( peerPolicy.getRemotePeerId() ).thenReturn( new UUID( 50, 50 ) );
-        when( peerPolicy2.getRemotePeerId() ).thenReturn( UUID.randomUUID() );
+        when( peerPolicy.getRemotePeerId() ).thenReturn( new UUID( 50, 50 ).toString() );
+        when( peerPolicy2.getRemotePeerId() ).thenReturn( UUID.randomUUID().toString() );
 
         Set<PeerPolicy> mySet = new HashSet<>();
         mySet.add( peerPolicy );
         mySet.add( peerPolicy2 );
 
         peerInfo = new PeerInfo();
-        peerInfo.setId( UUID.randomUUID() );
+        peerInfo.setId( UUID.randomUUID().toString() );
         peerInfo.setGatewayIp( "testGateWayIp" );
         peerInfo.setIp( "testIp" );
         peerInfo.setKeyId( "testKeyId" );
         peerInfo.setLastUsedVlanId( 555 );
         peerInfo.setName( "testName" );
-        peerInfo.setOwnerId( UUID.randomUUID() );
+        peerInfo.setOwnerId( UUID.randomUUID().toString() );
         peerInfo.setPeerPolicy( peerPolicy );
         peerInfo.setPeerPolicies( mySet );
         peerInfo.setPort( 8252 );
@@ -69,7 +69,7 @@ public class PeerInfoTest
         assertNotNull( peerInfo.getLastUsedVlanId() );
         assertNotNull( peerInfo.getKeyId() );
         assertNotNull( peerInfo.getPeerPolicies() );
-        assertNotNull( peerInfo.getPeerPolicy( new UUID( 50, 50 ) ) );
+        assertNotNull( peerInfo.getPeerPolicy( new UUID( 50, 50 ).toString() ) );
         peerInfo.hashCode();
         peerInfo.equals( "test" );
         peerInfo.equals( peerInfo );

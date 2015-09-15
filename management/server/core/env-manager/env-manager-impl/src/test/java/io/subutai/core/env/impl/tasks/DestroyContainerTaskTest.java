@@ -104,13 +104,13 @@ public class DestroyContainerTaskTest
 
         task.run();
 
-        verify( environmentManager, times( 2 ) ).removeEnvironment( any( UUID.class ), anyBoolean() );
+        verify( environmentManager, times( 2 ) ).removeEnvironment( any( String.class ), anyBoolean() );
 
 
         when( environment.getContainerHosts() ).thenReturn( Sets.<ContainerHost>newHashSet() );
 
         doThrow( environmentNotFoundException ).when( environmentManager )
-                                               .removeEnvironment( any( UUID.class ), anyBoolean() );
+                                               .removeEnvironment( any( String.class ), anyBoolean() );
         task.run();
 
         verify( environmentNotFoundException ).printStackTrace( any( PrintStream.class ) );

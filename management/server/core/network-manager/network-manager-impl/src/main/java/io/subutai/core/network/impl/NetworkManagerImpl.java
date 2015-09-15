@@ -3,7 +3,6 @@ package io.subutai.core.network.impl;
 
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -121,7 +120,7 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void cleanupEnvironmentNetworkSettings( final UUID environmentId ) throws NetworkManagerException
+    public void cleanupEnvironmentNetworkSettings( final String environmentId ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
@@ -201,7 +200,7 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void setupVniVLanMapping( final int tunnelId, final long vni, final int vLanId, final UUID environmentId )
+    public void setupVniVLanMapping( final int tunnelId, final long vni, final int vLanId, final String environmentId )
             throws NetworkManagerException
     {
         Preconditions.checkArgument( tunnelId > 0, "Tunnel id must be greater than 0" );
@@ -250,8 +249,7 @@ public class NetworkManagerImpl implements NetworkManager
             {
                 mappings.add( new VniVlanMapping(
                         Integer.parseInt( m.group( 1 ).replace( NetworkManager.TUNNEL_PREFIX, "" ) ),
-                        Long.parseLong( m.group( 2 ) ), Integer.parseInt( m.group( 3 ) ),
-                        UUID.fromString( m.group( 4 ) ) ) );
+                        Long.parseLong( m.group( 2 ) ), Integer.parseInt( m.group( 3 ) ), m.group( 4 ) ) );
             }
         }
 
@@ -381,7 +379,7 @@ public class NetworkManagerImpl implements NetworkManager
             if ( m.find() && m.groupCount() == 3 )
             {
                 reservedVnis.add( new Vni( Long.parseLong( m.group( 1 ) ), Integer.parseInt( m.group( 2 ) ),
-                        UUID.fromString( m.group( 3 ) ) ) );
+                        m.group( 3 ) ) );
             }
         }
 

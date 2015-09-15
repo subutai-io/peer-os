@@ -2,19 +2,18 @@ package io.subutai.core.metric.impl;
 
 
 import java.util.Set;
-import java.util.UUID;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.metric.api.MonitoringSettings;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
-
 
 public class MonitoringActivationRequest
 {
-    private Set<UUID> containerHostsIds;
+    private Set<String> containerHostsIds;
     private MonitoringSettings monitoringSettings;
 
 
@@ -34,7 +33,7 @@ public class MonitoringActivationRequest
     }
 
 
-    public Set<UUID> getContainerHostsIds()
+    public Set<String> getContainerHostsIds()
     {
         return containerHostsIds;
     }

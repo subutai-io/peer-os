@@ -34,7 +34,7 @@ public class ContainerHostMetricsCommandTest extends SystemOutRedirectTest
     Monitor monitor;
     @Mock
     EnvironmentManager environmentManager;
-    private static final UUID ENVIRONMENT_ID = UUID.randomUUID();
+    private static final String ENVIRONMENT_ID = UUID.randomUUID().toString();
     private static final String METRIC_TO_STRING = "metric";
     private static final String ENVIRONMENT_NOT_FOUND_MSG = "Environment not found";
     private ContainerHostMetricsCommand containerHostMetricsCommand;

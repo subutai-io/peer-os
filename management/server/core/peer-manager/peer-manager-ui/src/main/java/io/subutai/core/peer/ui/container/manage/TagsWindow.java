@@ -1,14 +1,6 @@
 package io.subutai.core.peer.ui.container.manage;
 
 
-import java.util.UUID;
-
-import io.subutai.common.environment.Environment;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.util.ServiceLocator;
-import io.subutai.common.util.UUIDUtil;
-import io.subutai.core.env.api.EnvironmentManager;
-
 import com.google.common.base.Strings;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.ui.Alignment;
@@ -18,6 +10,11 @@ import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
+
+import io.subutai.common.environment.Environment;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.util.ServiceLocator;
+import io.subutai.core.env.api.EnvironmentManager;
 
 
 public class TagsWindow extends Window
@@ -32,11 +29,9 @@ public class TagsWindow extends Window
         {
             EnvironmentManager environmentManager = serviceLocator.getService( EnvironmentManager.class );
             String environmentId = containerHost.getEnvironmentId();
-            if ( UUIDUtil.isStringAUuid( environmentId ) )
-            {
-                Environment environment = environmentManager.findEnvironment( UUID.fromString( environmentId ) );
-                environmentContainer = environment.getContainerHostById( containerHost.getId() );
-            }
+
+            Environment environment = environmentManager.findEnvironment( environmentId );
+            environmentContainer = environment.getContainerHostById( containerHost.getId() );
         }
         catch ( Exception e )
         {

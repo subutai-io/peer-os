@@ -9,11 +9,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import io.subutai.core.messenger.api.Message;
-import io.subutai.core.messenger.impl.Envelope;
-import io.subutai.core.messenger.impl.entity.MessageEntity;
 
 import com.google.common.collect.Maps;
+
+import io.subutai.core.messenger.api.Message;
+import io.subutai.core.messenger.impl.entity.MessageEntity;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
@@ -26,8 +26,8 @@ import static org.mockito.Mockito.when;
 public class MessageEntityTest
 {
     private static final UUID ID = UUID.randomUUID();
-    private static final UUID SOURCE_PEER_ID = UUID.randomUUID();
-    private static final UUID TARGET_PEER_ID = UUID.randomUUID();
+    private static final String SOURCE_PEER_ID = UUID.randomUUID().toString();
+    private static final String TARGET_PEER_ID = UUID.randomUUID().toString();
     private static final String SENDER = "sender";
     private static final String SENDER2 = "sender2";
     private static final String PAYLOAD = "payload";
@@ -93,7 +93,6 @@ public class MessageEntityTest
 
         messageEntity.setSender( SENDER2 );
         assertEquals( SENDER2, messageEntity.getSender() );
-
     }
 
 
@@ -105,6 +104,5 @@ public class MessageEntityTest
         map.put( messageEntity, messageEntity );
 
         assertEquals( new MessageEntity( envelope ), map.get( messageEntity ) );
-
     }
 }

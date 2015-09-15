@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
@@ -58,7 +59,7 @@ public class ExecAsyncCommandTest extends SystemOutRedirectTest
         command.doExecute();
 
         verify( commandExecutor )
-                .executeAsync( any( UUID.class ), any( RequestBuilder.class ), isA( CommandCallback.class ) );
+                .executeAsync( any( String.class ), any( RequestBuilder.class ), isA( CommandCallback.class ) );
 
 
         //test invalid id

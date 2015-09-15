@@ -109,7 +109,7 @@ public class IntegrationImpl implements Integration
     private byte[] serverFingerprint;
     private PGPMessenger messenger;
     private PGPPrivateKey senderKey;
-    private UUID peerId;
+    private String peerId;
 
 
     public void setSecurityManager( final SecurityManager securityManager )
@@ -139,7 +139,7 @@ public class IntegrationImpl implements Integration
             this.peerId = peerManager.getLocalPeerInfo().getId();
 
             this.hubPublicKey = PGPKeyHelper.readPublicKey( HSettings.HUB_PUB_KEY );
-            this.ownerPublicKey = securityManager.getKeyManager().getPublicKey( "owner-" + peerId.toString() );
+            this.ownerPublicKey = securityManager.getKeyManager().getPublicKey( "owner-" + peerId );
             this.peerPublicKey = securityManager.getKeyManager().getPublicKey( null );
 
             LOG.debug( String.format( "Peer fingerprint: %s",
@@ -719,7 +719,8 @@ public class IntegrationImpl implements Integration
                     packageDto.getSharedSecret() );
 
             peerManager.getLocalPeer().setupN2NConnection( config );
-            dto.setPeerId( peerId );
+            //TODO use String instead of UUID
+            dto.setPeerId( UUID.fromString( peerId ) );
             dto.setState( EnvironmentPeerDataDto.State.READY );
         }
         catch ( Exception e )
@@ -762,7 +763,8 @@ public class IntegrationImpl implements Integration
 
 
         EnvironmentPeerDataDto result = new EnvironmentPeerDataDto();
-        result.setPeerId( peerId );
+        //todo use String instead of UUID
+        result.setPeerId( UUID.fromString( peerId ) );
         try
         {
             Set<String> excludedAdresses = new HashSet<>();

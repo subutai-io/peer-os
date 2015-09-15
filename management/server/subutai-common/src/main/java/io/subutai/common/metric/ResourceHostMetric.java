@@ -1,8 +1,6 @@
 package io.subutai.common.metric;
 
 
-import java.util.UUID;
-
 import com.google.common.base.Objects;
 
 
@@ -11,10 +9,10 @@ import com.google.common.base.Objects;
  */
 public abstract class ResourceHostMetric extends Metric
 {
-    protected UUID peerId;
+    protected String peerId;
 
 
-    public UUID getPeerId()
+    public String getPeerId()
     {
         return peerId;
     }
@@ -25,6 +23,4 @@ public abstract class ResourceHostMetric extends Metric
     {
         return Objects.toStringHelper( this ).add( "metric", super.toString() ).add( "peerId", peerId ).toString();
     }
-
-
 }

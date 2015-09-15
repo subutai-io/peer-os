@@ -2,17 +2,17 @@ package io.subutai.core.metric.impl;
 
 
 import java.util.Set;
-import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Sets;
 
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.metric.api.MonitoringSettings;
 import io.subutai.core.peer.api.Payload;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.RequestListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Sets;
 
 
 public class MonitoringActivationListener extends RequestListener
@@ -41,10 +41,10 @@ public class MonitoringActivationListener extends RequestListener
         if ( request != null )
         {
             MonitoringSettings monitoringSettings = request.getMonitoringSettings();
-            Set<UUID> containerIds = request.getContainerHostsIds();
+            Set<String> containerIds = request.getContainerHostsIds();
             Set<ContainerHost> containerHosts = Sets.newHashSet();
 
-            for ( UUID id : containerIds )
+            for ( String id : containerIds )
             {
                 containerHosts.add( ( ContainerHost ) peerManager.getLocalPeer().bindHost( id ) );
             }

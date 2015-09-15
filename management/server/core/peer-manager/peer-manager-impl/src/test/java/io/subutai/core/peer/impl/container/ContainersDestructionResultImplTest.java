@@ -15,8 +15,8 @@ import static junit.framework.TestCase.assertEquals;
 
 public class ContainersDestructionResultImplTest
 {
-    private static final UUID PEER_ID = UUID.randomUUID();
-    private static final UUID CONTAINER_ID = UUID.randomUUID();
+    private static final String PEER_ID = UUID.randomUUID().toString();
+    private static final String CONTAINER_ID = UUID.randomUUID().toString();
     private static final String EXCEPTION = "exception";
 
     ContainersDestructionResultImpl containersDestructionResult;

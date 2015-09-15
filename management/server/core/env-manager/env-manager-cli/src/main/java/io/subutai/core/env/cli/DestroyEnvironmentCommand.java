@@ -1,16 +1,14 @@
 package io.subutai.core.env.cli;
 
 
-import java.util.UUID;
-
-import io.subutai.common.util.UUIDUtil;
-import io.subutai.core.env.api.EnvironmentManager;
-import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
+import io.subutai.core.env.api.EnvironmentManager;
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 
 /**
@@ -58,9 +56,9 @@ public class DestroyEnvironmentCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Preconditions.checkArgument( UUIDUtil.isStringAUuid( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        environmentManager.destroyEnvironment( UUID.fromString( environmentId ), async, forceMetadataRemoval );
+        environmentManager.destroyEnvironment( environmentId, async, forceMetadataRemoval );
 
         System.out.println( "Environment destroyed" );
 

@@ -5,11 +5,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.commons.net.util.SubnetUtils;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.CreateContainerGroupRequest;
 import io.subutai.common.environment.NodeGroup;
@@ -27,13 +33,6 @@ import io.subutai.core.env.impl.exception.NodeGroupBuildException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
-
-import org.apache.commons.net.util.SubnetUtils;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -85,7 +84,7 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
      *
      * @return - list of templates with parent dependencies
      */
-    public List<Template> fetchRequiredTemplates( UUID sourcePeerId, final String templateName )
+    public List<Template> fetchRequiredTemplates( String sourcePeerId, final String templateName )
             throws NodeGroupBuildException
     {
         List<Template> requiredTemplates = Lists.newArrayList();

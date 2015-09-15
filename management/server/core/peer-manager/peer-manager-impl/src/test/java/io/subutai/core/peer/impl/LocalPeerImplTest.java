@@ -75,7 +75,6 @@ import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.entity.ResourceHostEntity;
 import io.subutai.core.registry.api.RegistryException;
 import io.subutai.core.registry.api.TemplateRegistry;
-import io.subutai.core.security.api.*;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.StrategyManager;
@@ -107,13 +106,13 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class LocalPeerImplTest
 {
-    private static final UUID ENVIRONMENT_ID = UUID.randomUUID();
-    private static final UUID LOCAL_PEER_ID = UUID.randomUUID();
-    private static final UUID OWNER_ID = UUID.randomUUID();
+    private static final String ENVIRONMENT_ID = UUID.randomUUID().toString();
+    private static final String LOCAL_PEER_ID = UUID.randomUUID().toString();
+    private static final String OWNER_ID = UUID.randomUUID().toString();
     private static final String LOCAL_PEER_NAME = "local peer";
-    private static final UUID MANAGEMENT_HOST_ID = UUID.randomUUID();
-    private static final UUID RESOURCE_HOST_ID = UUID.randomUUID();
-    private static final UUID CONTAINER_HOST_ID = UUID.randomUUID();
+    private static final String MANAGEMENT_HOST_ID = UUID.randomUUID().toString();
+    private static final String RESOURCE_HOST_ID = UUID.randomUUID().toString();
+    private static final String CONTAINER_HOST_ID = UUID.randomUUID().toString();
     private static final String RESOURCE_HOST_NAME = "foo";
     private static final String CONTAINER_NAME = "foo";
     private static final String TEMPLATE_NAME = "master";
@@ -206,7 +205,7 @@ public class LocalPeerImplTest
         peerMap.put( IP, N2N_IP );
         localPeer =
                 spy( new LocalPeerImpl( daoManager, templateRegistry, quotaManager, strategyManager, commandExecutor,
-                        hostRegistry, monitor,httpContextManager,securityManager  ) );
+                        hostRegistry, monitor, httpContextManager, securityManager ) );
 
         localPeer.containerHostDataService = containerHostDataService;
         localPeer.containerGroupDataService = containerGroupDataService;
@@ -369,20 +368,20 @@ public class LocalPeerImplTest
         distribution.put( resourceHost, Sets.newHashSet( CONTAINER_NAME ) );
         doReturn( distribution ).when( localPeer )
                                 .distributeContainersToResourceHosts( any( CreateContainerGroupRequest.class ) );
-        doReturn( Common.MIN_VLAN_ID ).when( localPeer ).setupTunnels( anyMap(), any( UUID.class ) );
+        doReturn( Common.MIN_VLAN_ID ).when( localPeer ).setupTunnels( anyMap(), any( String.class ) );
         doReturn( Sets.newHashSet( hostInfoModel ) ).when( localPeer )
                                                     .processRequestCompletion( anyList(), any( ExecutorService.class ),
                                                             any( CreateContainerGroupRequest.class ) );
 
         localPeer.createContainerGroup(
-                new CreateContainerGroupRequest( peerMap, ENVIRONMENT_ID, UUID.randomUUID(), OWNER_ID, SUBNET,
-                        Lists.newArrayList( template ), 1, "ROUND_ROBIN", Lists.<Criteria>newArrayList(), 0 ) );
+                new CreateContainerGroupRequest( peerMap, ENVIRONMENT_ID, UUID.randomUUID().toString(), OWNER_ID,
+                        SUBNET, Lists.newArrayList( template ), 1, "ROUND_ROBIN", Lists.<Criteria>newArrayList(), 0 ) );
 
         try
         {
             localPeer.createContainerGroup(
-                    new CreateContainerGroupRequest( peerMap, ENVIRONMENT_ID, UUID.randomUUID(), OWNER_ID, "",
-                            Lists.newArrayList( template ), 1, "ROUND_ROBIN", Lists.<Criteria>newArrayList(), 0 ) );
+                    new CreateContainerGroupRequest( peerMap, ENVIRONMENT_ID, UUID.randomUUID().toString(), OWNER_ID,
+                            "", Lists.newArrayList( template ), 1, "ROUND_ROBIN", Lists.<Criteria>newArrayList(), 0 ) );
             fail( "Expected PeerException" );
         }
         catch ( PeerException e )
@@ -394,7 +393,7 @@ public class LocalPeerImplTest
         try
         {
             localPeer.createContainerGroup(
-                    new CreateContainerGroupRequest( peerMap, ENVIRONMENT_ID, UUID.randomUUID(), OWNER_ID,
+                    new CreateContainerGroupRequest( peerMap, ENVIRONMENT_ID, UUID.randomUUID().toString(), OWNER_ID,
                             SUBNET, Lists.newArrayList( template ), 1, "ROUND_ROBIN", Lists.<Criteria>newArrayList(),
                             0 ) );
             fail( "Expected PeerException" );
@@ -475,12 +474,12 @@ public class LocalPeerImplTest
         when( taskFuture.get() ).thenReturn( containerHost );
         when( request.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
         when( request.getOwnerId() ).thenReturn( OWNER_ID );
-        when( request.getInitiatorPeerId() ).thenReturn( UUID.randomUUID() );
+        when( request.getInitiatorPeerId() ).thenReturn( UUID.randomUUID().toString() );
         doReturn( containerGroup ).when( localPeer ).findContainerGroupByEnvironmentId( ENVIRONMENT_ID );
 
         localPeer.processRequestCompletion( Lists.newArrayList( taskFuture ), executorService, request );
 
-        when( request.getEnvironmentId() ).thenReturn( UUID.randomUUID() );
+        when( request.getEnvironmentId() ).thenReturn( UUID.randomUUID().toString() );
 
         localPeer.processRequestCompletion( Lists.newArrayList( taskFuture ), executorService, request );
 
@@ -498,7 +497,7 @@ public class LocalPeerImplTest
     {
         assertNotNull( localPeer.findContainerGroupByContainerId( CONTAINER_HOST_ID ) );
 
-        when( containerGroup.getContainerIds() ).thenReturn( Sets.<UUID>newHashSet() );
+        when( containerGroup.getContainerIds() ).thenReturn( Sets.<String>newHashSet() );
 
         localPeer.findContainerGroupByContainerId( CONTAINER_HOST_ID );
     }
@@ -509,7 +508,7 @@ public class LocalPeerImplTest
     {
         assertFalse( localPeer.findContainerGroupsByOwnerId( OWNER_ID ).isEmpty() );
 
-        when( containerGroup.getOwnerId() ).thenReturn( UUID.randomUUID() );
+        when( containerGroup.getOwnerId() ).thenReturn( UUID.randomUUID().toString() );
 
         assertTrue( localPeer.findContainerGroupsByOwnerId( OWNER_ID ).isEmpty() );
     }
@@ -520,7 +519,7 @@ public class LocalPeerImplTest
     {
         assertNotNull( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) );
 
-        when( containerGroup.getEnvironmentId() ).thenReturn( UUID.randomUUID() );
+        when( containerGroup.getEnvironmentId() ).thenReturn( UUID.randomUUID().toString() );
 
         assertNull( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) );
     }
@@ -569,7 +568,7 @@ public class LocalPeerImplTest
     {
         assertEquals( resourceHost, localPeer.getResourceHostById( RESOURCE_HOST_ID ) );
 
-        localPeer.getResourceHostById( UUID.randomUUID() );
+        localPeer.getResourceHostById( UUID.randomUUID().toString() );
     }
 
 
@@ -636,7 +635,8 @@ public class LocalPeerImplTest
 
         verify( containerGroupDataService ).remove( ENVIRONMENT_ID.toString() );
 
-        when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( CONTAINER_HOST_ID, UUID.randomUUID() ) );
+        when( containerGroup.getContainerIds() )
+                .thenReturn( Sets.newHashSet( CONTAINER_HOST_ID, UUID.randomUUID().toString() ) );
 
         localPeer.destroyContainer( containerHost );
 
@@ -772,11 +772,11 @@ public class LocalPeerImplTest
     {
         localPeer.execute( requestBuilder, containerHost, commandCallback );
 
-        verify( commandExecutor ).execute( CONTAINER_HOST_ID, requestBuilder, commandCallback );
+        verify( commandExecutor ).execute( CONTAINER_HOST_ID.toString(), requestBuilder, commandCallback );
 
         localPeer.execute( requestBuilder, containerHost );
 
-        verify( commandExecutor ).execute( CONTAINER_HOST_ID, requestBuilder );
+        verify( commandExecutor ).execute( CONTAINER_HOST_ID.toString(), requestBuilder );
 
         when( containerHost.isConnected() ).thenReturn( false );
 
@@ -807,11 +807,11 @@ public class LocalPeerImplTest
     {
         localPeer.executeAsync( requestBuilder, containerHost, commandCallback );
 
-        verify( commandExecutor ).executeAsync( CONTAINER_HOST_ID, requestBuilder, commandCallback );
+        verify( commandExecutor ).executeAsync( CONTAINER_HOST_ID.toString(), requestBuilder, commandCallback );
 
         localPeer.executeAsync( requestBuilder, containerHost );
 
-        verify( commandExecutor ).executeAsync( CONTAINER_HOST_ID, requestBuilder );
+        verify( commandExecutor ).executeAsync( CONTAINER_HOST_ID.toString(), requestBuilder );
 
         when( containerHost.isConnected() ).thenReturn( false );
 
@@ -933,7 +933,7 @@ public class LocalPeerImplTest
     {
 
         ContainerHostInfo containerHostInfo1 = mock( ContainerHostInfo.class );
-        when( containerHostInfo1.getId() ).thenReturn( UUID.randomUUID() );
+        when( containerHostInfo1.getId() ).thenReturn( UUID.randomUUID().toString() );
 
         when( resourceHostInfo.getContainers() ).thenReturn( Sets.newHashSet( containerHostInfo1 ) );
 
@@ -1206,6 +1206,4 @@ public class LocalPeerImplTest
 
         verify( managementHost ).setupTunnels( peerMap, ENVIRONMENT_ID );
     }
-
-
 }

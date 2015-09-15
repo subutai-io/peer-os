@@ -1,14 +1,7 @@
 package io.subutai.core.env.ui.tabs;
 
 
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
-
-import io.subutai.common.environment.Environment;
-import io.subutai.common.mdc.SubutaiExecutors;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.core.env.ui.EnvironmentManagerComponent;
-import io.subutai.core.env.ui.tabs.subviews.ContainerHostQuotaForm;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
@@ -22,6 +15,12 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
+
+import io.subutai.common.environment.Environment;
+import io.subutai.common.mdc.SubutaiExecutors;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.core.env.ui.EnvironmentManagerComponent;
+import io.subutai.core.env.ui.tabs.subviews.ContainerHostQuotaForm;
 
 
 public class EnvironmentContainersQuotaTab extends CustomComponent
@@ -206,7 +205,7 @@ public class EnvironmentContainersQuotaTab extends CustomComponent
 
     private void updateContainersTable()
     {
-        UUID envId = ( UUID ) envListComboBox.getValue();
+        String envId = envListComboBox.getValue().toString();
         envContainerHostContainer.removeAllItems();
         if ( envId != null )
         {

@@ -2,7 +2,6 @@ package io.subutai.core.network.api;
 
 
 import java.util.Set;
-import java.util.UUID;
 
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
@@ -76,7 +75,7 @@ public interface NetworkManager
      *
      * @param environmentId - environment id
      */
-    public void cleanupEnvironmentNetworkSettings( UUID environmentId ) throws NetworkManagerException;
+    public void cleanupEnvironmentNetworkSettings( String environmentId ) throws NetworkManagerException;
 
     /**
      * Removes gateway IP on a container
@@ -96,7 +95,7 @@ public interface NetworkManager
     /**
      * Sets up VNI-VLAN mapping on management host
      */
-    public void setupVniVLanMapping( int tunnelId, long vni, int vLanId, UUID environmentId )
+    public void setupVniVLanMapping( int tunnelId, long vni, int vLanId, String environmentId )
             throws NetworkManagerException;
 
     /**

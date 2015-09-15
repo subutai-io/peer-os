@@ -3,7 +3,11 @@ package io.subutai.core.env.ui;
 
 import java.io.File;
 import java.util.Set;
-import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vaadin.ui.Component;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.ContainerHost;
@@ -13,10 +17,6 @@ import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.server.ui.api.PortalModule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.vaadin.ui.Component;
 
 
 public class EnvironmentManagerPortalModule implements PortalModule, EnvironmentEventListener
@@ -88,14 +88,14 @@ public class EnvironmentManagerPortalModule implements PortalModule, Environment
 
 
     @Override
-    public void onContainerDestroyed( final Environment environment, final UUID containerId )
+    public void onContainerDestroyed( final Environment environment, final String containerId )
     {
         LOG.info( String.format( "Container destroyed: %s, environment: %s", containerId, environment ) );
     }
 
 
     @Override
-    public void onEnvironmentDestroyed( final UUID environmentId )
+    public void onEnvironmentDestroyed( final String environmentId )
     {
         LOG.info( String.format( "Environment destroyed: %s", environmentId ) );
     }

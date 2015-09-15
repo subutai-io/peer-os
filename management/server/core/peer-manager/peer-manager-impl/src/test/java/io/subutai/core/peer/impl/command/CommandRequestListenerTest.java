@@ -65,8 +65,8 @@ public class CommandRequestListenerTest
     {
         listener = new CommandRequestListener( localPeer, peerManager );
         when( payload.getMessage( CommandRequest.class ) ).thenReturn( commandRequest );
-        when( peerManager.getPeer( any( UUID.class ) ) ).thenReturn( sourcePeer );
-        when( localPeer.bindHost( any( UUID.class ) ) ).thenReturn( host );
+        when( peerManager.getPeer( any( String.class ) ) ).thenReturn( sourcePeer );
+        when( localPeer.bindHost( any( String.class ) ) ).thenReturn( host );
     }
 
 
@@ -88,7 +88,7 @@ public class CommandRequestListenerTest
 
         listener.onRequest( payload );
 
-        verify( peerManager, times( 2 ) ).getPeer( any( UUID.class ) );
+        verify( peerManager, times( 2 ) ).getPeer( any( String.class ) );
     }
 
 
@@ -97,7 +97,7 @@ public class CommandRequestListenerTest
     {
         CommandRequestListener.CommandRequestCallback callback =
                 new CommandRequestListener.CommandRequestCallback( commandRequest, sourcePeer , localPeer );
-        when( commandRequest.getEnvironmentId() ).thenReturn( UUID.randomUUID() );
+        when( commandRequest.getEnvironmentId() ).thenReturn( UUID.randomUUID().toString() );
 
         callback.onResponse( response, commandResult );
 

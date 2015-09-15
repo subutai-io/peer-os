@@ -1,16 +1,15 @@
 package io.subutai.core.peer.impl.container;
 
 
-import java.util.UUID;
 import java.util.concurrent.Callable;
+
+import com.google.common.base.Preconditions;
 
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.peer.api.LocalPeer;
 
-import com.google.common.base.Preconditions;
 
-
-public class DestroyContainerWrapperTask implements Callable<UUID>
+public class DestroyContainerWrapperTask implements Callable<String>
 {
     private final LocalPeer localPeer;
     private final ContainerHost containerHost;
@@ -27,7 +26,7 @@ public class DestroyContainerWrapperTask implements Callable<UUID>
 
 
     @Override
-    public UUID call() throws Exception
+    public String call() throws Exception
     {
         localPeer.destroyContainer( containerHost );
 
