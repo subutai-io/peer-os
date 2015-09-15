@@ -123,9 +123,6 @@ public interface Monitor
      * stress.
      *
      * @param alertMetric - body of alert in JSON
-     *
-     *
-     * TODO take this method to separate interface for by-REST only usage
      */
     public void alert( String alertMetric ) throws MonitorException;
 
