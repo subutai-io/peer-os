@@ -1,4 +1,4 @@
-package io.subutai.core.environment.impl.workflow.step;
+package io.subutai.core.environment.impl.workflow.creation.steps;
 
 
 import java.util.Map;
@@ -17,8 +17,18 @@ import io.subutai.core.environment.impl.entity.EnvironmentImpl;
  */
 public class PEKGenerationStep
 {
+    private final Topology topology;
+    private final EnvironmentImpl environment;
 
-    public Map<Peer, String> execute( Topology topology, EnvironmentImpl environment ) throws PeerException
+
+    public PEKGenerationStep( final Topology topology, final EnvironmentImpl environment )
+    {
+        this.topology = topology;
+        this.environment = environment;
+    }
+
+
+    public Map<Peer, String> execute() throws PeerException
     {
         Set<Peer> peers = topology.getAllPeers();
 

@@ -29,7 +29,7 @@ import io.subutai.core.environment.impl.dao.EnvironmentContainerDataService;
 import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.environment.impl.workflow.EnvironmentCreationWorkflow;
+import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.User;
 import io.subutai.core.network.api.NetworkManager;
@@ -48,6 +48,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private final NetworkManager networkManager;
     private final Tracker tracker;
     private final SecurityManager securityManager;
+    private final TemplateRegistry templateRegistry;
 
     private final DaoManager daoManager;
     private final String defaultDomain;
@@ -81,7 +82,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         //launch environment creation workflow
         EnvironmentCreationWorkflow environmentCreationWorkflow =
-                getEnvironmentCreationWorkflow( environment, topology, subnetCidr, sshKey, operationTracker );
+                getEnvironmentCreationWorkflow( environment, topology, sshKey, operationTracker );
 
         //start environment creation workflow
         environmentCreationWorkflow.start();
@@ -154,12 +155,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     protected EnvironmentCreationWorkflow getEnvironmentCreationWorkflow( final EnvironmentImpl environment,
-                                                                          final Topology topology,
-                                                                          final String subnetCidr, final String sshKey,
+                                                                          final Topology topology, final String sshKey,
                                                                           final TrackerOperation operationTracker )
     {
-        return new EnvironmentCreationWorkflow( peerManager, environment, topology, subnetCidr, sshKey,
-                operationTracker );
+        return new EnvironmentCreationWorkflow( defaultDomain, templateRegistry, networkManager, peerManager,
+                environment, topology, sshKey, operationTracker );
     }
 
 
@@ -300,6 +300,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         Preconditions.checkNotNull( identityManager );
         Preconditions.checkNotNull( tracker );
 
+        this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
         this.networkManager = networkManager;
         this.daoManager = daoManager;

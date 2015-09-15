@@ -41,6 +41,8 @@ public interface ManagementHost extends Host, HostInfo
      */
     int setupTunnels( Map<String, String> peerIps, String environmentId ) throws PeerException;
 
+    public Vni findVniByEnvironmentId( String environmentId ) throws PeerException;
+
     /**
      * Returns reserved vnis
      */

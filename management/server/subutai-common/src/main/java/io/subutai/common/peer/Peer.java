@@ -9,6 +9,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateContainerGroupRequest;
+import io.subutai.common.environment.CreateEnvironmentContainersRequest;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
@@ -50,6 +51,10 @@ public interface Peer
      * Returns metadata object of peer
      */
     public PeerInfo getPeerInfo();
+
+
+    public Set<HostInfoModel> createEnvironmentContainers( final CreateEnvironmentContainersRequest request )
+            throws PeerException;
 
     /**
      * Creates container group on the peer

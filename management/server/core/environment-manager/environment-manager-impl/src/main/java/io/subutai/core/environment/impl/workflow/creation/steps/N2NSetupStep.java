@@ -1,4 +1,4 @@
-package io.subutai.core.environment.impl.workflow.step;
+package io.subutai.core.environment.impl.workflow.creation.steps;
 
 
 import java.util.Set;

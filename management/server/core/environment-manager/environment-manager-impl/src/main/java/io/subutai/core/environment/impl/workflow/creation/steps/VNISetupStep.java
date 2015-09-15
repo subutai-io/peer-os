@@ -1,4 +1,4 @@
-package io.subutai.core.environment.impl.workflow.step;
+package io.subutai.core.environment.impl.workflow.creation.steps;
 
 
 import java.util.Map;
@@ -24,9 +24,18 @@ import io.subutai.core.environment.impl.entity.EnvironmentImpl;
  */
 public class VNISetupStep
 {
+    private final Topology topology;
+    private final EnvironmentImpl environment;
 
-    public Vni execute( Topology topology, EnvironmentImpl environment )
-            throws EnvironmentCreationException, PeerException
+
+    public VNISetupStep( final Topology topology, final EnvironmentImpl environment )
+    {
+        this.topology = topology;
+        this.environment = environment;
+    }
+
+
+    public void execute() throws EnvironmentCreationException, PeerException
     {
         Set<Peer> peers = topology.getAllPeers();
 
@@ -73,9 +82,6 @@ public class VNISetupStep
 
         //store vni in environment metadata
         environment.setVni( freeVni );
-
-
-        return newVni;
     }
 
 

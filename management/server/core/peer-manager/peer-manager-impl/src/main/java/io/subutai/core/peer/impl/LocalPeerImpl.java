@@ -45,6 +45,7 @@ import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.CreateContainerGroupRequest;
+import io.subutai.common.environment.CreateEnvironmentContainersRequest;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
@@ -428,6 +429,72 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    public Set<HostInfoModel> createEnvironmentContainers( final CreateEnvironmentContainersRequest request )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( request );
+
+        //check if strategy exists
+        try
+        {
+            strategyManager.findStrategyById( request.getStrategyId() );
+        }
+        catch ( StrategyNotFoundException e )
+        {
+            throw new PeerException( e );
+        }
+
+        SubnetUtils cidr;
+        try
+        {
+            cidr = new SubnetUtils( request.getSubnetCidr() );
+        }
+        catch ( IllegalArgumentException e )
+        {
+            throw new PeerException( "Failed to parse subnet CIDR", e );
+        }
+
+        Map<ResourceHost, Set<String>> containerDistribution = distributeContainersToResourceHosts( request );
+
+
+        String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
+        String[] allAddresses = cidr.getInfo().getAllAddresses();
+        String gateway = cidr.getInfo().getLowAddress();
+        int currentIpAddressOffset = 0;
+
+        List<Future<ContainerHost>> taskFutures = Lists.newArrayList();
+        ExecutorService executorService = getFixedExecutor( request.getNumberOfContainers() );
+
+        Vni environmentVni = getManagementHost().findVniByEnvironmentId( request.getEnvironmentId() );
+
+        if ( environmentVni == null )
+        {
+            throw new PeerException(
+                    String.format( "No reserved vni found for environment %s", request.getEnvironmentId() ) );
+        }
+
+        //create containers in parallel on each resource host
+        for ( Map.Entry<ResourceHost, Set<String>> resourceHostDistribution : containerDistribution.entrySet() )
+        {
+            ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) resourceHostDistribution.getKey();
+
+            for ( String hostname : resourceHostDistribution.getValue() )
+            {
+
+                String ipAddress = allAddresses[request.getIpAddressOffset() + currentIpAddressOffset];
+                taskFutures.add( executorService.submit(
+                        new CreateContainerWrapperTask( resourceHostEntity, request.getTemplateName(), hostname,
+                                String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(), gateway,
+                                Common.WAIT_CONTAINER_CONNECTION_SEC ) ) );
+
+                currentIpAddressOffset++;
+            }
+        }
+
+        return processRequestCompletion( taskFutures, executorService, request );
+    }
+
+
     @Override
     public Set<HostInfoModel> createContainerGroup( final CreateContainerGroupRequest request ) throws PeerException
     {
@@ -518,6 +585,60 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             throw new PeerException( e );
         }
+    }
+
+
+    protected Map<ResourceHost, Set<String>> distributeContainersToResourceHosts(
+            final CreateEnvironmentContainersRequest request ) throws PeerException
+    {
+        //collect resource host metrics  & prepare templates on each of them
+        List<ResourceHostMetric> serverMetricMap = Lists.newArrayList();
+        for ( ResourceHost resourceHost : getResourceHosts() )
+        {
+            //take connected resource hosts for container creation
+            //and prepare needed templates
+            if ( resourceHost.isConnected() )
+            {
+                try
+                {
+                    serverMetricMap.add( resourceHost.getHostMetric() );
+                }
+                catch ( ResourceHostException e )
+                {
+                    throw new PeerException( e );
+                }
+            }
+        }
+
+        //calculate placement strategy
+        Map<ResourceHostMetric, Integer> slots;
+        try
+        {
+            slots = strategyManager.getPlacementDistribution( serverMetricMap, request.getNumberOfContainers(),
+                    request.getStrategyId(), request.getCriteria() );
+        }
+        catch ( StrategyException e )
+        {
+            throw new PeerException( e );
+        }
+
+        //distribute new containers' names across selected resource hosts
+        Map<ResourceHost, Set<String>> containerDistribution = Maps.newHashMap();
+
+        for ( Map.Entry<ResourceHostMetric, Integer> e : slots.entrySet() )
+        {
+            Set<String> hostCloneNames = new HashSet<>();
+            for ( int i = 0; i < e.getValue(); i++ )
+            {
+                String newContainerName = StringUtil.trimToSize(
+                        String.format( "%s%s", request.getTemplateName(), UUID.randomUUID() ).replace( "-", "" ),
+                        Common.MAX_CONTAINER_NAME_LEN );
+                hostCloneNames.add( newContainerName );
+            }
+            ResourceHost resourceHost = getResourceHostByName( e.getKey().getHost() );
+            containerDistribution.put( resourceHost, hostCloneNames );
+        }
+        return containerDistribution;
     }
 
 
@@ -640,6 +761,74 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 containerGroupDataService.persist( containerGroup );
 
                 LOG.debug( "Error creating container group #createContainerGroup", e );
+            }
+        }
+        return result;
+    }
+
+
+    protected Set<HostInfoModel> processRequestCompletion( final List<Future<ContainerHost>> taskFutures,
+                                                           final ExecutorService executorService,
+                                                           final CreateEnvironmentContainersRequest request )
+    {
+        Set<HostInfoModel> result = Sets.newHashSet();
+        Set<ContainerHost> newContainers = Sets.newHashSet();
+
+        //wait for succeeded containers
+        for ( Future<ContainerHost> future : taskFutures )
+        {
+            try
+            {
+                ContainerHost containerHost = future.get();
+                newContainers.add( new ContainerHostEntity( getId(),
+                        hostRegistry.getContainerHostInfoById( containerHost.getId() ) ) );
+                result.add( new HostInfoModel( containerHost ) );
+            }
+            catch ( ExecutionException | InterruptedException | HostDisconnectedException e )
+            {
+                LOG.error( "Error creating container", e );
+            }
+        }
+
+        executorService.shutdown();
+
+        if ( !CollectionUtil.isCollectionEmpty( newContainers ) )
+        {
+            ContainerGroupEntity containerGroup;
+            try
+            {
+                //update existing container group to include new containers
+                containerGroup =
+                        ( ContainerGroupEntity ) findContainerGroupByEnvironmentId( request.getEnvironmentId() );
+
+
+                Set<String> containerIds = Sets.newHashSet( containerGroup.getContainerIds() );
+
+                for ( ContainerHost containerHost : newContainers )
+                {
+                    containerIds.add( containerHost.getId() );
+                }
+
+                containerGroup.setContainerIds( containerIds );
+
+                containerGroupDataService.update( containerGroup );
+            }
+            catch ( ContainerGroupNotFoundException e )
+            {
+                //create container group for new containers
+                containerGroup = new ContainerGroupEntity( request.getEnvironmentId(), request.getInitiatorPeerId(),
+                        request.getOwnerId() );
+
+                Set<String> containerIds = Sets.newHashSet();
+
+                for ( ContainerHost containerHost : newContainers )
+                {
+                    containerIds.add( containerHost.getId() );
+                }
+
+                containerGroup.setContainerIds( containerIds );
+
+                containerGroupDataService.persist( containerGroup );
             }
         }
         return result;
@@ -1854,7 +2043,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
      */
 
 
-    //TODO return PEK public key instead of int here
     @Override
     public String createEnvironmentKeyPair( String environmentId ) throws PeerException
     {

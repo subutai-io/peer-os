@@ -39,6 +39,7 @@ import io.subutai.core.peer.api.RequestListener;
 import io.subutai.core.peer.impl.command.CommandRequestListener;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.container.CreateContainerGroupRequestListener;
+import io.subutai.core.peer.impl.container.CreateEnvironmentContainersRequestListener;
 import io.subutai.core.peer.impl.container.DestroyEnvironmentContainersRequestListener;
 import io.subutai.core.peer.impl.dao.PeerDAO;
 import io.subutai.core.peer.impl.entity.ManagementHostEntity;
@@ -94,6 +95,7 @@ public class PeerManagerImpl implements PeerManager
         addRequestListener( commandResponseListener );
         //add create container requests listener
         addRequestListener( new CreateContainerGroupRequestListener( localPeer ) );
+        addRequestListener( new CreateEnvironmentContainersRequestListener( localPeer ) );
         //add destroy environment containers requests listener
         addRequestListener( new DestroyEnvironmentContainersRequestListener( localPeer ) );
         //add echo listener

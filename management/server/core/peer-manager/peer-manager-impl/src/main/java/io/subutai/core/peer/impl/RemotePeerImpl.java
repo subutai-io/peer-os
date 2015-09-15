@@ -29,6 +29,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateContainerGroupRequest;
+import io.subutai.common.environment.CreateEnvironmentContainersRequest;
 import io.subutai.common.exception.HTTPException;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
@@ -1261,6 +1262,40 @@ public class RemotePeerImpl implements RemotePeer
         }
 
         return messageRequest;
+    }
+
+
+    @Override
+    public Set<HostInfoModel> createEnvironmentContainers( final CreateEnvironmentContainersRequest request )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( request, "Invalid request" );
+
+
+        //*********construct Secure Header ****************************
+        Map<String, String> headers = Maps.newHashMap();
+        String envId = request.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + envId;
+        String envHeaderTarget = peerInfo.getId() + "-" + envId;
+
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
+        //************************************************************************
+
+        CreateContainerGroupResponse response =
+                sendRequest( request, RecipientType.CREATE_ENVIRONMENT_CONTAINERS_REQUEST.name(),
+                        Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateContainerGroupResponse.class,
+                        Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT, headers );
+
+        if ( response != null )
+        {
+            return response.getHosts();
+        }
+        else
+        {
+            throw new PeerException( "Command timed out" );
+        }
     }
 
 
