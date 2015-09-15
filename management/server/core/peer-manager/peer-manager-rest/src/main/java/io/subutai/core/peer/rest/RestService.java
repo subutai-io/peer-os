@@ -13,8 +13,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -80,6 +78,11 @@ public interface RestService
     @Path( "createpek" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response createEnvironmentKeyPair( @FormParam( "environmentId" ) String environmentId );
+
+    @POST
+    @Path( "creategateway" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response createGateway( @FormParam( "gatewayIp" ) String gatewayIp, @FormParam( "vlan" ) int vlan );
 
     //*************** Peer Registration Handshake REST - BEGIN ***************************
 

@@ -19,6 +19,7 @@ import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
@@ -58,6 +59,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     protected EnvironmentContainerDataService environmentContainerDataService;
     protected BlueprintDataService blueprintDataService;
 
+    protected ExceptionUtil exceptionUtil = new ExceptionUtil();
+
 
     @Override
     public Environment createEnvironment( final String name, final Topology topology, final String subnetCidr,
@@ -90,7 +93,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
             if ( environmentCreationWorkflow.getError() != null )
             {
-                throw new EnvironmentCreationException( environmentCreationWorkflow.getError() );
+                throw new EnvironmentCreationException(
+                        exceptionUtil.getRootCause( environmentCreationWorkflow.getError() ) );
             }
         }
 
@@ -149,7 +153,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     //************ utility methods
 
 
-    protected EnvironmentCreationWorkflow getEnvironmentCreationWorkflow( final Environment environment,
+    protected EnvironmentCreationWorkflow getEnvironmentCreationWorkflow( final EnvironmentImpl environment,
                                                                           final Topology topology,
                                                                           final String subnetCidr, final String sshKey,
                                                                           final TrackerOperation operationTracker )

@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -982,13 +983,31 @@ public class RestServiceImpl implements RestService
             Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
 
             LocalPeer localPeer = peerManager.getLocalPeer();
-            localPeer.createEnvironmentKeyPair( environmentId );
+            String pekPubKey = localPeer.createEnvironmentKeyPair( environmentId );
+
+            return Response.ok( pekPubKey ).status( Response.Status.CREATED ).build();
+        }
+        catch ( Exception ex )
+        {
+            return Response.status( Response.Status.NOT_FOUND ).build();
+        }
+    }
+
+
+    @Override
+    public Response createGateway( @FormParam( "gatewayIp" ) final String gatewayIp,
+                                   @FormParam( "vlan" ) final int vlan )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            localPeer.createGateway( gatewayIp, vlan );
 
             return Response.ok().status( Response.Status.CREATED ).build();
         }
         catch ( Exception ex )
         {
-            return Response.status( Response.Status.NOT_FOUND ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( ex ).build();
         }
     }
 

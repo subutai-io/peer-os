@@ -366,7 +366,7 @@ public interface Peer
     /* **************************************************************
      *
      */
-    public int createEnvironmentKeyPair( String environmentId ) throws PeerException;
+    public String createEnvironmentKeyPair( String environmentId ) throws PeerException;
 
 
     /**
@@ -378,4 +378,6 @@ public interface Peer
     void setupN2NConnection( N2NConfig config ) throws PeerException;
 
     void removeN2NConnection( N2NConfig config ) throws PeerException;
+
+    void createGateway( String environmentGatewayIp, int vlan ) throws PeerException;
 }

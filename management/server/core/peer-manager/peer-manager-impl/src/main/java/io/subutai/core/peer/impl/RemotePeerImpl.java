@@ -1427,7 +1427,7 @@ public class RemotePeerImpl implements RemotePeer
      *
      */
     @Override
-    public int createEnvironmentKeyPair( String environmentId ) throws PeerException
+    public String createEnvironmentKeyPair( String environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environmentId" );
 
@@ -1448,7 +1448,7 @@ public class RemotePeerImpl implements RemotePeer
 
             String response = post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
 
-            return 1;
+            return response;
         }
         catch ( Exception e )
         {
@@ -1537,6 +1537,36 @@ public class RemotePeerImpl implements RemotePeer
 
         Response response = client.delete();
         LOG.debug( String.format( "%s", response ) );
+    }
+
+
+    @Override
+    public void createGateway( final String environmentGatewayIp, final int vlan ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentGatewayIp ) );
+        Preconditions.checkArgument( vlan > 0 );
+
+        String path = "peer/creategateway";
+
+        try
+        {
+            //*********construct Secure Header ****************************
+            Map<String, String> headers = Maps.newHashMap();
+
+            headers.put( Common.HEADER_SPECIAL, "ENC" );
+            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
+            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
+            //*************************************************************
+            Map<String, String> params = Maps.newHashMap();
+            params.put( "gatewayIp", environmentGatewayIp );
+            params.put( "vlan", String.valueOf( vlan ) );
+
+            String response = post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( String.format( "Error creating gateway on peer %s", getName() ), e );
+        }
     }
 
 

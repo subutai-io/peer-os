@@ -2,6 +2,7 @@ package io.subutai.core.peer.impl;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -1851,8 +1852,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     /* ***********************************************
      *  Create PEK
      */
+
+
+    //TODO return PEK public key instead of int here
     @Override
-    public int createEnvironmentKeyPair( String environmentId ) throws PeerException
+    public String createEnvironmentKeyPair( String environmentId ) throws PeerException
     {
         KeyManager keyManager = securityManager.getKeyManager();
         EncryptionTool encTool = securityManager.getEncryptionTool();
@@ -1861,32 +1865,24 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             KeyPair keyPair = keyManager.generateKeyPair( environmentId, false );
 
-            if ( keyPair != null )
-            {
-                //**********************************************************************************
-                PGPSecretKeyRing secRing = PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() );
-                PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
-                PGPSecretKeyRing peerSecRing = keyManager.getSecretKeyRing( null );
 
-                //************Sign Key **************************************************************
-                pubRing = encTool.signPublicKey( pubRing, getId(), peerSecRing.getSecretKey(), "" );
+            //**********************************************************************************
+            PGPSecretKeyRing secRing = PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() );
+            PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
+            PGPSecretKeyRing peerSecRing = keyManager.getSecretKeyRing( null );
 
-                //***************Save Keys *********************************************************
-                keyManager.saveSecretKeyRing( environmentId, ( short ) 2, secRing );
-                keyManager.savePublicKeyRing( environmentId, ( short ) 2, pubRing );
+            //************Sign Key **************************************************************
+            pubRing = encTool.signPublicKey( pubRing, getId(), peerSecRing.getSecretKey(), "" );
 
+            //***************Save Keys *********************************************************
+            keyManager.saveSecretKeyRing( environmentId, ( short ) 2, secRing );
+            keyManager.savePublicKeyRing( environmentId, ( short ) 2, pubRing );
 
-                return 1;
-            }
-            else
-            {
-                LOG.error( "**** Error creating PEK Keys for Environmnet ****" );
-                return 0;
-            }
+            return encTool.armorByteArrayToString( pubRing.getEncoded() );
         }
-        catch ( PGPException ex )
+        catch ( IOException | PGPException ex )
         {
-            return 0;
+            throw new PeerException( ex );
         }
     }
 
@@ -1976,6 +1972,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         getManagementHost().removeN2NConnection( config );
         //TODO: decouple remove tunnel process
         getManagementHost().removeTunnel( config.getAddress() );
+    }
+
+
+    @Override
+    public void createGateway( final String environmentGatewayIp, final int vlan ) throws PeerException
+    {
+        getManagementHost().createGateway( environmentGatewayIp, vlan );
     }
 
 

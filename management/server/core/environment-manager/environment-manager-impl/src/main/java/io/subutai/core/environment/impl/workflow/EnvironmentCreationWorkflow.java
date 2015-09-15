@@ -1,18 +1,27 @@
 package io.subutai.core.environment.impl.workflow;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.servicemix.beanflow.Workflow;
 
-import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.workflow.step.ContainerCloneStep;
+import io.subutai.core.environment.impl.workflow.step.N2NSetupStep;
+import io.subutai.core.environment.impl.workflow.step.PEKGenerationStep;
+import io.subutai.core.environment.impl.workflow.step.VNISetupStep;
 import io.subutai.core.peer.api.PeerManager;
 
 
 public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWorkflow.EnvironmentCreationPhase>
 {
+    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentCreationWorkflow.class );
+
     private final PeerManager peerManager;
-    private final Environment environment;
+    private final EnvironmentImpl environment;
     private final Topology topology;
     private final String subnetCidr;
     private final String sshKey;
@@ -24,6 +33,16 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     public Throwable getError()
     {
         return error;
+    }
+
+
+    public void setError( final Throwable error )
+    {
+        this.error = error;
+        LOG.error( "Error creating environment", error );
+        operationTracker.addLogFailed( error.getMessage() );
+        //stop the workflow
+        stop();
     }
 
 
@@ -40,7 +59,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     }
 
 
-    public EnvironmentCreationWorkflow( PeerManager peerManager, Environment environment, Topology topology,
+    public EnvironmentCreationWorkflow( PeerManager peerManager, EnvironmentImpl environment, Topology topology,
                                         String subnetCidr, String sshKey, TrackerOperation operationTracker )
     {
         super( EnvironmentCreationPhase.INIT );
@@ -59,49 +78,91 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
     public EnvironmentCreationPhase INIT()
     {
-        System.out.println( "INIT" );
+        operationTracker.addLog( "Initializing environment creation" );
 
         return EnvironmentCreationPhase.GENERATE_KEYS;
     }
 
 
-    public EnvironmentCreationPhase GENERATE_KEYS() throws InterruptedException
+    public EnvironmentCreationPhase GENERATE_KEYS()
     {
-        System.out.println( "GENERATE_KEYS" );
+        operationTracker.addLog( "Generating PEKs" );
 
-        Thread.sleep( 3000 );
+        try
+        {
+            new PEKGenerationStep().execute( topology, environment );
 
-        return EnvironmentCreationPhase.SETUP_N2N;
+            return EnvironmentCreationPhase.SETUP_N2N;
+        }
+        catch ( Exception e )
+        {
+            setError( e );
+
+            return null;
+        }
     }
 
 
     public EnvironmentCreationPhase SETUP_N2N()
     {
-        System.out.println( "SETUP_N2N" );
+        operationTracker.addLog( "Setting up N2N" );
 
-        return EnvironmentCreationPhase.SETUP_VNI;
+        try
+        {
+            new N2NSetupStep().execute();
+
+            return EnvironmentCreationPhase.SETUP_VNI;
+        }
+        catch ( Exception e )
+        {
+            setError( e );
+
+            return null;
+        }
     }
 
 
     public EnvironmentCreationPhase SETUP_VNI()
     {
-        System.out.println( "SETUP_VNI" );
+        operationTracker.addLog( "Setting up VNI" );
 
-        return EnvironmentCreationPhase.CLONE_CONTAINERS;
+        try
+        {
+            new VNISetupStep().execute( topology, environment );
+
+            return EnvironmentCreationPhase.CLONE_CONTAINERS;
+        }
+        catch ( Exception e )
+        {
+            setError( e );
+
+            return null;
+        }
     }
 
 
     public EnvironmentCreationPhase CLONE_CONTAINERS()
     {
-        System.out.println( "CLONE_CONTAINERS" );
+        operationTracker.addLog( "Cloning containers" );
 
-        return EnvironmentCreationPhase.FINALIZE;
+        try
+        {
+            new ContainerCloneStep().execute( topology, environment );
+
+            return EnvironmentCreationPhase.FINALIZE;
+        }
+        catch ( Exception e )
+        {
+            setError( e );
+
+            return null;
+        }
     }
 
 
     public void FINALIZE()
     {
-        System.out.println( "FINALIZE" );
+        LOG.info( "Finalizing environment creation" );
 
         //this is a must have call
         stop();

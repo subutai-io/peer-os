@@ -77,7 +77,7 @@ public class EnvironmentManagerTest
         doReturn( environment ).when( environmentManager )
                                .createEmptyEnvironment( anyString(), anyString(), anyString() );
         doReturn( environmentCreationWorkflow ).when( environmentManager )
-                                               .getEnvironmentCreationWorkflow( any( Environment.class ),
+                                               .getEnvironmentCreationWorkflow( any( EnvironmentImpl.class ),
                                                        any( Topology.class ), anyString(), anyString(),
                                                        any( TrackerOperation.class ) );
         environmentManager.environmentDataService = environmentDataService;
