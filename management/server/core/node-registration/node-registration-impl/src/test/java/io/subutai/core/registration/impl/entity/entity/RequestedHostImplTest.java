@@ -9,8 +9,8 @@ import org.junit.Test;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.host.Interface;
 import io.subutai.core.registration.api.RegistrationStatus;
-import io.subutai.core.registration.impl.entity.HostInterface;
 import io.subutai.core.registration.impl.entity.RequestedHostImpl;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -62,7 +62,7 @@ public class RequestedHostImplTest
     @Test
     public void testSetInterfaces() throws Exception
     {
-        requestedHost.setInterfaces( Sets.newHashSet( mock( HostInterface.class ) ) );
+        requestedHost.setInterfaces( Sets.newHashSet( mock( Interface.class ) ) );
         assertEquals( 1, requestedHost.getInterfaces().size() );
     }
 

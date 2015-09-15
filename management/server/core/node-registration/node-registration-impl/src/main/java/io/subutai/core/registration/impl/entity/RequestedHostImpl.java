@@ -47,11 +47,12 @@ public class RequestedHostImpl implements RequestedHost, Serializable
 
     //    @Column( name = "interface_model" )
     //    @OneToOne( fetch = FetchType.EAGER, cascade = CascadeType.ALL )
-    @JoinColumn( name = "raw_interfaces" )
+    @JoinColumn( name = "host_interfaces" )
     @OneToMany( orphanRemoval = true,
+            targetEntity = HostInterface.class,
             cascade = CascadeType.ALL,
             fetch = FetchType.EAGER )
-    private Set<HostInterface> interfaces = Sets.newHashSet();
+    private Set<Interface> interfaces = Sets.newHashSet();
 
     @Column( name = "arch" )
     @Enumerated( EnumType.STRING )
@@ -118,10 +119,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     @Override
     public Set<Interface> getInterfaces()
     {
-        Set<Interface> temp = Sets.newHashSet();
-        temp.addAll( interfaces );
-        return temp;
-        //        return Sets.newHashSet();
+        return interfaces;
     }
 
 
@@ -205,7 +203,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     }
 
 
-    public void setInterfaces( final Set<HostInterface> interfaces )
+    public void setInterfaces( final Set<Interface> interfaces )
     {
         this.interfaces = interfaces;
     }

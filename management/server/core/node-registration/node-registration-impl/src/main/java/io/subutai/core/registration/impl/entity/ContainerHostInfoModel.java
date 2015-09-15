@@ -42,8 +42,11 @@ public class ContainerHostInfoModel implements HostInfo, Serializable
     private String hostname;
 
 
-    @OneToMany( cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, targetEntity =
-            HostInterface.class )
+    @JoinColumn( name = "host_interfaces" )
+    @OneToMany( cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER,
+            orphanRemoval = true,
+            targetEntity = HostInterface.class )
     private Set<Interface> netInterfaces = new HashSet<>();
 
     @Column( name = "arch" )
