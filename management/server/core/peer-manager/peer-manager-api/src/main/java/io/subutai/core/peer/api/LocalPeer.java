@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.Peer;
@@ -99,6 +100,17 @@ public interface LocalPeer extends Peer
      */
     public ContainerHost createContainer( final ResourceHost resourceHost, final Template template,
                                           final String containerName ) throws PeerException;
+
+
+    /**
+     * Imports environment containers and sets gateways.
+     *
+     * @param environment - environment to import
+     *
+     * @return - containerGroup entity interface
+     */
+    public ContainerGroup importEnvironment( final UUID resourceHostId, final Environment environment )
+            throws PeerException;
 
 
     /**

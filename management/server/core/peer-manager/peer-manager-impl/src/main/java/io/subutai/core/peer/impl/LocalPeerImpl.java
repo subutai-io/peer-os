@@ -44,6 +44,7 @@ import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.CreateContainerGroupRequest;
+import io.subutai.common.environment.Environment;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
@@ -417,6 +418,62 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             LOG.error( "Failed to create container", e );
             throw new PeerException( e );
+        }
+    }
+
+
+    @Override
+    public ContainerGroup importEnvironment( final UUID resourceHostId, final Environment environment )
+            throws PeerException
+    {
+        SubnetUtils cidr;
+        try
+        {
+            cidr = new SubnetUtils( environment.getSubnetCidr() );
+        }
+        catch ( IllegalArgumentException e )
+        {
+            throw new PeerException( "Failed to parse subnet CIDR", e );
+        }
+
+        String gateway = cidr.getInfo().getLowAddress();
+
+        Set<ContainerHost> containerHosts = environment.getContainerHosts();
+
+        return setContainersGateway( containerHosts, resourceHostId, gateway, environment );
+    }
+
+
+    private ContainerGroup setContainersGateway( Set<ContainerHost> containerHosts, final UUID resourceHostId,
+                                                 final String gateway, Environment environment ) throws PeerException
+    {
+        try
+        {
+            ResourceHost resourceHost = getResourceHostById( resourceHostId );
+            Set<ContainerHostEntity> containersToConfigure = Sets.newHashSet();
+            for ( final ContainerHost host : containerHosts )
+            {
+                //fixme Possible error message is thrown during sending setDefaultGateway command
+                ContainerHost containerHost = resourceHost.getContainerHostById( host.getId() );
+                containerHost.setDefaultGateway( gateway );
+                containersToConfigure.add( new ContainerHostEntity( getId().toString(),
+                        hostRegistry.getContainerHostInfoById( containerHost.getId() ) ) );
+            }
+            ContainerGroupEntity containerGroup =
+                    new ContainerGroupEntity( environment.getId(), getId(), getOwnerId() );
+            Set<UUID> containerIds = Sets.newHashSet();
+            for ( ContainerHost containerHost : containersToConfigure )
+            {
+                containerIds.add( containerHost.getId() );
+            }
+            containerGroup.setContainerIds( containerIds );
+            containerGroupDataService.update( containerGroup );
+            return containerGroup;
+        }
+        catch ( HostDisconnectedException e )
+        {
+            LOG.error( "Host is disconnected." );
+            return setContainersGateway( containerHosts, resourceHostId, gateway, environment );
         }
     }
 
