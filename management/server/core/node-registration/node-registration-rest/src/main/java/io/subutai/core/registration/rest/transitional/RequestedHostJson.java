@@ -7,13 +7,13 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.Interface;
+import io.subutai.common.peer.HostInfoModel;
 import io.subutai.common.peer.InterfaceModel;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.service.RequestedHost;
-import io.subutai.core.registration.api.service.VirtualHost;
 
 
-public class HostRequest implements RequestedHost
+public class RequestedHostJson implements RequestedHost
 {
     private String id;
     private String hostname;
@@ -25,14 +25,16 @@ public class HostRequest implements RequestedHost
     private String restHook;
     private RegistrationStatus status;
 
+    private Set<HostInfoModel> hostInfoModelSet = Sets.newHashSet();
 
-    public HostRequest()
+
+    public RequestedHostJson()
     {
     }
 
 
-    public HostRequest( final String id, final String hostname, final HostArchitecture arch, final String publicKey,
-                        final String restHook, final RegistrationStatus status )
+    public RequestedHostJson( final String id, final String hostname, final HostArchitecture arch,
+                              final String publicKey, final String restHook, final RegistrationStatus status )
     {
         this.id = id;
         this.hostname = hostname;
@@ -67,13 +69,6 @@ public class HostRequest implements RequestedHost
     public void setInterfaces( final Set<InterfaceModel> interfaces )
     {
         this.interfaces = interfaces;
-    }
-
-
-    @Override
-    public Set<VirtualHost> getContainers()
-    {
-        return Sets.newHashSet();
     }
 
 
@@ -137,12 +132,12 @@ public class HostRequest implements RequestedHost
         {
             return true;
         }
-        if ( !( o instanceof HostRequest ) )
+        if ( !( o instanceof RequestedHostJson ) )
         {
             return false;
         }
 
-        final HostRequest that = ( HostRequest ) o;
+        final RequestedHostJson that = ( RequestedHostJson ) o;
 
         return !( id != null ? !id.equals( that.id ) : that.id != null );
     }
@@ -158,7 +153,7 @@ public class HostRequest implements RequestedHost
     @Override
     public String toString()
     {
-        return "HostRequest{" +
+        return "RequestedHostJson{" +
                 "id='" + id + '\'' +
                 ", hostname='" + hostname + '\'' +
                 ", interfaces=" + interfaces +

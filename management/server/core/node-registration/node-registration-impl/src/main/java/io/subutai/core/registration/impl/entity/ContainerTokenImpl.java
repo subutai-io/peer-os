@@ -1,6 +1,7 @@
 package io.subutai.core.registration.impl.entity;
 
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import javax.persistence.Access;
@@ -19,7 +20,7 @@ import io.subutai.core.registration.api.service.ContainerToken;
 @Entity
 @Table( name = "containers_token" )
 @Access( AccessType.FIELD )
-public class ContainerTokenImpl implements ContainerToken
+public class ContainerTokenImpl implements ContainerToken, Serializable
 {
     @Id
     @Column( name = "container_token" )

@@ -19,8 +19,6 @@ public interface RequestedHost
 
     public Set<Interface> getInterfaces();
 
-    public Set<VirtualHost> getContainers();
-
     public HostArchitecture getArch();
 
     public RegistrationStatus getStatus();

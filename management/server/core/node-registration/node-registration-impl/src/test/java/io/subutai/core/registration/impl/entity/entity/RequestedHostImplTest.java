@@ -12,7 +12,6 @@ import io.subutai.common.host.HostArchitecture;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.impl.entity.HostInterface;
 import io.subutai.core.registration.impl.entity.RequestedHostImpl;
-import io.subutai.core.registration.impl.entity.VirtualHostImpl;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -65,21 +64,6 @@ public class RequestedHostImplTest
     {
         requestedHost.setInterfaces( Sets.newHashSet( mock( HostInterface.class ) ) );
         assertEquals( 1, requestedHost.getInterfaces().size() );
-    }
-
-
-    @Test
-    public void testGetContainers() throws Exception
-    {
-        assertEquals( requestedHost.getContainers().size(), 0 );
-    }
-
-
-    @Test
-    public void testSetContainers() throws Exception
-    {
-        requestedHost.setContainers( Sets.newHashSet( mock( VirtualHostImpl.class ) ) );
-        assertEquals( 0, requestedHost.getContainers().size() );
     }
 
 

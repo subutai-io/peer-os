@@ -1,6 +1,7 @@
 package io.subutai.core.registration.impl.entity;
 
 
+import java.io.Serializable;
 import java.util.Set;
 
 import javax.persistence.Access;
@@ -20,10 +21,10 @@ import javax.persistence.Table;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.service.RequestedHost;
-import io.subutai.core.registration.api.service.VirtualHost;
 
 
 /**
@@ -32,7 +33,7 @@ import io.subutai.core.registration.api.service.VirtualHost;
 @Entity
 @Table( name = "resource_host_requests" )
 @Access( AccessType.FIELD )
-public class RequestedHostImpl implements RequestedHost
+public class RequestedHostImpl implements RequestedHost, Serializable
 {
     @Id
     @Column( name = "host_id", nullable = false )
@@ -47,14 +48,10 @@ public class RequestedHostImpl implements RequestedHost
     //    @Column( name = "interface_model" )
     //    @OneToOne( fetch = FetchType.EAGER, cascade = CascadeType.ALL )
     @JoinColumn( name = "raw_interfaces" )
-    @OneToMany( orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER )
+    @OneToMany( orphanRemoval = true,
+            cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER )
     private Set<HostInterface> interfaces = Sets.newHashSet();
-    //
-
-    //    @JoinColumn( name = "requested_host_id" )
-    //    @OneToMany( targetEntity = VirtualHostImpl.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL,
-    //            orphanRemoval = true )
-    //    private Set<VirtualHostImpl> containers = Sets.newHashSet();
 
     @Column( name = "arch" )
     @Enumerated( EnumType.STRING )
@@ -73,6 +70,13 @@ public class RequestedHostImpl implements RequestedHost
     @Column( name = "status" )
     @Enumerated( EnumType.STRING )
     private RegistrationStatus status;
+
+    @OneToMany( targetEntity = ContainerHostInfoModel.class,
+            mappedBy = "requestedHost",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER,
+            orphanRemoval = true )
+    private Set<HostInfo> hostInfoSet = Sets.newHashSet();
 
 
     public RequestedHostImpl()
@@ -111,7 +115,6 @@ public class RequestedHostImpl implements RequestedHost
     }
 
 
-
     @Override
     public Set<Interface> getInterfaces()
     {
@@ -119,6 +122,18 @@ public class RequestedHostImpl implements RequestedHost
         temp.addAll( interfaces );
         return temp;
         //        return Sets.newHashSet();
+    }
+
+
+    public Set<HostInfo> getHostInfoSet()
+    {
+        return hostInfoSet;
+    }
+
+
+    public void setHostInfoSet( final Set<HostInfo> hostInfoSet )
+    {
+        this.hostInfoSet = hostInfoSet;
     }
 
 
@@ -172,23 +187,6 @@ public class RequestedHostImpl implements RequestedHost
 
 
     @Override
-    public Set<VirtualHost> getContainers()
-    {
-        //        Set<VirtualHost> temp = Sets.newHashSet();
-        //        temp.addAll( containers );
-        //        return temp;
-        return Sets.newHashSet();
-        //        return containers;
-    }
-
-
-    public void setContainers( final Set<VirtualHostImpl> containers )
-    {
-        //        this.containers = containers;
-    }
-
-
-    @Override
     public void setRestHook( final String restHook )
     {
         this.restHook = restHook;
@@ -211,6 +209,7 @@ public class RequestedHostImpl implements RequestedHost
     {
         this.interfaces = interfaces;
     }
+
 
     @Override
     public boolean equals( final Object o )

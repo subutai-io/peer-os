@@ -1,6 +1,8 @@
 package io.subutai.core.registration.impl.entity;
 
 
+import java.io.Serializable;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
@@ -21,7 +23,7 @@ import io.subutai.common.host.Interface;
 @Entity
 @Table( name = "host_interface" )
 @Access( AccessType.FIELD )
-public class HostInterface implements Interface
+public class HostInterface implements Interface, Serializable
 {
     @Id
     @GeneratedValue( strategy = GenerationType.IDENTITY )
