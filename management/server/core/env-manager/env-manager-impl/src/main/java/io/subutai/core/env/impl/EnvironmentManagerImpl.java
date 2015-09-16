@@ -1116,7 +1116,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             for ( PeerConf pc : env.getPeerConfs() )
             {
                 N2NConfig n = pc.getN2NConfig();
-                peerIds.add( n.getPeerId() );
+                //temp fix
+                peerIds.add( UUID.fromString( n.getPeerId() ));
             }
 
             String superNodeIp = null;

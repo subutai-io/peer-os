@@ -1174,8 +1174,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
-                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder(
+                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
+                    bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -2146,11 +2147,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            if ( keyManager.getSecretKey( environmentId ) != null )
-            {
-                LOG.warn( "Keypair already exists for: " + environmentId );
-                return 1;
-            }
+
             KeyPair keyPair = keyManager.generateKeyPair( environmentId, false );
 
 
