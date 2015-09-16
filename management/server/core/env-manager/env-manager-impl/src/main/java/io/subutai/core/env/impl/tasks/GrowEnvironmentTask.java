@@ -1,6 +1,7 @@
 package io.subutai.core.env.impl.tasks;
 
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
@@ -73,6 +74,19 @@ public class GrowEnvironmentTask implements Awaitable
             {
                 Set<Peer> newRemotePeers = Sets.newHashSet( topology.getNodeGroupPlacement().keySet() );
                 newRemotePeers.removeAll( environment.getPeers() );
+
+                if ( !newRemotePeers.isEmpty() )
+                {
+                    op.addLog( "Setting up n2n tunnel..." );
+                    Set<Peer> allPeers = new HashSet<>( environment.getPeers() );
+                    allPeers.addAll( topology.getAllPeers() );
+                    environmentManager.setupN2NConnection( environment, allPeers );
+                    for ( Peer p : newRemotePeers )
+                    {
+                        String pekId = String.format( "%s-%s", p.getId(), environment.getId() );
+                        p.createEnvironmentKeyPair( pekId );
+                    }
+                }
 
                 op.addLog( "Ensuring secure channel..." );
 
