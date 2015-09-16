@@ -92,6 +92,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         //start environment creation workflow
         environmentCreationWorkflow.start();
 
+        //notify environment event listeners
         environmentCreationWorkflow.onStop( new Runnable()
         {
             @Override
