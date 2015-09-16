@@ -236,7 +236,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void setContainersTransientFields( final Environment environment/*, final Set<ContainerHost> containers */ )
+    public void setContainersTransientFields( final Environment environment )
     {
         for ( ContainerHost containerHost : environment.getContainerHosts() )
         {
@@ -255,6 +255,24 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void saveEnvironment( final EnvironmentImpl environment )
     {
         environmentDataService.persist( environment );
+    }
+
+
+    public void registerListener( final EnvironmentEventListener listener )
+    {
+        if ( listener != null )
+        {
+            listeners.add( listener );
+        }
+    }
+
+
+    public void unregisterListener( final EnvironmentEventListener listener )
+    {
+        if ( listener != null )
+        {
+            listeners.remove( listener );
+        }
     }
 
 
