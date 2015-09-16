@@ -167,6 +167,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>environment-manager-impl</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>environment-manager-cli</artifactId>
+    </dependency>
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- H-Integration -->
     <dependency>

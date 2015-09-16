@@ -17,6 +17,7 @@
   <modules>
     <module>environment-manager-api</module>
     <module>environment-manager-impl</module>
+    <module>environment-manager-cli</module>
   </modules>
 
 </project>
