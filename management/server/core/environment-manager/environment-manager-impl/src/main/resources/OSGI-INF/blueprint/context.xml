@@ -32,7 +32,7 @@
 
   <!-- ************************************************************************************************* -->
   <bean id="daoManagerEnv" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
-    <jpa:unit unitname="envExtManagerPUnit" property="entityManagerFactory" />
+    <jpa:unit unitname="envExtManagerPUnit2" property="entityManagerFactory" />
   </bean>
   <!-- ************************************************************************************************** -->
 
