@@ -6,7 +6,7 @@ import java.util.List;
 import io.subutai.common.protocol.Criteria;
 
 
-public class CreateEnvironmentContainersRequest
+public class CreateEnvironmentContainerGroupRequest
 {
     private final String environmentId;
     private final String initiatorPeerId;
@@ -19,11 +19,11 @@ public class CreateEnvironmentContainersRequest
     private final String templateName;
 
 
-    public CreateEnvironmentContainersRequest( final String environmentId, final String initiatorPeerId,
-                                               final String ownerId, final String subnetCidr,
-                                               final int numberOfContainers, final String strategyId,
-                                               final List<Criteria> criteria, final int ipAddressOffset,
-                                               final String templateName )
+    public CreateEnvironmentContainerGroupRequest( final String environmentId, final String initiatorPeerId,
+                                                   final String ownerId, final String subnetCidr,
+                                                   final int numberOfContainers, final String strategyId,
+                                                   final List<Criteria> criteria, final int ipAddressOffset,
+                                                   final String templateName )
     {
         this.environmentId = environmentId;
         this.initiatorPeerId = initiatorPeerId;

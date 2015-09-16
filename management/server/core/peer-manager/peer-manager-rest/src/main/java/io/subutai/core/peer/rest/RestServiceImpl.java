@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -1073,6 +1074,38 @@ public class RestServiceImpl implements RestService
         {
             String address = interfaceName.replace( "n2n_", "" ).replace( "_", "." );
             localPeer.removeN2NConnection( new N2NConfig( address, interfaceName, communityName ) );
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            throw new WebApplicationException( e );
+        }
+    }
+
+
+    @Override
+    public Response cleanupNetwork( final String environmentId )
+    {
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        try
+        {
+            localPeer.cleanupEnvironmentNetworkSettings( environmentId );
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            throw new WebApplicationException( e );
+        }
+    }
+
+
+    @Override
+    public Response removeEnvironmentKeypair( @PathParam( "environmentId" ) final String environmentId )
+    {
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        try
+        {
+            localPeer.removeEnvironmentKeypair( environmentId );
             return Response.ok().build();
         }
         catch ( Exception e )

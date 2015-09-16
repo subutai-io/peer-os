@@ -74,15 +74,26 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getGateways();
 
+    //todo remove verbs from urls, http method type should be descriptive say DELETE means remove
     @POST
-    @Path( "createpek" )
+    @Path( "pek/{environmentId}" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response createEnvironmentKeyPair( @FormParam( "environmentId" ) String environmentId );
+    public Response createEnvironmentKeyPair( @PathParam( "environmentId" ) String environmentId );
 
     @POST
-    @Path( "creategateway" )
+    @Path( "gateway" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response createGateway( @FormParam( "gatewayIp" ) String gatewayIp, @FormParam( "vlan" ) int vlan );
+
+    @DELETE
+    @Path( "network/{environmentId}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response cleanupNetwork( @PathParam( "environmentId" ) String environmentId );
+
+    @DELETE
+    @Path( "pek/{environmentId}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response removeEnvironmentKeypair( @PathParam( "environmentId" ) String environmentId );
 
     //*************** Peer Registration Handshake REST - BEGIN ***************************
 

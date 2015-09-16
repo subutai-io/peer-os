@@ -178,7 +178,7 @@ public class DestroyEnvironmentTask implements Awaitable
                 {
                     for ( ContainerHost containerHost : environment.getContainerHosts() )
                     {
-                        if ( containerHost.getPeerId().equals( result.peerId().toString() ) )
+                        if ( containerHost.getPeerId().equals( result.peerId()) )
                         {
                             environment.removeContainer( containerHost.getId() );
 

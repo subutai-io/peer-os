@@ -27,6 +27,7 @@ import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
+import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentSecurityException;
 import io.subutai.core.environment.impl.dao.BlueprintDataService;
 import io.subutai.core.environment.impl.dao.EnvironmentContainerDataService;
@@ -225,6 +226,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
+    public void destroyEnvironment( final String environmentId, final boolean async,
+                                    final boolean forceMetadataRemoval )
+            throws EnvironmentDestructionException, EnvironmentNotFoundException
+    {
+
+    }
+
+
+    @Override
     public void destroyContainer( final String environmentId, final String containerId, final boolean async,
                                   final boolean forceMetadataRemoval )
             throws EnvironmentModificationException, EnvironmentNotFoundException
@@ -244,6 +254,26 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public String getDefaultDomainName()
     {
         return defaultDomain;
+    }
+
+
+    @Override
+    public void removeEnvironment( final String environmentId ) throws EnvironmentNotFoundException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
+        removeEnvironment( environmentId, true );
+    }
+
+
+    public void removeEnvironment( final String environmentId, final boolean checkAccess )
+            throws EnvironmentNotFoundException
+    {
+        findEnvironment( environmentId, checkAccess );
+
+        environmentDataService.remove( environmentId );
+
+        notifyOnEnvironmentDestroyed( environmentId );
     }
 
 

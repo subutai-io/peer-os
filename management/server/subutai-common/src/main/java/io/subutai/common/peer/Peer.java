@@ -9,7 +9,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateContainerGroupRequest;
-import io.subutai.common.environment.CreateEnvironmentContainersRequest;
+import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
@@ -53,7 +53,7 @@ public interface Peer
     public PeerInfo getPeerInfo();
 
 
-    public Set<HostInfoModel> createEnvironmentContainers( final CreateEnvironmentContainersRequest request )
+    public Set<HostInfoModel> createEnvironmentContainerGroup( final CreateEnvironmentContainerGroupRequest request )
             throws PeerException;
 
     /**
@@ -85,6 +85,11 @@ public interface Peer
      */
     public void setDefaultGateway( ContainerHost host, String gatewayIp ) throws PeerException;
 
+    /**
+     * Cleans up environment networking settings. This method is called when an environment is being destroyed to clean
+     * up its settings on the local peer.
+     */
+    void cleanupEnvironmentNetworkSettings( final String environmentId ) throws PeerException;
 
     /**
      * Returns true of the host is connected, false otherwise
@@ -341,6 +346,9 @@ public interface Peer
      */
     public ContainersDestructionResult destroyEnvironmentContainers( String environmentId ) throws PeerException;
 
+    public ContainersDestructionResult destroyEnvironmentContainerGroup( final String environmentId )
+            throws PeerException;
+
     //networking
 
     /* ************************************************
@@ -385,4 +393,6 @@ public interface Peer
     void removeN2NConnection( N2NConfig config ) throws PeerException;
 
     void createGateway( String environmentGatewayIp, int vlan ) throws PeerException;
+
+    void removeEnvironmentKeypair( String environmentId ) throws PeerException;
 }

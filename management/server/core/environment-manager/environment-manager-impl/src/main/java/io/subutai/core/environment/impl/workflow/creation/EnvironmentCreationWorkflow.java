@@ -108,7 +108,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new PEKGenerationStep( topology, environment ).execute();
+            new PEKGenerationStep( topology, environment, peerManager.getLocalPeer() ).execute();
 
             return EnvironmentCreationPhase.SETUP_N2N;
         }
@@ -127,7 +127,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new N2NSetupStep( topology, environment ).execute();
+            new N2NSetupStep( topology, environment, peerManager.getLocalPeer() ).execute();
 
             return EnvironmentCreationPhase.SETUP_VNI;
         }
@@ -146,7 +146,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new VNISetupStep( topology, environment ).execute();
+            new VNISetupStep( topology, environment, peerManager.getLocalPeer() ).execute();
 
             return EnvironmentCreationPhase.CLONE_CONTAINERS;
         }

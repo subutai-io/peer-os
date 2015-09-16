@@ -128,7 +128,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         try
         {
-            new N2NSetupStep( topology, environment ).execute();
+            new N2NSetupStep( topology, environment, peerManager.getLocalPeer() ).execute();
 
             return EnvironmentGrowingPhase.SETUP_VNI;
         }

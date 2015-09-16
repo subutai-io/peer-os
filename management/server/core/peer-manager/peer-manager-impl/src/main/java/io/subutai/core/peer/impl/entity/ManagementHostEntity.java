@@ -265,7 +265,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
     public void cleanupEnvironmentNetworkSettings( final String environmentId ) throws PeerException
     {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
         try
         {
@@ -463,6 +463,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
             throw new PeerException( "Error setting up tunnels", e.getCause() );
         }
     }
+
 
     @Override
     public Vni findVniByEnvironmentId( String environmentId ) throws PeerException

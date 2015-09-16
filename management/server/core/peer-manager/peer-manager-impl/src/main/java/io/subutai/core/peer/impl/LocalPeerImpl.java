@@ -45,7 +45,7 @@ import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.CreateContainerGroupRequest;
-import io.subutai.common.environment.CreateEnvironmentContainersRequest;
+import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
@@ -429,7 +429,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    public Set<HostInfoModel> createEnvironmentContainers( final CreateEnvironmentContainersRequest request )
+    public Set<HostInfoModel> createEnvironmentContainerGroup( final CreateEnvironmentContainerGroupRequest request )
             throws PeerException
     {
         Preconditions.checkNotNull( request );
@@ -589,7 +589,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     protected Map<ResourceHost, Set<String>> distributeContainersToResourceHosts(
-            final CreateEnvironmentContainersRequest request ) throws PeerException
+            final CreateEnvironmentContainerGroupRequest request ) throws PeerException
     {
         //collect resource host metrics  & prepare templates on each of them
         List<ResourceHostMetric> serverMetricMap = Lists.newArrayList();
@@ -769,7 +769,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     protected Set<HostInfoModel> processRequestCompletion( final List<Future<ContainerHost>> taskFutures,
                                                            final ExecutorService executorService,
-                                                           final CreateEnvironmentContainersRequest request )
+                                                           final CreateEnvironmentContainerGroupRequest request )
     {
         Set<HostInfoModel> result = Sets.newHashSet();
         Set<ContainerHost> newContainers = Sets.newHashSet();
@@ -1127,6 +1127,24 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             LOG.error( "Could not find container group", e );
         }
+    }
+
+
+    @Override
+    public void cleanupEnvironmentNetworkSettings( final String environmentId ) throws PeerException
+    {
+        getManagementHost().cleanupEnvironmentNetworkSettings( environmentId );
+    }
+
+
+    @Override
+    public void removeEnvironmentKeypair( final String environmentId ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
+
+        KeyManager keyManager = securityManager.getKeyManager();
+
+        keyManager.removeKeyRings( environmentId );
     }
 
 
@@ -1811,6 +1829,83 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         return new ContainersDestructionResultImpl( getId(), destroyedContainersIds, exception );
+    }
+
+
+    public ContainersDestructionResult destroyEnvironmentContainerGroup( final String environmentId )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        Set<Throwable> errors = Sets.newHashSet();
+        Set<String> destroyedContainersIds = Sets.newHashSet();
+        ContainerGroup containerGroup;
+
+        try
+        {
+            containerGroup = findContainerGroupByEnvironmentId( environmentId );
+        }
+        catch ( ContainerGroupNotFoundException e )
+        {
+            return new ContainersDestructionResultImpl( getId(), destroyedContainersIds,
+                    Common.CONTAINER_GROUP_NOT_FOUND );
+        }
+
+        Set<ContainerHost> containerHosts = Sets.newHashSet();
+
+        for ( String containerId : containerGroup.getContainerIds() )
+        {
+            try
+            {
+                containerHosts.add( getContainerHostById( containerId ) );
+            }
+            catch ( HostNotFoundException e )
+            {
+                errors.add( e );
+            }
+        }
+
+        destroyContainerGroup( containerHosts, destroyedContainersIds, errors );
+
+        String exception = null;
+
+        if ( !errors.isEmpty() )
+        {
+            exception = String.format( "There were errors while destroying containers: %s", errors );
+        }
+
+        return new ContainersDestructionResultImpl( getId(), destroyedContainersIds, exception );
+    }
+
+
+    private void destroyContainerGroup( final Set<ContainerHost> containerHosts,
+                                        final Set<String> destroyedContainersIds, final Set<Throwable> errors )
+    {
+        if ( !containerHosts.isEmpty() )
+        {
+            List<Future<String>> taskFutures = Lists.newArrayList();
+            ExecutorService executorService = getFixedExecutor( containerHosts.size() );
+
+            for ( ContainerHost containerHost : containerHosts )
+            {
+
+                taskFutures.add( executorService.submit( new DestroyContainerWrapperTask( this, containerHost ) ) );
+            }
+
+            for ( Future<String> taskFuture : taskFutures )
+            {
+                try
+                {
+                    destroyedContainersIds.add( taskFuture.get() );
+                }
+                catch ( ExecutionException | InterruptedException e )
+                {
+                    errors.add( exceptionUtil.getRootCause( e ) );
+                }
+            }
+
+            executorService.shutdown();
+        }
     }
 
 

@@ -9,6 +9,7 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
+import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 
 
 /**
@@ -64,6 +65,22 @@ public interface EnvironmentManager
     void setSshKey( String environmentId, String sshKey, boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException;
 
+
+    /**
+     * Destroys environment by id.
+     *
+     * @param environmentId - environment id
+     * @param async - indicates whether environment is destroyed synchronously or asynchronously to the calling party
+     * @param forceMetadataRemoval - if true, the call will remove environment metadata from database even if not all
+     * containers were destroyed, otherwise an exception is thrown when first error occurs
+     *
+     * @throws EnvironmentDestructionException - thrown if error occurs during environment destruction
+     * @throws EnvironmentNotFoundException - thrown if environment not found
+     */
+    void destroyEnvironment( String environmentId, boolean async, boolean forceMetadataRemoval )
+            throws EnvironmentDestructionException, EnvironmentNotFoundException;
+
+
     /**
      * Destroys container. If this is the last container, the associated environment will be removed too
      *
@@ -98,4 +115,13 @@ public interface EnvironmentManager
      * @return - default domain name
      */
     String getDefaultDomainName();
+
+    /**
+     * Removes environment from database only. Used to cleanup environment records.
+     *
+     * @param environmentId - environment id
+     *
+     * @throws EnvironmentNotFoundException - thrown if environment not found
+     */
+    void removeEnvironment( String environmentId ) throws EnvironmentNotFoundException;
 }

@@ -6,7 +6,7 @@ import java.util.concurrent.Callable;
 
 import com.google.common.collect.Sets;
 
-import io.subutai.common.environment.CreateEnvironmentContainersRequest;
+import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.peer.HostInfoModel;
 import io.subutai.common.peer.Peer;
@@ -56,8 +56,8 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
             Set<EnvironmentContainerImpl> containers = Sets.newHashSet();
             try
             {
-                Set<HostInfoModel> newHosts = peer.createEnvironmentContainers(
-                        new CreateEnvironmentContainersRequest( environment.getId(), localPeer.getId(),
+                Set<HostInfoModel> newHosts = peer.createEnvironmentContainerGroup(
+                        new CreateEnvironmentContainerGroupRequest( environment.getId(), localPeer.getId(),
                                 localPeer.getOwnerId(), environment.getSubnetCidr(), nodeGroup.getNumberOfContainers(),
                                 nodeGroup.getContainerPlacementStrategy().getStrategyId(),
                                 nodeGroup.getContainerPlacementStrategy().getCriteriaAsList(),

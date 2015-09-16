@@ -33,10 +33,7 @@ public class PeerConfImpl implements PeerConf, Serializable
     @ManyToOne( targetEntity = EnvironmentImpl.class )
     @JoinColumn( name = "environment_id" )
     private Environment environment;
-    //    @Column( name = "ip" )
-    //    private String ip;
-    //    @Column( name = "peer_id" )
-    //    private String peerId;
+
 
     @Embedded
     private N2NConfig n2NConfig;
@@ -77,31 +74,6 @@ public class PeerConfImpl implements PeerConf, Serializable
     {
         this.n2NConfig = n2NConfig;
     }
-
-    //
-    //    public String getIp()
-    //    {
-    //        return ip;
-    //    }
-    //
-    //
-    //    public void setIp( final String ip )
-    //    {
-    //        this.ip = ip;
-    //    }
-    //
-    //
-    //    @Override
-    //    public String getPeerId()
-    //    {
-    //        return peerId;
-    //    }
-    //
-    //
-    //    public void setPeerId( final String peerId )
-    //    {
-    //        this.peerId = peerId;
-    //    }
 
 
     @Override

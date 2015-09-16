@@ -6,7 +6,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.subutai.common.environment.CreateEnvironmentContainersRequest;
+import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.peer.HostInfoModel;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.Payload;
@@ -14,18 +14,18 @@ import io.subutai.core.peer.api.RequestListener;
 import io.subutai.core.peer.impl.RecipientType;
 
 
-public class CreateEnvironmentContainersRequestListener extends RequestListener
+public class CreateEnvironmentContainerGroupRequestListener extends RequestListener
 {
 
     private static final Logger LOG =
-            LoggerFactory.getLogger( CreateEnvironmentContainersRequestListener.class.getName() );
+            LoggerFactory.getLogger( CreateEnvironmentContainerGroupRequestListener.class.getName() );
 
     private LocalPeer localPeer;
 
 
-    public CreateEnvironmentContainersRequestListener( LocalPeer localPeer )
+    public CreateEnvironmentContainerGroupRequestListener( LocalPeer localPeer )
     {
-        super( RecipientType.CREATE_ENVIRONMENT_CONTAINERS_REQUEST.name() );
+        super( RecipientType.CREATE_ENVIRONMENT_CONTAINER_GROUP_REQUEST.name() );
 
         this.localPeer = localPeer;
     }
@@ -34,11 +34,11 @@ public class CreateEnvironmentContainersRequestListener extends RequestListener
     @Override
     public Object onRequest( final Payload payload ) throws Exception
     {
-        CreateEnvironmentContainersRequest request = payload.getMessage( CreateEnvironmentContainersRequest.class );
+        CreateEnvironmentContainerGroupRequest request = payload.getMessage( CreateEnvironmentContainerGroupRequest.class );
         if ( request != null )
         {
 
-            Set<HostInfoModel> containerHosts = localPeer.createEnvironmentContainers( request );
+            Set<HostInfoModel> containerHosts = localPeer.createEnvironmentContainerGroup( request );
 
             return new CreateContainerGroupResponse( containerHosts );
         }

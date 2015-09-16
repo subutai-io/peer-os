@@ -17,6 +17,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.peer.api.LocalPeer;
 
 
 /**
@@ -26,24 +27,26 @@ public class VNISetupStep
 {
     private final Topology topology;
     private final EnvironmentImpl environment;
+    private final LocalPeer localPeer;
 
 
-    public VNISetupStep( final Topology topology, final EnvironmentImpl environment )
+    public VNISetupStep( final Topology topology, final EnvironmentImpl environment, final LocalPeer localPeer )
     {
         this.topology = topology;
         this.environment = environment;
+        this.localPeer = localPeer;
     }
 
 
     public void execute() throws EnvironmentCreationException, PeerException
     {
         Set<Peer> peers = topology.getAllPeers();
+        peers.add( localPeer );
 
         //obtain reserved gateways
         Map<Peer, Set<Gateway>> reservedGateways = Maps.newHashMap();
         for ( Peer peer : peers )
         {
-
             reservedGateways.put( peer, peer.getGateways() );
         }
 

@@ -244,7 +244,7 @@ public class EnvironmentImpl implements Environment, Serializable
         for ( PeerConf p : peerConfs )
         {
             LOG.debug( String.format( "%s %s", p.getN2NConfig().getPeerId(), p.getN2NConfig().getAddress() ) );
-            if ( p.getN2NConfig().getPeerId().toString().equals( peerId ) )
+            if ( p.getN2NConfig().getPeerId().equals( peerId ) )
             {
                 result = p.getN2NConfig().getAddress();
                 break;
