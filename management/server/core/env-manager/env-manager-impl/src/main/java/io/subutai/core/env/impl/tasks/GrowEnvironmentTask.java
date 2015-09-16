@@ -81,6 +81,11 @@ public class GrowEnvironmentTask implements Awaitable
                     Set<Peer> allPeers = new HashSet<>( environment.getPeers() );
                     allPeers.addAll( topology.getAllPeers() );
                     environmentManager.setupN2NConnection( environment, allPeers );
+                    for ( Peer p : newRemotePeers )
+                    {
+                        String pekId = String.format( "%s-%s", p.getId(), environment.getId() );
+                        p.createEnvironmentKeyPair( pekId );
+                    }
                 }
 
                 op.addLog( "Ensuring secure channel..." );

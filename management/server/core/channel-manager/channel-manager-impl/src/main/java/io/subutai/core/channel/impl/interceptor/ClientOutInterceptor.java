@@ -66,6 +66,7 @@ public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
                         String envIdSource = headers.getHeaderString( Common.HEADER_ENV_ID_SOURCE );
                         String envIdTarget = headers.getHeaderString( Common.HEADER_ENV_ID_TARGET );
 
+
                         String peerIdSource = headers.getHeaderString( Common.HEADER_PEER_ID_SOURCE );
                         String peerIdTarget = headers.getHeaderString( Common.HEADER_PEER_ID_TARGET );
 

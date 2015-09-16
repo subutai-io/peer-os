@@ -1895,6 +1895,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
+            if ( keyManager.getSecretKey( environmentId ) != null )
+            {
+                LOG.warn( "Keypair already exists for: " + environmentId );
+                return 1;
+            }
             KeyPair keyPair = keyManager.generateKeyPair( environmentId, false );
 
             if ( keyPair != null )

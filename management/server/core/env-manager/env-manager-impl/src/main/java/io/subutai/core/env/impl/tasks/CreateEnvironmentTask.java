@@ -79,18 +79,18 @@ public class CreateEnvironmentTask implements Awaitable
 
             //**** Create Key Pair *****************************************
 
-            op.addLog( "Creating PEKs ..." );
-
-            try
-            {
-                localPeer.createEnvironmentKeyPair(
-                        localPeer.getId().toString() + "-" + environment.getId().toString() );
-            }
-            catch ( Exception ex )
-            {
-                throw new EnvironmentBuildException(
-                        String.format( "There were errors during creation of PEKs:  %s", ex.toString() ), null );
-            }
+//            op.addLog( "Creating PEKs ..." );
+//
+//            try
+//            {
+//                localPeer.createEnvironmentKeyPair(
+//                        localPeer.getId().toString() + "-" + environment.getId().toString() );
+//            }
+//            catch ( Exception ex )
+//            {
+//                throw new EnvironmentBuildException(
+//                        String.format( "There were errors during creation of PEKs:  %s", ex.toString() ), null );
+//            }
 
             //**************************************************************
 
