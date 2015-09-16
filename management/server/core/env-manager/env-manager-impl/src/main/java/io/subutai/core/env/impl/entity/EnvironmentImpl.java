@@ -79,7 +79,7 @@ public class EnvironmentImpl implements Environment, Serializable
     private Set<ContainerHost> containers = Sets.newHashSet();
 
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = PeerConfImpl.class,
-            cascade = CascadeType.ALL, orphanRemoval = true )
+            cascade = CascadeType.ALL, orphanRemoval = false )
     private Set<PeerConf> peerConfs = Sets.newHashSet();
 
     @Enumerated( EnumType.STRING )

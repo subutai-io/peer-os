@@ -54,14 +54,15 @@ public class CreateTunnelCommand extends OsgiCommandSupport
             System.out.println( String.format( "\tAdding peer %s to tunnel...", peerId ) );
             peerSet.add( peerManager.getPeer( peerId ) );
         }
-        List<N2NConfig> tunnelNetwork = environmentManager.setupN2NConnection( peerSet );
-        System.out.println( "Tunnel created successfully: " + tunnelNetwork.size() );
-        for ( N2NConfig config : tunnelNetwork )
-        {
-            System.out.println( "\tPeer ID\tSuper node\tAddreess\tInterface\tCommunity" );
-            System.out.println( String.format( "\t%s\t%s:%d\t%s\t%s\t%s", config.getPeerId(), config.getSuperNodeIp(),
-                    config.getN2NPort(),config.getAddress(),  config.getInterfaceName(), config.getCommunityName() ) );
-        }
+        //TODO: reimplement it
+//        List<N2NConfig> tunnelNetwork = environmentManager.setupN2NConnection( peerSet );
+//        System.out.println( "Tunnel created successfully: " + tunnelNetwork.size() );
+//        for ( N2NConfig config : tunnelNetwork )
+//        {
+//            System.out.println( "\tPeer ID\tSuper node\tAddreess\tInterface\tCommunity" );
+//            System.out.println( String.format( "\t%s\t%s:%d\t%s\t%s\t%s", config.getPeerId(), config.getSuperNodeIp(),
+//                    config.getN2NPort(),config.getAddress(),  config.getInterfaceName(), config.getCommunityName() ) );
+//        }
 
         return null;
     }

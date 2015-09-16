@@ -108,21 +108,23 @@ public class DestroyContainerTask implements Awaitable
                 throw new EnvironmentModificationException( e );
             }
 
-            if ( environment.getContainerHosts().isEmpty() )
-            {
-                try
-                {
-                    environmentManager.removeEnvironment( environment.getId(), false );
-                }
-                catch ( EnvironmentNotFoundException e )
-                {
-                    LOG.error( "Error removing environment", e );
-                }
-            }
-            else
-            {
-                environment.setStatus( EnvironmentStatus.HEALTHY );
-            }
+//            if ( environment.getContainerHosts().isEmpty() )
+//            {
+//                try
+//                {
+//                    //TODO either cleanup environment networking settings on each peer or leave empty environment
+//                    environmentManager.removeEnvironment( environment.getId(), false );
+//                }
+//                catch ( EnvironmentNotFoundException e )
+//                {
+//                    LOG.error( "Error removing environment", e );
+//                }
+//            }
+//            else
+//            {
+//                environment.setStatus( EnvironmentStatus.HEALTHY );
+//            }
+            environment.setStatus( EnvironmentStatus.HEALTHY );
 
             op.addLogDone( "Container destroyed successfully" );
         }
