@@ -35,6 +35,7 @@ import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
+import io.subutai.core.environment.impl.workflow.destruction.EnvironmentDestructionWorkflow;
 import io.subutai.core.environment.impl.workflow.growing.EnvironmentGrowingWorkflow;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.User;
@@ -141,6 +142,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                                final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkNotNull( topology, "Invalid topology" );
+        Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
+
         TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
                 String.format( "Growing environment %s", environmentId ) );
 
@@ -152,7 +157,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                                final boolean checkAccess, final TrackerOperation operationTracker )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
@@ -221,7 +226,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void setSshKey( final String environmentId, final String sshKey, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
-
+        //todo
     }
 
 
@@ -230,7 +235,63 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                     final boolean forceMetadataRemoval )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
+        TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Destroying environment %s", environmentId ) );
+
+        destroyEnvironment( environmentId, async, forceMetadataRemoval, true, op );
+    }
+
+
+    public void destroyEnvironment( final String environmentId, boolean async, final boolean forceMetadataRemoval,
+                                    final boolean checkAccess, final TrackerOperation operationTracker )
+            throws EnvironmentDestructionException, EnvironmentNotFoundException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+        {
+            operationTracker.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
+
+            throw new EnvironmentDestructionException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
+
+        EnvironmentDestructionWorkflow environmentDestructionWorkflow =
+                getEnvironmentDestructionWorkflow( peerManager, this, environment, operationTracker,
+                        forceMetadataRemoval );
+
+        environmentDestructionWorkflow.start();
+
+        environmentDestructionWorkflow.onStop( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    findEnvironment( environmentId );
+                }
+                catch ( EnvironmentNotFoundException e )
+                {
+                    notifyOnEnvironmentDestroyed( environmentId );
+                }
+            }
+        } );
+
+        //wait
+        if ( !async )
+        {
+            environmentDestructionWorkflow.join();
+
+            if ( environmentDestructionWorkflow.getError() != null )
+            {
+                throw new EnvironmentDestructionException(
+                        exceptionUtil.getRootCause( environmentDestructionWorkflow.getError() ) );
+            }
+        }
     }
 
 
@@ -239,7 +300,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                   final boolean forceMetadataRemoval )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-
+        //todo
     }
 
 
@@ -269,6 +330,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void removeEnvironment( final String environmentId, final boolean checkAccess )
             throws EnvironmentNotFoundException
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
         findEnvironment( environmentId, checkAccess );
 
         environmentDataService.remove( environmentId );
@@ -295,6 +358,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         return new EnvironmentGrowingWorkflow( defaultDomain, templateRegistry, networkManager, peerManager,
                 environment, topology, sshKey, operationTracker );
+    }
+
+
+    protected EnvironmentDestructionWorkflow getEnvironmentDestructionWorkflow( final PeerManager peerManager,
+                                                                                final EnvironmentManagerImpl
+                                                                                        environmentManager,
+                                                                                final EnvironmentImpl environment,
+                                                                                final TrackerOperation op,
+                                                                                final boolean forceMetadataRemoval )
+    {
+        return new EnvironmentDestructionWorkflow( peerManager, environmentManager, environment, op,
+                forceMetadataRemoval );
     }
 
 
