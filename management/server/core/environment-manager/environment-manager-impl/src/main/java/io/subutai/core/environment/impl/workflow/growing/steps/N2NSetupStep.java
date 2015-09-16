@@ -1,4 +1,4 @@
-package io.subutai.core.environment.impl.workflow.creation.steps;
+package io.subutai.core.environment.impl.workflow.growing.steps;
 
 
 import java.util.Set;
@@ -11,12 +11,8 @@ import io.subutai.common.protocol.N2NConfig;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 
-/**
- * N2N setup step
- */
 public class N2NSetupStep
 {
-
     private final Topology topology;
     private final EnvironmentImpl environment;
 
@@ -31,8 +27,10 @@ public class N2NSetupStep
     public Set<N2NConfig> execute()
     {
 
-        //obtain already participating peers
         Set<Peer> peers = Sets.newHashSet( topology.getAllPeers() );
+
+        //remove already participating peers
+        peers.removeAll( environment.getPeers() );
 
         //todo setup tunnels, create edge
         return null;

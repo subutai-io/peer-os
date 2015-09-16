@@ -1,4 +1,4 @@
-package io.subutai.core.environment.impl.workflow.creation;
+package io.subutai.core.environment.impl.workflow.growing;
 
 
 import org.slf4j.Logger;
@@ -11,20 +11,21 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
-import io.subutai.core.environment.impl.workflow.creation.steps.N2NSetupStep;
-import io.subutai.core.environment.impl.workflow.creation.steps.PEKGenerationStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.SetSshKeyStep;
-import io.subutai.core.environment.impl.workflow.creation.steps.VNISetupStep;
+import io.subutai.core.environment.impl.workflow.growing.steps.N2NSetupStep;
+import io.subutai.core.environment.impl.workflow.growing.steps.PEKGenerationStep;
+import io.subutai.core.environment.impl.workflow.growing.steps.VNISetupStep;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
 
 
-public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWorkflow.EnvironmentCreationPhase>
+public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkflow.EnvironmentGrowingPhase>
 {
-    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentCreationWorkflow.class );
+
+    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentGrowingWorkflow.class );
 
     private final TemplateRegistry templateRegistry;
     private final NetworkManager networkManager;
@@ -48,15 +49,33 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
         this.error = error;
-        LOG.error( "Error creating environment", error );
+        LOG.error( "Error growing environment", error );
         operationTracker.addLogFailed( error.getMessage() );
         //stop the workflow
         stop();
     }
 
 
+    public EnvironmentGrowingWorkflow( String defaultDomain, TemplateRegistry templateRegistry,
+                                       NetworkManager networkManager, PeerManager peerManager,
+                                       EnvironmentImpl environment, Topology topology, String sshKey,
+                                       TrackerOperation operationTracker )
+    {
+        super( EnvironmentGrowingPhase.INIT );
+
+        this.templateRegistry = templateRegistry;
+        this.peerManager = peerManager;
+        this.networkManager = networkManager;
+        this.environment = environment;
+        this.topology = topology;
+        this.sshKey = sshKey;
+        this.operationTracker = operationTracker;
+        this.defaultDomain = defaultDomain;
+    }
+
+
     //environment creation phases
-    public static enum EnvironmentCreationPhase
+    public static enum EnvironmentGrowingPhase
     {
         INIT,
         GENERATE_KEYS,
@@ -71,38 +90,20 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     }
 
 
-    public EnvironmentCreationWorkflow( String defaultDomain, TemplateRegistry templateRegistry,
-                                        NetworkManager networkManager, PeerManager peerManager,
-                                        EnvironmentImpl environment, Topology topology, String sshKey,
-                                        TrackerOperation operationTracker )
-    {
-        super( EnvironmentCreationPhase.INIT );
-
-        this.templateRegistry = templateRegistry;
-        this.peerManager = peerManager;
-        this.networkManager = networkManager;
-        this.environment = environment;
-        this.topology = topology;
-        this.sshKey = sshKey;
-        this.operationTracker = operationTracker;
-        this.defaultDomain = defaultDomain;
-    }
-
-
     //********************* WORKFLOW STEPS ************
 
 
-    public EnvironmentCreationPhase INIT()
+    public EnvironmentGrowingPhase INIT()
     {
-        operationTracker.addLog( "Initializing environment creation" );
+        operationTracker.addLog( "Initializing environment growth" );
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-        return EnvironmentCreationPhase.GENERATE_KEYS;
+        return EnvironmentGrowingPhase.GENERATE_KEYS;
     }
 
 
-    public EnvironmentCreationPhase GENERATE_KEYS()
+    public EnvironmentGrowingPhase GENERATE_KEYS()
     {
         operationTracker.addLog( "Generating PEKs" );
 
@@ -110,7 +111,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             new PEKGenerationStep( topology, environment ).execute();
 
-            return EnvironmentCreationPhase.SETUP_N2N;
+            return EnvironmentGrowingPhase.SETUP_N2N;
         }
         catch ( Exception e )
         {
@@ -121,7 +122,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     }
 
 
-    public EnvironmentCreationPhase SETUP_N2N()
+    public EnvironmentGrowingPhase SETUP_N2N()
     {
         operationTracker.addLog( "Setting up N2N" );
 
@@ -129,7 +130,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             new N2NSetupStep( topology, environment ).execute();
 
-            return EnvironmentCreationPhase.SETUP_VNI;
+            return EnvironmentGrowingPhase.SETUP_VNI;
         }
         catch ( Exception e )
         {
@@ -140,7 +141,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     }
 
 
-    public EnvironmentCreationPhase SETUP_VNI()
+    public EnvironmentGrowingPhase SETUP_VNI()
     {
         operationTracker.addLog( "Setting up VNI" );
 
@@ -148,7 +149,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             new VNISetupStep( topology, environment ).execute();
 
-            return EnvironmentCreationPhase.CLONE_CONTAINERS;
+            return EnvironmentGrowingPhase.CLONE_CONTAINERS;
         }
         catch ( Exception e )
         {
@@ -159,7 +160,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     }
 
 
-    public EnvironmentCreationPhase CLONE_CONTAINERS()
+    public EnvironmentGrowingPhase CLONE_CONTAINERS()
     {
         operationTracker.addLog( "Cloning containers" );
 
@@ -168,7 +169,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
             new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager.getLocalPeer() )
                     .execute();
 
-            return EnvironmentCreationPhase.CONFIGURE_HOSTS;
+            return EnvironmentGrowingPhase.CONFIGURE_HOSTS;
         }
         catch ( Exception e )
         {
@@ -179,7 +180,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     }
 
 
-    public EnvironmentCreationPhase CONFIGURE_HOSTS()
+    public EnvironmentGrowingPhase CONFIGURE_HOSTS()
     {
         operationTracker.addLog( "Configuring /etc/hosts" );
 
@@ -187,7 +188,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             new RegisterHostsStep( environment, networkManager ).execute();
 
-            return EnvironmentCreationPhase.CONFIGURE_SSH;
+            return EnvironmentGrowingPhase.CONFIGURE_SSH;
         }
         catch ( Exception e )
         {
@@ -198,7 +199,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     }
 
 
-    public EnvironmentCreationPhase CONFIGURE_SSH()
+    public EnvironmentGrowingPhase CONFIGURE_SSH()
     {
         operationTracker.addLog( "Configuring ssh" );
 
@@ -206,7 +207,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             new RegisterSshStep( environment, networkManager ).execute();
 
-            return EnvironmentCreationPhase.SET_ENVIRONMENT_SSH_KEY;
+            return EnvironmentGrowingPhase.SET_ENVIRONMENT_SSH_KEY;
         }
         catch ( Exception e )
         {
@@ -217,7 +218,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     }
 
 
-    public EnvironmentCreationPhase SET_ENVIRONMENT_SSH_KEY()
+    public EnvironmentGrowingPhase SET_ENVIRONMENT_SSH_KEY()
     {
         operationTracker.addLog( "Setting environment ssh key to containers" );
 
@@ -225,7 +226,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             new SetSshKeyStep( sshKey, environment, networkManager ).execute();
 
-            return EnvironmentCreationPhase.FINALIZE;
+            return EnvironmentGrowingPhase.FINALIZE;
         }
         catch ( Exception e )
         {
@@ -238,11 +239,11 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
     public void FINALIZE()
     {
-        LOG.info( "Finalizing environment creation" );
+        LOG.info( "Finalizing environment growth" );
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
-        operationTracker.addLogDone( "Environment is created" );
+        operationTracker.addLogDone( "Environment is grown" );
 
         //this is a must have call
         stop();

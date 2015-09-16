@@ -3,7 +3,6 @@ package io.subutai.core.environment.cli;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
 
@@ -12,11 +11,12 @@ import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
 
 
 @Command( scope = "environment", name = "build-local", description = "Command to build environment on local peer" )
-public class BuildLocalEnvironmentCommand extends OsgiCommandSupport
+public class BuildLocalEnvironmentCommand extends SubutaiShellCommandSupport
 {
 
     @Argument( name = "templateName", description = "Template name",

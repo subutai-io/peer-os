@@ -13,5 +13,13 @@
       </action>
     </command>
   </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="environment/grow-local">
+      <action class="io.subutai.core.environment.cli.GrowLocalEnvironmentCommand">
+        <argument ref="environmentManager" />
+        <argument ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
 
 </blueprint>

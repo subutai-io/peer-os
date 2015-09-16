@@ -17,6 +17,7 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.peer.ContainerHost;
@@ -33,6 +34,7 @@ import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
+import io.subutai.core.environment.impl.workflow.growing.EnvironmentGrowingWorkflow;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.User;
 import io.subutai.core.network.api.NetworkManager;
@@ -138,7 +140,79 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                                final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        return null;
+        TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Growing environment %s", environmentId ) );
+
+        return growEnvironment( environmentId, topology, async, true, op );
+    }
+
+
+    public Set<ContainerHost> growEnvironment( final String environmentId, final Topology topology, final boolean async,
+                                               final boolean checkAccess, final TrackerOperation operationTracker )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+        Preconditions.checkNotNull( topology, "Invalid topology" );
+        Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+        {
+            operationTracker.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
+
+            throw new EnvironmentModificationException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
+
+        final Set<ContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
+
+
+        //launch environment growing workflow
+        EnvironmentGrowingWorkflow environmentGrowingWorkflow =
+                getEnvironmentGrowingWorkflow( environment, topology, environment.getSshKey(), operationTracker );
+
+        //start environment growing workflow
+        environmentGrowingWorkflow.start();
+
+        //notify environment event listeners
+        environmentGrowingWorkflow.onStop( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    Set<ContainerHost> newContainers = Sets.newHashSet( environment.getContainerHosts() );
+                    newContainers.removeAll( oldContainers );
+                    notifyOnEnvironmentGrown( findEnvironment( environment.getId(), checkAccess ), newContainers );
+                }
+                catch ( EnvironmentNotFoundException e )
+                {
+                    LOG.error( "Error notifying environment event listeners", e );
+                }
+            }
+        } );
+
+        //wait
+        if ( !async )
+        {
+            environmentGrowingWorkflow.join();
+
+            if ( environmentGrowingWorkflow.getError() != null )
+            {
+                throw new EnvironmentModificationException(
+                        exceptionUtil.getRootCause( environmentGrowingWorkflow.getError() ) );
+            }
+            else
+            {
+                Set<ContainerHost> newContainers = Sets.newHashSet( environment.getContainerHosts() );
+                newContainers.removeAll( oldContainers );
+                return newContainers;
+            }
+        }
+
+        return Sets.newHashSet();
     }
 
 
@@ -181,6 +255,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                                                           final TrackerOperation operationTracker )
     {
         return new EnvironmentCreationWorkflow( defaultDomain, templateRegistry, networkManager, peerManager,
+                environment, topology, sshKey, operationTracker );
+    }
+
+
+    protected EnvironmentGrowingWorkflow getEnvironmentGrowingWorkflow( final EnvironmentImpl environment,
+                                                                        final Topology topology, final String sshKey,
+                                                                        final TrackerOperation operationTracker )
+    {
+        return new EnvironmentGrowingWorkflow( defaultDomain, templateRegistry, networkManager, peerManager,
                 environment, topology, sshKey, operationTracker );
     }
 
