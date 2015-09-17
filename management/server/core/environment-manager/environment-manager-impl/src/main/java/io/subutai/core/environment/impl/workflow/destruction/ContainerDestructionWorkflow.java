@@ -83,6 +83,8 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
 
     public ContainerDestructionPhase DESTROY_CONTAINER()
     {
+        operationTracker.addLog( "Destroying container" );
+
         try
         {
             new DestroyContainerStep( environmentManager, environment, containerHost, forceMetadataRemoval,
