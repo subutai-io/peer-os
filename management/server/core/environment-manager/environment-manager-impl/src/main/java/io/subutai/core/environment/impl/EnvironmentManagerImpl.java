@@ -2,8 +2,10 @@ package io.subutai.core.environment.impl;
 
 
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import org.slf4j.Logger;
@@ -14,21 +16,26 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.host.HostInfo;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
+import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.api.exception.EnvironmentSecurityException;
 import io.subutai.core.environment.impl.dao.BlueprintDataService;
 import io.subutai.core.environment.impl.dao.EnvironmentContainerDataService;
@@ -432,6 +439,252 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         notifyOnEnvironmentDestroyed( environmentId );
     }
 
+
+    @Override
+    public Set<Environment> getEnvironments()
+    {
+        Set<Environment> environments = Sets.newHashSet();
+        environments.addAll( environmentDataService.getAll() );
+
+        for ( Environment environment : environments )
+        {
+            setEnvironmentTransientFields( environment );
+            setContainersTransientFields( environment );
+        }
+
+        if ( !isUserAdmin() )
+        {
+            Long userId = getUserId();
+            for ( Iterator<Environment> iterator = environments.iterator(); iterator.hasNext(); )
+            {
+                final Environment environment = iterator.next();
+                if ( !Objects.equals( environment.getUserId(), userId ) )
+                {
+                    iterator.remove();
+                }
+            }
+        }
+
+        return environments;
+    }
+
+
+    @Override
+    public void saveBlueprint( final Blueprint blueprint ) throws EnvironmentManagerException
+    {
+        Preconditions.checkNotNull( blueprint, "Invalid blueprint" );
+
+        blueprintDataService.persist( blueprint );
+    }
+
+
+    @Override
+    public void removeBlueprint( final UUID blueprintId ) throws EnvironmentManagerException
+    {
+        Preconditions.checkNotNull( blueprintId, "Invalid blueprint id" );
+
+        blueprintDataService.remove( blueprintId );
+    }
+
+
+    @Override
+    public Set<Blueprint> getBlueprints() throws EnvironmentManagerException
+    {
+        return blueprintDataService.getAll();
+    }
+
+
+    @Override
+    public void updateEnvironmentContainersMetadata( final String environmentId ) throws EnvironmentManagerException
+    {
+        try
+        {
+            Environment environment = findEnvironment( environmentId );
+            Set<ContainerHost> containerHosts = environment.getContainerHosts();
+
+            for ( final ContainerHost containerHost : containerHosts )
+            {
+                try
+                {
+                    HostInfo hostInfo = containerHost.getPeer().getContainerHostInfoById( containerHost.getId() );
+
+                    EnvironmentContainerImpl environmentContainer =
+                            environmentContainerDataService.find( containerHost.getId() );
+                    environmentContainer.setHostname( hostInfo.getHostname() );
+                    environmentContainer.setNetInterfaces( hostInfo.getInterfaces() );
+
+                    environmentContainerDataService.update( environmentContainer );
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( "Couldn't get container host info from hosting peer", e );
+                }
+            }
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            throw new EnvironmentManagerException(
+                    String.format( "Couldn't find environment by id: %s", environmentId ), e );
+        }
+    }
+
+
+    @Override
+    public void assignEnvironmentDomain( final String environmentId, final String newDomain )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newDomain ), "Invalid domain" );
+        Preconditions.checkArgument( newDomain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
+
+        TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Assigning environment %s domain", environmentId ) );
+
+        modifyEnvironmentDomain( environmentId, newDomain, operationTracker, true );
+    }
+
+
+    @Override
+    public void removeEnvironmentDomain( final String environmentId )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
+        TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Removing environment %s domain", environmentId ) );
+
+        modifyEnvironmentDomain( environmentId, null, operationTracker, true );
+    }
+
+
+    public void modifyEnvironmentDomain( final String environmentId, final String domain,
+                                         final TrackerOperation operationTracker, boolean checkAccess )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+
+        try
+        {
+            if ( Strings.isNullOrEmpty( domain ) )
+            {
+                peerManager.getLocalPeer().removeVniDomain( environment.getVni() );
+            }
+            else
+            {
+                peerManager.getLocalPeer().setVniDomain( environment.getVni(), domain );
+            }
+
+            operationTracker.addLogDone( "Environment domain modified" );
+        }
+        catch ( Exception e )
+        {
+            operationTracker.addLogFailed( String.format( "Error modifying environment domain: %s", e.getMessage() ) );
+            throw new EnvironmentModificationException( e );
+        }
+    }
+
+
+    @Override
+    public String getEnvironmentDomain( final String environmentId )
+            throws EnvironmentManagerException, EnvironmentNotFoundException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, true );
+
+        try
+        {
+            return peerManager.getLocalPeer().getVniDomain( environment.getVni() );
+        }
+        catch ( PeerException e )
+        {
+            throw new EnvironmentManagerException( "Error obtaining environment domain", e );
+        }
+    }
+
+
+    @Override
+    public boolean isContainerInEnvironmentDomain( final String containerHostId, final String environmentId )
+            throws EnvironmentManagerException, EnvironmentNotFoundException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, true );
+
+        try
+        {
+            ContainerHost containerHost = environment.getContainerHostById( containerHostId );
+
+            return peerManager.getLocalPeer().isIpInVniDomain(
+                    containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ), environment.getVni() );
+        }
+        catch ( ContainerHostNotFoundException | PeerException e )
+        {
+            throw new EnvironmentManagerException( "Error checking container domain", e );
+        }
+    }
+
+
+    @Override
+    public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
+    {
+        TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Adding container %s to environment domain", containerHostId ) );
+
+        toggleContainerDomain( containerHostId, environmentId, true, operationTracker, true );
+    }
+
+
+    @Override
+    public void removeContainerFromEnvironmentDomain( final String containerHostId, final String environmentId )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
+    {
+        TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Removing container %s from environment domain", containerHostId ) );
+
+        toggleContainerDomain( containerHostId, environmentId, false, operationTracker, true );
+    }
+
+
+    public void toggleContainerDomain( final String containerHostId, final String environmentId, final boolean add,
+                                       final TrackerOperation operationTracker, final boolean checkAccess )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+
+        ContainerHost containerHost = environment.getContainerHostById( containerHostId );
+        try
+        {
+            if ( add )
+            {
+                peerManager.getLocalPeer()
+                           .addIpToVniDomain( containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ),
+                                   environment.getVni() );
+            }
+            else
+            {
+                peerManager.getLocalPeer().removeIpFromVniDomain(
+                        containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ),
+                        environment.getVni() );
+            }
+
+            operationTracker.addLogDone(
+                    String.format( "Container is %s environment domain", add ? "included in" : "excluded from" ) );
+        }
+        catch ( Exception e )
+        {
+            operationTracker.addLogFailed( String.format( "Error %s environment domain: %s",
+                    add ? "including container in" : "excluding container from", e.getMessage() ) );
+            throw new EnvironmentModificationException( e );
+        }
+    }
 
     //************ utility methods
 

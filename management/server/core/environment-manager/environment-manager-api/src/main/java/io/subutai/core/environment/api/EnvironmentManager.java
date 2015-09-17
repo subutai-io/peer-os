@@ -2,7 +2,10 @@ package io.subutai.core.environment.api;
 
 
 import java.util.Set;
+import java.util.UUID;
 
+import io.subutai.common.environment.Blueprint;
+import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
@@ -10,6 +13,7 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
+import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 
 
 /**
@@ -17,6 +21,13 @@ import io.subutai.core.environment.api.exception.EnvironmentDestructionException
  */
 public interface EnvironmentManager
 {
+
+    /**
+     * Returns all existing environments
+     *
+     * @return - set of {@code Environment}
+     */
+    Set<Environment> getEnvironments();
 
     /**
      * Creates environment based on a passed topology
@@ -124,4 +135,76 @@ public interface EnvironmentManager
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
     void removeEnvironment( String environmentId ) throws EnvironmentNotFoundException;
+
+
+    /**
+     * Save environment blueprint
+     *
+     * @param blueprint - blueprint to save
+     */
+    void saveBlueprint( Blueprint blueprint ) throws EnvironmentManagerException;
+
+
+    /**
+     * Remove blueprint from database
+     *
+     * @param blueprintId - blueprint id to remove
+     */
+    void removeBlueprint( UUID blueprintId ) throws EnvironmentManagerException;
+
+
+    /**
+     * Get All blueprints
+     *
+     * @return - set of blueprints
+     */
+    Set<Blueprint> getBlueprints() throws EnvironmentManagerException;
+
+
+    /**
+     * Updates environment container hosts metadata (hostname, network interface)
+     *
+     * @param environmentId - target environment Id
+     */
+    void updateEnvironmentContainersMetadata( String environmentId ) throws EnvironmentManagerException;
+
+    /**
+     * Removes an assigned domain if any from the environment
+     *
+     * @param environmentId - id of the environment which domain to remove
+     * @param async - indicates whether operation is done synchronously or asynchronously to the calling party
+     */
+    void removeEnvironmentDomain( String environmentId ) throws EnvironmentModificationException, EnvironmentNotFoundException;
+
+    /**
+     * Assigns a domain to the environment. External client would be able to access the environment containers via the
+     * domain name.
+     *
+     * @param environmentId - id of the environment to assign the passed domain to
+     * @param newDomain - domain url
+     * @param async - indicates whether operation is done synchronously or asynchronously to the calling party
+     */
+    void assignEnvironmentDomain( String environmentId, String newDomain )
+            throws EnvironmentModificationException, EnvironmentNotFoundException;
+
+    /**
+     * Returns the currently assigned domain
+     *
+     * @param environmentId - id of the environment which domain to return
+     *
+     * @return - domain url or null if not assigned
+     */
+    String getEnvironmentDomain( String environmentId ) throws EnvironmentManagerException, EnvironmentNotFoundException;
+
+
+    boolean isContainerInEnvironmentDomain( String containerHostId, String environmentId )
+            throws EnvironmentManagerException, EnvironmentNotFoundException;
+
+
+    void addContainerToEnvironmentDomain( String containerHostId, String environmentId )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
+
+
+    void removeContainerFromEnvironmentDomain( String containerHostId, String environmentId )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 }
