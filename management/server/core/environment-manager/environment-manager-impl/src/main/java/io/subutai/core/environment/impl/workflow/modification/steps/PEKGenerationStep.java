@@ -1,4 +1,4 @@
-package io.subutai.core.environment.impl.workflow.growing.steps;
+package io.subutai.core.environment.impl.workflow.modification.steps;
 
 
 import java.util.Map;

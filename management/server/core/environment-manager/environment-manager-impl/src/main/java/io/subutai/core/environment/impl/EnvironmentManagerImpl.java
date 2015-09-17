@@ -38,7 +38,8 @@ import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.ContainerDestructionWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.EnvironmentDestructionWorkflow;
-import io.subutai.core.environment.impl.workflow.growing.EnvironmentGrowingWorkflow;
+import io.subutai.core.environment.impl.workflow.modification.EnvironmentGrowingWorkflow;
+import io.subutai.core.environment.impl.workflow.modification.SshKeyModificationWorkflow;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.User;
 import io.subutai.core.network.api.NetworkManager;
@@ -228,7 +229,39 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void setSshKey( final String environmentId, final String sshKey, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
-        //todo
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
+        TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Setting environment %s ssh key", environmentId ) );
+
+        setSshKey( environmentId, sshKey, async, true, op );
+    }
+
+
+    public void setSshKey( final String environmentId, final String sshKey, final boolean async,
+                           final boolean checkAccess, final TrackerOperation operationTracker )
+            throws EnvironmentNotFoundException, EnvironmentModificationException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+
+        SshKeyModificationWorkflow sshKeyModificationWorkflow =
+                getSshKeyModificationWorkflow( environment, sshKey, networkManager, operationTracker );
+
+        sshKeyModificationWorkflow.start();
+
+        //wait
+        if ( !async )
+        {
+            sshKeyModificationWorkflow.join();
+
+            if ( sshKeyModificationWorkflow.getError() != null )
+            {
+                throw new EnvironmentModificationException(
+                        exceptionUtil.getRootCause( sshKeyModificationWorkflow.getError() ) );
+            }
+        }
     }
 
 
@@ -441,6 +474,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         return new ContainerDestructionWorkflow( environmentManager, environment, containerHost, forceMetadataRemoval,
                 operationTracker );
+    }
+
+
+    protected SshKeyModificationWorkflow getSshKeyModificationWorkflow( final EnvironmentImpl environment,
+                                                                        final String sshKey,
+                                                                        final NetworkManager networkManager,
+                                                                        final TrackerOperation operationTracker )
+    {
+        return new SshKeyModificationWorkflow( environment, sshKey, networkManager, operationTracker );
     }
 
 

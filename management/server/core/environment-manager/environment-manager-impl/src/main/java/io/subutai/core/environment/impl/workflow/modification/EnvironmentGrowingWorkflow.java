@@ -1,4 +1,4 @@
-package io.subutai.core.environment.impl.workflow.growing;
+package io.subutai.core.environment.impl.workflow.modification;
 
 
 import org.slf4j.Logger;
@@ -14,9 +14,9 @@ import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneSt
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.SetSshKeyStep;
-import io.subutai.core.environment.impl.workflow.growing.steps.N2NSetupStep;
-import io.subutai.core.environment.impl.workflow.growing.steps.PEKGenerationStep;
-import io.subutai.core.environment.impl.workflow.growing.steps.VNISetupStep;
+import io.subutai.core.environment.impl.workflow.modification.steps.N2NSetupStep;
+import io.subutai.core.environment.impl.workflow.modification.steps.PEKGenerationStep;
+import io.subutai.core.environment.impl.workflow.modification.steps.VNISetupStep;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
