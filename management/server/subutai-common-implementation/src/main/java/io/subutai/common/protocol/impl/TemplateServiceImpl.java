@@ -6,10 +6,10 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
+import io.subutai.common.dao.DaoManager;
 import io.subutai.common.datatypes.TemplateVersion;
 import io.subutai.common.exception.DaoException;
 import io.subutai.common.protocol.Template;
@@ -17,23 +17,13 @@ import io.subutai.common.protocol.api.TemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
-
 
 public class TemplateServiceImpl implements TemplateService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( TemplateServiceImpl.class.getName() );
 
 
-    private EntityManagerFactory entityManagerFactory;
-
-
-    public void setEntityManagerFactory( final EntityManagerFactory entityManagerFactory )
-    {
-        Preconditions.checkNotNull( entityManagerFactory, "EntityManagerFactory cannot be null value" );
-        this.entityManagerFactory = entityManagerFactory;
-        LOGGER.info( "EntityManagerFactory is assigned" );
-    }
+    private DaoManager daoManager;
 
 
     /**
@@ -49,7 +39,7 @@ public class TemplateServiceImpl implements TemplateService
         EntityManager entityManager = null;
         try
         {
-            entityManager = entityManagerFactory.createEntityManager();
+            entityManager = daoManager.getEntityManagerFactory().createEntityManager();
 
             if ( template.getParentTemplateName() != null && !template.getParentTemplateName()
                                                                       .equals( template.getTemplateName() ) )
@@ -57,10 +47,11 @@ public class TemplateServiceImpl implements TemplateService
                 Template parent = getTemplate( template.getParentTemplateName(), template.getLxcArch() );
                 if ( parent != null )
                 {
+                    daoManager.startTransaction(  entityManager );
                     entityManager.getTransaction().begin();
                     savedTemplate = entityManager.merge( template );
                     entityManager.flush();
-                    entityManager.getTransaction().commit();
+                    daoManager.commitTransaction( entityManager );
                     parent.addChildren( Arrays.asList( template ) );
                     saveTemplate( parent );
                 }
@@ -71,27 +62,23 @@ public class TemplateServiceImpl implements TemplateService
             }
             else
             {
-                entityManager.getTransaction().begin();
+                daoManager.startTransaction( entityManager );
                 savedTemplate = entityManager.merge( template );
                 entityManager.flush();
-                entityManager.getTransaction().commit();
+                daoManager.commitTransaction( entityManager );
             }
         }
         catch ( Exception ex )
         {
             LOGGER.warn( "Exception thrown in saveTemplate: ", ex );
-            if ( entityManager != null && entityManager.getTransaction().isActive() )
-            {
-                entityManager.getTransaction().rollback();
-            }
+
+            daoManager.rollBackTransaction( entityManager );
+
             throw new DaoException( ex );
         }
         finally
         {
-            if ( entityManager != null )
-            {
-                entityManager.close();
-            }
+            daoManager.closeEntityManager( entityManager );
         }
         return savedTemplate;
     }
@@ -108,31 +95,27 @@ public class TemplateServiceImpl implements TemplateService
         EntityManager entityManager = null;
         try
         {
-            entityManager = entityManagerFactory.createEntityManager();
-            entityManager.getTransaction().begin();
+            entityManager = daoManager.getEntityManagerFactory().createEntityManager();
+            daoManager.startTransaction( entityManager );
+
             Query query = entityManager.createNamedQuery( Template.QUERY_REMOVE_TEMPLATE_BY_NAME_ARCH );
             query.setParameter( "templateName", template.getTemplateName() );
             query.setParameter( "lxcArch", template.getLxcArch() );
             query.executeUpdate();
-            entityManager.getTransaction().commit();
+
+            daoManager.commitTransaction( entityManager );
             LOGGER.info( String.format( "Template deleted : %s", template.getTemplateName() ) );
         }
         catch ( Exception ex )
         {
-
             LOGGER.error( "Exception deleting template : %s", template.getTemplateName() );
-            if ( entityManager != null && entityManager.getTransaction().isActive() )
-            {
-                entityManager.getTransaction().rollback();
-            }
+            daoManager.rollBackTransaction( entityManager );
+
             throw new DaoException( ex );
         }
         finally
         {
-            if ( entityManager != null )
-            {
-                entityManager.close();
-            }
+            daoManager.closeEntityManager( entityManager );
         }
     }
 
@@ -152,7 +135,8 @@ public class TemplateServiceImpl implements TemplateService
         Template template = null;
         try
         {
-            entityManager = entityManagerFactory.createEntityManager();
+            entityManager = daoManager.getEntityManagerFactory().createEntityManager();
+
             TypedQuery<Template> query = entityManager.createQuery(
                     "SELECT t FROM Template t WHERE t.pk.templateName = :templateName AND t.pk.lxcArch = :lxcArch",
                     Template.class );
@@ -172,10 +156,7 @@ public class TemplateServiceImpl implements TemplateService
         }
         finally
         {
-            if ( entityManager != null )
-            {
-                entityManager.close();
-            }
+            daoManager.closeEntityManager( entityManager );
         }
     }
 
@@ -294,16 +275,20 @@ public class TemplateServiceImpl implements TemplateService
     @Override
     public List<Template> getAllTemplates() throws DaoException
     {
-        EntityManager entityManager;
+        EntityManager entityManager = null;
 
         try
         {
-            entityManager = entityManagerFactory.createEntityManager();
+            entityManager = daoManager.getEntityManagerFactory().createEntityManager();
             return entityManager.createNamedQuery( Template.QUERY_GET_ALL, Template.class ).getResultList();
         }
         catch ( Exception ex )
         {
             throw new DaoException( ex );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( entityManager );
         }
     }
 
@@ -369,8 +354,14 @@ public class TemplateServiceImpl implements TemplateService
     }
 
 
-    public EntityManagerFactory getEntityManagerFactory()
+    public DaoManager getDaoManager()
     {
-        return entityManagerFactory;
+        return daoManager;
+    }
+
+
+    public void setDaoManager( final DaoManager daoManager )
+    {
+        this.daoManager = daoManager;
     }
 }

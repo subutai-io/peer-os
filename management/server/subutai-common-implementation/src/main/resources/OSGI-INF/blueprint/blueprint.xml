@@ -6,8 +6,15 @@
     >
 
   <!--TemplateService-->
-  <bean id="templateServiceImpl" class="io.subutai.common.protocol.impl.TemplateServiceImpl">
+  <!-- ******************************************************************************** -->
+  <bean id="daoManagerCommonImpl" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
     <jpa:unit unitname="commonServicePUnit" property="entityManagerFactory" />
+  </bean>
+  <!-- ******************************************************************************** -->
+
+
+  <bean id="templateServiceImpl" class="io.subutai.common.protocol.impl.TemplateServiceImpl">
+    <property name="daoManager" ref="daoManagerCommonImpl" />
   </bean>
 
   <service ref="templateServiceImpl"  interface="io.subutai.common.protocol.api.TemplateService" />

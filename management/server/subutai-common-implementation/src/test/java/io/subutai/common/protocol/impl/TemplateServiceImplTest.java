@@ -9,6 +9,8 @@ import javax.persistence.Persistence;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import io.subutai.common.dao.DaoManager;
 import io.subutai.common.exception.DaoException;
 import io.subutai.common.protocol.Template;
 
@@ -38,13 +40,18 @@ public class TemplateServiceImplTest
     private EntityManager mockedEm;
     private EntityTransaction transaction;
 
+    private DaoManager daoManager;
+
 
     @Before
     public void setUp() throws Exception
     {
         emf = Persistence.createEntityManagerFactory( "default" );
+        daoManager = new DaoManager();
+        //daoManager.setEntityManagerFactory( emf );
+
         templateServiceImpl = new TemplateServiceImpl();
-        templateServiceImpl.setEntityManagerFactory( emf );
+        templateServiceImpl.setDaoManager( daoManager );
 
         mockedEmf = mock( EntityManagerFactory.class );
         mockedEm = mock( EntityManager.class );
@@ -67,12 +74,6 @@ public class TemplateServiceImplTest
     }
 
 
-    @Test
-    public void testSetEntityManagerFactory() throws Exception
-    {
-        assertEquals( emf, templateServiceImpl.getEntityManagerFactory() );
-    }
-
 
     @Test( expected = DaoException.class )
     public void testSaveTemplate() throws Exception
@@ -80,7 +81,7 @@ public class TemplateServiceImplTest
         templateServiceImpl.saveTemplate( TestUtils.getParentTemplate() );
         assertTrue( templateServiceImpl.getAllTemplates().contains( TestUtils.getParentTemplate() ) );
 
-        templateServiceImpl.setEntityManagerFactory( mockedEmf );
+
         templateServiceImpl.saveTemplate( TestUtils.getParentTemplate() );
     }
 
@@ -93,7 +94,7 @@ public class TemplateServiceImplTest
         templateServiceImpl.removeTemplate( TestUtils.getParentTemplate() );
         assertFalse( templateServiceImpl.getAllTemplates().contains( TestUtils.getParentTemplate() ) );
 
-        templateServiceImpl.setEntityManagerFactory( mockedEmf );
+        //templateServiceImpl.setEntityManagerFactory( mockedEmf );
         templateServiceImpl.removeTemplate( TestUtils.getParentTemplate() );
     }
 
@@ -107,7 +108,7 @@ public class TemplateServiceImplTest
         assertNotNull(
                 templateServiceImpl.getTemplate( parentTemplate.getTemplateName(), parentTemplate.getLxcArch() ) );
 
-        templateServiceImpl.setEntityManagerFactory( mockedEmf );
+        //templateServiceImpl.setEntityManagerFactory( mockedEmf );
         templateServiceImpl.getTemplate( parentTemplate.getTemplateName(), parentTemplate.getLxcArch() );
     }
 
@@ -122,7 +123,7 @@ public class TemplateServiceImplTest
                 .getTemplate( parentTemplate.getTemplateName(), parentTemplate.getLxcArch(), parentTemplate.getMd5sum(),
                         parentTemplate.getTemplateVersion() ) );
 
-        templateServiceImpl.setEntityManagerFactory( mockedEmf );
+        //templateServiceImpl.setEntityManagerFactory( mockedEmf );
         templateServiceImpl
                 .getTemplate( parentTemplate.getTemplateName(), parentTemplate.getLxcArch(), parentTemplate.getMd5sum(),
                         parentTemplate.getTemplateVersion() );
@@ -140,7 +141,7 @@ public class TemplateServiceImplTest
                 .getTemplate( parentTemplate.getTemplateName(), parentTemplate.getTemplateVersion(),
                         parentTemplate.getLxcArch() ) );
 
-        templateServiceImpl.setEntityManagerFactory( mockedEmf );
+        //templateServiceImpl.setEntityManagerFactory( mockedEmf );
         templateServiceImpl.getTemplate( parentTemplate.getTemplateName(), parentTemplate.getTemplateVersion(),
                 parentTemplate.getLxcArch() );
     }
@@ -154,7 +155,7 @@ public class TemplateServiceImplTest
         assertTrue( templateServiceImpl.getAllTemplates().contains( TestUtils.getParentTemplate() ) );
         assertTrue( templateServiceImpl.getAllTemplates().contains( TestUtils.getChildTemplate() ) );
 
-        templateServiceImpl.setEntityManagerFactory( mockedEmf );
+        //templateServiceImpl.setEntityManagerFactory( mockedEmf );
         templateServiceImpl.getAllTemplates();
     }
 
@@ -171,7 +172,7 @@ public class TemplateServiceImplTest
                 templateServiceImpl.getChildTemplates( parentTemplate.getTemplateName(), parentTemplate.getLxcArch() )
                                    .contains( childTemplate ) );
 
-        templateServiceImpl.setEntityManagerFactory( mockedEmf );
+        //templateServiceImpl.setEntityManagerFactory( mockedEmf );
         templateServiceImpl.getChildTemplates( parentTemplate.getTemplateName(), parentTemplate.getLxcArch() );
     }
 
@@ -188,7 +189,7 @@ public class TemplateServiceImplTest
                 .getChildTemplates( parentTemplate.getTemplateName(), parentTemplate.getTemplateVersion(),
                         parentTemplate.getLxcArch() ).contains( childTemplate ) );
 
-        templateServiceImpl.setEntityManagerFactory( mockedEmf );
+        //templateServiceImpl.setEntityManagerFactory( mockedEmf );
         templateServiceImpl.getChildTemplates( parentTemplate.getTemplateName(), parentTemplate.getTemplateVersion(),
                 parentTemplate.getLxcArch() );
     }
