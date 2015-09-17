@@ -10,6 +10,8 @@ import java.net.URL;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
@@ -26,6 +28,9 @@ import io.subutai.core.security.api.SecurityManager;
  */
 public class MessageContentUtil
 {
+    private static final Logger LOG = LoggerFactory.getLogger( MessageContentUtil.class );
+
+
     public static int checkUrlAccessibility( final int currentStatus, final URL url, final String basePath )
     {
         int status = currentStatus;
@@ -59,7 +64,8 @@ public class MessageContentUtil
     /* ******************************************************
      *
      */
-    public static void decryptContent( SecurityManager securityManager, Message message,String hostIdSource , String hostIdTarget )
+    public static void decryptContent( SecurityManager securityManager, Message message, String hostIdSource,
+                                       String hostIdTarget )
     {
 
         InputStream is = message.getContent( InputStream.class );
@@ -110,6 +116,7 @@ public class MessageContentUtil
 
                 KeyManager keyMan = securityManager.getKeyManager();
                 PGPSecretKeyRing secKey = keyMan.getSecretKeyRing( hostIdSource );
+                LOG.debug( "Decrypting with: " + hostIdSource );
 
                 byte[] outData = encTool.decrypt( data, secKey, "" );
 
@@ -129,7 +136,7 @@ public class MessageContentUtil
     *
     */
     public static void encryptContent( SecurityManager securityManager, String hostIdSource, String hostIdTarget,
-                                              String ip, Message message )
+                                       String ip, Message message )
     {
         OutputStream os = message.getContent( OutputStream.class );
 
@@ -149,8 +156,7 @@ public class MessageContentUtil
             org.apache.commons.io.IOUtils.closeQuietly( csnew );
 
             //do something with original message to produce finalMessage
-            byte[] finalMessage =
-                    encryptData( securityManager, hostIdSource, hostIdTarget, ip, originalMessage );
+            byte[] finalMessage = encryptData( securityManager, hostIdSource, hostIdTarget, ip, originalMessage );
 
             if ( finalMessage != null )
             {
@@ -194,7 +200,7 @@ public class MessageContentUtil
                 EncryptionTool encTool = securityManager.getEncryptionTool();
                 KeyManager keyMan = securityManager.getKeyManager();
                 PGPPublicKey pubKey = keyMan.getRemoteHostPublicKey( hostIdTarget, ip );
-
+                LOG.debug( String.format( "Encrypting with %s", hostIdTarget ) );
                 byte[] outData = encTool.encrypt( data, pubKey, false );
 
                 //byte[] outData = encTool.signAndEncrypt(  data, pubKey, false );

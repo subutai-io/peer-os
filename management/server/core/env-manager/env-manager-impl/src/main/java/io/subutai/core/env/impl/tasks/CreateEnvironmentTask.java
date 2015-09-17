@@ -65,32 +65,32 @@ public class CreateEnvironmentTask implements Awaitable
         {
             Set<Peer> allPeers = new HashSet<>( topology.getAllPeers() );
 
-            op.addLog( "Setting up n2n tunnel..." );
-
-            List<N2NConfig> tunnels = environmentManager.setupN2NConnection( allPeers );
-
-            for ( N2NConfig config : tunnels )
-            {
-                final PeerConf p = new PeerConfImpl();
-                p.setN2NConfig( config );
-                environment.addEnvironmentPeer( p );
-            }
+//            op.addLog( "Setting up n2n tunnel..." );
+//
+//            List<N2NConfig> tunnels = environmentManager.setupN2NConnection( allPeers );
+//
+//            for ( N2NConfig config : tunnels )
+//            {
+//                final PeerConf p = new PeerConfImpl();
+//                p.setN2NConfig( config );
+//                environment.addEnvironmentPeer( p );
+//            }
 
 
             //**** Create Key Pair *****************************************
 
-            op.addLog( "Creating PEKs ..." );
-
-            try
-            {
-                localPeer.createEnvironmentKeyPair(
-                        localPeer.getId().toString() + "-" + environment.getId().toString() );
-            }
-            catch ( Exception ex )
-            {
-                throw new EnvironmentBuildException(
-                        String.format( "There were errors during creation of PEKs:  %s", ex.toString() ), null );
-            }
+//            op.addLog( "Creating PEKs ..." );
+//
+//            try
+//            {
+//                localPeer.createEnvironmentKeyPair(
+//                        localPeer.getId().toString() + "-" + environment.getId().toString() );
+//            }
+//            catch ( Exception ex )
+//            {
+//                throw new EnvironmentBuildException(
+//                        String.format( "There were errors during creation of PEKs:  %s", ex.toString() ), null );
+//            }
 
             //**************************************************************
 

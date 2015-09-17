@@ -149,18 +149,18 @@ public class EnvironmentBuilder
             }
 
             //**** Create Key Pair *****************************************
-            try
-            {
-                if(peer != localPeer)
-                {
-                    peer.createEnvironmentKeyPair(peer.getId().toString()+"-"+ environment.getId().toString() );
-                }
-            }
-            catch(Exception ex)
-            {
-                throw new EnvironmentBuildException(
-                        String.format( "There were errors during creation of PEKs:  %s", ex.toString() ), null );
-            }
+//            try
+//            {
+//                if(peer != localPeer)
+//                {
+//                    peer.createEnvironmentKeyPair(peer.getId().toString()+"-"+ environment.getId().toString() );
+//                }
+//            }
+//            catch(Exception ex)
+//            {
+//                throw new EnvironmentBuildException(
+//                        String.format( "There were errors during creation of PEKs:  %s", ex.toString() ), null );
+//            }
 
             //**************************************************************
 

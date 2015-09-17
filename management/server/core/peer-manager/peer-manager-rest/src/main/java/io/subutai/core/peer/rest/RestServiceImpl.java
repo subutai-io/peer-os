@@ -5,11 +5,9 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
@@ -22,6 +20,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.host.ContainerHostState;
@@ -30,6 +29,7 @@ import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
+import io.subutai.common.peer.InterfacePattern;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
@@ -41,11 +41,9 @@ import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.RamQuota;
 import io.subutai.common.security.utils.io.HexUtil;
 import io.subutai.common.settings.ChannelSettings;
-import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.UUIDUtil;
-import io.subutai.common.peer.InterfacePattern;
 import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
@@ -197,7 +195,7 @@ public class RestServiceImpl implements RestService
             else
             {
                 //Encrypt Local Peer
-                PGPPublicKey pkey  = keyManager.getRemoteHostPublicKey( p.getId().toString(),p.getIp() );
+                PGPPublicKey pkey = keyManager.getRemoteHostPublicKey( p.getId().toString(), p.getIp() );
                 PeerInfo localPeer = peerManager.getLocalPeerInfo();
 
                 if ( pkey != null )
@@ -411,7 +409,7 @@ public class RestServiceImpl implements RestService
 
             PeerInfo p = jsonUtil.from( new String( data ), PeerInfo.class );
 
-            if(p.getKeyPhrase().equals( (peerManager.getPeerInfo( p.getId()).getKeyPhrase()  ) ))
+            if ( p.getKeyPhrase().equals( ( peerManager.getPeerInfo( p.getId() ).getKeyPhrase() ) ) )
             {
                 p.setStatus( PeerStatus.APPROVED );
                 peerManager.update( p );
@@ -424,7 +422,8 @@ public class RestServiceImpl implements RestService
                 String rootCertPx2 = new String( cert );
 
                 securityManager.getKeyStoreManager()
-                               .importCertAsTrusted( ChannelSettings.SECURE_PORT_X2, p.getId().toString(), rootCertPx2 );
+                               .importCertAsTrusted( ChannelSettings.SECURE_PORT_X2, p.getId().toString(),
+                                       rootCertPx2 );
                 //***********************************************************************
 
                 //************ Export Current Cert **************************************
@@ -446,7 +445,6 @@ public class RestServiceImpl implements RestService
             {
                 return Response.status( Response.Status.FORBIDDEN ).build();
             }
-
         }
         catch ( Exception e )
         {
@@ -998,6 +996,8 @@ public class RestServiceImpl implements RestService
     {
         try
         {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
+
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.createEnvironmentKeyPair( environmentId );
 

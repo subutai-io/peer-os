@@ -52,6 +52,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.util.N2NUtil;
 import io.subutai.core.env.api.EnvironmentEventListener;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.env.api.exception.EnvironmentCreationException;
@@ -64,6 +65,7 @@ import io.subutai.core.env.impl.dao.EnvironmentContainerDataService;
 import io.subutai.core.env.impl.dao.EnvironmentDataService;
 import io.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
+import io.subutai.core.env.impl.entity.PeerConfImpl;
 import io.subutai.core.env.impl.exception.EnvironmentBuildException;
 import io.subutai.core.env.impl.exception.ResultHolder;
 import io.subutai.core.env.impl.tasks.Awaitable;
@@ -81,6 +83,7 @@ import io.subutai.core.identity.api.User;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.api.HostNotFoundException;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.security.api.SecurityManager;
@@ -519,6 +522,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
         }
 
+        environmentDataService.update( environment );
         return newContainers;
     }
 
@@ -1170,8 +1174,89 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public List<N2NConfig> setupN2NConnection( final Set<Peer> peers ) throws EnvironmentManagerException
+    public void setupN2NConnection( final Environment env, final Set<Peer> peers ) throws EnvironmentManagerException
     {
+
+        //deleting n2n tunnels
+        //        Set<PeerConf> peerConfs = env.getPeerConfs();
+        //
+        //        for ( PeerConf peerConf : peerConfs )
+        //        {
+        //            UUID pId = peerConf.getN2NConfig().getPeerId();
+        //            try
+        //            {
+        //                peerManager.getPeer( pId ).removeN2NConnection( peerConf.getN2NConfig() );
+        //            }
+        //            catch ( PeerException e )
+        //            {
+        //                LOGGER.warn( "Could not remove n2n connection on " + pId );
+        //            }
+        //        }
+
+        //        env.getPeerConfs().clear();
+
+        if ( env.getPeerConfs().isEmpty() )
+        {
+            createN2NTunnel( env, peers );
+        }
+        else
+        {
+            Set<UUID> peerIds = new HashSet<>();
+            int maxIP = 0;
+            for ( PeerConf pc : env.getPeerConfs() )
+            {
+                N2NConfig n = pc.getN2NConfig();
+                peerIds.add( n.getPeerId() );
+            }
+
+            String superNodeIp = null;
+            try
+            {
+                superNodeIp = peerManager.getLocalPeer().getManagementHost().getExternalIp();
+            }
+            catch ( HostNotFoundException e )
+            {
+                e.printStackTrace();
+            }
+
+            SubnetUtils.SubnetInfo info =
+                    new SubnetUtils( env.getPeerConfs().iterator().next().getN2NConfig().getAddress(),
+                            N2NUtil.N2N_SUBNET_MASK ).getInfo();
+
+            String freeSubnet = info.getNetworkAddress();
+            String interfaceName = generateInterfaceName( freeSubnet );
+            String communityName = generateCommunityName( freeSubnet );
+            String sharedKey = "secret";
+            final String[] addresses = info.getAllAddresses();
+            int counter = env.getPeerConfs().size() + 1;
+            for ( Peer peer : peers )
+            {
+                if ( !peerIds.contains( peer.getId() ) )
+                {
+                    N2NConfig config = new N2NConfig( peer.getId(), superNodeIp, N2N_PORT, interfaceName, communityName,
+                            addresses[counter], sharedKey );
+
+                    try
+                    {
+                        peer.setupN2NConnection( config );
+                    }
+                    catch ( PeerException e )
+                    {
+                        e.printStackTrace();
+                    }
+                    final PeerConf p = new PeerConfImpl();
+                    p.setN2NConfig( config );
+                    env.addEnvironmentPeer( p );
+                    counter++;
+                }
+            }
+        }
+    }
+
+
+    private void createN2NTunnel( final Environment env, final Set<Peer> peers ) throws EnvironmentManagerException
+    {
+        // creating new n2n tunnels
         Set<String> allSubnets = getSubnets( peers );
         if ( LOGGER.isDebugEnabled() )
         {
@@ -1181,6 +1266,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 LOGGER.debug( s );
             }
         }
+
         String freeSubnet = findFreeEnvironmentSubnet( allSubnets );
 
         LOGGER.debug( String.format( "Free subnet for peer: %s", freeSubnet ) );
@@ -1193,7 +1279,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             String superNodeIp = peerManager.getLocalPeer().getManagementHost().getExternalIp();
             String interfaceName = generateInterfaceName( freeSubnet );
             String communityName = generateCommunityName( freeSubnet );
-            String sharedKey = UUID.randomUUID().toString();
+            String sharedKey = "secret";
             SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeSubnet, PEER_SUBNET_MASK ).getInfo();
             final String[] addresses = subnetInfo.getAllAddresses();
             int counter = 0;
@@ -1223,7 +1309,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
             taskExecutor.shutdown();
 
-            return result;
+            for ( N2NConfig config : result )
+            {
+                final PeerConf p = new PeerConfImpl();
+                p.setN2NConfig( config );
+                env.addEnvironmentPeer( p );
+            }
         }
         catch ( Exception e )
         {
