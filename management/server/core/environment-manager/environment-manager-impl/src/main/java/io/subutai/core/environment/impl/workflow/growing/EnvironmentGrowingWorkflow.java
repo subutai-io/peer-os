@@ -39,20 +39,19 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
     private Throwable error;
 
 
-    public Throwable getError()
+    //environment creation phases
+    public static enum EnvironmentGrowingPhase
     {
-        return error;
-    }
+        INIT,
+        GENERATE_KEYS,
+        SETUP_N2N,
+        SETUP_VNI,
+        CLONE_CONTAINERS,
+        CONFIGURE_HOSTS,
+        CONFIGURE_SSH,
+        SET_ENVIRONMENT_SSH_KEY,
+        FINALIZE
 
-
-    public void setError( final Throwable error )
-    {
-        environment.setStatus( EnvironmentStatus.UNHEALTHY );
-        this.error = error;
-        LOG.error( "Error growing environment", error );
-        operationTracker.addLogFailed( error.getMessage() );
-        //stop the workflow
-        stop();
     }
 
 
@@ -71,22 +70,6 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         this.sshKey = sshKey;
         this.operationTracker = operationTracker;
         this.defaultDomain = defaultDomain;
-    }
-
-
-    //environment creation phases
-    public static enum EnvironmentGrowingPhase
-    {
-        INIT,
-        GENERATE_KEYS,
-        SETUP_N2N,
-        SETUP_VNI,
-        CLONE_CONTAINERS,
-        CONFIGURE_HOSTS,
-        CONFIGURE_SSH,
-        SET_ENVIRONMENT_SSH_KEY,
-        FINALIZE
-
     }
 
 
@@ -246,6 +229,23 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         operationTracker.addLogDone( "Environment is grown" );
 
         //this is a must have call
+        stop();
+    }
+
+
+    public Throwable getError()
+    {
+        return error;
+    }
+
+
+    public void setError( final Throwable error )
+    {
+        environment.setStatus( EnvironmentStatus.UNHEALTHY );
+        this.error = error;
+        LOG.error( "Error growing environment", error );
+        operationTracker.addLogFailed( error.getMessage() );
+        //stop the workflow
         stop();
     }
 }

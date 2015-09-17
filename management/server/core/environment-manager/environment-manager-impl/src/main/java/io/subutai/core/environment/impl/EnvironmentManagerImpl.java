@@ -14,6 +14,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
@@ -35,6 +36,7 @@ import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
+import io.subutai.core.environment.impl.workflow.destruction.ContainerDestructionWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.EnvironmentDestructionWorkflow;
 import io.subutai.core.environment.impl.workflow.growing.EnvironmentGrowingWorkflow;
 import io.subutai.core.identity.api.IdentityManager;
@@ -260,8 +262,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
 
         EnvironmentDestructionWorkflow environmentDestructionWorkflow =
-                getEnvironmentDestructionWorkflow( peerManager, this, environment, operationTracker,
-                        forceMetadataRemoval );
+                getEnvironmentDestructionWorkflow( peerManager, this, environment, forceMetadataRemoval,
+                        operationTracker );
 
         environmentDestructionWorkflow.start();
 
@@ -300,7 +302,65 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                   final boolean forceMetadataRemoval )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        //todo
+
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
+
+        TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Destroying container %s", containerId ) );
+
+        destroyContainer( environmentId, containerId, async, forceMetadataRemoval, true, op );
+    }
+
+
+    public void destroyContainer( final String environmentId, final String containerId, final boolean async,
+                                  final boolean forceMetadataRemoval, final boolean checkAccess,
+                                  final TrackerOperation operationTracker )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+        {
+            operationTracker.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
+
+            throw new EnvironmentModificationException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
+
+        ContainerHost environmentContainer;
+        try
+        {
+            environmentContainer = environment.getContainerHostById( containerId );
+        }
+        catch ( ContainerHostNotFoundException e )
+        {
+            operationTracker.addLogFailed( String.format( "Container not registered: %s", e.getMessage() ) );
+
+            throw new EnvironmentModificationException( e );
+        }
+
+
+        ContainerDestructionWorkflow containerDestructionWorkflow =
+                getContainerDestructionWorkflow( this, environment, environmentContainer, forceMetadataRemoval,
+                        operationTracker );
+
+        containerDestructionWorkflow.start();
+
+        //wait
+        if ( !async )
+        {
+            containerDestructionWorkflow.join();
+
+            if ( containerDestructionWorkflow.getError() != null )
+            {
+                throw new EnvironmentModificationException(
+                        exceptionUtil.getRootCause( containerDestructionWorkflow.getError() ) );
+            }
+        }
     }
 
 
@@ -365,11 +425,22 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                                                                 final EnvironmentManagerImpl
                                                                                         environmentManager,
                                                                                 final EnvironmentImpl environment,
-                                                                                final TrackerOperation op,
-                                                                                final boolean forceMetadataRemoval )
+                                                                                final boolean forceMetadataRemoval,
+                                                                                final TrackerOperation
+                                                                                        operationTracker )
     {
-        return new EnvironmentDestructionWorkflow( peerManager, environmentManager, environment, op,
-                forceMetadataRemoval );
+        return new EnvironmentDestructionWorkflow( peerManager, environmentManager, environment, forceMetadataRemoval,
+                operationTracker );
+    }
+
+
+    protected ContainerDestructionWorkflow getContainerDestructionWorkflow(
+            final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
+            final ContainerHost containerHost, final boolean forceMetadataRemoval,
+            final TrackerOperation operationTracker )
+    {
+        return new ContainerDestructionWorkflow( environmentManager, environment, containerHost, forceMetadataRemoval,
+                operationTracker );
     }
 
 

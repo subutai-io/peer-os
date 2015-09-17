@@ -25,42 +25,10 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     private final PeerManager peerManager;
     private final EnvironmentManagerImpl environmentManager;
     private final EnvironmentImpl environment;
+    private final boolean forceMetadataRemoval;
     private final TrackerOperation operationTracker;
-    final boolean forceMetadataRemoval;
 
     private Throwable error;
-
-
-    public Throwable getError()
-    {
-        return error;
-    }
-
-
-    public void setError( final Throwable error )
-    {
-        environment.setStatus( EnvironmentStatus.UNHEALTHY );
-        this.error = error;
-        LOG.error( "Error growing environment", error );
-        operationTracker.addLogFailed( error.getMessage() );
-        //stop the workflow
-        stop();
-    }
-
-
-    public EnvironmentDestructionWorkflow( final PeerManager peerManager,
-                                           final EnvironmentManagerImpl environmentManager,
-                                           final EnvironmentImpl environment, final TrackerOperation operationTracker,
-                                           final boolean forceMetadataRemoval )
-    {
-        super( EnvironmentDestructionPhase.INIT );
-
-        this.peerManager = peerManager;
-        this.environmentManager = environmentManager;
-        this.environment = environment;
-        this.operationTracker = operationTracker;
-        this.forceMetadataRemoval = forceMetadataRemoval;
-    }
 
 
     public static enum EnvironmentDestructionPhase
@@ -71,6 +39,21 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
         CLEANUP_N2N,
         REMOVE_KEYS,
         FINALIZE
+    }
+
+
+    public EnvironmentDestructionWorkflow( final PeerManager peerManager,
+                                           final EnvironmentManagerImpl environmentManager,
+                                           final EnvironmentImpl environment, final boolean forceMetadataRemoval,
+                                           final TrackerOperation operationTracker )
+    {
+        super( EnvironmentDestructionPhase.INIT );
+
+        this.peerManager = peerManager;
+        this.environmentManager = environmentManager;
+        this.environment = environment;
+        this.forceMetadataRemoval = forceMetadataRemoval;
+        this.operationTracker = operationTracker;
     }
 
 
@@ -170,6 +153,23 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
         operationTracker.addLogDone( "Environment is destroyed" );
 
         //this is a must have call
+        stop();
+    }
+
+
+    public Throwable getError()
+    {
+        return error;
+    }
+
+
+    public void setError( final Throwable error )
+    {
+        environment.setStatus( EnvironmentStatus.UNHEALTHY );
+        this.error = error;
+        LOG.error( "Error destroying environment", error );
+        operationTracker.addLogFailed( error.getMessage() );
+        //stop the workflow
         stop();
     }
 }

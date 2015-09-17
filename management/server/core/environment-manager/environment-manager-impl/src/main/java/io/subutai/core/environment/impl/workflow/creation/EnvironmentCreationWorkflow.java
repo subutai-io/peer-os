@@ -38,23 +38,6 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     private Throwable error;
 
 
-    public Throwable getError()
-    {
-        return error;
-    }
-
-
-    public void setError( final Throwable error )
-    {
-        environment.setStatus( EnvironmentStatus.UNHEALTHY );
-        this.error = error;
-        LOG.error( "Error creating environment", error );
-        operationTracker.addLogFailed( error.getMessage() );
-        //stop the workflow
-        stop();
-    }
-
-
     //environment creation phases
     public static enum EnvironmentCreationPhase
     {
@@ -245,6 +228,23 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         operationTracker.addLogDone( "Environment is created" );
 
         //this is a must have call
+        stop();
+    }
+
+
+    public Throwable getError()
+    {
+        return error;
+    }
+
+
+    public void setError( final Throwable error )
+    {
+        environment.setStatus( EnvironmentStatus.UNHEALTHY );
+        this.error = error;
+        LOG.error( "Error creating environment", error );
+        operationTracker.addLogFailed( error.getMessage() );
+        //stop the workflow
         stop();
     }
 }
