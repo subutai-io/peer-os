@@ -37,7 +37,7 @@
   <!-- ************************************************************************************************** -->
 
   <reference-list id="eventLstnr"
-                  interface="io.subutai.core.env.api.EnvironmentEventListener"
+                  interface="io.subutai.core.environment.api.EnvironmentEventListener"
                   availability="optional">
     <reference-listener ref="environmentManager"
                         bind-method="registerListener" unbind-method="unregisterListener" />
@@ -55,6 +55,6 @@
     <argument ref="securityManager" />
   </bean>
 
-  <service ref="environmentManager" interface="io.subutai.core.env.api.EnvironmentManager" />
+  <service ref="environmentManager" interface="io.subutai.core.environment.api.EnvironmentManager" />
 
 </blueprint>

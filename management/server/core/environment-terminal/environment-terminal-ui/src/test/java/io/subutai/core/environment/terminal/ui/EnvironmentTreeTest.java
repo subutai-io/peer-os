@@ -10,14 +10,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Sets;
+import com.vaadin.data.util.HierarchicalContainer;
+
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Peer;
-import io.subutai.core.env.api.EnvironmentManager;
-
-import com.google.common.collect.Sets;
-import com.vaadin.data.util.HierarchicalContainer;
+import io.subutai.core.environment.api.EnvironmentManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

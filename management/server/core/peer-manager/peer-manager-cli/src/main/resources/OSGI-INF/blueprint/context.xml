@@ -90,6 +90,6 @@
   <reference id="templateRegistry" availability="mandatory"
              interface="io.subutai.core.registry.api.TemplateRegistry" />
   <reference id="environmentManager" availability="mandatory"
-             interface="io.subutai.core.env.api.EnvironmentManager" />
+             interface="io.subutai.core.environment.api.EnvironmentManager" />
 
 </blueprint>

@@ -3,6 +3,8 @@ package io.subutai.core.environment.impl.workflow.destruction.steps;
 
 import java.util.Set;
 
+import com.google.common.collect.Sets;
+
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
@@ -24,7 +26,7 @@ public class CleanUpNetworkStep
 
     public void execute() throws PeerException
     {
-        Set<Peer> peers = environment.getPeers();
+        Set<Peer> peers = Sets.newHashSet( environment.getPeers() );
         peers.add( localPeer );
 
 

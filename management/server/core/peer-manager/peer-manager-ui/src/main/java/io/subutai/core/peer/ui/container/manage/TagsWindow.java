@@ -14,7 +14,7 @@ import com.vaadin.ui.Window;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.env.api.EnvironmentManager;
+import io.subutai.core.environment.api.EnvironmentManager;
 
 
 public class TagsWindow extends Window

@@ -9,7 +9,7 @@
   <reference id="hostRegistry" availability="mandatory"
              interface="io.subutai.core.hostregistry.api.HostRegistry" />
   <reference id="environmentManager" availability="optional"
-             interface="io.subutai.core.env.api.EnvironmentManager" />
+             interface="io.subutai.core.environment.api.EnvironmentManager" />
   <reference id="httpContextManager" availability="mandatory"
              interface="io.subutai.core.http.manager.api.HttpContextManager" />
   <reference id="securityManager" availability="mandatory"

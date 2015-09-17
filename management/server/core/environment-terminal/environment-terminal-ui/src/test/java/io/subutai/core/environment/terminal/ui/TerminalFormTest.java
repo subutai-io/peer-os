@@ -8,15 +8,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import io.subutai.core.env.api.EnvironmentManager;
-import io.subutai.core.environment.terminal.ui.TerminalForm;
 
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.UI;
 
+import io.subutai.core.environment.api.EnvironmentManager;
+
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 

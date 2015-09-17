@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
@@ -33,7 +34,7 @@ public class PEKGenerationStep
 
     public Map<Peer, String> execute() throws PeerException
     {
-        Set<Peer> peers = topology.getAllPeers();
+        Set<Peer> peers = Sets.newHashSet(topology.getAllPeers());
         peers.add( localPeer );
 
         Map<Peer, String> peerPekPubKeys = Maps.newHashMap();

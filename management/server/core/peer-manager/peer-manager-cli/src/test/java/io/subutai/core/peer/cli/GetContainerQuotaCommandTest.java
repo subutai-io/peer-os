@@ -13,7 +13,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.quota.QuotaType;
 import io.subutai.common.test.SystemOutRedirectTest;
-import io.subutai.core.env.api.EnvironmentManager;
+import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.peer.api.PeerManager;
 
 import static junit.framework.TestCase.assertTrue;

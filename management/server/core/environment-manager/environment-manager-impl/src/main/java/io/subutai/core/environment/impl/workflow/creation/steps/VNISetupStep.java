@@ -40,7 +40,7 @@ public class VNISetupStep
 
     public void execute() throws EnvironmentCreationException, PeerException
     {
-        Set<Peer> peers = topology.getAllPeers();
+        Set<Peer> peers = Sets.newHashSet( topology.getAllPeers() );
         peers.add( localPeer );
 
         //obtain reserved gateways

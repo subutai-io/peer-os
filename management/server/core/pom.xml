@@ -34,7 +34,6 @@
     <module>command-executor</module>
     <module>wol-manager</module>
     <module>plugin-manager</module>
-    <module>env-manager</module>
     <module>identity-manager</module>
     <module>channel-manager</module>
     <module>http-context-manager</module>

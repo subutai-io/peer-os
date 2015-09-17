@@ -12,13 +12,13 @@
   </cxf:bus>
 
   <reference id="environmentManager" availability="mandatory"
-             interface="io.subutai.core.env.api.EnvironmentManager" />
+             interface="io.subutai.core.environment.api.EnvironmentManager" />
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
   <reference id="templateRegistry" availability="mandatory"
              interface="io.subutai.core.registry.api.TemplateRegistry" />
 
-  <bean id="environmentRestServiceImpl" class="io.subutai.core.env.rest.RestServiceImpl">
+  <bean id="environmentRestServiceImpl" class="RestServiceImpl">
     <argument ref="environmentManager" />
     <argument ref="peerManager" />
     <argument ref="templateRegistry" />
