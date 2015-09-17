@@ -5,8 +5,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -977,6 +975,23 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response createGateway( final String gatewayIp, final int vlan )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            localPeer.createGateway( gatewayIp, vlan );
+
+            return Response.ok().status( Response.Status.CREATED ).build();
+        }
+        catch ( Exception ex )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( ex ).build();
+        }
+    }
+
+
+    @Override
     public Response createEnvironmentKeyPair( final String environmentId )
     {
         try
@@ -996,19 +1011,17 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response createGateway( @FormParam( "gatewayIp" ) final String gatewayIp,
-                                   @FormParam( "vlan" ) final int vlan )
+    public Response removeEnvironmentKeyPair( final String environmentId )
     {
+        LocalPeer localPeer = peerManager.getLocalPeer();
         try
         {
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            localPeer.createGateway( gatewayIp, vlan );
-
-            return Response.ok().status( Response.Status.CREATED ).build();
+            localPeer.removeEnvironmentKeypair( environmentId );
+            return Response.ok().build();
         }
-        catch ( Exception ex )
+        catch ( Exception e )
         {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( ex ).build();
+            throw new WebApplicationException( e );
         }
     }
 
@@ -1090,22 +1103,6 @@ public class RestServiceImpl implements RestService
         try
         {
             localPeer.cleanupEnvironmentNetworkSettings( environmentId );
-            return Response.ok().build();
-        }
-        catch ( Exception e )
-        {
-            throw new WebApplicationException( e );
-        }
-    }
-
-
-    @Override
-    public Response removeEnvironmentKeypair( @PathParam( "environmentId" ) final String environmentId )
-    {
-        LocalPeer localPeer = peerManager.getLocalPeer();
-        try
-        {
-            localPeer.removeEnvironmentKeypair( environmentId );
             return Response.ok().build();
         }
         catch ( Exception e )

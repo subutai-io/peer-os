@@ -90,7 +90,7 @@ public interface RestService
 
     @DELETE
     @Path( "pek/{environmentId}" )
-    Response removeEnvironmentKeypair( @PathParam( "environmentId" ) String environmentId );
+    Response removeEnvironmentKeyPair( @PathParam( "environmentId" ) String environmentId );
 
     @DELETE
     @Path( "network/{environmentId}" )

@@ -78,7 +78,7 @@
     <com.google.guava.version>16.0.1</com.google.guava.version>
     <!-- REST -->
     <restlet-version>2.2.2</restlet-version>
-    <org.apache.cxf.version>2.7.12</org.apache.cxf.version>
+    <org.apache.cxf.version>2.7.16</org.apache.cxf.version>
     <!-- TEST -->
     <org.mockito.version>1.9.5</org.mockito.version>
     <com.jayway.awaitility.version>1.5.0</com.jayway.awaitility.version>
