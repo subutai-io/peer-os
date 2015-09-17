@@ -73,7 +73,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
             cascade = CascadeType.ALL,
             fetch = FetchType.EAGER,
             orphanRemoval = true )
-    private Set<ContainerInfo> hostInfoSet = Sets.newHashSet();
+    private Set<ContainerInfo> hostInfos = Sets.newHashSet();
 
 
     public RequestedHostImpl()
@@ -96,12 +96,12 @@ public class RequestedHostImpl implements RequestedHost, Serializable
             this.netInterfaces.add( netInterface );
         }
 
-        Set<ContainerInfo> hostInfoSet = requestedHost.getHostInfoSet();
+        Set<ContainerInfo> hostInfoSet = requestedHost.getHostInfos();
         for ( final ContainerInfo containerInfo : hostInfoSet )
         {
             ContainerInfoImpl containerInfoImpl = new ContainerInfoImpl( containerInfo );
             containerInfoImpl.setRequestedHost( this );
-            this.hostInfoSet.add( containerInfoImpl );
+            this.hostInfos.add( containerInfoImpl );
         }
     }
 
@@ -127,7 +127,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
 
     public RequestedHostImpl( final String id, final String hostname, final HostArchitecture arch, final String secret,
                               final String publicKey, final String restHook, final RegistrationStatus status,
-                              final HashSet<Interface> netInterfaces, final HashSet<ContainerInfo> hostInfoSet )
+                              final HashSet<Interface> netInterfaces, final HashSet<ContainerInfo> hostInfos )
     {
         this.id = id;
         this.hostname = hostname;
@@ -140,11 +140,11 @@ public class RequestedHostImpl implements RequestedHost, Serializable
         {
             this.netInterfaces.add( new HostInterface( anInterface ) );
         }
-        for ( final ContainerInfo hostInfo : hostInfoSet )
+        for ( final ContainerInfo hostInfo : hostInfos )
         {
             ContainerInfoImpl containerInfoImpl = new ContainerInfoImpl( hostInfo );
             containerInfoImpl.setRequestedHost( this );
-            this.hostInfoSet.add( containerInfoImpl );
+            this.hostInfos.add( containerInfoImpl );
         }
     }
 
@@ -157,15 +157,15 @@ public class RequestedHostImpl implements RequestedHost, Serializable
 
 
     @Override
-    public Set<ContainerInfo> getHostInfoSet()
+    public Set<ContainerInfo> getHostInfos()
     {
-        return hostInfoSet;
+        return hostInfos;
     }
 
 
-    public void setHostInfoSet( final Set<ContainerInfo> hostInfoSet )
+    public void setHostInfos( final Set<ContainerInfo> hostInfos )
     {
-        this.hostInfoSet = hostInfoSet;
+        this.hostInfos = hostInfos;
     }
 
 
@@ -280,7 +280,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
                 ", publicKey='" + publicKey + '\'' +
                 ", restHook='" + restHook + '\'' +
                 ", status=" + status +
-                ", hostInfoSet=" + hostInfoSet +
+                ", hostInfos=" + hostInfos +
                 '}';
     }
 }

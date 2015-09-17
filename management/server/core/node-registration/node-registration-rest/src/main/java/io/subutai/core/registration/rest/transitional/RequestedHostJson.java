@@ -25,7 +25,7 @@ public class RequestedHostJson implements RequestedHost
     private String restHook;
     private RegistrationStatus status;
 
-    private Set<ContainerInfoJson> hostInfoSet = Sets.newHashSet();
+    private Set<ContainerInfoJson> hostInfos = Sets.newHashSet();
 
 
     public RequestedHostJson()
@@ -73,10 +73,10 @@ public class RequestedHostJson implements RequestedHost
 
 
     @Override
-    public Set<ContainerInfo> getHostInfoSet()
+    public Set<ContainerInfo> getHostInfos()
     {
         Set<ContainerInfo> result = Sets.newHashSet();
-        result.addAll( hostInfoSet );
+        result.addAll( hostInfos );
         return result;
     }
 
@@ -166,13 +166,13 @@ public class RequestedHostJson implements RequestedHost
                 "id='" + id + '\'' +
                 ", hostname='" + hostname + '\'' +
                 ", interfaces=" + interfaces +
-                ", hostInfoSet=" + hostInfoSet +
+                ", hostInfos=" + hostInfos +
                 ", arch=" + arch +
                 ", secret='" + secret + '\'' +
                 ", publicKey='" + publicKey + '\'' +
                 ", restHook='" + restHook + '\'' +
                 ", status=" + status +
-                ", hostInfoSet=" + hostInfoSet +
+                ", hostInfos=" + hostInfos +
                 '}';
     }
 }

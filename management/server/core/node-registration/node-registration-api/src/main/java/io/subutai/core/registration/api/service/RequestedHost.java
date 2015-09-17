@@ -19,7 +19,7 @@ public interface RequestedHost
 
     public Set<Interface> getNetInterfaces();
 
-    public Set<ContainerInfo> getHostInfoSet();
+    public Set<ContainerInfo> getHostInfos();
 
     public HostArchitecture getArch();
 

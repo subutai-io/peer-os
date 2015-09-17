@@ -238,7 +238,7 @@ public class RegistrationManagerImpl implements RegistrationManager
         //TODO move the rest of code to separate function where approval process done selectively
         Map<Integer, Map<String, Set<ContainerInfo>>> groupedContainersByVlan = Maps.newHashMap();
 
-        for ( final ContainerInfo containerInfo : registrationRequest.getHostInfoSet() )
+        for ( final ContainerInfo containerInfo : registrationRequest.getHostInfos() )
         {
             //Group containers by environment relation
             // and group into node groups.
