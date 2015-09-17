@@ -92,7 +92,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         try
         {
-            new PEKGenerationStep( topology, environment ).execute();
+            new PEKGenerationStep( topology, environment, peerManager.getLocalPeer() ).execute();
 
             return EnvironmentGrowingPhase.SETUP_N2N;
         }
