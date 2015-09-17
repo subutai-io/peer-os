@@ -1666,7 +1666,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentGatewayIp ) );
         Preconditions.checkArgument( vlan > 0 );
 
-        String path = "peer/gateway";
+        String path = "peer/gateways";
 
         try
         {
