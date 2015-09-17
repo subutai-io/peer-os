@@ -21,5 +21,33 @@
       </action>
     </command>
   </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="environment/destroy">
+      <action class="io.subutai.core.environment.cli.DestroyEnvironmentCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="environment/list">
+      <action class="io.subutai.core.environment.cli.ListEnvironmentsCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="environment/view">
+      <action class="io.subutai.core.environment.cli.ViewEnvironmentCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="environment/destroy-container">
+      <action class="io.subutai.core.environment.cli.DestroyContainerCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
 
 </blueprint>
