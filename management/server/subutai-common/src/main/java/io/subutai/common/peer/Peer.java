@@ -351,6 +351,12 @@ public interface Peer
 
     //networking
 
+
+    /**
+     * Sets up tunnels on the local peer to the specified remote peers
+     */
+    public int setupTunnels( Map<String, String> peerIps, String environmentId ) throws PeerException;
+
     /* ************************************************
      * Returns all existing gateways of the peer
      */

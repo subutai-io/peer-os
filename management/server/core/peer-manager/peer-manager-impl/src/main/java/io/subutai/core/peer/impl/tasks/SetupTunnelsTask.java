@@ -70,7 +70,7 @@ public class SetupTunnelsTask implements Callable<Integer>
 
                 LOG.debug( String.format( "Setting up tunnel: %s %s", tunnelId, tunnelIp ) );
                 //create tunnel
-                networkManager.setupTunnel( tunnelId, tunnelIp/*peerIp */ );
+                networkManager.setupTunnel( tunnelId, tunnelIp );
             }
 
             //create vni-vlan mapping

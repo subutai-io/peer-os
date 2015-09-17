@@ -439,7 +439,8 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     @Override
     public int setupTunnels( final Map<String, String> peerIps, final String environmentId ) throws PeerException
     {
-        //        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
+        Preconditions.checkNotNull( peerIps, "Invalid peer ips set" );
+        Preconditions.checkArgument( !peerIps.isEmpty(), "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         //need to execute sequentially since other parallel executions can setup the same tunnel

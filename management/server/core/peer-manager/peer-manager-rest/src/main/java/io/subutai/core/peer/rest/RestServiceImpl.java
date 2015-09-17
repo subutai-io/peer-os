@@ -1,6 +1,7 @@
 package io.subutai.core.peer.rest;
 
 
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -1043,6 +1044,26 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error reserving vni #reserveVni", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response setupTunnels( final String peerIps, final String environmentId )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            int vlan = localPeer
+                    .setupTunnels( jsonUtil.<Map<String, String>>from( peerIps, new TypeToken<Map<String, String>>()
+                    {}.getType() ), environmentId );
+
+            return Response.ok( vlan ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error setting up tunnels #setupTunnels", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
