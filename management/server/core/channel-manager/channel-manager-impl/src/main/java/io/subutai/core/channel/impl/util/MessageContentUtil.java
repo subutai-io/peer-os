@@ -116,13 +116,23 @@ public class MessageContentUtil
 
                 KeyManager keyMan = securityManager.getKeyManager();
                 PGPSecretKeyRing secKey = keyMan.getSecretKeyRing( hostIdSource );
-                LOG.debug( "Decrypting with: " + hostIdSource );
 
-                byte[] outData = encTool.decrypt( data, secKey, "" );
+                if(secKey!=null)
+                {
+                    LOG.debug( " ****** Decrypting with: " + hostIdSource + " ****** ");
+                    byte[] outData = encTool.decrypt( data, secKey, "" );
+                    //byte[] outData = encTool.decryptAndVerify();
+                    return outData;
+                }
+                else
+                {
+                    LOG.debug( String.format( " ****** Decryption error. Could not find Secret key : %s ****** ", hostIdSource ) );
+                    throw new PGPException("Cannot find Secret Key");
+                }
 
-                //byte[] outData = encTool.decryptAndVerify();
 
-                return outData;
+
+
             }
         }
         catch ( Exception ex )
@@ -200,12 +210,19 @@ public class MessageContentUtil
                 EncryptionTool encTool = securityManager.getEncryptionTool();
                 KeyManager keyMan = securityManager.getKeyManager();
                 PGPPublicKey pubKey = keyMan.getRemoteHostPublicKey( hostIdTarget, ip );
-                LOG.debug( String.format( "Encrypting with %s", hostIdTarget ) );
-                byte[] outData = encTool.encrypt( data, pubKey, false );
 
-                //byte[] outData = encTool.signAndEncrypt(  data, pubKey, false );
-
-                return outData;
+                if(pubKey != null)
+                {
+                    LOG.debug( String.format( " ****** Encrypting with %s ****** ", hostIdTarget ) );
+                    byte[] outData = encTool.encrypt( data, pubKey, true );
+                    //byte[] outData = encTool.signAndEncrypt(  data, pubKey, false );
+                    return outData;
+                }
+                else
+                {
+                    LOG.debug( String.format( " ****** Encryption error. Could not find Public key : %s ****** ", hostIdTarget ) );
+                    throw new PGPException("Cannot find Public Key");
+                }
             }
         }
         catch ( Exception ex )
