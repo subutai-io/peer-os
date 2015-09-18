@@ -82,6 +82,12 @@ public interface RestService
     @Path( "gateways" )
     Response createGateway( @FormParam( "gatewayIp" ) String gatewayIp, @FormParam( "vlan" ) int vlan );
 
+
+    @POST
+    @Path( "tunnels" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response setupTunnels( @FormParam( "peerIps" ) String peerIps, @FormParam( "environmentId" ) String environmentId );
+
     //todo remove verbs from urls, http method type should be descriptive say DELETE means remove
     @POST
     @Path( "pek/{environmentId}" )

@@ -1982,7 +1982,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public int setupTunnels( final Map<String, String> peerIps, final String environmentId ) throws PeerException
     {
-        //        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
+        Preconditions.checkNotNull( peerIps, "Invalid peer ips set" );
+        Preconditions.checkArgument( !peerIps.isEmpty(), "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         return managementHost.setupTunnels( peerIps, environmentId );

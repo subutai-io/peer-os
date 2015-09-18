@@ -1,7 +1,6 @@
 package io.subutai.core.peer.api;
 
 
-import java.util.Map;
 import java.util.Set;
 
 import io.subutai.common.peer.ContainerHost;
@@ -121,13 +120,6 @@ public interface LocalPeer extends Peer
      * @return - set of {@code ContainerGroup}
      */
     public Set<ContainerGroup> findContainerGroupsByOwnerId( String ownerId );
-
-    //networking
-
-    /**
-     * Sets up tunnels on the local peer to the specified remote peers
-     */
-    public int setupTunnels( Map<String, String> peerIps, String environmentId ) throws PeerException;
 
 
     public void addRequestListener( RequestListener listener );

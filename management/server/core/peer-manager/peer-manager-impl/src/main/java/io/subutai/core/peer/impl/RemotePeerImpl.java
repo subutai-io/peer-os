@@ -1465,6 +1465,40 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public int setupTunnels( final Map<String, String> peerIps, final String environmentId ) throws PeerException
+    {
+
+        Preconditions.checkNotNull( peerIps, "Invalid peer ips set" );
+        Preconditions.checkArgument( !peerIps.isEmpty(), "Invalid peer ips set" );
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        String path = "peer/tunnels";
+
+        try
+        {
+            //*********construct Secure Header ****************************
+            Map<String, String> headers = Maps.newHashMap();
+
+            headers.put( Common.HEADER_SPECIAL, "ENC" );
+            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
+            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
+            //*************************************************************
+            Map<String, String> params = Maps.newHashMap();
+            params.put( "peerIps", jsonUtil.to( peerIps ) );
+            params.put( "environmentId", environmentId );
+
+            String response = post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
+
+            return Integer.parseInt( response );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( String.format( "Error setting up tunnels on peer %s", getName() ), e );
+        }
+    }
+
+
+    @Override
     public int reserveVni( final Vni vni ) throws PeerException
     {
         Preconditions.checkNotNull( vni, "Invalid vni" );
