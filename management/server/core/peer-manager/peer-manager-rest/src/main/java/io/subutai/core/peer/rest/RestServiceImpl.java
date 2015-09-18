@@ -1017,7 +1017,7 @@ public class RestServiceImpl implements RestService
         LocalPeer localPeer = peerManager.getLocalPeer();
         try
         {
-            localPeer.removeEnvironmentKeypair( environmentId );
+            localPeer.removeEnvironmentKeyPair( environmentId );
             return Response.ok().build();
         }
         catch ( Exception e )

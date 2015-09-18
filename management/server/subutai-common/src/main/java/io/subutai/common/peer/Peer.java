@@ -8,7 +8,6 @@ import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.environment.CreateContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
@@ -52,18 +51,16 @@ public interface Peer
      */
     public PeerInfo getPeerInfo();
 
-
-    public Set<HostInfoModel> createEnvironmentContainerGroup( final CreateEnvironmentContainerGroupRequest request )
-            throws PeerException;
-
     /**
-     * Creates container group on the peer
+     * Creates environment container group on the peer
      *
      * @param request - container creation request
      *
      * @return - set of metadaobjects of created containers
      */
-    public Set<HostInfoModel> createContainerGroup( CreateContainerGroupRequest request ) throws PeerException;
+    public Set<HostInfoModel> createEnvironmentContainerGroup( final CreateEnvironmentContainerGroupRequest request )
+            throws PeerException;
+
 
     /**
      * Start container on the peer
@@ -337,15 +334,14 @@ public interface Peer
      */
     public void setRamQuota( ContainerHost host, RamQuota ramQuota ) throws PeerException;
 
+
     /**
-     * Destroys hosted part of environment
+     * Destroys container group
      *
      * @param environmentId - id fo environment
      *
      * @return {@code ContainersDestructionResult}
      */
-    public ContainersDestructionResult destroyEnvironmentContainers( String environmentId ) throws PeerException;
-
     public ContainersDestructionResult destroyEnvironmentContainerGroup( final String environmentId )
             throws PeerException;
 
@@ -400,5 +396,5 @@ public interface Peer
 
     void createGateway( String environmentGatewayIp, int vlan ) throws PeerException;
 
-    void removeEnvironmentKeypair( String environmentId ) throws PeerException;
+    void removeEnvironmentKeyPair( String environmentId ) throws PeerException;
 }

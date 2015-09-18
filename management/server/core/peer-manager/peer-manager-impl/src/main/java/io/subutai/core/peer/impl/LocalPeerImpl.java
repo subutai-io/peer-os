@@ -44,7 +44,6 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
-import io.subutai.common.environment.CreateContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
@@ -109,7 +108,6 @@ import io.subutai.core.peer.impl.entity.ContainerGroupEntity;
 import io.subutai.core.peer.impl.entity.ContainerHostEntity;
 import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.entity.ResourceHostEntity;
-import io.subutai.core.registry.api.RegistryException;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -495,99 +493,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @Override
-    public Set<HostInfoModel> createContainerGroup( final CreateContainerGroupRequest request ) throws PeerException
-    {
-
-        Preconditions.checkNotNull( request, "Container create request shouldn't be null" );
-
-        //check if strategy exists
-        try
-        {
-            strategyManager.findStrategyById( request.getStrategyId() );
-        }
-        catch ( StrategyNotFoundException e )
-        {
-            throw new PeerException( e );
-        }
-
-
-        SubnetUtils cidr;
-        try
-        {
-            cidr = new SubnetUtils( request.getSubnetCidr() );
-        }
-        catch ( IllegalArgumentException e )
-        {
-            throw new PeerException( "Failed to parse subnet CIDR", e );
-        }
-
-        //setup networking
-        int vlan = setupTunnels( request.getPeerIps(), request.getEnvironmentId() );
-
-
-        //create gateway if initiator is not local peer
-        if ( !getId().equals( request.getInitiatorPeerId() ) )
-        {
-            managementHost.createGateway( cidr.getInfo().getLowAddress(), vlan );
-        }
-
-        registerRemoteTemplates( request );
-
-        Map<ResourceHost, Set<String>> containerDistribution = distributeContainersToResourceHosts( request );
-
-        String templateName = request.getTemplates().get( request.getTemplates().size() - 1 ).getTemplateName();
-
-        String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
-        String[] allAddresses = cidr.getInfo().getAllAddresses();
-        String gateway = cidr.getInfo().getLowAddress();
-        int currentIpAddressOffset = 0;
-
-        List<Future<ContainerHost>> taskFutures = Lists.newArrayList();
-        ExecutorService executorService = getFixedExecutor( request.getNumberOfContainers() );
-
-        //create containers in parallel on each resource host
-        for ( Map.Entry<ResourceHost, Set<String>> resourceHostDistribution : containerDistribution.entrySet() )
-        {
-            ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) resourceHostDistribution.getKey();
-
-            for ( String hostname : resourceHostDistribution.getValue() )
-            {
-
-                String ipAddress = allAddresses[request.getIpAddressOffset() + currentIpAddressOffset];
-                taskFutures.add( executorService.submit(
-                        new CreateContainerWrapperTask( resourceHostEntity, templateName, /*request.getTemplates(),*/
-                                hostname, String.format( "%s/%s", ipAddress, networkPrefix ), vlan, gateway,
-                                Common.WAIT_CONTAINER_CONNECTION_SEC ) ) );
-
-                currentIpAddressOffset++;
-            }
-        }
-
-        return processRequestCompletion( taskFutures, executorService, request );
-    }
-
-
-    protected void registerRemoteTemplates( final CreateContainerGroupRequest request ) throws PeerException
-    {
-        //try to register remote templates with local registry
-        try
-        {
-            for ( Template t : request.getTemplates() )
-            {
-                if ( t.isRemote() )
-                {
-                    tryToRegister( t );
-                }
-            }
-        }
-        catch ( RegistryException e )
-        {
-            throw new PeerException( e );
-        }
-    }
-
-
     protected Map<ResourceHost, Set<String>> distributeContainersToResourceHosts(
             final CreateEnvironmentContainerGroupRequest request ) throws PeerException
     {
@@ -639,131 +544,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             containerDistribution.put( resourceHost, hostCloneNames );
         }
         return containerDistribution;
-    }
-
-
-    protected Map<ResourceHost, Set<String>> distributeContainersToResourceHosts(
-            final CreateContainerGroupRequest request ) throws PeerException
-    {
-        //collect resource host metrics  & prepare templates on each of them
-        List<ResourceHostMetric> serverMetricMap = Lists.newArrayList();
-        for ( ResourceHost resourceHost : getResourceHosts() )
-        {
-            //take connected resource hosts for container creation
-            //and prepare needed templates
-            if ( resourceHost.isConnected() )
-            {
-                try
-                {
-                    serverMetricMap.add( resourceHost.getHostMetric() );
-                }
-                catch ( ResourceHostException e )
-                {
-                    throw new PeerException( e );
-                }
-            }
-        }
-
-        //calculate placement strategy
-        Map<ResourceHostMetric, Integer> slots;
-        try
-        {
-            slots = strategyManager.getPlacementDistribution( serverMetricMap, request.getNumberOfContainers(),
-                    request.getStrategyId(), request.getCriteria() );
-        }
-        catch ( StrategyException e )
-        {
-            throw new PeerException( e );
-        }
-
-        //distribute new containers' names across selected resource hosts
-        Map<ResourceHost, Set<String>> containerDistribution = Maps.newHashMap();
-        String templateName = request.getTemplates().get( request.getTemplates().size() - 1 ).getTemplateName();
-
-        for ( Map.Entry<ResourceHostMetric, Integer> e : slots.entrySet() )
-        {
-            Set<String> hostCloneNames = new HashSet<>();
-            for ( int i = 0; i < e.getValue(); i++ )
-            {
-                String newContainerName = StringUtil
-                        .trimToSize( String.format( "%s%s", templateName, UUID.randomUUID() ).replace( "-", "" ),
-                                Common.MAX_CONTAINER_NAME_LEN );
-                hostCloneNames.add( newContainerName );
-            }
-            ResourceHost resourceHost = getResourceHostByName( e.getKey().getHost() );
-            containerDistribution.put( resourceHost, hostCloneNames );
-        }
-        return containerDistribution;
-    }
-
-
-    protected Set<HostInfoModel> processRequestCompletion( final List<Future<ContainerHost>> taskFutures,
-                                                           final ExecutorService executorService,
-                                                           final CreateContainerGroupRequest request )
-    {
-        Set<HostInfoModel> result = Sets.newHashSet();
-        Set<ContainerHost> newContainers = Sets.newHashSet();
-
-        //wait for succeeded containers
-        for ( Future<ContainerHost> future : taskFutures )
-        {
-            try
-            {
-                ContainerHost containerHost = future.get();
-                newContainers.add( new ContainerHostEntity( getId(),
-                        hostRegistry.getContainerHostInfoById( containerHost.getId() ) ) );
-                result.add( new HostInfoModel( containerHost ) );
-            }
-            catch ( ExecutionException | InterruptedException | HostDisconnectedException e )
-            {
-                LOG.error( "Error creating container", e );
-            }
-        }
-
-        executorService.shutdown();
-
-        if ( !CollectionUtil.isCollectionEmpty( newContainers ) )
-        {
-            ContainerGroupEntity containerGroup;
-            try
-            {
-                //update existing container group to include new containers
-                containerGroup =
-                        ( ContainerGroupEntity ) findContainerGroupByEnvironmentId( request.getEnvironmentId() );
-
-
-                Set<String> containerIds = Sets.newHashSet( containerGroup.getContainerIds() );
-
-                for ( ContainerHost containerHost : newContainers )
-                {
-                    containerIds.add( containerHost.getId() );
-                }
-
-                containerGroup.setContainerIds( containerIds );
-
-                containerGroupDataService.update( containerGroup );
-            }
-            catch ( ContainerGroupNotFoundException e )
-            {
-                //create container group for new containers
-                containerGroup = new ContainerGroupEntity( request.getEnvironmentId(), request.getInitiatorPeerId(),
-                        request.getOwnerId() );
-
-                Set<String> containerIds = Sets.newHashSet();
-
-                for ( ContainerHost containerHost : newContainers )
-                {
-                    containerIds.add( containerHost.getId() );
-                }
-
-                containerGroup.setContainerIds( containerIds );
-
-                containerGroupDataService.persist( containerGroup );
-
-                LOG.debug( "Error creating container group #createContainerGroup", e );
-            }
-        }
-        return result;
     }
 
 
@@ -897,16 +677,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         return result;
-    }
-
-
-    private void tryToRegister( final Template template ) throws RegistryException
-    {
-        LOG.debug( String.format( "Trying to register template %s...", template.getTemplateName() ) );
-        if ( templateRegistry.getTemplate( template.getTemplateName() ) == null )
-        {
-            templateRegistry.registerTemplate( template );
-        }
     }
 
 
@@ -1138,7 +908,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void removeEnvironmentKeypair( final String environmentId ) throws PeerException
+    public void removeEnvironmentKeyPair( final String environmentId ) throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
 
@@ -1174,9 +944,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder(
-                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
-                    bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
+                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1787,52 +1556,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @Override
-    public ContainersDestructionResult destroyEnvironmentContainers( final String environmentId ) throws PeerException
-    {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-
-        Set<Throwable> errors = Sets.newHashSet();
-        Set<String> destroyedContainersIds = Sets.newHashSet();
-        ContainerGroup containerGroup;
-
-        try
-        {
-            containerGroup = findContainerGroupByEnvironmentId( environmentId );
-        }
-        catch ( ContainerGroupNotFoundException e )
-        {
-            return new ContainersDestructionResultImpl( getId(), destroyedContainersIds, "Container group not found" );
-        }
-
-        Set<ContainerHost> containerHosts = Sets.newHashSet();
-
-        for ( String containerId : containerGroup.getContainerIds() )
-        {
-            try
-            {
-                containerHosts.add( getContainerHostById( containerId ) );
-            }
-            catch ( HostNotFoundException e )
-            {
-                errors.add( e );
-                LOG.error( "error destroying environment containers #destroyEnvironmentContainers", e );
-            }
-        }
-
-        destroyContainers( containerHosts, destroyedContainersIds, errors, containerGroup );
-
-        String exception = null;
-
-        if ( !errors.isEmpty() )
-        {
-            exception = String.format( "There were errors while destroying containers: %s", errors );
-        }
-
-        return new ContainersDestructionResultImpl( getId(), destroyedContainersIds, exception );
-    }
-
-
     public ContainersDestructionResult destroyEnvironmentContainerGroup( final String environmentId )
             throws PeerException
     {
@@ -1906,50 +1629,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
 
             executorService.shutdown();
-        }
-    }
-
-
-    private void destroyContainers( final Set<ContainerHost> containerHosts, final Set<String> destroyedContainersIds,
-                                    final Set<Throwable> errors, final ContainerGroup containerGroup )
-    {
-        if ( !containerHosts.isEmpty() )
-        {
-            List<Future<String>> taskFutures = Lists.newArrayList();
-            ExecutorService executorService = getFixedExecutor( containerHosts.size() );
-
-            for ( ContainerHost containerHost : containerHosts )
-            {
-
-                taskFutures.add( executorService.submit( new DestroyContainerWrapperTask( this, containerHost ) ) );
-            }
-
-            for ( Future<String> taskFuture : taskFutures )
-            {
-                try
-                {
-                    destroyedContainersIds.add( taskFuture.get() );
-                }
-                catch ( ExecutionException | InterruptedException e )
-                {
-                    errors.add( exceptionUtil.getRootCause( e ) );
-                }
-            }
-
-            executorService.shutdown();
-
-            //cleanup environment network settings
-            if ( containerGroup.getContainerIds().size() == destroyedContainersIds.size() )
-            {
-                try
-                {
-                    getManagementHost().cleanupEnvironmentNetworkSettings( containerGroup.getEnvironmentId() );
-                }
-                catch ( PeerException e )
-                {
-                    errors.add( exceptionUtil.getRootCause( e ) );
-                }
-            }
         }
     }
 

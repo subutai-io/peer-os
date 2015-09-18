@@ -33,7 +33,7 @@ public class RemoveKeysStep
 
         for ( final Peer peer : peers )
         {
-            peer.removeEnvironmentKeypair( environment.getId() );
+            peer.removeEnvironmentKeyPair( environment.getId() );
         }
     }
 }

@@ -2,7 +2,6 @@ package io.subutai.common.environment;
 
 
 import java.util.Set;
-import java.util.UUID;
 
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Peer;

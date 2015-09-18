@@ -6,22 +6,20 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.subutai.core.peer.impl.container.DestroyEnvironmentContainersRequest;
-
 import static junit.framework.TestCase.assertEquals;
 
 
-public class DestroyEnvironmentContainersRequestTest
+public class DestroyEnvironmentContainerGroupRequestTest
 {
     private static final String ENV_ID = UUID.randomUUID().toString();
 
-    DestroyEnvironmentContainersRequest request;
+    DestroyEnvironmentContainerGroupRequest request;
 
 
     @Before
     public void setUp() throws Exception
     {
-        request = new DestroyEnvironmentContainersRequest( ENV_ID );
+        request = new DestroyEnvironmentContainerGroupRequest( ENV_ID );
     }
 
 

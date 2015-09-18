@@ -14,18 +14,18 @@ import static junit.framework.TestCase.assertEquals;
 
 
 @RunWith( MockitoJUnitRunner.class )
-public class CreateContainerGroupResponseTest
+public class CreateEnvironmentContainerGroupResponseTest
 {
     @Mock
     HostInfoModel hostInfoModel;
 
-    CreateContainerGroupResponse response;
+    CreateEnvironmentContainerGroupResponse response;
 
 
     @Before
     public void setUp() throws Exception
     {
-        response = new CreateContainerGroupResponse( Sets.newHashSet( hostInfoModel ) );
+        response = new CreateEnvironmentContainerGroupResponse( Sets.newHashSet( hostInfoModel ) );
     }
 
 

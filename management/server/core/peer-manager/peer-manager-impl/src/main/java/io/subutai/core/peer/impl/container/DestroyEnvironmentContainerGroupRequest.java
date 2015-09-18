@@ -1,12 +1,12 @@
 package io.subutai.core.peer.impl.container;
 
 
-public class DestroyEnvironmentContainersRequest
+public class DestroyEnvironmentContainerGroupRequest
 {
     private final String environmentId;
 
 
-    public DestroyEnvironmentContainersRequest( final String environmentId )
+    public DestroyEnvironmentContainerGroupRequest( final String environmentId )
     {
 
         this.environmentId = environmentId;
