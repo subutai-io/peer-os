@@ -8,6 +8,7 @@ import org.apache.servicemix.beanflow.Workflow;
 
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
@@ -111,7 +112,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         try
         {
-            new N2NSetupStep( topology, environment, peerManager.getLocalPeer() ).execute();
+            new N2NSetupStep( topology, environment, peerManager.getLocalPeer().getPeerInfo().getIp(), Common.SUPER_NODE_PORT ).execute();
 
             return EnvironmentGrowingPhase.SETUP_VNI;
         }

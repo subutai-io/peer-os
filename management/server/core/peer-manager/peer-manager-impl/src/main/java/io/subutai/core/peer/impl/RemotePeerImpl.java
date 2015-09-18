@@ -83,7 +83,7 @@ import io.subutai.core.peer.impl.request.MessageResponseListener;
  */
 public class RemotePeerImpl implements RemotePeer
 {
-    private static final Logger LOG = LoggerFactory.getLogger( RemotePeerImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( RemotePeerImpl.class );
 
     private final LocalPeer localPeer;
     protected final PeerInfo peerInfo;
@@ -94,6 +94,7 @@ public class RemotePeerImpl implements RemotePeer
     protected JsonUtil jsonUtil = new JsonUtil();
     private String baseUrl;
     private SecurityManager securityManager;
+    List<Object> providers;
 
 
     public RemotePeerImpl( LocalPeer localPeer, final PeerInfo peerInfo, final Messenger messenger,
@@ -123,6 +124,8 @@ public class RemotePeerImpl implements RemotePeer
                 break;
         }
         this.baseUrl = url;
+        this.providers = new ArrayList<Object>();
+        providers.add( new JacksonJaxbJsonProvider() );
     }
 
 
@@ -1591,12 +1594,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( pattern, "Pattern could not be null" );
 
-
         String path = buildPath( "peer/interfaces" );
-
-        //TODO: implement as singleton
-        List<Object> providers = new ArrayList<Object>();
-        providers.add( new JacksonJaxbJsonProvider() );
 
         WebClient client =
                 restUtil.createTrustedWebClientWithAuthAndProviders( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS,
