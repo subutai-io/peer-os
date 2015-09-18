@@ -85,11 +85,10 @@
     <junit.version>4.11</junit.version>
     <org.osgi.version>4.3.1</org.osgi.version>
 
-    <vaadin-version>7.3.3</vaadin-version>
+    <vaadin-version>7.5.0.beta3</vaadin-version>
 
     <!-- apache shiro -->
     <org.apache.shiro.version>1.2.3</org.apache.shiro.version>
-    <!--<org.bouncycastle.version>1.46</org.bouncycastle.version>-->
     <org.bouncycastle.version>1.52</org.bouncycastle.version>
 
     <!-- JWT lib -->
