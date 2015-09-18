@@ -40,7 +40,7 @@ public class CreateEnvironmentContainerGroupRequestListener extends RequestListe
 
             Set<HostInfoModel> containerHosts = localPeer.createEnvironmentContainerGroup( request );
 
-            return new CreateContainerGroupResponse( containerHosts );
+            return new CreateEnvironmentContainerGroupResponse( containerHosts );
         }
         else
         {

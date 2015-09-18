@@ -28,7 +28,6 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.environment.CreateContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.exception.HTTPException;
 import io.subutai.common.host.ContainerHostState;
@@ -69,9 +68,9 @@ import io.subutai.core.peer.impl.command.CommandRequest;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.command.CommandResultImpl;
 import io.subutai.core.peer.impl.container.ContainersDestructionResultImpl;
-import io.subutai.core.peer.impl.container.CreateContainerGroupResponse;
-import io.subutai.core.peer.impl.container.DestroyEnvironmentContainersRequest;
-import io.subutai.core.peer.impl.container.DestroyEnvironmentContainersResponse;
+import io.subutai.core.peer.impl.container.CreateEnvironmentContainerGroupResponse;
+import io.subutai.core.peer.impl.container.DestroyEnvironmentContainerGroupRequest;
+import io.subutai.core.peer.impl.container.DestroyEnvironmentContainerGroupResponse;
 import io.subutai.core.peer.impl.entity.HostInterface;
 import io.subutai.core.peer.impl.request.MessageRequest;
 import io.subutai.core.peer.impl.request.MessageResponse;
@@ -396,7 +395,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void removeEnvironmentKeypair( final String environmentId ) throws PeerException
+    public void removeEnvironmentKeyPair( final String environmentId ) throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
 
@@ -1337,43 +1336,9 @@ public class RemotePeerImpl implements RemotePeer
         headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //************************************************************************
 
-        CreateContainerGroupResponse response =
+        CreateEnvironmentContainerGroupResponse response =
                 sendRequest( request, RecipientType.CREATE_ENVIRONMENT_CONTAINER_GROUP_REQUEST.name(),
-                        Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateContainerGroupResponse.class,
-                        Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT, headers );
-
-        if ( response != null )
-        {
-            return response.getHosts();
-        }
-        else
-        {
-            throw new PeerException( "Command timed out" );
-        }
-    }
-
-
-    @Override
-    public Set<HostInfoModel> createContainerGroup( final CreateContainerGroupRequest request ) throws PeerException
-    {
-
-        Preconditions.checkNotNull( request, "Invalid request" );
-
-
-        //*********construct Secure Header ****************************
-        Map<String, String> headers = Maps.newHashMap();
-        String envId = request.getEnvironmentId().toString();
-        String envHeaderSource = localPeer.getId() + "-" + envId;
-        String envHeaderTarget = peerInfo.getId() + "-" + envId;
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
-        //************************************************************************
-
-        CreateContainerGroupResponse response =
-                sendRequest( request, RecipientType.CREATE_CONTAINER_GROUP_REQUEST.name(),
-                        Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateContainerGroupResponse.class,
+                        Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateEnvironmentContainerGroupResponse.class,
                         Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT, headers );
 
         if ( response != null )
@@ -1405,10 +1370,10 @@ public class RemotePeerImpl implements RemotePeer
         //**************************************************************************
 
 
-        DestroyEnvironmentContainersResponse response =
-                sendRequest( new DestroyEnvironmentContainersRequest( environmentId ),
+        DestroyEnvironmentContainerGroupResponse response =
+                sendRequest( new DestroyEnvironmentContainerGroupRequest( environmentId ),
                         RecipientType.DESTROY_ENVIRONMENT_CONTAINER_GROUP_REQUEST.name(),
-                        Timeouts.DESTROY_CONTAINER_REQUEST_TIMEOUT, DestroyEnvironmentContainersResponse.class,
+                        Timeouts.DESTROY_CONTAINER_REQUEST_TIMEOUT, DestroyEnvironmentContainerGroupResponse.class,
                         Timeouts.DESTROY_CONTAINER_RESPONSE_TIMEOUT, headers );
 
         if ( response != null )
@@ -1423,39 +1388,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    @Override
-    public ContainersDestructionResult destroyEnvironmentContainers( final String environmentId ) throws PeerException
-    {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-
-        //*********construct Secure Header ****************************
-        Map<String, String> headers = Maps.newHashMap();
-        String envHeaderSource = localPeer.getId() + "-" + environmentId;
-        String envHeaderTarget = peerInfo.getId() + "-" + environmentId;
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
-        //**************************************************************************
-
-
-        DestroyEnvironmentContainersResponse response =
-                sendRequest( new DestroyEnvironmentContainersRequest( environmentId ),
-                        RecipientType.CONTAINER_DESTROY_REQUEST.name(), Timeouts.DESTROY_CONTAINER_REQUEST_TIMEOUT,
-                        DestroyEnvironmentContainersResponse.class, Timeouts.DESTROY_CONTAINER_RESPONSE_TIMEOUT,
-                        headers );
-
-        if ( response != null )
-        {
-            return new ContainersDestructionResultImpl( getId(), response.getDestroyedContainersIds(),
-                    response.getException() );
-        }
-        else
-        {
-            throw new PeerException( "Command timed out" );
-        }
-    }
 
 
     //networking

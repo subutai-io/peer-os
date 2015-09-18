@@ -10,24 +10,22 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.collect.Sets;
 
-import io.subutai.core.peer.impl.container.DestroyEnvironmentContainersResponse;
-
 import static junit.framework.TestCase.assertEquals;
 
 
 @RunWith( MockitoJUnitRunner.class )
-public class DestroyEnvironmentContainersResponseTest
+public class DestroyEnvironmentContainerGroupResponseTest
 {
     private static final String CONTAINER_ID = UUID.randomUUID().toString();
     private static final String EXCEPTION = "exception";
 
-    DestroyEnvironmentContainersResponse response;
+    DestroyEnvironmentContainerGroupResponse response;
 
 
     @Before
     public void setUp() throws Exception
     {
-        response = new DestroyEnvironmentContainersResponse( Sets.newHashSet( CONTAINER_ID ), EXCEPTION );
+        response = new DestroyEnvironmentContainerGroupResponse( Sets.newHashSet( CONTAINER_ID ), EXCEPTION );
     }
 
 

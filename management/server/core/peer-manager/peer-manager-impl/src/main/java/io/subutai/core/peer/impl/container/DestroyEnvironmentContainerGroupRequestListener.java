@@ -30,14 +30,14 @@ public class DestroyEnvironmentContainerGroupRequestListener extends RequestList
     @Override
     public Object onRequest( final Payload payload ) throws Exception
     {
-        DestroyEnvironmentContainersRequest request = payload.getMessage( DestroyEnvironmentContainersRequest.class );
+        DestroyEnvironmentContainerGroupRequest request = payload.getMessage( DestroyEnvironmentContainerGroupRequest.class );
 
         if ( request != null )
         {
             ContainersDestructionResult result =
                     localPeer.destroyEnvironmentContainerGroup( request.getEnvironmentId() );
 
-            return new DestroyEnvironmentContainersResponse( result.getDestroyedContainersIds(),
+            return new DestroyEnvironmentContainerGroupResponse( result.getDestroyedContainersIds(),
                     result.getException() );
         }
         else

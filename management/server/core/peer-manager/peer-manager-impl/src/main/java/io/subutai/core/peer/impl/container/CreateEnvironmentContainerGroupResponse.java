@@ -6,12 +6,12 @@ import java.util.Set;
 import io.subutai.common.peer.HostInfoModel;
 
 
-public class CreateContainerGroupResponse
+public class CreateEnvironmentContainerGroupResponse
 {
     private Set<HostInfoModel> hosts;
 
 
-    public CreateContainerGroupResponse( final Set<HostInfoModel> hosts )
+    public CreateEnvironmentContainerGroupResponse( final Set<HostInfoModel> hosts )
     {
         this.hosts = hosts;
     }
