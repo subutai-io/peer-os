@@ -31,7 +31,7 @@ import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.network.api.Tunnel;
+import io.subutai.core.peer.api.Tunnel;
 import io.subutai.core.repository.api.RepositoryException;
 import io.subutai.core.repository.api.RepositoryManager;
 

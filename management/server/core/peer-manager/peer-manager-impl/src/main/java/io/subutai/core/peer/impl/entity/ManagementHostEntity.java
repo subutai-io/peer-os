@@ -47,7 +47,7 @@ import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.network.api.Tunnel;
+import io.subutai.core.peer.api.Tunnel;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.impl.tasks.CreateGatewayTask;
 import io.subutai.core.peer.impl.tasks.ReserveVniTask;
@@ -482,6 +482,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
+    @Override
     public void setupVniVlanMapping( final int tunnelId, final long vni, final int vlanId, final String environmentId )
             throws PeerException
     {
@@ -506,6 +507,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
+    @Override
     public int findTunnel( String peerIp, Set<Tunnel> tunnels )
     {
         for ( Tunnel tunnel : tunnels )
@@ -519,7 +521,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         return -1;
     }
 
-
+    @Override
     public int calculateNextTunnelId( Set<Tunnel> tunnels )
     {
         int maxTunnelId = 0;

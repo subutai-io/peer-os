@@ -135,4 +135,11 @@ public interface ManagementHost extends Host, HostInfo
     void removeIpFromVlanDomain( String hostIp, int vlan ) throws PeerException;
 
     void removeN2NConnection( N2NConfig config ) throws PeerException;
+
+    int findTunnel( String tunnelIp, Set<Tunnel> tunnels );
+
+    int calculateNextTunnelId( Set<Tunnel> tunnels );
+
+    void setupVniVlanMapping( int tunnelId, long vni, int vlan, String environmentId ) throws PeerException;
+
 }

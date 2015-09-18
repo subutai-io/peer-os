@@ -3,8 +3,10 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorCompletionService;
@@ -31,6 +33,7 @@ import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.util.N2NUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.entity.PeerConfImpl;
+import io.subutai.core.peer.api.LocalPeer;
 
 
 /**
@@ -43,15 +46,17 @@ public class N2NSetupStep
     private final Environment env;
     private final String supernode;
     private final int supernodePort;
+    private final LocalPeer localPeer;
 
 
     public N2NSetupStep( final Topology topology, final Environment environment, final String supernode,
-                         final int supernodePort )
+                         final int supernodePort, final LocalPeer localPeer )
     {
         this.topology = topology;
         this.env = environment;
         this.supernode = supernode;
         this.supernodePort = supernodePort;
+        this.localPeer = localPeer;
     }
 
 
@@ -61,6 +66,7 @@ public class N2NSetupStep
         //obtain already participating peers
         Set<Peer> peers = Sets.newHashSet( topology.getAllPeers() );
 
+        peers.add( localPeer );
         // creating new n2n tunnels
         Set<String> allSubnets = getSubnets( peers );
         LOGGER.debug( String.format( "Found %d peer subnets:", allSubnets.size() ) );
@@ -85,30 +91,29 @@ public class N2NSetupStep
             final String[] addresses = subnetInfo.getAllAddresses();
             int counter = 0;
 
-            ExecutorService taskExecutor = Executors.newFixedThreadPool( peers.size() );
+            ExecutorService n2nExecutor = Executors.newFixedThreadPool( peers.size() );
 
-            ExecutorCompletionService<N2NConfig> executorCompletionService =
-                    new ExecutorCompletionService<>( taskExecutor );
+            ExecutorCompletionService<N2NConfig> n2nCompletionService = new ExecutorCompletionService<>( n2nExecutor );
 
 
+            // n2n2 setup
             List<N2NConfig> result = new ArrayList<>( peers.size() );
             for ( Peer peer : peers )
             {
                 N2NConfig config = new N2NConfig( peer.getId(), supernode, supernodePort, interfaceName, communityName,
                         addresses[counter], sharedKey );
-                executorCompletionService.submit( new SetupN2NConnectionTask( peer, config ) );
+                n2nCompletionService.submit( new SetupN2NConnectionTask( peer, config ) );
                 counter++;
             }
 
             for ( Peer peer : peers )
             {
-                final Future<N2NConfig> f = executorCompletionService.take();
+                final Future<N2NConfig> f = n2nCompletionService.take();
                 N2NConfig config = f.get();
                 result.add( config );
-                counter++;
             }
 
-            taskExecutor.shutdown();
+            n2nExecutor.shutdown();
 
             for ( N2NConfig config : result )
             {
@@ -116,6 +121,35 @@ public class N2NSetupStep
                 p.setN2NConfig( config );
                 env.addEnvironmentPeer( p );
             }
+
+            // tunnel setup
+            Map<String, String> tunnels = new HashMap();
+            for ( PeerConf peerConf : env.getPeerConfs() )
+            {
+                tunnels.put( peerConf.getN2NConfig().getPeerId(), peerConf.getN2NConfig().getAddress() );
+            }
+
+
+            int peersCount = env.getPeerConfs().size();
+            ExecutorService tunnelExecutor = Executors.newFixedThreadPool( peersCount );
+
+            ExecutorCompletionService<Integer> tunnelCompletionService =
+                    new ExecutorCompletionService<Integer>( tunnelExecutor );
+
+
+            for ( Peer peer : peers )
+            {
+                tunnelCompletionService.submit( new SetupTunnelTask( peer, env.getId(), tunnels ) );
+            }
+
+            for ( int i = 0; i < peersCount; i++ )
+            {
+                final Future<Integer> f = tunnelCompletionService.take();
+                Integer vlanId = f.get();
+                LOGGER.debug( String.format( "VLAN_ID: %d", vlanId ) );
+            }
+
+            tunnelExecutor.shutdown();
         }
         catch ( Exception e )
         {
@@ -170,6 +204,29 @@ public class N2NSetupStep
         {
             peer.setupN2NConnection( n2NConfig );
             return n2NConfig;
+        }
+    }
+
+
+    private class SetupTunnelTask implements Callable<Integer>
+    {
+        private final Peer peer;
+        private final String environmentId;
+        private final Map<String, String> tunnels;
+
+
+        public SetupTunnelTask( final Peer peer, final String environmentId, final Map<String, String> tunnels )
+        {
+            this.peer = peer;
+            this.environmentId = environmentId;
+            this.tunnels = tunnels;
+        }
+
+
+        @Override
+        public Integer call() throws Exception
+        {
+            return peer.setupTunnels( tunnels, environmentId );
         }
     }
 }
