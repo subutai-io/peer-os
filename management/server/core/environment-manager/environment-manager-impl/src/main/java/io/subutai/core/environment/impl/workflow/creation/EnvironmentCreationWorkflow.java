@@ -8,6 +8,7 @@ import org.apache.servicemix.beanflow.Workflow;
 
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
@@ -43,8 +44,8 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     {
         INIT,
         GENERATE_KEYS,
-        SETUP_N2N,
         SETUP_VNI,
+        SETUP_N2N,
         CLONE_CONTAINERS,
         CONFIGURE_HOSTS,
         CONFIGURE_SSH,
@@ -93,25 +94,6 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             new PEKGenerationStep( topology, environment, peerManager.getLocalPeer() ).execute();
 
-            return EnvironmentCreationPhase.SETUP_N2N;
-        }
-        catch ( Exception e )
-        {
-            setError( e );
-
-            return null;
-        }
-    }
-
-
-    public EnvironmentCreationPhase SETUP_N2N()
-    {
-        operationTracker.addLog( "Setting up N2N" );
-
-        try
-        {
-            new N2NSetupStep( topology, environment, peerManager.getLocalPeer() ).execute();
-
             return EnvironmentCreationPhase.SETUP_VNI;
         }
         catch ( Exception e )
@@ -130,6 +112,26 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         try
         {
             new VNISetupStep( topology, environment, peerManager.getLocalPeer() ).execute();
+
+            return EnvironmentCreationPhase.SETUP_N2N;
+        }
+        catch ( Exception e )
+        {
+            setError( e );
+
+            return null;
+        }
+    }
+
+
+    public EnvironmentCreationPhase SETUP_N2N()
+    {
+        operationTracker.addLog( "Setting up N2N" );
+
+        try
+        {
+            new N2NSetupStep( topology, environment, peerManager.getLocalPeer().getPeerInfo().getIp(),
+                    Common.SUPER_NODE_PORT, peerManager.getLocalPeer() ).execute();
 
             return EnvironmentCreationPhase.CLONE_CONTAINERS;
         }

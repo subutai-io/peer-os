@@ -34,7 +34,7 @@ import io.subutai.core.registry.api.TemplateRegistry;
 
 public class RestServiceImpl implements RestService
 {
-    private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class );
 
     private static final String ERROR_KEY = "ERROR";
     private final EnvironmentManager environmentManager;

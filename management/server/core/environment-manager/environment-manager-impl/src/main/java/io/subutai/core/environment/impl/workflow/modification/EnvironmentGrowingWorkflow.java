@@ -8,6 +8,7 @@ import org.apache.servicemix.beanflow.Workflow;
 
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
@@ -44,8 +45,8 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
     {
         INIT,
         GENERATE_KEYS,
-        SETUP_N2N,
         SETUP_VNI,
+        SETUP_N2N,
         CLONE_CONTAINERS,
         CONFIGURE_HOSTS,
         CONFIGURE_SSH,
@@ -94,25 +95,6 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         {
             new PEKGenerationStep( topology, environment, peerManager.getLocalPeer() ).execute();
 
-            return EnvironmentGrowingPhase.SETUP_N2N;
-        }
-        catch ( Exception e )
-        {
-            setError( e );
-
-            return null;
-        }
-    }
-
-
-    public EnvironmentGrowingPhase SETUP_N2N()
-    {
-        operationTracker.addLog( "Setting up N2N" );
-
-        try
-        {
-            new N2NSetupStep( topology, environment, peerManager.getLocalPeer() ).execute();
-
             return EnvironmentGrowingPhase.SETUP_VNI;
         }
         catch ( Exception e )
@@ -123,14 +105,31 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         }
     }
 
-
     public EnvironmentGrowingPhase SETUP_VNI()
     {
         operationTracker.addLog( "Setting up VNI" );
 
         try
         {
-            new VNISetupStep( topology, environment ).execute();
+            new VNISetupStep( topology, environment, peerManager.getLocalPeer() ).execute();
+
+            return EnvironmentGrowingPhase.SETUP_N2N;
+        }
+        catch ( Exception e )
+        {
+            setError( e );
+
+            return null;
+        }
+    }
+
+    public EnvironmentGrowingPhase SETUP_N2N()
+    {
+        operationTracker.addLog( "Setting up N2N" );
+
+        try
+        {
+            new N2NSetupStep( topology, environment, peerManager.getLocalPeer().getPeerInfo().getIp(), Common.SUPER_NODE_PORT ).execute();
 
             return EnvironmentGrowingPhase.CLONE_CONTAINERS;
         }
@@ -141,6 +140,8 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
             return null;
         }
     }
+
+
 
 
     public EnvironmentGrowingPhase CLONE_CONTAINERS()

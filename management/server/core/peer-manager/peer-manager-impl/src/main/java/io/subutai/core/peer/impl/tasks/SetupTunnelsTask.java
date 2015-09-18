@@ -11,20 +11,20 @@ import org.slf4j.LoggerFactory;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.network.api.NetworkManager;
-import io.subutai.core.network.api.Tunnel;
-import io.subutai.core.peer.impl.entity.ManagementHostEntity;
+import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.core.peer.api.Tunnel;
 
 
 public class SetupTunnelsTask implements Callable<Integer>
 {
     private static final Logger LOG = LoggerFactory.getLogger( SetupTunnelsTask.class );
     private final NetworkManager networkManager;
-    private final ManagementHostEntity managementHost;
+    private final ManagementHost managementHost;
     private final String environmentId;
     private final Map<String, String> peerIps;
 
 
-    public SetupTunnelsTask( final NetworkManager networkManager, final ManagementHostEntity managementHost,
+    public SetupTunnelsTask( final NetworkManager networkManager, final ManagementHost managementHost,
                              final String environmentId, final Map<String, String> peerIps )
     {
         this.networkManager = networkManager;
@@ -49,11 +49,17 @@ public class SetupTunnelsTask implements Callable<Integer>
 
 
         //remove local IP, just in case
-        peerIps.remove( managementHost.getExternalIp() );
+        //        peerIps.remove( managementHost.getExternalIp() );
 
 
         for ( String peerIp : peerIps.keySet() )
         {
+            if ( peerIp.equals( managementHost.getPeerId() ) )
+            {
+                LOG.debug( "Skiping local peer." );
+                continue;
+            }
+
             LOG.debug( String.format( "Setting up tunnel on : %s", peerIp ) );
 
             //setup tunnels to each remote peer

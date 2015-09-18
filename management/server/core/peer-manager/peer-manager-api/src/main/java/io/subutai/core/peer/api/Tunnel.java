@@ -1,4 +1,4 @@
-package io.subutai.core.network.api;
+package io.subutai.core.peer.api;
 
 
 /**
