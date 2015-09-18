@@ -39,11 +39,7 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>identity-manager-api</artifactId>
     </dependency>
-    <!--<dependency>-->
-    <!--<groupId>javax.servlet</groupId>-->
-    <!--<artifactId>javax.servlet-api</artifactId>-->
-    <!--<scope>runtime</scope>-->
-    <!--</dependency>-->
+
   </dependencies>
 
   <build>

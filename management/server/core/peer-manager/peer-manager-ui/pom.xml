@@ -58,11 +58,8 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-server</artifactId>
+      <scope>provided</scope>
     </dependency>
-<!--    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-    </dependency>-->
     <!--Test-->
     <dependency>
       <groupId>org.mockito</groupId>

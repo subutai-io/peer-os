@@ -50,6 +50,7 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-server</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>

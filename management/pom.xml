@@ -1064,21 +1064,7 @@
         <artifactId>jackson-core-asl</artifactId>
         <version>1.9.13</version>
       </dependency>
-      <!--
 
-            <dependency>
-              <groupId>org.apache.httpcomponents</groupId>
-              <artifactId>httpcore-osgi</artifactId>
-              <version>${org.apache.httpcomonents.version}</version>
-            </dependency>
-      -->
-
-      <!--     <dependency>
-             <groupId>org.apache.httpcomponents</groupId>
-             <artifactId>httpclient-osgi</artifactId>
-             <version>${org.apache.httpcomonents.version}</version>
-           </dependency>
-     -->
       <dependency>
         <groupId>org.apache.shiro</groupId>
         <artifactId>shiro-core</artifactId>
