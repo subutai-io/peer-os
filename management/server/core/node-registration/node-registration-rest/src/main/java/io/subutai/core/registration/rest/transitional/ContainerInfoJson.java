@@ -24,7 +24,7 @@ public class ContainerInfoJson implements ContainerInfo
     private Integer vlan;
     private String templateName;
     private Set<InterfaceModel> netInterfaces = new HashSet<>();
-    private HostArchitecture hostArchitecture;
+    private HostArchitecture arch;
     private String publicKey;
 
 
@@ -39,11 +39,11 @@ public class ContainerInfoJson implements ContainerInfo
         this.hostname = hostInfo.getHostname();
         this.templateName = hostInfo.getTemplateName();
         this.vlan = hostInfo.getVlan();
-        this.hostArchitecture = hostInfo.getArch();
+        this.arch = hostInfo.getArch();
         this.publicKey = hostInfo.getPublicKey();
-        if ( hostArchitecture == null )
+        if ( arch == null )
         {
-            hostArchitecture = HostArchitecture.AMD64;
+            arch = HostArchitecture.AMD64;
         }
         for ( Interface anInterface : hostInfo.getInterfaces() )
         {
@@ -78,7 +78,7 @@ public class ContainerInfoJson implements ContainerInfo
     @Override
     public HostArchitecture getArch()
     {
-        return hostArchitecture;
+        return arch;
     }
 
 
@@ -142,7 +142,7 @@ public class ContainerInfoJson implements ContainerInfo
 
         final ContainerInfoJson that = ( ContainerInfoJson ) o;
 
-        return hostArchitecture == that.hostArchitecture && hostname.equals( that.hostname ) && id.equals( that.id )
+        return arch == that.arch && hostname.equals( that.hostname ) && id.equals( that.id )
                 && netInterfaces.equals( that.netInterfaces );
     }
 
@@ -153,7 +153,7 @@ public class ContainerInfoJson implements ContainerInfo
         int result = id.hashCode();
         result = 31 * result + hostname.hashCode();
         result = 31 * result + netInterfaces.hashCode();
-        result = 31 * result + hostArchitecture.hashCode();
+        result = 31 * result + arch.hashCode();
         return result;
     }
 
@@ -165,7 +165,7 @@ public class ContainerInfoJson implements ContainerInfo
                 "id='" + id + '\'' +
                 ", hostname='" + hostname + '\'' +
                 ", netInterfaces=" + netInterfaces +
-                ", hostArchitecture=" + hostArchitecture +
+                ", arch=" + arch +
                 '}';
     }
 }

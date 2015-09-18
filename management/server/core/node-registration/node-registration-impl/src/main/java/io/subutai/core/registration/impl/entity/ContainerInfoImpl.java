@@ -62,7 +62,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
 
     @Column( name = "arch" )
     @Enumerated( EnumType.STRING )
-    private HostArchitecture hostArchitecture;
+    private HostArchitecture arch;
 
     @ManyToOne
     @JoinColumn( name = "requested_host" )
@@ -75,7 +75,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
 
 
     public ContainerInfoImpl( final String id, final String hostname, final Set<Interface> netInterfaces,
-                              final HostArchitecture hostArchitecture, String publicKey )
+                              final HostArchitecture arch, String publicKey )
     {
         this.id = id;
         this.hostname = hostname;
@@ -84,11 +84,11 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
         {
             this.netInterfaces.add( new HostInterface( netInterface ) );
         }
-        this.hostArchitecture = hostArchitecture;
+        this.arch = arch;
         this.publicKey = publicKey;
-        if ( hostArchitecture == null )
+        if ( arch == null )
         {
-            this.hostArchitecture = HostArchitecture.AMD64;
+            this.arch = HostArchitecture.AMD64;
         }
     }
 
@@ -99,11 +99,11 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
         this.hostname = hostInfo.getHostname();
         this.templateName = hostInfo.getTemplateName();
         this.vlan = hostInfo.getVlan();
-        this.hostArchitecture = hostInfo.getArch();
+        this.arch = hostInfo.getArch();
         this.publicKey = hostInfo.getPublicKey();
-        if ( hostArchitecture == null )
+        if ( arch == null )
         {
-            hostArchitecture = HostArchitecture.AMD64;
+            arch = HostArchitecture.AMD64;
         }
         for ( Interface anInterface : hostInfo.getInterfaces() )
         {
@@ -148,7 +148,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
     @Override
     public HostArchitecture getArch()
     {
-        return hostArchitecture;
+        return arch;
     }
 
 
@@ -212,7 +212,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
 
         final ContainerInfoImpl that = ( ContainerInfoImpl ) o;
 
-        return hostArchitecture == that.hostArchitecture && hostname.equals( that.hostname ) && id.equals( that.id )
+        return arch == that.arch && hostname.equals( that.hostname ) && id.equals( that.id )
                 && netInterfaces.equals( that.netInterfaces );
     }
 
@@ -223,7 +223,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
         int result = id.hashCode();
         result = 31 * result + hostname.hashCode();
         result = 31 * result + netInterfaces.hashCode();
-        result = 31 * result + hostArchitecture.hashCode();
+        result = 31 * result + arch.hashCode();
         return result;
     }
 
@@ -235,7 +235,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
                 "id='" + id + '\'' +
                 ", hostname='" + hostname + '\'' +
                 ", netInterfaces=" + netInterfaces +
-                ", hostArchitecture=" + hostArchitecture +
+                ", arch=" + arch +
                 '}';
     }
 }
