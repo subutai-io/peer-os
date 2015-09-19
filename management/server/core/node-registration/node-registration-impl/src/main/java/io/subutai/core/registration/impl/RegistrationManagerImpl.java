@@ -171,6 +171,7 @@ public class RegistrationManagerImpl implements RegistrationManager
         else
         {
             RequestedHostImpl registrationRequest = new RequestedHostImpl( requestedHost );
+            registrationRequest.setStatus( RegistrationStatus.REQUESTED );
             try
             {
                 requestDataService.persist( registrationRequest );
@@ -215,6 +216,11 @@ public class RegistrationManagerImpl implements RegistrationManager
     public void approveRequest( final UUID requestId )
     {
         RequestedHostImpl registrationRequest = requestDataService.find( requestId );
+
+        if ( !RegistrationStatus.REQUESTED.equals( registrationRequest.getStatus() ) )
+        {
+            return;
+        }
         registrationRequest.setStatus( RegistrationStatus.APPROVED );
         requestDataService.update( registrationRequest );
         KeyManager keyManager = securityManager.getKeyManager();

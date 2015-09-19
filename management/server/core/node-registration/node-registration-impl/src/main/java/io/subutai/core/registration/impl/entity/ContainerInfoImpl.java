@@ -220,11 +220,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
     @Override
     public int hashCode()
     {
-        int result = id.hashCode();
-        result = 31 * result + hostname.hashCode();
-        result = 31 * result + netInterfaces.hashCode();
-        result = 31 * result + arch.hashCode();
-        return result;
+        return id.hashCode();
     }
 
 

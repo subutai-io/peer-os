@@ -10,7 +10,6 @@ import com.google.common.collect.Sets;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
-import io.subutai.common.peer.InterfaceModel;
 import io.subutai.core.registration.api.service.ContainerInfo;
 
 
@@ -23,13 +22,14 @@ public class ContainerInfoJson implements ContainerInfo
     private String hostname;
     private Integer vlan;
     private String templateName;
-    private Set<InterfaceModel> netInterfaces = new HashSet<>();
+    private Set<HostInterfaceJson> netInterfaces = new HashSet<>();
     private HostArchitecture arch;
     private String publicKey;
 
 
     public ContainerInfoJson()
     {
+        arch = HostArchitecture.AMD64;
     }
 
 
@@ -47,7 +47,7 @@ public class ContainerInfoJson implements ContainerInfo
         }
         for ( Interface anInterface : hostInfo.getInterfaces() )
         {
-            this.netInterfaces.add( new InterfaceModel( anInterface ) );
+            this.netInterfaces.add( new HostInterfaceJson( anInterface ) );
         }
     }
 
@@ -142,19 +142,15 @@ public class ContainerInfoJson implements ContainerInfo
 
         final ContainerInfoJson that = ( ContainerInfoJson ) o;
 
-        return arch == that.arch && hostname.equals( that.hostname ) && id.equals( that.id )
-                && netInterfaces.equals( that.netInterfaces );
+        return arch == that.arch && hostname.equals( that.hostname ) && id.equals( that.id ) && netInterfaces
+                .equals( that.netInterfaces );
     }
 
 
     @Override
     public int hashCode()
     {
-        int result = id.hashCode();
-        result = 31 * result + hostname.hashCode();
-        result = 31 * result + netInterfaces.hashCode();
-        result = 31 * result + arch.hashCode();
-        return result;
+        return id.hashCode();
     }
 
 

@@ -93,7 +93,8 @@ public class RequestedHostImpl implements RequestedHost, Serializable
         Set<Interface> netInterfaces = requestedHost.getNetInterfaces();
         for ( final Interface netInterface : netInterfaces )
         {
-            this.netInterfaces.add( netInterface );
+            HostInterface hostInterface = new HostInterface( netInterface );
+            this.netInterfaces.add( hostInterface );
         }
 
         Set<ContainerInfo> hostInfoSet = requestedHost.getHostInfos();

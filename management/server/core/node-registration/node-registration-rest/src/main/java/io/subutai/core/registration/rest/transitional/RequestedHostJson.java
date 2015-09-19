@@ -7,7 +7,6 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.Interface;
-import io.subutai.common.peer.InterfaceModel;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.RequestedHost;
@@ -17,7 +16,7 @@ public class RequestedHostJson implements RequestedHost
 {
     private String id;
     private String hostname;
-    private Set<InterfaceModel> interfaces = Sets.newHashSet();
+    private Set<HostInterfaceJson> interfaces = Sets.newHashSet();
     private HostArchitecture arch;
     private String secret;
 
@@ -30,6 +29,7 @@ public class RequestedHostJson implements RequestedHost
 
     public RequestedHostJson()
     {
+        this.arch = HostArchitecture.AMD64;
     }
 
 
@@ -42,6 +42,10 @@ public class RequestedHostJson implements RequestedHost
         this.publicKey = publicKey;
         this.restHook = restHook;
         this.status = status;
+        if ( arch == null )
+        {
+            this.arch = HostArchitecture.AMD64;
+        }
     }
 
 
@@ -66,7 +70,7 @@ public class RequestedHostJson implements RequestedHost
     }
 
 
-    public void setInterfaces( final Set<InterfaceModel> interfaces )
+    public void setInterfaces( final Set<HostInterfaceJson> interfaces )
     {
         this.interfaces = interfaces;
     }
