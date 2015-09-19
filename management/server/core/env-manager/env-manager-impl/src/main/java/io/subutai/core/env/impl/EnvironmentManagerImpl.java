@@ -222,6 +222,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    protected EnvironmentImpl createEmptyEnvironment( final String name, final String subnetCidr, final String sshKey )
+    {
+
+        final EnvironmentImpl environment = new EnvironmentImpl( name, subnetCidr, sshKey, getUserId() );
+
+        saveEnvironment( environment );
+
+        setEnvironmentTransientFields( environment );
+
+        notifyOnEnvironmentCreated( environment );
+
+        return environment;
+    }
+
+
     protected Environment findEnvironment( final UUID environmentId, boolean checkAccess )
             throws EnvironmentNotFoundException
     {
@@ -245,21 +260,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         //set container's transient fields
         setContainersTransientFields( environment );
-
-        return environment;
-    }
-
-
-    protected EnvironmentImpl createEmptyEnvironment( final String name, final String subnetCidr, final String sshKey )
-    {
-
-        final EnvironmentImpl environment = new EnvironmentImpl( name, subnetCidr, sshKey, getUserId() );
-
-        saveEnvironment( environment );
-
-        setEnvironmentTransientFields( environment );
-
-        notifyOnEnvironmentCreated( environment );
 
         return environment;
     }

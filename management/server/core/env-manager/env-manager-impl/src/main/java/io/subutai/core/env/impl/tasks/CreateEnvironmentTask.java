@@ -77,25 +77,22 @@ public class CreateEnvironmentTask implements Awaitable
 //            }
 
 
-            //**** Create Key Pair *****************************************
+            //**** Create Environment Key Pair ******************************
 
-//            op.addLog( "Creating PEKs ..." );
-//
-//            try
-//            {
-//                localPeer.createEnvironmentKeyPair(
-//                        localPeer.getId().toString() + "-" + environment.getId().toString() );
-//            }
-//            catch ( Exception ex )
-//            {
-//                throw new EnvironmentBuildException(
-//                        String.format( "There were errors during creation of PEKs:  %s", ex.toString() ), null );
-//            }
+            try
+            {
+                op.addLog( "Creating PEK for local Peer ..." );
+                localPeer.createEnvironmentKeyPair(
+                        localPeer.getId().toString() + "-" + environment.getId().toString() );
+            }
+            catch ( Exception ex )
+            {
+                throw new EnvironmentBuildException(
+                        String.format( "There were errors during creation of PEKs:  %s", ex.toString() ), null );
+            }
 
             //**************************************************************
 
-
-            op.addLog( "Setting up secure channel..." );
 
             //check availability of subnet
             Map<Peer, Set<Gateway>> usedGateways = environmentManager.getUsedGateways( allPeers );
