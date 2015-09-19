@@ -25,7 +25,8 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>vaadin-api</artifactId>
+      <artifactId>vaadin-ui</artifactId>
+      <classifier>classes</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -47,10 +48,7 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-server</artifactId>
-    </dependency>
+
 
     <dependency>
       <groupId>commons-net</groupId>

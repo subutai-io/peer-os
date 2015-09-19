@@ -33,9 +33,8 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>vaadin-api</module>
-    <module>vaadin-impl</module>
     <module>vaadin-ui</module>
+    <module>vaadin-impl</module>
     <module>vaadin-custom</module>
   </modules>
 </project>

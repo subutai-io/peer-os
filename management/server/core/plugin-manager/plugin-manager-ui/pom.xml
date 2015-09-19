@@ -25,13 +25,12 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>vaadin-api</artifactId>
-      <version>${project.version}</version>
+      <artifactId>vaadin-ui</artifactId>
+      <classifier>classes</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>vaadin-custom</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
