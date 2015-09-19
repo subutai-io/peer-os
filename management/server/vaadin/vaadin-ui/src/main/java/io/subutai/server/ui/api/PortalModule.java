@@ -36,9 +36,9 @@ public interface PortalModule
     File getImage();
 
     /**
-     * Return a new {@link Component} used to displayed this module
+     * Return a new {@link com.vaadin.ui.Component} used to displayed this module
      *
-     * @return a new {@link Component}
+     * @return a new {@link com.vaadin.ui.Component}
      */
     Component createComponent();
 
