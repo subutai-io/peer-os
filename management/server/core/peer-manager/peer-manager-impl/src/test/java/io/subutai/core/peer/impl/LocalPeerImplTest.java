@@ -704,7 +704,6 @@ public class LocalPeerImplTest
 
         when( hostRegistry.getHostInfoById( CONTAINER_HOST_ID ) ).thenReturn( hostInfo );
 
-        assertFalse( localPeer.isConnected( containerHost ) );
 
         HostDisconnectedException hostDisconnectedException = mock( HostDisconnectedException.class );
 
