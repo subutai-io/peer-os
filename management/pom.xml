@@ -70,12 +70,12 @@
     <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
     <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
     <!-- Runtime -->
-    <karaf.version>3.0.2</karaf.version>
+    <karaf.version>3.0.3</karaf.version>
     <osgi.framework.version>5.0.0</osgi.framework.version>
     <aries.blueprint.version>1.1.0</aries.blueprint.version>
     <aries.proxy.version>1.0.1</aries.proxy.version>
     <aries.util.version>1.1.0</aries.util.version>
-    <com.google.guava.version>16.0.1</com.google.guava.version>
+    <com.google.guava.version>18.0</com.google.guava.version>
     <!-- REST -->
     <restlet-version>2.2.2</restlet-version>
     <org.apache.cxf.version>2.7.16</org.apache.cxf.version>
@@ -83,9 +83,8 @@
     <org.mockito.version>1.9.5</org.mockito.version>
     <com.jayway.awaitility.version>1.5.0</com.jayway.awaitility.version>
     <junit.version>4.11</junit.version>
-    <org.osgi.version>4.3.1</org.osgi.version>
 
-    <vaadin-version>7.4.7</vaadin-version>
+    <vaadin-version>7.3.7</vaadin-version>
 
     <!-- apache shiro -->
     <org.apache.shiro.version>1.2.3</org.apache.shiro.version>
@@ -878,12 +877,12 @@
       <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
-        <version>2.3</version>
+        <version>2.3.1</version>
       </dependency>
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>16.0.1</version>
+        <version>${com.google.guava.version}</version>
         <!--Because of cassandra-driver-core lib-->
       </dependency>
       <dependency>

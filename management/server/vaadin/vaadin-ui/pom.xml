@@ -56,6 +56,10 @@
       <artifactId>subutai-common</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>identity-manager-impl</artifactId>
+    </dependency>
     <!-- Vaadin dependencies -->
     <dependency>
       <groupId>com.vaadin</groupId>
@@ -97,10 +101,7 @@
       <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>identity-manager-impl</artifactId>
-    </dependency>
+
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
