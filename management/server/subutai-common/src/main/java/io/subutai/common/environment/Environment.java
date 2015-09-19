@@ -102,6 +102,8 @@ public interface Environment
      */
     public Long getVni();
 
+    String getPeerId();
+
     /**
      * Searches container by its id withing this environment
      *
@@ -126,4 +128,8 @@ public interface Environment
     String findN2nIp( String peerId );
 
     void addEnvironmentPeer( PeerConf peerConf );
+
+    void setStatus( EnvironmentStatus status );
+
+    void setVni( long freeVni );
 }

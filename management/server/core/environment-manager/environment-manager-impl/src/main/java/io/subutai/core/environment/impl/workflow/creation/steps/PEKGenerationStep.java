@@ -7,6 +7,7 @@ import java.util.Set;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -20,11 +21,11 @@ import io.subutai.core.peer.api.LocalPeer;
 public class PEKGenerationStep
 {
     private final Topology topology;
-    private final EnvironmentImpl environment;
+    private final Environment environment;
     private final LocalPeer localPeer;
 
 
-    public PEKGenerationStep( final Topology topology, final EnvironmentImpl environment, final LocalPeer localPeer )
+    public PEKGenerationStep( final Topology topology, final Environment environment, final LocalPeer localPeer )
     {
         this.topology = topology;
         this.environment = environment;

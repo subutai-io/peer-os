@@ -10,6 +10,7 @@ import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
@@ -36,6 +37,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
     private final String sshKey;
     private final String defaultDomain;
     private final TrackerOperation operationTracker;
+    private final EnvironmentDataService dataService;
 
     private Throwable error;
 
@@ -59,7 +61,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
     public EnvironmentGrowingWorkflow( String defaultDomain, TemplateRegistry templateRegistry,
                                        NetworkManager networkManager, PeerManager peerManager,
                                        EnvironmentImpl environment, Topology topology, String sshKey,
-                                       TrackerOperation operationTracker )
+                                       TrackerOperation operationTracker, EnvironmentDataService dataService )
     {
         super( EnvironmentGrowingPhase.INIT );
 
@@ -71,6 +73,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         this.sshKey = sshKey;
         this.operationTracker = operationTracker;
         this.defaultDomain = defaultDomain;
+        this.dataService = dataService;
     }
 
 
@@ -83,6 +86,8 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
+        dataService.update( environment );
+
         return EnvironmentGrowingPhase.GENERATE_KEYS;
     }
 
@@ -94,6 +99,8 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         try
         {
             new PEKGenerationStep( topology, environment, peerManager.getLocalPeer() ).execute();
+
+            dataService.update( environment );
 
             return EnvironmentGrowingPhase.SETUP_VNI;
         }
@@ -113,6 +120,8 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         {
             new VNISetupStep( topology, environment, peerManager.getLocalPeer() ).execute();
 
+            dataService.update( environment );
+
             return EnvironmentGrowingPhase.SETUP_N2N;
         }
         catch ( Exception e )
@@ -130,6 +139,8 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         try
         {
             new N2NSetupStep( topology, environment, peerManager.getLocalPeer().getPeerInfo().getIp(), Common.SUPER_NODE_PORT ).execute();
+
+            dataService.update( environment );
 
             return EnvironmentGrowingPhase.CLONE_CONTAINERS;
         }
@@ -153,6 +164,8 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
             new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager.getLocalPeer() )
                     .execute();
 
+            dataService.update( environment );
+
             return EnvironmentGrowingPhase.CONFIGURE_HOSTS;
         }
         catch ( Exception e )
@@ -171,6 +184,8 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         try
         {
             new RegisterHostsStep( environment, networkManager ).execute();
+
+            dataService.update( environment );
 
             return EnvironmentGrowingPhase.CONFIGURE_SSH;
         }
@@ -191,6 +206,8 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         {
             new RegisterSshStep( environment, networkManager ).execute();
 
+            dataService.update( environment );
+
             return EnvironmentGrowingPhase.SET_ENVIRONMENT_SSH_KEY;
         }
         catch ( Exception e )
@@ -210,6 +227,8 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         {
             new SetSshKeyStep( sshKey, environment, networkManager ).execute();
 
+            dataService.update( environment );
+
             return EnvironmentGrowingPhase.FINALIZE;
         }
         catch ( Exception e )
@@ -226,6 +245,8 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         LOG.info( "Finalizing environment growth" );
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
+
+        dataService.update( environment );
 
         operationTracker.addLogDone( "Environment is grown" );
 

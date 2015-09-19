@@ -138,4 +138,29 @@ public class N2NConfig
     {
         this.sharedKey = sharedKey;
     }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof N2NConfig ) )
+        {
+            return false;
+        }
+
+        final N2NConfig config = ( N2NConfig ) o;
+
+        return address.equals( config.address );
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return address.hashCode();
+    }
 }

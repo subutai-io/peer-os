@@ -95,6 +95,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         //create empty environment
         final EnvironmentImpl environment = createEmptyEnvironment( name, subnetCidr, sshKey );
 
+        //        saveEnvironment( environment );
         //create operation tracker
         TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
                 String.format( "Creating environment %s ", environment.getId() ) );
@@ -112,14 +113,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             @Override
             public void run()
             {
-                try
-                {
-                    notifyOnEnvironmentCreated( findEnvironment( environment.getId() ) );
-                }
-                catch ( EnvironmentNotFoundException e )
-                {
-                    LOG.error( "Error notifying environment event listeners", e );
-                }
+                //                try
+                //                {
+                //                    notifyOnEnvironmentCreated( findEnvironment( environment.getId() ) );
+                notifyOnEnvironmentCreated( environment );
+                //                }
+                //                catch ( EnvironmentNotFoundException e )
+                //                {
+                //                    LOG.error( "Error notifying environment event listeners", e );
+                //                }
             }
         } );
 
@@ -136,14 +138,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
 
         //return created environment
-        try
-        {
-            return findEnvironment( environment.getId() );
-        }
-        catch ( EnvironmentNotFoundException e )
-        {
-            throw new EnvironmentCreationException( e );
-        }
+        //        try
+        //        {
+
+        //        updateEnvironment( environment );
+        return environment;
+        //        }
+        //        catch ( EnvironmentNotFoundException e )
+        //        {
+        //            throw new EnvironmentCreationException( e );
+        //        }
     }
 
 
@@ -228,8 +232,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
         }
 
+        //        updateEnvironment(environment);
         return Sets.newHashSet();
     }
+
+
+    //    private void updateEnvironment( final EnvironmentImpl environment )
+    //    {
+    //        environmentDataService.update( environment );
+    //    }
 
 
     @Override
@@ -269,6 +280,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                         exceptionUtil.getRootCause( sshKeyModificationWorkflow.getError() ) );
             }
         }
+        //        updateEnvironment(environment);
     }
 
 
@@ -694,7 +706,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                                                           final TrackerOperation operationTracker )
     {
         return new EnvironmentCreationWorkflow( defaultDomain, templateRegistry, networkManager, peerManager,
-                environment, topology, sshKey, operationTracker );
+                environment, topology, sshKey, operationTracker, environmentDataService );
     }
 
 
@@ -703,7 +715,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                                                         final TrackerOperation operationTracker )
     {
         return new EnvironmentGrowingWorkflow( defaultDomain, templateRegistry, networkManager, peerManager,
-                environment, topology, sshKey, operationTracker );
+                environment, topology, sshKey, operationTracker, environmentDataService );
     }
 
 
@@ -716,7 +728,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                                                                         operationTracker )
     {
         return new EnvironmentDestructionWorkflow( peerManager, environmentManager, environment, forceMetadataRemoval,
-                operationTracker );
+                operationTracker, environmentDataService );
     }
 
 
@@ -785,7 +797,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     public void setEnvironmentTransientFields( final Environment environment )
     {
-        ( ( EnvironmentImpl ) environment ).setDataService( environmentDataService );
+        //        ( ( EnvironmentImpl ) environment ).setDataService( environmentDataService );
         ( ( EnvironmentImpl ) environment ).setEnvironmentManager( this );
     }
 
@@ -806,10 +818,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void saveEnvironment( final EnvironmentImpl environment )
-    {
-        environmentDataService.persist( environment );
-    }
+    //    public void saveEnvironment( final EnvironmentImpl environment )
+    //    {
+    //        environmentDataService.persist( environment );
+    //    }
 
 
     public void registerListener( final EnvironmentEventListener listener )
@@ -899,7 +911,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final EnvironmentImpl environment = new EnvironmentImpl( name, subnetCidr, sshKey, getUserId() );
 
-        saveEnvironment( environment );
+        //        saveEnvironment( environment );
 
         setEnvironmentTransientFields( environment );
 
@@ -964,5 +976,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void dispose()
     {
         executor.shutdown();
+    }
+
+
+    @Override
+    public Peer resolvePeer( final String peerId )
+    {
+        return peerManager.getPeer( peerId );
     }
 }

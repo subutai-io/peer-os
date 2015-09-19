@@ -9,6 +9,7 @@ import org.apache.servicemix.beanflow.Workflow;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
+import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.destruction.steps.CleanUpNetworkStep;
 import io.subutai.core.environment.impl.workflow.destruction.steps.CleanupN2NStep;
@@ -27,6 +28,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     private final EnvironmentImpl environment;
     private final boolean forceMetadataRemoval;
     private final TrackerOperation operationTracker;
+    private final EnvironmentDataService dataService;
 
     private Throwable error;
 
@@ -45,7 +47,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     public EnvironmentDestructionWorkflow( final PeerManager peerManager,
                                            final EnvironmentManagerImpl environmentManager,
                                            final EnvironmentImpl environment, final boolean forceMetadataRemoval,
-                                           final TrackerOperation operationTracker )
+                                           final TrackerOperation operationTracker, final EnvironmentDataService dataService )
     {
         super( EnvironmentDestructionPhase.INIT );
 
@@ -54,6 +56,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
         this.environment = environment;
         this.forceMetadataRemoval = forceMetadataRemoval;
         this.operationTracker = operationTracker;
+        this.dataService = dataService;
     }
 
 
@@ -66,7 +69,26 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-        return EnvironmentDestructionPhase.DESTROY_CONTAINERS;
+        return EnvironmentDestructionPhase.CLEANUP_N2N;
+    }
+
+
+    public EnvironmentDestructionPhase CLEANUP_N2N()
+    {
+        operationTracker.addLog( "Cleaning up N2N" );
+
+        try
+        {
+            new CleanupN2NStep( environment, peerManager.getLocalPeer() ).execute();
+
+            return EnvironmentDestructionPhase.DESTROY_CONTAINERS;
+        }
+        catch ( Exception e )
+        {
+            setError( e );
+
+            return null;
+        }
     }
 
 
@@ -97,25 +119,6 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
         {
             new CleanUpNetworkStep( environment, peerManager.getLocalPeer() ).execute();
 
-            return EnvironmentDestructionPhase.CLEANUP_N2N;
-        }
-        catch ( Exception e )
-        {
-            setError( e );
-
-            return null;
-        }
-    }
-
-
-    public EnvironmentDestructionPhase CLEANUP_N2N()
-    {
-        operationTracker.addLog( "Cleaning up N2N" );
-
-        try
-        {
-            new CleanupN2NStep( environment, peerManager.getLocalPeer() ).execute();
-
             return EnvironmentDestructionPhase.REMOVE_KEYS;
         }
         catch ( Exception e )
@@ -125,7 +128,6 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
             return null;
         }
     }
-
 
     public EnvironmentDestructionPhase REMOVE_KEYS()
     {
@@ -149,6 +151,8 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     public void FINALIZE()
     {
         LOG.info( "Finalizing environment destruction" );
+
+        dataService.remove( environment.getId() );
 
         operationTracker.addLogDone( "Environment is destroyed" );
 
