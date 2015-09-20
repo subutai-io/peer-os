@@ -61,13 +61,14 @@ public class MessageEncryptor implements TextMessagePostProcessor
             {
                 EncryptionTool encryptionTool = getSecurityManager().getEncryptionTool();
 
-                //obtain target host pub key for encrypting
-                PGPPublicKey hostKeyForEncrypting =
-                        MessageEncryptor.getSecurityManager().getKeyManager().getPublicKey( topic );
 
                 RequestWrapper requestWrapper = JsonUtil.fromJson( message, RequestWrapper.class );
 
                 Request originalRequest = requestWrapper.getRequest();
+
+                //obtain target host pub key for encrypting
+                PGPPublicKey hostKeyForEncrypting = MessageEncryptor.getSecurityManager().getKeyManager()
+                                                                    .getPublicKey( originalRequest.getId().toString() );
 
                 if ( originalRequest.getCommand().toLowerCase().matches( CLONE_CMD_REGEX ) )
                 {
