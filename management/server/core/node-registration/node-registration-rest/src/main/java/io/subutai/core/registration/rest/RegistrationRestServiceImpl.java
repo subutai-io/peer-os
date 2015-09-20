@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.service.RequestedHost;
-import io.subutai.core.registration.rest.transitional.HostRequest;
+import io.subutai.core.registration.rest.transitional.RequestedHostJson;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 
@@ -48,7 +48,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         {
             byte[] decrypted = encryptionTool.decrypt( message.getBytes() );
             String decryptedMessage = new String( decrypted, "UTF-8" );
-            RequestedHost temp = JsonUtil.fromJson( decryptedMessage, HostRequest.class );
+            RequestedHost temp = JsonUtil.fromJson( decryptedMessage, RequestedHostJson.class );
 
             registrationManager.queueRequest( temp );
 

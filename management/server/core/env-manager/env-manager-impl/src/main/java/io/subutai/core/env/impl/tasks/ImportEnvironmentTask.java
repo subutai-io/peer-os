@@ -2,7 +2,6 @@ package io.subutai.core.env.impl.tasks;
 
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
@@ -12,18 +11,15 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.net.util.SubnetUtils;
 
-import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.Peer;
-import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.env.api.exception.EnvironmentCreationException;
 import io.subutai.core.env.impl.EnvironmentManagerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
-import io.subutai.core.env.impl.entity.PeerConfImpl;
 import io.subutai.core.env.impl.exception.EnvironmentBuildException;
 import io.subutai.core.env.impl.exception.ResultHolder;
 import io.subutai.core.peer.api.LocalPeer;
@@ -42,6 +38,7 @@ public class ImportEnvironmentTask implements Awaitable
     private final Topology topology;
     private final ResultHolder<EnvironmentCreationException> resultHolder;
     private final TrackerOperation op;
+    private final Integer envVlan;
     protected Semaphore semaphore;
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
 
@@ -49,7 +46,7 @@ public class ImportEnvironmentTask implements Awaitable
     public ImportEnvironmentTask( final LocalPeer localPeer, final EnvironmentManagerImpl environmentManager,
                                   final EnvironmentImpl environment, final Topology topology,
                                   final ResultHolder<EnvironmentCreationException> resultHolder,
-                                  final TrackerOperation op )
+                                  final TrackerOperation op, Integer envVlan )
     {
         this.localPeer = localPeer;
         this.environmentManager = environmentManager;
@@ -58,6 +55,7 @@ public class ImportEnvironmentTask implements Awaitable
         this.resultHolder = resultHolder;
         this.op = op;
         this.semaphore = new Semaphore( 0 );
+        this.envVlan = envVlan;
     }
 
 
@@ -82,19 +80,19 @@ public class ImportEnvironmentTask implements Awaitable
 
 
             //**** Create Key Pair *****************************************
-//
-//            op.addLog( "Creating PEKs ..." );
-//
-//            try
-//            {
-//                localPeer.createEnvironmentKeyPair(
-//                        localPeer.getId().toString() + "-" + environment.getId().toString() );
-//            }
-//            catch ( Exception ex )
-//            {
-//                throw new EnvironmentBuildException(
-//                        String.format( "There were errors during creation of PEKs:  %s", ex.toString() ), null );
-//            }
+
+            op.addLog( "Creating PEKs ..." );
+
+            try
+            {
+                localPeer.createEnvironmentKeyPair(
+                        localPeer.getId().toString() + "-" + environment.getId().toString() );
+            }
+            catch ( Exception ex )
+            {
+                throw new EnvironmentBuildException(
+                        String.format( "There were errors during creation of PEKs:  %s", ex.toString() ), null );
+            }
 
             //**************************************************************
 
@@ -126,7 +124,7 @@ public class ImportEnvironmentTask implements Awaitable
             long vni = environmentManager.findFreeVni( allPeers );
 
             //reserve VNI on local peer
-            Vni newVni = new Vni( vni, environment.getId() );
+            Vni newVni = new Vni( vni, envVlan, environment.getId() );
 
             op.addLog( "Reserving new vni on local peer..." );
 
@@ -149,7 +147,7 @@ public class ImportEnvironmentTask implements Awaitable
             //save environment VNI
             environment.setVni( vni );
 
-            environmentManager.growEnvironment( environment.getId(), topology, false, false, op );
+            environmentManager.configureEnvironment( environment.getId(), op );
 
             op.addLogDone( "Environment created successfully" );
         }

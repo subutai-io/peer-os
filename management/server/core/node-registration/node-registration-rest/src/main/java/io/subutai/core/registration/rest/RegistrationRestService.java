@@ -18,7 +18,6 @@ public interface RegistrationRestService
 
     @POST
     @Path( "public-key" )
-
     public Response registerPublicKey( String message );
 
     @POST
