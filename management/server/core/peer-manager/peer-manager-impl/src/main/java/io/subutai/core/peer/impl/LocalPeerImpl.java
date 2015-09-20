@@ -976,8 +976,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
-                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder(
+                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
+                    bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -989,12 +990,19 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public boolean isConnected( final Host host )
     {
-        Preconditions.checkNotNull( host, "Host is null, nothig to do here" );
+        Preconditions.checkNotNull( host, "Host is null" );
 
         try
         {
-            hostRegistry.getHostInfoById( host.getId() );
-            return true;
+            HostInfo hostInfo = hostRegistry.getHostInfoById( host.getId() );
+            if ( hostInfo instanceof ContainerHostInfo )
+            {
+                return ContainerHostState.RUNNING.equals( ( ( ContainerHostInfo ) hostInfo ).getStatus() );
+            }
+            else
+            {
+                return false;
+            }
         }
         catch ( HostDisconnectedException e )
         {
