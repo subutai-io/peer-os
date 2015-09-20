@@ -1,7 +1,6 @@
 package io.subutai.core.env.api;
 
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -16,7 +15,6 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Peer;
-import io.subutai.common.protocol.N2NConfig;
 import io.subutai.core.env.api.exception.EnvironmentCreationException;
 import io.subutai.core.env.api.exception.EnvironmentDestructionException;
 import io.subutai.core.env.api.exception.EnvironmentManagerException;
@@ -63,7 +61,7 @@ public interface EnvironmentManager
 
 
     Environment importEnvironment( String name, Topology topology, Map<NodeGroup, Set<HostInfo>> containers, String ssh,
-                                   Integer vlan, UUID resourceHostId ) throws EnvironmentCreationException;
+                                   Integer vlan ) throws EnvironmentCreationException;
 
 
     /**

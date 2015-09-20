@@ -2,10 +2,8 @@ package io.subutai.core.env.impl.tasks;
 
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
 import org.slf4j.Logger;
@@ -13,19 +11,15 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.net.util.SubnetUtils;
 
-import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.Peer;
-import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.env.api.exception.EnvironmentCreationException;
 import io.subutai.core.env.impl.EnvironmentManagerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
-import io.subutai.core.env.impl.entity.PeerConfImpl;
-import io.subutai.core.env.impl.exception.EnvironmentBuildException;
 import io.subutai.core.env.impl.exception.ResultHolder;
 import io.subutai.core.peer.api.LocalPeer;
 
@@ -43,7 +37,6 @@ public class ImportEnvironmentTask implements Awaitable
     private final Topology topology;
     private final ResultHolder<EnvironmentCreationException> resultHolder;
     private final TrackerOperation op;
-    private final UUID resourceHostId;
     private final Integer envVlan;
     protected Semaphore semaphore;
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
@@ -52,7 +45,7 @@ public class ImportEnvironmentTask implements Awaitable
     public ImportEnvironmentTask( final LocalPeer localPeer, final EnvironmentManagerImpl environmentManager,
                                   final EnvironmentImpl environment, final Topology topology,
                                   final ResultHolder<EnvironmentCreationException> resultHolder,
-                                  final TrackerOperation op, Integer envVlan, final UUID resourceHostId )
+                                  final TrackerOperation op, Integer envVlan )
     {
         this.localPeer = localPeer;
         this.environmentManager = environmentManager;
@@ -62,7 +55,6 @@ public class ImportEnvironmentTask implements Awaitable
         this.op = op;
         this.semaphore = new Semaphore( 0 );
         this.envVlan = envVlan;
-        this.resourceHostId = resourceHostId;
     }
 
 
@@ -154,7 +146,7 @@ public class ImportEnvironmentTask implements Awaitable
             //save environment VNI
             environment.setVni( vni );
 
-            environmentManager.configureEnvironment( environment.getId(), resourceHostId, op );
+            environmentManager.configureEnvironment( environment.getId(), op );
 
             op.addLogDone( "Environment created successfully" );
         }

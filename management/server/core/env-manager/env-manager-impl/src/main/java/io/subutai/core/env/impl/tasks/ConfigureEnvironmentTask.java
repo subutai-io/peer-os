@@ -1,7 +1,6 @@
 package io.subutai.core.env.impl.tasks;
 
 
-import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
 import org.slf4j.Logger;
@@ -32,7 +31,6 @@ public class ConfigureEnvironmentTask implements Awaitable
     private final PeerManager peerManager;
     private final ResultHolder<EnvironmentModificationException> resultHolder;
     private final TrackerOperation op;
-    private final UUID resourceHostId;
     protected Semaphore semaphore;
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
 
@@ -40,7 +38,7 @@ public class ConfigureEnvironmentTask implements Awaitable
     public ConfigureEnvironmentTask( final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
                                      final PeerManager peerManager,
                                      final ResultHolder<EnvironmentModificationException> resultHolder,
-                                     final TrackerOperation op, final UUID resourceHostId )
+                                     final TrackerOperation op )
     {
         this.environmentManager = environmentManager;
         this.environment = environment;
@@ -48,7 +46,6 @@ public class ConfigureEnvironmentTask implements Awaitable
         this.resultHolder = resultHolder;
         this.semaphore = new Semaphore( 0 );
         this.op = op;
-        this.resourceHostId = resourceHostId;
     }
 
 

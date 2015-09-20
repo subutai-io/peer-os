@@ -106,6 +106,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
         for ( final ContainerInfo containerInfo : hostInfoSet )
         {
             ContainerInfoImpl containerInfoImpl = new ContainerInfoImpl( containerInfo );
+            containerInfoImpl.setStatus( RegistrationStatus.REQUESTED );
             containerInfoImpl.setRequestedHost( this );
             this.hostInfos.add( containerInfoImpl );
         }

@@ -320,8 +320,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     @Override
     public Environment importEnvironment( final String name, final Topology topology,
-                                          final Map<NodeGroup, Set<HostInfo>> containers, String ssh, Integer vlan,
-                                          UUID resourceHostId ) throws EnvironmentCreationException
+                                          final Map<NodeGroup, Set<HostInfo>> containers, String ssh, Integer vlan )
+            throws EnvironmentCreationException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
         Preconditions.checkNotNull( topology, "Invalid topology" );
@@ -385,7 +385,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         Awaitable createEnvironmentTask =
                 new ImportEnvironmentTask( peerManager.getLocalPeer(), this, environment, topology, resultHolder, op,
-                        vlan, resourceHostId );
+                        vlan );
 
         executor.submit( createEnvironmentTask );
 
@@ -400,11 +400,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void configureEnvironment( UUID environmentId, UUID resourceHostId, TrackerOperation op )
+    public void configureEnvironment( UUID environmentId, TrackerOperation op )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-        Preconditions.checkNotNull( resourceHostId, "ResourceHostId cannot be null." );
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
 
@@ -419,7 +418,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
 
         Awaitable growEnvironmentTask =
-                new ConfigureEnvironmentTask( this, environment, peerManager, resultHolder, op, resourceHostId );
+                new ConfigureEnvironmentTask( this, environment, peerManager, resultHolder, op );
 
         executor.submit( growEnvironmentTask );
     }

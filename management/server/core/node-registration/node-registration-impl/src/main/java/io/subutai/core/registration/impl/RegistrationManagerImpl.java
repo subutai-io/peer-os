@@ -327,7 +327,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             {
                 Environment environment = environmentManager
                         .importEnvironment( String.format( "environment_%d", mapEntry.getKey() ), topology,
-                                classification, "", mapEntry.getKey(), UUID.fromString( registrationRequest.getId() ) );
+                                classification, "", mapEntry.getKey() );
                 //Save container gateway from environment configuration to update container network configuration
                 // later when it will be available
                 SubnetUtils cidr;
