@@ -122,6 +122,8 @@ public class GrowEnvironmentTask implements Awaitable
                     environmentManager.setSshKey( environment.getId(), environment.getSshKey(), false, false, op );
                 }
 
+                environmentManager.setupTunnels( environment );
+
                 environment.setStatus( EnvironmentStatus.HEALTHY );
 
                 op.addLogDone( "Environment grown successfully" );

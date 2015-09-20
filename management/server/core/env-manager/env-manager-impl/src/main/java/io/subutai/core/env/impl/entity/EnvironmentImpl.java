@@ -317,10 +317,15 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         Set<Peer> peers = Sets.newHashSet();
 
-        for ( ContainerHost containerHost : getContainerHosts() )
+        for ( PeerConf peerConf : peerConfs )
         {
-            peers.add( containerHost.getPeer() );
+            Peer peer = environmentManager.resolvePeer( peerConf.getN2NConfig().getPeerId() );
+            peers.add( peer );
         }
+        //        for ( ContainerHost containerHost : getContainerHosts() )
+        //        {
+        //            peers.add( containerHost.getPeer() );
+        //        }
 
         return peers;
     }

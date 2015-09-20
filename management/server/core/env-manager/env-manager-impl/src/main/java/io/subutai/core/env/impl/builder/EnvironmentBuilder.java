@@ -104,29 +104,31 @@ public class EnvironmentBuilder
         //setup tunnels to all participating peers on local peer in case local peer is not included as provider peer
         LocalPeer localPeer = peerManager.getLocalPeer();
 
-        Map<String, String> peerIps = new HashMap();
-
-        for ( Peer peer : allPeers )
-        {
-            if ( !peer.getId().equals( localPeer.getId() ) )
-            {
-                String n2nIp = environment.findN2nIp( peer.getId().toString() );
-                peerIps.put( peer.getPeerInfo().getIp(), n2nIp );
-            }
-        }
+//        Map<String, String> tunnels = new HashMap();
+//
+//        for ( Peer peer : allPeers )
+//        {
+//            if ( !peer.getId().equals( localPeer.getId() ) )
+//            {
+//                String n2nIp = environment.findN2nIp( peer.getId().toString() );
+//                tunnels.put( peer.getPeerInfo().getIp(), n2nIp );
+//            }
+//        }
 
         //setup tunnels to all remote peers
-        if ( !peerIps.isEmpty() )
-        {
-            try
-            {
-                localPeer.setupTunnels( peerIps, environment.getId() );
-            }
-            catch ( PeerException e )
-            {
-                throw new EnvironmentBuildException( "Error setting up tunnels to remote peers", e );
-            }
-        }
+//
+//        if ( !tunnels.isEmpty() )
+//        {
+//            try
+//            {
+//
+//                localPeer.setupTunnels( tunnels, environment.getId() );
+//            }
+//            catch ( PeerException e )
+//            {
+//                throw new EnvironmentBuildException( "Error setting up tunnels to remote peers", e );
+//            }
+//        }
 
         int currentLastUsedIpIndex = environment.getLastUsedIpIndex();
 
@@ -140,8 +142,8 @@ public class EnvironmentBuilder
             Peer peer = peerPlacement.getKey();
 
             taskCompletionService.submit(
-                    new NodeGroupBuilder( environment, templateRegistry, peerManager, peer,
-                            peerPlacement.getValue(), allPeers, defaultDomain, currentLastUsedIpIndex + 1 ) );
+                    new NodeGroupBuilder( environment, templateRegistry, peerManager, peer, peerPlacement.getValue(),
+                            allPeers, defaultDomain, currentLastUsedIpIndex + 1 ) );
 
             for ( NodeGroup nodeGroup : peerPlacement.getValue() )
             {
