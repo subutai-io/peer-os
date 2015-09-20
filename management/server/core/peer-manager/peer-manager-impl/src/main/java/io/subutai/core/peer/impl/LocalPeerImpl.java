@@ -1008,7 +1008,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public boolean isConnected( final Host host )
     {
-        Preconditions.checkNotNull( host, "Host is null, nothig to do here" );
+        Preconditions.checkNotNull( host, "Host is null" );
 
         try
         {
@@ -1017,13 +1017,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 return ContainerHostState.RUNNING.equals( ( ( ContainerHostInfo ) hostInfo ).getStatus() );
             }
-
-            Host h = bindHost( host.getId() );
-            return !isTimedOut( h.getLastHeartbeat(), HOST_INACTIVE_TIME );
+            else
+            {
+                return true;
+            }
         }
-        catch ( PeerException | HostDisconnectedException e )
+        catch ( HostDisconnectedException e )
         {
-            //            LOG.error( "Error checking host connected status #isConnected", e );
             return false;
         }
     }
