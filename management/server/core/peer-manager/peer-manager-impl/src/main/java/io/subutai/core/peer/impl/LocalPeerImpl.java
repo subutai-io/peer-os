@@ -957,7 +957,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public boolean isConnected( final Host host )
     {
-        Preconditions.checkNotNull( host, "Host is null, nothig to do here" );
+        Preconditions.checkNotNull( host, "Host is null" );
 
         try
         {
@@ -966,21 +966,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 return ContainerHostState.RUNNING.equals( ( ( ContainerHostInfo ) hostInfo ).getStatus() );
             }
-
-            Host h = bindHost( host.getId() );
-            return !isTimedOut( ( ( AbstractSubutaiHost ) h ).getLastHeartbeat(), HOST_INACTIVE_TIME );
+            else
+            {
+                return false;
+            }
         }
-        catch ( PeerException | HostDisconnectedException e )
+        catch ( HostDisconnectedException e )
         {
-            //            LOG.error( "Error checking host connected status #isConnected", e );
             return false;
         }
-    }
-
-
-    private boolean isTimedOut( long lastHeartbeat, long timeoutInMillis )
-    {
-        return ( System.currentTimeMillis() - lastHeartbeat ) > timeoutInMillis;
     }
 
 
