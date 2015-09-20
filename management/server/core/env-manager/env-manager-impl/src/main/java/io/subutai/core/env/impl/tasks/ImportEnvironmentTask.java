@@ -20,6 +20,7 @@ import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.env.api.exception.EnvironmentCreationException;
 import io.subutai.core.env.impl.EnvironmentManagerImpl;
 import io.subutai.core.env.impl.entity.EnvironmentImpl;
+import io.subutai.core.env.impl.exception.EnvironmentBuildException;
 import io.subutai.core.env.impl.exception.ResultHolder;
 import io.subutai.core.peer.api.LocalPeer;
 
@@ -79,19 +80,19 @@ public class ImportEnvironmentTask implements Awaitable
 
 
             //**** Create Key Pair *****************************************
-//
-//            op.addLog( "Creating PEKs ..." );
-//
-//            try
-//            {
-//                localPeer.createEnvironmentKeyPair(
-//                        localPeer.getId().toString() + "-" + environment.getId().toString() );
-//            }
-//            catch ( Exception ex )
-//            {
-//                throw new EnvironmentBuildException(
-//                        String.format( "There were errors during creation of PEKs:  %s", ex.toString() ), null );
-//            }
+
+            op.addLog( "Creating PEKs ..." );
+
+            try
+            {
+                localPeer.createEnvironmentKeyPair(
+                        localPeer.getId().toString() + "-" + environment.getId().toString() );
+            }
+            catch ( Exception ex )
+            {
+                throw new EnvironmentBuildException(
+                        String.format( "There were errors during creation of PEKs:  %s", ex.toString() ), null );
+            }
 
             //**************************************************************
 
