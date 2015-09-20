@@ -40,6 +40,14 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="node/clear-requests">
+      <action class="io.subutai.core.registration.cli.ClearRequests">
+        <argument ref="nodeRegistration" />
+      </action>
+    </command>
+  </command-bundle>
+
   <reference id="nodeRegistration" availability="mandatory"
              interface="io.subutai.core.registration.api.RegistrationManager" />
 

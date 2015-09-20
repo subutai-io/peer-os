@@ -44,6 +44,7 @@ import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.CreateContainerGroupRequest;
+import io.subutai.common.environment.Environment;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
@@ -418,6 +419,23 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             LOG.error( "Failed to create container", e );
             throw new PeerException( e );
         }
+    }
+
+
+    @Override
+    public ContainerGroup processEnvironmentContainers( final Environment environment )
+            throws PeerException
+    {
+        Set<ContainerHost> containerHosts = environment.getContainerHosts();
+        ContainerGroupEntity containerGroup = new ContainerGroupEntity( environment.getId(), getId(), getOwnerId() );
+        Set<UUID> containerIds = Sets.newHashSet();
+        for ( ContainerHost containerHost : containerHosts )
+        {
+            containerIds.add( containerHost.getId() );
+        }
+        containerGroup.setContainerIds( containerIds );
+        containerGroupDataService.update( containerGroup );
+        return containerGroup;
     }
 
 
@@ -990,7 +1008,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public boolean isConnected( final Host host )
     {
-        Preconditions.checkNotNull( host, "Host is null, nothig to do here" );
+        Preconditions.checkNotNull( host, "Host is null" );
 
         try
         {
@@ -999,13 +1017,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 return ContainerHostState.RUNNING.equals( ( ( ContainerHostInfo ) hostInfo ).getStatus() );
             }
-
-            Host h = bindHost( host.getId() );
-            return !isTimedOut( h.getLastHeartbeat(), HOST_INACTIVE_TIME );
+            else
+            {
+                return true;
+            }
         }
-        catch ( PeerException | HostDisconnectedException e )
+        catch ( HostDisconnectedException e )
         {
-            //            LOG.error( "Error checking host connected status #isConnected", e );
             return false;
         }
     }

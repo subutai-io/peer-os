@@ -1,6 +1,7 @@
 package io.subutai.core.registration.impl.entity;
 
 
+import java.io.Serializable;
 import java.util.Set;
 
 import javax.persistence.Access;
@@ -22,17 +23,17 @@ import com.google.common.collect.Sets;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.Interface;
 import io.subutai.core.registration.api.RegistrationStatus;
+import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.RequestedHost;
-import io.subutai.core.registration.api.service.VirtualHost;
 
 
 /**
  * Created by talas on 8/24/15.
  */
 @Entity
-@Table( name = "resource_host_requests" )
+@Table( name = "node_resource_host_requests" )
 @Access( AccessType.FIELD )
-public class RequestedHostImpl implements RequestedHost
+public class RequestedHostImpl implements RequestedHost, Serializable
 {
     @Id
     @Column( name = "host_id", nullable = false )
@@ -41,24 +42,16 @@ public class RequestedHostImpl implements RequestedHost
     @Column( name = "hostname" )
     private String hostname;
 
-    //    private InterfaceModel interfaceModel;
-
-
-    //    @Column( name = "interface_model" )
-    //    @OneToOne( fetch = FetchType.EAGER, cascade = CascadeType.ALL )
-    @JoinColumn( name = "raw_interfaces" )
-    @OneToMany( orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER )
-    private Set<HostInterface> interfaces = Sets.newHashSet();
-    //
-
-    //    @JoinColumn( name = "requested_host_id" )
-    //    @OneToMany( targetEntity = VirtualHostImpl.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL,
-    //            orphanRemoval = true )
-    //    private Set<VirtualHostImpl> containers = Sets.newHashSet();
+    @JoinColumn( name = "net_interfaces" )
+    @OneToMany( orphanRemoval = true,
+            targetEntity = HostInterface.class,
+            cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER )
+    private Set<Interface> netInterfaces = Sets.newHashSet();
 
     @Column( name = "arch" )
     @Enumerated( EnumType.STRING )
-    private HostArchitecture arch;
+    private HostArchitecture arch = HostArchitecture.AMD64;
 
     @Column( name = "secret" )
     private String secret;
@@ -72,7 +65,14 @@ public class RequestedHostImpl implements RequestedHost
 
     @Column( name = "status" )
     @Enumerated( EnumType.STRING )
-    private RegistrationStatus status;
+    private RegistrationStatus status = RegistrationStatus.REQUESTED;
+
+    @OneToMany( targetEntity = ContainerInfoImpl.class,
+            mappedBy = "requestedHost",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER,
+            orphanRemoval = true )
+    private Set<ContainerInfo> hostInfos = Sets.newHashSet();
 
 
     public RequestedHostImpl()
@@ -80,21 +80,42 @@ public class RequestedHostImpl implements RequestedHost
     }
 
 
-    public RequestedHostImpl( final String id, final String hostname, final HostArchitecture arch,
-                              final String publicKey, final String restHook, final RegistrationStatus status )
+    public RequestedHostImpl( final RequestedHost requestedHost )
     {
-        this.id = id;
-        this.hostname = hostname;
-        this.arch = arch;
-        this.publicKey = publicKey;
-        this.restHook = restHook;
-        this.status = status;
+        this.id = requestedHost.getId();
+        this.hostname = requestedHost.getHostname();
+        this.arch = requestedHost.getArch();
+        this.secret = requestedHost.getSecret();
+        this.publicKey = requestedHost.getPublicKey();
+        this.restHook = requestedHost.getRestHook();
+        this.status = requestedHost.getStatus();
+
+        if ( this.arch == null )
+        {
+            this.arch = HostArchitecture.AMD64;
+        }
+
+        Set<Interface> netInterfaces = requestedHost.getNetInterfaces();
+        for ( final Interface netInterface : netInterfaces )
+        {
+            HostInterface hostInterface = new HostInterface( netInterface );
+            this.netInterfaces.add( hostInterface );
+        }
+
+        Set<ContainerInfo> hostInfoSet = requestedHost.getHostInfos();
+        for ( final ContainerInfo containerInfo : hostInfoSet )
+        {
+            ContainerInfoImpl containerInfoImpl = new ContainerInfoImpl( containerInfo );
+            containerInfoImpl.setStatus( RegistrationStatus.REQUESTED );
+            containerInfoImpl.setRequestedHost( this );
+            this.hostInfos.add( containerInfoImpl );
+        }
     }
 
 
     public RequestedHostImpl( final String id, final String hostname, final HostArchitecture arch, final String secret,
                               final String publicKey, final String restHook, final RegistrationStatus status,
-                              Set<Interface> interfaces )
+                              Set<Interface> netInterfaces )
     {
         this.id = id;
         this.hostname = hostname;
@@ -104,21 +125,35 @@ public class RequestedHostImpl implements RequestedHost
         this.restHook = restHook;
         this.status = status;
 
-        for ( final Interface anInterface : interfaces )
+        for ( final Interface anInterface : netInterfaces )
         {
-            this.interfaces.add( new HostInterface( anInterface ) );
+            this.netInterfaces.add( new HostInterface( anInterface ) );
+        }
+
+        if ( this.arch == null )
+        {
+            this.arch = HostArchitecture.AMD64;
         }
     }
 
 
+    @Override
+    public Set<Interface> getNetInterfaces()
+    {
+        return netInterfaces;
+    }
+
 
     @Override
-    public Set<Interface> getInterfaces()
+    public Set<ContainerInfo> getHostInfos()
     {
-        Set<Interface> temp = Sets.newHashSet();
-        temp.addAll( interfaces );
-        return temp;
-        //        return Sets.newHashSet();
+        return hostInfos;
+    }
+
+
+    public void setHostInfos( final Set<ContainerInfo> hostInfos )
+    {
+        this.hostInfos = hostInfos;
     }
 
 
@@ -172,23 +207,6 @@ public class RequestedHostImpl implements RequestedHost
 
 
     @Override
-    public Set<VirtualHost> getContainers()
-    {
-        //        Set<VirtualHost> temp = Sets.newHashSet();
-        //        temp.addAll( containers );
-        //        return temp;
-        return Sets.newHashSet();
-        //        return containers;
-    }
-
-
-    public void setContainers( final Set<VirtualHostImpl> containers )
-    {
-        //        this.containers = containers;
-    }
-
-
-    @Override
     public void setRestHook( final String restHook )
     {
         this.restHook = restHook;
@@ -207,10 +225,11 @@ public class RequestedHostImpl implements RequestedHost
     }
 
 
-    public void setInterfaces( final Set<HostInterface> interfaces )
+    public void setNetInterfaces( final Set<Interface> netInterfaces )
     {
-        this.interfaces = interfaces;
+        this.netInterfaces = netInterfaces;
     }
+
 
     @Override
     public boolean equals( final Object o )
@@ -243,11 +262,13 @@ public class RequestedHostImpl implements RequestedHost
         return "RequestedHostImpl{" +
                 "id='" + id + '\'' +
                 ", hostname='" + hostname + '\'' +
-                ", interfaces=" + interfaces +
+                ", status=" + status +
                 ", arch=" + arch +
+                ", secret='" + secret + '\'' +
                 ", publicKey='" + publicKey + '\'' +
                 ", restHook='" + restHook + '\'' +
-                ", status=" + status +
+                ", netInterfaces=" + netInterfaces +
+                ", hostInfos=" + hostInfos +
                 '}';
     }
 }

@@ -5,11 +5,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import io.subutai.common.peer.Peer;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
+import io.subutai.common.peer.Peer;
 
 
 public class Topology

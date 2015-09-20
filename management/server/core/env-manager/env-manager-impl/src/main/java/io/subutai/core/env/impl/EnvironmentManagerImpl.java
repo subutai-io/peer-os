@@ -37,6 +37,7 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInfo;
@@ -45,6 +46,7 @@ import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.HostInfoModel;
 import io.subutai.common.peer.InterfacePattern;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -52,6 +54,7 @@ import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.N2NUtil;
+import io.subutai.common.util.StringUtil;
 import io.subutai.core.env.api.EnvironmentEventListener;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.env.api.exception.EnvironmentCreationException;
@@ -68,10 +71,12 @@ import io.subutai.core.env.impl.entity.PeerConfImpl;
 import io.subutai.core.env.impl.exception.EnvironmentBuildException;
 import io.subutai.core.env.impl.exception.ResultHolder;
 import io.subutai.core.env.impl.tasks.Awaitable;
+import io.subutai.core.env.impl.tasks.ConfigureEnvironmentTask;
 import io.subutai.core.env.impl.tasks.CreateEnvironmentTask;
 import io.subutai.core.env.impl.tasks.DestroyContainerTask;
 import io.subutai.core.env.impl.tasks.DestroyEnvironmentTask;
 import io.subutai.core.env.impl.tasks.GrowEnvironmentTask;
+import io.subutai.core.env.impl.tasks.ImportEnvironmentTask;
 import io.subutai.core.env.impl.tasks.SetContainerDomainTask;
 import io.subutai.core.env.impl.tasks.SetDomainTask;
 import io.subutai.core.env.impl.tasks.SetSshKeyTask;
@@ -80,6 +85,7 @@ import io.subutai.core.identity.api.User;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.HostNotFoundException;
+import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.security.api.SecurityManager;
@@ -98,6 +104,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     private final PeerManager peerManager;
     private final NetworkManager networkManager;
+    private final TemplateRegistry templateRegistry;
     protected ExecutorService executor = SubutaiExecutors.newCachedThreadPool();
     private final String defaultDomain;
     private final IdentityManager identityManager;
@@ -309,6 +316,112 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             throw new EnvironmentCreationException( e );
         }
+    }
+
+
+    @Override
+    public Environment importEnvironment( final String name, final Topology topology,
+                                          final Map<NodeGroup, Set<HostInfo>> containers, String ssh, Integer vlan )
+            throws EnvironmentCreationException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
+        Preconditions.checkNotNull( topology, "Invalid topology" );
+        Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
+
+
+        Map.Entry<NodeGroup, Set<HostInfo>> containersEntry = containers.entrySet().iterator().next();
+        Iterator<HostInfo> hostIterator = containersEntry.getValue().iterator();
+
+        String ip = "";
+        while ( hostIterator.hasNext() && StringUtil.isStringNullOrEmpty( ip ) )
+        {
+            HostInfo sampleHostInfo = hostIterator.next();
+
+            //TODO ip is chosen from first standing container host info
+            for ( final Interface iface : sampleHostInfo.getInterfaces() )
+            {
+                if ( StringUtil.isStringNullOrEmpty( iface.getIp() ) )
+                {
+                    continue;
+                }
+                ip = iface.getIp();
+                break;
+            }
+        }
+
+        if ( StringUtil.isStringNullOrEmpty( ip ) )
+        {
+            throw new EnvironmentCreationException( "Invalid environment ip range" );
+        }
+
+
+        LocalPeer localPeer = peerManager.getLocalPeer();
+
+        final EnvironmentImpl environment = createEmptyEnvironment( name, ip, ssh );
+        Set<EnvironmentContainerImpl> containersToImport = Sets.newHashSet();
+
+        for ( final Map.Entry<NodeGroup, Set<HostInfo>> entry : containers.entrySet() )
+        {
+            NodeGroup nodeGroup = entry.getKey();
+            Set<HostInfo> containersHostInfo = entry.getValue();
+            for ( final HostInfo hostInfo : containersHostInfo )
+            {
+                EnvironmentContainerImpl envContainer =
+                        new EnvironmentContainerImpl( localPeer.getId(), localPeer, nodeGroup.getName(),
+                                new HostInfoModel( hostInfo ),
+                                templateRegistry.getTemplate( nodeGroup.getTemplateName() ), nodeGroup.getSshGroupId(),
+                                nodeGroup.getHostsGroupId(), defaultDomain );
+                containersToImport.add( envContainer );
+            }
+        }
+
+        environment.addContainers( containersToImport );
+
+
+        TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Environment Containers successfully imported %s ", environment.getId() ) );
+
+        final ResultHolder<EnvironmentCreationException> resultHolder = new ResultHolder<>();
+
+
+        Awaitable createEnvironmentTask =
+                new ImportEnvironmentTask( peerManager.getLocalPeer(), this, environment, topology, resultHolder, op,
+                        vlan );
+
+        executor.submit( createEnvironmentTask );
+
+        try
+        {
+            return findEnvironment( environment.getId() );
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            throw new EnvironmentCreationException( e );
+        }
+    }
+
+
+    public void configureEnvironment( UUID environmentId, TrackerOperation op )
+            throws EnvironmentNotFoundException, EnvironmentModificationException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
+
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+        {
+            op.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
+
+            throw new EnvironmentModificationException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
+
+        final ResultHolder<EnvironmentModificationException> resultHolder = new ResultHolder<>();
+
+        Awaitable growEnvironmentTask =
+                new ConfigureEnvironmentTask( this, environment, peerManager, resultHolder, op );
+
+        executor.submit( growEnvironmentTask );
     }
 
 
@@ -1019,6 +1132,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         Preconditions.checkNotNull( tracker );
 
         this.peerManager = peerManager;
+        this.templateRegistry = templateRegistry;
         this.networkManager = networkManager;
         this.daoManager = daoManager;
         this.defaultDomain = defaultDomain;
