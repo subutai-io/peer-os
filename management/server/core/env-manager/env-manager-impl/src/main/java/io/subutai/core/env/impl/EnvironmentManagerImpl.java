@@ -4,6 +4,7 @@ package io.subutai.core.env.impl;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -1158,9 +1159,38 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @Override
+    public void setupTunnels( Environment env ) throws EnvironmentManagerException
+    {
+        Map<String, String> tunnels = new HashMap();
+        for ( PeerConf peerConf : env.getPeerConfs() )
+        {
+            tunnels.put( peerConf.getN2NConfig().getPeerId().toString(), peerConf.getN2NConfig().getAddress() );
+        }
+
+        for ( Peer peer : env.getPeers() )
+        {
+            try
+            {
+                LOGGER.debug( "Setting tunnels on: " + peer.getId() );
+
+                Map<String, String> t = new HashMap<>( tunnels );
+                t.remove( peer.getId().toString() );
+                peer.setupTunnels( t, env.getId() );
+            }
+            catch ( PeerException e )
+            {
+                throw new EnvironmentManagerException( "Error setting up tunnels to remote peers", e );
+            }
+        }
+    }
+
+
     private void createN2NTunnel( final Environment env, final Set<Peer> peers ) throws EnvironmentManagerException
     {
         // creating new n2n tunnels
+
+        peers.add( peerManager.getLocalPeer() );
         Set<String> allSubnets = getSubnets( peers );
         if ( LOGGER.isDebugEnabled() )
         {
@@ -1243,6 +1273,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             throw new EnvironmentManagerException( "Unable remove n2n tunnel.", e );
         }
+    }
+
+
+    @Override
+    public Peer resolvePeer( final UUID peerId )
+    {
+        return peerManager.getPeer( peerId );
     }
 
 

@@ -161,7 +161,7 @@ public class IntegrationImpl implements Integration
             WebClient client = io.subutai.core.hintegration.impl.HttpClient.createTrustedWebClient( baseUrl + path );
 
             processor = new HeartbeatProcessor( this );
-            this.hearbeatExecutorService.scheduleWithFixedDelay( processor, 10, 30, TimeUnit.SECONDS );
+            this.hearbeatExecutorService.scheduleWithFixedDelay( processor, 10, 360, TimeUnit.SECONDS );
 
             keyStore = KeyStore.getInstance( "JKS" );
 

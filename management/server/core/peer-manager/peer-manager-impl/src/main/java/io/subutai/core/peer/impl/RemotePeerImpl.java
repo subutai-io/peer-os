@@ -1507,6 +1507,39 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public int setupTunnels( final Map<String, String> peerIps, final UUID environmentId ) throws PeerException
+    {
+
+        Preconditions.checkNotNull( peerIps, "Invalid peer ips set" );
+        Preconditions.checkArgument( !peerIps.isEmpty(), "Invalid peer ips set" );
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        String path = "peer/tunnels";
+
+        try
+        {
+            //*********construct Secure Header ****************************
+            Map<String, String> headers = Maps.newHashMap();
+
+            headers.put( Common.HEADER_SPECIAL, "ENC" );
+            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId().toString() );
+            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId().toString() );
+            //*************************************************************
+            Map<String, String> params = Maps.newHashMap();
+            params.put( "peerIps", jsonUtil.to( peerIps ) );
+            params.put( "environmentId", environmentId.toString() );
+
+            String response = post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
+
+            return Integer.parseInt( response );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( String.format( "Error setting up tunnels on peer %s", getName() ), e );
+        }
+    }
+
+    @Override
     public void setupN2NConnection( final N2NConfig config )
     {
         LOG.debug( String.format( "Adding remote peer to n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),

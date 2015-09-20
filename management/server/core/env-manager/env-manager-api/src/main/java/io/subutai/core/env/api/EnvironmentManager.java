@@ -216,5 +216,9 @@ public interface EnvironmentManager
 
     void setupN2NConnection( Environment environment, Set<Peer> peers ) throws EnvironmentManagerException;
 
+    void setupTunnels( Environment env ) throws EnvironmentManagerException;
+
     void removeN2NConnection( Environment environment ) throws EnvironmentManagerException;
+
+    Peer resolvePeer( UUID peerId );
 }
