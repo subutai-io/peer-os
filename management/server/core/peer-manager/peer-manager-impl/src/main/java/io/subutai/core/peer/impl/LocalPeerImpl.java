@@ -1001,7 +1001,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
             else
             {
-                return false;
+                return true;
             }
         }
         catch ( HostDisconnectedException e )
