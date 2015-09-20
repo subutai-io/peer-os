@@ -53,6 +53,7 @@ import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.N2NUtil;
+import io.subutai.common.util.StringUtil;
 import io.subutai.core.env.api.EnvironmentEventListener;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.env.api.exception.EnvironmentCreationException;
@@ -82,8 +83,8 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.User;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.HostNotFoundException;
+import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.security.api.SecurityManager;
@@ -329,11 +330,29 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         Map.Entry<NodeGroup, Set<HostInfo>> containersEntry = containers.entrySet().iterator().next();
         Iterator<HostInfo> hostIterator = containersEntry.getValue().iterator();
-        HostInfo sampleHostInfo = hostIterator.next();
-        Iterator<Interface> interfaceIterator = sampleHostInfo.getInterfaces().iterator();
 
-        //TODO ip is chosen from first standing container host info
-        String ip = interfaceIterator.next().getIp();
+        String ip = "";
+        while ( hostIterator.hasNext() && StringUtil.isStringNullOrEmpty( ip ) )
+        {
+            HostInfo sampleHostInfo = hostIterator.next();
+
+            //TODO ip is chosen from first standing container host info
+            for ( final Interface iface : sampleHostInfo.getInterfaces() )
+            {
+                if ( StringUtil.isStringNullOrEmpty( iface.getIp() ) )
+                {
+                    continue;
+                }
+                ip = iface.getIp();
+                break;
+            }
+        }
+
+        if ( StringUtil.isStringNullOrEmpty( ip ) )
+        {
+            throw new EnvironmentCreationException( "Invalid environment ip range" );
+        }
+
 
         LocalPeer localPeer = peerManager.getLocalPeer();
 

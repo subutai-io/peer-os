@@ -24,6 +24,7 @@ import javax.persistence.Table;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
+import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 
 
@@ -62,34 +63,19 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
 
     @Column( name = "arch" )
     @Enumerated( EnumType.STRING )
-    private HostArchitecture arch;
+    private HostArchitecture arch = HostArchitecture.AMD64;
 
     @ManyToOne
     @JoinColumn( name = "requested_host" )
     private RequestedHostImpl requestedHost;
 
+    @Column( name = "status" )
+    @Enumerated( EnumType.STRING )
+    private RegistrationStatus status = RegistrationStatus.REQUESTED;
+
 
     public ContainerInfoImpl()
     {
-    }
-
-
-    public ContainerInfoImpl( final String id, final String hostname, final Set<Interface> netInterfaces,
-                              final HostArchitecture arch, String publicKey )
-    {
-        this.id = id;
-        this.hostname = hostname;
-        this.netInterfaces = netInterfaces;
-        for ( final Interface netInterface : netInterfaces )
-        {
-            this.netInterfaces.add( new HostInterface( netInterface ) );
-        }
-        this.arch = arch;
-        this.publicKey = publicKey;
-        if ( arch == null )
-        {
-            this.arch = HostArchitecture.AMD64;
-        }
     }
 
 
@@ -100,6 +86,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
         this.templateName = hostInfo.getTemplateName();
         this.vlan = hostInfo.getVlan();
         this.arch = hostInfo.getArch();
+        this.status = hostInfo.getStatus();
         this.publicKey = hostInfo.getPublicKey();
         if ( arch == null )
         {
@@ -109,6 +96,19 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
         {
             this.netInterfaces.add( new HostInterface( anInterface ) );
         }
+    }
+
+
+    @Override
+    public RegistrationStatus getStatus()
+    {
+        return status;
+    }
+
+
+    public void setStatus( final RegistrationStatus status )
+    {
+        this.status = status;
     }
 
 
@@ -229,7 +229,10 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
     {
         return "ContainerInfoImpl{" +
                 "id='" + id + '\'' +
+                ", publicKey='" + publicKey + '\'' +
                 ", hostname='" + hostname + '\'' +
+                ", vlan=" + vlan +
+                ", templateName='" + templateName + '\'' +
                 ", netInterfaces=" + netInterfaces +
                 ", arch=" + arch +
                 '}';

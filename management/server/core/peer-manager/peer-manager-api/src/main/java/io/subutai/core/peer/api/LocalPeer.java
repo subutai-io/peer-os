@@ -103,13 +103,13 @@ public interface LocalPeer extends Peer
 
 
     /**
-     * Imports environment containers and sets gateways.
+     * Configures environment containers and persists container group metadata.
      *
      * @param environment - environment to import
      *
      * @return - containerGroup entity interface
      */
-    public ContainerGroup importEnvironment( final UUID resourceHostId, final Environment environment )
+    public ContainerGroup processEnvironmentContainers( final Environment environment )
             throws PeerException;
 
 

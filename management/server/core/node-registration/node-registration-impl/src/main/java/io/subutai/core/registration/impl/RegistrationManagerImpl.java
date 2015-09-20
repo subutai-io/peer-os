@@ -40,8 +40,10 @@ import io.subutai.core.registration.api.exception.NodeRegistrationException;
 import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.ContainerToken;
 import io.subutai.core.registration.api.service.RequestedHost;
+import io.subutai.core.registration.impl.dao.ContainerInfoDataService;
 import io.subutai.core.registration.impl.dao.ContainerTokenDataService;
 import io.subutai.core.registration.impl.dao.RequestDataService;
+import io.subutai.core.registration.impl.entity.ContainerInfoImpl;
 import io.subutai.core.registration.impl.entity.ContainerTokenImpl;
 import io.subutai.core.registration.impl.entity.RequestedHostImpl;
 import io.subutai.core.security.api.SecurityManager;
@@ -55,8 +57,9 @@ import io.subutai.core.security.api.crypto.KeyManager;
 public class RegistrationManagerImpl implements RegistrationManager
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RegistrationManagerImpl.class );
-    private RequestDataService requestDataService;
     private SecurityManager securityManager;
+    private RequestDataService requestDataService;
+    private ContainerInfoDataService containerInfoDataService;
     private ContainerTokenDataService containerTokenDataService;
     private DaoManager daoManager;
     private Broker broker;
@@ -77,21 +80,7 @@ public class RegistrationManagerImpl implements RegistrationManager
     {
         containerTokenDataService = new ContainerTokenDataService( daoManager );
         requestDataService = new RequestDataService( daoManager );
-
-        //        Interface hostInterface = new HostInterface( "iName1", "ip", "mac" );
-        //        Interface hostInterface1 = new HostInterface( "iName2", "ip", "mac" );
-        //        HostInfo containerHostInfoModel =
-        //                new ContainerInfoImpl( UUID.randomUUID().toString(), "hostname", Sets.newHashSet(
-        // hostInterface1 ),
-        //                        HostArchitecture.AMD64 );
-        //
-        //        RequestedHostImpl requestedHost =
-        //                new RequestedHostImpl( UUID.randomUUID().toString(), UUID.randomUUID().toString(),
-        //                        HostArchitecture.AMD64, "secret", "publicKey", "restHook", RegistrationStatus
-        // .REQUESTED,
-        //                        Sets.newHashSet( hostInterface ), Sets.newHashSet( containerHostInfoModel ) );
-        //
-        //        requestDataService.update( requestedHost );
+        containerInfoDataService = new ContainerInfoDataService( daoManager );
     }
 
 
@@ -223,8 +212,8 @@ public class RegistrationManagerImpl implements RegistrationManager
         }
         registrationRequest.setStatus( RegistrationStatus.APPROVED );
         requestDataService.update( registrationRequest );
-        KeyManager keyManager = securityManager.getKeyManager();
-        keyManager.savePublicKeyRing( registrationRequest.getId(), ( short ) 2, registrationRequest.getPublicKey() );
+
+        importHostPublicKey( registrationRequest.getId(), registrationRequest.getPublicKey() );
 
         WebClient client = RestUtil.createWebClient( registrationRequest.getRestHook() );
         Form form = new Form();
@@ -242,9 +231,34 @@ public class RegistrationManagerImpl implements RegistrationManager
         }
 
         //TODO move the rest of code to separate function where approval process done selectively
+        for ( final ContainerInfo containerInfo : registrationRequest.getHostInfos() )
+        {
+            importHostPublicKey( containerInfo.getId().toString(), containerInfo.getPublicKey() );
+        }
+
+        processEnvironmentImport( registrationRequest );
+    }
+
+
+    private void importHostPublicKey( String hostId, String publicKey )
+    {
+        try
+        {
+            KeyManager keyManager = securityManager.getKeyManager();
+            keyManager.savePublicKeyRing( hostId, ( short ) 2, publicKey );
+        }
+        catch ( Exception ex )
+        {
+            LOGGER.error( "Error importing host public key", ex );
+        }
+    }
+
+
+    private Map<Integer, Map<String, Set<ContainerInfo>>> groupContainersByVlan( Set<ContainerInfo> containerInfoSet )
+    {
         Map<Integer, Map<String, Set<ContainerInfo>>> groupedContainersByVlan = Maps.newHashMap();
 
-        for ( final ContainerInfo containerInfo : registrationRequest.getHostInfos() )
+        for ( final ContainerInfo containerInfo : containerInfoSet )
         {
             //Group containers by environment relation
             // and group into node groups.
@@ -254,6 +268,7 @@ public class RegistrationManagerImpl implements RegistrationManager
                 groupedContainers = Maps.newHashMap();
             }
 
+            //Group by container infos by container name
             Set<ContainerInfo> group = groupedContainers.get( containerInfo.getTemplateName() );
             if ( group != null )
             {
@@ -263,16 +278,24 @@ public class RegistrationManagerImpl implements RegistrationManager
             {
                 group = Sets.newHashSet( containerInfo );
             }
-            groupedContainers.put( containerInfo.getTemplateName(), group );
 
-            groupedContainersByVlan.put( containerInfo.getVlan(), groupedContainers );
 
-            //save container hosts' public keys
-            keyManager.savePublicKeyRing( containerInfo.getId().toString(), ( short ) 2, containerInfo.getPublicKey() );
+            if ( containerInfo.getVlan() != 0 )
+            {
+                groupedContainers.put( containerInfo.getTemplateName(), group );
+                groupedContainersByVlan.put( containerInfo.getVlan(), groupedContainers );
+            }
         }
+        return groupedContainersByVlan;
+    }
+
+
+    private void processEnvironmentImport( RequestedHostImpl registrationRequest )
+    {
+        Map<Integer, Map<String, Set<ContainerInfo>>> groupedContainersByVlan =
+                groupContainersByVlan( registrationRequest.getHostInfos() );
 
         LocalPeer localPeer = peerManager.getLocalPeer();
-
 
         for ( final Map.Entry<Integer, Map<String, Set<ContainerInfo>>> mapEntry : groupedContainersByVlan.entrySet() )
         {
@@ -283,8 +306,10 @@ public class RegistrationManagerImpl implements RegistrationManager
             for ( final Map.Entry<String, Set<ContainerInfo>> entry : rawNodeGroup.entrySet() )
             {
                 //place where to create node groups
-                NodeGroup nodeGroup = new NodeGroup( String.format( "%s_group", entry.getKey() ), entry.getKey(),
-                        entry.getValue().size(), 1, 1, new PlacementStrategy( "ROUND_ROBIN" ) );
+                String templateName = entry.getKey();
+                NodeGroup nodeGroup =
+                        new NodeGroup( String.format( "%s_group", templateName ), templateName, entry.getValue().size(),
+                                1, 1, new PlacementStrategy( "ROUND_ROBIN" ) );
                 topology.addNodeGroupPlacement( localPeer, nodeGroup );
 
                 Set<HostInfo> converter = Sets.newHashSet();
@@ -295,7 +320,16 @@ public class RegistrationManagerImpl implements RegistrationManager
             try
             {
                 environmentManager.importEnvironment( String.format( "environment_%d", mapEntry.getKey() ), topology,
-                        classification, "", mapEntry.getKey(), requestId );
+                        classification, "", mapEntry.getKey(), UUID.fromString( registrationRequest.getId() ) );
+                for ( final Set<HostInfo> infos : classification.values() )
+                {
+                    for ( final HostInfo hostInfo : infos )
+                    {
+                        ContainerInfoImpl containerInfo = containerInfoDataService.find( hostInfo.getId().toString() );
+                        containerInfo.setStatus( RegistrationStatus.APPROVED );
+                        containerInfoDataService.update( containerInfo );
+                    }
+                }
             }
             catch ( EnvironmentCreationException e )
             {

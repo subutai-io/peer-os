@@ -10,6 +10,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
+import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 
 
@@ -25,6 +26,7 @@ public class ContainerInfoJson implements ContainerInfo
     private Set<HostInterfaceJson> netInterfaces = new HashSet<>();
     private HostArchitecture arch;
     private String publicKey;
+    private RegistrationStatus status = RegistrationStatus.REQUESTED;
 
 
     public ContainerInfoJson()
@@ -41,6 +43,7 @@ public class ContainerInfoJson implements ContainerInfo
         this.vlan = hostInfo.getVlan();
         this.arch = hostInfo.getArch();
         this.publicKey = hostInfo.getPublicKey();
+        this.status = hostInfo.getStatus();
         if ( arch == null )
         {
             arch = HostArchitecture.AMD64;
@@ -118,6 +121,19 @@ public class ContainerInfoJson implements ContainerInfo
     public void setPublicKey( final String publicKey )
     {
         this.publicKey = publicKey;
+    }
+
+
+    @Override
+    public RegistrationStatus getStatus()
+    {
+        return status;
+    }
+
+
+    public void setStatus( final RegistrationStatus status )
+    {
+        this.status = status;
     }
 
 

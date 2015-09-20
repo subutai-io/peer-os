@@ -66,7 +66,7 @@ public class ConfigureEnvironmentTask implements Awaitable
                 op.addLog( "Cloning containers..." );
 
                 LocalPeer localPeer = peerManager.getLocalPeer();
-                localPeer.importEnvironment( resourceHostId, environment );
+                localPeer.processEnvironmentContainers( environment );
 
                 environmentManager.setContainersTransientFields( environment );
 

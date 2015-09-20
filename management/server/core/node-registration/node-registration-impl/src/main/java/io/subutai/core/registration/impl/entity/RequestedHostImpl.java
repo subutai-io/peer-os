@@ -2,7 +2,6 @@ package io.subutai.core.registration.impl.entity;
 
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Access;
@@ -52,7 +51,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
 
     @Column( name = "arch" )
     @Enumerated( EnumType.STRING )
-    private HostArchitecture arch;
+    private HostArchitecture arch = HostArchitecture.AMD64;
 
     @Column( name = "secret" )
     private String secret;
@@ -66,7 +65,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
 
     @Column( name = "status" )
     @Enumerated( EnumType.STRING )
-    private RegistrationStatus status;
+    private RegistrationStatus status = RegistrationStatus.REQUESTED;
 
     @OneToMany( targetEntity = ContainerInfoImpl.class,
             mappedBy = "requestedHost",
@@ -90,6 +89,12 @@ public class RequestedHostImpl implements RequestedHost, Serializable
         this.publicKey = requestedHost.getPublicKey();
         this.restHook = requestedHost.getRestHook();
         this.status = requestedHost.getStatus();
+
+        if ( this.arch == null )
+        {
+            this.arch = HostArchitecture.AMD64;
+        }
+
         Set<Interface> netInterfaces = requestedHost.getNetInterfaces();
         for ( final Interface netInterface : netInterfaces )
         {
@@ -123,29 +128,10 @@ public class RequestedHostImpl implements RequestedHost, Serializable
         {
             this.netInterfaces.add( new HostInterface( anInterface ) );
         }
-    }
 
-
-    public RequestedHostImpl( final String id, final String hostname, final HostArchitecture arch, final String secret,
-                              final String publicKey, final String restHook, final RegistrationStatus status,
-                              final HashSet<Interface> netInterfaces, final HashSet<ContainerInfo> hostInfos )
-    {
-        this.id = id;
-        this.hostname = hostname;
-        this.arch = arch;
-        this.secret = secret;
-        this.publicKey = publicKey;
-        this.restHook = restHook;
-        this.status = status;
-        for ( final Interface anInterface : netInterfaces )
+        if ( this.arch == null )
         {
-            this.netInterfaces.add( new HostInterface( anInterface ) );
-        }
-        for ( final ContainerInfo hostInfo : hostInfos )
-        {
-            ContainerInfoImpl containerInfoImpl = new ContainerInfoImpl( hostInfo );
-            containerInfoImpl.setRequestedHost( this );
-            this.hostInfos.add( containerInfoImpl );
+            this.arch = HostArchitecture.AMD64;
         }
     }
 
@@ -275,12 +261,12 @@ public class RequestedHostImpl implements RequestedHost, Serializable
         return "RequestedHostImpl{" +
                 "id='" + id + '\'' +
                 ", hostname='" + hostname + '\'' +
-                ", netInterfaces=" + netInterfaces +
+                ", status=" + status +
                 ", arch=" + arch +
                 ", secret='" + secret + '\'' +
                 ", publicKey='" + publicKey + '\'' +
                 ", restHook='" + restHook + '\'' +
-                ", status=" + status +
+                ", netInterfaces=" + netInterfaces +
                 ", hostInfos=" + hostInfos +
                 '}';
     }

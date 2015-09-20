@@ -7,6 +7,7 @@ import java.util.UUID;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
+import io.subutai.core.registration.api.RegistrationStatus;
 
 
 /**
@@ -52,4 +53,10 @@ public interface ContainerInfo extends HostInfo
      * Container host public key
      */
     public String getPublicKey();
+
+
+    /**
+     * Get container host info status
+     */
+    public RegistrationStatus getStatus();
 }
