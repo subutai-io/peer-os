@@ -26,6 +26,7 @@ public class ContainerInfoJson implements ContainerInfo
     private Set<HostInterfaceJson> netInterfaces = new HashSet<>();
     private HostArchitecture arch;
     private String publicKey;
+    private String gateway;
     private RegistrationStatus status = RegistrationStatus.REQUESTED;
 
 
@@ -44,6 +45,7 @@ public class ContainerInfoJson implements ContainerInfo
         this.arch = hostInfo.getArch();
         this.publicKey = hostInfo.getPublicKey();
         this.status = hostInfo.getStatus();
+        this.gateway = hostInfo.getGateway();
         if ( arch == null )
         {
             arch = HostArchitecture.AMD64;
@@ -66,6 +68,19 @@ public class ContainerInfoJson implements ContainerInfo
     public String getHostname()
     {
         return hostname;
+    }
+
+
+    @Override
+    public String getGateway()
+    {
+        return gateway;
+    }
+
+
+    public void setGateway( final String gateway )
+    {
+        this.gateway = gateway;
     }
 
 

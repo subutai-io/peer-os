@@ -59,4 +59,10 @@ public interface ContainerInfo extends HostInfo
      * Get container host info status
      */
     public RegistrationStatus getStatus();
+
+
+    /**
+     * Returns host gateway, if container has environment relation if not returns empty string
+     */
+    public String getGateway();
 }

@@ -17,6 +17,8 @@
 
   <service ref="registrationManager" interface="io.subutai.core.registration.api.RegistrationManager" />
 
+  <service ref="registrationManager" interface="io.subutai.core.hostregistry.api.HostListener" />
+
   <reference id="securityManagerRef" availability="mandatory"
              interface="io.subutai.core.security.api.SecurityManager" />
 

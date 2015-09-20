@@ -50,6 +50,9 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
     @Column( name = "vlan" )
     private Integer vlan;
 
+    @Column( name = "gateway" )
+    private String gateway = "";
+
     @Column( name = "templateName" )
     private String templateName;
 
@@ -88,6 +91,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
         this.arch = hostInfo.getArch();
         this.status = hostInfo.getStatus();
         this.publicKey = hostInfo.getPublicKey();
+        this.gateway = hostInfo.getGateway();
         if ( arch == null )
         {
             arch = HostArchitecture.AMD64;
@@ -182,6 +186,19 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
     public Integer getVlan()
     {
         return vlan;
+    }
+
+
+    @Override
+    public String getGateway()
+    {
+        return gateway;
+    }
+
+
+    public void setGateway( final String gateway )
+    {
+        this.gateway = gateway;
     }
 
 

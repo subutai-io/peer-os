@@ -11,6 +11,7 @@ import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.net.util.SubnetUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
 
@@ -25,6 +26,7 @@ import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.common.util.RestUtil;
@@ -32,8 +34,12 @@ import io.subutai.core.broker.api.Broker;
 import io.subutai.core.broker.api.ClientCredentials;
 import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.env.api.exception.EnvironmentCreationException;
+import io.subutai.core.hostregistry.api.HostListener;
+import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.core.peer.api.HostNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.ResourceHost;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.exception.NodeRegistrationException;
@@ -54,7 +60,7 @@ import io.subutai.core.security.api.crypto.KeyManager;
 /**
  * Created by talas on 8/24/15.
  */
-public class RegistrationManagerImpl implements RegistrationManager
+public class RegistrationManagerImpl implements RegistrationManager, HostListener
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RegistrationManagerImpl.class );
     private SecurityManager securityManager;
@@ -319,13 +325,28 @@ public class RegistrationManagerImpl implements RegistrationManager
             //trigger environment import task
             try
             {
-                environmentManager.importEnvironment( String.format( "environment_%d", mapEntry.getKey() ), topology,
-                        classification, "", mapEntry.getKey(), UUID.fromString( registrationRequest.getId() ) );
+                Environment environment = environmentManager
+                        .importEnvironment( String.format( "environment_%d", mapEntry.getKey() ), topology,
+                                classification, "", mapEntry.getKey(), UUID.fromString( registrationRequest.getId() ) );
+                //Save container gateway from environment configuration to update container network configuration
+                // later when it will be available
+                SubnetUtils cidr;
+                try
+                {
+                    cidr = new SubnetUtils( environment.getSubnetCidr() );
+                }
+                catch ( IllegalArgumentException e )
+                {
+                    throw new RuntimeException( "Failed to parse subnet CIDR", e );
+                }
+
+                String gateway = cidr.getInfo().getLowAddress();
                 for ( final Set<HostInfo> infos : classification.values() )
                 {
                     for ( final HostInfo hostInfo : infos )
                     {
                         ContainerInfoImpl containerInfo = containerInfoDataService.find( hostInfo.getId().toString() );
+                        containerInfo.setGateway( gateway );
                         containerInfo.setStatus( RegistrationStatus.APPROVED );
                         containerInfoDataService.update( containerInfo );
                     }
@@ -334,6 +355,45 @@ public class RegistrationManagerImpl implements RegistrationManager
             catch ( EnvironmentCreationException e )
             {
                 LOGGER.error( "Error importing environment", e );
+            }
+        }
+    }
+
+
+    @Override
+    public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
+    {
+        RequestedHostImpl requestedHost = requestDataService.find( resourceHostInfo.getId() );
+        if ( requestedHost != null && requestedHost.getStatus() == RegistrationStatus.APPROVED )
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            try
+            {
+                ResourceHost resourceHost = localPeer.getResourceHostById( resourceHostInfo.getId() );
+                for ( final ContainerInfo containerInfo : requestedHost.getHostInfos() )
+                {
+                    if ( containerInfo.getStatus().equals( RegistrationStatus.APPROVED )
+                            && containerInfo.getVlan() != 0 )
+                    {
+
+                        ContainerInfoImpl containerInfoImpl =
+                                containerInfoDataService.find( containerInfo.getId().toString() );
+
+                        ContainerHost containerHost = resourceHost.getContainerHostById( containerInfo.getId() );
+                        containerHost.setDefaultGateway( containerInfoImpl.getGateway() );
+
+                        containerInfoImpl.setStatus( RegistrationStatus.REGISTERED );
+                        containerInfoDataService.update( containerInfoImpl );
+                    }
+                }
+            }
+            catch ( HostNotFoundException e )
+            {
+                LOGGER.error( "Error getting resource host", e );
+            }
+            catch ( PeerException e )
+            {
+                LOGGER.error( "Error setting container gateway", e );
             }
         }
     }
