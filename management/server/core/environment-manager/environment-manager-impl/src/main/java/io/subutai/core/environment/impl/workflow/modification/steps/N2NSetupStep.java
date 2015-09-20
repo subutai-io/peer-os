@@ -71,7 +71,7 @@ public class N2NSetupStep
         String communityName = N2NUtil.generateCommunityName( freeSubnet );
         String sharedKey = "secret";
         final String[] addresses = info.getAllAddresses();
-        int counter = environment.getPeerConfs().size() + 1;
+        int counter = environment.getPeerConfs().size();
         for ( Peer peer : peers )
         {
             if ( !peerIds.contains( peer.getId() ) )
@@ -103,19 +103,17 @@ public class N2NSetupStep
             tunnels.put( peerConf.getN2NConfig().getPeerId(), peerConf.getN2NConfig().getAddress() );
         }
 
-        int peersCount = environment.getPeerConfs().size();
-        ExecutorService tunnelExecutor = Executors.newFixedThreadPool( peersCount );
+        ExecutorService tunnelExecutor = Executors.newFixedThreadPool( peers.size() );
 
         ExecutorCompletionService<Integer> tunnelCompletionService =
                 new ExecutorCompletionService<Integer>( tunnelExecutor );
 
-
-        for ( Peer peer : peers )
+        for ( Peer peer : environment.getPeers() )
         {
             tunnelCompletionService.submit( new SetupTunnelTask( peer, environment.getId(), tunnels ) );
         }
 
-        for ( Peer peer : peers )
+        for ( Peer peer : environment.getPeers() )
         {
             final Future<Integer> f = tunnelCompletionService.take();
             Integer vlanId = f.get();

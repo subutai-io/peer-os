@@ -11,6 +11,7 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.Peer;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -207,4 +208,6 @@ public interface EnvironmentManager
 
     void removeContainerFromEnvironmentDomain( String containerHostId, String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
+
+    Peer resolvePeer( String peerId );
 }

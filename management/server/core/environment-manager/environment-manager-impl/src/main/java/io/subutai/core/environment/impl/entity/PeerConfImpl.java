@@ -75,7 +75,6 @@ public class PeerConfImpl implements PeerConf, Serializable
         this.n2NConfig = n2NConfig;
     }
 
-
     @Override
     public String toString()
     {
@@ -84,5 +83,36 @@ public class PeerConfImpl implements PeerConf, Serializable
         sb.append( ", n2NConfig=" ).append( n2NConfig );
         sb.append( '}' );
         return sb.toString();
+    }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof PeerConfImpl ) )
+        {
+            return false;
+        }
+
+        final PeerConfImpl peerConf = ( PeerConfImpl ) o;
+
+        if ( !environment.equals( peerConf.environment ) )
+        {
+            return false;
+        }
+        return n2NConfig.equals( peerConf.n2NConfig );
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        int result = environment.hashCode();
+        result = 31 * result + n2NConfig.hashCode();
+        return result;
     }
 }

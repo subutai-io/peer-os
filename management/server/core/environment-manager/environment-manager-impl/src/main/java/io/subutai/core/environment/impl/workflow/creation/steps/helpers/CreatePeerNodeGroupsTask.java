@@ -7,6 +7,7 @@ import java.util.concurrent.Callable;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
+import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.peer.HostInfoModel;
 import io.subutai.common.peer.Peer;
@@ -23,7 +24,7 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
     private final Peer peer;
     private final Set<NodeGroup> nodeGroups;
     private final LocalPeer localPeer;
-    private final EnvironmentImpl environment;
+    private final Environment environment;
     private final int ipAddressOffset;
     private final TemplateRegistry templateRegistry;
     private final String defaultDomain;
@@ -31,7 +32,7 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
 
 
     public CreatePeerNodeGroupsTask( final Peer peer, final Set<NodeGroup> nodeGroups, final LocalPeer localPeer,
-                                     final EnvironmentImpl environment, final int ipAddressOffset,
+                                     final Environment environment, final int ipAddressOffset,
                                      final TemplateRegistry templateRegistry, final String defaultDomain )
     {
         this.peer = peer;

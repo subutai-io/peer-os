@@ -40,6 +40,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.impl.dao.EnvironmentDataService;
+import io.subutai.core.peer.api.LocalPeer;
 
 
 /**
@@ -58,6 +59,9 @@ public class EnvironmentImpl implements Environment, Serializable
     @Id
     @Column( name = "environment_id" )
     private String environmentId;
+
+    @Column( name = "peer_id" )
+    private String peerId;
 
     @Column( name = "name" )
     private String name;
@@ -92,8 +96,8 @@ public class EnvironmentImpl implements Environment, Serializable
     private Long userId;
 
 
-    @Transient
-    private EnvironmentDataService dataService;
+    //    @Transient
+    //    private EnvironmentDataService dataService;
     @Transient
     private EnvironmentManager environmentManager;
 
@@ -158,7 +162,7 @@ public class EnvironmentImpl implements Environment, Serializable
     public void saveSshKey( final String sshKey )
     {
         this.publicKey = Strings.isNullOrEmpty( sshKey ) ? null : sshKey.trim();
-        dataService.update( this );
+        //        dataService.update( this );
     }
 
 
@@ -187,6 +191,19 @@ public class EnvironmentImpl implements Environment, Serializable
     public EnvironmentStatus getStatus()
     {
         return status;
+    }
+
+
+    @Override
+    public String getPeerId()
+    {
+        return peerId;
+    }
+
+
+    public void setPeerId( final String peerId )
+    {
+        this.peerId = peerId;
     }
 
 
@@ -317,10 +334,15 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         Set<Peer> peers = Sets.newHashSet();
 
-        for ( ContainerHost containerHost : getContainerHosts() )
+        for ( PeerConf peerConf : peerConfs )
         {
-            peers.add( containerHost.getPeer() );
+            peers.add( environmentManager.resolvePeer( peerConf.getN2NConfig().getPeerId() ) );
         }
+
+        //        for ( ContainerHost containerHost : getContainerHosts() )
+        //        {
+        //            peers.add( containerHost.getPeer() );
+        //        }
 
         return peers;
     }
@@ -339,7 +361,7 @@ public class EnvironmentImpl implements Environment, Serializable
                 containers.remove( container );
             }
 
-            dataService.update( this );
+            //            dataService.update( this );
         }
         catch ( ContainerHostNotFoundException e )
         {
@@ -362,7 +384,7 @@ public class EnvironmentImpl implements Environment, Serializable
             this.containers.addAll( containers );
         }
 
-        dataService.update( this );
+        //        dataService.update( this );
     }
 
 
@@ -372,16 +394,16 @@ public class EnvironmentImpl implements Environment, Serializable
 
         this.status = status;
 
-        dataService.update( this );
+        //        dataService.update( this );
     }
 
 
-    public void setDataService( final EnvironmentDataService dataService )
-    {
-        Preconditions.checkNotNull( dataService );
-
-        this.dataService = dataService;
-    }
+    //    public void setDataService( final EnvironmentDataService dataService )
+    //    {
+    //        Preconditions.checkNotNull( dataService );
+    //
+    ////        this.dataService = dataService;
+    //    }
 
 
     public void setEnvironmentManager( final EnvironmentManager environmentManager )
@@ -446,7 +468,7 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         this.vni = vni;
 
-        dataService.update( this );
+        //        dataService.update( this );
     }
 
 
@@ -460,7 +482,7 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         this.lastUsedIpIndex = lastUsedIpIndex;
 
-        dataService.update( this );
+        //        dataService.update( this );
     }
 
 

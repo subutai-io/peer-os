@@ -1,6 +1,7 @@
 package io.subutai.common.environment;
 
 
+import io.subutai.common.peer.Peer;
 import io.subutai.common.protocol.N2NConfig;
 
 
@@ -19,4 +20,5 @@ public interface PeerConf
     N2NConfig getN2NConfig();
 
     void setN2NConfig( N2NConfig config );
+
 }
