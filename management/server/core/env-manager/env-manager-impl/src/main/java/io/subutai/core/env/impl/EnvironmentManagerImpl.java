@@ -343,7 +343,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 {
                     continue;
                 }
-                ip = iface.getIp();
+                ip = iface.getIp() + "/24";
                 break;
             }
         }

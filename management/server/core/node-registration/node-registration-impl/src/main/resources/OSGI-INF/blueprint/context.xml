@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
            xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0">
+
+  <!-- Allow the use of system properties -->
+  <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
+
+  <cm:property-placeholder persistent-id="environment" update-strategy="none">
+    <cm:default-properties>
+      <cm:property name="defaultDomain" value="intra.lan" />
+    </cm:default-properties>
+  </cm:property-placeholder>
 
   <bean id="daoManager" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
     <jpa:unit unitname="nodeRegistrationUnit" property="entityManagerFactory" />
@@ -10,9 +21,11 @@
         init-method="init">
     <argument ref="securityManagerRef" />
     <argument ref="daoManager" />
+    <argument value="${defaultDomain}" />
     <property name="broker" ref="brokerRef" />
     <property name="environmentManager" ref="envRef" />
     <property name="peerManager" ref="peerRef" />
+    <property name="networkManager" ref="networkRef" />
   </bean>
 
   <service ref="registrationManager" interface="io.subutai.core.registration.api.RegistrationManager" />
@@ -30,5 +43,8 @@
 
   <reference id="peerRef" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
+
+  <reference id="networkRef" availability="mandatory"
+             interface="io.subutai.core.network.api.NetworkManager" />
 
 </blueprint>

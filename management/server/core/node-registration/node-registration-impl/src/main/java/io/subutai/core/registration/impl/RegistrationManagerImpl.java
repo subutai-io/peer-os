@@ -36,6 +36,8 @@ import io.subutai.core.env.api.EnvironmentManager;
 import io.subutai.core.env.api.exception.EnvironmentCreationException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.core.network.api.NetworkManager;
+import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.HostNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
@@ -69,16 +71,18 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     private ContainerTokenDataService containerTokenDataService;
     private DaoManager daoManager;
     private Broker broker;
+    private String domainName;
     private PeerManager peerManager;
     private EnvironmentManager environmentManager;
+    private NetworkManager networkManager;
 
-    public static final String PEER_SUBNET_MASK = "255.255.255.0";
 
-
-    public RegistrationManagerImpl( final SecurityManager securityManager, final DaoManager daoManager )
+    public RegistrationManagerImpl( final SecurityManager securityManager, final DaoManager daoManager,
+                                    String domainName )
     {
         this.securityManager = securityManager;
         this.daoManager = daoManager;
+        this.domainName = domainName;
     }
 
 
@@ -87,6 +91,18 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         containerTokenDataService = new ContainerTokenDataService( daoManager );
         requestDataService = new RequestDataService( daoManager );
         containerInfoDataService = new ContainerInfoDataService( daoManager );
+    }
+
+
+    public NetworkManager getNetworkManager()
+    {
+        return networkManager;
+    }
+
+
+    public void setNetworkManager( final NetworkManager networkManager )
+    {
+        this.networkManager = networkManager;
     }
 
 
@@ -370,6 +386,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             try
             {
                 ResourceHost resourceHost = localPeer.getResourceHostById( resourceHostInfo.getId() );
+                Map<Integer, Set<ContainerHost>> containerHostList = Maps.newHashMap();
                 for ( final ContainerInfo containerInfo : requestedHost.getHostInfos() )
                 {
                     if ( containerInfo.getStatus().equals( RegistrationStatus.APPROVED )
@@ -384,7 +401,21 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
                         containerInfoImpl.setStatus( RegistrationStatus.REGISTERED );
                         containerInfoDataService.update( containerInfoImpl );
+
+                        //we assume that newly imported environment has always default sshGroupId=1, hostsGroupId=1
+
+                        //configure hosts on each group | group containers by ssh group
+                        Set<ContainerHost> containers = containerHostList.get( containerInfoImpl.getVlan() );
+                        if ( containers == null )
+                        {
+                            containers = Sets.newHashSet();
+                        }
+                        containers.add( containerHost );
                     }
+                }
+                for ( final Map.Entry<Integer, Set<ContainerHost>> entry : containerHostList.entrySet() )
+                {
+                    configureHosts( entry.getValue() );
                 }
             }
             catch ( HostNotFoundException e )
@@ -395,7 +426,21 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             {
                 LOGGER.error( "Error setting container gateway", e );
             }
+            catch ( NetworkManagerException e )
+            {
+                LOGGER.error( "Error configuring container hosts", e );
+            }
         }
+    }
+
+
+    private void configureHosts( final Set<ContainerHost> containerHosts ) throws NetworkManagerException
+    {
+        //assume that inside one host group the domain name must be the same for all containers
+        //so pick one container's domain name as the group domain name
+        networkManager.registerHosts( containerHosts, domainName );
+
+        networkManager.exchangeSshKeys( containerHosts );
     }
 
 

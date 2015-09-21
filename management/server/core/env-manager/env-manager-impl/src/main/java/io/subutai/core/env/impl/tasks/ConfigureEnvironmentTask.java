@@ -6,8 +6,6 @@ import java.util.concurrent.Semaphore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
-
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.tracker.TrackerOperation;
@@ -60,7 +58,7 @@ public class ConfigureEnvironmentTask implements Awaitable
             {
                 op.addLog( "Ensuring secure channel..." );
 
-                op.addLog( "Cloning containers..." );
+                op.addLog( "Processing new containers..." );
 
                 LocalPeer localPeer = peerManager.getLocalPeer();
                 localPeer.processEnvironmentContainers( environment );
@@ -69,22 +67,23 @@ public class ConfigureEnvironmentTask implements Awaitable
 
                 op.addLog( "Configuring /etc/hosts..." );
 
-                environmentManager.configureHosts( environment.getContainerHosts() );
-
-                op.addLog( "Configuring ssh..." );
-
-                environmentManager.configureSsh( environment.getContainerHosts() );
-
-                if ( !Strings.isNullOrEmpty( environment.getSshKey() ) )
-                {
-                    op.addLog( "Setting environment ssh key.." );
-
-                    environmentManager.setSshKey( environment.getId(), environment.getSshKey(), false, false, op );
-                }
+                //TODO perform this task upon host registry container notification
+                //                environmentManager.configureHosts( environment.getContainerHosts() );
+                //
+                //                op.addLog( "Configuring ssh..." );
+                //
+                //                environmentManager.configureSsh( environment.getContainerHosts() );
+                //
+                //                if ( !Strings.isNullOrEmpty( environment.getSshKey() ) )
+                //                {
+                //                    op.addLog( "Setting environment ssh key.." );
+                //
+                //                    environmentManager.setSshKey( environment.getId(), environment.getSshKey(), false, false, op );
+                //                }
 
                 environment.setStatus( EnvironmentStatus.HEALTHY );
 
-                op.addLogDone( "Environment grown successfully" );
+                op.addLogDone( "Environment imported successfully" );
             }
             catch ( Exception e )
             {
