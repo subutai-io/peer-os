@@ -180,15 +180,16 @@ public class NodeGroupBuilder implements Callable<Set<NodeGroupBuildResult>>
             Set<EnvironmentContainerImpl> containers = Sets.newHashSet();
             try
             {
-                Map<String, String> peerIps = new HashMap();
+                Map<String, String> tunnels = new HashMap();
 
                 //add initiator peer mandatorily
-                peerIps.put( localPeer.getPeerInfo().getIp(), environment.findN2nIp( localPeer.getId().toString() ) );
+                tunnels.put( localPeer.getPeerInfo().getIp(), environment.findN2nIp( localPeer.getId().toString() ) );
 
-                combinePeers( localPeer, peerIps );
+
+                combinePeers( localPeer, tunnels );
 
                 Set<HostInfoModel> newHosts = peer.createContainerGroup(
-                        new CreateContainerGroupRequest( peerIps, environment.getId(), localPeer.getId(),
+                        new CreateContainerGroupRequest( tunnels, environment.getId(), localPeer.getId(),
                                 localPeer.getOwnerId(), environment.getSubnetCidr(),
                                 fetchRequiredTemplates( peer.getId(), nodeGroup.getTemplateName() ),
                                 nodeGroup.getNumberOfContainers(),
