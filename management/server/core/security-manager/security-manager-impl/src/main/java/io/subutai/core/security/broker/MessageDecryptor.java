@@ -78,12 +78,8 @@ public class MessageDecryptor implements ByteMessagePreProcessor
                     hostId = heartBeat.getHostInfo().getId();
                 }
 
-                UUID mgmtId = getPeerManager().getLocalPeer().getManagementHost().getId();
-                //todo refactor here when agent supplies proper fingerprint id and peer too
-                UUID keyId = mgmtId.equals( hostId ) ? getPeerManager().getLocalPeer().getId() : hostId;
-
                 PGPPublicKey hostKeyForVerifying =
-                        MessageEncryptor.getSecurityManager().getKeyManager().getPublicKey( keyId.toString() );
+                        MessageEncryptor.getSecurityManager().getKeyManager().getPublicKey( hostId.toString() );
 
                 if ( encryptionTool.verifySignature( contentAndSignatures, hostKeyForVerifying ) )
                 {

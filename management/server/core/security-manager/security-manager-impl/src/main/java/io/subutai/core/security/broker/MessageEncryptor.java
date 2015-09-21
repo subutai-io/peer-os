@@ -78,15 +78,9 @@ public class MessageEncryptor implements TextMessagePostProcessor
 
                 Request originalRequest = requestWrapper.getRequest();
 
-                UUID mgmtId = getPeerManager().getLocalPeer().getManagementHost().getId();
-
-                //todo refactor here when agent supplies proper fingerprint id and peer too
-                UUID keyId = mgmtId.equals( originalRequest.getId() ) ? getPeerManager().getLocalPeer().getId() :
-                             originalRequest.getId();
-
                 //obtain target host pub key for encrypting
                 PGPPublicKey hostKeyForEncrypting =
-                        MessageEncryptor.getSecurityManager().getKeyManager().getPublicKey( keyId.toString() );
+                        MessageEncryptor.getSecurityManager().getKeyManager().getPublicKey( originalRequest.getId().toString() );
 
                 if ( originalRequest.getCommand().toLowerCase().matches( CLONE_CMD_REGEX ) )
                 {
