@@ -1,11 +1,15 @@
 package io.subutai.core.security.broker;
 
 
+import java.util.List;
+
 import javax.naming.NamingException;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
 
 import io.subutai.common.command.Request;
 import io.subutai.common.command.RequestBuilder;
@@ -53,7 +57,6 @@ public class MessageEncryptor implements TextMessagePostProcessor
     {
         LOG.debug( String.format( "OUTGOING %s", message ) );
 
-        //assume this is a host  topic
         if ( encryptionEnabled )
         {
             try
@@ -70,14 +73,19 @@ public class MessageEncryptor implements TextMessagePostProcessor
 
                 if ( originalRequest.getCommand().toLowerCase().matches( CLONE_CMD_REGEX ) )
                 {
+
+                    //add token for container creation
+                    List<String> args = Lists.newArrayList( originalRequest.getArgs() );
+                    args.add( "-t" );
+                    args.add( getRegistrationManager().generateContainerTTLToken(
+                            ( originalRequest.getTimeout() + Common.WAIT_CONTAINER_CONNECTION_SEC + 10 ) * 1000L )
+                                                      .getToken() );
+
                     //add token for container creation
                     originalRequest =
                             new RequestBuilder.RequestImpl( originalRequest.getType(), originalRequest.getId(),
                                     originalRequest.getCommandId(), originalRequest.getWorkingDirectory(),
-                                    String.format( "%s -t %s", originalRequest.getCommand(), getRegistrationManager()
-                                            .generateContainerTTLToken( ( originalRequest.getTimeout()
-                                                    + Common.WAIT_CONTAINER_CONNECTION_SEC + 10 ) * 1000L )
-                                            .getToken() ), originalRequest.getArgs(), originalRequest.getEnvironment(),
+                                    originalRequest.getCommand(), args, originalRequest.getEnvironment(),
                                     originalRequest.getStdOut(), originalRequest.getStdErr(),
                                     originalRequest.getRunAs(), originalRequest.getTimeout(),
                                     originalRequest.isDaemon(), originalRequest.getConfigPoints(),

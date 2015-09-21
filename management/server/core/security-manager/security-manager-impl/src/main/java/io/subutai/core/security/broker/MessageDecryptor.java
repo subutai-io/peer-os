@@ -67,7 +67,7 @@ public class MessageDecryptor implements ByteMessagePreProcessor
 
 
                 PGPPublicKey hostKeyForVerifying =
-                        MessageEncryptor.getSecurityManager().getKeyManager().getPublicKey( hostId.toString() );
+                        MessageEncryptor.getSecurityManager().getKeyManager().getPublicKey( hostId );
 
                 if ( encryptionTool.verifySignature( contentAndSignatures, hostKeyForVerifying ) )
                 {
