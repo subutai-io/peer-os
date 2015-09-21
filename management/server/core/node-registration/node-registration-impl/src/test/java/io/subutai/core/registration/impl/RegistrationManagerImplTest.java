@@ -57,7 +57,7 @@ public class RegistrationManagerImplTest
     @Before
     public void setUp() throws Exception
     {
-        registrationManager = new RegistrationManagerImpl( securityManager, daoManager );
+        registrationManager = new RegistrationManagerImpl( securityManager, daoManager, "" );
         registrationManager.setRequestDataService( requestDataService );
 
         RequestedHostImpl host1 = mock( RequestedHostImpl.class );
