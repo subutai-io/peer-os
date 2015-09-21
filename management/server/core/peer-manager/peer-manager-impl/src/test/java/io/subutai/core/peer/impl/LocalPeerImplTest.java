@@ -67,6 +67,7 @@ import io.subutai.core.peer.impl.entity.ResourceHostEntity;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.strategy.api.StrategyManager;
+import junit.framework.TestCase;
 
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertEquals;
@@ -556,7 +557,7 @@ public class LocalPeerImplTest
 
         when( hostRegistry.getHostInfoById( CONTAINER_HOST_ID ) ).thenReturn( hostInfo );
 
-        assertFalse( localPeer.isConnected( containerHost ) );
+        TestCase.assertTrue( localPeer.isConnected( containerHost ) );
 
         HostDisconnectedException hostDisconnectedException = mock( HostDisconnectedException.class );
 
