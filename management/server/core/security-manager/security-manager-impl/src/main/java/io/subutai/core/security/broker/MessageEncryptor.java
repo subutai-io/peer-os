@@ -2,7 +2,6 @@ package io.subutai.core.security.broker;
 
 
 import java.util.List;
-import java.util.UUID;
 
 import javax.naming.NamingException;
 
@@ -19,7 +18,6 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.UUIDUtil;
 import io.subutai.core.broker.api.TextMessagePostProcessor;
-import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -55,13 +53,6 @@ public class MessageEncryptor implements TextMessagePostProcessor
     }
 
 
-    public static PeerManager getPeerManager() throws NamingException
-    {
-
-        return ServiceLocator.getServiceNoCache( PeerManager.class );
-    }
-
-
     @Override
     public String process( final String topic, final String message )
     {
@@ -79,8 +70,8 @@ public class MessageEncryptor implements TextMessagePostProcessor
                 Request originalRequest = requestWrapper.getRequest();
 
                 //obtain target host pub key for encrypting
-                PGPPublicKey hostKeyForEncrypting =
-                        MessageEncryptor.getSecurityManager().getKeyManager().getPublicKey( originalRequest.getId().toString() );
+                PGPPublicKey hostKeyForEncrypting = MessageEncryptor.getSecurityManager().getKeyManager()
+                                                                    .getPublicKey( originalRequest.getId().toString() );
 
                 if ( originalRequest.getCommand().toLowerCase().matches( CLONE_CMD_REGEX ) )
                 {

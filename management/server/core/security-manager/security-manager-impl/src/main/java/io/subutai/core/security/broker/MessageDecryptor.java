@@ -3,18 +3,14 @@ package io.subutai.core.security.broker;
 
 import java.util.UUID;
 
-import javax.naming.NamingException;
-
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.broker.api.ByteMessagePreProcessor;
 import io.subutai.core.broker.api.Topic;
-import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 
 
@@ -31,13 +27,6 @@ public class MessageDecryptor implements ByteMessagePreProcessor
     public MessageDecryptor( final boolean encryptionEnabled )
     {
         this.encryptionEnabled = encryptionEnabled;
-    }
-
-
-    public static PeerManager getPeerManager() throws NamingException
-    {
-
-        return ServiceLocator.getServiceNoCache( PeerManager.class );
     }
 
 
