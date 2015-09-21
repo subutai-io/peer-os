@@ -74,7 +74,6 @@ public class MessageEncryptor implements TextMessagePostProcessor
             {
                 EncryptionTool encryptionTool = getSecurityManager().getEncryptionTool();
 
-
                 RequestWrapper requestWrapper = JsonUtil.fromJson( message, RequestWrapper.class );
 
                 Request originalRequest = requestWrapper.getRequest();
