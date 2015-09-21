@@ -23,7 +23,7 @@ public class ContainerInfoJson implements ContainerInfo
     private String hostname;
     private Integer vlan;
     private String templateName;
-    private Set<HostInterfaceJson> netInterfaces = new HashSet<>();
+    private Set<HostInterfaceJson> interfaces = new HashSet<>();
     private HostArchitecture arch;
     private String publicKey;
     private String gateway;
@@ -52,7 +52,7 @@ public class ContainerInfoJson implements ContainerInfo
         }
         for ( Interface anInterface : hostInfo.getInterfaces() )
         {
-            this.netInterfaces.add( new HostInterfaceJson( anInterface ) );
+            this.interfaces.add( new HostInterfaceJson( anInterface ) );
         }
     }
 
@@ -88,7 +88,7 @@ public class ContainerInfoJson implements ContainerInfo
     public Set<Interface> getInterfaces()
     {
         Set<Interface> result = Sets.newHashSet();
-        result.addAll( this.netInterfaces );
+        result.addAll( this.interfaces );
         return result;
     }
 
@@ -173,8 +173,8 @@ public class ContainerInfoJson implements ContainerInfo
 
         final ContainerInfoJson that = ( ContainerInfoJson ) o;
 
-        return arch == that.arch && hostname.equals( that.hostname ) && id.equals( that.id ) && netInterfaces
-                .equals( that.netInterfaces );
+        return arch == that.arch && hostname.equals( that.hostname ) && id.equals( that.id ) && interfaces
+                .equals( that.interfaces );
     }
 
 
@@ -191,7 +191,7 @@ public class ContainerInfoJson implements ContainerInfo
         return "ContainerHostInfoModel{" +
                 "id='" + id + '\'' +
                 ", hostname='" + hostname + '\'' +
-                ", netInterfaces=" + netInterfaces +
+                ", interfaces=" + interfaces +
                 ", arch=" + arch +
                 '}';
     }
