@@ -1380,7 +1380,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             for ( PeerConf peerConf : environment.getPeerConfs() )
             {
                 Peer peer = peerManager.getPeer( peerConf.getN2NConfig().getPeerId() );
-                peer.removeN2NConnection( peerConf.getN2NConfig() );
+                try
+                {
+                    peer.removeN2NConnection( peerConf.getN2NConfig() );
+                }
+                catch ( Exception e )
+                {
+                    LOGGER.warn( e.getMessage() );
+                }
             }
         }
         catch ( Exception e )
