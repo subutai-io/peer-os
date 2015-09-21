@@ -35,6 +35,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>node-registration-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>peer-manager-api</artifactId>
+    </dependency>
 
     <!-- ********* KeyServer ************* -->
     <dependency>
