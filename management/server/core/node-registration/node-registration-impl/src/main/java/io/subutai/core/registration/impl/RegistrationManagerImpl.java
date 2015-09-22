@@ -420,7 +420,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             }
             catch ( HostNotFoundException e )
             {
-                LOGGER.error( "Error getting resource host", e );
+//                LOGGER.error( "Error getting resource host", e );
             }
             catch ( PeerException e )
             {

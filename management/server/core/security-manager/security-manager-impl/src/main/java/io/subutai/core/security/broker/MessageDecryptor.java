@@ -33,7 +33,7 @@ public class MessageDecryptor implements ByteMessagePreProcessor
     @Override
     public byte[] process( final String topic, final byte[] message )
     {
-        LOG.debug( String.format( "INCOMING %s", new String( message ) ) );
+        //        LOG.debug( String.format( "INCOMING %s", new String( message ) ) );
 
         //process incoming heartbeats and responses
         if ( encryptionEnabled && ( Topic.RESPONSE_TOPIC.name().equalsIgnoreCase( topic ) || Topic.HEARTBEAT_TOPIC
