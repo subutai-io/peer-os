@@ -55,5 +55,7 @@ public interface Host extends Serializable
 
     public String getMacByInterfaceName( String interfaceName );
 
+    void setNetInterfaces( Set<Interface> interfaces );
+
     public HostArchitecture getHostArchitecture();
 }

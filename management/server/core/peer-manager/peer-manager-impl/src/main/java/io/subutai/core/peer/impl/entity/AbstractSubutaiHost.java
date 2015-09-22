@@ -231,6 +231,7 @@ public abstract class AbstractSubutaiHost implements Host
     }
 
 
+    @Override
     public void setNetInterfaces( Set<Interface> interfaces )
     {
         this.interfaces.clear();
