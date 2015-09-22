@@ -30,7 +30,7 @@ public class TagsWindow extends Window
             EnvironmentManager environmentManager = serviceLocator.getService( EnvironmentManager.class );
             String environmentId = containerHost.getEnvironmentId();
 
-            Environment environment = environmentManager.findEnvironment( environmentId );
+            Environment environment = environmentManager.loadEnvironment( environmentId );
             environmentContainer = environment.getContainerHostById( containerHost.getId() );
         }
         catch ( Exception e )

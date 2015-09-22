@@ -59,7 +59,11 @@ import io.subutai.core.peer.api.LocalPeer;
 @Access( AccessType.FIELD )
 public class EnvironmentImpl implements Environment, Serializable
 {
+    @Transient
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentImpl.class );
+
+    @Transient
+    private EnvironmentManager environmentManager;
 
     @Id
     @Column( name = "environment_id" )
@@ -114,9 +118,6 @@ public class EnvironmentImpl implements Environment, Serializable
 
     @Column( name = "user_id" )
     private Long userId;
-
-    @Transient
-    private EnvironmentManager environmentManager;
 
 
     protected EnvironmentImpl()
@@ -305,10 +306,11 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public Set<ContainerHost> getContainerHosts()
     {
-        synchronized ( containers )
-        {
-            return Sets.newConcurrentHashSet( containers );
-        }
+        return containers;
+        //        synchronized ( containers )
+        //        {
+        //            return Sets.newConcurrentHashSet( containers );
+        //        }
     }
 
 

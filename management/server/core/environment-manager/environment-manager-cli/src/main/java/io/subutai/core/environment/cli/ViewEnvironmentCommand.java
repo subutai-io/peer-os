@@ -43,7 +43,7 @@ public class ViewEnvironmentCommand extends SubutaiShellCommandSupport
     protected Object doExecute() throws Exception
     {
 
-        Environment environment = environmentManager.findEnvironment( environmentId );
+        Environment environment = environmentManager.loadEnvironment( environmentId );
 
         System.out.println( String.format( "Environment name %s", environment.getName() ) );
 

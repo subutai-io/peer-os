@@ -47,7 +47,7 @@ public class ContainerHostMetricsCommandTest extends SystemOutRedirectTest
         ContainerHostMetric metric = mock( ContainerHostMetric.class );
         when( metric.toString() ).thenReturn( METRIC_TO_STRING );
         when( monitor.getContainerHostsMetrics( environment ) ).thenReturn( Sets.newHashSet( metric ) );
-        when( environmentManager.findEnvironment( ENVIRONMENT_ID ) ).thenReturn( environment );
+        when( environmentManager.loadEnvironment( ENVIRONMENT_ID ) ).thenReturn( environment );
         containerHostMetricsCommand = new ContainerHostMetricsCommand( monitor, environmentManager );
         containerHostMetricsCommand.environmentIdString = ENVIRONMENT_ID.toString();
     }
@@ -80,7 +80,7 @@ public class ContainerHostMetricsCommandTest extends SystemOutRedirectTest
     public void testDoExecuteWithMissingEnvironment() throws Exception
     {
         doThrow( new EnvironmentNotFoundException( null ) ).when( environmentManager )
-                                                           .findEnvironment( ENVIRONMENT_ID );
+                                                           .loadEnvironment( ENVIRONMENT_ID );
 
         containerHostMetricsCommand.doExecute();
 

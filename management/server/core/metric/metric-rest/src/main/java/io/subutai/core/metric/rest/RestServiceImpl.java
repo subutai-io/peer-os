@@ -69,7 +69,7 @@ public class RestServiceImpl implements RestService
             Environment environment;
             try
             {
-                environment = environmentManager.findEnvironment( environmentId );
+                environment = environmentManager.loadEnvironment( environmentId );
             }
             catch ( EnvironmentNotFoundException e )
             {

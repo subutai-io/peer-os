@@ -197,7 +197,7 @@ public class MonitorImplTest
         when( containerHost.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID.toString() );
         when( containerHost.getId() ).thenReturn( HOST_ID );
         when( localPeer.getResourceHosts() ).thenReturn( Sets.newHashSet( resourceHost ) );
-        when( environmentManager.findEnvironment( ENVIRONMENT_ID ) ).thenReturn( environment );
+        when( environmentManager.loadEnvironment( ENVIRONMENT_ID ) ).thenReturn( environment );
     }
 
 

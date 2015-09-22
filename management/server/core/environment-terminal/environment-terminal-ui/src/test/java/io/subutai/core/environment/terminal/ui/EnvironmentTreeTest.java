@@ -123,7 +123,7 @@ public class EnvironmentTreeTest
 
 
         when( environmentManager.getEnvironments() ).thenReturn( Sets.newHashSet( environmentA ) );
-        when( environmentManager.findEnvironment( PEER_ID ) ).thenReturn( environmentA );
+        when( environmentManager.loadEnvironment( PEER_ID ) ).thenReturn( environmentA );
 
         Set<ContainerHost> containers = Sets.newHashSet( containerHostA );
         when( environmentA.getContainerHosts() ).thenReturn( containers );
@@ -161,7 +161,7 @@ public class EnvironmentTreeTest
 
 
         when( environmentManager.getEnvironments() ).thenReturn( Sets.newHashSet( environmentA ) );
-        when( environmentManager.findEnvironment( PEER_ID ) ).thenReturn( environmentA );
+        when( environmentManager.loadEnvironment( PEER_ID ) ).thenReturn( environmentA );
 
         Set<ContainerHost> containers = Sets.newHashSet( containerHostA, containerHostB );
 

@@ -120,7 +120,7 @@ public interface EnvironmentManager
      *
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
-    Environment findEnvironment( String environmentId ) throws EnvironmentNotFoundException;
+    Environment loadEnvironment( String environmentId ) throws EnvironmentNotFoundException;
 
 
     /**
@@ -177,7 +177,8 @@ public interface EnvironmentManager
      * @param environmentId - id of the environment which domain to remove
      * @param async - indicates whether operation is done synchronously or asynchronously to the calling party
      */
-    void removeEnvironmentDomain( String environmentId ) throws EnvironmentModificationException, EnvironmentNotFoundException;
+    void removeEnvironmentDomain( String environmentId )
+            throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     /**
      * Assigns a domain to the environment. External client would be able to access the environment containers via the
@@ -197,7 +198,8 @@ public interface EnvironmentManager
      *
      * @return - domain url or null if not assigned
      */
-    String getEnvironmentDomain( String environmentId ) throws EnvironmentManagerException, EnvironmentNotFoundException;
+    String getEnvironmentDomain( String environmentId )
+            throws EnvironmentManagerException, EnvironmentNotFoundException;
 
 
     boolean isContainerInEnvironmentDomain( String containerHostId, String environmentId )
@@ -214,4 +216,6 @@ public interface EnvironmentManager
     Peer resolvePeer( String peerId );
 
     void notifyOnContainerDestroyed( Environment environment, String containerId );
+
+//    void saveOrUpdate( Environment environment );
 }

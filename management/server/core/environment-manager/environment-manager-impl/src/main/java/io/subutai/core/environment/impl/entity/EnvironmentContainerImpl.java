@@ -64,7 +64,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     private String hostId;
     @Column( name = "hostname", nullable = false )
     private String hostname;
-    @Column( name = "containerName", nullable = false )
+    @Column( name = "containerName", nullable = true )
     private String containerName;
     @Column( name = "node_group_name", nullable = false )
     private String nodeGroupName;
@@ -100,8 +100,8 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
     @Transient
     private Peer peer;
-    @Transient
-    private DataService<String, EnvironmentContainerImpl> dataService;
+//    @Transient
+//    private DataService<String, EnvironmentContainerImpl> dataService;
     @Transient
     private EnvironmentManager environmentManager;
 
@@ -158,13 +158,13 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
         }
     }
 
-
-    public void setDataService( final DataService dataService )
-    {
-        Preconditions.checkNotNull( dataService );
-
-        this.dataService = dataService;
-    }
+//
+//    public void setDataService( final DataService dataService )
+//    {
+//        Preconditions.checkNotNull( dataService );
+//
+//        this.dataService = dataService;
+//    }
 
 
     public void setPeer( final Peer peer )
@@ -301,7 +301,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
         this.tags.add( tag );
-        dataService.update( this );
+//        dataService.update( this );
     }
 
 
@@ -310,7 +310,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
         this.tags.remove( tag );
-        dataService.update( this );
+//        dataService.update( this );
     }
 
 

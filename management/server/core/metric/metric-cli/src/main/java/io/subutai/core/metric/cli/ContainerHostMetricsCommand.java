@@ -46,7 +46,7 @@ public class ContainerHostMetricsCommand extends SubutaiShellCommandSupport
     {
         try
         {
-            Environment environment = environmentManager.findEnvironment( environmentIdString );
+            Environment environment = environmentManager.loadEnvironment( environmentIdString );
             Set<ContainerHostMetric> metrics = monitor.getContainerHostsMetrics( environment );
             for ( ContainerHostMetric metric : metrics )
             {

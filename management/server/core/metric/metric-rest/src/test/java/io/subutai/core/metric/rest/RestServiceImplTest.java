@@ -128,7 +128,7 @@ public class RestServiceImplTest
     {
         String environmentId = UUID.randomUUID().toString();
         Environment environment = mock( Environment.class );
-        when( environmentManager.findEnvironment( environmentId ) ).thenReturn( environment );
+        when( environmentManager.loadEnvironment( environmentId ) ).thenReturn( environment );
         when( monitor.getContainerHostsMetrics( environment ) ).thenReturn( Sets.newHashSet( containerHostMetric ) );
 
         Response response = restService.getContainerHostsMetrics( environmentId.toString() );
@@ -144,7 +144,7 @@ public class RestServiceImplTest
     public void testGetContainerHostMetricsWithNullEnvironment() throws Exception
     {
         String environmentId = UUID.randomUUID().toString();
-        doThrow( new EnvironmentNotFoundException( null ) ).when( environmentManager ).findEnvironment( environmentId );
+        doThrow( new EnvironmentNotFoundException( null ) ).when( environmentManager ).loadEnvironment( environmentId );
 
         Response response = restService.getContainerHostsMetrics( environmentId.toString() );
 
@@ -157,7 +157,7 @@ public class RestServiceImplTest
     {
         String environmentId = UUID.randomUUID().toString();
         Environment environment = mock( Environment.class );
-        when( environmentManager.findEnvironment( environmentId ) ).thenReturn( environment );
+        when( environmentManager.loadEnvironment( environmentId ) ).thenReturn( environment );
         when( monitor.getContainerHostsMetrics( environment ) ).thenThrow( new MonitorException( "" ) );
 
         Response response = restService.getContainerHostsMetrics( environmentId.toString() );

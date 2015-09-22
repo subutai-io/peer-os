@@ -287,7 +287,7 @@ public class EnvironmentTree extends ConcurrentComponent
         {
             Set<String> matchedContainerNames = Sets.newHashSet();
 
-            Environment env = environmentManager.findEnvironment( environment.getId() );
+            Environment env = environmentManager.loadEnvironment( environment.getId() );
 
             for ( ContainerHost ec : env.getContainerHosts() )
             {
@@ -331,7 +331,7 @@ public class EnvironmentTree extends ConcurrentComponent
         {
             try
             {
-                Environment env = environmentManager.findEnvironment( environment.getId() );
+                Environment env = environmentManager.loadEnvironment( environment.getId() );
 
                 Set<String> presentItems = Sets.newHashSet();
                 fillWithEnvironmentContainers( env, presentItems );

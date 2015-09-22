@@ -48,7 +48,7 @@ public class GetContainerQuotaCommand extends SubutaiShellCommandSupport
 
 
         Peer peer = peerManager.getPeer( peerId );
-        Environment environment = environmentManager.findEnvironment( environmentId );
+        Environment environment = environmentManager.loadEnvironment( environmentId );
 
         ContainerHost targetContainer = environment.getContainerHostByHostname( containerName );
         if ( targetContainer == null )

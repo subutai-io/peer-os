@@ -9,6 +9,7 @@ import org.apache.servicemix.beanflow.Workflow;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.destruction.steps.CleanUpNetworkStep;
@@ -24,16 +25,16 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentDestructionWorkflow.class );
 
     private final PeerManager peerManager;
-    private final EnvironmentManager environmentManager;
+    private final EnvironmentManagerImpl environmentManager;
     private final EnvironmentImpl environment;
     private final boolean forceMetadataRemoval;
     private final TrackerOperation operationTracker;
-    private final EnvironmentDataService dataService;
+    //    private final EnvironmentDataService dataService;
 
     private Throwable error;
 
 
-    public static enum EnvironmentDestructionPhase
+    public enum EnvironmentDestructionPhase
     {
         INIT,
         DESTROY_CONTAINERS,
@@ -44,10 +45,10 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     }
 
 
-    public EnvironmentDestructionWorkflow( final PeerManager peerManager,
-                                           final EnvironmentManager environmentManager,
+    public EnvironmentDestructionWorkflow( final PeerManager peerManager, final EnvironmentManagerImpl environmentManager,
                                            final EnvironmentImpl environment, final boolean forceMetadataRemoval,
-                                           final TrackerOperation operationTracker, final EnvironmentDataService dataService )
+                                           final TrackerOperation operationTracker/*, final EnvironmentDataService
+                                           dataService*/ )
     {
         super( EnvironmentDestructionPhase.INIT );
 
@@ -56,7 +57,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
         this.environment = environment;
         this.forceMetadataRemoval = forceMetadataRemoval;
         this.operationTracker = operationTracker;
-        this.dataService = dataService;
+        //        this.dataService = dataService;
     }
 
 
@@ -129,6 +130,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
         }
     }
 
+
     public EnvironmentDestructionPhase REMOVE_KEYS()
     {
         operationTracker.addLog( "Removing keys" );
@@ -152,7 +154,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     {
         LOG.info( "Finalizing environment destruction" );
 
-        dataService.remove( environment.getId() );
+        environmentManager.remove( environment );
 
         operationTracker.addLogDone( "Environment is destroyed" );
 

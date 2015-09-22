@@ -220,7 +220,7 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            Environment environment = environmentManager.findEnvironment( environmentId );
+            Environment environment = environmentManager.loadEnvironment( environmentId );
 
             return Response.ok( JsonUtil.toJson(
                     new EnvironmentJson( environment.getId(), environment.getName(), environment.getStatus(),

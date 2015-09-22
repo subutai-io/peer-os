@@ -741,7 +741,7 @@ public class MonitorImpl implements Monitor
         try
         {
             //obtain user from environment
-            Environment environment = environmentManager.findEnvironment( metric.getEnvironmentId() );
+            Environment environment = environmentManager.loadEnvironment( metric.getEnvironmentId() );
             User user = identityManager.getUser( environment.getUserId() );
 
             if ( user == null )

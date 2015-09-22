@@ -223,7 +223,7 @@ public class ContainersWindow extends Window
                     containerHost.dispose();
                     try
                     {
-                        environment = environmentManager.findEnvironment( environment.getId() );
+                        environment = environmentManager.loadEnvironment( environment.getId() );
                     }
                     catch ( EnvironmentNotFoundException e )
                     {

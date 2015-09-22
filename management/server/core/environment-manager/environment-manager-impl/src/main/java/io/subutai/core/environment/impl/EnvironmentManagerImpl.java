@@ -115,7 +115,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 //                try
                 //                {
-                //                    notifyOnEnvironmentCreated( findEnvironment( environment.getId() ) );
+                //                    notifyOnEnvironmentCreated( loadEnvironment( environment.getId() ) );
                 notifyOnEnvironmentCreated( environment );
                 //                }
                 //                catch ( EnvironmentNotFoundException e )
@@ -175,7 +175,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, checkAccess );
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
         {
@@ -205,7 +205,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 {
                     Set<ContainerHost> newContainers = Sets.newHashSet( environment.getContainerHosts() );
                     newContainers.removeAll( oldContainers );
-                    notifyOnEnvironmentGrown( findEnvironment( environment.getId(), checkAccess ), newContainers );
+                    notifyOnEnvironmentGrown( loadEnvironment( environment.getId(), checkAccess ), newContainers );
                 }
                 catch ( EnvironmentNotFoundException e )
                 {
@@ -262,7 +262,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, checkAccess );
 
         SshKeyModificationWorkflow sshKeyModificationWorkflow =
                 getSshKeyModificationWorkflow( environment, sshKey, networkManager, operationTracker );
@@ -303,7 +303,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, checkAccess );
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
         {
@@ -326,7 +326,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 try
                 {
-                    findEnvironment( environmentId );
+                    loadEnvironment( environmentId );
                 }
                 catch ( EnvironmentNotFoundException e )
                 {
@@ -373,7 +373,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, checkAccess );
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
         {
@@ -417,9 +417,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public Environment findEnvironment( final String environmentId ) throws EnvironmentNotFoundException
+    public Environment loadEnvironment( final String environmentId ) throws EnvironmentNotFoundException
     {
-        return findEnvironment( environmentId, false );
+        return loadEnvironment( environmentId, false );
     }
 
 
@@ -444,7 +444,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        findEnvironment( environmentId, checkAccess );
+        loadEnvironment( environmentId, checkAccess );
 
         environmentDataService.remove( environmentId );
 
@@ -511,7 +511,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         try
         {
-            Environment environment = findEnvironment( environmentId );
+            Environment environment = loadEnvironment( environmentId );
             Set<ContainerHost> containerHosts = environment.getContainerHosts();
 
             for ( final ContainerHost containerHost : containerHosts )
@@ -575,7 +575,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, checkAccess );
 
         try
         {
@@ -604,7 +604,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, true );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, true );
 
         try
         {
@@ -624,7 +624,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, true );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, true );
 
         try
         {
@@ -669,7 +669,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId, checkAccess );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, checkAccess );
 
         ContainerHost containerHost = environment.getContainerHostById( containerHostId );
         try
@@ -705,8 +705,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                                                           final Topology topology, final String sshKey,
                                                                           final TrackerOperation operationTracker )
     {
-        return new EnvironmentCreationWorkflow( defaultDomain, templateRegistry, networkManager, peerManager,
-                environment, topology, sshKey, operationTracker, environmentDataService );
+        return new EnvironmentCreationWorkflow( defaultDomain, templateRegistry, this, networkManager, peerManager,
+                environment, topology, sshKey, operationTracker/*, environmentDataService*/ );
     }
 
 
@@ -728,7 +728,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                                                                         operationTracker )
     {
         return new EnvironmentDestructionWorkflow( peerManager, environmentManager, environment, forceMetadataRemoval,
-                operationTracker, environmentDataService );
+                operationTracker/*, environmentDataService*/ );
     }
 
 
@@ -751,7 +751,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    protected Environment findEnvironment( final String environmentId, boolean checkAccess )
+    protected Environment loadEnvironment( final String environmentId, boolean checkAccess )
             throws EnvironmentNotFoundException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
@@ -806,7 +806,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         for ( ContainerHost containerHost : environment.getContainerHosts() )
         {
-            ( ( EnvironmentContainerImpl ) containerHost ).setDataService( environmentContainerDataService );
+//            ( ( EnvironmentContainerImpl ) containerHost ).setDataService( environmentContainerDataService );
             ( ( EnvironmentContainerImpl ) containerHost ).setEnvironmentManager( this );
 
 
@@ -911,8 +911,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final EnvironmentImpl environment = new EnvironmentImpl( name, subnetCidr, sshKey, getUserId() );
 
-        //        saveEnvironment( environment );
-
         setEnvironmentTransientFields( environment );
 
         notifyOnEnvironmentCreated( environment );
@@ -983,5 +981,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public Peer resolvePeer( final String peerId )
     {
         return peerManager.getPeer( peerId );
+    }
+
+
+    public void saveOrUpdate( final EnvironmentImpl environment )
+    {
+        environmentDataService.saveOrUpdate( environment );
+    }
+
+
+    public void remove( final EnvironmentImpl environment )
+    {
+        environmentDataService.remove( environment );
     }
 }

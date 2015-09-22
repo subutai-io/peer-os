@@ -77,7 +77,7 @@ public class RestServiceImplTest
         when( containerHost.getTemplateName() ).thenReturn( TestUtil.TEMPLATE_NAME );
         when( containerHost.getStatus() ).thenReturn( TestUtil.CONTAINER_STATE );
         when( environmentManager.getEnvironments() ).thenReturn( Sets.newHashSet( environment ) );
-        when( environmentManager.findEnvironment( TestUtil.ENV_ID ) ).thenReturn( environment );
+        when( environmentManager.loadEnvironment( TestUtil.ENV_ID ) ).thenReturn( environment );
         when( environment.getContainerHostById( TestUtil.CONTAINER_ID ) ).thenReturn( containerHost );
     }
 
@@ -90,7 +90,7 @@ public class RestServiceImplTest
                                                                  anyString(), anyString(), anyBoolean() );
 
         doThrow( new EnvironmentNotFoundException( "" ) ).when( environmentManager )
-                                                         .findEnvironment( any( String.class ) );
+                                                         .loadEnvironment( any( String.class ) );
     }
 
 
