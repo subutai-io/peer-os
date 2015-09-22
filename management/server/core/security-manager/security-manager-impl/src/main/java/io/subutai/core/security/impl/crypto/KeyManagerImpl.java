@@ -348,21 +348,30 @@ public class KeyManagerImpl implements KeyManager
         {
             PGPSecretKeyRing secretKeyRing = null;
             String fingerprint = securityManagerDAO.getSecretKeyFingerprint( hostId );
-            secretKeyRing = PGPKeyUtil.readSecretKeyRing( secretKeyStoreDAO.getSecretKeyData( fingerprint ).getData() );
 
-            if ( secretKeyRing != null )
-            {
-                return secretKeyRing;
-            }
-            else
+            if(Strings.isNullOrEmpty( fingerprint ))
             {
                 LOG.error( "Object not found with fprint:" + fingerprint );
                 return null;
             }
+            else
+            {
+                secretKeyRing = PGPKeyUtil.readSecretKeyRing( secretKeyStoreDAO.getSecretKeyData( fingerprint ).getData() );
+
+                if ( secretKeyRing != null )
+                {
+                    return secretKeyRing;
+                }
+                else
+                {
+                    LOG.error( "Object not found with fprint:" + fingerprint );
+                    return null;
+                }
+            }
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error getting Secret key:" + ex.toString() );
+            LOG.error( "Error getting Secret key:" + ex.toString(), ex );
             return null;
         }
     }
