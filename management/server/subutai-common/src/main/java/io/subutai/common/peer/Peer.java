@@ -27,8 +27,11 @@ import io.subutai.common.quota.RamQuota;
 
 /**
  * Peer interface
+ *
+ * TODO separate methods into PeerSpecific and EnvironmentSpecific interfaces
+ * this interface should be a marker interface @Nurkaly do this
  */
-public interface Peer
+public interface Peer extends PeerSpecific, EnvironmentSpecific
 {
 
     /**
