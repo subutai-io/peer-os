@@ -8,7 +8,7 @@ import org.apache.servicemix.beanflow.Workflow;
 
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.tracker.TrackerOperation;
-import io.subutai.core.environment.impl.EnvironmentManagerImpl;
+import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.destruction.steps.CleanUpNetworkStep;
@@ -24,7 +24,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentDestructionWorkflow.class );
 
     private final PeerManager peerManager;
-    private final EnvironmentManagerImpl environmentManager;
+    private final EnvironmentManager environmentManager;
     private final EnvironmentImpl environment;
     private final boolean forceMetadataRemoval;
     private final TrackerOperation operationTracker;
@@ -45,7 +45,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
 
     public EnvironmentDestructionWorkflow( final PeerManager peerManager,
-                                           final EnvironmentManagerImpl environmentManager,
+                                           final EnvironmentManager environmentManager,
                                            final EnvironmentImpl environment, final boolean forceMetadataRemoval,
                                            final TrackerOperation operationTracker, final EnvironmentDataService dataService )
     {

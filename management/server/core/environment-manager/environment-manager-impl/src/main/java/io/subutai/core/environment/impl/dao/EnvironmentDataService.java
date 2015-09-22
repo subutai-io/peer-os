@@ -176,7 +176,6 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
 //        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
-
             daoManager.startTransaction( em );
             if ( em.contains( item ) )
             {

@@ -3,7 +3,6 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +23,6 @@ import org.apache.commons.net.util.SubnetUtils;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.Interface;
 import io.subutai.common.peer.InterfacePattern;
@@ -44,18 +42,18 @@ public class N2NSetupStep
     private static final Logger LOGGER = LoggerFactory.getLogger( N2NSetupStep.class );
     private final Topology topology;
     private final Environment env;
-    private final String supernode;
-    private final int supernodePort;
+    //    private final String supernode;
+    //    private final int supernodePort;
     private final LocalPeer localPeer;
 
 
-    public N2NSetupStep( final Topology topology, final Environment environment, final String supernode,
-                         final int supernodePort, final LocalPeer localPeer )
+    public N2NSetupStep( final Topology topology, final Environment environment/*, final String supernode,
+                         final int supernodePort*/, final LocalPeer localPeer )
     {
         this.topology = topology;
         this.env = environment;
-        this.supernode = supernode;
-        this.supernodePort = supernodePort;
+        //        this.supernode = supernode;
+        //        this.supernodePort = supernodePort;
         this.localPeer = localPeer;
     }
 
@@ -69,11 +67,6 @@ public class N2NSetupStep
         peers.add( localPeer );
         // creating new n2n tunnels
         Set<String> allSubnets = getSubnets( peers );
-        LOGGER.debug( String.format( "Found %d peer subnets:", allSubnets.size() ) );
-        for ( String s : allSubnets )
-        {
-            LOGGER.debug( s );
-        }
 
         String freeSubnet = N2NUtil.findFreeSubnet( allSubnets );
 
@@ -84,8 +77,9 @@ public class N2NSetupStep
             {
                 throw new IllegalStateException( "Could not calculate subnet." );
             }
-            String interfaceName = N2NUtil.generateInterfaceName( freeSubnet );
-            String communityName = N2NUtil.generateCommunityName( freeSubnet );
+            env.setTunnelNetwork(freeSubnet);
+            //            String interfaceName = N2NUtil.generateInterfaceName( freeSubnet );
+            //            String communityName = N2NUtil.generateCommunityName( freeSubnet );
             String sharedKey = "secret";
             SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeSubnet, N2NUtil.N2N_SUBNET_MASK ).getInfo();
             final String[] addresses = subnetInfo.getAllAddresses();
@@ -100,8 +94,8 @@ public class N2NSetupStep
             List<N2NConfig> result = new ArrayList<>( peers.size() );
             for ( Peer peer : peers )
             {
-                N2NConfig config = new N2NConfig( peer.getId(), supernode, supernodePort, interfaceName, communityName,
-                        addresses[counter], sharedKey );
+                N2NConfig config = new N2NConfig( peer.getId(), env.getSuperNode(), env.getSuperNodePort(),
+                        env.getTunnelInterfaceName(), env.getTunnelCommunityName(), addresses[counter], sharedKey );
                 n2nCompletionService.submit( new SetupN2NConnectionTask( peer, config ) );
                 counter++;
             }
@@ -117,18 +111,11 @@ public class N2NSetupStep
 
             for ( N2NConfig config : result )
             {
-                final PeerConf p = new PeerConfImpl();
-                p.setN2NConfig( config );
-                env.addEnvironmentPeer( p );
+                env.addEnvironmentPeer( new PeerConfImpl( config ) );
             }
 
             // tunnel setup
-            Map<String, String> tunnels = new HashMap();
-            for ( PeerConf peerConf : env.getPeerConfs() )
-            {
-                tunnels.put( peerConf.getN2NConfig().getPeerId(), peerConf.getN2NConfig().getAddress() );
-            }
-
+            Map<String, String> tunnels = env.getTunnels();
 
             int peersCount = env.getPeerConfs().size();
             ExecutorService tunnelExecutor = Executors.newFixedThreadPool( peersCount );

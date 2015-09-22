@@ -4,6 +4,8 @@ package io.subutai.core.environment.api;
 import java.util.Set;
 import java.util.UUID;
 
+import com.sun.corba.se.impl.corba.EnvironmentImpl;
+
 import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
@@ -210,4 +212,6 @@ public interface EnvironmentManager
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
     Peer resolvePeer( String peerId );
+
+    void notifyOnContainerDestroyed( Environment environment, String containerId );
 }

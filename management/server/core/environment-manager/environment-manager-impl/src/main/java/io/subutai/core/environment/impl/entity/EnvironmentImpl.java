@@ -2,6 +2,9 @@ package io.subutai.core.environment.impl.entity;
 
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -17,6 +20,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.Version;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +42,7 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.util.CollectionUtil;
+import io.subutai.common.util.N2NUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.peer.api.LocalPeer;
@@ -54,20 +59,23 @@ import io.subutai.core.peer.api.LocalPeer;
 @Access( AccessType.FIELD )
 public class EnvironmentImpl implements Environment, Serializable
 {
-    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentImpl.class );
 
     @Id
     @Column( name = "environment_id" )
     private String environmentId;
 
-    @Column( name = "peer_id" )
+    @Version
+    private Long version;
+
+    @Column( name = "peer_id", nullable = false )
     private String peerId;
 
-    @Column( name = "name" )
+    @Column( name = "name", nullable = false )
     private String name;
 
-    @Column( name = "create_time" )
-    private long creationTimestamp;
+    @Column( name = "create_time", nullable = false )
+    private long creationTimestamp = System.currentTimeMillis();
 
     @Column( name = "subnet_cidr" )
     private String subnetCidr;
@@ -78,8 +86,19 @@ public class EnvironmentImpl implements Environment, Serializable
     @Column( name = "vni" )
     private Long vni;
 
+    @Column( name = "super_node" )
+    private String superNode;
+
+    @Column( name = "super_node_port" )
+    private int superNodePort;
+
+
+    @Column( name = "tunnel_network" )
+    private String tunnelNetwork;
+
+
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = EnvironmentContainerImpl.class,
-            cascade = CascadeType.ALL, orphanRemoval = true )
+            cascade = CascadeType.ALL, orphanRemoval = false )
     private Set<ContainerHost> containers = Sets.newHashSet();
 
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = PeerConfImpl.class,
@@ -87,7 +106,8 @@ public class EnvironmentImpl implements Environment, Serializable
     private Set<PeerConf> peerConfs = Sets.newHashSet();
 
     @Enumerated( EnumType.STRING )
-    private EnvironmentStatus status;
+    @Column( name = "status", nullable = false )
+    private EnvironmentStatus status = EnvironmentStatus.EMPTY;
 
     @Column( name = "public_key", length = 3000 )
     private String publicKey;
@@ -95,9 +115,6 @@ public class EnvironmentImpl implements Environment, Serializable
     @Column( name = "user_id" )
     private Long userId;
 
-
-    //    @Transient
-    //    private EnvironmentDataService dataService;
     @Transient
     private EnvironmentManager environmentManager;
 
@@ -207,6 +224,18 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
+    public Long getVersion()
+    {
+        return version;
+    }
+
+
+    public void setVersion( final Long version )
+    {
+        this.version = version;
+    }
+
+
     @Override
     public ContainerHost getContainerHostById( String id ) throws ContainerHostNotFoundException
     {
@@ -250,27 +279,6 @@ public class EnvironmentImpl implements Environment, Serializable
             hosts.add( getContainerHostById( id ) );
         }
         return hosts;
-    }
-
-
-    @Override
-    public String findN2nIp( final String peerId )
-    {
-        String result = null;
-        LOG.debug( "Finding n2n ip for " + peerId );
-        for ( PeerConf p : peerConfs )
-        {
-            LOG.debug( String.format( "%s %s", p.getN2NConfig().getPeerId(), p.getN2NConfig().getAddress() ) );
-            if ( p.getN2NConfig().getPeerId().equals( peerId ) )
-            {
-                result = p.getN2NConfig().getAddress();
-                break;
-            }
-        }
-
-        LOG.debug( "N2N ip for " + peerId + ":" + result );
-
-        return result;
     }
 
 
@@ -336,13 +344,8 @@ public class EnvironmentImpl implements Environment, Serializable
 
         for ( PeerConf peerConf : peerConfs )
         {
-            peers.add( environmentManager.resolvePeer( peerConf.getN2NConfig().getPeerId() ) );
+            peers.add( environmentManager.resolvePeer( peerConf.getPeerId() ) );
         }
-
-        //        for ( ContainerHost containerHost : getContainerHosts() )
-        //        {
-        //            peers.add( containerHost.getPeer() );
-        //        }
 
         return peers;
     }
@@ -360,8 +363,6 @@ public class EnvironmentImpl implements Environment, Serializable
             {
                 containers.remove( container );
             }
-
-            //            dataService.update( this );
         }
         catch ( ContainerHostNotFoundException e )
         {
@@ -383,8 +384,6 @@ public class EnvironmentImpl implements Environment, Serializable
         {
             this.containers.addAll( containers );
         }
-
-        //        dataService.update( this );
     }
 
 
@@ -393,17 +392,7 @@ public class EnvironmentImpl implements Environment, Serializable
         Preconditions.checkNotNull( status );
 
         this.status = status;
-
-        //        dataService.update( this );
     }
-
-
-    //    public void setDataService( final EnvironmentDataService dataService )
-    //    {
-    //        Preconditions.checkNotNull( dataService );
-    //
-    ////        this.dataService = dataService;
-    //    }
 
 
     public void setEnvironmentManager( final EnvironmentManager environmentManager )
@@ -467,8 +456,6 @@ public class EnvironmentImpl implements Environment, Serializable
     public void setVni( long vni )
     {
         this.vni = vni;
-
-        //        dataService.update( this );
     }
 
 
@@ -481,16 +468,118 @@ public class EnvironmentImpl implements Environment, Serializable
     public void setLastUsedIpIndex( int lastUsedIpIndex )
     {
         this.lastUsedIpIndex = lastUsedIpIndex;
+    }
 
-        //        dataService.update( this );
+
+    @Override
+    public String getSuperNode()
+    {
+        return superNode;
+    }
+
+
+    public void setSuperNode( final String superNode )
+    {
+        this.superNode = superNode;
+    }
+
+
+    @Override
+    public int getSuperNodePort()
+    {
+        return superNodePort;
+    }
+
+
+    public void setSuperNodePort( final int superNodePort )
+    {
+        this.superNodePort = superNodePort;
+    }
+
+
+    @Override
+    public String getTunnelNetwork()
+    {
+        return tunnelNetwork;
+    }
+
+
+    public void setTunnelNetwork( final String tunnelNetwork )
+    {
+        this.tunnelNetwork = tunnelNetwork;
+    }
+
+
+    @Override
+    public Map<String, String> getTunnels()
+    {
+        Map<String, String> result = new HashMap<>();
+        for ( PeerConf peerConf : getPeerConfs() )
+        {
+            result.put( peerConf.getPeerId(), peerConf.getTunnelAddress() );
+        }
+        return result;
+    }
+
+
+    @Override
+    public boolean isMember( final Peer peer )
+    {
+        boolean found = false;
+        for ( Iterator<PeerConf> it = peerConfs.iterator(); it.hasNext(); )
+        {
+            PeerConf f = it.next();
+            if ( f.getPeerId().equals( peer.getId() ) )
+            {
+                found = true;
+                break;
+            }
+        }
+        return found;
+    }
+
+
+    @Override
+    public String getTunnelInterfaceName()
+    {
+        if ( tunnelNetwork == null )
+        {
+            throw new IllegalStateException( "Tunnel network not defined yet." );
+        }
+        return N2NUtil.generateInterfaceName( tunnelNetwork );
+    }
+
+
+    @Override
+    public String getTunnelCommunityName()
+    {
+        if ( tunnelNetwork == null )
+        {
+            throw new IllegalStateException( "Tunnel network not defined yet." );
+        }
+        return N2NUtil.generateCommunityName( tunnelNetwork );
     }
 
 
     @Override
     public String toString()
     {
-        return Objects.toStringHelper( this ).add( "environmentId", environmentId ).add( "name", name )
-                      .add( "creationTimestamp", creationTimestamp ).add( "status", status )
-                      .add( "containers", getContainerHosts() ).toString();
+        final StringBuffer sb = new StringBuffer( "EnvironmentImpl{" );
+        sb.append( "userId=" ).append( userId );
+        sb.append( ", publicKey='" ).append( publicKey ).append( '\'' );
+        sb.append( ", status=" ).append( status );
+        sb.append( ", peerConfs=" ).append( peerConfs );
+        sb.append( ", containers=" ).append( containers );
+        sb.append( ", superNodePort=" ).append( superNodePort );
+        sb.append( ", superNode='" ).append( superNode ).append( '\'' );
+        sb.append( ", vni=" ).append( vni );
+        sb.append( ", lastUsedIpIndex=" ).append( lastUsedIpIndex );
+        sb.append( ", subnetCidr='" ).append( subnetCidr ).append( '\'' );
+        sb.append( ", creationTimestamp=" ).append( creationTimestamp );
+        sb.append( ", name='" ).append( name ).append( '\'' );
+        sb.append( ", peerId='" ).append( peerId ).append( '\'' );
+        sb.append( ", environmentId='" ).append( environmentId ).append( '\'' );
+        sb.append( '}' );
+        return sb.toString();
     }
 }

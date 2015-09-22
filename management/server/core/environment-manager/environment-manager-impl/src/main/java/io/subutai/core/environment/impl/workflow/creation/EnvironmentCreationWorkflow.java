@@ -85,6 +85,8 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         operationTracker.addLog( "Initializing environment creation" );
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
+        environment.setSuperNode( peerManager.getLocalPeerInfo().getIp() );
+        environment.setSuperNodePort( Common.SUPER_NODE_PORT );
         dataService.saveOrUpdate( environment );
         return EnvironmentCreationPhase.GENERATE_KEYS;
     }
@@ -138,12 +140,12 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new N2NSetupStep( topology, environment, peerManager.getLocalPeer().getPeerInfo().getIp(),
-                    Common.SUPER_NODE_PORT, peerManager.getLocalPeer() ).execute();
+            new N2NSetupStep( topology, environment, /*peerManager.getLocalPeer().getPeerInfo().getIp(),
+                    Common.SUPER_NODE_PORT, */peerManager.getLocalPeer() ).execute();
 
             dataService.saveOrUpdate( environment );
 
-//            environment = dataService.find( environment.getId() );
+            //            environment = dataService.find( environment.getId() );
 
             return EnvironmentCreationPhase.CLONE_CONTAINERS;
         }

@@ -32,7 +32,8 @@ public class CleanupN2NStep
 
         for ( PeerConf p : environment.getPeerConfs() )
         {
-            n2nConfigs.put( p.getN2NConfig().getPeerId(), p.getN2NConfig() );
+            n2nConfigs.put( p.getPeerId(), new N2NConfig( p.getTunnelAddress(), environment.getTunnelInterfaceName(),
+                    environment.getTunnelCommunityName() ) );
         }
 
         for ( Peer peer : environment.getPeers() )

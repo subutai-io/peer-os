@@ -6,7 +6,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
-import io.subutai.core.environment.impl.EnvironmentManagerImpl;
+import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.peer.api.HostNotFoundException;
@@ -14,14 +14,14 @@ import io.subutai.core.peer.api.HostNotFoundException;
 
 public class DestroyContainerStep
 {
-    private final EnvironmentManagerImpl environmentManager;
+    private final EnvironmentManager environmentManager;
     private final EnvironmentImpl environment;
     private final ContainerHost containerHost;
     private final boolean forceMetadataRemoval;
     private final TrackerOperation operationTracker;
 
 
-    public DestroyContainerStep( final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
+    public DestroyContainerStep( final EnvironmentManager environmentManager, final EnvironmentImpl environment,
                                  final ContainerHost containerHost, final boolean forceMetadataRemoval,
                                  final TrackerOperation operationTracker )
     {

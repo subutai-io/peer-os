@@ -57,22 +57,22 @@ import io.subutai.core.environment.api.EnvironmentManager;
 @Access( AccessType.FIELD )
 public class EnvironmentContainerImpl implements ContainerHost, Serializable
 {
-    @Column( name = "peer_id" )
+    @Column( name = "peer_id", nullable = false )
     private String peerId;
     @Id
-    @Column( name = "host_id" )
+    @Column( name = "host_id", nullable = false )
     private String hostId;
-    @Column( name = "hostname" )
+    @Column( name = "hostname", nullable = false )
     private String hostname;
-    @Column( name = "containerName" )
+    @Column( name = "containerName", nullable = false )
     private String containerName;
-    @Column( name = "node_group_name" )
+    @Column( name = "node_group_name", nullable = false )
     private String nodeGroupName;
-    @Column( name = "creator_peer_id" )
+    @Column( name = "creator_peer_id", nullable = false )
     private String creatorPeerId;
-    @Column( name = "template_name" )
+    @Column( name = "template_name", nullable = false )
     private String templateName;
-    @Column( name = "template_arch" )
+    @Column( name = "template_arch", nullable = false )
     private String templateArch;
 
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
@@ -82,7 +82,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     @JoinColumn( name = "environment_id" )
     private Environment environment;
 
-    @Column( name = "arch" )
+    @Column( name = "arch", nullable = false )
     @Enumerated
     private HostArchitecture hostArchitecture;
 

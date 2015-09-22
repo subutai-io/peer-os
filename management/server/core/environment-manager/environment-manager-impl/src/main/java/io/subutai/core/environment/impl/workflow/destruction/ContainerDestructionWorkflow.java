@@ -9,7 +9,7 @@ import org.apache.servicemix.beanflow.Workflow;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.tracker.TrackerOperation;
-import io.subutai.core.environment.impl.EnvironmentManagerImpl;
+import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.destruction.steps.DestroyContainerStep;
 
@@ -18,7 +18,7 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
 {
     private static final Logger LOG = LoggerFactory.getLogger( ContainerDestructionWorkflow.class );
 
-    private final EnvironmentManagerImpl environmentManager;
+    private final EnvironmentManager environmentManager;
     private final EnvironmentImpl environment;
     private final ContainerHost containerHost;
     private final boolean forceMetadataRemoval;
@@ -35,7 +35,7 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
     }
 
 
-    public ContainerDestructionWorkflow( final EnvironmentManagerImpl environmentManager,
+    public ContainerDestructionWorkflow( final EnvironmentManager environmentManager,
                                          final EnvironmentImpl environment, final ContainerHost containerHost,
                                          final boolean forceMetadataRemoval, final TrackerOperation operationTracker )
     {

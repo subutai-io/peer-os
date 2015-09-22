@@ -20,21 +20,21 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
+import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
-import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.destruction.steps.helpers.EnvironmentContainerGroupDestructionTask;
 
 
 public class DestroyContainersStep
 {
-    private final EnvironmentImpl environment;
-    private final EnvironmentManagerImpl environmentManager;
+    private final Environment environment;
+    private final EnvironmentManager environmentManager;
     private final boolean forceMetadataRemoval;
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
-    public DestroyContainersStep( final EnvironmentImpl environment, final EnvironmentManagerImpl environmentManager,
+    public DestroyContainersStep( final Environment environment, final EnvironmentManager environmentManager,
                                   final boolean forceMetadataRemoval )
     {
         Preconditions.checkNotNull( environment );
@@ -132,7 +132,7 @@ public class DestroyContainersStep
 
             if ( forceMetadataRemoval || environment.getContainerHosts().isEmpty() )
             {
-                environmentManager.removeEnvironment( environment.getId(), false );
+                environmentManager.removeEnvironment( environment.getId()/*, false*/ );
             }
             else
             {

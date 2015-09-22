@@ -1,9 +1,6 @@
 package io.subutai.common.protocol;
 
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 
 
@@ -11,22 +8,14 @@ import javax.xml.bind.annotation.XmlRootElement;
  * N2N config
  */
 @XmlRootElement
-@Embeddable
 public class N2NConfig
 {
-    @Column( name = "n2n_peer_id" )
     private String peerId;
-    @Column( name = "n2n_supernode" )
     private String superNodeIp;
-    @Column( name = "n2n_supernode_port" )
     private int n2NPort;
-    @Column( name = "n2n_interface_name" )
     private String interfaceName;
-    @Column( name = "n2n_community_name" )
     private String communityName;
-    @Column( name = "n2n_address" )
     private String address;
-    @Transient
     private String sharedKey;
 
 

@@ -112,6 +112,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         }
     }
 
+
     public EnvironmentGrowingPhase SETUP_VNI()
     {
         operationTracker.addLog( "Setting up VNI" );
@@ -132,13 +133,14 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         }
     }
 
+
     public EnvironmentGrowingPhase SETUP_N2N()
     {
         operationTracker.addLog( "Setting up N2N" );
 
         try
         {
-            new N2NSetupStep( topology, environment, peerManager.getLocalPeer().getPeerInfo().getIp(), Common.SUPER_NODE_PORT ).execute();
+            new N2NSetupStep( topology, environment ).execute();
 
             dataService.update( environment );
 
@@ -151,8 +153,6 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
             return null;
         }
     }
-
-
 
 
     public EnvironmentGrowingPhase CLONE_CONTAINERS()
