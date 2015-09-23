@@ -8,6 +8,7 @@ import javax.persistence.EntityManagerFactory;
 
 import io.subutai.common.protocol.api.DataService;
 import io.subutai.core.peer.impl.entity.ManagementHostEntity;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,13 +135,13 @@ public class ManagementHostDataService implements DataService<String, Management
 
 
     @Override
-    public void update( final ManagementHostEntity item )
+    public void update( ManagementHostEntity item )
     {
         EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
-            em.merge( item );
+            item = em.merge( item );
             em.getTransaction().commit();
         }
         catch ( Exception e )

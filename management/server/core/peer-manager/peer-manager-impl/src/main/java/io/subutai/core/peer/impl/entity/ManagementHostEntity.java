@@ -65,7 +65,7 @@ import io.subutai.core.repository.api.RepositoryManager;
 @Access( AccessType.FIELD )
 public class ManagementHostEntity extends AbstractSubutaiHost implements ManagementHost, Disposable
 {
-    private static final Logger LOG = LoggerFactory.getLogger( ManagementHostEntity.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ManagementHostEntity.class );
 
     private static final String GATEWAY_INTERFACE_NAME_REGEX = "^br-(\\d+)$";
     private static final Pattern GATEWAY_INTERFACE_NAME_PATTERN = Pattern.compile( GATEWAY_INTERFACE_NAME_REGEX );

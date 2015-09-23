@@ -26,9 +26,8 @@ import io.subutai.common.host.Interface;
 public class HostInterface implements Interface, Serializable
 {
     @Id
-    @GeneratedValue
     @JsonIgnore
-    private Long id;
+    private String id;
 
     @Column( name = "name", nullable = false )
     private String interfaceName;
@@ -51,19 +50,20 @@ public class HostInterface implements Interface, Serializable
 
     public HostInterface( final Interface s )
     {
+        this.id = s.getMac()+"-"+s.getIp();
         this.interfaceName = s.getInterfaceName();
         this.ip = s.getIp().replace( "addr:", "" );
         this.mac = s.getMac();
     }
 
 
-    public Long getId()
+    public String getId()
     {
         return id;
     }
 
 
-    public void setId( final Long id )
+    public void setId( final String id )
     {
         this.id = id;
     }

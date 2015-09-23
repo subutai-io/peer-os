@@ -423,8 +423,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public ContainerGroup processEnvironmentContainers( final Environment environment )
-            throws PeerException
+    public ContainerGroup processEnvironmentContainers( final Environment environment ) throws PeerException
     {
         Set<ContainerHost> containerHosts = environment.getContainerHosts();
         ContainerGroupEntity containerGroup = new ContainerGroupEntity( environment.getId(), getId(), getOwnerId() );
@@ -1313,7 +1312,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 try
                 {
                     host = getResourceHostByName( resourceHostInfo.getHostname() );
-
+                    ( ( ResourceHostEntity ) host ).setNetInterfaces( resourceHostInfo.getInterfaces() );
+                    resourceHostDataService.update( ( ResourceHostEntity ) host );
                     saveResourceHostContainers( host, resourceHostInfo.getContainers() );
                 }
                 catch ( HostNotFoundException e )
@@ -1347,6 +1347,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             if ( containerHostDataService.find( containerHostInfo.getId().toString() ) != null )
             {
+                ( ( ContainerHostEntity ) containerHost ).setNetInterfaces( containerHostInfo.getInterfaces() );
                 containerHostDataService.update( ( ContainerHostEntity ) containerHost );
             }
             else
