@@ -41,7 +41,6 @@ import io.subutai.common.peer.HostInfoModel;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.protocol.api.DataService;
 import io.subutai.common.quota.CpuQuotaInfo;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
@@ -100,8 +99,8 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
     @Transient
     private Peer peer;
-//    @Transient
-//    private DataService<String, EnvironmentContainerImpl> dataService;
+    //    @Transient
+    //    private DataService<String, EnvironmentContainerImpl> dataService;
     @Transient
     private EnvironmentManager environmentManager;
 
@@ -158,13 +157,13 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
         }
     }
 
-//
-//    public void setDataService( final DataService dataService )
-//    {
-//        Preconditions.checkNotNull( dataService );
-//
-//        this.dataService = dataService;
-//    }
+    //
+    //    public void setDataService( final DataService dataService )
+    //    {
+    //        Preconditions.checkNotNull( dataService );
+    //
+    //        this.dataService = dataService;
+    //    }
 
 
     public void setPeer( final Peer peer )
@@ -296,21 +295,23 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     }
 
 
+    //TODO @Timur Jamakeev make sure this tag gets persisted
     @Override
     public void addTag( final String tag )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
         this.tags.add( tag );
-//        dataService.update( this );
+        //        dataService.update( this );
     }
 
 
+    //TODO @Timur Jamakeev make sure this tag gets persisted
     @Override
     public void removeTag( final String tag )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
         this.tags.remove( tag );
-//        dataService.update( this );
+        //        dataService.update( this );
     }
 
 
