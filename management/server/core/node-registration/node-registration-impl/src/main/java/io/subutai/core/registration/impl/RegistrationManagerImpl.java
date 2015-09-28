@@ -396,7 +396,6 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                                 containerInfoDataService.find( containerInfo.getId().toString() );
 
                         ContainerHost containerHost = resourceHost.getContainerHostById( containerInfo.getId() );
-                        //                        containerHost.setDefaultGateway( containerInfoImpl.getGateway() );
 
                         containerInfoImpl.setStatus( RegistrationStatus.REGISTERED );
                         containerInfoDataService.update( containerInfoImpl );
@@ -419,12 +418,8 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             }
             catch ( HostNotFoundException e )
             {
-                //                LOGGER.error( "Error getting resource host", e );
+                //ignore
             }
-            //            catch ( PeerException e )
-            //            {
-            //                LOGGER.error( "Error setting container gateway", e );
-            //            }
             catch ( NetworkManagerException e )
             {
                 LOGGER.error( "Error configuring container hosts", e );
@@ -496,6 +491,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     }
 
 
+    //TODO in future user could import his containers selectively
     @Override
     public void importEnvironment( final Environment environment, final List<ContainerHost> containerHosts )
             throws NodeRegistrationException

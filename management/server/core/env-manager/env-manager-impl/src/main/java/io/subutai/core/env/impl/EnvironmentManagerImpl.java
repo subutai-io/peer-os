@@ -360,6 +360,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         final EnvironmentImpl environment = createEmptyEnvironment( name, ip, ssh );
         Set<EnvironmentContainerImpl> containersToImport = Sets.newHashSet();
 
+        int lastIpAddr = 1;
         for ( final Map.Entry<NodeGroup, Set<HostInfo>> entry : containers.entrySet() )
         {
             NodeGroup nodeGroup = entry.getKey();
@@ -372,10 +373,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                 templateRegistry.getTemplate( nodeGroup.getTemplateName() ), nodeGroup.getSshGroupId(),
                                 nodeGroup.getHostsGroupId(), defaultDomain );
                 containersToImport.add( envContainer );
+
+                String[] subnets = envContainer.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ).split( "." );
+                if ( subnets.length == 4 )
+                {
+                    lastIpAddr = Integer.valueOf( subnets[3] );
+                }
             }
         }
 
         environment.addContainers( containersToImport );
+        environment.setLastUsedIpIndex( lastIpAddr );
 
 
         TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
