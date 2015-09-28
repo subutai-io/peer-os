@@ -78,7 +78,7 @@ public abstract class AbstractSubutaiHost implements Host
         Preconditions.checkNotNull( peerId, "Peer ID is null" );
 
         this.peerId = peerId;
-        this.hostId = hostInfo.getId().toString();
+        this.hostId = hostInfo.getId();
         this.hostname = hostInfo.getHostname();
         this.hostArchitecture = hostInfo.getArch();
 

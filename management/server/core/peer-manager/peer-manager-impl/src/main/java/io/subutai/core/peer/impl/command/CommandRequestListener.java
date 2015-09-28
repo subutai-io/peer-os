@@ -90,7 +90,7 @@ public class CommandRequestListener extends RequestListener
             {
                 //*********construct Secure Header ****************************
                 Map<String, String> headers = Maps.newHashMap();
-                String envId = commandRequest.getEnvironmentId().toString();
+                String envId = commandRequest.getEnvironmentId();
                 String envHeaderTarget = sourcePeer.getId()+"-"+envId;
                 String envHeaderSource = localPeer.getId() +"-"+envId;
 

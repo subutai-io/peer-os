@@ -8,9 +8,7 @@ import org.apache.servicemix.beanflow.Workflow;
 
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.tracker.TrackerOperation;
-import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
-import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.destruction.steps.CleanUpNetworkStep;
 import io.subutai.core.environment.impl.workflow.destruction.steps.CleanupN2NStep;
@@ -29,7 +27,6 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     private final EnvironmentImpl environment;
     private final boolean forceMetadataRemoval;
     private final TrackerOperation operationTracker;
-    //    private final EnvironmentDataService dataService;
 
     private Throwable error;
 
@@ -45,10 +42,10 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     }
 
 
-    public EnvironmentDestructionWorkflow( final PeerManager peerManager, final EnvironmentManagerImpl environmentManager,
+    public EnvironmentDestructionWorkflow( final PeerManager peerManager,
+                                           final EnvironmentManagerImpl environmentManager,
                                            final EnvironmentImpl environment, final boolean forceMetadataRemoval,
-                                           final TrackerOperation operationTracker/*, final EnvironmentDataService
-                                           dataService*/ )
+                                           final TrackerOperation operationTracker )
     {
         super( EnvironmentDestructionPhase.INIT );
 
@@ -57,7 +54,6 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
         this.environment = environment;
         this.forceMetadataRemoval = forceMetadataRemoval;
         this.operationTracker = operationTracker;
-        //        this.dataService = dataService;
     }
 
 

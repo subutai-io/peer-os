@@ -364,6 +364,8 @@ public class RestServiceImpl implements RestService
 
     /* *************************************************************
      * Get Public key and save it in the local KeyServer
+     *
+     * TODO remove this method if not used
      */
     private String getRemotePeerPublicKey( String peerId, final String ip )
     {
@@ -426,9 +428,7 @@ public class RestServiceImpl implements RestService
                 //***********************************************************************
 
                 //************ Export Current Cert **************************************
-                String localPeerCert = "";
-
-                localPeerCert =
+                String localPeerCert =
                         securityManager.getKeyStoreManager().exportCertificate( ChannelSettings.SECURE_PORT_X2, "" );
 
                 httpContextManager.reloadTrustStore();

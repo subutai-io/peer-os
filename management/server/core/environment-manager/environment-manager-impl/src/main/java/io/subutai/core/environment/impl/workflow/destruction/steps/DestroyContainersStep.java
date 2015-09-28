@@ -22,6 +22,7 @@ import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
+import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.destruction.steps.helpers.EnvironmentContainerGroupDestructionTask;
 
@@ -29,12 +30,12 @@ import io.subutai.core.environment.impl.workflow.destruction.steps.helpers.Envir
 public class DestroyContainersStep
 {
     private final Environment environment;
-    private final EnvironmentManager environmentManager;
+    private final EnvironmentManagerImpl environmentManager;
     private final boolean forceMetadataRemoval;
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
-    public DestroyContainersStep( final Environment environment, final EnvironmentManager environmentManager,
+    public DestroyContainersStep( final Environment environment, final EnvironmentManagerImpl environmentManager,
                                   final boolean forceMetadataRemoval )
     {
         Preconditions.checkNotNull( environment );

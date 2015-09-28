@@ -52,7 +52,6 @@ import io.subutai.core.identity.api.User;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
-import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.tracker.api.Tracker;
 
 
@@ -66,7 +65,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private final PeerManager peerManager;
     private final NetworkManager networkManager;
     private final Tracker tracker;
-    private final SecurityManager securityManager;
     private final TemplateRegistry templateRegistry;
 
     private final DaoManager daoManager;
@@ -706,7 +704,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                                                           final TrackerOperation operationTracker )
     {
         return new EnvironmentCreationWorkflow( defaultDomain, templateRegistry, this, networkManager, peerManager,
-                environment, topology, sshKey, operationTracker/*, environmentDataService*/ );
+                environment, topology, sshKey, operationTracker );
     }
 
 
@@ -715,7 +713,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                                                         final TrackerOperation operationTracker )
     {
         return new EnvironmentGrowingWorkflow( defaultDomain, templateRegistry, networkManager, peerManager,
-                environment, topology, sshKey, operationTracker, environmentDataService );
+                environment, topology, sshKey, operationTracker, this );
     }
 
 
@@ -728,7 +726,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                                                                         operationTracker )
     {
         return new EnvironmentDestructionWorkflow( peerManager, environmentManager, environment, forceMetadataRemoval,
-                operationTracker/*, environmentDataService*/ );
+                operationTracker );
     }
 
 
@@ -747,7 +745,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                                                         final NetworkManager networkManager,
                                                                         final TrackerOperation operationTracker )
     {
-        return new SshKeyModificationWorkflow( environment, sshKey, networkManager, operationTracker );
+        return new SshKeyModificationWorkflow( environment, sshKey, networkManager, operationTracker, this );
     }
 
 
@@ -797,7 +795,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     public void setEnvironmentTransientFields( final Environment environment )
     {
-        //        ( ( EnvironmentImpl ) environment ).setDataService( environmentDataService );
         ( ( EnvironmentImpl ) environment ).setEnvironmentManager( this );
     }
 
@@ -806,9 +803,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         for ( ContainerHost containerHost : environment.getContainerHosts() )
         {
-//            ( ( EnvironmentContainerImpl ) containerHost ).setDataService( environmentContainerDataService );
-            ( ( EnvironmentContainerImpl ) containerHost ).setEnvironmentManager( this );
 
+            ( ( EnvironmentContainerImpl ) containerHost ).setEnvironmentManager( this );
 
             String peerId = containerHost.getPeerId();
             Peer peer = peerManager.getPeer( peerId );
@@ -816,12 +812,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             ( ( EnvironmentContainerImpl ) containerHost ).setPeer( peer );
         }
     }
-
-
-    //    public void saveEnvironment( final EnvironmentImpl environment )
-    //    {
-    //        environmentDataService.persist( environment );
-    //    }
 
 
     public void registerListener( final EnvironmentEventListener listener )
@@ -941,8 +931,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager,
                                    final NetworkManager networkManager, final DaoManager daoManager,
                                    final String defaultDomain, final IdentityManager identityManager,
-                                   final Tracker tracker,
-                                   final io.subutai.core.security.api.SecurityManager securityManager )
+                                   final Tracker tracker )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
@@ -959,7 +948,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         this.defaultDomain = defaultDomain;
         this.identityManager = identityManager;
         this.tracker = tracker;
-        this.securityManager = securityManager;
     }
 
 

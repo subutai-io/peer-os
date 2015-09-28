@@ -41,7 +41,6 @@ import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.container.CreateEnvironmentContainerGroupRequestListener;
 import io.subutai.core.peer.impl.container.DestroyEnvironmentContainerGroupRequestListener;
 import io.subutai.core.peer.impl.dao.PeerDAO;
-import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.security.api.SecurityManager;
 
@@ -105,16 +104,10 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    public SecurityManager getSecurityManager()
-    {
-        return this.securityManager;
-    }
-
-
     @Override
     public boolean register( final PeerInfo peerInfo ) throws PeerException
     {
-        return peerDAO.saveInfo( SOURCE_REMOTE_PEER, peerInfo.getId().toString(), peerInfo );
+        return peerDAO.saveInfo( SOURCE_REMOTE_PEER, peerInfo.getId(), peerInfo );
     }
 
 
@@ -122,17 +115,15 @@ public class PeerManagerImpl implements PeerManager
     public boolean unregister( final String remotePeerId ) throws PeerException
     {
         ManagementHost mgmHost = getLocalPeer().getManagementHost();
-        ManagementHostEntity managementHost = ( ManagementHostEntity ) mgmHost;
         PeerInfo p = getPeerInfo( remotePeerId );
-        managementHost.removeRepository( p.getId().toString(), p.getIp() );
-        //        managementHost.removeTunnel( p.getIp() );
+        mgmHost.removeRepository( p.getId(), p.getIp() );
 
         PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( remotePeerId );
         // Remove peer policy of the target remote peer from the local peer
         if ( peerPolicy != null )
         {
             localPeer.getPeerInfo().getPeerPolicies().remove( peerPolicy );
-            peerDAO.saveInfo( SOURCE_LOCAL_PEER, localPeer.getId().toString(), localPeer );
+            peerDAO.saveInfo( SOURCE_LOCAL_PEER, localPeer.getId(), localPeer );
         }
 
         //*********Remove Security Relationship  ****************************
@@ -155,7 +146,7 @@ public class PeerManagerImpl implements PeerManager
         {
             source = SOURCE_REMOTE_PEER;
         }
-        return peerDAO.saveInfo( source, peerInfo.getId().toString(), peerInfo );
+        return peerDAO.saveInfo( source, peerInfo.getId(), peerInfo );
     }
 
 
@@ -264,7 +255,7 @@ public class PeerManagerImpl implements PeerManager
                 counter++;
             }
 
-            for ( Peer peer : peers )
+            for ( Peer ignored : peers )
             {
                 final Future<N2NConfig> f = executorCompletionService.take();
                 N2NConfig config = f.get();
@@ -298,7 +289,7 @@ public class PeerManagerImpl implements PeerManager
         {
             Set<Interface> r = peer.getNetworkInterfaces( N2NUtil.N2N_SUBNET_INTERFACES_PATTERN );
 
-            Collection peerSubnets = CollectionUtils.collect( r, new Transformer()
+            Collection peerSubnets = CollectionUtils.<String>collect( r, new Transformer()
             {
                 @Override
                 public Object transform( final Object o )

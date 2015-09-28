@@ -106,7 +106,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         {
             ContainerGroup containerGroup = localPeer.findContainerGroupByContainerId( getId() );
 
-            return containerGroup.getEnvironmentId().toString();
+            return containerGroup.getEnvironmentId();
         }
         catch ( ContainerGroupNotFoundException e )
         {

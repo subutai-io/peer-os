@@ -4,8 +4,6 @@ package io.subutai.core.environment.api;
 import java.util.Set;
 import java.util.UUID;
 
-import com.sun.corba.se.impl.corba.EnvironmentImpl;
-
 import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
@@ -175,7 +173,6 @@ public interface EnvironmentManager
      * Removes an assigned domain if any from the environment
      *
      * @param environmentId - id of the environment which domain to remove
-     * @param async - indicates whether operation is done synchronously or asynchronously to the calling party
      */
     void removeEnvironmentDomain( String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
@@ -186,7 +183,6 @@ public interface EnvironmentManager
      *
      * @param environmentId - id of the environment to assign the passed domain to
      * @param newDomain - domain url
-     * @param async - indicates whether operation is done synchronously or asynchronously to the calling party
      */
     void assignEnvironmentDomain( String environmentId, String newDomain )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
@@ -216,6 +212,4 @@ public interface EnvironmentManager
     Peer resolvePeer( String peerId );
 
     void notifyOnContainerDestroyed( Environment environment, String containerId );
-
-//    void saveOrUpdate( Environment environment );
 }

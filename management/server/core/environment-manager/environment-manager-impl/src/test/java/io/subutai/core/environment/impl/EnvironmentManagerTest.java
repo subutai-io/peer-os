@@ -73,7 +73,7 @@ public class EnvironmentManagerTest
     {
         topology.addNodeGroupPlacement( peer, nodeGroup );
         environmentManager = spy( new EnvironmentManagerImpl( templateRegistry, peerManager, networkManager, daoManager,
-                Common.DEFAULT_DOMAIN_NAME, identityManager, tracker, securityManager ) );
+                Common.DEFAULT_DOMAIN_NAME, identityManager, tracker ) );
         doReturn( environment ).when( environmentManager )
                                .createEmptyEnvironment( anyString(), anyString(), anyString() );
         doReturn( environmentCreationWorkflow ).when( environmentManager )

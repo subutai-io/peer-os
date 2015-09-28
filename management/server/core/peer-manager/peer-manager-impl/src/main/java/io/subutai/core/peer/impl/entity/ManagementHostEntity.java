@@ -32,7 +32,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.command.CommandUtil;
 import io.subutai.common.host.Interface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.mdc.SubutaiExecutors;
@@ -47,8 +46,8 @@ import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.peer.api.Tunnel;
 import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.core.peer.api.Tunnel;
 import io.subutai.core.peer.impl.tasks.CreateGatewayTask;
 import io.subutai.core.peer.impl.tasks.ReserveVniTask;
 import io.subutai.core.peer.impl.tasks.SetupTunnelsTask;
@@ -74,8 +73,6 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     protected ExecutorService singleThreadExecutorService = SubutaiExecutors.newSingleThreadExecutor();
     @Transient
     protected ServiceLocator serviceLocator = new ServiceLocator();
-    @Transient
-    protected CommandUtil commandUtil = new CommandUtil();
 
 
     protected ManagementHostEntity()
@@ -520,6 +517,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
         return -1;
     }
+
 
     @Override
     public int calculateNextTunnelId( Set<Tunnel> tunnels )

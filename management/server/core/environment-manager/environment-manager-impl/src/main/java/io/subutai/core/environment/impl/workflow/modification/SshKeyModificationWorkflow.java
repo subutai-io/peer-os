@@ -8,6 +8,7 @@ import org.apache.servicemix.beanflow.Workflow;
 
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.SetSshKeyStep;
 import io.subutai.core.network.api.NetworkManager;
@@ -21,6 +22,7 @@ public class SshKeyModificationWorkflow extends Workflow<SshKeyModificationWorkf
     private final String sshKey;
     private final NetworkManager networkManager;
     private final TrackerOperation operationTracker;
+    private final EnvironmentManagerImpl environmentManager;
 
     private Throwable error;
 
@@ -32,7 +34,8 @@ public class SshKeyModificationWorkflow extends Workflow<SshKeyModificationWorkf
 
 
     public SshKeyModificationWorkflow( final EnvironmentImpl environment, final String sshKey,
-                                       final NetworkManager networkManager, final TrackerOperation operationTracker )
+                                       final NetworkManager networkManager, final TrackerOperation operationTracker,
+                                       final EnvironmentManagerImpl environmentManager )
     {
         super( SshKeyModificationPhase.INIT );
 
@@ -40,6 +43,7 @@ public class SshKeyModificationWorkflow extends Workflow<SshKeyModificationWorkf
         this.sshKey = sshKey;
         this.networkManager = networkManager;
         this.operationTracker = operationTracker;
+        this.environmentManager = environmentManager;
     }
 
 
@@ -64,6 +68,9 @@ public class SshKeyModificationWorkflow extends Workflow<SshKeyModificationWorkf
         try
         {
             new SetSshKeyStep( sshKey, environment, networkManager ).execute();
+
+            environmentManager.saveOrUpdate( environment );
+
 
             return SshKeyModificationPhase.FINALIZE;
         }

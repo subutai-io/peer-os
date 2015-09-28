@@ -81,7 +81,6 @@ import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
@@ -127,9 +126,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private String externalIpInterface = "eth1";
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
-    // 5 min
-    private static final long HOST_INACTIVE_TIME = 5 * 1000 * 60;
-
 
     private DaoManager daoManager;
     private TemplateRegistry templateRegistry;
@@ -148,7 +144,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
     protected Set<RequestListener> requestListeners = Sets.newHashSet();
     protected PeerInfo peerInfo;
-    private HttpContextManager httpContextManager;
     private SecurityManager securityManager;
 
     protected boolean initialized = false;
@@ -156,7 +151,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     public LocalPeerImpl( DaoManager daoManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
                           StrategyManager strategyManager, CommandExecutor commandExecutor, HostRegistry hostRegistry,
-                          Monitor monitor, HttpContextManager httpContextManager, SecurityManager securityManager )
+                          Monitor monitor, SecurityManager securityManager )
 
     {
         this.strategyManager = strategyManager;
@@ -166,7 +161,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         this.monitor = monitor;
         this.commandExecutor = commandExecutor;
         this.hostRegistry = hostRegistry;
-        this.httpContextManager = httpContextManager;
         this.securityManager = securityManager;
     }
 
@@ -944,8 +938,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
-                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder(
+                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
+                    bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -962,14 +957,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         try
         {
             HostInfo hostInfo = hostRegistry.getHostInfoById( host.getId() );
-            if ( hostInfo instanceof ContainerHostInfo )
-            {
-                return ContainerHostState.RUNNING.equals( ( ( ContainerHostInfo ) hostInfo ).getStatus() );
-            }
-            else
-            {
-                return true;
-            }
+            return !( hostInfo instanceof ContainerHostInfo ) || ContainerHostState.RUNNING
+                    .equals( ( ( ContainerHostInfo ) hostInfo ).getStatus() );
         }
         catch ( HostDisconnectedException e )
         {

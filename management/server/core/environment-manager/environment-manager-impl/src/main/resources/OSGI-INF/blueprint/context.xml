@@ -27,8 +27,6 @@
              interface="io.subutai.core.identity.api.IdentityManager" />
   <reference id="tracker"
              interface="io.subutai.core.tracker.api.Tracker" />
-  <reference id="securityManager"
-             interface="io.subutai.core.security.api.SecurityManager" />
 
   <!-- ************************************************************************************************* -->
   <bean id="daoManagerEnv" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
@@ -52,7 +50,6 @@
     <argument value="${defaultDomain}" />
     <argument ref="identityManager" />
     <argument ref="tracker" />
-    <argument ref="securityManager" />
   </bean>
 
   <service ref="environmentManager" interface="io.subutai.core.environment.api.EnvironmentManager" />

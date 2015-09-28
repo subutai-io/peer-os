@@ -1,9 +1,7 @@
 package io.subutai.core.peer.impl;
 
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +18,9 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 
 import io.subutai.common.command.CommandCallback;
@@ -92,7 +92,6 @@ public class RemotePeerImpl implements RemotePeer
     protected RestUtil restUtil = new RestUtil();
     protected JsonUtil jsonUtil = new JsonUtil();
     private String baseUrl;
-    private SecurityManager securityManager;
     List<Object> providers;
 
 
@@ -123,7 +122,7 @@ public class RemotePeerImpl implements RemotePeer
                 break;
         }
         this.baseUrl = url;
-        this.providers = new ArrayList<Object>();
+        this.providers = Lists.newArrayList();
         providers.add( new JacksonJaxbJsonProvider() );
     }
 
@@ -241,8 +240,8 @@ public class RemotePeerImpl implements RemotePeer
         Map<String, String> headers = Maps.newHashMap();
 
         headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId().toString() );
-        headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId().toString() );
+        headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
+        headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
         //*************************************************************
 
 
@@ -270,7 +269,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/start";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
@@ -303,7 +302,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/stop";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
@@ -336,7 +335,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/destroy";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
@@ -371,7 +370,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/gateway";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
         params.put( "gatewayIp", gatewayIp );
 
         //*********construct Secure Header ****************************
@@ -415,7 +414,7 @@ public class RemotePeerImpl implements RemotePeer
             //*************************************************************
 
 
-            String response = delete( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, headers );
+            delete( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, headers );
         }
         catch ( Exception e )
         {
@@ -442,7 +441,7 @@ public class RemotePeerImpl implements RemotePeer
             //*************************************************************
 
 
-            String response = delete( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, headers );
+            delete( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, headers );
         }
         catch ( Exception e )
         {
@@ -460,7 +459,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/isconnected";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
 
         //*********construct Secure Header ****************************
@@ -499,7 +498,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/resource/usage";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
         params.put( "processPid", String.valueOf( processPid ) );
 
         //*********construct Secure Header ****************************
@@ -533,7 +532,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/state";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
@@ -568,7 +567,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/quota/ram";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
@@ -602,7 +601,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/quota/ram/info";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
@@ -638,7 +637,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/quota/ram";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
         params.put( "ram", String.valueOf( ramInMb ) );
 
         //*********construct Secure Header ****************************
@@ -671,7 +670,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/quota/cpu";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
@@ -705,7 +704,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/quota/cpu/info";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
@@ -740,7 +739,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/quota/cpu";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
         params.put( "cpu", String.valueOf( cpuPercent ) );
 
         //*********construct Secure Header ****************************
@@ -774,7 +773,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/quota/cpuset";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
@@ -811,7 +810,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/quota/cpuset";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
         params.put( "cpuset", jsonUtil.to( cpuSet ) );
 
         //*********construct Secure Header ****************************
@@ -847,7 +846,7 @@ public class RemotePeerImpl implements RemotePeer
 
         Map<String, String> params = Maps.newHashMap();
 
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
         params.put( "diskPartition", jsonUtil.to( diskPartition ) );
 
         //*********construct Secure Header ****************************
@@ -885,7 +884,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/quota/disk";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
         params.put( "diskQuota", jsonUtil.to( diskQuota ) );
 
         //*********construct Secure Header ****************************
@@ -920,7 +919,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/quota/ram2";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
         params.put( "ramQuota", jsonUtil.to( ramQuota ) );
 
         //*********construct Secure Header ****************************
@@ -954,7 +953,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/quota/ram/available";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
@@ -988,7 +987,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/quota/cpu/available";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
@@ -1025,7 +1024,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/quota/disk/available";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
         params.put( "diskPartition", jsonUtil.to( diskPartition ) );
 
         //*********construct Secure Header ****************************
@@ -1063,7 +1062,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/quota/info";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
         params.put( "quotaType", jsonUtil.to( quotaType ) );
 
         //*********construct Secure Header ****************************
@@ -1102,7 +1101,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/container/quota";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
         params.put( "quotaInfo", jsonUtil.to( quotaInfo ) );
 
         //*********construct Secure Header ****************************
@@ -1391,9 +1390,6 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-
-
-
     //networking
 
 
@@ -1444,8 +1440,8 @@ public class RemotePeerImpl implements RemotePeer
             Map<String, String> headers = Maps.newHashMap();
 
             headers.put( Common.HEADER_SPECIAL, "ENC" );
-            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId().toString() );
-            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId().toString() );
+            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
+            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
 
             //*************************************************************
 
@@ -1475,8 +1471,8 @@ public class RemotePeerImpl implements RemotePeer
             Map<String, String> headers = Maps.newHashMap();
 
             headers.put( Common.HEADER_SPECIAL, "ENC" );
-            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId().toString() );
-            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId().toString() );
+            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
+            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
             //*************************************************************
 
             String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, headers );
@@ -1502,8 +1498,8 @@ public class RemotePeerImpl implements RemotePeer
             Map<String, String> headers = Maps.newHashMap();
 
             headers.put( Common.HEADER_SPECIAL, "ENC" );
-            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId().toString() );
-            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId().toString() );
+            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
+            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
             //*************************************************************
 
             String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, headers );
@@ -1572,7 +1568,7 @@ public class RemotePeerImpl implements RemotePeer
 
         Collection interfaces = client.postAndGetCollection( pattern, HostInterface.class );
         LOG.debug( String.format( "%d", interfaces.size() ) );
-        return new HashSet<Interface>( interfaces );
+        return Sets.newHashSet( interfaces );
     }
 
 
@@ -1587,7 +1583,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
         //TODO: implement as singleton
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = Lists.newArrayList();
         providers.add( new JacksonJaxbJsonProvider() );
 
         WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
@@ -1596,7 +1592,7 @@ public class RemotePeerImpl implements RemotePeer
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        Response response = client.post( config );
+        client.post( config );
     }
 
 
@@ -1611,7 +1607,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
         //TODO: implement as singleton
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = Lists.newArrayList();
         providers.add( new JacksonJaxbJsonProvider() );
 
         WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
@@ -1646,7 +1642,7 @@ public class RemotePeerImpl implements RemotePeer
             params.put( "gatewayIp", environmentGatewayIp );
             params.put( "vlan", String.valueOf( vlan ) );
 
-            String response = post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
+            post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
         }
         catch ( Exception e )
         {
