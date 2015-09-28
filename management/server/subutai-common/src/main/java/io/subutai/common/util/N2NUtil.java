@@ -17,7 +17,7 @@ public abstract class N2NUtil
     public static InterfacePattern N2N_SUBNET_INTERFACES_PATTERN = new InterfacePattern( "ip", "^10.*" );
 
 
-    public static String findFreeSubnet( final Set<String> excludedSubnets )
+    public static String findFreeTunnelNetwork( final Set<String> excludedNetworks )
     {
         String result = null;
         int i = 11;
@@ -26,7 +26,7 @@ public abstract class N2NUtil
         while ( result == null && i < 254 )
         {
             String s = String.format( "10.%d.%d.0", i, j );
-            if ( !excludedSubnets.contains( s ) )
+            if ( !excludedNetworks.contains( s ) )
             {
                 result = s;
             }
@@ -43,13 +43,12 @@ public abstract class N2NUtil
     }
 
 
-    public static String findFreeAddress( Set<String> excludedAddresses )
+    public static String findFreeAddress( String network, Set<String> excludedAddresses )
     {
-        Preconditions.checkNotNull( excludedAddresses, "Excepted address set could not be null." );
-        Preconditions.checkArgument( !excludedAddresses.isEmpty(),
-                "Excluded address set should contains at least one address." );
+        Preconditions.checkNotNull( network, "Network address could not be null." );
+        Preconditions.checkNotNull( excludedAddresses, "Excluded address set could not be null." );
 
-        String fmt = excludedAddresses.iterator().next().replaceAll( ".\\d$", ".%s" );
+        String fmt = network.replaceAll( ".\\d$", ".%s" );
 
         String result = null;
         for ( int i = 1; i < 255; i++ )

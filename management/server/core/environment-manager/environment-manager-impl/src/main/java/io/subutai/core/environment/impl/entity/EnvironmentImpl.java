@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.net.util.SubnetUtils;
 
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -44,8 +43,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.N2NUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.environment.impl.dao.EnvironmentDataService;
-import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 
 
 /**
@@ -63,7 +61,7 @@ public class EnvironmentImpl implements Environment, Serializable
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentImpl.class );
 
     @Transient
-    private EnvironmentManager environmentManager;
+    private EnvironmentManagerImpl environmentManager;
 
     @Id
     @Column( name = "environment_id" )
@@ -99,7 +97,6 @@ public class EnvironmentImpl implements Environment, Serializable
 
     @Column( name = "tunnel_network" )
     private String tunnelNetwork;
-
 
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = EnvironmentContainerImpl.class,
             cascade = CascadeType.ALL, orphanRemoval = false )
@@ -397,7 +394,7 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    public void setEnvironmentManager( final EnvironmentManagerImpl environmentManager )
     {
         Preconditions.checkNotNull( environmentManager );
 
@@ -557,11 +554,10 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         if ( tunnelNetwork == null )
         {
-            throw new IllegalStateException( "Tunnel network not defined yet." );
+            throw new IllegalStateException( "Tunnel network does not defined yet." );
         }
-        return N2NUtil.generateCommunityName( tunnelNetwork );
+        return N2NUtil.generateCommunityName( this.environmentId );
     }
-
 
     @Override
     public String toString()

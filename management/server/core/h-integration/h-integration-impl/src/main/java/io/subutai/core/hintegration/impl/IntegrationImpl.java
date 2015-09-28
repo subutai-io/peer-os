@@ -781,7 +781,7 @@ public class IntegrationImpl implements Integration
             if ( excludedAdresses.isEmpty() )
             {
                 Set<String> excludedSubnets = getEnvironmentSubnets();
-                String freeSubnet = N2NUtil.findFreeSubnet( excludedSubnets );
+                String freeSubnet = N2NUtil.findFreeTunnelNetwork( excludedSubnets );
                 address = freeSubnet.replaceAll( ".\\d$", ".1" );
             }
             else
@@ -790,7 +790,7 @@ public class IntegrationImpl implements Integration
                                                                                                               .getNetworkAddress();
                 if ( isSubnetFree( subnet ) )
                 {
-                    address = N2NUtil.findFreeAddress( excludedAdresses );
+                    address = N2NUtil.findFreeAddress( subnet, excludedAdresses );
                 }
                 else
                 {

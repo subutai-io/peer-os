@@ -42,18 +42,13 @@ public class N2NSetupStep
     private static final Logger LOGGER = LoggerFactory.getLogger( N2NSetupStep.class );
     private final Topology topology;
     private final Environment env;
-    //    private final String supernode;
-    //    private final int supernodePort;
     private final LocalPeer localPeer;
 
 
-    public N2NSetupStep( final Topology topology, final Environment environment/*, final String supernode,
-                         final int supernodePort*/, final LocalPeer localPeer )
+    public N2NSetupStep( final Topology topology, final Environment environment, final LocalPeer localPeer )
     {
         this.topology = topology;
         this.env = environment;
-        //        this.supernode = supernode;
-        //        this.supernodePort = supernodePort;
         this.localPeer = localPeer;
     }
 
@@ -66,29 +61,26 @@ public class N2NSetupStep
 
         peers.add( localPeer );
         // creating new n2n tunnels
-        Set<String> allSubnets = getSubnets( peers );
+        Set<String> existingNetworks = getTunnelNetworks( peers );
 
-        String freeSubnet = N2NUtil.findFreeSubnet( allSubnets );
+        String freeTunnelNetwork = N2NUtil.findFreeTunnelNetwork( existingNetworks );
 
-        LOGGER.debug( String.format( "Free subnet for peer: %s", freeSubnet ) );
+        LOGGER.debug( String.format( "Free tunnel network: %s", freeTunnelNetwork ) );
         try
         {
-            if ( freeSubnet == null )
+            if ( freeTunnelNetwork == null )
             {
-                throw new IllegalStateException( "Could not calculate subnet." );
+                throw new IllegalStateException( "Could not calculate tunnel network." );
             }
-            env.setTunnelNetwork(freeSubnet);
-            //            String interfaceName = N2NUtil.generateInterfaceName( freeSubnet );
-            //            String communityName = N2NUtil.generateCommunityName( freeSubnet );
+            env.setTunnelNetwork( freeTunnelNetwork );
             String sharedKey = "secret";
-            SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeSubnet, N2NUtil.N2N_SUBNET_MASK ).getInfo();
+            SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeTunnelNetwork, N2NUtil.N2N_SUBNET_MASK ).getInfo();
             final String[] addresses = subnetInfo.getAllAddresses();
             int counter = 0;
 
             ExecutorService n2nExecutor = Executors.newFixedThreadPool( peers.size() );
 
             ExecutorCompletionService<N2NConfig> n2nCompletionService = new ExecutorCompletionService<>( n2nExecutor );
-
 
             // n2n2 setup
             List<N2NConfig> result = new ArrayList<>( peers.size() );
@@ -132,8 +124,7 @@ public class N2NSetupStep
             for ( int i = 0; i < peersCount; i++ )
             {
                 final Future<Integer> f = tunnelCompletionService.take();
-                Integer vlanId = f.get();
-                LOGGER.debug( String.format( "VLAN_ID: %d", vlanId ) );
+                f.get();
             }
 
             tunnelExecutor.shutdown();
@@ -146,16 +137,15 @@ public class N2NSetupStep
     }
 
 
-    private Set<String> getSubnets( final Set<Peer> allPeers )
+    private Set<String> getTunnelNetworks( final Set<Peer> peers )
     {
-        Set<String> allSubnets = new HashSet<>();
+        Set<String> result = new HashSet<>();
 
-        InterfacePattern peerSubnetsPattern = new InterfacePattern( "ip", "^10.*" );
-        for ( Peer peer : allPeers )
+        for ( Peer peer : peers )
         {
-            Set<Interface> r = peer.getNetworkInterfaces( peerSubnetsPattern );
+            Set<Interface> r = peer.getNetworkInterfaces( N2NUtil.N2N_SUBNET_INTERFACES_PATTERN );
 
-            Collection peerSubnets = CollectionUtils.collect( r, new Transformer()
+            Collection tunnels = CollectionUtils.collect( r, new Transformer()
             {
                 @Override
                 public Object transform( final Object o )
@@ -166,10 +156,10 @@ public class N2NSetupStep
                 }
             } );
 
-            allSubnets.addAll( peerSubnets );
+            result.addAll( tunnels );
         }
 
-        return allSubnets;
+        return result;
     }
 
 

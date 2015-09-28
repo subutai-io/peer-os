@@ -209,7 +209,5 @@ public interface EnvironmentManager
     void removeContainerFromEnvironmentDomain( String containerHostId, String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
-    Peer resolvePeer( String peerId );
-
     void notifyOnContainerDestroyed( Environment environment, String containerId );
 }

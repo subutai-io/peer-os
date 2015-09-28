@@ -47,16 +47,8 @@ public class N2NSetupStep
     {
         Set<Peer> peers = Sets.newHashSet( topology.getAllPeers() );
 
-        Set<String> peerIds = new HashSet<>();
-        for ( PeerConf pc : environment.getPeerConfs() )
-        {
-            peerIds.add( pc.getPeerId() );
-        }
-
         SubnetUtils.SubnetInfo info =
                 new SubnetUtils( environment.getTunnelNetwork(), N2NUtil.N2N_SUBNET_MASK ).getInfo();
-
-        String freeSubnet = info.getNetworkAddress();
 
         String sharedKey = "secret";
         final String[] addresses = info.getAllAddresses();

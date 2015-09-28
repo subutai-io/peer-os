@@ -965,7 +965,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    @Override
     public Peer resolvePeer( final String peerId )
     {
         return peerManager.getPeer( peerId );

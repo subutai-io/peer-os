@@ -223,7 +223,7 @@ public class PeerManagerImpl implements PeerManager
             LOG.debug( s );
         }
 
-        String freeSubnet = N2NUtil.findFreeSubnet( usedN2NSubnets );
+        String freeSubnet = N2NUtil.findFreeTunnelNetwork( usedN2NSubnets );
 
         LOG.debug( String.format( "Free subnet for peer: %s", freeSubnet ) );
         try
