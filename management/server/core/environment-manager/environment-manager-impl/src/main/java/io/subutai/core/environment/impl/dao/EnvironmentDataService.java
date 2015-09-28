@@ -191,7 +191,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
     }
 
 
-    public EnvironmentImpl saveOrUpdate( EnvironmentImpl item )
+    public Environment saveOrUpdate( Environment item )
     {
         //        EntityManager em = daoManager.getEntityManagerFromFactory();
         try

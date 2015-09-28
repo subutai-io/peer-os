@@ -880,6 +880,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @Override
+    public void notifyOnContainerStateChanged( final Environment environment, final ContainerHost containerHost )
+    {
+        saveOrUpdate( environment );
+    }
+
+
     public void notifyOnEnvironmentDestroyed( final String environmentId )
     {
         for ( final EnvironmentEventListener listener : listeners )
@@ -971,7 +978,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void saveOrUpdate( final EnvironmentImpl environment )
+    public void saveOrUpdate( final Environment environment )
     {
         environmentDataService.saveOrUpdate( environment );
     }

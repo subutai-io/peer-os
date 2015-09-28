@@ -126,7 +126,8 @@ public class ContainersWindow extends Window
                 @Override
                 public void buttonClick( final Button.ClickEvent event )
                 {
-                    getUI().addWindow( new TagsWindow( containerHost, peerManager.getLocalPeer() ) );
+                    getUI().addWindow( new TagsWindow( environmentManager, environment, containerHost,
+                            peerManager.getLocalPeer() ) );
                 }
             } );
             final Runnable startRunnable = new Runnable()

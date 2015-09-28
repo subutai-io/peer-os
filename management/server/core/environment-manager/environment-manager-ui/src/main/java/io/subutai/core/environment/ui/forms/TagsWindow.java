@@ -1,7 +1,9 @@
 package io.subutai.core.environment.ui.forms;
 
 
+import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.peer.api.HostNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
 
@@ -20,7 +22,7 @@ public class TagsWindow extends Window
 {
 
 
-    public TagsWindow( final ContainerHost containerHost, LocalPeer localPeer )
+    public TagsWindow( final EnvironmentManager environmentManager, final Environment environment, final ContainerHost containerHost, LocalPeer localPeer )
     {
         ContainerHost localContainer = null;
         try
@@ -72,6 +74,8 @@ public class TagsWindow extends Window
                     {
                         finalLocalContainer.removeTag( tag );
                     }
+
+                    environmentManager.notifyOnContainerStateChanged( environment, containerHost );
                 }
                 else
                 {
@@ -106,6 +110,8 @@ public class TagsWindow extends Window
                     {
                         finalLocalContainer.addTag( tag );
                     }
+
+                    environmentManager.notifyOnContainerStateChanged( environment, containerHost );
                 }
                 else
                 {

@@ -304,10 +304,6 @@ public class EnvironmentImpl implements Environment, Serializable
     public Set<ContainerHost> getContainerHosts()
     {
         return containers;
-        //        synchronized ( containers )
-        //        {
-        //            return Sets.newConcurrentHashSet( containers );
-        //        }
     }
 
 
@@ -558,6 +554,7 @@ public class EnvironmentImpl implements Environment, Serializable
         }
         return N2NUtil.generateCommunityName( this.environmentId );
     }
+
 
     @Override
     public String toString()

@@ -210,4 +210,6 @@ public interface EnvironmentManager
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
     void notifyOnContainerDestroyed( Environment environment, String containerId );
+
+    void notifyOnContainerStateChanged( Environment environment, ContainerHost containerHost );
 }
