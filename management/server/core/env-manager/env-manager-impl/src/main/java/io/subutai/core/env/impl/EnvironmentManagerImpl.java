@@ -377,7 +377,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 String[] subnets = envContainer.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ).split( "." );
                 if ( subnets.length == 4 )
                 {
-                    lastIpAddr = Integer.valueOf( subnets[3] );
+                    Integer tmp = Integer.valueOf( subnets[3] );
+                    if ( tmp > lastIpAddr )
+                    {
+                        lastIpAddr = tmp;
+                    }
                 }
             }
         }
