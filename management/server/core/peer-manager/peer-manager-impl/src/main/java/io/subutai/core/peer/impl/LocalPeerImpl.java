@@ -230,8 +230,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     protected void initPeerInfo( PeerDAO peerDAO )
     {
-        //obtain id from fs
-
         peerInfo = new PeerInfo();
         peerInfo.setId( securityManager.getKeyManager().getPeerId() );
         peerInfo.setName( "Local Subutai server" );
@@ -888,8 +886,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
-                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder(
+                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
+                    bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1139,6 +1138,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         if ( initialized )
         {
+            //todo compare id of host with local peer id to determine management host once agent starts supplying
+            //todo-> fingerprint of its pgp key as id
             if ( resourceHostInfo.getHostname().equals( "management" ) )
             {
                 if ( managementHost == null )
