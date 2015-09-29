@@ -72,7 +72,6 @@ public class KeyManagerImpl implements KeyManager
         this.keyServer = keyServer;
 
         keyData = new SecurityKeyData();
-        keyData.setManHostId( manHostId );
         keyData.setOwnerPublicKeyringFile( ownerPublicKeyringFile );
         keyData.setPublicKeyringFile( publicKeyringFile );
         keyData.setSecretKeyringFile( secretKeyringFile );
@@ -91,6 +90,8 @@ public class KeyManagerImpl implements KeyManager
     {
         try
         {
+
+
             InputStream ownerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getOwnerPublicKeyringFile() );
             InputStream peerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getPublicKeyringFile() );
             InputStream peerSecStream = PGPEncryptionUtil.getFileInputStream( keyData.getSecretKeyringFile() );
@@ -98,11 +99,15 @@ public class KeyManagerImpl implements KeyManager
             if ( ownerPubStream == null || peerPubStream == null || peerSecStream == null )
             {
                 LOG.info( " **** Error loading PGPPublicKeyRing/PGPSecretKeyRing files. Files not found.**** :" );
+                //todo System.exit(1) with error message
             }
             else
             {
+                PGPPublicKeyRing peerPubRing = PGPKeyUtil.readPublicKeyRing( peerPubStream );
+                String peerId = PGPKeyUtil.getFingerprint( peerPubRing.getPublicKey().getFingerprint() );
+                keyData.setManHostId( peerId );
                 saveSecretKeyRing( keyData.getManHostId(), ( short ) 1, PGPKeyUtil.readSecretKeyRing( peerSecStream ) );
-                savePublicKeyRing( keyData.getManHostId(), ( short ) 1, PGPKeyUtil.readPublicKeyRing( peerPubStream ) );
+                savePublicKeyRing( keyData.getManHostId(), ( short ) 1, peerPubRing );
                 savePublicKeyRing( "owner-" + keyData.getManHostId(), ( short ) 1,
                         PGPKeyUtil.readPublicKeyRing( ownerPubStream ) );
             }
