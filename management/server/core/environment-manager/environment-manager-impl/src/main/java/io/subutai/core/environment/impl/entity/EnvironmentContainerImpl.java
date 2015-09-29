@@ -304,6 +304,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     }
 
 
+    //TODO @Timur Jamakeev make sure this tag gets persisted
     @Override
     public void removeTag( final String tag )
     {

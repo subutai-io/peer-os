@@ -30,7 +30,7 @@ import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.Tunnel;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.api.ResourceHost;
+import io.subutai.common.peer.ResourceHost;
 
 
 /**

@@ -7,8 +7,8 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -21,20 +21,24 @@ import io.subutai.common.host.Interface;
 
 @Entity
 @Table( name = "interface" )
+@IdClass( InterfaceId.class )
 @Access( AccessType.FIELD )
 @XmlRootElement
-public class HostInterface implements Interface, Serializable
+public class HostInterfaceImpl implements Interface, Serializable
 {
-    @Id
-    @GeneratedValue
-    @JsonIgnore
-    private Long id;
+    //    @Id
+    //    @GeneratedValue
+    //    @JsonIgnore
+    //    private Long id;
 
     @Column( name = "name", nullable = false )
     private String interfaceName;
 
+    @Id
     @Column( name = "ip", nullable = false )
     private String ip;
+
+    @Id
     @Column( name = "mac", nullable = false )
     private String mac;
 
@@ -44,30 +48,30 @@ public class HostInterface implements Interface, Serializable
     private AbstractSubutaiHost host;
 
 
-    protected HostInterface()
+    protected HostInterfaceImpl()
     {
     }
 
 
-    public HostInterface( final Interface s )
+    public HostInterfaceImpl( final Interface s )
     {
         this.interfaceName = s.getInterfaceName();
         this.ip = s.getIp().replace( "addr:", "" );
         this.mac = s.getMac();
     }
-
-
-    public Long getId()
-    {
-        return id;
-    }
-
-
-    public void setId( final Long id )
-    {
-        this.id = id;
-    }
-
+//
+//
+//    public Long getId()
+//    {
+//        return id;
+//    }
+//
+//
+//    public void setId( final Long id )
+//    {
+//        this.id = id;
+//    }
+//
 
     @Override
     public String getInterfaceName()
@@ -117,6 +121,37 @@ public class HostInterface implements Interface, Serializable
     public void setHost( final AbstractSubutaiHost host )
     {
         this.host = host;
+    }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof HostInterfaceImpl ) )
+        {
+            return false;
+        }
+
+        final HostInterfaceImpl that = ( HostInterfaceImpl ) o;
+
+        if ( !ip.equals( that.ip ) )
+        {
+            return false;
+        }
+        return mac.equals( that.mac );
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        int result = ip.hashCode();
+        result = 31 * result + mac.hashCode();
+        return result;
     }
 }
 

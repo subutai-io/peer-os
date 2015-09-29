@@ -17,7 +17,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.datatypes.TemplateVersion;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
-import io.subutai.core.peer.api.HostNotFoundException;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;

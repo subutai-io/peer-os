@@ -60,14 +60,14 @@ import io.subutai.core.repository.api.RepositoryManager;
 @Access( AccessType.FIELD )
 public class ManagementHostEntity extends AbstractSubutaiHost implements ManagementHost, Disposable
 {
-    private static final Logger LOG = LoggerFactory.getLogger( ManagementHostEntity.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ManagementHostEntity.class );
 
     private static final String GATEWAY_INTERFACE_NAME_REGEX = "^br-(\\d+)$";
     private static final Pattern GATEWAY_INTERFACE_NAME_PATTERN = Pattern.compile( GATEWAY_INTERFACE_NAME_REGEX );
 
 
     @Column
-    String name = "Subutai Management Host";
+    private String name = "Subutai Management Host";
 
     @Transient
     protected ExecutorService singleThreadExecutorService = SubutaiExecutors.newSingleThreadExecutor();
@@ -359,7 +359,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     {
         Set<Gateway> gateways = Sets.newHashSet();
 
-        for ( Interface iface : interfaces )
+        for ( Interface iface : getInterfaces() )
         {
             Matcher matcher = GATEWAY_INTERFACE_NAME_PATTERN.matcher( iface.getInterfaceName().trim() );
             if ( matcher.find() )

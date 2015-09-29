@@ -12,12 +12,14 @@ import java.util.regex.Pattern;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.omg.CORBA.UNKNOWN;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +34,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.protocol.Disposable;
@@ -40,9 +43,9 @@ import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
-import io.subutai.core.peer.api.HostNotFoundException;
-import io.subutai.core.peer.api.ResourceHost;
-import io.subutai.core.peer.api.ResourceHostException;
+import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.core.peer.impl.container.CreateContainerTask;
 import io.subutai.core.peer.impl.container.DestroyContainerTask;
 import io.subutai.core.registry.api.TemplateRegistry;
@@ -63,9 +66,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     private static final String PRECONDITION_CONTAINER_IS_NULL_MSG = "Container host is null";
     private static final String CONTAINER_EXCEPTION_MSG_FORMAT = "Container with name %s does not exist";
 
-    @OneToMany( mappedBy = "parent", fetch = FetchType.EAGER,
+    @OneToMany( mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.EAGER,
             targetEntity = ContainerHostEntity.class )
-    final Set<ContainerHost> containersHosts = Sets.newHashSet();
+    private Set<ContainerHost> containersHosts = Sets.newHashSet();
 
     @Transient
     protected ExecutorService singleThreadExecutorService = Executors.newSingleThreadExecutor();
@@ -179,10 +182,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     public Set<ContainerHost> getContainerHosts()
     {
-        synchronized ( containersHosts )
-        {
-            return Sets.newConcurrentHashSet( containersHosts );
-        }
+        return containersHosts;
     }
 
 
@@ -412,17 +412,39 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    public void addContainerHost( ContainerHost host )
+    //    public void addContainerHost( ContainerHost host )
+    //    {
+    //        Preconditions.checkNotNull( host, "Invalid container host" );
+    //
+    //        host.setParent( this );
+    //
+    //        containersHosts.add( host );
+    //    }
+
+
+    @Override
+    public boolean updateHostInfo( final HostInfo hostInfo )
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        boolean result = super.updateHostInfo( hostInfo );
 
-        ( ( ContainerHostEntity ) host ).setParent( this );
-
-        synchronized ( containersHosts )
+        ResourceHostInfo resourceHostInfo = ( ResourceHostInfo ) hostInfo;
+        for ( ContainerHostInfo info : resourceHostInfo.getContainers() )
         {
-            //replace host
-            containersHosts.remove( host );
-            containersHosts.add( host );
+            ContainerHostEntity containerHost;
+            try
+            {
+                containerHost = ( ContainerHostEntity ) getContainerHostByName( info.getHostname() );
+            }
+            catch ( HostNotFoundException e )
+            {
+                containerHost = new ContainerHostEntity( peerId, info, "UNKNOWN" );
+                //                addContainerHost( containerHost );
+                containerHost.setParent( this );
+                containersHosts.add( containerHost );
+                result = true;
+            }
+            containerHost.updateHostInfo( info );
         }
+        return result;
     }
 }

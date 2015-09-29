@@ -18,7 +18,7 @@ import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.core.peer.api.HostNotFoundException;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

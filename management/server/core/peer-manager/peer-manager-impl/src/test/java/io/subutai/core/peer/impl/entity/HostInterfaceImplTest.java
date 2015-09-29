@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith( MockitoJUnitRunner.class )
-public class HostInterfaceTest
+public class HostInterfaceImplTest
 {
     private static final String INTERFACE_NAME = "eth0";
     private static final String IP = "127.0.0.1";
@@ -24,7 +24,7 @@ public class HostInterfaceTest
     @Mock
     AbstractSubutaiHost abstractSubutaiHost;
 
-    HostInterface hostInterface;
+    HostInterfaceImpl hostInterface;
 
 
     @Before
@@ -34,7 +34,7 @@ public class HostInterfaceTest
         when( anInterface.getIp() ).thenReturn( IP );
         when( anInterface.getMac() ).thenReturn( MAC );
 
-        hostInterface = new HostInterface( anInterface );
+        hostInterface = new HostInterfaceImpl( anInterface );
     }
 
 

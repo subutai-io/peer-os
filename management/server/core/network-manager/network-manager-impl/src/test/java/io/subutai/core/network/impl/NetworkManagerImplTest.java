@@ -24,11 +24,11 @@ import io.subutai.core.network.api.N2NConnection;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.Tunnel;
-import io.subutai.core.peer.api.HostNotFoundException;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.api.ResourceHost;
+import io.subutai.common.peer.ResourceHost;
 import junit.framework.TestCase;
 
 import static junit.framework.Assert.assertFalse;

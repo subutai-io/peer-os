@@ -15,7 +15,7 @@ import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
-import io.subutai.core.peer.api.ResourceHost;
+import io.subutai.common.peer.ResourceHost;
 
 
 /**

@@ -15,7 +15,7 @@ import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.api.ResourceHost;
+import io.subutai.common.peer.ResourceHost;
 
 
 @Command( scope = "peer", name = "hosts" )

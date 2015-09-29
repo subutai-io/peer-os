@@ -51,10 +51,10 @@ import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.metric.api.MonitoringSettings;
 import io.subutai.core.peer.api.ContainerGroup;
 import io.subutai.core.peer.api.ContainerGroupNotFoundException;
-import io.subutai.core.peer.api.HostNotFoundException;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.api.ResourceHost;
+import io.subutai.common.peer.ResourceHost;
 
 
 /**

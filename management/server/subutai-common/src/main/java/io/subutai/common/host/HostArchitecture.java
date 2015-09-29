@@ -1,6 +1,9 @@
 package io.subutai.common.host;
 
 
+import javax.persistence.Enumerated;
+
+
 /**
  * Host architectures uname -p/m
  */

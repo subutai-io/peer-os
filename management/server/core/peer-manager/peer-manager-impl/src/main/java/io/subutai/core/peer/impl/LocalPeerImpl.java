@@ -86,19 +86,18 @@ import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.peer.api.ContainerGroup;
 import io.subutai.core.peer.api.ContainerGroupNotFoundException;
-import io.subutai.core.peer.api.HostNotFoundException;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.Payload;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.RequestListener;
-import io.subutai.core.peer.api.ResourceHost;
-import io.subutai.core.peer.api.ResourceHostException;
+import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.core.peer.impl.container.ContainersDestructionResultImpl;
 import io.subutai.core.peer.impl.container.CreateContainerWrapperTask;
 import io.subutai.core.peer.impl.container.DestroyContainerWrapperTask;
 import io.subutai.core.peer.impl.dao.ContainerGroupDataService;
-import io.subutai.core.peer.impl.dao.ContainerHostDataService;
 import io.subutai.core.peer.impl.dao.ManagementHostDataService;
 import io.subutai.core.peer.impl.dao.PeerDAO;
 import io.subutai.core.peer.impl.dao.ResourceHostDataService;
@@ -129,7 +128,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     private DaoManager daoManager;
     private TemplateRegistry templateRegistry;
-    protected ManagementHost managementHost;
+    protected ManagementHostEntity managementHost;
     protected Set<ResourceHost> resourceHosts = Sets.newHashSet();
     private CommandExecutor commandExecutor;
     private StrategyManager strategyManager;
@@ -137,7 +136,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private Monitor monitor;
     protected ManagementHostDataService managementHostDataService;
     protected ResourceHostDataService resourceHostDataService;
-    protected ContainerHostDataService containerHostDataService;
+    //    protected ContainerHostDataService containerHostDataService;
     protected ContainerGroupDataService containerGroupDataService;
     private HostRegistry hostRegistry;
     protected CommandUtil commandUtil = new CommandUtil();
@@ -185,6 +184,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     public void init()
     {
+        LOG.debug( "********************************************** Initializing peer ******************************************" );
+
         PeerDAO peerDAO;
         try
         {
@@ -202,12 +203,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
 
             managementHostDataService = getManagementHostDataService();
-            Collection allManagementHostEntity = managementHostDataService.getAll();
+            Collection<ManagementHostEntity> allManagementHostEntity = managementHostDataService.getAll();
             if ( allManagementHostEntity != null && !allManagementHostEntity.isEmpty() )
             {
-                managementHost = ( ManagementHost ) allManagementHostEntity.iterator().next();
-                ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
-                ( ( ManagementHostEntity ) managementHost ).init();
+                managementHost = allManagementHostEntity.iterator().next();
+                managementHost.setPeer( this );
+                managementHost.init();
             }
 
             resourceHostDataService = getResourceHostDataService();
@@ -216,14 +217,21 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 resourceHosts.addAll( resourceHostDataService.getAll() );
             }
-            containerHostDataService = new ContainerHostDataService( daoManager.getEntityManagerFactory() );
+            //            containerHostDataService = new ContainerHostDataService( daoManager.getEntityManagerFactory
+            // () );
             containerGroupDataService = new ContainerGroupDataService( daoManager.getEntityManagerFactory() );
 
-            setResourceHostTransientFields( getResourceHosts() );
+            setResourceHostTransientFields( resourceHosts );
+
             for ( ResourceHost resourceHost : getResourceHosts() )
             {
+                for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
+                {
+                    LOG.debug( String.format( "%s %s", resourceHost.getHostname(), containerHost.getHostname() ) );
+                }
 
-                setContainersTransientFields( resourceHost.getContainerHosts() );
+
+                //                setContainersTransientFields( resourceHost.getContainerHosts() );
             }
 
             initialized = true;
@@ -555,7 +563,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 ContainerHost containerHost = future.get();
                 newContainers.add( new ContainerHostEntity( getId(),
-                        hostRegistry.getContainerHostInfoById( containerHost.getId() ) ) );
+                        hostRegistry.getContainerHostInfoById( containerHost.getId() ), request.getEnvironmentId() ) );
                 result.add( new HostInfoModel( containerHost ) );
             }
             catch ( ExecutionException | InterruptedException | HostDisconnectedException e )
@@ -860,7 +868,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             ContainerHostEntity entity = ( ContainerHostEntity ) bindHost( host.getId() );
             ResourceHost resourceHost = entity.getParent();
             resourceHost.destroyContainerHost( host );
-            containerHostDataService.remove( host.getId() );
+            //            containerHostDataService.remove( host.getId() );
             ( ( ResourceHostEntity ) entity.getParent() ).removeContainerHost( entity );
 
             //update container group
@@ -1195,10 +1203,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 if ( managementHost == null )
                 {
                     managementHost = new ManagementHostEntity( getId(), resourceHostInfo );
-                    ( ( AbstractSubutaiHost ) managementHost ).setPeer( this );
+                    managementHost.setPeer( this );
+                    managementHost.setManaged( true );
                     try
                     {
-                        ( ( AbstractSubutaiHost ) managementHost ).init();
+                        managementHost.init();
                     }
                     catch ( Exception e )
                     {
@@ -1208,81 +1217,83 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 }
                 else
                 {
-                    ( ( AbstractSubutaiHost ) managementHost ).setNetInterfaces( resourceHostInfo.getInterfaces() );
-                    managementHostDataService.update( ( ManagementHostEntity ) managementHost );
+                    managementHost.updateHostInfo( resourceHostInfo );
                     peerInfo.setIp( managementHost.getIpByInterfaceName( externalIpInterface ) );
                 }
-                ( ( AbstractSubutaiHost ) managementHost ).updateHostInfo( resourceHostInfo );
+                //                ( ( AbstractSubutaiHost ) managementHost ).updateHostInfo( resourceHostInfo );
             }
             else
             {
-                ResourceHost host;
+                ResourceHostEntity host;
                 try
                 {
-                    host = getResourceHostByName( resourceHostInfo.getHostname() );
-
-                    saveResourceHostContainers( host, resourceHostInfo.getContainers() );
+                    host = ( ResourceHostEntity ) getResourceHostByName( resourceHostInfo.getHostname() );
                 }
                 catch ( HostNotFoundException e )
                 {
                     LOG.debug( "Host not found in #onHeartbeat", e );
                     host = new ResourceHostEntity( getId(), resourceHostInfo );
-                    ( ( AbstractSubutaiHost ) host ).init();
-                    resourceHostDataService.persist( ( ResourceHostEntity ) host );
+                    host.init();
+                    resourceHostDataService.persist( host );
                     addResourceHost( host );
-                    setResourceHostTransientFields( Sets.newHashSet( host ) );
-
-                    saveResourceHostContainers( host, resourceHostInfo.getContainers() );
+                    HashSet<ResourceHost> a = new HashSet<ResourceHost>();
+                    setResourceHostTransientFields( a );
                 }
-                ( ( AbstractSubutaiHost ) host ).updateHostInfo( resourceHostInfo );
+                //                updateResourceHostContainers( host, resourceHostInfo.getContainers() );
+                if ( host.updateHostInfo( resourceHostInfo ) )
+                {
+                    resourceHostDataService.update( host );
+                    LOG.debug( String.format( "Resource host %s updated.", host.getId() ) );
+                }
             }
         }
     }
 
 
-    protected void saveResourceHostContainers( ResourceHost resourceHost, Set<ContainerHostInfo> containerHostInfos )
-    {
-        Set<ContainerHost> oldHosts = resourceHost.getContainerHosts();
-        Set<String> newContainerIds = Sets.newHashSet();
-        for ( ContainerHostInfo containerHostInfo : containerHostInfos )
-        {
-            newContainerIds.add( containerHostInfo.getId() );
+    //    protected void updateResourceHostContainers( ResourceHost resourceHost, Set<ContainerHostInfo>
+    // containerHostInfos )
+    //    {
+    //        Set<ContainerHost> oldHosts = resourceHost.getContainerHosts();
+    //        Set<String> newContainerIds = Sets.newHashSet();
+    //        for ( ContainerHostInfo containerHostInfo : containerHostInfos )
+    //        {
+    //            newContainerIds.add( containerHostInfo.getId() );
+    //
+    //            ContainerHostEntity containerHost = new ContainerHostEntity( getId(), containerHostInfo );
+    //            setContainersTransientFields( Sets.newHashSet( containerHost ) );
+    //            ( ( ResourceHostEntity ) resourceHost ).addContainerHost( containerHost );
+    //
+    //            //            if ( containerHostDataService.find( containerHostInfo.getId() ) != null )
+    //            //            {
+    //            //                containerHostDataService.update( ( ContainerHostEntity ) containerHost );
+    //            //            }
+    //            //            else
+    //            //            {
+    //            //                containerHostDataService.persist( ( ContainerHostEntity ) containerHost );
+    //            //            }
+    //        }
+    //
+    //        for ( ContainerHost oldHost : oldHosts )
+    //        {
+    //            if ( !newContainerIds.contains( oldHost.getId() ) )
+    //            {
+    //                //remove container which is missing in heartbeat
+    //                //                containerHostDataService.remove( oldHost.getId() );
+    //                ( ( ResourceHostEntity ) resourceHost ).removeContainerHost( oldHost );
+    //            }
+    //        }
+    //    }
 
-            ContainerHost containerHost = new ContainerHostEntity( getId(), containerHostInfo );
-            setContainersTransientFields( Sets.newHashSet( containerHost ) );
-            ( ( ResourceHostEntity ) resourceHost ).addContainerHost( containerHost );
 
-            if ( containerHostDataService.find( containerHostInfo.getId() ) != null )
-            {
-                containerHostDataService.update( ( ContainerHostEntity ) containerHost );
-            }
-            else
-            {
-                containerHostDataService.persist( ( ContainerHostEntity ) containerHost );
-            }
-        }
-
-        for ( ContainerHost oldHost : oldHosts )
-        {
-            if ( !newContainerIds.contains( oldHost.getId() ) )
-            {
-                //remove container which is missing in heartbeat
-                containerHostDataService.remove( oldHost.getId() );
-                ( ( ResourceHostEntity ) resourceHost ).removeContainerHost( oldHost );
-            }
-        }
-    }
-
-
-    private void setContainersTransientFields( final Set<ContainerHost> containerHosts )
-    {
-        for ( ContainerHost containerHost : containerHosts )
-        {
-            ( ( AbstractSubutaiHost ) containerHost ).setPeer( this );
-            ( ( ContainerHostEntity ) containerHost ).setDataService( containerHostDataService );
-            ( ( ContainerHostEntity ) containerHost ).setLocalPeer( this );
-        }
-    }
+    //    private void setContainersTransientFields( final Set<ContainerHost> containerHosts )
+    //    {
+    //        for ( ContainerHost containerHost : containerHosts )
+    //        {
+    //            ( ( AbstractSubutaiHost ) containerHost ).setPeer( this );
+    //            //            ( ( ContainerHostEntity ) containerHost ).setDataService( containerHostDataService );
+    //            //            ( ( ContainerHostEntity ) containerHost ).setLocalPeer( this );
+    //        }
+    //    }
 
 
     // ********** Quota functions *****************
@@ -1915,10 +1926,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public void removeN2NConnection( final N2NConfig config ) throws PeerException
     {
-        LOG.debug( String.format( "Removing local peer to n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
+        LOG.debug( String.format( "Removing peer from n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
                 config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
         getManagementHost().removeN2NConnection( config );
-        //TODO: decouple remove tunnel process
         getManagementHost().removeTunnel( config.getAddress() );
     }
 

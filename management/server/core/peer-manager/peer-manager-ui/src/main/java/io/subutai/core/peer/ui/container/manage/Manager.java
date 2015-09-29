@@ -27,7 +27,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.api.ResourceHost;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.peer.ui.container.common.Buttons;
 import io.subutai.server.ui.component.ConfirmationDialog;
 

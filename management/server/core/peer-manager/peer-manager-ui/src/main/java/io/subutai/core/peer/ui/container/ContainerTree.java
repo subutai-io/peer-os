@@ -28,7 +28,7 @@ import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
-import io.subutai.core.peer.api.ResourceHost;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.server.ui.component.ConcurrentComponent;
 
 

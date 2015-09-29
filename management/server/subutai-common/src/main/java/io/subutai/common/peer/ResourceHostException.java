@@ -1,4 +1,4 @@
-package io.subutai.core.peer.api;
+package io.subutai.common.peer;
 
 
 public class ResourceHostException extends Exception

@@ -21,7 +21,7 @@ import io.subutai.core.git.api.GitChangedFile;
 import io.subutai.core.git.api.GitException;
 import io.subutai.core.git.api.GitFileStatus;
 
-import io.subutai.core.peer.api.HostNotFoundException;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;

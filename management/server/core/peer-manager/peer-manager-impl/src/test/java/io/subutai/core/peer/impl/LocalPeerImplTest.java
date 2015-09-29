@@ -49,12 +49,12 @@ import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.peer.api.ContainerGroupNotFoundException;
-import io.subutai.core.peer.api.HostNotFoundException;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.peer.api.Payload;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.RequestListener;
-import io.subutai.core.peer.api.ResourceHost;
-import io.subutai.core.peer.api.ResourceHostException;
+import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.core.peer.impl.dao.ContainerGroupDataService;
 import io.subutai.core.peer.impl.dao.ContainerHostDataService;
 import io.subutai.core.peer.impl.dao.ManagementHostDataService;
@@ -777,7 +777,7 @@ public class LocalPeerImplTest
 
         when( resourceHostInfo.getContainers() ).thenReturn( Sets.newHashSet( containerHostInfo1 ) );
 
-        localPeer.saveResourceHostContainers( resourceHost, resourceHostInfo.getContainers() );
+        localPeer.updateResourceHostContainers( resourceHost, resourceHostInfo.getContainers() );
 
         verify( containerHostDataService ).persist( any( ContainerHostEntity.class ) );
 
@@ -787,7 +787,7 @@ public class LocalPeerImplTest
 
         doReturn( containerHost ).when( containerHostDataService ).find( anyString() );
 
-        localPeer.saveResourceHostContainers( resourceHost, resourceHostInfo.getContainers() );
+        localPeer.updateResourceHostContainers( resourceHost, resourceHostInfo.getContainers() );
 
         verify( containerHostDataService ).update( any( ContainerHostEntity.class ) );
     }

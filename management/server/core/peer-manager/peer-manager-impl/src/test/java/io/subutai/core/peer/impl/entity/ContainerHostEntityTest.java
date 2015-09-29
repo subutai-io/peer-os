@@ -20,7 +20,7 @@ import io.subutai.common.quota.RamQuota;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.core.peer.api.ContainerGroup;
 import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.core.peer.api.ResourceHost;
+import io.subutai.common.peer.ResourceHost;
 
 import com.google.common.collect.Sets;
 
@@ -82,7 +82,7 @@ public class ContainerHostEntityTest
 
         containerHostEntity = new ContainerHostEntity( PEER_ID.toString(), containerHostInfo );
         containerHostEntity.setLocalPeer( localPeer );
-        containerHostEntity.setDataService( dataService );
+//        containerHostEntity.setDataService( dataService );
         containerHostEntity.setPeer( peer );
         when( localPeer.findContainerGroupByContainerId( HOST_ID ) ).thenReturn( containerGroup );
         when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );

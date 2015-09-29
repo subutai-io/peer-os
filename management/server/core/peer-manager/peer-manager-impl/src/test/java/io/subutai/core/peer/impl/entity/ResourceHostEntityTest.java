@@ -30,8 +30,8 @@ import io.subutai.common.protocol.Template;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
-import io.subutai.core.peer.api.HostNotFoundException;
-import io.subutai.core.peer.api.ResourceHostException;
+import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.core.registry.api.TemplateRegistry;
 
 import static junit.framework.Assert.assertTrue;

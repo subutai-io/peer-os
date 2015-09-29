@@ -19,9 +19,9 @@ import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
 import io.subutai.core.peer.api.ContainerCreationException;
-import io.subutai.core.peer.api.HostNotFoundException;
-import io.subutai.core.peer.api.ResourceHost;
-import io.subutai.core.peer.api.ResourceHostException;
+import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.ResourceHostException;
 
 
 public class CreateContainerTask implements Callable<ContainerHost>

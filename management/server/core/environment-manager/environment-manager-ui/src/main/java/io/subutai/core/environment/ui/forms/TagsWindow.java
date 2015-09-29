@@ -4,7 +4,7 @@ package io.subutai.core.environment.ui.forms;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.peer.api.HostNotFoundException;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
 
 import com.google.common.base.Strings;

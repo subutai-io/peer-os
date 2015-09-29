@@ -42,7 +42,7 @@ import io.subutai.common.util.RestUtil;
 import io.subutai.core.peer.api.ContainerGroup;
 import io.subutai.core.peer.api.ContainerGroupNotFoundException;
 import io.subutai.core.peer.api.ManagementHost;
-import io.subutai.core.peer.api.ResourceHost;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.peer.ui.PeerManagerPortalModule;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;

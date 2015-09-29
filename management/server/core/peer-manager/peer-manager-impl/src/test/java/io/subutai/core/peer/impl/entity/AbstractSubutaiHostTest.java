@@ -213,7 +213,7 @@ public class AbstractSubutaiHostTest
     @Test
     public void testAddInterface() throws Exception
     {
-        HostInterface hostInterface = mock( HostInterface.class );
+        HostInterfaceImpl hostInterface = mock( HostInterfaceImpl.class );
 
         host.addInterface( hostInterface );
 

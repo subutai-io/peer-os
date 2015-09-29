@@ -16,8 +16,8 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
-import io.subutai.core.peer.api.ResourceHost;
-import io.subutai.core.peer.api.ResourceHostException;
+import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.ResourceHostException;
 
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;

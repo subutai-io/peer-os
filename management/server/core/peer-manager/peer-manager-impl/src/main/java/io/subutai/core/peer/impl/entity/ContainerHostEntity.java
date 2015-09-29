@@ -26,7 +26,6 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.protocol.api.DataService;
 import io.subutai.common.quota.CpuQuotaInfo;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
@@ -34,7 +33,7 @@ import io.subutai.common.quota.RamQuota;
 import io.subutai.core.peer.api.ContainerGroup;
 import io.subutai.core.peer.api.ContainerGroupNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.core.peer.api.ResourceHost;
+import io.subutai.common.peer.ResourceHost;
 
 
 /**
@@ -53,17 +52,20 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Column( name = "containerName" )
     private String containerName;
 
+    @Column( name = "environment_id" )
+    private String environmentId;
+
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
     private Set<String> tags = new HashSet<>();
 
     @Transient
     private volatile ContainerHostState state = ContainerHostState.STOPPED;
 
-    @Transient
-    private DataService dataService;
+    //    @Transient
+    //    private DataService dataService;
 
-    @Transient
-    private LocalPeer localPeer;
+    //    @Transient
+    //    private LocalPeer localPeer;
 
 
     protected ContainerHostEntity()
@@ -78,40 +80,55 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    public void setLocalPeer( final LocalPeer localPeer )
-    {
-        this.localPeer = localPeer;
-    }
+    //    public void setLocalPeer( final LocalPeer localPeer )
+    //    {
+    //        this.localPeer = localPeer;
+    //    }
 
 
-    public void setDataService( final DataService dataService )
-    {
-        this.dataService = dataService;
-    }
+    //    public void setDataService( final DataService dataService )
+    //    {
+    //        this.dataService = dataService;
+    //    }
 
 
-    public ContainerHostEntity( String peerId, HostInfo hostInfo )
+    public ContainerHostEntity( String peerId, HostInfo hostInfo, String environmentId )
     {
         super( peerId, hostInfo );
 
         updateHostInfo( hostInfo );
 
         this.containerName = ( ( ContainerHostInfo ) hostInfo ).getContainerName();
+        this.environmentId = environmentId;
+    }
+
+
+    public void setEnvironmentId( final String environmentId )
+    {
+        this.environmentId = environmentId;
     }
 
 
     public String getEnvironmentId()
     {
-        try
-        {
-            ContainerGroup containerGroup = localPeer.findContainerGroupByContainerId( getId() );
+        //        try
+        //        {
+        //            ContainerGroup containerGroup = localPeer.findContainerGroupByContainerId( getId() );
+        //
+        //            return containerGroup.getEnvironmentId();
+        //        }
+        //        catch ( ContainerGroupNotFoundException e )
+        //        {
+        //            return null;
+        //        }
+        return environmentId;
+    }
 
-            return containerGroup.getEnvironmentId();
-        }
-        catch ( ContainerGroupNotFoundException e )
-        {
-            return null;
-        }
+
+    @Override
+    public Peer getPeer()
+    {
+        return parent.getPeer();
     }
 
 
@@ -120,7 +137,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
         this.tags.add( tag );
-        this.dataService.update( this );
+        //        this.dataService.update( this );
     }
 
 
@@ -129,7 +146,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
         this.tags.remove( tag );
-        this.dataService.update( this );
+        //        this.dataService.update( this );
     }
 
 
@@ -216,12 +233,13 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
 
     @Override
-    public void updateHostInfo( final HostInfo hostInfo )
+    public boolean updateHostInfo( final HostInfo hostInfo )
     {
         super.updateHostInfo( hostInfo );
 
         ContainerHostInfo containerHostInfo = ( ContainerHostInfo ) hostInfo;
         this.state = containerHostInfo.getStatus();
+        return false;
     }
 
 

@@ -5,7 +5,7 @@ import java.util.concurrent.Callable;
 
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.core.peer.api.ResourceHost;
+import io.subutai.common.peer.ResourceHost;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;

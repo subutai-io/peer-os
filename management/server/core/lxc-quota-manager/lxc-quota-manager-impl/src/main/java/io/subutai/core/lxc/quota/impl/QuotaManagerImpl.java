@@ -28,9 +28,9 @@ import io.subutai.common.quota.RamQuota;
 import io.subutai.common.quota.RamQuotaUnit;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.lxc.quota.api.QuotaManager;
-import io.subutai.core.peer.api.HostNotFoundException;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.api.ResourceHost;
+import io.subutai.common.peer.ResourceHost;
 
 
 public class QuotaManagerImpl implements QuotaManager

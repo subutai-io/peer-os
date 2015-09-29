@@ -71,7 +71,7 @@ import io.subutai.core.peer.impl.container.ContainersDestructionResultImpl;
 import io.subutai.core.peer.impl.container.CreateEnvironmentContainerGroupResponse;
 import io.subutai.core.peer.impl.container.DestroyEnvironmentContainerGroupRequest;
 import io.subutai.core.peer.impl.container.DestroyEnvironmentContainerGroupResponse;
-import io.subutai.core.peer.impl.entity.HostInterface;
+import io.subutai.core.peer.impl.entity.HostInterfaceImpl;
 import io.subutai.core.peer.impl.request.MessageRequest;
 import io.subutai.core.peer.impl.request.MessageResponse;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
@@ -1566,7 +1566,7 @@ public class RemotePeerImpl implements RemotePeer
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        Collection interfaces = client.postAndGetCollection( pattern, HostInterface.class );
+        Collection interfaces = client.postAndGetCollection( pattern, HostInterfaceImpl.class );
         LOG.debug( String.format( "%d", interfaces.size() ) );
         return Sets.newHashSet( interfaces );
     }

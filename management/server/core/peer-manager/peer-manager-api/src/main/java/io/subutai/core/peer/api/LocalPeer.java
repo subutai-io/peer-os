@@ -5,8 +5,10 @@ import java.util.Set;
 
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.Template;
 
 

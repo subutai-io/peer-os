@@ -1,4 +1,4 @@
-package io.subutai.core.peer.api;
+package io.subutai.common.peer;
 
 
 import java.util.Set;

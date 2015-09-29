@@ -368,7 +368,7 @@ public class ManagementHostEntityTest
     @Test
     public void testGetGateways() throws Exception
     {
-        HostInterface hostInterface = mock( HostInterface.class );
+        HostInterfaceImpl hostInterface = mock( HostInterfaceImpl.class );
         when( hostInterface.getInterfaceName() ).thenReturn( "br-100" );
 
         managementHostEntity.addInterface( hostInterface );
