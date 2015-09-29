@@ -128,9 +128,8 @@ public class PGPKeyUtil
     public static String getFingerprint( byte[] fingerprint )
     {
         char[] hex = Hex.encodeHex( fingerprint, false );
-        String fingerprintStr = new String( hex );
 
-        return fingerprintStr;
+        return new String( hex );
     }
 
 
