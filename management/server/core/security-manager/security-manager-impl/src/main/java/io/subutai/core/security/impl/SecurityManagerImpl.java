@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.keyserver.api.KeyServer;
-import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.CertificateManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -35,7 +34,6 @@ public class SecurityManagerImpl implements SecurityManager
     private EncryptionTool encryptionTool = null;
     private SecurityManagerDAO securityManagerDAO = null;
     private KeyServer keyServer = null;
-    private PeerManager peerManager = null;
     private SecurityKeyData keyData = null;
     private SecretKeyStoreDAO secretKeyStoreDAO = null;
     private KeyStoreManager keyStoreManager = null;
@@ -186,24 +184,6 @@ public class SecurityManagerImpl implements SecurityManager
     public SecurityKeyData getSecurityKeyData()
     {
         return keyData;
-    }
-
-
-    /* *****************************
-     *
-     */
-    public PeerManager getPeerManager()
-    {
-        return peerManager;
-    }
-
-
-    /* *****************************
-     *
-     */
-    public void setPeerManager( final PeerManager peerManager )
-    {
-        this.peerManager = peerManager;
     }
 
 

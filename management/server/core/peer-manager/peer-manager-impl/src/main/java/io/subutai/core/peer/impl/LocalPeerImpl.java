@@ -1,14 +1,11 @@
 package io.subutai.core.peer.impl;
 
 
-import java.io.File;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -28,7 +25,6 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
@@ -121,12 +117,9 @@ import io.subutai.core.strategy.api.StrategyNotFoundException;
  */
 public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 {
-    private String peerIdPath = String.format( "%s/id", Common.SUBUTAI_APP_DATA_PATH );
-    private String peerIdFile = "peer_id";
-    private String externalIpInterface = "eth1";
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
-
+    private String externalIpInterface = "eth1";
     private DaoManager daoManager;
     private TemplateRegistry templateRegistry;
     protected ManagementHost managementHost;
@@ -162,18 +155,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         this.commandExecutor = commandExecutor;
         this.hostRegistry = hostRegistry;
         this.securityManager = securityManager;
-    }
-
-
-    public void setPeerIdPath( final String peerIdPath )
-    {
-        this.peerIdPath = peerIdPath;
-    }
-
-
-    public void setPeerIdFile( final String peerIdFile )
-    {
-        this.peerIdFile = peerIdFile;
     }
 
 
@@ -250,42 +231,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected void initPeerInfo( PeerDAO peerDAO )
     {
         //obtain id from fs
-        File scriptsDirectory = new File( peerIdPath );
-        if ( !scriptsDirectory.exists() )
-        {
-            boolean created = scriptsDirectory.mkdirs();
-            if ( created )
-            {
-                LOG.info( "Peer id directory created" );
-            }
-        }
-        Path peerIdFilePath = Paths.get( peerIdPath, peerIdFile );
-        File peerIdFile = peerIdFilePath.toFile();
-        UUID peerId;
-        try
-        {
-            if ( !peerIdFile.exists() )
-            {
-                //generate new id and save to fs
-                peerId = UUID.randomUUID();
-                FileUtils.writeStringToFile( peerIdFile, peerId.toString() );
-            }
-            else
-            {
-                //read id from file
-                peerId = UUID.fromString( FileUtils.readFileToString( peerIdFile ) );
-            }
-        }
-        catch ( Exception e )
-        {
-            throw new PeerInitializationError( "Failed to obtain peer id file", e );
-        }
+
         peerInfo = new PeerInfo();
-        //TODO take peer id from fingerprint of peer pgp key
-        peerInfo.setId( peerId.toString() );
+        peerInfo.setId( securityManager.getKeyManager().getPeerId() );
         peerInfo.setName( "Local Subutai server" );
-        //TODO get ownerId from fingerprint of owner pgp key
-        peerInfo.setOwnerId( UUID.randomUUID().toString() );
+        peerInfo.setOwnerId( securityManager.getKeyManager().getOwnerId() );
         setPeerIp();
         peerInfo.setName( String.format( "Peer %s", peerInfo.getId() ) );
 
@@ -938,9 +888,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder(
-                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
-                    bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
+                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {

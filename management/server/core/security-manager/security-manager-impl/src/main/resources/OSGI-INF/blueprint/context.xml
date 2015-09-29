@@ -35,10 +35,6 @@
 
   <!-- ************************************************************************************************** -->
 
-  <reference id="peerManager" interface="io.subutai.core.peer.api.PeerManager" />
-
-  <!-- ************************************************************************************************** -->
-
   <bean id="securityManager" scope="singleton" init-method="init" destroy-method="destroy"
         class="io.subutai.core.security.impl.SecurityManagerImpl">
 
@@ -49,7 +45,6 @@
 
     <property name="daoManager" ref="daoSecurityManager" />
     <property name="keyServer" ref="keyServer" />
-    <property name="peerManager" ref="peerManager" />
 
   </bean>
 

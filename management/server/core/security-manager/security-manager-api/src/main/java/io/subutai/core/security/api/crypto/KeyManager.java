@@ -10,7 +10,6 @@ import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
 import io.subutai.common.security.crypto.pgp.KeyPair;
-import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 
 
 /**
@@ -40,6 +39,11 @@ public interface KeyManager
      * Gets KeyRing from the store and returns Publickey object
      */
     public PGPPublicKey getPublicKey( String hostId );
+
+
+    public String getPeerId();
+
+    public String getOwnerId();
 
 
     /* *****************************
@@ -87,25 +91,25 @@ public interface KeyManager
     /* *****************************************
      * Removes SecretKeyRing from the Store
      */
-    public void removeSecretKeyRing( String hostId);
+    public void removeSecretKeyRing( String hostId );
 
 
     /* *****************************************
      *
      */
-    public KeyPair generateKeyPair ( String userId, boolean armored );
+    public KeyPair generateKeyPair( String userId, boolean armored );
 
 
     /* *****************************************
      *
      */
-    public void saveKeyPair (String hostId, short type, KeyPair keyPair );
+    public void saveKeyPair( String hostId, short type, KeyPair keyPair );
 
 
     /* *****************************************
      * Removes Secret and PublicKeyrings from the Store
      */
-    public void removeKeyRings( String hostId);
+    public void removeKeyRings( String hostId );
 
 
     /* *****************************
@@ -118,5 +122,4 @@ public interface KeyManager
      *
      */
     public PGPPublicKey getRemoteHostPublicKey( String hostId, String ip );
-
 }
