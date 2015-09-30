@@ -40,7 +40,7 @@ public class RestServiceImpl implements RestService
         catch ( MessageException e )
         {
             LOG.error( "Error in processMessage", e );
-            return Response.serverError().entity( e ).build();
+            return Response.serverError().entity( e.getMessage() ).build();
         }
     }
 }
