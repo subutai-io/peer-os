@@ -111,6 +111,8 @@ public class IntegrationImpl implements Integration
     private PGPPrivateKey senderKey;
     private String peerId;
 
+    private boolean integrationEnabled;
+
 
     public void setSecurityManager( final SecurityManager securityManager )
     {
@@ -132,48 +134,49 @@ public class IntegrationImpl implements Integration
 
     public void init() throws HIntegrationException
     {
-        LOG.debug( "H-INTEGRATION" );
-
-        try
+        if ( integrationEnabled )
         {
-            this.peerId = peerManager.getLocalPeerInfo().getId();
+            LOG.debug( "H-INTEGRATION" );
 
-            this.hubPublicKey = PGPKeyHelper.readPublicKey( HSettings.HUB_PUB_KEY );
-            this.ownerPublicKey = securityManager.getKeyManager().getPublicKey( "owner-" + peerId );
-            this.peerPublicKey = securityManager.getKeyManager().getPublicKey( null );
+            try
+            {
+                this.peerId = peerManager.getLocalPeerInfo().getId();
 
-            LOG.debug( String.format( "Peer fingerprint: %s",
-                    PGPKeyUtil.getFingerprint( peerPublicKey.getFingerprint() ) ) );
-            LOG.debug( String.format( "Hub fingerprint: %s",
-                    PGPKeyUtil.getFingerprint( hubPublicKey.getFingerprint() ) ) );
-            LOG.debug( String.format( "Owner fingerprint: %s",
-                    PGPKeyUtil.getFingerprint( ownerPublicKey.getFingerprint() ) ) );
+                this.hubPublicKey = PGPKeyHelper.readPublicKey( HSettings.H_PUB_KEY );
+                this.ownerPublicKey = securityManager.getKeyManager().getPublicKey( "owner-" + peerId );
+                this.peerPublicKey = securityManager.getKeyManager().getPublicKey( null );
 
-            serverFingerprint = hubPublicKey.getFingerprint();
+                LOG.debug( String.format( "Peer fingerprint: %s", PGPKeyUtil.getFingerprint( peerPublicKey.getFingerprint() ) ) );
+                LOG.debug( String.format( "Hub fingerprint: %s", PGPKeyUtil.getFingerprint( hubPublicKey.getFingerprint() ) ) );
+                LOG.debug( String.format( "Owner fingerprint: %s", PGPKeyUtil.getFingerprint( ownerPublicKey.getFingerprint() ) ) );
 
-            //            senderKey = PGPKeyHelper.readPrivateKey( HSettings.PEER_SECRET_KEY, "12345678" );
-            senderKey = securityManager.getKeyManager().getPrivateKey( null );
-            messenger = new PGPMessenger( senderKey, hubPublicKey );
+                serverFingerprint = hubPublicKey.getFingerprint();
 
-            generateX509Certificate();
+                //            senderKey = PGPKeyHelper.readPrivateKey( HSettings.PEER_SECRET_KEY, "12345678" );
+                senderKey = securityManager.getKeyManager().getPrivateKey( null );
+                messenger = new PGPMessenger( senderKey, hubPublicKey );
 
-            String path = String.format( "/rest/v1/peers/%s/hearbeat", peerManager.getLocalPeerInfo().getId() );
-            WebClient client = io.subutai.core.hintegration.impl.HttpClient.createTrustedWebClient( baseUrl + path );
+                generateX509Certificate();
 
-            processor = new HeartbeatProcessor( this );
-            this.hearbeatExecutorService.scheduleWithFixedDelay( processor, 10, 180, TimeUnit.SECONDS );
+                String path = String.format( "/rest/v1/peers/%s/hearbeat", peerManager.getLocalPeerInfo().getId() );
+                WebClient client = io.subutai.core.hintegration.impl.HttpClient.createTrustedWebClient( baseUrl +
+                        path );
 
-            keyStore = KeyStore.getInstance( "JKS" );
+                processor = new HeartbeatProcessor( this );
+                this.hearbeatExecutorService.scheduleWithFixedDelay( processor, 10, 180, TimeUnit.SECONDS );
 
-            keyStore.load( new FileInputStream( HSettings.PEER_KEYSTORE ), "subutai".toCharArray() );
-        }
-        catch ( IOException | PGPException | CertificateException | KeyStoreException e )
-        {
-            throw new HIntegrationException( "Could not initialize integration module.", e );
-        }
-        catch ( NoSuchAlgorithmException e )
-        {
-            e.printStackTrace();
+                keyStore = KeyStore.getInstance( "JKS" );
+
+                keyStore.load( new FileInputStream( HSettings.PEER_KEYSTORE ), "subutai".toCharArray() );
+            }
+            catch ( IOException | PGPException | CertificateException | KeyStoreException e )
+            {
+                throw new HIntegrationException( "Could not initialize integration module.", e );
+            }
+            catch ( NoSuchAlgorithmException e )
+            {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -952,5 +955,11 @@ public class IntegrationImpl implements Integration
 
         IOUtils.copy( is, bos );
         return bos.toByteArray();
+    }
+
+
+    public void setIntegrationEnabled( final boolean integrationEnabled )
+    {
+        this.integrationEnabled = integrationEnabled;
     }
 }
