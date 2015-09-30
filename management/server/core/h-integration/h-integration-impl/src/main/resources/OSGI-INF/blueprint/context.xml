@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint default-activation="eager"
-           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
 
   <reference id="securityManager"
              interface="io.subutai.core.security.api.SecurityManager" />
@@ -8,11 +9,19 @@
   <reference id="peerManager"
              interface="io.subutai.core.peer.api.PeerManager" />
 
+  <cm:property-placeholder persistent-id="peer" update-strategy="none">
+    <cm:default-properties>
+      <cm:property name="integrationEnabled" value="" />
+    </cm:default-properties>
+  </cm:property-placeholder>
+
+
   <bean id="hIntegrationImpl" scope="singleton" init-method="init" destroy-method="destroy"
         class="io.subutai.core.hintegration.impl.IntegrationImpl">
     <property name="securityManager" ref="securityManager" />
     <property name="peerManager" ref="peerManager" />
     <property name="bundleContext" ref="blueprintBundleContext" />
+    <property name="integrationEnabled" value="${integrationEnabled}" />
   </bean>
 
   <service ref="hIntegrationImpl" interface="io.subutai.core.hintegration.api.Integration" />
