@@ -6,7 +6,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>template-registry-parent</artifactId>
-    <version>2.0.0</version>
+    <version>4.0.0-RC1</version>
   </parent>
 
   <artifactId>template-registry-ui</artifactId>
