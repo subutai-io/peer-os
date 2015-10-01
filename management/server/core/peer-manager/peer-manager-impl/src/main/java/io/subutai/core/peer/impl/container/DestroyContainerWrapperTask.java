@@ -9,7 +9,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.peer.api.LocalPeer;
 
 
-public class DestroyContainerWrapperTask implements Callable<String>
+public class DestroyContainerWrapperTask implements Callable<ContainerHost>
 {
     private final LocalPeer localPeer;
     private final ContainerHost containerHost;
@@ -26,10 +26,10 @@ public class DestroyContainerWrapperTask implements Callable<String>
 
 
     @Override
-    public String call() throws Exception
+    public ContainerHost call() throws Exception
     {
         localPeer.destroyContainer( containerHost );
 
-        return containerHost.getId();
+        return containerHost;
     }
 }

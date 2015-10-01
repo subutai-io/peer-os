@@ -16,7 +16,7 @@ import com.vaadin.data.util.HierarchicalContainer;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.core.environment.api.EnvironmentManager;
 
@@ -37,9 +37,9 @@ public class EnvironmentTreeTest
     @Mock
     private Environment environmentA;
     @Mock
-    private ContainerHost containerHostB;
+    private EnvironmentContainerHost containerHostB;
     @Mock
-    private ContainerHost containerHostA;
+    private EnvironmentContainerHost containerHostA;
 
     @Mock
     Peer peer;
@@ -69,7 +69,7 @@ public class EnvironmentTreeTest
         environmentTree.environment = environmentA;
 
 
-        Set<ContainerHost> hostSet = environmentTree.getSelectedContainers();
+        Set<EnvironmentContainerHost> hostSet = environmentTree.getSelectedContainers();
 
 
         assertNotNull( hostSet );
@@ -125,7 +125,7 @@ public class EnvironmentTreeTest
         when( environmentManager.getEnvironments() ).thenReturn( Sets.newHashSet( environmentA ) );
         when( environmentManager.loadEnvironment( PEER_ID ) ).thenReturn( environmentA );
 
-        Set<ContainerHost> containers = Sets.newHashSet( containerHostA );
+        Set<EnvironmentContainerHost> containers = Sets.newHashSet( containerHostA );
         when( environmentA.getContainerHosts() ).thenReturn( containers );
         when( environmentA.getId() ).thenReturn( PEER_ID );
         when( environmentA.getName() ).thenReturn( "environmentA" );
@@ -163,7 +163,7 @@ public class EnvironmentTreeTest
         when( environmentManager.getEnvironments() ).thenReturn( Sets.newHashSet( environmentA ) );
         when( environmentManager.loadEnvironment( PEER_ID ) ).thenReturn( environmentA );
 
-        Set<ContainerHost> containers = Sets.newHashSet( containerHostA, containerHostB );
+        Set<EnvironmentContainerHost> containers = Sets.newHashSet( containerHostA, containerHostB );
 
         when( environmentA.getContainerHosts() ).thenReturn( containers );
         when( environmentA.getId() ).thenReturn( PEER_ID );

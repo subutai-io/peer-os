@@ -25,15 +25,12 @@ import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.CpuQuotaInfo;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.RamQuota;
-import io.subutai.core.peer.api.ContainerGroup;
-import io.subutai.core.peer.api.ContainerGroupNotFoundException;
-import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.common.peer.ResourceHost;
 
 
 /**
@@ -52,8 +49,8 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Column( name = "containerName" )
     private String containerName;
 
-    @Column( name = "environment_id" )
-    private String environmentId;
+    //    @Column( name = "environment_id" )
+    //    private String environmentId;
 
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
     private Set<String> tags = new HashSet<>();
@@ -92,37 +89,37 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     //    }
 
 
-    public ContainerHostEntity( String peerId, HostInfo hostInfo, String environmentId )
+    public ContainerHostEntity( String peerId, HostInfo hostInfo )
     {
         super( peerId, hostInfo );
 
         updateHostInfo( hostInfo );
 
         this.containerName = ( ( ContainerHostInfo ) hostInfo ).getContainerName();
-        this.environmentId = environmentId;
+        //        this.environmentId = environmentId;
     }
 
 
-    public void setEnvironmentId( final String environmentId )
-    {
-        this.environmentId = environmentId;
-    }
+    //    public void setEnvironmentId( final String environmentId )
+    //    {
+    //        this.environmentId = environmentId;
+    //    }
 
 
-    public String getEnvironmentId()
-    {
-        //        try
-        //        {
-        //            ContainerGroup containerGroup = localPeer.findContainerGroupByContainerId( getId() );
-        //
-        //            return containerGroup.getEnvironmentId();
-        //        }
-        //        catch ( ContainerGroupNotFoundException e )
-        //        {
-        //            return null;
-        //        }
-        return environmentId;
-    }
+    //    public String getEnvironmentId()
+    //    {
+    //        //        try
+    //        //        {
+    //        //            ContainerGroup containerGroup = localPeer.findContainerGroupByContainerId( getId() );
+    //        //
+    //        //            return containerGroup.getEnvironmentId();
+    //        //        }
+    //        //        catch ( ContainerGroupNotFoundException e )
+    //        //        {
+    //        //            return null;
+    //        //        }
+    //        return environmentId;
+    //    }
 
 
     @Override
@@ -211,8 +208,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     public void dispose() throws PeerException
     {
-        Peer peer = getPeer();
-        peer.destroyContainer( this );
+        getPeer().destroyContainer( this );
     }
 
 

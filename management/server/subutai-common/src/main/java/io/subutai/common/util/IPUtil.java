@@ -6,6 +6,9 @@ import java.net.InetAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
+
+import io.subutai.common.settings.Common;
 
 
 public class IPUtil
@@ -45,6 +48,11 @@ public class IPUtil
             LOGGER.error( "Error parsing InetAddress", e );
             return false;
         }
+    }
+
+    public static boolean isValid( final String ip )
+    {
+        return !Strings.isNullOrEmpty( ip ) && ip.matches( Common.IP_REGEX );
     }
 }
 

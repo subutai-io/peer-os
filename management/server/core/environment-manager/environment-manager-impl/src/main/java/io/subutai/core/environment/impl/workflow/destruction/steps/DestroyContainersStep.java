@@ -113,7 +113,7 @@ public class DestroyContainersStep
                     {
                         if ( containerHost.getPeerId().equals( result.peerId() ) )
                         {
-                            environment.removeContainer( containerHost.getId() );
+                            environment.removeContainer( containerHost );
 
                             environmentManager.notifyOnContainerDestroyed( environment, containerHost.getId() );
                         }
@@ -121,25 +121,26 @@ public class DestroyContainersStep
                 }
                 else if ( !CollectionUtil.isCollectionEmpty( result.getDestroyedContainersIds() ) )
                 {
-                    for ( String containerId : result.getDestroyedContainersIds() )
+                    for ( ContainerHost container : result.getDestroyedContainersIds() )
                     {
-                        environment.removeContainer( containerId );
+                        environment.removeContainer( container );
 
-                        environmentManager.notifyOnContainerDestroyed( environment, containerId );
+                        environmentManager.notifyOnContainerDestroyed( environment, container.getId() );
                     }
                 }
             }
 
 
-            if ( forceMetadataRemoval || environment.getContainerHosts().isEmpty() )
-            {
-                environmentManager.removeEnvironment( environment.getId()/*, false*/ );
-            }
-            else
-            {
-                throw new EnvironmentDestructionException(
-                        String.format( "There were errors while destroying environment: %s", exceptions ) );
-            }
+            //            if ( forceMetadataRemoval || environment.getContainerHosts().isEmpty() )
+            //            {
+            //                environmentManager.removeEnvironment( environment.getId()/*, false*/ );
+            //            }
+            //            else
+            //            {
+            //                throw new EnvironmentDestructionException(
+            //                        String.format( "There were errors while destroying environment: %s", exceptions
+            // ) );
+            //            }
         }
         finally
         {

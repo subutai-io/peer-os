@@ -18,6 +18,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.network.api.ContainerInfo;
 import io.subutai.core.network.api.N2NConnection;
@@ -92,7 +93,7 @@ public class NetworkManagerImplTest
     @Mock
     ResourceHost resourceHost;
     @Mock
-    ContainerHost containerHost;
+    EnvironmentContainerHost containerHost;
     @Mock
     CommandResult commandResult;
     @Mock
@@ -106,7 +107,7 @@ public class NetworkManagerImplTest
 
     private NetworkManagerImpl spyNetworkManager;
 
-    private Set<ContainerHost> containers;
+    private Set<EnvironmentContainerHost> containers;
 
     private NetworkManagerImpl networkManager;
 

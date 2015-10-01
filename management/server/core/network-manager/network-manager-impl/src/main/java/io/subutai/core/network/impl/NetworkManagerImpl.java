@@ -19,6 +19,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
@@ -488,14 +489,14 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void exchangeSshKeys( final Set<ContainerHost> containers ) throws NetworkManagerException
+    public void exchangeSshKeys( final Set<EnvironmentContainerHost> containers ) throws NetworkManagerException
     {
         getSshManager( containers ).execute();
     }
 
 
     @Override
-    public void addSshKeyToAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
+    public void addSshKeyToAuthorizedKeys( final Set<EnvironmentContainerHost> containers, final String sshKey )
             throws NetworkManagerException
     {
         getSshManager( containers ).appendSshKey( sshKey );
@@ -503,7 +504,7 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void replaceSshKeyInAuthorizedKeys( final Set<ContainerHost> containers, final String oldSshKey,
+    public void replaceSshKeyInAuthorizedKeys( final Set<EnvironmentContainerHost> containers, final String oldSshKey,
                                                final String newSshKey ) throws NetworkManagerException
     {
         getSshManager( containers ).replaceSshKey( oldSshKey, newSshKey );
@@ -511,7 +512,7 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void removeSshKeyFromAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
+    public void removeSshKeyFromAuthorizedKeys( final Set<EnvironmentContainerHost> containers, final String sshKey )
             throws NetworkManagerException
     {
         getSshManager( containers ).removeSshKey( sshKey );
@@ -519,20 +520,20 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void registerHosts( final Set<ContainerHost> containerHosts, final String domainName )
+    public void registerHosts( final Set<EnvironmentContainerHost> containerHosts, final String domainName )
             throws NetworkManagerException
     {
         getHostManager( containerHosts, domainName ).execute();
     }
 
 
-    protected SshManager getSshManager( final Set<ContainerHost> containers )
+    protected SshManager getSshManager( final Set<EnvironmentContainerHost> containers )
     {
         return new SshManager( containers );
     }
 
 
-    protected HostManager getHostManager( final Set<ContainerHost> containerHosts, final String domainName )
+    protected HostManager getHostManager( final Set<EnvironmentContainerHost> containerHosts, final String domainName )
     {
         return new HostManager( containerHosts, domainName );
     }

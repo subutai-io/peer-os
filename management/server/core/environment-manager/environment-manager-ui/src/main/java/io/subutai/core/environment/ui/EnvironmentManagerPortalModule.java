@@ -11,6 +11,7 @@ import com.vaadin.ui.Component;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.util.FileUtil;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -81,7 +82,7 @@ public class EnvironmentManagerPortalModule implements PortalModule, Environment
 
 
     @Override
-    public void onEnvironmentGrown( final Environment environment, final Set<ContainerHost> newContainers )
+    public void onEnvironmentGrown( final Environment environment, final Set<EnvironmentContainerHost> newContainers )
     {
         LOG.info( String.format( "Environment grown: %s, containers: %s", environment, newContainers ) );
     }

@@ -18,7 +18,7 @@ import io.subutai.common.quota.RamQuota;
 public interface ContainerHost extends Host, ContainerHostInfo
 {
 
-    public String getEnvironmentId();
+//    public String getEnvironmentId();
 
     public String getNodeGroupName();
 
@@ -158,6 +158,4 @@ public interface ContainerHost extends Host, ContainerHostInfo
      * @param ramQuota - quota to set
      */
     public void setRamQuota( RamQuota ramQuota ) throws PeerException;
-
-
 }

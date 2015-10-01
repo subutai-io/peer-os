@@ -8,20 +8,19 @@ import com.google.common.collect.Sets;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.peer.api.LocalPeer;
 
 
 public class RemoveKeysStep
 {
 
     private final EnvironmentImpl environment;
-    private final LocalPeer localPeer;
+//    private final LocalPeer localPeer;
 
 
-    public RemoveKeysStep( final EnvironmentImpl environment, final LocalPeer localPeer )
+    public RemoveKeysStep( final EnvironmentImpl environment/*, final LocalPeer localPeer*/ )
     {
         this.environment = environment;
-        this.localPeer = localPeer;
+//        this.localPeer = localPeer;
     }
 
 
@@ -29,7 +28,7 @@ public class RemoveKeysStep
     {
 
         Set<Peer> peers = Sets.newHashSet( environment.getPeers() );
-        peers.add( localPeer );
+//        peers.add( localPeer );
 
         for ( final Peer peer : peers )
         {

@@ -5,17 +5,18 @@ import java.util.Set;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainersDestructionResult;
 
 
 public class ContainersDestructionResultImpl implements ContainersDestructionResult
 {
     private final String peerId;
-    private final Set<String> destroyedContainersIds;
+    private final Set<ContainerHost> destroyedContainersIds;
     private final String exception;
 
 
-    public ContainersDestructionResultImpl( final String peerId, final Set<String> destroyedContainersIds,
+    public ContainersDestructionResultImpl( final String peerId, final Set<ContainerHost> destroyedContainersIds,
                                             final String exception )
     {
         Preconditions.checkNotNull( peerId );
@@ -35,7 +36,7 @@ public class ContainersDestructionResultImpl implements ContainersDestructionRes
 
 
     @Override
-    public Set<String> getDestroyedContainersIds()
+    public Set<ContainerHost> getDestroyedContainersIds()
     {
         return destroyedContainersIds;
     }

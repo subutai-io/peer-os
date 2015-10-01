@@ -39,10 +39,10 @@ import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.N2NUtil;
-import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 
 
@@ -57,7 +57,7 @@ import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 @Access( AccessType.FIELD )
 public class EnvironmentImpl implements Environment, Serializable
 {
-    @Transient
+    //    @Transient
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentImpl.class );
 
     @Transient
@@ -99,8 +99,8 @@ public class EnvironmentImpl implements Environment, Serializable
     private String tunnelNetwork;
 
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = EnvironmentContainerImpl.class,
-            cascade = CascadeType.ALL, orphanRemoval = false )
-    private Set<ContainerHost> containers = Sets.newHashSet();
+            cascade = CascadeType.ALL, orphanRemoval = true )
+    private Set<EnvironmentContainerHost> containers = Sets.newHashSet();
 
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = PeerConfImpl.class,
             cascade = CascadeType.ALL, orphanRemoval = false )
@@ -301,7 +301,7 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public Set<ContainerHost> getContainerHosts()
+    public Set<EnvironmentContainerHost> getContainerHosts()
     {
         return containers;
     }
@@ -316,7 +316,7 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public Set<ContainerHost> growEnvironment( final Topology topology, boolean async )
+    public Set<EnvironmentContainerHost> growEnvironment( final Topology topology, boolean async )
             throws EnvironmentModificationException
     {
         try
@@ -346,23 +346,25 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public void removeContainer( String containerId )
+    public void removeContainer( ContainerHost container )
     {
-        Preconditions.checkNotNull( containerId );
+        Preconditions.checkNotNull( container );
+        containers.remove( container );
 
-        try
-        {
-            ContainerHost container = getContainerHostById( containerId );
-
-            synchronized ( containers )
-            {
-                containers.remove( container );
-            }
-        }
-        catch ( ContainerHostNotFoundException e )
-        {
-            LOG.warn( String.format( "Failed to remove container %s because it does not exist", containerId ), e );
-        }
+        //        try
+        //        {
+        ////            ContainerHost container = getContainerHostById( containerId );
+        //
+        //            synchronized ( containers )
+        //            {
+        //                containers.remove( container );
+        //            }
+        //        }
+        //        catch ( ContainerHostNotFoundException e )
+        //        {
+        //            LOG.warn( String.format( "Failed to remove container %s because it does not exist", containerId
+        // ), e );
+        //        }
     }
 
 

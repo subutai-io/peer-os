@@ -15,6 +15,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.network.api.NetworkManagerException;
 
@@ -27,14 +28,14 @@ public class SshManager
 
     private static final Logger LOG = LoggerFactory.getLogger( SshManager.class.getName() );
 
-    private Set<ContainerHost> containerHosts;
+    private Set<EnvironmentContainerHost> containerHosts;
     private Commands commands;
 
     protected List<String> keys;
     protected CommandUtil commandUtil;
 
 
-    public SshManager( Set<ContainerHost> containerHosts )
+    public SshManager( Set<EnvironmentContainerHost> containerHosts )
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ), "Containers are empty" );
         this.containerHosts = containerHosts;

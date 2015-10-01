@@ -149,6 +149,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
         try
         {
             daoManager.startTransaction( em );
+//            em.merge( item );
             em.remove( item );
             daoManager.commitTransaction( em );
         }

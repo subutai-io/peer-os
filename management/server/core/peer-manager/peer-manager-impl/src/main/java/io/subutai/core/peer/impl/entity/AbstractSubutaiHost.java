@@ -51,9 +51,6 @@ public abstract class AbstractSubutaiHost implements Host
     @Enumerated( EnumType.STRING )
     private HostArchitecture hostArchitecture;
 
-    @Column( name = "managed" )
-    private boolean managed = false;
-
     @Transient
     protected Set<Interface> interfaces = new CopyOnWriteArraySet<>();
 
@@ -81,10 +78,10 @@ public abstract class AbstractSubutaiHost implements Host
         this.hostname = hostInfo.getHostname();
         this.hostArchitecture = hostInfo.getArch();
 
-        //        for ( Interface s : hostInfo.getInterfaces() )
-        //        {
-        //            addInterface( new HostInterfaceImpl( s ) );
-        //        }
+        for ( Interface s : hostInfo.getInterfaces() )
+        {
+            addInterface( new HostInterfaceImpl( s ) );
+        }
     }
 
 
@@ -105,19 +102,6 @@ public abstract class AbstractSubutaiHost implements Host
         this.peer = peer;
     }
 
-
-    public boolean isManaged()
-    {
-        return managed;
-    }
-
-
-    public void setManaged( final boolean managed )
-    {
-        this.managed = managed;
-    }
-
-
     @Override
     public CommandResult execute( final RequestBuilder requestBuilder ) throws CommandException
     {
@@ -129,7 +113,7 @@ public abstract class AbstractSubutaiHost implements Host
     public CommandResult execute( final RequestBuilder requestBuilder, final CommandCallback callback )
             throws CommandException
     {
-        return peer.execute( requestBuilder, this, callback );
+        return getPeer().execute( requestBuilder, this, callback );
     }
 
 
@@ -144,7 +128,7 @@ public abstract class AbstractSubutaiHost implements Host
     public void executeAsync( final RequestBuilder requestBuilder, final CommandCallback callback )
             throws CommandException
     {
-        peer.executeAsync( requestBuilder, this, callback );
+        getPeer().executeAsync( requestBuilder, this, callback );
     }
 
 
@@ -238,13 +222,13 @@ public abstract class AbstractSubutaiHost implements Host
     }
 
 
-    //    public void addInterface( HostInterfaceImpl hostInterface )
-    //    {
-    //        Preconditions.checkNotNull( hostInterface, "HostInterface could not be null." );
-    //
-    //        hostInterface.setHost( this );
-    //        interfaces.add( hostInterface );
-    //    }
+    public void addInterface( HostInterfaceImpl hostInterface )
+    {
+        Preconditions.checkNotNull( hostInterface, "HostInterface could not be null." );
+
+        hostInterface.setHost( this );
+        interfaces.add( hostInterface );
+    }
     //
     //
     //    public void removeInterface( Interface hostInterface )

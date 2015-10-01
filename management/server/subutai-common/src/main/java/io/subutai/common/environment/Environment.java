@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 
 
@@ -54,7 +55,7 @@ public interface Environment
      *
      * @return - set of @{code ContainerHost}
      */
-    Set<ContainerHost> getContainerHosts();
+    Set<EnvironmentContainerHost> getContainerHosts();
 
 
     /**
@@ -73,7 +74,7 @@ public interface Environment
      * @param topology = topology to use when growing
      * @param async - sync or async to the calling party
      */
-    Set<ContainerHost> growEnvironment( Topology topology, boolean async ) throws EnvironmentModificationException;
+    Set<EnvironmentContainerHost> growEnvironment( Topology topology, boolean async ) throws EnvironmentModificationException;
 
 
     /**
@@ -146,5 +147,5 @@ public interface Environment
 
     void setTunnelNetwork( String network );
 
-    void removeContainer( String containerHostId );
+    void removeContainer( ContainerHost containerHost );
 }

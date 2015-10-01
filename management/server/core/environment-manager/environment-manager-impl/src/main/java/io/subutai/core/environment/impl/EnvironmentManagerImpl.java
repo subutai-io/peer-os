@@ -26,6 +26,7 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
@@ -150,7 +151,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public Set<ContainerHost> growEnvironment( final String environmentId, final Topology topology,
+    public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology,
                                                final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
@@ -165,7 +166,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public Set<ContainerHost> growEnvironment( final String environmentId, final Topology topology, final boolean async,
+    public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology, final boolean async,
                                                final boolean checkAccess, final TrackerOperation operationTracker )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
@@ -183,7 +184,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     String.format( "Environment status is %s", environment.getStatus() ) );
         }
 
-        final Set<ContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
+        final Set<EnvironmentContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
 
 
         //launch environment growing workflow
@@ -201,7 +202,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 try
                 {
-                    Set<ContainerHost> newContainers = Sets.newHashSet( environment.getContainerHosts() );
+                    Set<EnvironmentContainerHost> newContainers = Sets.newHashSet( environment.getContainerHosts() );
                     newContainers.removeAll( oldContainers );
                     notifyOnEnvironmentGrown( loadEnvironment( environment.getId(), checkAccess ), newContainers );
                 }
@@ -224,7 +225,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
             else
             {
-                Set<ContainerHost> newContainers = Sets.newHashSet( environment.getContainerHosts() );
+                Set<EnvironmentContainerHost> newContainers = Sets.newHashSet( environment.getContainerHosts() );
                 newContainers.removeAll( oldContainers );
                 return newContainers;
             }
@@ -442,9 +443,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        loadEnvironment( environmentId, checkAccess );
+        Environment environment = loadEnvironment( environmentId, checkAccess );
 
-        environmentDataService.remove( environmentId );
+        environmentDataService.remove( ( EnvironmentImpl ) environment );
 
         notifyOnEnvironmentDestroyed( environmentId );
     }
@@ -510,7 +511,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         try
         {
             Environment environment = loadEnvironment( environmentId );
-            Set<ContainerHost> containerHosts = environment.getContainerHosts();
+            Set<EnvironmentContainerHost> containerHosts = environment.getContainerHosts();
 
             for ( final ContainerHost containerHost : containerHosts )
             {
@@ -725,7 +726,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                                                                 final TrackerOperation
                                                                                         operationTracker )
     {
-        return new EnvironmentDestructionWorkflow( peerManager, environmentManager, environment, forceMetadataRemoval,
+        return new EnvironmentDestructionWorkflow( /*peerManager,*/ environmentManager, environment, forceMetadataRemoval,
                 operationTracker );
     }
 
@@ -848,7 +849,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void notifyOnEnvironmentGrown( final Environment environment, final Set<ContainerHost> containers )
+    public void notifyOnEnvironmentGrown( final Environment environment, final Set<EnvironmentContainerHost> containers )
     {
         for ( final EnvironmentEventListener listener : listeners )
         {

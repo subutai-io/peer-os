@@ -165,7 +165,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     public void init()
     {
-        LOG.debug( "********************************************** Initializing peer ******************************************" );
+        LOG.debug( "********************************************** Initializing peer "
+                + "******************************************" );
 
         PeerDAO peerDAO;
         try
@@ -360,8 +361,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            return resourceHost
-                    .createContainer( template.getTemplateName(), /*Arrays.asList( template ), */containerName, 180 );
+            return resourceHost.createContainer( template.getTemplateName(), containerName, 180 );
         }
         catch ( ResourceHostException e )
         {
@@ -371,7 +371,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected ExecutorService getFixedExecutor( int numOfThreads )
+    protected ExecutorService getFixedPoolExecutor( int numOfThreads )
     {
         return Executors.newFixedThreadPool( numOfThreads );
     }
@@ -411,7 +411,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         int currentIpAddressOffset = 0;
 
         List<Future<ContainerHost>> taskFutures = Lists.newArrayList();
-        ExecutorService executorService = getFixedExecutor( request.getNumberOfContainers() );
+        ExecutorService executorService = getFixedPoolExecutor( request.getNumberOfContainers() );
 
         Vni environmentVni = getManagementHost().findVniByEnvironmentId( request.getEnvironmentId() );
 
@@ -511,7 +511,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 ContainerHost containerHost = future.get();
                 newContainers.add( new ContainerHostEntity( getId(),
-                        hostRegistry.getContainerHostInfoById( containerHost.getId() ), request.getEnvironmentId() ) );
+                        hostRegistry.getContainerHostInfoById( containerHost.getId() ) ) );
                 result.add( new HostInfoModel( containerHost ) );
             }
             catch ( ExecutionException | InterruptedException | HostDisconnectedException e )
@@ -810,11 +810,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void destroyContainer( final ContainerHost host ) throws PeerException
     {
         Preconditions.checkNotNull( host, "Container host is already null" );
+        ContainerHostEntity entity = ( ContainerHostEntity ) bindHost( host.getId() );
+        ResourceHost resourceHost = entity.getParent();
 
         try
         {
-            ContainerHostEntity entity = ( ContainerHostEntity ) bindHost( host.getId() );
-            ResourceHost resourceHost = entity.getParent();
             resourceHost.destroyContainerHost( host );
             //            containerHostDataService.remove( host.getId() );
             ( ( ResourceHostEntity ) entity.getParent() ).removeContainerHost( entity );
@@ -839,14 +839,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( ResourceHostException e )
         {
+
             String errMsg = String.format( "Could not destroy container [%s]", host.getHostname() );
             LOG.error( errMsg, e );
             throw new PeerException( errMsg, e.toString() );
         }
         catch ( ContainerGroupNotFoundException e )
         {
-            LOG.error( "Could not find container group", e );
+            LOG.warn( "Could not find container group for: " + host.getHostname(), e );
         }
+        resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
     }
 
 
@@ -894,9 +896,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder(
-                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
-                    bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
+                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1154,7 +1155,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 {
                     managementHost = new ManagementHostEntity( getId(), resourceHostInfo );
                     managementHost.setPeer( this );
-                    managementHost.setManaged( true );
                     try
                     {
                         managementHost.init();
@@ -1187,6 +1187,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     resourceHostDataService.persist( host );
                     addResourceHost( host );
                     HashSet<ResourceHost> a = new HashSet<ResourceHost>();
+                    a.add( host );
                     setResourceHostTransientFields( a );
                 }
                 //                updateResourceHostContainers( host, resourceHostInfo.getContainers() );
@@ -1506,7 +1507,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         Set<Throwable> errors = Sets.newHashSet();
-        Set<String> destroyedContainersIds = Sets.newHashSet();
+        Set<ContainerHost> destroyedContainersIds = Sets.newHashSet();
         ContainerGroup containerGroup;
 
         try
@@ -1547,12 +1548,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     private void destroyContainerGroup( final Set<ContainerHost> containerHosts,
-                                        final Set<String> destroyedContainersIds, final Set<Throwable> errors )
+                                        final Set<ContainerHost> destroyedContainersIds, final Set<Throwable> errors )
     {
         if ( !containerHosts.isEmpty() )
         {
-            List<Future<String>> taskFutures = Lists.newArrayList();
-            ExecutorService executorService = getFixedExecutor( containerHosts.size() );
+            List<Future<ContainerHost>> taskFutures = Lists.newArrayList();
+            ExecutorService executorService = getFixedPoolExecutor( containerHosts.size() );
 
             for ( ContainerHost containerHost : containerHosts )
             {
@@ -1560,7 +1561,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 taskFutures.add( executorService.submit( new DestroyContainerWrapperTask( this, containerHost ) ) );
             }
 
-            for ( Future<String> taskFuture : taskFutures )
+            for ( Future<ContainerHost> taskFuture : taskFutures )
             {
                 try
                 {

@@ -61,7 +61,7 @@ public class DestroyContainerStep
             }
         }
 
-        environment.removeContainer( containerHost.getId() );
+        environment.removeContainer( containerHost );
 
         environmentManager.notifyOnContainerDestroyed( environment, containerHost.getId() );
     }

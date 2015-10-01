@@ -21,6 +21,7 @@ import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
@@ -339,7 +340,7 @@ public class RestServiceImpl implements RestService
         {
             Topology topology = buildTopology( topologyJson );
 
-            Set<ContainerHost> newContainers = environmentManager.growEnvironment( environmentId, topology, false );
+            Set<EnvironmentContainerHost> newContainers = environmentManager.growEnvironment( environmentId, topology, false );
 
             return Response.ok( JsonUtil.toJson( convertContainersToContainerJson( newContainers ) ) ).build();
         }
@@ -531,10 +532,10 @@ public class RestServiceImpl implements RestService
     }
 
 
-    private Set<ContainerJson> convertContainersToContainerJson( Set<ContainerHost> containerHosts )
+    private Set<ContainerJson> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts )
     {
         Set<ContainerJson> jsonSet = Sets.newHashSet();
-        for ( ContainerHost containerHost : containerHosts )
+        for ( EnvironmentContainerHost containerHost : containerHosts )
         {
             ContainerHostState state = containerHost.getStatus();
 

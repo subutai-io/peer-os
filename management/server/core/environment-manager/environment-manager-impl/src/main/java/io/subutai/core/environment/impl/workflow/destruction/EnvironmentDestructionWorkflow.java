@@ -22,7 +22,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentDestructionWorkflow.class );
 
-    private final PeerManager peerManager;
+//    private final PeerManager peerManager;
     private final EnvironmentManagerImpl environmentManager;
     private final EnvironmentImpl environment;
     private final boolean forceMetadataRemoval;
@@ -42,14 +42,14 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     }
 
 
-    public EnvironmentDestructionWorkflow( final PeerManager peerManager,
+    public EnvironmentDestructionWorkflow( /*final PeerManager peerManager,*/
                                            final EnvironmentManagerImpl environmentManager,
                                            final EnvironmentImpl environment, final boolean forceMetadataRemoval,
                                            final TrackerOperation operationTracker )
     {
         super( EnvironmentDestructionPhase.INIT );
 
-        this.peerManager = peerManager;
+//        this.peerManager = peerManager;
         this.environmentManager = environmentManager;
         this.environment = environment;
         this.forceMetadataRemoval = forceMetadataRemoval;
@@ -76,7 +76,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
         try
         {
-            new CleanupN2NStep( environment, peerManager.getLocalPeer() ).execute();
+            new CleanupN2NStep( environment ).execute();
 
             return EnvironmentDestructionPhase.DESTROY_CONTAINERS;
         }
@@ -114,7 +114,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
         try
         {
-            new CleanUpNetworkStep( environment, peerManager.getLocalPeer() ).execute();
+            new CleanUpNetworkStep( environment/*, peerManager.getLocalPeer()*/ ).execute();
 
             return EnvironmentDestructionPhase.REMOVE_KEYS;
         }
@@ -133,7 +133,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
         try
         {
-            new RemoveKeysStep( environment, peerManager.getLocalPeer() ).execute();
+            new RemoveKeysStep( environment/*, peerManager.getLocalPeer()*/ ).execute();
 
             return EnvironmentDestructionPhase.FINALIZE;
         }

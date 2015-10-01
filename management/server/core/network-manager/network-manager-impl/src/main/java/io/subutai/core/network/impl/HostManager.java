@@ -6,6 +6,7 @@ import java.util.Set;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.network.api.NetworkManagerException;
 import org.slf4j.Logger;
@@ -23,13 +24,13 @@ public class HostManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( HostManager.class.getName() );
 
-    private Set<ContainerHost> containerHosts;
+    private Set<EnvironmentContainerHost> containerHosts;
     private String domainName;
     private Commands commands;
     protected CommandUtil commandUtil;
 
 
-    public HostManager( Set<ContainerHost> containerHosts, String domainName )
+    public HostManager( Set<EnvironmentContainerHost> containerHosts, String domainName )
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ), "Containers are empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ), "Domain name is empty" );

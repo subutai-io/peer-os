@@ -34,6 +34,7 @@ import io.subutai.common.metric.OwnerResourceUsage;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -114,7 +115,7 @@ public class MonitorImpl implements Monitor
         Set<ContainerHostMetric> metrics = new HashSet<>();
 
         //obtain environment containers
-        Set<ContainerHost> containerHosts = environment.getContainerHosts();
+        Set<EnvironmentContainerHost> containerHosts = environment.getContainerHosts();
 
         Set<Peer> peers = Sets.newHashSet();
 
@@ -411,7 +412,9 @@ public class MonitorImpl implements Monitor
         }
 
         //activate monitoring
-        activateMonitoring( environment.getContainerHosts(), monitoringSettings, environment.getId() );
+        Set<ContainerHost> a = new HashSet<>();
+        a.addAll( environment.getContainerHosts() );
+        activateMonitoring( a, monitoringSettings, environment.getId() );
     }
 
 
@@ -430,7 +433,9 @@ public class MonitorImpl implements Monitor
         //save subscription to database
         try
         {
-            monitorDao.addSubscription( containerHost.getEnvironmentId(), trimmedSubscriberId );
+            String environmentId = containerHost instanceof EnvironmentContainerHost ?
+                                   ( ( EnvironmentContainerHost ) containerHost ).getEnvironmentId() : null;
+            monitorDao.addSubscription( environmentId, trimmedSubscriberId );
         }
         catch ( DaoException e )
         {
@@ -439,7 +444,9 @@ public class MonitorImpl implements Monitor
         }
 
         //activate monitoring
-        activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings, containerHost.getEnvironmentId() );
+        String environmentId = containerHost instanceof EnvironmentContainerHost ?
+                               ( ( EnvironmentContainerHost ) containerHost ).getEnvironmentId() : null;
+        activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings, environmentId );
     }
 
 
@@ -466,14 +473,16 @@ public class MonitorImpl implements Monitor
 
 
     @Override
-    public void activateMonitoring( final ContainerHost containerHost, final MonitoringSettings monitoringSettings )
-            throws MonitorException
+    public void activateMonitoring( final ContainerHost containerHost, final MonitoringSettings monitoringSettings/*,
+     final String environmentId*/ ) throws MonitorException
 
     {
         Preconditions.checkNotNull( containerHost, CONTAINER_IS_NULL_MSG );
         Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
 
-        activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings, containerHost.getEnvironmentId() );
+        String environmentId = containerHost instanceof EnvironmentContainerHost ?
+                               ( ( EnvironmentContainerHost ) containerHost ).getEnvironmentId() : null;
+        activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings, environmentId );
     }
 
 

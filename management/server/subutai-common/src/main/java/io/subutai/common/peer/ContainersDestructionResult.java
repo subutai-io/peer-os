@@ -8,7 +8,7 @@ public interface ContainersDestructionResult
 {
     public String peerId();
 
-    public Set<String> getDestroyedContainersIds();
+    public Set<ContainerHost> getDestroyedContainersIds();
 
     public String getException();
 }

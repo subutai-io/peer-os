@@ -4,7 +4,7 @@ package io.subutai.core.environment.api;
 import java.util.Set;
 
 import io.subutai.common.environment.Environment;
-import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 
 
 /**
@@ -26,7 +26,7 @@ public interface EnvironmentEventListener
      * @param environment - target environment changed
      * @param newContainers - set of new container hosts
      */
-    public void onEnvironmentGrown( Environment environment, Set<ContainerHost> newContainers );
+    public void onEnvironmentGrown( Environment environment, Set<EnvironmentContainerHost> newContainers );
 
 
     /**

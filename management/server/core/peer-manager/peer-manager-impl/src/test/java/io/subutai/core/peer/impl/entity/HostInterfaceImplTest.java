@@ -38,13 +38,13 @@ public class HostInterfaceImplTest
     }
 
 
-    @Test
-    public void testSetNGetId() throws Exception
-    {
-        hostInterface.setId( ID );
-
-        assertEquals( ID, hostInterface.getId() );
-    }
+//    @Test
+//    public void testSetNGetId() throws Exception
+//    {
+//        hostInterface.setId( ID );
+//
+//        assertEquals( ID, hostInterface.getId() );
+//    }
 
 
     @Test

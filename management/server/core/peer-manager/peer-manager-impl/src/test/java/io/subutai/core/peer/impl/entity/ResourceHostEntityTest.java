@@ -110,6 +110,7 @@ public class ResourceHostEntityTest
         when( anInterface.getInterfaceName() ).thenReturn( INTERFACE_NAME );
         when( anInterface.getIp() ).thenReturn( IP );
         when( anInterface.getMac() ).thenReturn( MAC );
+
         resourceHostEntity = new ResourceHostEntity( PEER_ID.toString(), hostInfo );
         resourceHostEntity.setHostRegistry( hostRegistry );
         resourceHostEntity.setMonitor( monitor );

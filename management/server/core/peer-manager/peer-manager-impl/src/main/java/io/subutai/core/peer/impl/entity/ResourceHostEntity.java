@@ -19,7 +19,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.omg.CORBA.UNKNOWN;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,15 +36,18 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.Template;
+import io.subutai.common.settings.Common;
+import io.subutai.common.util.IPUtil;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
-import io.subutai.common.peer.HostNotFoundException;
-import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.peer.ResourceHostException;
 import io.subutai.core.peer.impl.container.CreateContainerTask;
 import io.subutai.core.peer.impl.container.DestroyContainerTask;
 import io.subutai.core.registry.api.TemplateRegistry;
@@ -67,7 +69,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     private static final String CONTAINER_EXCEPTION_MSG_FORMAT = "Container with name %s does not exist";
 
     @OneToMany( mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.EAGER,
-            targetEntity = ContainerHostEntity.class )
+            targetEntity = ContainerHostEntity.class, orphanRemoval = true )
     private Set<ContainerHost> containersHosts = Sets.newHashSet();
 
     @Transient
@@ -316,7 +318,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    public void removeContainerHost( final ContainerHost containerHost )
+    public void removeContainerHost( final ContainerHostEntity containerHost )
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
 
@@ -325,6 +327,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             synchronized ( containersHosts )
             {
                 containersHosts.remove( containerHost );
+                containerHost.setParent( null );
             }
         }
     }
@@ -372,14 +375,24 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             //ignore
         }
 
-        Future<ContainerHost> containerHostFuture =
-                queueSequentialTask( new CreateContainerTask( this, template, hostname, ip, vlan, gateway, timeout ) );
+        Future<ContainerHost> containerHostFuture = queueSequentialTask(
+                new CreateContainerTask( this, template, hostname, ip, vlan, /*gateway, */timeout ) );
 
         try
         {
-            return containerHostFuture.get();
+            ContainerHost result = containerHostFuture.get();
+            if ( result != null )
+            {
+                final ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) result;
+                containerHostEntity.setParent( this );
+                if ( IPUtil.isValid( gateway ) )
+                {
+                    containerHostEntity.setDefaultGateway( gateway );
+                }
+            }
+            return result;
         }
-        catch ( ExecutionException | InterruptedException e )
+        catch ( ExecutionException | InterruptedException | PeerException e )
         {
             throw new ResourceHostException( "Error creating container", e );
         }
@@ -390,7 +403,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public ContainerHost createContainer( final String templateName, final String hostname, final int timeout )
             throws ResourceHostException
     {
-        return createContainer( templateName, hostname, null, 0, null, timeout );
+        ContainerHost result = createContainer( templateName, hostname, null, 0, null, timeout );
+        return result;
     }
 
 
@@ -412,14 +426,14 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    //    public void addContainerHost( ContainerHost host )
-    //    {
-    //        Preconditions.checkNotNull( host, "Invalid container host" );
-    //
-    //        host.setParent( this );
-    //
-    //        containersHosts.add( host );
-    //    }
+    public void addContainerHost( ContainerHostEntity host )
+    {
+        Preconditions.checkNotNull( host, "Invalid container host" );
+
+        host.setParent( this );
+
+        containersHosts.add( host );
+    }
 
 
     @Override
@@ -437,10 +451,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
             catch ( HostNotFoundException e )
             {
-                containerHost = new ContainerHostEntity( peerId, info, "UNKNOWN" );
-                //                addContainerHost( containerHost );
-                containerHost.setParent( this );
-                containersHosts.add( containerHost );
+                containerHost = new ContainerHostEntity( peerId, info );
+                addContainerHost( containerHost );
                 result = true;
             }
             containerHost.updateHostInfo( info );

@@ -37,6 +37,7 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.HostInfoModel;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -54,7 +55,7 @@ import io.subutai.core.environment.api.EnvironmentManager;
 @Entity
 @Table( name = "environment_container" )
 @Access( AccessType.FIELD )
-public class EnvironmentContainerImpl implements ContainerHost, Serializable
+public class EnvironmentContainerImpl implements EnvironmentContainerHost, Serializable
 {
     @Column( name = "peer_id", nullable = false )
     private String peerId;

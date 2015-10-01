@@ -12,6 +12,7 @@ import com.google.common.base.Strings;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -86,11 +87,11 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
 
         topology.addNodeGroupPlacement( peerManager.getLocalPeer(), nodeGroup );
 
-        Set<ContainerHost> newContainers = environmentManager.growEnvironment( environmentId, topology, async );
+        Set<EnvironmentContainerHost> newContainers = environmentManager.growEnvironment( environmentId, topology, async );
 
         System.out.println( "New containers created:" );
 
-        for ( ContainerHost containerHost : newContainers )
+        for ( EnvironmentContainerHost containerHost : newContainers )
         {
             System.out.println( "-----------------------------------------------------------------" );
 

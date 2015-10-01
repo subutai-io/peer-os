@@ -38,6 +38,7 @@ import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainersDestructionResult;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostInfoModel;
 import io.subutai.common.peer.InterfacePattern;
@@ -262,10 +263,12 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void startContainer( final ContainerHost host ) throws PeerException
+    public void startContainer( final ContainerHost containerHost ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Container host is null" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "peer/container/start";
 
         Map<String, String> params = Maps.newHashMap();
@@ -295,9 +298,12 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void stopContainer( final ContainerHost host ) throws PeerException
+    public void stopContainer( final ContainerHost containerHost ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Container host is null" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
 
         String path = "peer/container/stop";
 
@@ -328,10 +334,12 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void destroyContainer( final ContainerHost host ) throws PeerException
+    public void destroyContainer( final ContainerHost containerHost ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Container host is null" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "peer/container/destroy";
 
         Map<String, String> params = Maps.newHashMap();
@@ -361,9 +369,12 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setDefaultGateway( final ContainerHost host, final String gatewayIp ) throws PeerException
+    public void setDefaultGateway( final ContainerHost containerHost, final String gatewayIp ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkArgument( !Strings.isNullOrEmpty( gatewayIp ) && gatewayIp.matches( Common.IP_REGEX ),
                 "Invalid gateway IP" );
 
@@ -451,11 +462,12 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public boolean isConnected( final Host host )
+    public boolean isConnected( final Host containerHost )
     {
-        Preconditions.checkNotNull( host, "Container host is null" );
-        Preconditions.checkArgument( host instanceof ContainerHost );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "peer/container/isconnected";
 
         Map<String, String> params = Maps.newHashMap();
@@ -465,8 +477,8 @@ public class RemotePeerImpl implements RemotePeer
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource = localPeer.getId() + "-" + ( ( ContainerHost ) host ).getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + ( ( ContainerHost ) host ).getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
 
         headers.put( Common.HEADER_SPECIAL, "ENC" );
         headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
@@ -489,10 +501,13 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public ProcessResourceUsage getProcessResourceUsage( final ContainerHost host, final int processPid )
+    public ProcessResourceUsage getProcessResourceUsage( final ContainerHost containerHost, final int processPid )
             throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkArgument( processPid > 0, "Process pid must be greater than 0" );
 
         String path = "peer/container/resource/usage";
@@ -525,10 +540,12 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public ContainerHostState getContainerHostState( final ContainerHost host ) throws PeerException
+    public ContainerHostState getContainerHostState( final ContainerHost containerHost ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "peer/container/state";
 
         Map<String, String> params = Maps.newHashMap();
@@ -560,10 +577,12 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public int getRamQuota( final ContainerHost host ) throws PeerException
+    public int getRamQuota( final ContainerHost containerHost ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "peer/container/quota/ram";
 
         Map<String, String> params = Maps.newHashMap();
@@ -594,10 +613,12 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public RamQuota getRamQuotaInfo( final ContainerHost host ) throws PeerException
+    public RamQuota getRamQuotaInfo( final ContainerHost containerHost ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "peer/container/quota/ram/info";
 
         Map<String, String> params = Maps.newHashMap();
@@ -629,9 +650,12 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setRamQuota( final ContainerHost host, final int ramInMb ) throws PeerException
+    public void setRamQuota( final ContainerHost containerHost, final int ramInMb ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkArgument( ramInMb > 0, "Ram quota value must be greater than 0" );
 
         String path = "peer/container/quota/ram";
@@ -663,10 +687,12 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public int getCpuQuota( final ContainerHost host ) throws PeerException
+    public int getCpuQuota( final ContainerHost containerHost ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "peer/container/quota/cpu";
 
         Map<String, String> params = Maps.newHashMap();
@@ -697,10 +723,12 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public CpuQuotaInfo getCpuQuotaInfo( final ContainerHost host ) throws PeerException
+    public CpuQuotaInfo getCpuQuotaInfo( final ContainerHost containerHost ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "peer/container/quota/cpu/info";
 
         Map<String, String> params = Maps.newHashMap();
@@ -731,9 +759,12 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setCpuQuota( final ContainerHost host, final int cpuPercent ) throws PeerException
+    public void setCpuQuota( final ContainerHost containerHost, final int cpuPercent ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkArgument( cpuPercent > 0, "Cpu quota value must be greater than 0" );
 
         String path = "peer/container/quota/cpu";
@@ -766,10 +797,12 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public Set<Integer> getCpuSet( final ContainerHost host ) throws PeerException
+    public Set<Integer> getCpuSet( final ContainerHost containerHost ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "peer/container/quota/cpuset";
 
         Map<String, String> params = Maps.newHashMap();
@@ -802,9 +835,12 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setCpuSet( final ContainerHost host, final Set<Integer> cpuSet ) throws PeerException
+    public void setCpuSet( final ContainerHost containerHost, final Set<Integer> cpuSet ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( cpuSet ), "Empty cpu set" );
 
         String path = "peer/container/quota/cpuset";
@@ -837,9 +873,13 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public DiskQuota getDiskQuota( final ContainerHost host, final DiskPartition diskPartition ) throws PeerException
+    public DiskQuota getDiskQuota( final ContainerHost containerHost, final DiskPartition diskPartition )
+            throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkNotNull( diskPartition, "Invalid disk partition" );
 
         String path = "peer/container/quota/disk";
@@ -876,9 +916,12 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setDiskQuota( final ContainerHost host, final DiskQuota diskQuota ) throws PeerException
+    public void setDiskQuota( final ContainerHost containerHost, final DiskQuota diskQuota ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkNotNull( diskQuota, "Invalid disk quota" );
 
         String path = "peer/container/quota/disk";
@@ -911,9 +954,12 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setRamQuota( final ContainerHost host, final RamQuota ramQuota ) throws PeerException
+    public void setRamQuota( final ContainerHost containerHost, final RamQuota ramQuota ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkNotNull( ramQuota, "Invalid ram quota" );
 
         String path = "peer/container/quota/ram2";
@@ -946,10 +992,12 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public int getAvailableRamQuota( final ContainerHost host ) throws PeerException
+    public int getAvailableRamQuota( final ContainerHost containerHost ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "peer/container/quota/ram/available";
 
         Map<String, String> params = Maps.newHashMap();
@@ -980,10 +1028,12 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public int getAvailableCpuQuota( final ContainerHost host ) throws PeerException
+    public int getAvailableCpuQuota( final ContainerHost containerHost ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "peer/container/quota/cpu/available";
 
         Map<String, String> params = Maps.newHashMap();
@@ -1015,10 +1065,13 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public DiskQuota getAvailableDiskQuota( final ContainerHost host, final DiskPartition diskPartition )
+    public DiskQuota getAvailableDiskQuota( final ContainerHost containerHost, final DiskPartition diskPartition )
             throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkNotNull( diskPartition, "Invalid disk partition" );
 
         String path = "peer/container/quota/disk/available";
@@ -1054,9 +1107,12 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public QuotaInfo getQuotaInfo( final ContainerHost host, final QuotaType quotaType ) throws PeerException
+    public QuotaInfo getQuotaInfo( final ContainerHost containerHost, final QuotaType quotaType ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkNotNull( quotaType, "Invalid quota type" );
 
         String path = "peer/container/quota/info";
@@ -1092,10 +1148,12 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setQuota( final ContainerHost host, final QuotaInfo quotaInfo ) throws PeerException
+    public void setQuota( final ContainerHost containerHost, final QuotaInfo quotaInfo ) throws PeerException
     {
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkNotNull( quotaInfo, "Invalid quota info" );
 
         String path = "peer/container/quota";
@@ -1135,7 +1193,8 @@ public class RemotePeerImpl implements RemotePeer
         {
             //*********construct Secure Header ****************************
             Map<String, String> headers = Maps.newHashMap();
-            String envId = localPeer.getContainerHostById( containerHostId ).getEnvironmentId();
+            String envId = ( ( EnvironmentContainerHost ) localPeer.getContainerHostById( containerHostId ) )
+                    .getEnvironmentId();
             String envHeaderSource = localPeer.getId() + "-" + envId;
             String envHeaderTarget = peerInfo.getId() + "-" + envId;
 
@@ -1225,7 +1284,7 @@ public class RemotePeerImpl implements RemotePeer
             throw new CommandException( "Operation not allowed" );
         }
 
-        String environmentId = ( ( ContainerHost ) host ).getEnvironmentId();
+        String environmentId = ( ( EnvironmentContainerHost ) host ).getEnvironmentId();
         CommandRequest request = new CommandRequest( requestBuilder, host.getId(), environmentId );
         //cache callback
         commandResponseListener.addCallback( request.getRequestId(), callback, requestBuilder.getTimeout(), semaphore );

@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -216,7 +216,7 @@ public class CommandsTest
     @Test
     public void testGetAddIpHostToEtcHostsCommand() throws Exception
     {
-        ContainerHost containerHost = mock( ContainerHost.class );
+        EnvironmentContainerHost containerHost = mock( EnvironmentContainerHost.class );
         assertNotNull( commands.getAddIpHostToEtcHostsCommand( DOMAIN, Sets.newHashSet( containerHost ) ) );
     }
 }

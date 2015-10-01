@@ -23,6 +23,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.exception.HTTPException;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -108,7 +109,7 @@ public class RemotePeerImplTest
     @Mock
     HTTPException httpException;
     @Mock
-    ContainerHost containerHost;
+    EnvironmentContainerHost containerHost;
     @Mock
     CommandCallback commandCallback;
     @Mock

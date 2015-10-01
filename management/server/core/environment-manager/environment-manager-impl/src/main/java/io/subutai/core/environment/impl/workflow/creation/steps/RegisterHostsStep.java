@@ -7,7 +7,7 @@ import java.util.Set;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.network.api.NetworkManager;
@@ -33,15 +33,15 @@ public class RegisterHostsStep
     }
 
 
-    public void configureHosts( final Set<ContainerHost> containerHosts ) throws NetworkManagerException
+    public void configureHosts( final Set<EnvironmentContainerHost> containerHosts ) throws NetworkManagerException
     {
-        Map<Integer, Set<ContainerHost>> hostGroups = Maps.newHashMap();
+        Map<Integer, Set<EnvironmentContainerHost>> hostGroups = Maps.newHashMap();
 
         //group containers by host group
-        for ( ContainerHost containerHost : containerHosts )
+        for ( EnvironmentContainerHost containerHost : containerHosts )
         {
             int hostGroupId = ( ( EnvironmentContainerImpl ) containerHost ).getHostsGroupId();
-            Set<ContainerHost> groupedContainers = hostGroups.get( hostGroupId );
+            Set<EnvironmentContainerHost> groupedContainers = hostGroups.get( hostGroupId );
 
             if ( groupedContainers == null )
             {
@@ -53,10 +53,10 @@ public class RegisterHostsStep
         }
 
         //configure hosts on each group
-        for ( Map.Entry<Integer, Set<ContainerHost>> hostGroup : hostGroups.entrySet() )
+        for ( Map.Entry<Integer, Set<EnvironmentContainerHost>> hostGroup : hostGroups.entrySet() )
         {
             int hostGroupId = hostGroup.getKey();
-            Set<ContainerHost> groupedContainers = hostGroup.getValue();
+            Set<EnvironmentContainerHost> groupedContainers = hostGroup.getValue();
 
             //ignore group ids <= 0
             if ( hostGroupId > 0 )

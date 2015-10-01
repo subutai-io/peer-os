@@ -7,7 +7,7 @@ import java.util.Set;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.network.api.NetworkManager;
@@ -34,15 +34,15 @@ public class RegisterSshStep
     }
 
 
-    public void configureSsh( final Set<ContainerHost> containerHosts ) throws NetworkManagerException
+    public void configureSsh( final Set<EnvironmentContainerHost> containerHosts ) throws NetworkManagerException
     {
-        Map<Integer, Set<ContainerHost>> sshGroups = Maps.newHashMap();
+        Map<Integer, Set<EnvironmentContainerHost>> sshGroups = Maps.newHashMap();
 
         //group containers by ssh group
-        for ( ContainerHost containerHost : containerHosts )
+        for ( EnvironmentContainerHost containerHost : containerHosts )
         {
             int sshGroupId = ( ( EnvironmentContainerImpl ) containerHost ).getSshGroupId();
-            Set<ContainerHost> groupedContainers = sshGroups.get( sshGroupId );
+            Set<EnvironmentContainerHost> groupedContainers = sshGroups.get( sshGroupId );
 
             if ( groupedContainers == null )
             {
@@ -54,10 +54,10 @@ public class RegisterSshStep
         }
 
         //configure ssh on each group
-        for ( Map.Entry<Integer, Set<ContainerHost>> sshGroup : sshGroups.entrySet() )
+        for ( Map.Entry<Integer, Set<EnvironmentContainerHost>> sshGroup : sshGroups.entrySet() )
         {
             int sshGroupId = sshGroup.getKey();
-            Set<ContainerHost> groupedContainers = sshGroup.getValue();
+            Set<EnvironmentContainerHost> groupedContainers = sshGroup.getValue();
 
             //ignore group ids <= 0
             if ( sshGroupId > 0 )
