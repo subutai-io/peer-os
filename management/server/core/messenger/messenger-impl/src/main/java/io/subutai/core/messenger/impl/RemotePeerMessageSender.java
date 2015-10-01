@@ -65,8 +65,8 @@ public class RemotePeerMessageSender implements Callable<Boolean>
                 Map<String, String> headers = Maps.newHashMap();
 
                 headers.put( Common.HEADER_SPECIAL, "ENC");
-                headers.put( Common.HEADER_ENV_ID_SOURCE,localPeerId.toString() );
-                headers.put( Common.HEADER_ENV_ID_TARGET,targetPeer.getId().toString() );
+                headers.put( Common.HEADER_PEER_ID_SOURCE,localPeerId.toString() );
+                headers.put( Common.HEADER_PEER_ID_TARGET,targetPeer.getId().toString() );
                 //*************************************************************
 
                 switch ( port )

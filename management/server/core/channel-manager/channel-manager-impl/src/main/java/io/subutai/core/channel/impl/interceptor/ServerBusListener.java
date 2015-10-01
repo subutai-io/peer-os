@@ -23,6 +23,14 @@ public class ServerBusListener extends AbstractFeature
     {
         LOG.info( "Adding LoggingFeature interceptor on bus: " + bus );
 
+        LOG.info( " ******* BUS.ORG.APACHE: "+ bus.getProperty("org.apache.cxf.io.CachedOutputStream.Threshold"));
+        LOG.info( " ******* BUS.IO: "+ bus.getProperty("bus.io.CachedOutputStream.Threshold"));
+        bus.setProperty( "bus.io.CachedOutputStream.Threshold", "500000" );
+        LOG.info( " ******* BUS.IO: "+ bus.getProperty("bus.io.CachedOutputStream.Threshold"));
+
+        System.setProperty( "org.apache.cxf.io.CachedOutputStream.Threshold", "500000" );
+
+
         // initialise the feature on the bus, which will add the interceptors
 
         //***** PRE_STREAM **********************************
