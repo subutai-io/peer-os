@@ -1,7 +1,6 @@
 package io.subutai.core.peer.impl;
 
 
-import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -13,9 +12,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import org.apache.openjpa.persistence.EntityManagerFactoryImpl;
-import org.apache.openjpa.persistence.EntityManagerImpl;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -32,8 +29,11 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostInfoModel;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
@@ -51,19 +51,12 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
-import io.subutai.core.peer.api.ContainerGroupNotFoundException;
-import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.peer.api.Payload;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.RequestListener;
-import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.peer.ResourceHostException;
-import io.subutai.core.peer.impl.dao.ContainerGroupDataService;
-import io.subutai.core.peer.impl.dao.ContainerHostDataService;
 import io.subutai.core.peer.impl.dao.ManagementHostDataService;
 import io.subutai.core.peer.impl.dao.PeerDAO;
 import io.subutai.core.peer.impl.dao.ResourceHostDataService;
-import io.subutai.core.peer.impl.entity.ContainerGroupEntity;
 import io.subutai.core.peer.impl.entity.ContainerHostEntity;
 import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.entity.ResourceHostEntity;
@@ -76,12 +69,10 @@ import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anySet;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -141,10 +132,10 @@ public class LocalPeerImplTest
     @Mock
     RequestListener requestListener;
 
-//    @Mock
-//    ContainerHostDataService containerHostDataService;
-    @Mock
-    ContainerGroupDataService containerGroupDataService;
+    //    @Mock
+    //    ContainerHostDataService containerHostDataService;
+    //    @Mock
+    //    ContainerGroupDataService containerGroupDataService;
     @Mock
     ResourceHostDataService resourceHostDataService;
     @Mock
@@ -163,8 +154,8 @@ public class LocalPeerImplTest
     Template template;
     @Mock
     HostInfoModel hostInfoModel;
-    @Mock
-    ContainerGroupEntity containerGroup;
+    //    @Mock
+    //    ContainerGroupEntity containerGroup;
     @Mock
     CommandException commandException;
     @Mock
@@ -190,6 +181,7 @@ public class LocalPeerImplTest
     @Mock
     EntityManagerFactoryImpl entityManagerFactory;
 
+
     @Before
     public void setUp() throws Exception
     {
@@ -200,7 +192,7 @@ public class LocalPeerImplTest
                         hostRegistry, monitor, securityManager ) );
 
         //        localPeer.containerHostDataService = containerHostDataService;
-        localPeer.containerGroupDataService = containerGroupDataService;
+        //        localPeer.containerGroupDataService = containerGroupDataService;
         localPeer.resourceHostDataService = resourceHostDataService;
         localPeer.managementHostDataService = managementHostDataService;
         localPeer.resourceHosts = Sets.newHashSet( ( ResourceHost ) resourceHost );
@@ -228,11 +220,11 @@ public class LocalPeerImplTest
         when( hostRegistry.getHostInfoById( CONTAINER_HOST_ID ) ).thenReturn( containerHostInfo );
         when( containerHostInfo.getId() ).thenReturn( CONTAINER_HOST_ID );
         when( containerHost.getHostname() ).thenReturn( CONTAINER_NAME );
-        //        when( containerHost.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
-        when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( CONTAINER_HOST_ID ) );
-        when( containerGroup.getOwnerId() ).thenReturn( OWNER_ID );
-        when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
-        when( containerGroupDataService.getAll() ).thenReturn( Lists.newArrayList( containerGroup ) );
+        when( containerHost.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
+        //        when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( CONTAINER_HOST_ID ) );
+        //        when( containerGroup.getOwnerId() ).thenReturn( OWNER_ID );
+        //        when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
+        //        when( containerGroupDataService.getAll() ).thenReturn( Lists.newArrayList( containerGroup ) );
         doReturn( resourceHost ).when( localPeer ).getResourceHostByName( RESOURCE_HOST_NAME );
         doReturn( containerHost ).when( resourceHost ).getContainerHostByName( CONTAINER_NAME );
         when( containerHost.getParent() ).thenReturn( resourceHost );
@@ -351,37 +343,37 @@ public class LocalPeerImplTest
     }
 
 
-    @Test( expected = ContainerGroupNotFoundException.class )
-    public void testFindContainerGroupByContainerId() throws Exception
-    {
-        assertNotNull( localPeer.findContainerGroupByContainerId( CONTAINER_HOST_ID ) );
+    //    @Test( expected = ContainerGroupNotFoundException.class )
+    //    public void testFindContainerGroupByContainerId() throws Exception
+    //    {
+    //        assertNotNull( localPeer.findContainerGroupByContainerId( CONTAINER_HOST_ID ) );
+    //
+    //        when( containerGroup.getContainerIds() ).thenReturn( Sets.<String>newHashSet() );
+    //
+    //        localPeer.findContainerGroupByContainerId( CONTAINER_HOST_ID );
+    //    }
 
-        when( containerGroup.getContainerIds() ).thenReturn( Sets.<String>newHashSet() );
+    //
+    //    @Test
+    //    public void testFindContainerGroupsByOwnerId() throws Exception
+    //    {
+    //        assertFalse( localPeer.findContainerGroupsByOwnerId( OWNER_ID ).isEmpty() );
+    //
+    //        when( containerGroup.getOwnerId() ).thenReturn( UUID.randomUUID().toString() );
+    //
+    //        assertTrue( localPeer.findContainerGroupsByOwnerId( OWNER_ID ).isEmpty() );
+    //    }
 
-        localPeer.findContainerGroupByContainerId( CONTAINER_HOST_ID );
-    }
-
-
-    @Test
-    public void testFindContainerGroupsByOwnerId() throws Exception
-    {
-        assertFalse( localPeer.findContainerGroupsByOwnerId( OWNER_ID ).isEmpty() );
-
-        when( containerGroup.getOwnerId() ).thenReturn( UUID.randomUUID().toString() );
-
-        assertTrue( localPeer.findContainerGroupsByOwnerId( OWNER_ID ).isEmpty() );
-    }
-
-
-    @Test( expected = ContainerGroupNotFoundException.class )
-    public void testFindContainerGroupByEnvironmentId() throws Exception
-    {
-        assertNotNull( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) );
-
-        when( containerGroup.getEnvironmentId() ).thenReturn( UUID.randomUUID().toString() );
-
-        assertNull( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) );
-    }
+    //
+    //    @Test( expected = ContainerGroupNotFoundException.class )
+    //    public void testFindContainerGroupByEnvironmentId() throws Exception
+    //    {
+    //        assertNotNull( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) );
+    //
+    //        when( containerGroup.getEnvironmentId() ).thenReturn( UUID.randomUUID().toString() );
+    //
+    //        assertNull( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) );
+    //    }
 
 
     @Test( expected = HostNotFoundException.class )
@@ -492,21 +484,21 @@ public class LocalPeerImplTest
     {
         localPeer.destroyContainer( containerHost );
 
-        verify( containerGroupDataService ).remove( ENVIRONMENT_ID.toString() );
+        //        verify( containerGroupDataService ).remove( ENVIRONMENT_ID.toString() );
 
-        when( containerGroup.getContainerIds() )
-                .thenReturn( Sets.newHashSet( CONTAINER_HOST_ID, UUID.randomUUID().toString() ) );
-
-        localPeer.destroyContainer( containerHost );
-
-        verify( containerGroupDataService ).update( containerGroup );
-
-        ContainerGroupNotFoundException exception = mock( ContainerGroupNotFoundException.class );
-        doThrow( exception ).when( localPeer ).findContainerGroupByContainerId( CONTAINER_HOST_ID );
+        //        when( containerGroup.getContainerIds() )
+        //                .thenReturn( Sets.newHashSet( CONTAINER_HOST_ID, UUID.randomUUID().toString() ) );
 
         localPeer.destroyContainer( containerHost );
 
-        verify( exception ).printStackTrace( any( PrintStream.class ) );
+        //        verify( containerGroupDataService ).update( containerGroup );
+
+        //        ContainerGroupNotFoundException exception = mock( ContainerGroupNotFoundException.class );
+        //        doThrow( exception ).when( localPeer ).findContainerGroupByContainerId( CONTAINER_HOST_ID );
+
+        localPeer.destroyContainer( containerHost );
+
+        //        verify( exception ).printStackTrace( any( PrintStream.class ) );
 
         doThrow( new ResourceHostException( "" ) ).when( resourceHost ).destroyContainerHost( containerHost );
 
@@ -518,22 +510,6 @@ public class LocalPeerImplTest
         catch ( PeerException e )
         {
         }
-    }
-
-
-    @Test
-    public void testCleanupEnvironmentNetworkSettings() throws Exception
-    {
-        localPeer.cleanupEnvironmentNetworkSettings( containerGroup );
-
-        verify( managementHost ).cleanupEnvironmentNetworkSettings( ENVIRONMENT_ID );
-
-        PeerException peerException = mock( PeerException.class );
-        doThrow( peerException ).when( managementHost ).cleanupEnvironmentNetworkSettings( ENVIRONMENT_ID );
-
-        localPeer.cleanupEnvironmentNetworkSettings( containerGroup );
-
-        verify( exceptionUtil ).getRootCause( peerException );
     }
 
 
@@ -787,18 +763,18 @@ public class LocalPeerImplTest
 
         resourceHost.updateHostInfo( resourceHostInfo );
 
-//        verify( containerHostDataService ).persist( any( ContainerHostEntity.class ) );
-//
-//        verify( containerHostDataService ).remove( CONTAINER_HOST_ID.toString() );
+        //        verify( containerHostDataService ).persist( any( ContainerHostEntity.class ) );
+        //
+        //        verify( containerHostDataService ).remove( CONTAINER_HOST_ID.toString() );
 
         when( resourceHostInfo.getContainers() ).thenReturn( Sets.newHashSet( containerHostInfo ) );
 
-//        doReturn( containerHost ).when( containerHostDataService ).find( anyString() );
+        //        doReturn( containerHost ).when( containerHostDataService ).find( anyString() );
 
         //        localPeer.updateResourceHostContainers( resourceHost, resourceHostInfo.getContainers() );
         resourceHost.updateHostInfo( resourceHostInfo );
 
-//        verify( containerHostDataService ).update( any( ContainerHostEntity.class ) );
+        //        verify( containerHostDataService ).update( any( ContainerHostEntity.class ) );
     }
 
 

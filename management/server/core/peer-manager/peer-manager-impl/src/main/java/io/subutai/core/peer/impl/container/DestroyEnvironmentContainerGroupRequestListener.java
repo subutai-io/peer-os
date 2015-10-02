@@ -35,7 +35,7 @@ public class DestroyEnvironmentContainerGroupRequestListener extends RequestList
         if ( request != null )
         {
             ContainersDestructionResult result =
-                    localPeer.destroyEnvironmentContainerGroup( request.getEnvironmentId() );
+                    localPeer.destroyContainersByEnvironment( request.getEnvironmentId() );
 
             return new DestroyEnvironmentContainerGroupResponse( result.getDestroyedContainersIds(),
                     result.getException() );

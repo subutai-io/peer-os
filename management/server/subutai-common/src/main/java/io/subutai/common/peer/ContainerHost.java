@@ -17,8 +17,11 @@ import io.subutai.common.quota.RamQuota;
  */
 public interface ContainerHost extends Host, ContainerHostInfo
 {
+    String getInitiatorPeerId();
 
-//    public String getEnvironmentId();
+    String getOwnerId();
+
+    String getEnvironmentId();
 
     public String getNodeGroupName();
 

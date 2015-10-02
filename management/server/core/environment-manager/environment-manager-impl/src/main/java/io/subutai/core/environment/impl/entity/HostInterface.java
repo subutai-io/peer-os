@@ -25,7 +25,7 @@ import io.subutai.common.host.Interface;
  * @see EnvironmentContainerImpl
  */
 @Entity
-@Table( name = "environment_container_interface" )
+@Table( name = "env_con_intf" )
 @Access( AccessType.FIELD )
 public class HostInterface implements Interface, Serializable
 {

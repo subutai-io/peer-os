@@ -1,6 +1,7 @@
 package io.subutai.core.peer.impl.entity;
 
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -42,7 +43,6 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.settings.Common;
 import io.subutai.common.util.IPUtil;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
@@ -57,7 +57,7 @@ import io.subutai.core.registry.api.TemplateRegistry;
  * Resource host implementation.
  */
 @Entity
-@Table( name = "resource_host" )
+@Table( name = "r_host" )
 @Access( AccessType.FIELD )
 public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceHost, Disposable
 {
@@ -350,6 +350,36 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
+    public Set<ContainerHost> getContainerHostsByEnvironmentId( final String environmentId )
+    {
+        Set<ContainerHost> result = new HashSet<>();
+        for ( ContainerHost containerHost : containersHosts )
+        {
+            if ( environmentId.equals( containerHost.getEnvironmentId() ) )
+            {
+                result.add( containerHost );
+            }
+        }
+        return result;
+    }
+
+
+    @Override
+    public Set<ContainerHost> getContainerHostsByOwnerId( final String ownerId )
+    {
+        Set<ContainerHost> result = new HashSet<>();
+        for ( ContainerHost containerHost : containersHosts )
+        {
+            if ( ownerId.equals( containerHost.getOwnerId() ) )
+            {
+                result.add( containerHost );
+            }
+        }
+        return result;
+    }
+
+
+    @Override
     public ContainerHost createContainer( final String templateName, final String hostname, final String ip,
                                           final int vlan, final String gateway, final int timeout )
             throws ResourceHostException
@@ -371,8 +401,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         catch ( HostNotFoundException e )
         {
-            LOG.debug( "Error getting container host by name: " + hostname, e );
             //ignore
+            LOG.info( String.format( "Container host '%s' does not exists, creating new one.", hostname ) );
         }
 
         Future<ContainerHost> containerHostFuture = queueSequentialTask(
@@ -384,7 +414,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             if ( result != null )
             {
                 final ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) result;
-                containerHostEntity.setParent( this );
+                //                containerHostEntity.setParent( this );
                 if ( IPUtil.isValid( gateway ) )
                 {
                     containerHostEntity.setDefaultGateway( gateway );

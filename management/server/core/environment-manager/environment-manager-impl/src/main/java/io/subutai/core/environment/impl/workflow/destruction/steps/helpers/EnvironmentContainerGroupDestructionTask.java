@@ -28,6 +28,6 @@ public class EnvironmentContainerGroupDestructionTask implements Callable<Contai
     @Override
     public ContainersDestructionResult call() throws Exception
     {
-        return peer.destroyEnvironmentContainerGroup( environmentId );
+        return peer.destroyContainersByEnvironment( environmentId );
     }
 }

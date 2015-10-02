@@ -33,16 +33,14 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerStatus;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.security.utils.io.HexUtil;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
-import io.subutai.core.peer.api.ContainerGroup;
-import io.subutai.core.peer.api.ContainerGroupNotFoundException;
 import io.subutai.core.peer.api.ManagementHost;
-import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.peer.ui.PeerManagerPortalModule;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -465,7 +463,7 @@ public class PeerRegisterForm extends CustomComponent
     {
         int relationExists = relationExist;
         for ( final Iterator<ResourceHost> itResource =
-                      module.getPeerManager().getLocalPeer().getResourceHosts().iterator();
+              module.getPeerManager().getLocalPeer().getResourceHosts().iterator();
               itResource.hasNext() && relationExists == 0; )
         {
             ResourceHost resourceHost = itResource.next();
@@ -473,20 +471,21 @@ public class PeerRegisterForm extends CustomComponent
                   itContainer.hasNext() && relationExists == 0; )
             {
                 ContainerHost containerHost = itContainer.next();
-                try
-                {
-                    ContainerGroup containerGroup = module.getPeerManager().getLocalPeer()
-                                                          .findContainerGroupByContainerId( containerHost.getId() );
+                //                try
+                //                {
+                //                    ContainerGroup containerGroup = module.getPeerManager().getLocalPeer()
+                //                                                          .findContainerGroupByContainerId(
+                // containerHost.getId() );
 
-                    if ( containerGroup.getInitiatorPeerId().equals( remotePeerInfo.getId() ) )
-                    {
-                        relationExists = 2;
-                    }
-                }
-                catch ( ContainerGroupNotFoundException ignore )
+                if ( containerHost.getInitiatorPeerId().equals( remotePeerInfo.getId() ) )
                 {
-                    //ignore
+                    relationExists = 2;
                 }
+                //                }
+                //                catch ( ContainerGroupNotFoundException ignore )
+                //                {
+                //                    //ignore
+                //                }
             }
         }
         return relationExists;

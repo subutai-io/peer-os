@@ -53,7 +53,7 @@ import io.subutai.core.environment.api.EnvironmentManager;
  * Database entity to store environment container host parameters in structured manner.
  */
 @Entity
-@Table( name = "environment_container" )
+@Table( name = "env_con" )
 @Access( AccessType.FIELD )
 public class EnvironmentContainerImpl implements EnvironmentContainerHost, Serializable
 {
@@ -559,6 +559,19 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         this.hostId = id;
     }
 
+
+    @Override
+    public String getInitiatorPeerId()
+    {
+        return this.peerId;
+    }
+
+
+    @Override
+    public String getOwnerId()
+    {
+        throw new UnsupportedOperationException( "Not implemented yet." );
+    }
 
     @Override
     public boolean equals( final Object o )
