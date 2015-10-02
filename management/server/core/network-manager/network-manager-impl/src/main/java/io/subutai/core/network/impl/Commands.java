@@ -2,13 +2,13 @@ package io.subutai.core.network.impl;
 
 
 import java.util.Set;
-import java.util.UUID;
 
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.OutputRedirection;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.settings.Common;
 
 
@@ -129,11 +129,11 @@ public class Commands
     }
 
 
-    public RequestBuilder getSetupVniVlanMappingCommand( String tunnelName, long vni, int vLanId, UUID environmentId )
+    public RequestBuilder getSetupVniVlanMappingCommand( String tunnelName, long vni, int vLanId, String environmentId )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
                 Lists.newArrayList( "-m", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ),
-                        environmentId.toString() ) );
+                        environmentId ) );
     }
 
 
@@ -150,10 +150,10 @@ public class Commands
     }
 
 
-    public RequestBuilder getReserveVniCommand( long vni, int vlan, UUID environmentId )
+    public RequestBuilder getReserveVniCommand( long vni, int vlan, String environmentId )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
-                Lists.newArrayList( "-E", String.valueOf( vni ), String.valueOf( vlan ), environmentId.toString() ) );
+                Lists.newArrayList( "-E", String.valueOf( vni ), String.valueOf( vlan ), environmentId ) );
     }
 
 
@@ -250,7 +250,7 @@ public class Commands
     }
 
 
-    public RequestBuilder getAddIpHostToEtcHostsCommand( String domainName, Set<ContainerHost> containerHosts )
+    public RequestBuilder getAddIpHostToEtcHostsCommand( String domainName, Set<EnvironmentContainerHost> containerHosts )
     {
         StringBuilder cleanHosts = new StringBuilder( "localhost|127.0.0.1|" );
         StringBuilder appendHosts = new StringBuilder();

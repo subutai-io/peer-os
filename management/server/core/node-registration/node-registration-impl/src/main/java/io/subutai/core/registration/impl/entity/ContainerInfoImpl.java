@@ -21,16 +21,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.Interface;
-import io.subutai.core.registration.api.RegistrationStatus;
-import io.subutai.core.registration.api.service.ContainerInfo;
 
 
-/**
- * Created by talas on 9/15/15.
- */
 @Entity
 @Access( AccessType.FIELD )
 @Table( name = "node_container_host_model" )

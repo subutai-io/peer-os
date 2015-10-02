@@ -3,9 +3,14 @@ package io.subutai.core.lxc.quota.impl;
 
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -23,14 +28,9 @@ import io.subutai.common.quota.RamQuota;
 import io.subutai.common.quota.RamQuotaUnit;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.lxc.quota.api.QuotaManager;
-import io.subutai.core.peer.api.HostNotFoundException;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.api.ResourceHost;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
+import io.subutai.common.peer.ResourceHost;
 
 
 public class QuotaManagerImpl implements QuotaManager
@@ -74,7 +74,7 @@ public class QuotaManagerImpl implements QuotaManager
 
 
     @Override
-    public int getRamQuota( final UUID containerId ) throws QuotaException
+    public int getRamQuota( final String containerId ) throws QuotaException
     {
         Preconditions.checkNotNull( containerId );
 
@@ -88,7 +88,7 @@ public class QuotaManagerImpl implements QuotaManager
 
 
     @Override
-    public RamQuota getRamQuotaInfo( final UUID containerId ) throws QuotaException
+    public RamQuota getRamQuotaInfo( final String containerId ) throws QuotaException
     {
         Preconditions.checkNotNull( containerId );
 
@@ -102,7 +102,7 @@ public class QuotaManagerImpl implements QuotaManager
 
 
     @Override
-    public void setRamQuota( final UUID containerId, final int ramInMb ) throws QuotaException
+    public void setRamQuota( final String containerId, final int ramInMb ) throws QuotaException
     {
         Preconditions.checkNotNull( containerId );
         Preconditions.checkArgument( ramInMb > 0 );
@@ -115,7 +115,7 @@ public class QuotaManagerImpl implements QuotaManager
 
 
     @Override
-    public int getCpuQuota( final UUID containerId ) throws QuotaException
+    public int getCpuQuota( final String containerId ) throws QuotaException
     {
         Preconditions.checkNotNull( containerId );
 
@@ -129,7 +129,7 @@ public class QuotaManagerImpl implements QuotaManager
 
 
     @Override
-    public CpuQuotaInfo getCpuQuotaInfo( final UUID containerId ) throws QuotaException
+    public CpuQuotaInfo getCpuQuotaInfo( final String containerId ) throws QuotaException
     {
         Preconditions.checkNotNull( containerId );
 
@@ -143,7 +143,7 @@ public class QuotaManagerImpl implements QuotaManager
 
 
     @Override
-    public void setCpuQuota( final UUID containerId, final int cpuPercent ) throws QuotaException
+    public void setCpuQuota( final String containerId, final int cpuPercent ) throws QuotaException
     {
         Preconditions.checkNotNull( containerId );
         Preconditions.checkArgument( cpuPercent > 0 && cpuPercent <= 100 );
@@ -156,7 +156,7 @@ public class QuotaManagerImpl implements QuotaManager
 
 
     @Override
-    public Set<Integer> getCpuSet( final UUID containerId ) throws QuotaException
+    public Set<Integer> getCpuSet( final String containerId ) throws QuotaException
     {
         Preconditions.checkNotNull( containerId );
 
@@ -193,7 +193,7 @@ public class QuotaManagerImpl implements QuotaManager
 
 
     @Override
-    public void setCpuSet( final UUID containerId, final Set<Integer> cpuSet ) throws QuotaException
+    public void setCpuSet( final String containerId, final Set<Integer> cpuSet ) throws QuotaException
     {
         Preconditions.checkNotNull( containerId );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( cpuSet ) );
@@ -214,7 +214,7 @@ public class QuotaManagerImpl implements QuotaManager
 
 
     @Override
-    public DiskQuota getDiskQuota( final UUID containerId, DiskPartition diskPartition ) throws QuotaException
+    public DiskQuota getDiskQuota( final String containerId, DiskPartition diskPartition ) throws QuotaException
     {
         Preconditions.checkNotNull( containerId );
         Preconditions.checkNotNull( diskPartition );
@@ -229,7 +229,7 @@ public class QuotaManagerImpl implements QuotaManager
 
 
     @Override
-    public void setDiskQuota( final UUID containerId, final DiskQuota diskQuota ) throws QuotaException
+    public void setDiskQuota( final String containerId, final DiskQuota diskQuota ) throws QuotaException
     {
         Preconditions.checkNotNull( containerId );
         Preconditions.checkNotNull( diskQuota );
@@ -243,7 +243,7 @@ public class QuotaManagerImpl implements QuotaManager
     }
 
 
-    public void setRamQuota( final UUID containerId, final RamQuota ramQuota ) throws QuotaException
+    public void setRamQuota( final String containerId, final RamQuota ramQuota ) throws QuotaException
     {
         Preconditions.checkNotNull( containerId );
         Preconditions.checkNotNull( ramQuota );
@@ -256,7 +256,7 @@ public class QuotaManagerImpl implements QuotaManager
 
 
     @Override
-    public int getAvailableRamQuota( final UUID containerId ) throws QuotaException
+    public int getAvailableRamQuota( final String containerId ) throws QuotaException
     {
         Preconditions.checkNotNull( containerId );
 
@@ -270,7 +270,7 @@ public class QuotaManagerImpl implements QuotaManager
 
 
     @Override
-    public int getAvailableCpuQuota( final UUID containerId ) throws QuotaException
+    public int getAvailableCpuQuota( final String containerId ) throws QuotaException
     {
         Preconditions.checkNotNull( containerId );
 
@@ -284,7 +284,7 @@ public class QuotaManagerImpl implements QuotaManager
 
 
     @Override
-    public DiskQuota getAvailableDiskQuota( final UUID containerId, final DiskPartition diskPartition )
+    public DiskQuota getAvailableDiskQuota( final String containerId, final DiskPartition diskPartition )
             throws QuotaException
     {
 
@@ -301,7 +301,7 @@ public class QuotaManagerImpl implements QuotaManager
     }
 
 
-    protected CommandResult executeOnContainersResourceHost( UUID containerId, RequestBuilder command )
+    protected CommandResult executeOnContainersResourceHost( String containerId, RequestBuilder command )
             throws QuotaException
     {
         ResourceHost resourceHost = getResourceHostByContainerId( containerId );
@@ -317,7 +317,7 @@ public class QuotaManagerImpl implements QuotaManager
     }
 
 
-    protected ContainerHost getContainerHostById( UUID containerId ) throws QuotaException
+    protected ContainerHost getContainerHostById( String containerId ) throws QuotaException
     {
         try
         {
@@ -330,7 +330,7 @@ public class QuotaManagerImpl implements QuotaManager
     }
 
 
-    protected ResourceHost getResourceHostByContainerId( UUID containerId ) throws QuotaException
+    protected ResourceHost getResourceHostByContainerId( String containerId ) throws QuotaException
     {
         try
         {
@@ -344,7 +344,7 @@ public class QuotaManagerImpl implements QuotaManager
 
 
     @Override
-    public QuotaInfo getQuotaInfo( UUID containerId, final QuotaType quotaType ) throws QuotaException
+    public QuotaInfo getQuotaInfo( String containerId, final QuotaType quotaType ) throws QuotaException
     {
         QuotaInfo quotaInfo = null;
         switch ( quotaType )

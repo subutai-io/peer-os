@@ -3,13 +3,12 @@ package io.subutai.common.peer;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.environment.CreateContainerGroupRequest;
+import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
@@ -28,14 +27,17 @@ import io.subutai.common.quota.RamQuota;
 
 /**
  * Peer interface
+ *
+ * TODO separate methods into PeerSpecific and EnvironmentSpecific interfaces
+ * this interface should be a marker interface @Nurkaly do this
  */
-public interface Peer
+public interface Peer extends PeerSpecific, EnvironmentSpecific
 {
 
     /**
      * Returns id of peer
      */
-    public UUID getId();
+    public String getId();
 
     /**
      * Returns name of peer
@@ -45,7 +47,7 @@ public interface Peer
     /**
      * Returns owner id of peer
      */
-    public UUID getOwnerId();
+    public String getOwnerId();
 
     /**
      * Returns metadata object of peer
@@ -53,13 +55,15 @@ public interface Peer
     public PeerInfo getPeerInfo();
 
     /**
-     * Creates container group on the peer
+     * Creates environment container group on the peer
      *
      * @param request - container creation request
      *
      * @return - set of metadaobjects of created containers
      */
-    public Set<HostInfoModel> createContainerGroup( CreateContainerGroupRequest request ) throws PeerException;
+    public Set<HostInfoModel> createEnvironmentContainerGroup( final CreateEnvironmentContainerGroupRequest request )
+            throws PeerException;
+
 
     /**
      * Start container on the peer
@@ -81,6 +85,11 @@ public interface Peer
      */
     public void setDefaultGateway( ContainerHost host, String gatewayIp ) throws PeerException;
 
+    /**
+     * Cleans up environment networking settings. This method is called when an environment is being destroyed to clean
+     * up its settings on the local peer.
+     */
+    void cleanupEnvironmentNetworkSettings( final String environmentId ) throws PeerException;
 
     /**
      * Returns true of the host is connected, false otherwise
@@ -328,16 +337,24 @@ public interface Peer
      */
     public void setRamQuota( ContainerHost host, RamQuota ramQuota ) throws PeerException;
 
+
     /**
-     * Destroys hosted part of environment
+     * Destroys container group
      *
      * @param environmentId - id fo environment
      *
      * @return {@code ContainersDestructionResult}
      */
-    public ContainersDestructionResult destroyEnvironmentContainers( UUID environmentId ) throws PeerException;
+    public ContainersDestructionResult destroyEnvironmentContainerGroup( final String environmentId )
+            throws PeerException;
 
     //networking
+
+
+    /**
+     * Sets up tunnels on the local peer to the specified remote peers
+     */
+    public int setupTunnels( Map<String, String> peerIps, String environmentId ) throws PeerException;
 
     /* ************************************************
      * Returns all existing gateways of the peer
@@ -361,13 +378,13 @@ public interface Peer
      *
      * @return - containerHost
      */
-    public HostInfo getContainerHostInfoById( UUID containerHostId ) throws PeerException;
+    public HostInfo getContainerHostInfoById( String containerHostId ) throws PeerException;
 
 
     /* **************************************************************
      *
      */
-    public int createEnvironmentKeyPair( String environmentId ) throws PeerException;
+    public String createEnvironmentKeyPair( String environmentId ) throws PeerException;
 
 
     /**
@@ -380,8 +397,7 @@ public interface Peer
 
     void removeN2NConnection( N2NConfig config ) throws PeerException;
 
-    /**
-     * Sets up tunnels on the local peer to the specified remote peers
-     */
-    public int setupTunnels( Map<String, String> peerIps, UUID environmentId ) throws PeerException;
+    void createGateway( String environmentGatewayIp, int vlan ) throws PeerException;
+
+    void removeEnvironmentKeyPair( String environmentId ) throws PeerException;
 }

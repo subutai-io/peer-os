@@ -3,17 +3,20 @@ package io.subutai.common.peer;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
+import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
 
 
-public class HostInfoModel implements HostInfo
+public class HostInfoModel implements ContainerHostInfo
 {
-    private UUID id;
+    private ContainerHostState status;
+    private String id;
     private String hostname;
+    private String containerName;
     private Set<InterfaceModel> netInterfaces = new HashSet<>();
     private HostArchitecture hostArchitecture;
 
@@ -38,12 +41,14 @@ public class HostInfoModel implements HostInfo
     {
         this.id = containerHost.getId();
         this.hostname = containerHost.getHostname();
-        this.hostArchitecture = containerHost.getHostArchitecture();
+        this.hostArchitecture = containerHost.getArch();
+        this.containerName = containerHost.getContainerName();
+        this.status = containerHost.getStatus();
         if ( hostArchitecture == null )
         {
             hostArchitecture = HostArchitecture.AMD64;
         }
-        for ( Interface anInterface : containerHost.getNetInterfaces() )
+        for ( Interface anInterface : containerHost.getInterfaces() )
         {
             this.netInterfaces.add( new InterfaceModel( anInterface ) );
         }
@@ -51,7 +56,21 @@ public class HostInfoModel implements HostInfo
 
 
     @Override
-    public UUID getId()
+    public ContainerHostState getStatus()
+    {
+        return status;
+    }
+
+
+    @Override
+    public String getContainerName()
+    {
+        return containerName;
+    }
+
+
+    @Override
+    public String getId()
     {
         return id;
     }

@@ -4,7 +4,7 @@ package io.subutai.core.peer.ui;
 import java.io.File;
 import com.vaadin.ui.Component;
 import io.subutai.common.util.FileUtil;
-import io.subutai.core.env.api.EnvironmentManager;
+import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.peer.api.PeerManager;

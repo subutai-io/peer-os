@@ -24,16 +24,13 @@ import org.apache.commons.net.util.SubnetUtils;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
-import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.PeerConf;
 import io.subutai.common.host.Interface;
-import io.subutai.common.peer.InterfacePattern;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.protocol.N2NConfig;
-import io.subutai.core.env.api.exception.EnvironmentManagerException;
+import io.subutai.common.util.N2NUtil;
 import io.subutai.core.messenger.api.Messenger;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
@@ -41,10 +38,9 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.RequestListener;
 import io.subutai.core.peer.impl.command.CommandRequestListener;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
-import io.subutai.core.peer.impl.container.CreateContainerGroupRequestListener;
-import io.subutai.core.peer.impl.container.DestroyEnvironmentContainersRequestListener;
+import io.subutai.core.peer.impl.container.CreateEnvironmentContainerGroupRequestListener;
+import io.subutai.core.peer.impl.container.DestroyEnvironmentContainerGroupRequestListener;
 import io.subutai.core.peer.impl.dao.PeerDAO;
-import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.security.api.SecurityManager;
 
@@ -96,11 +92,9 @@ public class PeerManagerImpl implements PeerManager
         commandResponseListener = new CommandResponseListener();
         addRequestListener( commandResponseListener );
         //add create container requests listener
-        addRequestListener( new CreateContainerGroupRequestListener( localPeer ) );
+        addRequestListener( new CreateEnvironmentContainerGroupRequestListener( localPeer ) );
         //add destroy environment containers requests listener
-        addRequestListener( new DestroyEnvironmentContainersRequestListener( localPeer ) );
-        //add echo listener
-        addRequestListener( new EchoRequestListener() );
+        addRequestListener( new DestroyEnvironmentContainerGroupRequestListener( localPeer ) );
     }
 
 
@@ -110,42 +104,33 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    public SecurityManager getSecurityManager()
-    {
-        return this.securityManager;
-    }
-
-
     @Override
     public boolean register( final PeerInfo peerInfo ) throws PeerException
     {
-        return peerDAO.saveInfo( SOURCE_REMOTE_PEER, peerInfo.getId().toString(), peerInfo );
+        return peerDAO.saveInfo( SOURCE_REMOTE_PEER, peerInfo.getId(), peerInfo );
     }
 
 
     @Override
-    public boolean unregister( final String uuid ) throws PeerException
+    public boolean unregister( final String remotePeerId ) throws PeerException
     {
         ManagementHost mgmHost = getLocalPeer().getManagementHost();
-        ManagementHostEntity managementHost = ( ManagementHostEntity ) mgmHost;
-        UUID remotePeerId = UUID.fromString( uuid );
         PeerInfo p = getPeerInfo( remotePeerId );
-        managementHost.removeRepository( p.getId().toString(), p.getIp() );
-        //        managementHost.removeTunnel( p.getIp() );
+        mgmHost.removeRepository( p.getId(), p.getIp() );
 
         PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( remotePeerId );
         // Remove peer policy of the target remote peer from the local peer
         if ( peerPolicy != null )
         {
             localPeer.getPeerInfo().getPeerPolicies().remove( peerPolicy );
-            peerDAO.saveInfo( SOURCE_LOCAL_PEER, localPeer.getId().toString(), localPeer );
+            peerDAO.saveInfo( SOURCE_LOCAL_PEER, localPeer.getId(), localPeer );
         }
 
         //*********Remove Security Relationship  ****************************
-        securityManager.getKeyManager().removePublicKeyRing( uuid.toString() );
+        securityManager.getKeyManager().removePublicKeyRing( remotePeerId );
         //*******************************************************************
 
-        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, uuid );
+        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, remotePeerId );
     }
 
 
@@ -161,7 +146,7 @@ public class PeerManagerImpl implements PeerManager
         {
             source = SOURCE_REMOTE_PEER;
         }
-        return peerDAO.saveInfo( source, peerInfo.getId().toString(), peerInfo );
+        return peerDAO.saveInfo( source, peerInfo.getId(), peerInfo );
     }
 
 
@@ -188,10 +173,10 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public PeerInfo getPeerInfo( UUID uuid )
+    public PeerInfo getPeerInfo( String id )
     {
         String source;
-        if ( uuid.compareTo( localPeer.getId() ) == 0 )
+        if ( id.compareTo( localPeer.getId() ) == 0 )
         {
             source = SOURCE_LOCAL_PEER;
         }
@@ -199,12 +184,12 @@ public class PeerManagerImpl implements PeerManager
         {
             source = SOURCE_REMOTE_PEER;
         }
-        return peerDAO.getInfo( source, uuid.toString(), PeerInfo.class );
+        return peerDAO.getInfo( source, id, PeerInfo.class );
     }
 
 
     @Override
-    public Peer getPeer( final UUID peerId )
+    public Peer getPeer( final String peerId )
     {
         if ( localPeer.getId().equals( peerId ) )
         {
@@ -222,13 +207,6 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public Peer getPeer( final String peerId )
-    {
-        return getPeer( UUID.fromString( peerId ) );
-    }
-
-
-    @Override
     public LocalPeer getLocalPeer()
     {
         return localPeer;
@@ -238,16 +216,14 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public List<N2NConfig> setupN2NConnection( final Set<Peer> peers ) throws PeerException
     {
-        Set<String> allSubnets = getSubnets( peers );
-        if ( LOG.isDebugEnabled() )
+        Set<String> usedN2NSubnets = getN2NSubnets( peers );
+        LOG.debug( String.format( "Found %d n2n subnets:", usedN2NSubnets.size() ) );
+        for ( String s : usedN2NSubnets )
         {
-            LOG.debug( String.format( "Found %d peer subnets:", allSubnets.size() ) );
-            for ( String s : allSubnets )
-            {
-                LOG.debug( s );
-            }
+            LOG.debug( s );
         }
-        String freeSubnet = findFreeSubnet( allSubnets );
+
+        String freeSubnet = N2NUtil.findFreeTunnelNetwork( usedN2NSubnets );
 
         LOG.debug( String.format( "Free subnet for peer: %s", freeSubnet ) );
         try
@@ -257,10 +233,10 @@ public class PeerManagerImpl implements PeerManager
                 throw new IllegalStateException( "Could not calculate subnet." );
             }
             String superNodeIp = getLocalPeer().getManagementHost().getExternalIp();
-            String interfaceName = generateInterfaceName( freeSubnet );
-            String communityName = generateCommunityName( freeSubnet );
+            String interfaceName = N2NUtil.generateInterfaceName( freeSubnet );
+            String communityName = N2NUtil.generateCommunityName( freeSubnet );
             String sharedKey = UUID.randomUUID().toString();
-            SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeSubnet, PEER_SUBNET_MASK ).getInfo();
+            SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeSubnet, N2NUtil.N2N_SUBNET_MASK ).getInfo();
             final String[] addresses = subnetInfo.getAllAddresses();
             int counter = 0;
 
@@ -279,7 +255,7 @@ public class PeerManagerImpl implements PeerManager
                 counter++;
             }
 
-            for ( Peer peer : peers )
+            for ( Peer ignored : peers )
             {
                 final Future<N2NConfig> f = executorCompletionService.take();
                 N2NConfig config = f.get();
@@ -298,54 +274,22 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    private String generateCommunityName( final String freeSubnet )
+    /**
+     * Returns set of currently used n2n subnets of given peers.
+     *
+     * @param peers set of peers
+     *
+     * @return set of currently used n2n subnets.
+     */
+    private Set<String> getN2NSubnets( final Set<Peer> peers )
     {
-        return String.format( "com_%s", freeSubnet.replace( ".", "_" ) );
-    }
+        Set<String> result = new HashSet<>();
 
-
-    private String generateInterfaceName( final String freeSubnet )
-    {
-        return String.format( "n2n_%s", freeSubnet.replace( ".", "_" ) );
-    }
-
-
-    private String findFreeSubnet( final Set<String> allSubnets )
-    {
-        String result = null;
-        int i = 11;
-        int j = 0;
-
-        while ( result == null && i < 254 )
+        for ( Peer peer : peers )
         {
-            String s = String.format( "10.%d.%d.0", i, j );
-            if ( !allSubnets.contains( s ) )
-            {
-                result = s;
-            }
+            Set<Interface> r = peer.getNetworkInterfaces( N2NUtil.N2N_SUBNET_INTERFACES_PATTERN );
 
-            j++;
-            if ( j > 254 )
-            {
-                i++;
-                j = 0;
-            }
-        }
-
-        return result;
-    }
-
-
-    private Set<String> getSubnets( final Set<Peer> allPeers )
-    {
-        Set<String> allSubnets = new HashSet<>();
-
-        InterfacePattern peerSubnetsPattern = new InterfacePattern( "ip", "^10.*" );
-        for ( Peer peer : allPeers )
-        {
-            Set<Interface> r = peer.getNetworkInterfaces( peerSubnetsPattern );
-
-            Collection peerSubnets = CollectionUtils.collect( r, new Transformer()
+            Collection peerSubnets = CollectionUtils.<String>collect( r, new Transformer()
             {
                 @Override
                 public Object transform( final Object o )
@@ -356,10 +300,10 @@ public class PeerManagerImpl implements PeerManager
                 }
             } );
 
-            allSubnets.addAll( peerSubnets );
+            result.addAll( peerSubnets );
         }
 
-        return allSubnets;
+        return result;
     }
 
 

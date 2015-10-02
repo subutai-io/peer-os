@@ -2,7 +2,6 @@ package io.subutai.core.registration.api.service;
 
 
 import java.util.Set;
-import java.util.UUID;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
@@ -10,15 +9,12 @@ import io.subutai.common.host.Interface;
 import io.subutai.core.registration.api.RegistrationStatus;
 
 
-/**
- * Created by talas on 9/15/15.
- */
 public interface ContainerInfo extends HostInfo
 {
     /**
      * Returns id of host
      */
-    public UUID getId();
+    public String getId();
 
 
     /**

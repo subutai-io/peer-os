@@ -10,14 +10,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.Peer;
-import io.subutai.core.env.api.EnvironmentManager;
 
 import com.google.common.collect.Sets;
 import com.vaadin.data.util.HierarchicalContainer;
+
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.Peer;
+import io.subutai.core.environment.api.EnvironmentManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -27,18 +28,18 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class EnvironmentTreeTest
 {
-    private static final UUID PEER_ID = UUID.randomUUID();
-    private static UUID CONTAINER_A_ID = UUID.randomUUID();
-    private static UUID CONTAINER_B_ID = UUID.randomUUID();
+    private static final String PEER_ID = UUID.randomUUID().toString();
+    private static String CONTAINER_A_ID = UUID.randomUUID().toString();
+    private static String CONTAINER_B_ID = UUID.randomUUID().toString();
     @Mock
     EnvironmentManager environmentManager;
 
     @Mock
     private Environment environmentA;
     @Mock
-    private ContainerHost containerHostB;
+    private EnvironmentContainerHost containerHostB;
     @Mock
-    private ContainerHost containerHostA;
+    private EnvironmentContainerHost containerHostA;
 
     @Mock
     Peer peer;
@@ -68,7 +69,7 @@ public class EnvironmentTreeTest
         environmentTree.environment = environmentA;
 
 
-        Set<ContainerHost> hostSet = environmentTree.getSelectedContainers();
+        Set<EnvironmentContainerHost> hostSet = environmentTree.getSelectedContainers();
 
 
         assertNotNull( hostSet );
@@ -122,9 +123,9 @@ public class EnvironmentTreeTest
 
 
         when( environmentManager.getEnvironments() ).thenReturn( Sets.newHashSet( environmentA ) );
-        when( environmentManager.findEnvironment( PEER_ID ) ).thenReturn( environmentA );
+        when( environmentManager.loadEnvironment( PEER_ID ) ).thenReturn( environmentA );
 
-        Set<ContainerHost> containers = Sets.newHashSet( containerHostA );
+        Set<EnvironmentContainerHost> containers = Sets.newHashSet( containerHostA );
         when( environmentA.getContainerHosts() ).thenReturn( containers );
         when( environmentA.getId() ).thenReturn( PEER_ID );
         when( environmentA.getName() ).thenReturn( "environmentA" );
@@ -160,9 +161,9 @@ public class EnvironmentTreeTest
 
 
         when( environmentManager.getEnvironments() ).thenReturn( Sets.newHashSet( environmentA ) );
-        when( environmentManager.findEnvironment( PEER_ID ) ).thenReturn( environmentA );
+        when( environmentManager.loadEnvironment( PEER_ID ) ).thenReturn( environmentA );
 
-        Set<ContainerHost> containers = Sets.newHashSet( containerHostA, containerHostB );
+        Set<EnvironmentContainerHost> containers = Sets.newHashSet( containerHostA, containerHostB );
 
         when( environmentA.getContainerHosts() ).thenReturn( containers );
         when( environmentA.getId() ).thenReturn( PEER_ID );

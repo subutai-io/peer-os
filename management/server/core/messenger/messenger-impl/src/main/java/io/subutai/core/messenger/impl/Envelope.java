@@ -3,13 +3,12 @@ package io.subutai.core.messenger.impl;
 
 import java.sql.Timestamp;
 import java.util.Map;
-import java.util.UUID;
-
-import io.subutai.core.messenger.api.Message;
-import io.subutai.core.messenger.impl.entity.MessageEntity;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+
+import io.subutai.core.messenger.api.Message;
+import io.subutai.core.messenger.impl.entity.MessageEntity;
 
 
 /**
@@ -18,7 +17,7 @@ import com.google.common.base.Strings;
 public class Envelope
 {
     private final MessageImpl message;
-    private final UUID targetPeerId;
+    private final String targetPeerId;
     private final String recipient;
     private final int timeToLive;
     private final Map<String, String> headers;
@@ -40,7 +39,7 @@ public class Envelope
     }
 
 
-    public Envelope( final Message message, UUID targetPeerId, String recipient, int timeToLive,
+    public Envelope( final Message message, String targetPeerId, String recipient, int timeToLive,
                      Map<String, String> headers )
     {
 
@@ -63,7 +62,7 @@ public class Envelope
     }
 
 
-    public UUID getTargetPeerId()
+    public String getTargetPeerId()
     {
         return targetPeerId;
     }

@@ -2,16 +2,15 @@ package io.subutai.core.peer.api;
 
 
 import java.util.Set;
-import java.util.UUID;
 
 
 public interface ContainerGroup
 {
-    public UUID getEnvironmentId();
+    public String getEnvironmentId();
 
-    public UUID getInitiatorPeerId();
+    public String getInitiatorPeerId();
 
-    public UUID getOwnerId();
+    public String getOwnerId();
 
-    public Set<UUID> getContainerIds();
+    public Set<String> getContainerIds();
 }

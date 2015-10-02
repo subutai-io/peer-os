@@ -45,11 +45,11 @@ public class ManagementHostDataServiceTest
     @Before
     public void setUp() throws Exception
     {
-        service = new ManagementHostDataService( entityManagerFactory );
         when( entityManagerFactory.createEntityManager() ).thenReturn( em );
         when( em.getTransaction() ).thenReturn( transaction );
         when( transaction.isActive() ).thenReturn( true );
         when( em.createQuery( anyString(), eq( ManagementHostEntity.class ) ) ).thenReturn( typedQuery );
+        service = new ManagementHostDataService( entityManagerFactory );
     }
 
 

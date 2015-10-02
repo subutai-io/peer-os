@@ -5,9 +5,6 @@ import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.subutai.common.mdc.SubutaiExecutors;
-import io.subutai.core.env.api.EnvironmentManager;
-
 import com.google.common.base.Strings;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
@@ -23,6 +20,9 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
+
+import io.subutai.common.mdc.SubutaiExecutors;
+import io.subutai.core.environment.api.EnvironmentManager;
 
 
 /**

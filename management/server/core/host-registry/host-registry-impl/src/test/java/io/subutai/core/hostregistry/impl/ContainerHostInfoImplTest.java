@@ -10,7 +10,7 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.core.hostregistry.api.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostInfo;
 
 import com.google.common.collect.Maps;
 
@@ -25,8 +25,8 @@ public class ContainerHostInfoImplTest
 {
 
     private static final String HOSTNAME = "container1";
-    private static final UUID ID = UUID.randomUUID();
-    private static final UUID ID2 = UUID.randomUUID();
+    private static final String ID = UUID.randomUUID().toString();
+    private static final String ID2 = UUID.randomUUID().toString();
     private static final ContainerHostState CONTAINER_STATUS = ContainerHostState.FROZEN;
     private static final HostArchitecture ARCH = HostArchitecture.AMD64;
     private static final String IP = "127.0.0.1";

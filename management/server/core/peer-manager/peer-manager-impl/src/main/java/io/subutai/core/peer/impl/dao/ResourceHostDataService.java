@@ -17,12 +17,14 @@ import com.google.common.collect.Lists;
 public class ResourceHostDataService implements DataService<String, ResourceHostEntity>
 {
     private static final Logger LOG = LoggerFactory.getLogger( ResourceHostDataService.class );
-    EntityManagerFactory emf;
+//    private EntityManagerFactory emf;
+    private EntityManager em;
 
 
     public ResourceHostDataService( EntityManagerFactory entityManagerFactory )
     {
-        this.emf = entityManagerFactory;
+//        this.emf = entityManagerFactory;
+        this.em =  entityManagerFactory.createEntityManager();
     }
 
 
@@ -30,7 +32,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
     public ResourceHostEntity find( final String id )
     {
         ResourceHostEntity result = null;
-        EntityManager em = emf.createEntityManager();
+//        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
@@ -45,10 +47,10 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
                 em.getTransaction().rollback();
             }
         }
-        finally
-        {
-            em.close();
-        }
+//        finally
+//        {
+//            em.close();
+//        }
         return result;
     }
 
@@ -57,7 +59,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
     public Collection<ResourceHostEntity> getAll()
     {
         Collection<ResourceHostEntity> result = Lists.newArrayList();
-        EntityManager em = emf.createEntityManager();
+//        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
@@ -72,10 +74,10 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
                 em.getTransaction().rollback();
             }
         }
-        finally
-        {
-            em.close();
-        }
+//        finally
+//        {
+//            em.close();
+//        }
         return result;
     }
 
@@ -83,7 +85,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
     @Override
     public void persist( final ResourceHostEntity item )
     {
-        EntityManager em = emf.createEntityManager();
+//        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
@@ -99,17 +101,17 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
                 em.getTransaction().rollback();
             }
         }
-        finally
-        {
-            em.close();
-        }
+//        finally
+//        {
+//            em.close();
+//        }
     }
 
 
     @Override
     public void remove( final String id )
     {
-        EntityManager em = emf.createEntityManager();
+//        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
@@ -133,13 +135,13 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
 
 
     @Override
-    public void update( final ResourceHostEntity item )
+    public void update( ResourceHostEntity item )
     {
-        EntityManager em = emf.createEntityManager();
+//        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
-            em.merge( item );
+            item = em.merge( item );
             em.getTransaction().commit();
         }
         catch ( Exception e )
@@ -150,9 +152,9 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
                 em.getTransaction().rollback();
             }
         }
-        finally
-        {
-            em.close();
-        }
+//        finally
+//        {
+//            em.close();
+//        }
     }
 }

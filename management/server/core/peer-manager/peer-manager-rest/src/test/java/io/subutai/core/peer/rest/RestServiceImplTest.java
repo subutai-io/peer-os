@@ -52,21 +52,20 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+
 @Ignore
 @RunWith( MockitoJUnitRunner.class )
 public class RestServiceImplTest
 {
-    private static final UUID PEER_ID = UUID.randomUUID();
+    private static final String PEER_ID = UUID.randomUUID().toString();
     private static final String JSON = "json";
     private static final String IP = "127.0.0.1";
     private static final String ENTITY = "entity";
-    private static final String CERT = "cert";
-    private static final UUID CONTAINER_ID = UUID.randomUUID();
+    private static final String CONTAINER_ID = UUID.randomUUID().toString();
     private static final String TEMPLATE_NAME = "master";
     private static final int PID = 123;
     private static final int QUOTA = 123;
-    private static final String ALIAS = "alias";
-    private static final UUID ENV_ID = UUID.randomUUID();
+
     @Mock
     PeerManager peerManager;
     @Mock
@@ -104,14 +103,14 @@ public class RestServiceImplTest
     @Before
     public void setUp() throws Exception
     {
-        restService = spy( new RestServiceImpl( peerManager, httpContextManager,securityManager ) );
+        restService = spy( new RestServiceImpl( peerManager, httpContextManager, securityManager ) );
         restService.jsonUtil = jsonUtil;
         restService.restUtil = restUtil;
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
         when( localPeer.getId() ).thenReturn( PEER_ID );
         when( localPeer.getPeerInfo() ).thenReturn( peerInfo );
         when( localPeer.bindHost( CONTAINER_ID.toString() ) ).thenReturn( containerHost );
-        when( peerInfo.getPeerPolicy( any( UUID.class ) ) ).thenReturn( peerPolicy );
+        when( peerInfo.getPeerPolicy( any( String.class ) ) ).thenReturn( peerPolicy );
         when( peerManager.getPeer( PEER_ID.toString() ) ).thenReturn( peer );
         when( peer.getPeerInfo() ).thenReturn( peerInfo );
         when( peerInfo.getId() ).thenReturn( PEER_ID );
@@ -329,20 +328,20 @@ public class RestServiceImplTest
     @Test
     public void testApproveForRegistrationRequest2() throws Exception
     {
-        Response response1 = restService.approveForRegistrationRequest( PEER_ID.toString() ,"HEXSTR" );
+        Response response1 = restService.approveForRegistrationRequest( PEER_ID.toString(), "HEXSTR" );
 
         assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
 
         when( peerInfo.getStatus() ).thenReturn( PeerStatus.REQUESTED );
         when( webClient.put( anyObject() ) ).thenReturn( response );
 
-        restService.approveForRegistrationRequest( PEER_ID.toString(),"HEXSTR" );
+        restService.approveForRegistrationRequest( PEER_ID.toString(), "HEXSTR" );
 
         //verify( httpContextManager ).reloadTrustStore();
 
         doThrow( exception ).when( peerManager ).update( peerInfo );
 
-        response1 = restService.approveForRegistrationRequest( PEER_ID.toString() ,"HEXSTR" );
+        response1 = restService.approveForRegistrationRequest( PEER_ID.toString(), "HEXSTR" );
 
         assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
     }
@@ -430,7 +429,7 @@ public class RestServiceImplTest
     @Test
     public void testGetContainerState() throws Exception
     {
-        when( containerHost.getState() ).thenReturn( ContainerHostState.RUNNING );
+        when( containerHost.getStatus() ).thenReturn( ContainerHostState.RUNNING );
 
         restService.getContainerState( CONTAINER_ID.toString() );
 
@@ -755,5 +754,4 @@ public class RestServiceImplTest
 
         assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
     }
-
 }

@@ -1,13 +1,10 @@
 package io.subutai.core.peer.impl;
 
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
 import javax.ws.rs.core.MediaType;
@@ -21,7 +18,9 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 
 import io.subutai.common.command.CommandCallback;
@@ -29,7 +28,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.environment.CreateContainerGroupRequest;
+import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.exception.HTTPException;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
@@ -39,6 +38,7 @@ import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainersDestructionResult;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostInfoModel;
 import io.subutai.common.peer.InterfacePattern;
@@ -69,10 +69,10 @@ import io.subutai.core.peer.impl.command.CommandRequest;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.command.CommandResultImpl;
 import io.subutai.core.peer.impl.container.ContainersDestructionResultImpl;
-import io.subutai.core.peer.impl.container.CreateContainerGroupResponse;
-import io.subutai.core.peer.impl.container.DestroyEnvironmentContainersRequest;
-import io.subutai.core.peer.impl.container.DestroyEnvironmentContainersResponse;
-import io.subutai.core.peer.impl.entity.HostInterface;
+import io.subutai.core.peer.impl.container.CreateEnvironmentContainerGroupResponse;
+import io.subutai.core.peer.impl.container.DestroyEnvironmentContainerGroupRequest;
+import io.subutai.core.peer.impl.container.DestroyEnvironmentContainerGroupResponse;
+import io.subutai.core.peer.impl.entity.HostInterfaceImpl;
 import io.subutai.core.peer.impl.request.MessageRequest;
 import io.subutai.core.peer.impl.request.MessageResponse;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
@@ -83,7 +83,7 @@ import io.subutai.core.peer.impl.request.MessageResponseListener;
  */
 public class RemotePeerImpl implements RemotePeer
 {
-    private static final Logger LOG = LoggerFactory.getLogger( RemotePeerImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( RemotePeerImpl.class );
 
     private final LocalPeer localPeer;
     protected final PeerInfo peerInfo;
@@ -93,7 +93,7 @@ public class RemotePeerImpl implements RemotePeer
     protected RestUtil restUtil = new RestUtil();
     protected JsonUtil jsonUtil = new JsonUtil();
     private String baseUrl;
-    private SecurityManager securityManager;
+    List<Object> providers;
 
 
     public RemotePeerImpl( LocalPeer localPeer, final PeerInfo peerInfo, final Messenger messenger,
@@ -123,6 +123,8 @@ public class RemotePeerImpl implements RemotePeer
                 break;
         }
         this.baseUrl = url;
+        this.providers = Lists.newArrayList();
+        providers.add( new JacksonJaxbJsonProvider() );
     }
 
 
@@ -159,20 +161,20 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public UUID getId()
+    public String getId()
     {
         return peerInfo.getId();
     }
 
 
     @Override
-    public UUID getRemoteId() throws PeerException
+    public String getRemoteId() throws PeerException
     {
         String path = "peer/id";
 
         try
         {
-            return UUID.fromString( get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, null ) );
+            return get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, null );
         }
         catch ( Exception e )
         {
@@ -210,7 +212,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public UUID getOwnerId()
+    public String getOwnerId()
     {
         return peerInfo.getOwnerId();
     }
@@ -238,9 +240,9 @@ public class RemotePeerImpl implements RemotePeer
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_PEER_ID_SOURCE,localPeer.getId().toString() );
-        headers.put( Common.HEADER_PEER_ID_TARGET,peerInfo.getId().toString() );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
+        headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
         //*************************************************************
 
 
@@ -261,24 +263,26 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void startContainer( final ContainerHost host ) throws PeerException
+    public void startContainer( final ContainerHost containerHost ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Container host is null" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "peer/container/start";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-        
-        String envHeaderSource  = localPeer.getId()+"-"+host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId()+"-"+host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
+
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -294,24 +298,27 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void stopContainer( final ContainerHost host ) throws PeerException
+    public void stopContainer( final ContainerHost containerHost ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Container host is null" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
 
         String path = "peer/container/stop";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource  = localPeer.getId()+"-"+host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId()+"-"+host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -327,24 +334,26 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void destroyContainer( final ContainerHost host ) throws PeerException
+    public void destroyContainer( final ContainerHost containerHost ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Container host is null" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "peer/container/destroy";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource  = localPeer.getId()+"-"+host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId()+"-"+host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -360,27 +369,30 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setDefaultGateway( final ContainerHost host, final String gatewayIp ) throws PeerException
+    public void setDefaultGateway( final ContainerHost containerHost, final String gatewayIp ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkArgument( !Strings.isNullOrEmpty( gatewayIp ) && gatewayIp.matches( Common.IP_REGEX ),
                 "Invalid gateway IP" );
 
         String path = "peer/container/gateway";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
         params.put( "gatewayIp", gatewayIp );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource  = localPeer.getId()+"-"+host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId()+"-"+host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -396,28 +408,82 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public boolean isConnected( final Host host )
+    public void removeEnvironmentKeyPair( final String environmentId ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Container host is null" );
-        Preconditions.checkArgument( host instanceof ContainerHost );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
 
+        String path = String.format( "peer/pek/%s", environmentId );
+
+        try
+        {
+            //*********construct Secure Header ****************************
+            Map<String, String> headers = Maps.newHashMap();
+
+            headers.put( Common.HEADER_SPECIAL, "ENC" );
+            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
+            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
+            //*************************************************************
+
+
+            delete( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, headers );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( String.format( "Error removing PEK on peer %s", getName() ), e );
+        }
+    }
+
+
+    @Override
+    public void cleanupEnvironmentNetworkSettings( final String environmentId ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
+        String path = String.format( "peer/network/%s", environmentId );
+
+        try
+        {
+            //*********construct Secure Header ****************************
+            Map<String, String> headers = Maps.newHashMap();
+
+            headers.put( Common.HEADER_SPECIAL, "ENC" );
+            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
+            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
+            //*************************************************************
+
+
+            delete( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, headers );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( String.format( "Error cleaning up network on peer %s", getName() ), e );
+        }
+    }
+
+
+    @Override
+    public boolean isConnected( final Host containerHost )
+    {
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "peer/container/isconnected";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource  = localPeer.getId()+"-"+(( ContainerHost ) host ).getEnvironmentId() ;
-        String envHeaderTarget = peerInfo.getId()+"-"+(( ContainerHost ) host ).getEnvironmentId() ;
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
-
 
 
         try
@@ -435,24 +501,27 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public ProcessResourceUsage getProcessResourceUsage( final ContainerHost host, final int processPid )
+    public ProcessResourceUsage getProcessResourceUsage( final ContainerHost containerHost, final int processPid )
             throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkArgument( processPid > 0, "Process pid must be greater than 0" );
 
         String path = "peer/container/resource/usage";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
         params.put( "processPid", String.valueOf( processPid ) );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-        String envheader = localPeer.getId()+"-"+host.getEnvironmentId();
+        String envheader = localPeer.getId() + "-" + host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envheader );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envheader );
         //*************************************************************
 
         try
@@ -461,8 +530,7 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, alias, params, headers );
 
             return jsonUtil.from( response, new TypeToken<ProcessResourceUsage>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         catch ( Exception e )
         {
@@ -472,24 +540,26 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public ContainerHostState getContainerHostState( final ContainerHost host ) throws PeerException
+    public ContainerHostState getContainerHostState( final ContainerHost containerHost ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "peer/container/state";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource  = localPeer.getId()+"-"+host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId()+"-"+host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -507,24 +577,26 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public int getRamQuota( final ContainerHost host ) throws PeerException
+    public int getRamQuota( final ContainerHost containerHost ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "peer/container/quota/ram";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource  = localPeer.getId()+"-"+host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId()+"-"+host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
         try
         {
@@ -541,24 +613,26 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public RamQuota getRamQuotaInfo( final ContainerHost host ) throws PeerException
+    public RamQuota getRamQuotaInfo( final ContainerHost containerHost ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "peer/container/quota/ram/info";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource  = localPeer.getId()+"-"+host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId()+"-"+host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -576,26 +650,29 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setRamQuota( final ContainerHost host, final int ramInMb ) throws PeerException
+    public void setRamQuota( final ContainerHost containerHost, final int ramInMb ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkArgument( ramInMb > 0, "Ram quota value must be greater than 0" );
 
         String path = "peer/container/quota/ram";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
         params.put( "ram", String.valueOf( ramInMb ) );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource  = localPeer.getId()+"-"+host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId()+"-"+host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
         try
         {
@@ -610,24 +687,26 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public int getCpuQuota( final ContainerHost host ) throws PeerException
+    public int getCpuQuota( final ContainerHost containerHost ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "peer/container/quota/cpu";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource  = localPeer.getId()+"-"+host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId()+"-"+host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
         try
         {
@@ -644,24 +723,26 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public CpuQuotaInfo getCpuQuotaInfo( final ContainerHost host ) throws PeerException
+    public CpuQuotaInfo getCpuQuotaInfo( final ContainerHost containerHost ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "peer/container/quota/cpu/info";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource  = localPeer.getId()+"-"+host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId()+"-"+host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
         try
         {
@@ -678,26 +759,29 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setCpuQuota( final ContainerHost host, final int cpuPercent ) throws PeerException
+    public void setCpuQuota( final ContainerHost containerHost, final int cpuPercent ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkArgument( cpuPercent > 0, "Cpu quota value must be greater than 0" );
 
         String path = "peer/container/quota/cpu";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
         params.put( "cpu", String.valueOf( cpuPercent ) );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource  = localPeer.getId()+"-"+host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId()+"-"+host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //**************************************************************
 
         try
@@ -713,24 +797,26 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public Set<Integer> getCpuSet( final ContainerHost host ) throws PeerException
+    public Set<Integer> getCpuSet( final ContainerHost containerHost ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "peer/container/quota/cpuset";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource  = localPeer.getId()+"-"+host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId()+"-"+host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -739,8 +825,7 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, alias, params, headers );
 
             return jsonUtil.from( response, new TypeToken<Set<Integer>>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         catch ( Exception e )
         {
@@ -750,26 +835,29 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setCpuSet( final ContainerHost host, final Set<Integer> cpuSet ) throws PeerException
+    public void setCpuSet( final ContainerHost containerHost, final Set<Integer> cpuSet ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( cpuSet ), "Empty cpu set" );
 
         String path = "peer/container/quota/cpuset";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
         params.put( "cpuset", jsonUtil.to( cpuSet ) );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource  = localPeer.getId()+"-"+host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId()+"-"+host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -785,27 +873,31 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public DiskQuota getDiskQuota( final ContainerHost host, final DiskPartition diskPartition ) throws PeerException
+    public DiskQuota getDiskQuota( final ContainerHost containerHost, final DiskPartition diskPartition )
+            throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkNotNull( diskPartition, "Invalid disk partition" );
 
         String path = "peer/container/quota/disk";
 
         Map<String, String> params = Maps.newHashMap();
 
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
         params.put( "diskPartition", jsonUtil.to( diskPartition ) );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource  = localPeer.getId()+"-"+host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId()+"-"+host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -814,8 +906,7 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, alias, params, headers );
 
             return jsonUtil.from( response, new TypeToken<DiskQuota>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         catch ( Exception e )
         {
@@ -825,26 +916,29 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setDiskQuota( final ContainerHost host, final DiskQuota diskQuota ) throws PeerException
+    public void setDiskQuota( final ContainerHost containerHost, final DiskQuota diskQuota ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkNotNull( diskQuota, "Invalid disk quota" );
 
         String path = "peer/container/quota/disk";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
         params.put( "diskQuota", jsonUtil.to( diskQuota ) );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource  = localPeer.getId()+"-"+host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId()+"-"+host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -860,26 +954,29 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setRamQuota( final ContainerHost host, final RamQuota ramQuota ) throws PeerException
+    public void setRamQuota( final ContainerHost containerHost, final RamQuota ramQuota ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkNotNull( ramQuota, "Invalid ram quota" );
 
         String path = "peer/container/quota/ram2";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
         params.put( "ramQuota", jsonUtil.to( ramQuota ) );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource  = localPeer.getId()+"-"+host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId()+"-"+host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -895,24 +992,26 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public int getAvailableRamQuota( final ContainerHost host ) throws PeerException
+    public int getAvailableRamQuota( final ContainerHost containerHost ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "peer/container/quota/ram/available";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource  = localPeer.getId()+"-"+host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId()+"-"+host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
         try
         {
@@ -929,24 +1028,26 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public int getAvailableCpuQuota( final ContainerHost host ) throws PeerException
+    public int getAvailableCpuQuota( final ContainerHost containerHost ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "peer/container/quota/cpu/available";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource  = localPeer.getId()+"-"+host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId()+"-"+host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -964,27 +1065,30 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public DiskQuota getAvailableDiskQuota( final ContainerHost host, final DiskPartition diskPartition )
+    public DiskQuota getAvailableDiskQuota( final ContainerHost containerHost, final DiskPartition diskPartition )
             throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkNotNull( diskPartition, "Invalid disk partition" );
 
         String path = "peer/container/quota/disk/available";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
         params.put( "diskPartition", jsonUtil.to( diskPartition ) );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource  = localPeer.getId()+"-"+host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId()+"-"+host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -993,8 +1097,7 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, alias, params, headers );
 
             return jsonUtil.from( response, new TypeToken<DiskQuota>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         catch ( Exception e )
         {
@@ -1004,26 +1107,29 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public QuotaInfo getQuotaInfo( final ContainerHost host, final QuotaType quotaType ) throws PeerException
+    public QuotaInfo getQuotaInfo( final ContainerHost containerHost, final QuotaType quotaType ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkNotNull( quotaType, "Invalid quota type" );
 
         String path = "peer/container/quota/info";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
         params.put( "quotaType", jsonUtil.to( quotaType ) );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource  = localPeer.getId()+"-"+host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId()+"-"+host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -1032,8 +1138,7 @@ public class RemotePeerImpl implements RemotePeer
             String response = get( path, alias, params, headers );
 
             return jsonUtil.from( response, new TypeToken<QuotaInfo>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         catch ( Exception e )
         {
@@ -1043,27 +1148,29 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setQuota( final ContainerHost host, final QuotaInfo quotaInfo ) throws PeerException
+    public void setQuota( final ContainerHost containerHost, final QuotaInfo quotaInfo ) throws PeerException
     {
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
-        Preconditions.checkNotNull( host, "Invalid container host" );
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkNotNull( quotaInfo, "Invalid quota info" );
 
         String path = "peer/container/quota";
 
         Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId().toString() );
+        params.put( "containerId", host.getId() );
         params.put( "quotaInfo", jsonUtil.to( quotaInfo ) );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource  = localPeer.getId()+"-"+host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId()+"-"+host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
+        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -1079,20 +1186,21 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public HostInfo getContainerHostInfoById( final UUID containerHostId ) throws PeerException
+    public HostInfo getContainerHostInfoById( final String containerHostId ) throws PeerException
     {
         String path = String.format( "peer/container/info" );
         try
         {
             //*********construct Secure Header ****************************
             Map<String, String> headers = Maps.newHashMap();
-            String envId = localPeer.getContainerHostById(containerHostId  ).getEnvironmentId();
-            String envHeaderSource = localPeer.getId()+"-"+envId;
-            String envHeaderTarget = peerInfo.getId()+"-"+envId;
+            String envId = ( ( EnvironmentContainerHost ) localPeer.getContainerHostById( containerHostId ) )
+                    .getEnvironmentId();
+            String envHeaderSource = localPeer.getId() + "-" + envId;
+            String envHeaderTarget = peerInfo.getId() + "-" + envId;
 
-            headers.put( Common.HEADER_SPECIAL, "ENC");
-            headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-            headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+            headers.put( Common.HEADER_SPECIAL, "ENC" );
+            headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+            headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
             //*************************************************************
 
             Map<String, String> params = Maps.newHashMap();
@@ -1105,7 +1213,6 @@ public class RemotePeerImpl implements RemotePeer
             throw new PeerException( String.format( "Error getting hostInfo from peer %s", getName() ), e );
         }
     }
-
 
 
     //DONE
@@ -1177,8 +1284,7 @@ public class RemotePeerImpl implements RemotePeer
             throw new CommandException( "Operation not allowed" );
         }
 
-        UUID environmentId = UUID.fromString( ( ( ContainerHost ) host ).getEnvironmentId() );
-
+        String environmentId = ( ( EnvironmentContainerHost ) host ).getEnvironmentId();
         CommandRequest request = new CommandRequest( requestBuilder, host.getId(), environmentId );
         //cache callback
         commandResponseListener.addCallback( request.getRequestId(), callback, requestBuilder.getTimeout(), semaphore );
@@ -1186,14 +1292,14 @@ public class RemotePeerImpl implements RemotePeer
         //send command request to remote peer counterpart
         try
         {
-             //*********construct Secure Header ****************************
+            //*********construct Secure Header ****************************
             Map<String, String> headers = Maps.newHashMap();
-            String envHeaderSource = localPeer.getId()+"-"+environmentId;
-            String envHeaderTarget = peerInfo.getId()+"-"+environmentId;
+            String envHeaderSource = localPeer.getId() + "-" + environmentId;
+            String envHeaderTarget = peerInfo.getId() + "-" + environmentId;
 
-            headers.put( Common.HEADER_SPECIAL, "ENC");
-            headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-            headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+            headers.put( Common.HEADER_SPECIAL, "ENC" );
+            headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+            headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
             //************************************************************************
 
 
@@ -1274,26 +1380,26 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public Set<HostInfoModel> createContainerGroup( final CreateContainerGroupRequest request ) throws PeerException
+    public Set<HostInfoModel> createEnvironmentContainerGroup( final CreateEnvironmentContainerGroupRequest request )
+            throws PeerException
     {
-
         Preconditions.checkNotNull( request, "Invalid request" );
 
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-        String envId = request.getEnvironmentId().toString() ;
-        String envHeaderSource = localPeer.getId()+"-"+envId;
-        String envHeaderTarget = peerInfo.getId()+"-"+envId;
+        String envId = request.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + envId;
+        String envHeaderTarget = peerInfo.getId() + "-" + envId;
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //************************************************************************
 
-        CreateContainerGroupResponse response =
-                sendRequest( request, RecipientType.CREATE_CONTAINER_GROUP_REQUEST.name(),
-                        Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateContainerGroupResponse.class,
+        CreateEnvironmentContainerGroupResponse response =
+                sendRequest( request, RecipientType.CREATE_ENVIRONMENT_CONTAINER_GROUP_REQUEST.name(),
+                        Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateEnvironmentContainerGroupResponse.class,
                         Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT, headers );
 
         if ( response != null )
@@ -1308,27 +1414,28 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public ContainersDestructionResult destroyEnvironmentContainers( final UUID environmentId ) throws PeerException
+    public ContainersDestructionResult destroyEnvironmentContainerGroup( final String environmentId )
+            throws PeerException
     {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-        String envHeaderSource = localPeer.getId()+"-"+environmentId;
-        String envHeaderTarget = peerInfo.getId()+"-"+environmentId;
+        String envHeaderSource = localPeer.getId() + "-" + environmentId;
+        String envHeaderTarget = peerInfo.getId() + "-" + environmentId;
 
-        headers.put( Common.HEADER_SPECIAL, "ENC");
-        headers.put( Common.HEADER_ENV_ID_SOURCE,envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET,envHeaderTarget );
+        headers.put( Common.HEADER_SPECIAL, "ENC" );
+        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
+        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //**************************************************************************
 
 
-        DestroyEnvironmentContainersResponse response =
-                sendRequest( new DestroyEnvironmentContainersRequest( environmentId ),
-                        RecipientType.CONTAINER_DESTROY_REQUEST.name(), Timeouts.DESTROY_CONTAINER_REQUEST_TIMEOUT,
-                        DestroyEnvironmentContainersResponse.class, Timeouts.DESTROY_CONTAINER_RESPONSE_TIMEOUT,
-                        headers );
+        DestroyEnvironmentContainerGroupResponse response =
+                sendRequest( new DestroyEnvironmentContainerGroupRequest( environmentId ),
+                        RecipientType.DESTROY_ENVIRONMENT_CONTAINER_GROUP_REQUEST.name(),
+                        Timeouts.DESTROY_CONTAINER_REQUEST_TIMEOUT, DestroyEnvironmentContainerGroupResponse.class,
+                        Timeouts.DESTROY_CONTAINER_RESPONSE_TIMEOUT, headers );
 
         if ( response != null )
         {
@@ -1346,6 +1453,40 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public int setupTunnels( final Map<String, String> peerIps, final String environmentId ) throws PeerException
+    {
+
+        Preconditions.checkNotNull( peerIps, "Invalid peer ips set" );
+        Preconditions.checkArgument( !peerIps.isEmpty(), "Invalid peer ips set" );
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        String path = "peer/tunnels";
+
+        try
+        {
+            //*********construct Secure Header ****************************
+            Map<String, String> headers = Maps.newHashMap();
+
+            headers.put( Common.HEADER_SPECIAL, "ENC" );
+            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
+            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
+            //*************************************************************
+            Map<String, String> params = Maps.newHashMap();
+            params.put( "peerIps", jsonUtil.to( peerIps ) );
+            params.put( "environmentId", environmentId );
+
+            String response = post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
+
+            return Integer.parseInt( response );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( String.format( "Error setting up tunnels on peer %s", getName() ), e );
+        }
+    }
+
+
+    @Override
     public int reserveVni( final Vni vni ) throws PeerException
     {
         Preconditions.checkNotNull( vni, "Invalid vni" );
@@ -1357,9 +1498,9 @@ public class RemotePeerImpl implements RemotePeer
             //*********construct Secure Header ****************************
             Map<String, String> headers = Maps.newHashMap();
 
-            headers.put( Common.HEADER_SPECIAL, "ENC");
-            headers.put( Common.HEADER_PEER_ID_SOURCE,localPeer.getId().toString() );
-            headers.put( Common.HEADER_PEER_ID_TARGET,peerInfo.getId().toString() );
+            headers.put( Common.HEADER_SPECIAL, "ENC" );
+            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
+            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
 
             //*************************************************************
 
@@ -1379,8 +1520,6 @@ public class RemotePeerImpl implements RemotePeer
     //************ END ENVIRONMENT SPECIFIC REST
 
 
-
-
     @Override
     public Set<Gateway> getGateways() throws PeerException
     {
@@ -1390,16 +1529,15 @@ public class RemotePeerImpl implements RemotePeer
             //*********construct Secure Header ****************************
             Map<String, String> headers = Maps.newHashMap();
 
-            headers.put( Common.HEADER_SPECIAL, "ENC");
-            headers.put( Common.HEADER_PEER_ID_SOURCE,localPeer.getId().toString() );
-            headers.put( Common.HEADER_PEER_ID_TARGET,peerInfo.getId().toString() );
+            headers.put( Common.HEADER_SPECIAL, "ENC" );
+            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
+            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
             //*************************************************************
 
             String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, headers );
 
             return jsonUtil.from( response, new TypeToken<Set<Gateway>>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         catch ( Exception e )
         {
@@ -1418,16 +1556,15 @@ public class RemotePeerImpl implements RemotePeer
             //*********construct Secure Header ****************************
             Map<String, String> headers = Maps.newHashMap();
 
-            headers.put( Common.HEADER_SPECIAL, "ENC");
-            headers.put( Common.HEADER_PEER_ID_SOURCE,localPeer.getId().toString() );
-            headers.put( Common.HEADER_PEER_ID_TARGET,peerInfo.getId().toString() );
+            headers.put( Common.HEADER_SPECIAL, "ENC" );
+            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
+            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
             //*************************************************************
 
             String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, headers );
 
             return jsonUtil.from( response, new TypeToken<Set<Vni>>()
-            {
-            }.getType() );
+            {}.getType() );
         }
         catch ( Exception e )
         {
@@ -1436,40 +1573,33 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-
     /* ***************************************************
      *
      */
     @Override
-    public int createEnvironmentKeyPair( String environmentId) throws PeerException
+    public String createEnvironmentKeyPair( String environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environmentId" );
 
-        String path = "peer/createpek";
+        String path = String.format( "peer/pek/%s", environmentId );
 
         try
         {
             //*********construct Secure Header ****************************
             Map<String, String> headers = Maps.newHashMap();
 
-            headers.put( Common.HEADER_SPECIAL, "ENC");
-            headers.put( Common.HEADER_PEER_ID_SOURCE,localPeer.getId().toString() );
-            headers.put( Common.HEADER_PEER_ID_TARGET,peerInfo.getId().toString() );
+            headers.put( Common.HEADER_SPECIAL, "ENC" );
+            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
+            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
             //*************************************************************
 
-            Map<String, String> params = Maps.newHashMap();
-            params.put( "environmentId", environmentId);
-
-            String response = post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
-
-            return 1;
+            return post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, headers );
         }
         catch ( Exception e )
         {
-            throw new PeerException( String.format( "Error creating PEK on peer %s",  getName() ), e );
+            throw new PeerException( String.format( "Error creating PEK on peer %s", getName() ), e );
         }
     }
-
 
 
     /* ***************************************************
@@ -1486,12 +1616,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( pattern, "Pattern could not be null" );
 
-
         String path = buildPath( "peer/interfaces" );
-
-        //TODO: implement as singleton
-        List<Object> providers = new ArrayList<Object>();
-        providers.add( new JacksonJaxbJsonProvider() );
 
         WebClient client =
                 restUtil.createTrustedWebClientWithAuthAndProviders( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS,
@@ -1500,44 +1625,44 @@ public class RemotePeerImpl implements RemotePeer
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        Collection interfaces = client.postAndGetCollection( pattern, HostInterface.class );
+        Collection interfaces = client.postAndGetCollection( pattern, HostInterfaceImpl.class );
         LOG.debug( String.format( "%d", interfaces.size() ) );
-        return new HashSet<Interface>( interfaces );
+        return Sets.newHashSet( interfaces );
     }
 
 
-    @Override
-    public int setupTunnels( final Map<String, String> peerIps, final UUID environmentId ) throws PeerException
-    {
-
-        Preconditions.checkNotNull( peerIps, "Invalid peer ips set" );
-        Preconditions.checkArgument( !peerIps.isEmpty(), "Invalid peer ips set" );
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-
-        String path = "peer/tunnels";
-
-        try
-        {
-            //*********construct Secure Header ****************************
-            Map<String, String> headers = Maps.newHashMap();
-
-            headers.put( Common.HEADER_SPECIAL, "ENC" );
-            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId().toString() );
-            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId().toString() );
-            //*************************************************************
-            Map<String, String> params = Maps.newHashMap();
-            params.put( "peerIps", jsonUtil.to( peerIps ) );
-            params.put( "environmentId", environmentId.toString() );
-
-            String response = post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
-
-            return Integer.parseInt( response );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( String.format( "Error setting up tunnels on peer %s", getName() ), e );
-        }
-    }
+//    @Override
+//    public int setupTunnels( final Map<String, String> peerIps, final UUID environmentId ) throws PeerException
+//    {
+//
+//        Preconditions.checkNotNull( peerIps, "Invalid peer ips set" );
+//        Preconditions.checkArgument( !peerIps.isEmpty(), "Invalid peer ips set" );
+//        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+//
+//        String path = "peer/tunnels";
+//
+//        try
+//        {
+//            //*********construct Secure Header ****************************
+//            Map<String, String> headers = Maps.newHashMap();
+//
+//            headers.put( Common.HEADER_SPECIAL, "ENC" );
+//            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId().toString() );
+//            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId().toString() );
+//            //*************************************************************
+//            Map<String, String> params = Maps.newHashMap();
+//            params.put( "peerIps", jsonUtil.to( peerIps ) );
+//            params.put( "environmentId", environmentId.toString() );
+//
+//            String response = post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
+//
+//            return Integer.parseInt( response );
+//        }
+//        catch ( Exception e )
+//        {
+//            throw new PeerException( String.format( "Error setting up tunnels on peer %s", getName() ), e );
+//        }
+//    }
 
     @Override
     public void setupN2NConnection( final N2NConfig config )
@@ -1550,7 +1675,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
         //TODO: implement as singleton
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = Lists.newArrayList();
         providers.add( new JacksonJaxbJsonProvider() );
 
         WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
@@ -1559,7 +1684,7 @@ public class RemotePeerImpl implements RemotePeer
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        Response response = client.post( config );
+        client.post( config );
     }
 
 
@@ -1574,7 +1699,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
         //TODO: implement as singleton
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = Lists.newArrayList();
         providers.add( new JacksonJaxbJsonProvider() );
 
         WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
@@ -1585,6 +1710,36 @@ public class RemotePeerImpl implements RemotePeer
 
         Response response = client.delete();
         LOG.debug( String.format( "%s", response ) );
+    }
+
+
+    @Override
+    public void createGateway( final String environmentGatewayIp, final int vlan ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentGatewayIp ) );
+        Preconditions.checkArgument( vlan > 0 );
+
+        String path = "peer/gateways";
+
+        try
+        {
+            //*********construct Secure Header ****************************
+            Map<String, String> headers = Maps.newHashMap();
+
+            headers.put( Common.HEADER_SPECIAL, "ENC" );
+            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
+            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
+            //*************************************************************
+            Map<String, String> params = Maps.newHashMap();
+            params.put( "gatewayIp", environmentGatewayIp );
+            params.put( "vlan", String.valueOf( vlan ) );
+
+            post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( String.format( "Error creating gateway on peer %s", getName() ), e );
+        }
     }
 
 
@@ -1611,5 +1766,4 @@ public class RemotePeerImpl implements RemotePeer
     {
         return getId().hashCode();
     }
-
 }

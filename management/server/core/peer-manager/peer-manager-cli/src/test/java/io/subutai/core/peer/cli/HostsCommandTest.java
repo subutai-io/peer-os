@@ -16,7 +16,7 @@ import io.subutai.core.identity.api.User;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.api.ResourceHost;
+import io.subutai.common.peer.ResourceHost;
 
 import com.google.common.collect.Sets;
 
@@ -30,7 +30,7 @@ public class HostsCommandTest extends SystemOutRedirectTest
     private static final String CONTAINER_HOST_HOSTNAME = "container";
     private static final String RESOURCE_HOST_HOSTNAME = "resource";
     private static final String MGMT_HOST_HOSTNAME = "management";
-    private static final UUID ID = UUID.randomUUID();
+    private static final String ID = UUID.randomUUID().toString();
     private static final String USERNAME = "user";
     private static final long LAST_HEARTBEAT = System.currentTimeMillis();
     @Mock
@@ -66,13 +66,10 @@ public class HostsCommandTest extends SystemOutRedirectTest
         when( resourceHost.getHostname() ).thenReturn( RESOURCE_HOST_HOSTNAME );
         when( containerHost.getHostname() ).thenReturn( CONTAINER_HOST_HOSTNAME );
         when( user.getUsername() ).thenReturn( USERNAME );
-        when( managementHost.getLastHeartbeat() ).thenReturn( LAST_HEARTBEAT );
-        when( resourceHost.getLastHeartbeat() ).thenReturn( LAST_HEARTBEAT );
-        when( containerHost.getLastHeartbeat() ).thenReturn( LAST_HEARTBEAT );
         when( managementHost.getId() ).thenReturn( ID );
         when( resourceHost.getId() ).thenReturn( ID );
         when( containerHost.getId() ).thenReturn( ID );
-        when( containerHost.getState() ).thenReturn( ContainerHostState.RUNNING );
+        when( containerHost.getStatus() ).thenReturn( ContainerHostState.RUNNING );
     }
 
 

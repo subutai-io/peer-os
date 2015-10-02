@@ -35,14 +35,14 @@ import static org.mockito.Mockito.when;
 public class MessengerDaoTest
 {
 
-    private static final UUID TARGET_PEER_ID = UUID.randomUUID();
+    private static final String TARGET_PEER_ID = UUID.randomUUID().toString();
     private static final String RECIPIENT = "recipient";
     private static final int TIME_TO_LIVE = 5;
     private static final Timestamp CREATE_DATE = new Timestamp( System.currentTimeMillis() );
     private static final Map<String, String> HEADERS = Maps.newHashMap();
 
 
-    private static final UUID SOURCE_PEER_ID = UUID.randomUUID();
+    private static final String SOURCE_PEER_ID = UUID.randomUUID().toString();
     private static final Object PAYLOAD = new Object();
 
 

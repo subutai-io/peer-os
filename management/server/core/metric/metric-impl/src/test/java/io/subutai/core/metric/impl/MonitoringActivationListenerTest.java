@@ -52,9 +52,9 @@ public class MonitoringActivationListenerTest
     public void testOnRequest() throws Exception
     {
         when( payload.getMessage( MonitoringActivationRequest.class ) ).thenReturn( request );
-        when( request.getContainerHostsIds() ).thenReturn( Sets.newHashSet( UUID.randomUUID() ) );
+        when( request.getContainerHostsIds() ).thenReturn( Sets.newHashSet( UUID.randomUUID().toString() ) );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
-        when( localPeer.bindHost( any( UUID.class ) ) ).thenReturn( mock( ContainerHost.class ) );
+        when( localPeer.bindHost( any( String.class ) ) ).thenReturn( mock( ContainerHost.class ) );
 
         listener.onRequest( payload );
 

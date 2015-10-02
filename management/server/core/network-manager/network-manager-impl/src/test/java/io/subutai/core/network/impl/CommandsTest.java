@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -25,7 +25,7 @@ public class CommandsTest
     private static final String TUNNEL_TYPE = "tunnel type";
     private static final String GATEWAY_IP = "gateway.ip";
     private static final int VLAN_ID = 100;
-    private static final UUID ENVIRONMENT_ID = UUID.randomUUID();
+    private static final String ENVIRONMENT_ID = UUID.randomUUID().toString();
     private static final String CONTAINER_NAME = "container";
     private static final String PATH_TO_KEY_FILE = "/path/to/key/file";
     private static final String KEY_TYPE = "key type";
@@ -216,7 +216,7 @@ public class CommandsTest
     @Test
     public void testGetAddIpHostToEtcHostsCommand() throws Exception
     {
-        ContainerHost containerHost = mock( ContainerHost.class );
+        EnvironmentContainerHost containerHost = mock( EnvironmentContainerHost.class );
         assertNotNull( commands.getAddIpHostToEtcHostsCommand( DOMAIN, Sets.newHashSet( containerHost ) ) );
     }
 }

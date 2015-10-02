@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class ListCommandTest extends SystemOutRedirectTest
 {
-    private static final UUID PEER_ID = UUID.randomUUID();
+    private static final String PEER_ID = UUID.randomUUID().toString();
     private static final String ERR_MSG = "error";
     @Mock
     PeerManager peerManager;

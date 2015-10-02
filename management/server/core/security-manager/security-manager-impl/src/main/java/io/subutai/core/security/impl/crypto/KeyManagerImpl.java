@@ -3,6 +3,7 @@ package io.subutai.core.security.impl.crypto;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Objects;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -64,33 +65,12 @@ public class KeyManagerImpl implements KeyManager
     /* *****************************
      *
      */
-    public KeyManagerImpl( SecurityManagerDAO securityManagerDAO, KeyServer keyServer, String publicKeyringFile,
-                           String ownerPublicKeyringFile, String secretKeyringFile, String secretKeyringPwd,
-                           String manHostId, String manHostKeyFingerprint )
-    {
-        this.securityManagerDAO = securityManagerDAO;
-        this.keyServer = keyServer;
-
-        keyData = new SecurityKeyData();
-        keyData.setManHostId( manHostId );
-        keyData.setOwnerPublicKeyringFile( ownerPublicKeyringFile );
-        keyData.setPublicKeyringFile( publicKeyringFile );
-        keyData.setSecretKeyringFile( secretKeyringFile );
-        keyData.setSecretKeyringPwd( secretKeyringPwd );
-        keyData.setManHostKeyFingerprint( manHostKeyFingerprint );
-
-        // Create Key Identity Record , save Public key in the KeyStore.
-        init();
-    }
-
-
-    /* *****************************
-     *
-     */
     private void init()
     {
         try
         {
+
+
             InputStream ownerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getOwnerPublicKeyringFile() );
             InputStream peerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getPublicKeyringFile() );
             InputStream peerSecStream = PGPEncryptionUtil.getFileInputStream( keyData.getSecretKeyringFile() );
@@ -98,13 +78,16 @@ public class KeyManagerImpl implements KeyManager
             if ( ownerPubStream == null || peerPubStream == null || peerSecStream == null )
             {
                 LOG.info( " **** Error loading PGPPublicKeyRing/PGPSecretKeyRing files. Files not found.**** :" );
+                //todo System.exit(1) with error message
             }
             else
             {
+                PGPPublicKeyRing peerPubRing = PGPKeyUtil.readPublicKeyRing( peerPubStream );
+                String peerId = PGPKeyUtil.getFingerprint( peerPubRing.getPublicKey().getFingerprint() );
+                keyData.setManHostId( peerId );
                 saveSecretKeyRing( keyData.getManHostId(), ( short ) 1, PGPKeyUtil.readSecretKeyRing( peerSecStream ) );
-                savePublicKeyRing( keyData.getManHostId(), ( short ) 1, PGPKeyUtil.readPublicKeyRing( peerPubStream ) );
-                savePublicKeyRing( "owner-" + keyData.getManHostId(), ( short ) 1,
-                        PGPKeyUtil.readPublicKeyRing( ownerPubStream ) );
+                savePublicKeyRing( keyData.getManHostId(), ( short ) 1, peerPubRing );
+                savePublicKeyRing( getOwnerKeyIdx(), ( short ) 1, PGPKeyUtil.readPublicKeyRing( ownerPubStream ) );
             }
         }
         catch ( Exception ex )
@@ -114,9 +97,30 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
+    //todo Nurkaly please revise this so that we take owner idx from the constant
+    private String getOwnerKeyIdx()
+    {
+        return "owner-" + keyData.getManHostId();
+    }
+
+
+    @Override
+    public String getPeerId()
+    {
+        return PGPKeyUtil.getFingerprint( getPublicKey( null ).getFingerprint() );
+    }
+
+
+    @Override
+    public String getOwnerId()
+    {
+        return PGPKeyUtil.getFingerprint( getPublicKey( getOwnerKeyIdx() ).getFingerprint() );
+    }
+
+
     /* ***************************************************************
-     *
-     */
+         *
+         */
     @Override
     public void saveSecretKeyRing( String hostId, short type, PGPSecretKeyRing secretKeyRing )
     {
@@ -202,7 +206,7 @@ public class KeyManagerImpl implements KeyManager
     {
         try
         {
-            if ( hostId != keyData.getManHostId() )
+            if ( !Objects.equals( hostId, keyData.getManHostId() ) )
             {
                 securityManagerDAO.removeKeyIdentityData( hostId );
             }
@@ -225,7 +229,7 @@ public class KeyManagerImpl implements KeyManager
     {
         try
         {
-            if ( hostId != keyData.getManHostId() )
+            if ( !Objects.equals( hostId, keyData.getManHostId() ) )
             {
                 String fingerprint = securityManagerDAO.getSecretKeyFingerprint( hostId );
                 secretKeyStoreDAO.removeSecretKeyRing( fingerprint );
@@ -244,7 +248,7 @@ public class KeyManagerImpl implements KeyManager
     @Override
     public PGPPublicKey getPublicKey( String hostId )
     {
-        PGPPublicKeyRing publicKeyRing = null;
+        PGPPublicKeyRing publicKeyRing;
 
         try
         {
@@ -308,7 +312,7 @@ public class KeyManagerImpl implements KeyManager
     @Override
     public PGPPublicKeyRing getPublicKeyRing( String hostId )
     {
-        PGPPublicKeyRing publicKeyRing = null;
+        PGPPublicKeyRing publicKeyRing;
 
         if ( Strings.isNullOrEmpty( hostId ) )
         {
@@ -328,7 +332,7 @@ public class KeyManagerImpl implements KeyManager
         catch ( Exception ex )
         {
             LOG.error( "Error getting Public key:" + ex.toString() );
-            return publicKeyRing;
+            return null;
         }
     }
 
@@ -346,7 +350,7 @@ public class KeyManagerImpl implements KeyManager
 
         try
         {
-            PGPSecretKeyRing secretKeyRing = null;
+            PGPSecretKeyRing secretKeyRing;
             String fingerprint = securityManagerDAO.getSecretKeyFingerprint( hostId );
 
             if(Strings.isNullOrEmpty( fingerprint ))
@@ -390,20 +394,9 @@ public class KeyManagerImpl implements KeyManager
 
         try
         {
-            InputStream secretKeyRingStream = null;
             String fingerprint = securityManagerDAO.getSecretKeyFingerprint( hostId );
-            secretKeyRingStream = PGPKeyUtil
+            return PGPKeyUtil
                     .readSecretKeyRingInputStream( secretKeyStoreDAO.getSecretKeyData( fingerprint ).getData() );
-
-            if ( secretKeyRingStream != null )
-            {
-                return secretKeyRingStream;
-            }
-            else
-            {
-                LOG.error( "Object not found with fprint:" + fingerprint );
-                return null;
-            }
         }
         catch ( Exception ex )
         {
@@ -451,7 +444,7 @@ public class KeyManagerImpl implements KeyManager
     @Override
     public PGPPrivateKey getPrivateKey( String hostId )
     {
-        PGPPrivateKey privateKey = null;
+        PGPPrivateKey privateKey;
 
         if ( Strings.isNullOrEmpty( hostId ) )
         {
@@ -476,7 +469,7 @@ public class KeyManagerImpl implements KeyManager
         catch ( Exception ex )
         {
             LOG.error( "Error getting Private key:" + ex.toString() );
-            return privateKey;
+            return null;
         }
     }
 
@@ -520,7 +513,7 @@ public class KeyManagerImpl implements KeyManager
     @Override
     public KeyPair generateKeyPair( String userId, boolean armored )
     {
-        KeyPair keyPair = null;
+        KeyPair keyPair;
 
         try
         {
@@ -545,7 +538,7 @@ public class KeyManagerImpl implements KeyManager
             saveSecretKeyRing( hostId, type, PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() ) );
             savePublicKeyRing( hostId, type, PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() ) );
         }
-        catch ( Exception ex )
+        catch ( Exception ignored )
         {
 
         }
@@ -560,7 +553,7 @@ public class KeyManagerImpl implements KeyManager
     {
         try
         {
-            if ( hostId != keyData.getManHostId() )
+            if ( !Objects.equals( hostId, keyData.getManHostId() ) )
             {
                 removeSecretKeyRing( hostId );
                 removePublicKeyRing( hostId );
@@ -570,7 +563,7 @@ public class KeyManagerImpl implements KeyManager
                 LOG.error( hostId + " Cannot be removed (possibly ManagementHost):" );
             }
         }
-        catch ( Exception ex )
+        catch ( Exception ignored )
         {
 
         }
@@ -585,7 +578,7 @@ public class KeyManagerImpl implements KeyManager
     {
         try
         {
-            PGPPublicKeyRing pubRing = null;
+            PGPPublicKeyRing pubRing;
 
             if ( Strings.isNullOrEmpty( remoteHostId ) )
             {

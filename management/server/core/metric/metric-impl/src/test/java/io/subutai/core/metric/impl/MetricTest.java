@@ -44,7 +44,7 @@ public class MetricTest
     @Test
     public void testToString() throws Exception
     {
-        UUID environmentId = UUID.randomUUID();
+        String environmentId = UUID.randomUUID().toString();
         metric.setEnvironmentId( environmentId );
 
         assertThat( metric.toString(), containsString( environmentId.toString() ) );
@@ -54,8 +54,8 @@ public class MetricTest
     @Test
     public void testOutput() throws Exception
     {
-        metric.setEnvironmentId( UUID.randomUUID() );
-        metric.setHostId( UUID.randomUUID() );
+        metric.setEnvironmentId( UUID.randomUUID().toString() );
+        metric.setHostId( UUID.randomUUID().toString() );
 
         System.out.println(metric);
 

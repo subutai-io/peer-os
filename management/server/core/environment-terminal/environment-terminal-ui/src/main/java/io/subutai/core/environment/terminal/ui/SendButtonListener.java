@@ -4,23 +4,24 @@ package io.subutai.core.environment.terminal.ui;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
+import com.vaadin.ui.Button;
+
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.command.Response;
 import io.subutai.common.command.ResponseType;
-import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Strings;
-import com.vaadin.ui.Button;
 
 
 /**
@@ -49,7 +50,7 @@ public class SendButtonListener implements Button.ClickListener
     @Override
     public void buttonClick( Button.ClickEvent event )
     {
-        Set<ContainerHost> containers = form.environmentTree.getSelectedContainers();
+        Set<EnvironmentContainerHost> containers = form.environmentTree.getSelectedContainers();
         if ( CollectionUtil.isCollectionEmpty( containers ) )
         {
             form.show( "Please, select container(s)" );
@@ -65,7 +66,7 @@ public class SendButtonListener implements Button.ClickListener
     }
 
 
-    protected void executeCommand( Set<ContainerHost> containers )
+    protected void executeCommand( Set<EnvironmentContainerHost> containers )
     {
 
         RequestBuilder requestBuilder = new RequestBuilder( form.programTxtFld.getValue() );
@@ -88,7 +89,7 @@ public class SendButtonListener implements Button.ClickListener
 
             form.indicator.setVisible( true );
 
-            for ( ContainerHost host : containers )
+            for ( EnvironmentContainerHost host : containers )
             {
                 executor.execute( new ExecuteCommandTask( form, host, requestBuilder ) );
             }

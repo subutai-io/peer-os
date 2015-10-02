@@ -4,8 +4,6 @@ package io.subutai.core.metric.api;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.subutai.core.metric.api.MonitoringSettings;
-
 import static junit.framework.TestCase.assertEquals;
 
 

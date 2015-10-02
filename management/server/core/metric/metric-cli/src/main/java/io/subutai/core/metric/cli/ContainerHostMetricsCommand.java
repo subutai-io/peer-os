@@ -2,19 +2,18 @@ package io.subutai.core.metric.cli;
 
 
 import java.util.Set;
-import java.util.UUID;
-
-import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.core.env.api.EnvironmentManager;
-import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-import io.subutai.core.metric.api.ContainerHostMetric;
-import io.subutai.core.metric.api.Monitor;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
+
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+import io.subutai.common.metric.ContainerHostMetric;
+import io.subutai.core.metric.api.Monitor;
 
 
 /**
@@ -24,7 +23,7 @@ import com.google.common.base.Preconditions;
 public class ContainerHostMetricsCommand extends SubutaiShellCommandSupport
 {
     @Argument( index = 0, name = "environment id", required = true, multiValued = false,
-            description = "environment id (uuid)" )
+            description = "environment id " )
     String environmentIdString;
 
 
@@ -45,12 +44,9 @@ public class ContainerHostMetricsCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-
-        UUID environmentId = UUID.fromString( environmentIdString );
-
         try
         {
-            Environment environment = environmentManager.findEnvironment( environmentId );
+            Environment environment = environmentManager.loadEnvironment( environmentIdString );
             Set<ContainerHostMetric> metrics = monitor.getContainerHostsMetrics( environment );
             for ( ContainerHostMetric metric : metrics )
             {

@@ -62,7 +62,7 @@ public class RequestNotifierTest
         requestNotifier = new RequestNotifier( peerManager, messenger, requestListener, message, messageRequest );
         when( messageRequest.getPayload() ).thenReturn( payload );
         when( requestListener.onRequest( payload ) ).thenReturn( response );
-        when( peerManager.getPeer( any( UUID.class ) ) ).thenReturn( peer );
+        when( peerManager.getPeer( any( String.class ) ) ).thenReturn( peer );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
     }
 

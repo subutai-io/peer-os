@@ -11,8 +11,8 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.core.hostregistry.api.ContainerHostInfo;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 
 import com.google.common.collect.Maps;
 
@@ -26,12 +26,12 @@ import static org.junit.Assert.assertThat;
 public class ResourceHostInfoImplTest
 {
     private static final String HOST_HOSTNAME = "host";
-    private static final UUID HOST_ID = UUID.randomUUID();
-    private static final UUID HOST_ID2 = UUID.randomUUID();
+    private static final String HOST_ID = UUID.randomUUID().toString();
+    private static final String HOST_ID2 = UUID.randomUUID().toString();
     private static final String HOST_IP = "127.0.0.2";
     private static final String HOST_MAC_ADDRESS = "0c:8b:fd:c0:ea:fe";
     private static final String CONTAINER_HOSTNAME = "container";
-    private static final UUID CONTAINER_ID = UUID.randomUUID();
+    private static final String CONTAINER_ID = UUID.randomUUID().toString();
     private static final String CONTAINER_IP = "127.0.0.1";
     private static final String CONTAINER_INTERFACE = "eth0";
     private static final String CONTAINER_MAC_ADDRESS = "0c:8b:fd:c0:ea:fe";

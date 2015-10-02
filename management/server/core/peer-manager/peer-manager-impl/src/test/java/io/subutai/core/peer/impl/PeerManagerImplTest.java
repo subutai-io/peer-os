@@ -32,8 +32,9 @@ import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.request.MessageRequestListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.registry.api.TemplateRegistry;
-import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.core.strategy.api.StrategyManager;
+
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
@@ -54,7 +55,7 @@ import static org.mockito.Mockito.when;
 public class PeerManagerImplTest
 {
     private static final String PEER_ID_FILE = "./id";
-    private static final UUID PEER_ID = UUID.randomUUID();
+    private static final String PEER_ID = UUID.randomUUID().toString();
     @Mock
     PeerDAO peerDAO;
     @Mock
@@ -100,7 +101,8 @@ public class PeerManagerImplTest
     @Before
     public void setUp() throws Exception
     {
-        peerManager = spy( new PeerManagerImpl( messenger, localPeer, daoManager , messageResponseListener , securityManager) );
+        peerManager = spy( new PeerManagerImpl( messenger, localPeer, daoManager, messageResponseListener,
+                securityManager ) );
 
 
         peerManager.commandResponseListener = commandResponseListener;
@@ -169,7 +171,7 @@ public class PeerManagerImplTest
 
         verify( peerDAO ).saveInfo( anyString(), anyString(), anyObject() );
 
-        when( peerInfo.getId() ).thenReturn( UUID.randomUUID() );
+        when( peerInfo.getId() ).thenReturn( UUID.randomUUID().toString() );
 
         peerManager.update( peerInfo );
 
@@ -206,7 +208,7 @@ public class PeerManagerImplTest
 
         UUID id = UUID.randomUUID();
 
-        peerManager.getPeerInfo( id );
+        peerManager.getPeerInfo( id.toString() );
 
         verify( peerDAO ).getInfo( PeerManagerImpl.SOURCE_REMOTE_PEER, id.toString(), PeerInfo.class );
     }
@@ -217,7 +219,7 @@ public class PeerManagerImplTest
     {
         assertEquals( localPeer, peerManager.getPeer( PEER_ID ) );
 
-        doReturn( peerInfo ).when( peerManager ).getPeerInfo( any( UUID.class ) );
+        doReturn( peerInfo ).when( peerManager ).getPeerInfo( any( String.class ) );
 
         assertFalse( localPeer.equals( peerManager.getPeer( UUID.randomUUID().toString() ) ) );
     }

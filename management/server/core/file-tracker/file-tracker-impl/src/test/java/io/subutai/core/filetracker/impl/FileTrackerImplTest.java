@@ -45,7 +45,7 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class FileTrackerImplTest
 {
-    private static final UUID ID = UUIDUtil.generateRandomUUID();
+    private static final String ID = UUIDUtil.generateRandomUUID().toString();
     private static final String CONFIG_POINT = "/etc/approx";
     private static final InotifyEventType EVENT_TYPE = InotifyEventType.CREATE_FOLDER;
     private static final String INOTIFY_RESPONSE = String.format(
@@ -84,7 +84,7 @@ public class FileTrackerImplTest
         fileTracker.jsonUtil = jsonUtil;
         fileTracker.listeners = listeners;
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
-        when( localPeer.bindHost( ID ) ).thenReturn( host );
+        when( localPeer.bindHost( ID.toString() ) ).thenReturn( host );
     }
 
 

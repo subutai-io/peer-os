@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.test.SystemOutRedirectTest;
@@ -39,7 +40,7 @@ public class ExecSyncCommandTest extends SystemOutRedirectTest
         command = new ExecSyncCommand( commandExecutor );
         command.hostId = HOST_ID;
         command.command = COMMAND;
-        when( commandExecutor.execute( any( UUID.class ), any( RequestBuilder.class ) ) ).thenReturn( commandResult );
+        when( commandExecutor.execute( any( String.class ), any( RequestBuilder.class ) ) ).thenReturn( commandResult );
     }
 
 
@@ -56,17 +57,8 @@ public class ExecSyncCommandTest extends SystemOutRedirectTest
         //test execution
         command.doExecute();
 
-        verify( commandExecutor ).execute( any( UUID.class ), any( RequestBuilder.class ) );
+        verify( commandExecutor ).execute( any( String.class ), any( RequestBuilder.class ) );
 
         assertThat( getSysOut(), containsString( commandResult.toString() ) );
-
-
-        //test invalid id
-
-        command.hostId = "invalid id";
-
-        command.doExecute();
-
-        assertThat( getSysOut(), containsString( "Invalid host id" ) );
     }
 }

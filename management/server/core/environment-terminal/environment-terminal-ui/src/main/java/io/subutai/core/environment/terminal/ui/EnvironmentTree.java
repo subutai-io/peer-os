@@ -11,11 +11,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.core.env.api.EnvironmentManager;
-import io.subutai.server.ui.component.ConcurrentComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +31,12 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Tree;
 
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.server.ui.component.ConcurrentComponent;
+
 
 /**
  * Container tree
@@ -49,7 +50,7 @@ public class EnvironmentTree extends ConcurrentComponent
     private static final String ICON_PROPERTY = "icon";
     protected final Tree tree;
     protected HierarchicalContainer container;
-    protected Set<ContainerHost> selectedContainers = new HashSet<>();
+    protected Set<EnvironmentContainerHost> selectedContainers = new HashSet<>();
     protected Environment environment;
     protected ScheduledExecutorService scheduler;
     protected final EnvironmentManager environmentManager;
@@ -97,7 +98,7 @@ public class EnvironmentTree extends ConcurrentComponent
                 Item item = tree.getItem( itemId );
                 if ( item != null && item.getItemProperty( VALUE_PROPERTY ) != null )
                 {
-                    ContainerHost ec = ( ContainerHost ) item.getItemProperty( VALUE_PROPERTY ).getValue();
+                    EnvironmentContainerHost  ec = ( EnvironmentContainerHost ) item.getItemProperty( VALUE_PROPERTY ).getValue();
                     if ( ec != null )
                     {
                         description = "Hostname: " + ec.getHostname() + "<br>" + "Peer ID: " + ec.getPeerId() + "<br>"
@@ -117,14 +118,15 @@ public class EnvironmentTree extends ConcurrentComponent
                 if ( event.getProperty().getValue() instanceof Set )
                 {
                     Tree t = ( Tree ) event.getProperty();
-                    Set<ContainerHost> selectedList = new HashSet<>();
+                    Set<EnvironmentContainerHost> selectedList = new HashSet<>();
                     for ( Object o : ( Iterable<?> ) t.getValue() )
                     {
                         if ( tree.getItem( o ) != null && tree.getItem( o ).getItemProperty( VALUE_PROPERTY ) != null
                                 && tree.getItem( o ).getItemProperty( VALUE_PROPERTY ).getValue() != null )
                         {
-                            ContainerHost containerHost =
-                                    ( ContainerHost ) tree.getItem( o ).getItemProperty( VALUE_PROPERTY ).getValue();
+                            EnvironmentContainerHost containerHost =
+                                    ( EnvironmentContainerHost ) tree.getItem( o ).getItemProperty( VALUE_PROPERTY )
+                                                                     .getValue();
                             selectedList.add( containerHost );
                         }
                     }
@@ -215,7 +217,7 @@ public class EnvironmentTree extends ConcurrentComponent
     protected HierarchicalContainer getNodeContainer()
     {
         container = new HierarchicalContainer();
-        container.addContainerProperty( VALUE_PROPERTY, ContainerHost.class, null );
+        container.addContainerProperty( VALUE_PROPERTY, EnvironmentContainerHost.class, null );
         container.addContainerProperty( ICON_PROPERTY, Resource.class, new ThemeResource( "img/lxc/physical.png" ) );
 
         return container;
@@ -242,11 +244,11 @@ public class EnvironmentTree extends ConcurrentComponent
             Property p = item.getItemProperty( propertyId );
 
             // Should always check validity
-            if ( p == null || !p.getType().equals( ContainerHost.class ) || p.getValue() == null )
+            if ( p == null || !p.getType().equals( EnvironmentContainerHost.class ) || p.getValue() == null )
             {
                 return false;
             }
-            ContainerHost value = ( ContainerHost ) p.getValue();
+            EnvironmentContainerHost value = ( EnvironmentContainerHost ) p.getValue();
 
             // The actual filter logic
             return containerNames.contains( value.getHostname() );
@@ -286,9 +288,9 @@ public class EnvironmentTree extends ConcurrentComponent
         {
             Set<String> matchedContainerNames = Sets.newHashSet();
 
-            Environment env = environmentManager.findEnvironment( environment.getId() );
+            Environment env = environmentManager.loadEnvironment( environment.getId() );
 
-            for ( ContainerHost ec : env.getContainerHosts() )
+            for ( EnvironmentContainerHost ec : env.getContainerHosts() )
             {
                 LOG.debug( String.format( "%s tags: %s", ec.getHostname(), ec.getTags() ) );
                 if ( ec.getTags().contains( tag ) )
@@ -299,7 +301,7 @@ public class EnvironmentTree extends ConcurrentComponent
 
             container.addContainerFilter( new ContainerNamesFilter( VALUE_PROPERTY, matchedContainerNames ) );
 
-            for ( ContainerHost ec : environment.getContainerHosts() )
+            for ( EnvironmentContainerHost ec : environment.getContainerHosts() )
             {
                 if ( !matchedContainerNames.contains( ec.getHostname() ) )
                 {
@@ -317,7 +319,7 @@ public class EnvironmentTree extends ConcurrentComponent
     }
 
 
-    public Set<ContainerHost> getSelectedContainers()
+    public Set<EnvironmentContainerHost> getSelectedContainers()
     {
         return Collections.unmodifiableSet( selectedContainers );
     }
@@ -330,7 +332,7 @@ public class EnvironmentTree extends ConcurrentComponent
         {
             try
             {
-                Environment env = environmentManager.findEnvironment( environment.getId() );
+                Environment env = environmentManager.loadEnvironment( environment.getId() );
 
                 Set<String> presentItems = Sets.newHashSet();
                 fillWithEnvironmentContainers( env, presentItems );
@@ -342,9 +344,10 @@ public class EnvironmentTree extends ConcurrentComponent
                     if ( !presentItems.contains( itemId ) )
                     {
                         container.removeItem( itemId );
-                        for ( Iterator<ContainerHost> iterator = selectedContainers.iterator(); iterator.hasNext(); )
+                        for ( Iterator<EnvironmentContainerHost> iterator = selectedContainers.iterator();
+                              iterator.hasNext(); )
                         {
-                            final ContainerHost ec = iterator.next();
+                            final EnvironmentContainerHost ec = iterator.next();
                             String peerId = ec.getPeerId();
                             String ecId = peerId + ":" + ec.getId();
                             if ( !presentItems.contains( ecId ) )
@@ -368,7 +371,7 @@ public class EnvironmentTree extends ConcurrentComponent
 
     private void fillWithEnvironmentContainers( final Environment env, final Set<String> presentItems )
     {
-        for ( ContainerHost ec : env.getContainerHosts() )
+        for ( EnvironmentContainerHost ec : env.getContainerHosts() )
         {
             String peerId = ec.getPeerId();
             String itemId = peerId + ":" + ec.getId();

@@ -8,8 +8,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.network.Vni;
-
 import static org.junit.Assert.assertNotNull;
 
 
@@ -22,8 +20,8 @@ public class VniTest
     @Before
     public void setUp() throws Exception
     {
-        vni = new Vni( 555, 555, UUID.randomUUID() );
-        vni = new Vni( 555, UUID.randomUUID() );
+        vni = new Vni( 555, 555, UUID.randomUUID().toString() );
+        vni = new Vni( 555, UUID.randomUUID().toString() );
     }
 
 

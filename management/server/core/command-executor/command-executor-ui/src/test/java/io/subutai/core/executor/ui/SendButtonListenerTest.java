@@ -11,6 +11,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Sets;
+import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.TextField;
+
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -20,18 +27,11 @@ import io.subutai.common.command.Response;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
 import io.subutai.core.executor.api.CommandExecutor;
-
-import io.subutai.core.hostregistry.api.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.server.ui.component.HostTree;
-
-import com.google.common.collect.Sets;
-import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.TextField;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -52,7 +52,7 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class SendButtonListenerTest
 {
-    private static final UUID ID = UUID.randomUUID();
+    private static final String ID = UUID.randomUUID().toString();
     private static final String STRING_VALUE = "VALUE";
 
     @Mock
@@ -109,7 +109,7 @@ public class SendButtonListenerTest
         when( terminalForm.getRunAsTxtFld() ).thenReturn( textField );
         when( terminalForm.getIndicator() ).thenReturn( label );
         when( terminalForm.getTaskCount() ).thenReturn( atomicInteger );
-        when( terminalForm.getDaemonChk() ).thenReturn(checkBox);
+        when( terminalForm.getDaemonChk() ).thenReturn( checkBox );
         when( terminalForm.getHostTree() ).thenReturn( hostTree );
         when( hostTree.getSelectedHosts() ).thenReturn( Sets.<HostInfo>newHashSet() );
     }

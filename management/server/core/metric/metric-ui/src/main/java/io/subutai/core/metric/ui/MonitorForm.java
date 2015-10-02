@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.naming.NamingException;
 
@@ -19,21 +18,6 @@ import org.jfree.data.time.Minute;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
-import io.subutai.common.environment.Environment;
-import io.subutai.common.host.HostInfo;
-import io.subutai.common.metric.HistoricalMetric;
-import io.subutai.common.metric.MetricType;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.Host;
-import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.env.api.EnvironmentManager;
-import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.metric.api.Monitor;
-import io.subutai.core.metric.ui.chart.JFreeChartWrapper;
-import io.subutai.core.peer.api.HostNotFoundException;
-import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.api.ResourceHost;
-import io.subutai.server.ui.component.HostTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +38,22 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+
+import io.subutai.common.environment.Environment;
+import io.subutai.common.host.HostInfo;
+import io.subutai.common.metric.HistoricalMetric;
+import io.subutai.common.metric.MetricType;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.Host;
+import io.subutai.common.util.ServiceLocator;
+import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.metric.api.Monitor;
+import io.subutai.core.metric.ui.chart.JFreeChartWrapper;
+import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.core.peer.api.PeerManager;
+import io.subutai.common.peer.ResourceHost;
+import io.subutai.server.ui.component.HostTree;
 
 
 public class MonitorForm extends CustomComponent
@@ -141,12 +141,12 @@ public class MonitorForm extends CustomComponent
 
     private void loadMetrics()
     {
-        Map<UUID, List<HistoricalMetric>> historicalCpuMetric = new HashMap<>();
-        Map<UUID, List<HistoricalMetric>> historicalRamMetric = new HashMap<>();
-        Map<UUID, List<HistoricalMetric>> historicalDiskVarMetric = new HashMap<>();
-        Map<UUID, List<HistoricalMetric>> historicalDiskHomeMetric = new HashMap<>();
-        Map<UUID, List<HistoricalMetric>> historicalDiskOptMetric = new HashMap<>();
-        Map<UUID, List<HistoricalMetric>> historicalDiskRootfsMetric = new HashMap<>();
+        Map<String, List<HistoricalMetric>> historicalCpuMetric = new HashMap<>();
+        Map<String, List<HistoricalMetric>> historicalRamMetric = new HashMap<>();
+        Map<String, List<HistoricalMetric>> historicalDiskVarMetric = new HashMap<>();
+        Map<String, List<HistoricalMetric>> historicalDiskHomeMetric = new HashMap<>();
+        Map<String, List<HistoricalMetric>> historicalDiskOptMetric = new HashMap<>();
+        Map<String, List<HistoricalMetric>> historicalDiskRootfsMetric = new HashMap<>();
 
         Set<Host> hosts = new HashSet<>();
         for ( final HostInfo hostInfo : hostTree.getSelectedHosts() )
@@ -227,43 +227,43 @@ public class MonitorForm extends CustomComponent
     }
 
 
-    private void addCpuMetrics( Map<UUID, List<HistoricalMetric>> hostMetrics )
+    private void addCpuMetrics( Map<String, List<HistoricalMetric>> hostMetrics )
     {
         addMetrics( hostMetrics, "CPU(seconds)" );
     }
 
 
-    private void addRamMetrics( Map<UUID, List<HistoricalMetric>> hostMetrics )
+    private void addRamMetrics( Map<String, List<HistoricalMetric>> hostMetrics )
     {
         addMetrics( hostMetrics, "RAM(MB)" );
     }
 
 
-    private void addHomeDiskMetrics( Map<UUID, List<HistoricalMetric>> hostMetrics )
+    private void addHomeDiskMetrics( Map<String, List<HistoricalMetric>> hostMetrics )
     {
         addMetrics( hostMetrics, "Home Dataset(MB)" );
     }
 
 
-    private void addVarDiskMetrics( Map<UUID, List<HistoricalMetric>> hostMetrics )
+    private void addVarDiskMetrics( Map<String, List<HistoricalMetric>> hostMetrics )
     {
         addMetrics( hostMetrics, "Var Dataset(MB)" );
     }
 
 
-    private void addOptDiskMetrics( Map<UUID, List<HistoricalMetric>> hostMetrics )
+    private void addOptDiskMetrics( Map<String, List<HistoricalMetric>> hostMetrics )
     {
         addMetrics( hostMetrics, "Opt Dataset(MB)" );
     }
 
 
-    private void addRootfsDiskMetrics( Map<UUID, List<HistoricalMetric>> hostMetrics )
+    private void addRootfsDiskMetrics( Map<String, List<HistoricalMetric>> hostMetrics )
     {
         addMetrics( hostMetrics, "Rootfs Dataset(MB)" );
     }
 
 
-    private void addMetrics( Map<UUID, List<HistoricalMetric>> hostMetrics, String chartTitle )
+    private void addMetrics( Map<String, List<HistoricalMetric>> hostMetrics, String chartTitle )
     {
         String categoryXAxis = "Time";
         String categoryYAxis = "Usage";
@@ -281,7 +281,7 @@ public class MonitorForm extends CustomComponent
     }
 
 
-    private XYDataset createMetricsDataset( final Map<UUID, List<HistoricalMetric>> hostMetrics )
+    private XYDataset createMetricsDataset( final Map<String, List<HistoricalMetric>> hostMetrics )
     {
 
         TimeSeries localTimeSeries;
@@ -291,7 +291,7 @@ public class MonitorForm extends CustomComponent
             return timeSeriesCollection;
         }
 
-        for ( final Map.Entry<UUID, List<HistoricalMetric>> entry : hostMetrics.entrySet() )
+        for ( final Map.Entry<String, List<HistoricalMetric>> entry : hostMetrics.entrySet() )
         {
             List<HistoricalMetric> historicalMetrics = entry.getValue();
             localTimeSeries = new TimeSeries( historicalMetrics.get( 0 ).getHost().getHostname() );

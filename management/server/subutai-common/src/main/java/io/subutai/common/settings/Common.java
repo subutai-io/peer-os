@@ -3,6 +3,7 @@ package io.subutai.common.settings;
 
 public class Common
 {
+    public static final String CONTAINER_GROUP_NOT_FOUND = "Container group not found";
     public static final String SUBUTAI_APP_DATA_PATH = System.getProperty( "subutaiAppDataPath" );
     public static final String DEFAULT_CONTAINER_INTERFACE = "eth0";
     public static final String MANAGEMENT_HOST_EXTERNAL_IP_INTERFACE = "eth1";
@@ -43,6 +44,7 @@ public class Common
     public static final String APT_REPO_AMD64_PACKAGES_SUBPATH = "amd64/trusty/";
     public static final String DEFAULT_LXC_ARCH = "amd64";
     public static final String DEFAULT_NET_INTERFACE = "eth0";
+    public static final int SUPER_NODE_PORT = 5000;
     public static String DEFAULT_TEMPLATE_VERSION = "2.1.0";
     public static final String PACKAGE_PREFIX = "subutai-";
     public static final String PACKAGE_PREFIX_WITHOUT_DASH = "subutai";

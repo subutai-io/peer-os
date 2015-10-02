@@ -88,7 +88,7 @@ public class MessageSender
         //get next messages to send
         Set<Envelope> envelopes = messengerDao.getEnvelopes();
 
-        Map<UUID, Set<Envelope>> peerEnvelopesMap = Maps.newHashMap();
+        Map<String, Set<Envelope>> peerEnvelopesMap = Maps.newHashMap();
         int maxTimeToLive = 0;
         //distribute envelops to peers
         for ( Envelope envelope : envelopes )
@@ -117,7 +117,7 @@ public class MessageSender
 
 
         //try to send messages in parallel - one thread per peer
-        for ( Map.Entry<UUID, Set<Envelope>> envelopsPerPeer : peerEnvelopesMap.entrySet() )
+        for ( Map.Entry<String, Set<Envelope>> envelopsPerPeer : peerEnvelopesMap.entrySet() )
         {
             Peer targetPeer = messenger.getPeerManager().getPeer( envelopsPerPeer.getKey() );
             if ( targetPeer.isLocal() )

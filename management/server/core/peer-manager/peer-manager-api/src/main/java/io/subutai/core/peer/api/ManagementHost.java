@@ -4,8 +4,8 @@ package io.subutai.core.peer.api;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
+import io.subutai.common.host.HostInfo;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.Host;
@@ -16,7 +16,7 @@ import io.subutai.common.protocol.N2NConfig;
 /**
  * Management host interface.
  */
-public interface ManagementHost extends Host
+public interface ManagementHost extends Host, HostInfo
 {
     /**
      * Adds remote apt repository to local apt sources
@@ -39,7 +39,9 @@ public interface ManagementHost extends Host
      * @param peerIps - remote peer ips
      * @param environmentId -  context environment
      */
-    int setupTunnels( Map<String, String> peerIps, UUID environmentId ) throws PeerException;
+    int setupTunnels( Map<String, String> peerIps, String environmentId ) throws PeerException;
+
+    public Vni findVniByEnvironmentId( String environmentId ) throws PeerException;
 
     /**
      * Returns reserved vnis
@@ -70,7 +72,7 @@ public interface ManagementHost extends Host
      * Cleans up environment networking settings. This method is called when an environment is being destroyed to clean
      * up its settings on the local peer.
      */
-    void cleanupEnvironmentNetworkSettings( final UUID environmentId ) throws PeerException;
+    void cleanupEnvironmentNetworkSettings( final String environmentId ) throws PeerException;
 
     /**
      * Removes a tunnel to remote peer
@@ -133,4 +135,11 @@ public interface ManagementHost extends Host
     void removeIpFromVlanDomain( String hostIp, int vlan ) throws PeerException;
 
     void removeN2NConnection( N2NConfig config ) throws PeerException;
+
+    int findTunnel( String tunnelIp, Set<Tunnel> tunnels );
+
+    int calculateNextTunnelId( Set<Tunnel> tunnels );
+
+    void setupVniVlanMapping( int tunnelId, long vni, int vlan, String environmentId ) throws PeerException;
+
 }

@@ -14,14 +14,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.slf4j.Logger;
+
+import com.google.common.collect.Sets;
+
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
-import org.slf4j.Logger;
-
-import com.google.common.collect.Sets;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -34,8 +35,7 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class MessageSenderTest
 {
-    private static final UUID LOCAL_PEER_ID = UUID.randomUUID();
-    private static final UUID TARGET_PEER_ID = UUID.randomUUID();
+    private static final String TARGET_PEER_ID = UUID.randomUUID().toString();
     private static final int TIME_TO_LIVE = 5;
     private static final Timestamp CREATE_DATE = new Timestamp( System.currentTimeMillis() );
     @Mock
@@ -120,9 +120,9 @@ public class MessageSenderTest
         when( peer.getId() ).thenReturn( TARGET_PEER_ID );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
         when( peerManager.getLocalPeerInfo() ).thenReturn( peerInfo );
-        when( peerInfo.getId() ).thenReturn( UUID.randomUUID() );
+        when( peerInfo.getId() ).thenReturn( UUID.randomUUID().toString() );
         when( localPeer.isLocal() ).thenReturn( false );
-        when( localPeer.getId() ).thenReturn( UUID.randomUUID() );
+        when( localPeer.getId() ).thenReturn( UUID.randomUUID().toString() );
         when( completer.take() ).thenReturn( future );
         when( messenger.getPeerManager() ).thenReturn( peerManager );
 

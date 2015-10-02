@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.cache.ExpiringCache;
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
@@ -22,11 +23,10 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.core.broker.api.Broker;
 import io.subutai.core.broker.api.BrokerException;
 import io.subutai.core.broker.api.Topic;
-
-import io.subutai.core.hostregistry.api.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.fail;
@@ -44,7 +44,7 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class CommandProcessorTest
 {
-    private static final UUID HOST_ID = UUID.randomUUID();
+    private static final String HOST_ID = UUID.randomUUID().toString();
     private static final UUID COMMAND_ID = UUID.randomUUID();
     private static final String RESPONSE_JSON = String.format(
             " { response: {" + "      \"type\":\"EXECUTE_RESPONSE\"," + "      \"id\":\"%s\","
@@ -204,7 +204,7 @@ public class CommandProcessorTest
 
 
             @Override
-            public UUID getId()
+            public String getId()
             {
                 return HOST_ID;
             }
@@ -334,7 +334,5 @@ public class CommandProcessorTest
         catch ( CommandException e )
         {
         }
-
-
     }
 }

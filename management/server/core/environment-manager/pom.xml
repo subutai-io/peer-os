@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <artifactId>mgmt-server-core-parent</artifactId>
+    <groupId>io.subutai</groupId>
+    <version>4.0.0-RC1</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>environment-manager</artifactId>
+  <name>Subutai Environment Manager Parent</name>
+  <description>Subutai Environment Manager Parent</description>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>environment-manager-api</module>
+    <module>environment-manager-impl</module>
+    <module>environment-manager-cli</module>
+    <module>environment-manager-ui</module>
+    <module>environment-manager-rest</module>
+  </modules>
+
+</project>

@@ -15,9 +15,6 @@ import io.subutai.common.protocol.api.DataService;
 import io.subutai.core.registration.impl.entity.ContainerTokenImpl;
 
 
-/**
- * Created by talas on 8/28/15.
- */
 public class ContainerTokenDataService implements DataService<String, ContainerTokenImpl>
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( ContainerTokenDataService.class );

@@ -280,4 +280,11 @@ public class EncryptionToolImpl implements EncryptionTool
     {
         return new byte[0];
     }
+
+
+    @Override
+    public String armorByteArrayToString( byte[] array ) throws PGPException
+    {
+        return PGPEncryptionUtil.armorByteArrayToString( array );
+    }
 }

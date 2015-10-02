@@ -10,10 +10,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.HostInfoModel;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
@@ -38,10 +37,10 @@ public class HostInfoModelTest
         Set<Interface> mySet = new HashSet<>();
         mySet.add( anInterface );
 
-        when( containerHost.getId() ).thenReturn( UUID.randomUUID() );
+        when( containerHost.getId() ).thenReturn( UUID.randomUUID().toString() );
         when( containerHost.getHostname() ).thenReturn( "testHostName" );
-        when( containerHost.getHostArchitecture() ).thenReturn( null );
-        when( containerHost.getNetInterfaces() ).thenReturn( mySet );
+        when( containerHost.getArch() ).thenReturn( null );
+        when( containerHost.getInterfaces() ).thenReturn( mySet );
         when( anInterface.getInterfaceName() ).thenReturn( "testInterFace" );
         when( anInterface.getIp() ).thenReturn( "testIp" );
         when( anInterface.getMac() ).thenReturn( "testMac" );

@@ -9,26 +9,27 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Sets;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.network.api.ContainerInfo;
 import io.subutai.core.network.api.N2NConnection;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.network.api.Tunnel;
-import io.subutai.core.peer.api.HostNotFoundException;
+import io.subutai.core.peer.api.Tunnel;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.api.ResourceHost;
-
-import com.google.common.collect.Sets;
-
+import io.subutai.common.peer.ResourceHost;
 import junit.framework.TestCase;
 
 import static junit.framework.Assert.assertFalse;
@@ -63,7 +64,7 @@ public class NetworkManagerImplTest
     private static final String GATEWAY_IP = "gateway.ip";
     private static final int VLAN_ID = 100;
     private static final int VNI = 100;
-    private static final UUID ENVIRONMENT_ID = UUID.randomUUID();
+    private static final String ENVIRONMENT_ID = UUID.randomUUID().toString();
     private static final String CONTAINER_NAME = "container";
     private static final int NET_MASK = 24;
     private static final String CONTAINER_IP_OUTPUT =
@@ -92,7 +93,7 @@ public class NetworkManagerImplTest
     @Mock
     ResourceHost resourceHost;
     @Mock
-    ContainerHost containerHost;
+    EnvironmentContainerHost containerHost;
     @Mock
     CommandResult commandResult;
     @Mock
@@ -106,7 +107,7 @@ public class NetworkManagerImplTest
 
     private NetworkManagerImpl spyNetworkManager;
 
-    private Set<ContainerHost> containers;
+    private Set<EnvironmentContainerHost> containers;
 
     private NetworkManagerImpl networkManager;
 

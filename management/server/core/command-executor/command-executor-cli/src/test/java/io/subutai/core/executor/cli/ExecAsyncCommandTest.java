@@ -8,14 +8,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.executor.api.CommandExecutor;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.verify;
@@ -58,15 +57,6 @@ public class ExecAsyncCommandTest extends SystemOutRedirectTest
         command.doExecute();
 
         verify( commandExecutor )
-                .executeAsync( any( UUID.class ), any( RequestBuilder.class ), isA( CommandCallback.class ) );
-
-
-        //test invalid id
-
-        command.hostId = "invalid id";
-
-        command.doExecute();
-
-        assertThat( getSysOut(), containsString( "Invalid host id" ) );
+                .executeAsync( any( String.class ), any( RequestBuilder.class ), isA( CommandCallback.class ) );
     }
 }

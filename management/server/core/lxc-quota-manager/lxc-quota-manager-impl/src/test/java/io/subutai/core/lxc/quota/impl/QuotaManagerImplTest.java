@@ -20,10 +20,10 @@ import io.subutai.common.quota.QuotaException;
 import io.subutai.common.quota.QuotaType;
 import io.subutai.common.quota.RamQuota;
 import io.subutai.common.quota.RamQuotaUnit;
-import io.subutai.core.peer.api.HostNotFoundException;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.api.ResourceHost;
+import io.subutai.common.peer.ResourceHost;
 
 import com.google.common.collect.Sets;
 
@@ -42,7 +42,7 @@ public class QuotaManagerImplTest
     private QuotaManagerImpl quotaManager;
     private Commands commands = new Commands();
 
-    private UUID uuid = UUID.randomUUID();
+    private String uuid = UUID.randomUUID().toString();
     private String containerName = "containerName";
     private String containerHostname = "containerHostname";
     private String quotaResult = "100";

@@ -1,8 +1,6 @@
 package io.subutai.core.executor.api;
 
 
-import java.util.UUID;
-
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -22,7 +20,7 @@ public interface CommandExecutor
      *
      * @return - result of command execution
      */
-    public CommandResult execute( UUID hostId, RequestBuilder requestBuilder ) throws CommandException;
+    public CommandResult execute( String hostId, RequestBuilder requestBuilder ) throws CommandException;
 
     /**
      * Executes command on host synchronously
@@ -33,7 +31,7 @@ public interface CommandExecutor
      *
      * @return - result of command execution
      */
-    public CommandResult execute( UUID hostId, RequestBuilder requestBuilder, CommandCallback callback )
+    public CommandResult execute( String hostId, RequestBuilder requestBuilder, CommandCallback callback )
             throws CommandException;
 
     /**
@@ -42,7 +40,7 @@ public interface CommandExecutor
      * @param hostId - target host id
      * @param requestBuilder - command to execute
      */
-    public void executeAsync( UUID hostId, RequestBuilder requestBuilder ) throws CommandException;
+    public void executeAsync( String hostId, RequestBuilder requestBuilder ) throws CommandException;
 
     /**
      * Executes command on host asynchronously
@@ -51,6 +49,6 @@ public interface CommandExecutor
      * @param requestBuilder - command to execute
      * @param callback - callback to trigger on each response from host
      */
-    public void executeAsync( UUID hostId, RequestBuilder requestBuilder, CommandCallback callback )
+    public void executeAsync( String hostId, RequestBuilder requestBuilder, CommandCallback callback )
             throws CommandException;
 }

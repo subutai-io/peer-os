@@ -1,10 +1,11 @@
 package io.subutai.common.environment;
 
 
+import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 
 
@@ -16,29 +17,29 @@ public interface Environment
     /**
      * Return id of environment creator user
      */
-    public Long getUserId();
+    Long getUserId();
 
     /**
      * Returns id of environment
      */
-    public UUID getId();
+    String getId();
 
     /**
      * Returns name of environment
      */
-    public String getName();
+    String getName();
 
     /**
      * Returns status of environment
      *
      * @return @{code EnvironmentStatus}
      */
-    public EnvironmentStatus getStatus();
+    EnvironmentStatus getStatus();
 
     /**
      * Returns creation timestamp
      */
-    public long getCreationTimestamp();
+    long getCreationTimestamp();
 
     Set<PeerConf> getPeerConfs();
 
@@ -47,14 +48,14 @@ public interface Environment
      *
      * @return - key or null
      */
-    public String getSshKey();
+    String getSshKey();
 
     /**
      * Returns contained container hosts
      *
      * @return - set of @{code ContainerHost}
      */
-    public Set<ContainerHost> getContainerHosts();
+    Set<EnvironmentContainerHost> getContainerHosts();
 
 
     /**
@@ -63,7 +64,7 @@ public interface Environment
      * @param containerHost - container to destroy
      * @param async - sync or async to the calling party
      */
-    public void destroyContainer( ContainerHost containerHost, boolean async )
+    void destroyContainer( ContainerHost containerHost, boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException;
 
 
@@ -73,8 +74,7 @@ public interface Environment
      * @param topology = topology to use when growing
      * @param async - sync or async to the calling party
      */
-    public Set<ContainerHost> growEnvironment( Topology topology, boolean async )
-            throws EnvironmentModificationException;
+    Set<EnvironmentContainerHost> growEnvironment( Topology topology, boolean async ) throws EnvironmentModificationException;
 
 
     /**
@@ -83,25 +83,27 @@ public interface Environment
      * @param sshKey - ssh key or null to remove
      * @param async - sync or async to the calling party
      */
-    public void setSshKey( String sshKey, boolean async ) throws EnvironmentModificationException;
+    void setSshKey( String sshKey, boolean async ) throws EnvironmentModificationException;
 
     /**
      * Returns pees which host any container(s) from this environment
      */
-    public Set<Peer> getPeers();
+    Set<Peer> getPeers();
 
     /**
      * Network subnet of the environment in CIDR format notation.
      *
      * @return subnet string in CIDR format notation
      */
-    public String getSubnetCidr();
+    String getSubnetCidr();
 
 
     /**
      * VNI of the environment.
      */
-    public Long getVni();
+    Long getVni();
+
+    String getPeerId();
 
     /**
      * Searches container by its id withing this environment
@@ -110,8 +112,7 @@ public interface Environment
      *
      * @return - found container host
      */
-
-    public ContainerHost getContainerHostById( UUID id ) throws ContainerHostNotFoundException;
+    ContainerHost getContainerHostById( String id ) throws ContainerHostNotFoundException;
 
     /**
      * Searches container by its hostname withing this environment
@@ -120,11 +121,31 @@ public interface Environment
      *
      * @return - found container host
      */
-    public ContainerHost getContainerHostByHostname( String hostname ) throws ContainerHostNotFoundException;
+    ContainerHost getContainerHostByHostname( String hostname ) throws ContainerHostNotFoundException;
 
-    public Set<ContainerHost> getContainerHostsByIds( Set<UUID> ids ) throws ContainerHostNotFoundException;
-
-    String findN2nIp( String peerId );
+    Set<ContainerHost> getContainerHostsByIds( Set<String> ids ) throws ContainerHostNotFoundException;
 
     void addEnvironmentPeer( PeerConf peerConf );
+
+    void setStatus( EnvironmentStatus status );
+
+    void setVni( long freeVni );
+
+    String getTunnelNetwork();
+
+    Map<String, String> getTunnels();
+
+    boolean isMember( Peer peer );
+
+    String getSuperNode();
+
+    int getSuperNodePort();
+
+    String getTunnelInterfaceName();
+
+    String getTunnelCommunityName();
+
+    void setTunnelNetwork( String network );
+
+    void removeContainer( ContainerHost containerHost );
 }

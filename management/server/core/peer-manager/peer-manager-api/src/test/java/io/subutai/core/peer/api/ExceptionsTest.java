@@ -6,10 +6,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.core.peer.api.ContainerCreationException;
-import io.subutai.core.peer.api.ContainerGroupNotFoundException;
-import io.subutai.core.peer.api.HostNotFoundException;
-import io.subutai.core.peer.api.ResourceHostException;
+import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.ResourceHostException;
 
 import static junit.framework.Assert.assertNull;
 import static junit.framework.TestCase.assertEquals;

@@ -1,8 +1,6 @@
 package io.subutai.core.security.broker;
 
 
-import java.util.UUID;
-
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +45,7 @@ public class MessageDecryptor implements ByteMessagePreProcessor
                 ContentAndSignatures contentAndSignatures = encryptionTool.decryptAndReturnSignatures( message );
 
                 //obtain target host pub key by id from content for verifying
-                UUID hostId;
+                String hostId;
 
                 if ( Topic.RESPONSE_TOPIC.name().equalsIgnoreCase( topic ) )
                 {
@@ -68,7 +66,7 @@ public class MessageDecryptor implements ByteMessagePreProcessor
                 }
 
                 PGPPublicKey hostKeyForVerifying =
-                        MessageEncryptor.getSecurityManager().getKeyManager().getPublicKey( hostId.toString() );
+                        MessageEncryptor.getSecurityManager().getKeyManager().getPublicKey( hostId );
 
                 if ( encryptionTool.verifySignature( contentAndSignatures, hostKeyForVerifying ) )
                 {

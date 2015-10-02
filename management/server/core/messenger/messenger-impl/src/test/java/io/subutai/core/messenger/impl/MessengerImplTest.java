@@ -14,17 +14,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Maps;
+
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
 import io.subutai.core.messenger.api.MessageListener;
 import io.subutai.core.messenger.api.MessageStatus;
-
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
-
-import com.google.common.collect.Maps;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -45,7 +45,7 @@ import static org.mockito.Mockito.when;
 public class MessengerImplTest
 {
 
-    private static final UUID LOCAL_PEER_ID = UUID.randomUUID();
+    private static final String LOCAL_PEER_ID = UUID.randomUUID().toString();
     private static final UUID MESSAGE_ID = UUID.randomUUID();
     private static final String RECIPIENT = "sender";
     private static final Object PAYLOAD = new Object();
@@ -82,12 +82,12 @@ public class MessengerImplTest
         when( entityManagerFactory.createEntityManager() ).thenReturn( entityManager );
         when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
 
-        messenger =spy( new MessengerImpl());
+        messenger = spy( new MessengerImpl() );
         messenger.messageSender = messageSender;
         messenger.notificationExecutor = notificationExecutor;
         messenger.messengerDao = messengerDao;
         messenger.setDaoManager( daoManager );
-       doReturn( peerManager ). when( messenger).getPeerManager() ;
+        doReturn( peerManager ).when( messenger ).getPeerManager();
 
         when( localPeer.getId() ).thenReturn( LOCAL_PEER_ID );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );

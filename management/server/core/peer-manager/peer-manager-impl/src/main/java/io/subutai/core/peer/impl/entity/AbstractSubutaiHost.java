@@ -1,23 +1,21 @@
 package io.subutai.core.peer.impl.entity;
 
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import javax.persistence.OneToMany;
 import javax.persistence.Transient;
+
+import com.google.common.base.Preconditions;
 
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
@@ -28,8 +26,6 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.Peer;
-
-import com.google.common.base.Preconditions;
 
 
 /**
@@ -52,12 +48,11 @@ public abstract class AbstractSubutaiHost implements Host
     protected String hostname;
 
     @Column( name = "arch" )
-    @Enumerated
+    @Enumerated( EnumType.STRING )
     private HostArchitecture hostArchitecture;
 
-    @OneToMany( mappedBy = "host", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity = HostInterface
-            .class )
-    protected Set<Interface> interfaces = new HashSet<>();
+    @Transient
+    protected Set<Interface> interfaces = new CopyOnWriteArraySet<>();
 
     @Transient
     protected volatile long lastHeartbeat = 0;
@@ -67,7 +62,6 @@ public abstract class AbstractSubutaiHost implements Host
     private Peer peer;
 
 
-    @Override
     public void init()
     {
         // Empty method
@@ -80,13 +74,13 @@ public abstract class AbstractSubutaiHost implements Host
         Preconditions.checkNotNull( peerId, "Peer ID is null" );
 
         this.peerId = peerId;
-        this.hostId = hostInfo.getId().toString();
+        this.hostId = hostInfo.getId();
         this.hostname = hostInfo.getHostname();
         this.hostArchitecture = hostInfo.getArch();
 
         for ( Interface s : hostInfo.getInterfaces() )
         {
-            addInterface( new HostInterface( s ) );
+            addInterface( new HostInterfaceImpl( s ) );
         }
     }
 
@@ -108,7 +102,6 @@ public abstract class AbstractSubutaiHost implements Host
         this.peer = peer;
     }
 
-
     @Override
     public CommandResult execute( final RequestBuilder requestBuilder ) throws CommandException
     {
@@ -120,7 +113,7 @@ public abstract class AbstractSubutaiHost implements Host
     public CommandResult execute( final RequestBuilder requestBuilder, final CommandCallback callback )
             throws CommandException
     {
-        return peer.execute( requestBuilder, this, callback );
+        return getPeer().execute( requestBuilder, this, callback );
     }
 
 
@@ -135,14 +128,14 @@ public abstract class AbstractSubutaiHost implements Host
     public void executeAsync( final RequestBuilder requestBuilder, final CommandCallback callback )
             throws CommandException
     {
-        peer.executeAsync( requestBuilder, this, callback );
+        getPeer().executeAsync( requestBuilder, this, callback );
     }
 
 
     @Override
-    public UUID getId()
+    public String getId()
     {
-        return UUID.fromString( hostId );
+        return hostId;
     }
 
 
@@ -160,16 +153,23 @@ public abstract class AbstractSubutaiHost implements Host
     }
 
 
-    public void updateHostInfo( final HostInfo hostInfo )
+    public boolean updateHostInfo( final HostInfo hostInfo )
     {
-        lastHeartbeat = System.currentTimeMillis();
+        this.lastHeartbeat = System.currentTimeMillis();
+        this.interfaces.clear();
+        // add interfaces
+        for ( Interface intf : hostInfo.getInterfaces() )
+        {
+            interfaces.add( new HostInterfaceImpl( intf ) );
+        }
+        return false;
     }
 
 
     @Override
     public boolean isConnected()
     {
-        return peer.isConnected( this );
+        return getPeer().isConnected( this );
     }
 
 
@@ -180,16 +180,16 @@ public abstract class AbstractSubutaiHost implements Host
 
 
     @Override
-    public Set<Interface> getNetInterfaces()
+    public Set<Interface> getInterfaces()
     {
-        return Collections.unmodifiableSet( this.interfaces );
+        return interfaces;
     }
 
 
     @Override
     public String getIpByInterfaceName( String interfaceName )
     {
-        for ( Interface iface : interfaces )
+        for ( Interface iface : getInterfaces() )
         {
             if ( iface.getInterfaceName().equalsIgnoreCase( interfaceName ) )
             {
@@ -204,7 +204,7 @@ public abstract class AbstractSubutaiHost implements Host
     @Override
     public String getMacByInterfaceName( final String interfaceName )
     {
-        for ( Interface iface : interfaces )
+        for ( Interface iface : getInterfaces() )
         {
             if ( iface.getInterfaceName().equalsIgnoreCase( interfaceName ) )
             {
@@ -222,27 +222,35 @@ public abstract class AbstractSubutaiHost implements Host
     }
 
 
-    public void addInterface( HostInterface hostInterface )
+    public void addInterface( HostInterfaceImpl hostInterface )
     {
         Preconditions.checkNotNull( hostInterface, "HostInterface could not be null." );
 
         hostInterface.setHost( this );
         interfaces.add( hostInterface );
     }
+    //
+    //
+    //    public void removeInterface( Interface hostInterface )
+    //    {
+    //        Preconditions.checkNotNull( hostInterface, "HostInterface could not be null." );
+    //
+    //        interfaces.remove( hostInterface );
+    //    }
 
-
-    public void setNetInterfaces( Set<Interface> interfaces )
-    {
-        this.interfaces.clear();
-        for ( Interface iface : interfaces )
-        {
-            addInterface( new HostInterface( iface ) );
-        }
-    }
+    //
+    //    public void setNetInterfaces( Set<Interface> interfaces )
+    //    {
+    //        this.interfaces.clear();
+    //        for ( Interface iface : interfaces )
+    //        {
+    //            addInterface( new HostInterfaceImpl( iface ) );
+    //        }
+    //    }
 
 
     @Override
-    public HostArchitecture getHostArchitecture()
+    public HostArchitecture getArch()
     {
         return this.hostArchitecture;
     }
@@ -262,7 +270,7 @@ public abstract class AbstractSubutaiHost implements Host
 
         final AbstractSubutaiHost that = ( AbstractSubutaiHost ) o;
 
-        return getHostId().equals( that.getHostId() );
+        return getId().equals( that.getId() );
     }
 
 
@@ -280,5 +288,16 @@ public abstract class AbstractSubutaiHost implements Host
                 "peerId=" + peerId +
                 ", lastHeartbeat=" + lastHeartbeat +
                 '}';
+    }
+
+
+    @Override
+    public int compareTo( final HostInfo o )
+    {
+        if ( hostname != null && o != null )
+        {
+            return hostname.compareTo( o.getHostname() );
+        }
+        return -1;
     }
 }

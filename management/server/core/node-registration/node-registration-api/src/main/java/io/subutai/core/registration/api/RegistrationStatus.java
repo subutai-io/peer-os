@@ -1,9 +1,6 @@
 package io.subutai.core.registration.api;
 
 
-/**
- * Created by talas on 8/24/15.
- */
 public enum RegistrationStatus
 {
     REQUESTED, APPROVED, REJECTED, BLOCKED, REGISTERED;

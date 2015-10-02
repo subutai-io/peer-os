@@ -15,6 +15,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.core.network.api.NetworkManagerException;
 
 import static junit.framework.TestCase.fail;
@@ -32,7 +33,7 @@ public class SshManagerTest
 {
     private static final String SSH_KEY = "KEY";
     @Mock
-    ContainerHost containerHost;
+    EnvironmentContainerHost containerHost;
     @Mock
     CommandUtil commandUtil;
     @Mock

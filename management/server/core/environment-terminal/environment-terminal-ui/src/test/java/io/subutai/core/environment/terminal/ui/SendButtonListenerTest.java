@@ -11,12 +11,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.command.Response;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.peer.ContainerHost;
 
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.core.executor.api.CommandExecutor;
 
 import com.google.common.collect.Sets;
@@ -41,7 +42,7 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class SendButtonListenerTest
 {
-    private static final UUID ID = UUID.randomUUID();
+    private static final String ID = UUID.randomUUID().toString();
     private static final String STRING_VALUE = "VALUE";
 
     @Mock
@@ -60,7 +61,7 @@ public class SendButtonListenerTest
     TextField workDirTxtFld;
 
     @Mock
-    ContainerHost containerHost;
+    EnvironmentContainerHost containerHost;
     @Mock
     ComboBox comboBox;
     @Mock
@@ -80,7 +81,7 @@ public class SendButtonListenerTest
     ExecutorService executorService;
 
     Set<HostInfo> resourceHosts = Sets.newHashSet();
-    Set<ContainerHost> containerHosts = Sets.newHashSet();
+    Set<EnvironmentContainerHost> containerHosts = Sets.newHashSet();
 
 
     SendButtonListener listener;
@@ -102,7 +103,7 @@ public class SendButtonListenerTest
         containerHosts.add( containerHost );
         when( containerHost.getId() ).thenReturn( ID );
 
-        when( environmentTree.getSelectedContainers() ).thenReturn( Sets.<ContainerHost>newHashSet() );
+        when( environmentTree.getSelectedContainers() ).thenReturn( Sets.<EnvironmentContainerHost>newHashSet() );
     }
 
 
@@ -246,6 +247,4 @@ public class SendButtonListenerTest
         //
         //        verify( terminalForm, times( 2 ) ).addOutput( anyString() );
     }
-
-
 }

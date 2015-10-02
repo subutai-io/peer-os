@@ -1,9 +1,6 @@
 package io.subutai.core.registration.api.exception;
 
 
-/**
- * Created by talas on 8/28/15.
- */
 public class NodeRegistrationException extends Exception
 {
     public NodeRegistrationException()

@@ -10,7 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.test.SystemOutRedirectTest;
-import io.subutai.core.hostregistry.api.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 public class GetContainerHostInfoCommandTest extends SystemOutRedirectTest
 {
     private static final String HOSTNAME = "hostname";
-    private static final UUID ID = UUID.randomUUID();
+    private static final String ID = UUID.randomUUID().toString();
     @Mock
     HostRegistry hostRegistry;
     @Mock
@@ -42,7 +42,9 @@ public class GetContainerHostInfoCommandTest extends SystemOutRedirectTest
     {
         command = new GetContainerHostInfoCommand( hostRegistry );
         when( hostRegistry.getContainerHostInfoByHostname( HOSTNAME ) ).thenReturn( containerHostInfo );
+        when( hostRegistry.getContainerHostInfoByHostname( ID ) ).thenReturn( containerHostInfo );
         when( hostRegistry.getContainerHostInfoById( ID ) ).thenReturn( containerHostInfo );
+        when( hostRegistry.getContainerHostInfoById( HOSTNAME ) ).thenReturn( containerHostInfo );
     }
 
 
@@ -64,7 +66,7 @@ public class GetContainerHostInfoCommandTest extends SystemOutRedirectTest
         assertThat( getSysOut(), containsString( containerHostInfo.toString() ) );
 
         //check by id
-        command.identifier = ID.toString();
+        command.identifier = ID;
 
         command.doExecute();
 
@@ -74,6 +76,7 @@ public class GetContainerHostInfoCommandTest extends SystemOutRedirectTest
 
         HostDisconnectedException exception = mock( HostDisconnectedException.class );
         doThrow( exception ).when( hostRegistry ).getContainerHostInfoById( ID );
+        doThrow( exception ).when( hostRegistry ).getContainerHostInfoByHostname( ID );
         resetSysOut();
 
         command.doExecute();

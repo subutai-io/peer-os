@@ -22,7 +22,7 @@ public class VniVlanMappingTest
     @Before
     public void setUp() throws Exception
     {
-        vniVlanMapping = new VniVlanMapping( 555, 555, 555, UUID.randomUUID() );
+        vniVlanMapping = new VniVlanMapping( 555, 555, 555, UUID.randomUUID().toString() );
     }
 
 

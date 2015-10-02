@@ -4,16 +4,16 @@ package io.subutai.core.environment.terminal.ui;
 import java.io.File;
 import java.util.Date;
 import java.util.Set;
-import java.util.UUID;
+
+import com.vaadin.ui.Component;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.util.FileUtil;
-import io.subutai.core.env.api.EnvironmentEventListener;
-import io.subutai.core.env.api.EnvironmentManager;
+import io.subutai.core.environment.api.EnvironmentEventListener;
+import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.server.ui.api.PortalModule;
-
-import com.vaadin.ui.Component;
 
 
 public class EnvironmentTerminalPortalModule implements PortalModule, EnvironmentEventListener
@@ -86,21 +86,21 @@ public class EnvironmentTerminalPortalModule implements PortalModule, Environmen
 
 
     @Override
-    public void onEnvironmentGrown( final Environment environment, final Set<ContainerHost> newContainers )
+    public void onEnvironmentGrown( final Environment environment, final Set<EnvironmentContainerHost> newContainers )
     {
         updateDate.setTime( System.currentTimeMillis() );
     }
 
 
     @Override
-    public void onContainerDestroyed( final Environment environment, final UUID containerId )
+    public void onContainerDestroyed( final Environment environment, final String containerId )
     {
         updateDate.setTime( System.currentTimeMillis() );
     }
 
 
     @Override
-    public void onEnvironmentDestroyed( final UUID environmentId )
+    public void onEnvironmentDestroyed( final String environmentId )
     {
         updateDate.setTime( System.currentTimeMillis() );
     }

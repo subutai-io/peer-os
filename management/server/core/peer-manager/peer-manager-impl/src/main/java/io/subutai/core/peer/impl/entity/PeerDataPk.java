@@ -47,17 +47,7 @@ class PeerDataPk implements Serializable
         {
             PeerDataPk ppk = ( PeerDataPk ) obj;
 
-            if ( !ppk.getId().equals( this.id ) )
-            {
-                return false;
-            }
-
-            if ( !ppk.getSource().equals( this.source ) )
-            {
-                return false;
-            }
-
-            return true;
+            return ppk.getId().equals( this.id ) && ppk.getSource().equals( this.source );
         }
 
         return false;

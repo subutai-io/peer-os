@@ -1,7 +1,7 @@
 package io.subutai.core.security.broker;
 
 
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 
 
 /**

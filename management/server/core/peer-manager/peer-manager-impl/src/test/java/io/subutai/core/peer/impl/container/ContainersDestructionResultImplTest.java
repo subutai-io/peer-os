@@ -5,28 +5,33 @@ import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
 import com.google.common.collect.Sets;
 
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.peer.impl.container.ContainersDestructionResultImpl;
+import io.subutai.core.peer.impl.entity.ContainerHostEntity;
 
 import static junit.framework.TestCase.assertEquals;
 
 
 public class ContainersDestructionResultImplTest
 {
-    private static final UUID PEER_ID = UUID.randomUUID();
-    private static final UUID CONTAINER_ID = UUID.randomUUID();
+    private static final String PEER_ID = UUID.randomUUID().toString();
+    private static final String CONTAINER_ID = UUID.randomUUID().toString();
     private static final String EXCEPTION = "exception";
 
     ContainersDestructionResultImpl containersDestructionResult;
 
+    @Mock
+    ContainerHost containerHost;
 
     @Before
     public void setUp() throws Exception
     {
         containersDestructionResult =
-                new ContainersDestructionResultImpl( PEER_ID, Sets.newHashSet( CONTAINER_ID ), EXCEPTION );
+                new ContainersDestructionResultImpl( PEER_ID, Sets.newHashSet( containerHost ), EXCEPTION );
     }
 
 
@@ -40,7 +45,7 @@ public class ContainersDestructionResultImplTest
     @Test
     public void testGetDestroyedContainersIds() throws Exception
     {
-        assertEquals( Sets.newHashSet( CONTAINER_ID ), containersDestructionResult.getDestroyedContainersIds() );
+        assertEquals( Sets.newHashSet( containerHost ), containersDestructionResult.getDestroyedContainersIds() );
     }
 
 

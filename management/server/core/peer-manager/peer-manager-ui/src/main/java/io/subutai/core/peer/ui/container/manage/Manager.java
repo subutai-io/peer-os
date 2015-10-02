@@ -6,15 +6,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.PeerException;
-import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.api.ResourceHost;
-import io.subutai.core.peer.ui.container.common.Buttons;
-
-import io.subutai.server.ui.component.ConfirmationDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +21,15 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
+
+import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.PeerException;
+import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.api.PeerManager;
+import io.subutai.common.peer.ResourceHost;
+import io.subutai.core.peer.ui.container.common.Buttons;
+import io.subutai.server.ui.component.ConfirmationDialog;
 
 
 @SuppressWarnings( "serial" )
@@ -84,16 +84,6 @@ public class Manager extends VerticalLayout
                 getContainerInfo();
             }
         } );
-        final Button cleanDbBtn = new Button( Buttons.CLEAN_DB.getButtonLabel() );
-        cleanDbBtn.addStyleName( DEFAULT_STYLE_NAME );
-        cleanDbBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                peerManager.getLocalPeer().cleanDb();
-            }
-        } );
 
         indicator = new Label();
         indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
@@ -106,7 +96,6 @@ public class Manager extends VerticalLayout
         grid.setSpacing( true );
 
         grid.addComponent( infoBtn );
-        grid.addComponent( cleanDbBtn );
         grid.addComponent( indicator );
         grid.setComponentAlignment( indicator, Alignment.MIDDLE_CENTER );
         addComponent( grid );
@@ -209,11 +198,11 @@ public class Manager extends VerticalLayout
         try
         {
             final ContainerHost containerHost = localPeer.getContainerHostByName( lxcHostname );
-            if ( containerHost.getState() == ContainerHostState.RUNNING )
+            if ( containerHost.getStatus() == ContainerHostState.RUNNING )
             {
                 return new Action[] { STOP_CONTAINER, DESTROY_CONTAINER, TAG_CONTAINER };
             }
-            else if ( containerHost.getState() == ContainerHostState.STOPPED )
+            else if ( containerHost.getStatus() == ContainerHostState.STOPPED )
             {
                 return new Action[] { START_CONTAINER, DESTROY_CONTAINER, TAG_CONTAINER };
             }
@@ -244,14 +233,14 @@ public class Manager extends VerticalLayout
         final ContainerHost containerHost = localPeer.getContainerHostByName( lxcHostname );
         if ( action == START_CONTAINER )
         {
-            if ( containerHost.getState() == ContainerHostState.STOPPED )
+            if ( containerHost.getStatus() == ContainerHostState.STOPPED )
             {
                 startContainer( containerHost );
             }
         }
         else if ( action == STOP_CONTAINER )
         {
-            if ( containerHost.getState() == ContainerHostState.RUNNING )
+            if ( containerHost.getStatus() == ContainerHostState.RUNNING )
             {
                 stopContainer( containerHost );
             }
@@ -302,7 +291,7 @@ public class Manager extends VerticalLayout
     {
         for ( ContainerHost containerHost : containerHosts )
         {
-            if ( containerHost.getState() == ContainerHostState.STOPPED )
+            if ( containerHost.getStatus() == ContainerHostState.STOPPED )
             {
                 startContainer( containerHost );
             }
@@ -314,7 +303,7 @@ public class Manager extends VerticalLayout
     {
         for ( ContainerHost containerHost : containerHosts )
         {
-            if ( containerHost.getState() == ContainerHostState.RUNNING )
+            if ( containerHost.getStatus() == ContainerHostState.RUNNING )
             {
                 stopContainer( containerHost );
             }
@@ -553,15 +542,9 @@ public class Manager extends VerticalLayout
                 Label containerStatus = new Label();
                 final String lxcHostname = containerHost.getHostname();
                 ContainerHostState state;
-                try
-                {
-                    state = containerHost.getState();
-                }
-                catch ( PeerException e )
-                {
-                    LOG.warn( "Invalid Container host state #populateTable" );
-                    state = ContainerHostState.STOPPED;
-                }
+
+                state = containerHost.getStatus();
+
                 if ( ContainerHostState.RUNNING.equals( state ) )
                 {
                     containerStatus.setValue( "RUNNING" );

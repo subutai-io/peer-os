@@ -13,18 +13,21 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.environment.CreateContainerGroupRequest;
 import io.subutai.common.exception.HTTPException;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.protocol.Criteria;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.CpuQuotaInfo;
 import io.subutai.common.quota.DiskPartition;
@@ -41,15 +44,9 @@ import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.Payload;
 import io.subutai.core.peer.impl.command.BlockingCommandCallback;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
-import io.subutai.core.peer.impl.container.CreateContainerGroupResponse;
-import io.subutai.core.peer.impl.container.DestroyEnvironmentContainersResponse;
 import io.subutai.core.peer.impl.request.MessageRequest;
 import io.subutai.core.peer.impl.request.MessageResponse;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
@@ -79,9 +76,9 @@ public class RemotePeerImplTest
     private static final String HEADER_NAME = "header";
     private static final String HEADER_VALUE = "header value";
     private static final String TEMPLATE_NAME = "master";
-    private static final UUID CONTAINER_ID = UUID.randomUUID();
-    private static final UUID ENV_ID = UUID.randomUUID();
-    private static final UUID PEER_ID = UUID.randomUUID();
+    private static final String CONTAINER_ID = UUID.randomUUID().toString();
+    private static final String ENV_ID = UUID.randomUUID().toString();
+    private static final String PEER_ID = UUID.randomUUID().toString();
     private static final String IP = "127.0.0.1";
     private static final int PID = 123;
     private static final int VLAN = 123;
@@ -112,7 +109,7 @@ public class RemotePeerImplTest
     @Mock
     HTTPException httpException;
     @Mock
-    ContainerHost containerHost;
+    EnvironmentContainerHost containerHost;
     @Mock
     CommandCallback commandCallback;
     @Mock
@@ -130,6 +127,7 @@ public class RemotePeerImplTest
     RemotePeerImpl remotePeer;
 
     Map<String, String> peerMap = new HashMap<>();
+
 
     @Before
     public void setUp() throws Exception
@@ -221,7 +219,7 @@ public class RemotePeerImplTest
         when( restUtil.request( eq( RestUtil.RequestType.GET ), anyString(), anyString(), anyMap(), anyMap() ) )
                 .thenReturn( ID );
 
-        UUID id = remotePeer.getRemoteId();
+        String id = remotePeer.getRemoteId();
 
         assertEquals( ID, id.toString() );
 
@@ -237,7 +235,7 @@ public class RemotePeerImplTest
         UUID ID = UUID.randomUUID();
         when( restUtil.request( eq( RestUtil.RequestType.GET ), anyString(), anyString(), anyMap(), anyMap() ) )
                 .thenReturn( ID.toString() );
-        when( peerInfo.getId() ).thenReturn( ID );
+        when( peerInfo.getId() ).thenReturn( ID.toString() );
 
         assertTrue( remotePeer.isOnline() );
 
@@ -732,50 +730,6 @@ public class RemotePeerImplTest
         catch ( PeerException e )
         {
         }
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testCreateContainerGroup() throws Exception
-    {
-        CreateContainerGroupResponse response = mock( CreateContainerGroupResponse.class );
-        Template template = new Template();
-        MessageResponse messageResponse = mock( MessageResponse.class );
-        when( messageResponseListener.waitResponse( any( MessageRequest.class ), anyInt(), anyInt() ) )
-                .thenReturn( messageResponse );
-        Payload payload = mock( Payload.class );
-        when( messageResponse.getPayload() ).thenReturn( payload );
-        when( payload.getMessage( any( Class.class ) ) ).thenReturn( response ).thenReturn( null );
-
-        remotePeer.createContainerGroup(
-                new CreateContainerGroupRequest( peerMap, ENV_ID, UUID.randomUUID(), UUID.randomUUID(),
-                        SUBNET, Lists.newArrayList( template ), 1, "ROUND_ROBIN", Lists.<Criteria>newArrayList(), 0 ) );
-
-        verify( response ).getHosts();
-
-        remotePeer.createContainerGroup(
-                new CreateContainerGroupRequest( peerMap, ENV_ID, UUID.randomUUID(), UUID.randomUUID(),
-                        SUBNET, Lists.newArrayList( template ), 1, "ROUND_ROBIN", Lists.<Criteria>newArrayList(), 0 ) );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testDestroyEnvironmentContainers() throws Exception
-    {
-
-        MessageResponse messageResponse = mock( MessageResponse.class );
-        when( messageResponseListener.waitResponse( any( MessageRequest.class ), anyInt(), anyInt() ) )
-                .thenReturn( messageResponse );
-        Payload payload = mock( Payload.class );
-        when( messageResponse.getPayload() ).thenReturn( payload );
-        DestroyEnvironmentContainersResponse response = mock( DestroyEnvironmentContainersResponse.class );
-        when( payload.getMessage( any( Class.class ) ) ).thenReturn( response ).thenReturn( null );
-
-        remotePeer.destroyEnvironmentContainers( ENV_ID );
-
-        verify( response ).getDestroyedContainersIds();
-
-        remotePeer.destroyEnvironmentContainers( ENV_ID );
     }
 
 

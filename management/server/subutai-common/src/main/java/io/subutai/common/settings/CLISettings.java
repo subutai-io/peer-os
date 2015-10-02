@@ -21,6 +21,9 @@ public class CLISettings
             put( "env", Sets.newHashSet( "build-local", "destroy-container", "destroy", "grow-local", "list", "remove",
                     "view" ) );
 
+            put( "environment", Sets.newHashSet( "build-local", "destroy-container", "destroy", "grow-local", "list", "remove",
+                    "view" ) );
+
             put( "git", Sets.newHashSet( "add-all", "add-files", "checkout", "clone", "commit-all", "commit-files",
                     "delete-branch", "delete-files", "diff-branches", "diff-file", "get-current-branch", "init",
                     "list-branches", "list-stashes", "merge", "pull", "push", "revert-commit", "stash", "undo-hard",

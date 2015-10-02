@@ -1,13 +1,6 @@
 package io.subutai.core.hostregistry.cli;
 
 
-import java.util.UUID;
-
-import io.subutai.common.util.UUIDUtil;
-import io.subutai.core.hostregistry.api.ContainerHostInfo;
-import io.subutai.core.hostregistry.api.HostDisconnectedException;
-import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +8,11 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
+
+import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.core.hostregistry.api.HostDisconnectedException;
+import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 
 @Command( scope = "host", name = "container-host", description = "Prints details about container host" )
@@ -44,13 +42,13 @@ public class GetContainerHostInfoCommand extends SubutaiShellCommandSupport
         {
             ContainerHostInfo containerHostInfo;
 
-            if ( UUIDUtil.isStringAUuid( identifier ) )
+            try
             {
-                UUID id = UUIDUtil.generateUUIDFromString( identifier );
-                containerHostInfo = hostRegistry.getContainerHostInfoById( id );
+                containerHostInfo = hostRegistry.getContainerHostInfoById( identifier );
             }
-            else
+            catch ( HostDisconnectedException e )
             {
+
                 containerHostInfo = hostRegistry.getContainerHostInfoByHostname( identifier );
             }
 

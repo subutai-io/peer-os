@@ -103,7 +103,7 @@ public class Template
 
     //indicates where template is generated
     @Expose
-    private UUID peerId;
+    private String peerId;
 
     @Expose
     private boolean remote = false;
@@ -296,13 +296,13 @@ public class Template
     }
 
 
-    public UUID getPeerId()
+    public String getPeerId()
     {
         return peerId;
     }
 
 
-    private void setPeerId( final UUID peerId )
+    private void setPeerId( final String peerId )
     {
         this.peerId = peerId;
     }
@@ -320,7 +320,7 @@ public class Template
     }
 
 
-    public Template getRemoteClone( UUID peerId )
+    public Template getRemoteClone( String peerId )
     {
         Template result =
                 new Template( this.pk.getLxcArch(), this.lxcUtsname, this.subutaiConfigPath, this.subutaiParent,

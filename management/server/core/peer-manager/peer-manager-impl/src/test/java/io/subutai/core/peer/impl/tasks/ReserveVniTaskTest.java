@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class ReserveVniTaskTest
 {
-    private static final UUID ENV_ID = UUID.randomUUID();
+    private static final String ENV_ID = UUID.randomUUID().toString();
     private static final int VLAN = 100;
     private static final long VNI = 10000;
     @Mock

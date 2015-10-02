@@ -2,7 +2,6 @@ package io.subutai.core.peer.impl.entity;
 
 
 import java.util.Set;
-import java.util.UUID;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -13,11 +12,11 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import io.subutai.common.util.CollectionUtil;
-import io.subutai.core.peer.api.ContainerGroup;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
+
+import io.subutai.common.util.CollectionUtil;
+import io.subutai.core.peer.api.ContainerGroup;
 
 
 /**
@@ -40,15 +39,15 @@ public class ContainerGroupEntity implements ContainerGroup
     private Set<String> containerIds = Sets.newHashSet();
 
 
-    public ContainerGroupEntity( final UUID environmentId, final UUID initiatorPeerId, final UUID ownerId )
+    public ContainerGroupEntity( final String environmentId, final String initiatorPeerId, final String ownerId )
     {
         Preconditions.checkNotNull( environmentId );
         Preconditions.checkNotNull( initiatorPeerId );
         Preconditions.checkNotNull( ownerId );
 
-        this.environmentId = environmentId.toString();
-        this.initiatorPeerId = initiatorPeerId.toString();
-        this.ownerId = ownerId.toString();
+        this.environmentId = environmentId;
+        this.initiatorPeerId = initiatorPeerId;
+        this.ownerId = ownerId;
     }
 
 
@@ -56,9 +55,9 @@ public class ContainerGroupEntity implements ContainerGroup
 
 
     @Override
-    public UUID getEnvironmentId()
+    public String getEnvironmentId()
     {
-        return UUID.fromString( environmentId );
+        return environmentId;
     }
 
 
@@ -69,9 +68,9 @@ public class ContainerGroupEntity implements ContainerGroup
 
 
     @Override
-    public UUID getInitiatorPeerId()
+    public String getInitiatorPeerId()
     {
-        return UUID.fromString( initiatorPeerId );
+        return initiatorPeerId;
     }
 
 
@@ -82,9 +81,9 @@ public class ContainerGroupEntity implements ContainerGroup
 
 
     @Override
-    public UUID getOwnerId()
+    public String getOwnerId()
     {
-        return UUID.fromString( ownerId );
+        return ownerId;
     }
 
 
@@ -95,29 +94,29 @@ public class ContainerGroupEntity implements ContainerGroup
 
 
     @Override
-    public Set<UUID> getContainerIds()
+    public Set<String> getContainerIds()
     {
-        Set<UUID> ids = Sets.newHashSet();
+        Set<String> ids = Sets.newHashSet();
 
         for ( String id : containerIds )
         {
-            ids.add( UUID.fromString( id ) );
+            ids.add( id );
         }
 
         return ids;
     }
 
 
-    public void setContainerIds( final Set<UUID> containerIds )
+    public void setContainerIds( final Set<String> containerIds )
 
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerIds ), "Invalid container ids set" );
 
         Set<String> ids = Sets.newHashSet();
 
-        for ( UUID id : containerIds )
+        for ( String id : containerIds )
         {
-            ids.add( id.toString() );
+            ids.add( id );
         }
 
         this.containerIds = ids;

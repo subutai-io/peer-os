@@ -45,11 +45,11 @@ public class ResourceHostDataServiceTest
     @Before
     public void setUp() throws Exception
     {
-        service = new ResourceHostDataService( entityManagerFactory );
         when( entityManagerFactory.createEntityManager() ).thenReturn( em );
         when( em.getTransaction() ).thenReturn( transaction );
         when( transaction.isActive() ).thenReturn( true );
         when( em.createQuery( anyString(), eq( ResourceHostEntity.class ) ) ).thenReturn( typedQuery );
+        service = new ResourceHostDataService( entityManagerFactory );
     }
 
 

@@ -8,7 +8,6 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -33,10 +32,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.command.CommandException;
-import io.subutai.common.command.CommandUtil;
-import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.Interface;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
@@ -45,14 +42,12 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.settings.Common;
-import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.network.api.Tunnel;
 import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.core.peer.api.Tunnel;
 import io.subutai.core.peer.impl.tasks.CreateGatewayTask;
 import io.subutai.core.peer.impl.tasks.ReserveVniTask;
 import io.subutai.core.peer.impl.tasks.SetupTunnelsTask;
@@ -72,14 +67,12 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Column
-    String name = "Subutai Management Host";
+    private String name = "Subutai Management Host";
 
     @Transient
     protected ExecutorService singleThreadExecutorService = SubutaiExecutors.newSingleThreadExecutor();
     @Transient
     protected ServiceLocator serviceLocator = new ServiceLocator();
-    @Transient
-    protected CommandUtil commandUtil = new CommandUtil();
 
 
     protected ManagementHostEntity()
@@ -267,9 +260,9 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    public void cleanupEnvironmentNetworkSettings( final UUID environmentId ) throws PeerException
+    public void cleanupEnvironmentNetworkSettings( final String environmentId ) throws PeerException
     {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
         try
         {
@@ -366,7 +359,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     {
         Set<Gateway> gateways = Sets.newHashSet();
 
-        for ( Interface iface : interfaces )
+        for ( Interface iface : getInterfaces() )
         {
             Matcher matcher = GATEWAY_INTERFACE_NAME_PATTERN.matcher( iface.getInterfaceName().trim() );
             if ( matcher.find() )
@@ -441,9 +434,10 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
-    public int setupTunnels( final Map<String, String> peerIps, final UUID environmentId ) throws PeerException
+    public int setupTunnels( final Map<String, String> peerIps, final String environmentId ) throws PeerException
     {
-        //        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
+        Preconditions.checkNotNull( peerIps, "Invalid peer ips set" );
+        Preconditions.checkArgument( !peerIps.isEmpty(), "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         //need to execute sequentially since other parallel executions can setup the same tunnel
@@ -469,7 +463,8 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    public Vni findVniByEnvironmentId( UUID environmentId ) throws PeerException
+    @Override
+    public Vni findVniByEnvironmentId( String environmentId ) throws PeerException
     {
         //check if vni is already reserved
         for ( Vni aVni : getReservedVnis() )
@@ -484,7 +479,8 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    public void setupVniVlanMapping( final int tunnelId, final long vni, final int vlanId, final UUID environmentId )
+    @Override
+    public void setupVniVlanMapping( final int tunnelId, final long vni, final int vlanId, final String environmentId )
             throws PeerException
     {
         try
@@ -508,6 +504,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
+    @Override
     public int findTunnel( String peerIp, Set<Tunnel> tunnels )
     {
         for ( Tunnel tunnel : tunnels )
@@ -522,6 +519,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
+    @Override
     public int calculateNextTunnelId( Set<Tunnel> tunnels )
     {
         int maxTunnelId = 0;

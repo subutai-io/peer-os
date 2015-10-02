@@ -1,14 +1,6 @@
 package io.subutai.core.peer.ui.container.manage;
 
 
-import java.util.UUID;
-
-import io.subutai.common.environment.Environment;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.util.ServiceLocator;
-import io.subutai.common.util.UUIDUtil;
-import io.subutai.core.env.api.EnvironmentManager;
-
 import com.google.common.base.Strings;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.ui.Alignment;
@@ -19,6 +11,12 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
+import io.subutai.common.environment.Environment;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.util.ServiceLocator;
+import io.subutai.core.environment.api.EnvironmentManager;
+
 
 public class TagsWindow extends Window
 {
@@ -27,23 +25,21 @@ public class TagsWindow extends Window
 
     public TagsWindow( final ContainerHost containerHost )
     {
-        ContainerHost environmentContainer = null;
-        try
-        {
-            EnvironmentManager environmentManager = serviceLocator.getService( EnvironmentManager.class );
-            String environmentId = containerHost.getEnvironmentId();
-            if ( UUIDUtil.isStringAUuid( environmentId ) )
-            {
-                Environment environment = environmentManager.findEnvironment( UUID.fromString( environmentId ) );
-                environmentContainer = environment.getContainerHostById( containerHost.getId() );
-            }
-        }
-        catch ( Exception e )
-        {
-            //ignore
-        }
+//        ContainerHost environmentContainer = null;
+//        try
+//        {
+////            EnvironmentManager environmentManager = serviceLocator.getService( EnvironmentManager.class );
+////            String environmentId = ( ( EnvironmentContainerHost ) containerHost ).getEnvironmentId();
+//
+////            Environment environment = environmentManager.loadEnvironment( environmentId );
+////            environmentContainer = environment.getContainerHostById( containerHost.getId() );
+//        }
+//        catch ( Exception e )
+//        {
+//            //ignore
+//        }
 
-        final ContainerHost finalEnvironmentContainer = environmentContainer;
+//        final ContainerHost finalEnvironmentContainer = environmentContainer;
 
         setCaption( containerHost.getHostname() );
         setWidth( "350px" );
@@ -78,10 +74,10 @@ public class TagsWindow extends Window
                     String tag = String.valueOf( tagsSelect.getValue() ).trim();
                     containerHost.removeTag( tag );
                     tagsSelect.setContainerDataSource( new IndexedContainer( containerHost.getTags() ) );
-                    if ( finalEnvironmentContainer != null )
-                    {
-                        finalEnvironmentContainer.removeTag( tag );
-                    }
+//                    if ( finalEnvironmentContainer != null )
+//                    {
+//                        finalEnvironmentContainer.removeTag( tag );
+//                    }
                 }
                 else
                 {
@@ -112,10 +108,10 @@ public class TagsWindow extends Window
                     String tag = tagTxt.getValue().trim();
                     containerHost.addTag( tag );
                     tagsSelect.setContainerDataSource( new IndexedContainer( containerHost.getTags() ) );
-                    if ( finalEnvironmentContainer != null )
-                    {
-                        finalEnvironmentContainer.addTag( tag );
-                    }
+//                    if ( finalEnvironmentContainer != null )
+//                    {
+//                        finalEnvironmentContainer.addTag( tag );
+//                    }
                 }
                 else
                 {

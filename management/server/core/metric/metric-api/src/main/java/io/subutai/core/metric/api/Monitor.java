@@ -5,9 +5,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import io.subutai.common.environment.Environment;
+import io.subutai.common.metric.ContainerHostMetric;
 import io.subutai.common.metric.HistoricalMetric;
 import io.subutai.common.metric.MetricType;
 import io.subutai.common.metric.OwnerResourceUsage;
@@ -15,7 +15,7 @@ import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
-import io.subutai.core.peer.api.ResourceHost;
+import io.subutai.common.peer.ResourceHost;
 
 
 /**
@@ -116,16 +116,13 @@ public interface Monitor
      *
      * @return - {@code OwnerResourceUsage}
      */
-    public OwnerResourceUsage getOwnerResourceUsage( UUID ownerId ) throws MonitorException;
+    public OwnerResourceUsage getOwnerResourceUsage( String ownerId ) throws MonitorException;
 
     /**
      * This method is called by REST endpoint from local peer indicating that some container hosted locally is under
      * stress.
      *
      * @param alertMetric - body of alert in JSON
-     *
-     *
-     * TODO take this method to separate interface for by-REST only usage
      */
     public void alert( String alertMetric ) throws MonitorException;
 
@@ -141,5 +138,5 @@ public interface Monitor
      * @param hosts physical or container hosts to be monitored
      * @param metricType to be retrieved for historical data
      */
-    public Map<UUID, List<HistoricalMetric>> getHistoricalMetrics( Collection<Host> hosts, MetricType metricType );
+    public Map<String, List<HistoricalMetric>> getHistoricalMetrics( Collection<Host> hosts, MetricType metricType );
 }

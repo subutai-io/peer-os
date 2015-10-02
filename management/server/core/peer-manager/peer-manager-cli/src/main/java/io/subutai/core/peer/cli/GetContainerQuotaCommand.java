@@ -1,18 +1,16 @@
 package io.subutai.core.peer.cli;
 
 
-import java.util.UUID;
+import org.apache.karaf.shell.commands.Argument;
+import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.quota.QuotaType;
-import io.subutai.core.env.api.EnvironmentManager;
+import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
-
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
 
 
 @Command( scope = "peer", name = "get-quota", description = "gets quota information from peer for container" )
@@ -50,7 +48,7 @@ public class GetContainerQuotaCommand extends SubutaiShellCommandSupport
 
 
         Peer peer = peerManager.getPeer( peerId );
-        Environment environment = environmentManager.findEnvironment( UUID.fromString( environmentId ) );
+        Environment environment = environmentManager.loadEnvironment( environmentId );
 
         ContainerHost targetContainer = environment.getContainerHostByHostname( containerName );
         if ( targetContainer == null )

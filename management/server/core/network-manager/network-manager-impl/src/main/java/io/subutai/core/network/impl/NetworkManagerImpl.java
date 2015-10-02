@@ -3,7 +3,6 @@ package io.subutai.core.network.impl;
 
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,6 +19,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
@@ -28,10 +28,10 @@ import io.subutai.core.network.api.ContainerInfo;
 import io.subutai.core.network.api.N2NConnection;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.network.api.Tunnel;
+import io.subutai.core.peer.api.Tunnel;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.api.ResourceHost;
+import io.subutai.common.peer.ResourceHost;
 
 
 /**
@@ -121,7 +121,7 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void cleanupEnvironmentNetworkSettings( final UUID environmentId ) throws NetworkManagerException
+    public void cleanupEnvironmentNetworkSettings( final String environmentId ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
@@ -201,7 +201,7 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void setupVniVLanMapping( final int tunnelId, final long vni, final int vLanId, final UUID environmentId )
+    public void setupVniVLanMapping( final int tunnelId, final long vni, final int vLanId, final String environmentId )
             throws NetworkManagerException
     {
         Preconditions.checkArgument( tunnelId > 0, "Tunnel id must be greater than 0" );
@@ -250,8 +250,7 @@ public class NetworkManagerImpl implements NetworkManager
             {
                 mappings.add( new VniVlanMapping(
                         Integer.parseInt( m.group( 1 ).replace( NetworkManager.TUNNEL_PREFIX, "" ) ),
-                        Long.parseLong( m.group( 2 ) ), Integer.parseInt( m.group( 3 ) ),
-                        UUID.fromString( m.group( 4 ) ) ) );
+                        Long.parseLong( m.group( 2 ) ), Integer.parseInt( m.group( 3 ) ), m.group( 4 ) ) );
             }
         }
 
@@ -381,7 +380,7 @@ public class NetworkManagerImpl implements NetworkManager
             if ( m.find() && m.groupCount() == 3 )
             {
                 reservedVnis.add( new Vni( Long.parseLong( m.group( 1 ) ), Integer.parseInt( m.group( 2 ) ),
-                        UUID.fromString( m.group( 3 ) ) ) );
+                        m.group( 3 ) ) );
             }
         }
 
@@ -490,14 +489,14 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void exchangeSshKeys( final Set<ContainerHost> containers ) throws NetworkManagerException
+    public void exchangeSshKeys( final Set<EnvironmentContainerHost> containers ) throws NetworkManagerException
     {
         getSshManager( containers ).execute();
     }
 
 
     @Override
-    public void addSshKeyToAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
+    public void addSshKeyToAuthorizedKeys( final Set<EnvironmentContainerHost> containers, final String sshKey )
             throws NetworkManagerException
     {
         getSshManager( containers ).appendSshKey( sshKey );
@@ -505,7 +504,7 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void replaceSshKeyInAuthorizedKeys( final Set<ContainerHost> containers, final String oldSshKey,
+    public void replaceSshKeyInAuthorizedKeys( final Set<EnvironmentContainerHost> containers, final String oldSshKey,
                                                final String newSshKey ) throws NetworkManagerException
     {
         getSshManager( containers ).replaceSshKey( oldSshKey, newSshKey );
@@ -513,7 +512,7 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void removeSshKeyFromAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
+    public void removeSshKeyFromAuthorizedKeys( final Set<EnvironmentContainerHost> containers, final String sshKey )
             throws NetworkManagerException
     {
         getSshManager( containers ).removeSshKey( sshKey );
@@ -521,20 +520,20 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void registerHosts( final Set<ContainerHost> containerHosts, final String domainName )
+    public void registerHosts( final Set<EnvironmentContainerHost> containerHosts, final String domainName )
             throws NetworkManagerException
     {
         getHostManager( containerHosts, domainName ).execute();
     }
 
 
-    protected SshManager getSshManager( final Set<ContainerHost> containers )
+    protected SshManager getSshManager( final Set<EnvironmentContainerHost> containers )
     {
         return new SshManager( containers );
     }
 
 
-    protected HostManager getHostManager( final Set<ContainerHost> containerHosts, final String domainName )
+    protected HostManager getHostManager( final Set<EnvironmentContainerHost> containerHosts, final String domainName )
     {
         return new HostManager( containerHosts, domainName );
     }

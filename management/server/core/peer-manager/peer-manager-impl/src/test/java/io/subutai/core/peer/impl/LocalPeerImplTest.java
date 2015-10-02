@@ -4,17 +4,16 @@ package io.subutai.core.peer.impl;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import org.apache.openjpa.persistence.EntityManagerFactoryImpl;
+import org.apache.openjpa.persistence.EntityManagerImpl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -25,18 +24,16 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
-import io.subutai.common.environment.CreateContainerGroupRequest;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostInfoModel;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.protocol.Criteria;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
@@ -47,23 +44,20 @@ import io.subutai.common.quota.RamQuota;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.executor.api.CommandExecutor;
-import io.subutai.core.hostregistry.api.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
 import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.peer.api.ContainerGroupNotFoundException;
-import io.subutai.core.peer.api.HostNotFoundException;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.peer.api.Payload;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.RequestListener;
-import io.subutai.core.peer.api.ResourceHost;
-import io.subutai.core.peer.api.ResourceHostException;
-import io.subutai.core.peer.impl.container.DestroyContainerWrapperTask;
+import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.core.peer.impl.dao.ContainerGroupDataService;
 import io.subutai.core.peer.impl.dao.ContainerHostDataService;
 import io.subutai.core.peer.impl.dao.ManagementHostDataService;
@@ -73,13 +67,10 @@ import io.subutai.core.peer.impl.entity.ContainerGroupEntity;
 import io.subutai.core.peer.impl.entity.ContainerHostEntity;
 import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.entity.ResourceHostEntity;
-import io.subutai.core.registry.api.RegistryException;
 import io.subutai.core.registry.api.TemplateRegistry;
-import io.subutai.core.security.api.*;
 import io.subutai.core.security.api.SecurityManager;
-import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.StrategyManager;
-import io.subutai.core.strategy.api.StrategyNotFoundException;
+import junit.framework.TestCase;
 
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertEquals;
@@ -89,8 +80,6 @@ import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -107,13 +96,13 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class LocalPeerImplTest
 {
-    private static final UUID ENVIRONMENT_ID = UUID.randomUUID();
-    private static final UUID LOCAL_PEER_ID = UUID.randomUUID();
-    private static final UUID OWNER_ID = UUID.randomUUID();
+    private static final String ENVIRONMENT_ID = UUID.randomUUID().toString();
+    private static final String LOCAL_PEER_ID = UUID.randomUUID().toString();
+    private static final String OWNER_ID = UUID.randomUUID().toString();
     private static final String LOCAL_PEER_NAME = "local peer";
-    private static final UUID MANAGEMENT_HOST_ID = UUID.randomUUID();
-    private static final UUID RESOURCE_HOST_ID = UUID.randomUUID();
-    private static final UUID CONTAINER_HOST_ID = UUID.randomUUID();
+    private static final String MANAGEMENT_HOST_ID = UUID.randomUUID().toString();
+    private static final String RESOURCE_HOST_ID = UUID.randomUUID().toString();
+    private static final String CONTAINER_HOST_ID = UUID.randomUUID().toString();
     private static final String RESOURCE_HOST_NAME = "foo";
     private static final String CONTAINER_NAME = "foo";
     private static final String TEMPLATE_NAME = "master";
@@ -152,8 +141,8 @@ public class LocalPeerImplTest
     @Mock
     RequestListener requestListener;
 
-    @Mock
-    ContainerHostDataService containerHostDataService;
+//    @Mock
+//    ContainerHostDataService containerHostDataService;
     @Mock
     ContainerGroupDataService containerGroupDataService;
     @Mock
@@ -198,6 +187,8 @@ public class LocalPeerImplTest
 
     Map<String, String> peerMap = new HashMap<>();
 
+    @Mock
+    EntityManagerFactoryImpl entityManagerFactory;
 
     @Before
     public void setUp() throws Exception
@@ -206,9 +197,9 @@ public class LocalPeerImplTest
         peerMap.put( IP, N2N_IP );
         localPeer =
                 spy( new LocalPeerImpl( daoManager, templateRegistry, quotaManager, strategyManager, commandExecutor,
-                        hostRegistry, monitor,httpContextManager,securityManager  ) );
+                        hostRegistry, monitor, securityManager ) );
 
-        localPeer.containerHostDataService = containerHostDataService;
+        //        localPeer.containerHostDataService = containerHostDataService;
         localPeer.containerGroupDataService = containerGroupDataService;
         localPeer.resourceHostDataService = resourceHostDataService;
         localPeer.managementHostDataService = managementHostDataService;
@@ -217,12 +208,10 @@ public class LocalPeerImplTest
         localPeer.exceptionUtil = exceptionUtil;
         localPeer.managementHost = managementHost;
         localPeer.requestListeners = Sets.newHashSet( requestListener );
+        when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
         when( managementHost.getId() ).thenReturn( MANAGEMENT_HOST_ID );
-        when( managementHost.getHostId() ).thenReturn( MANAGEMENT_HOST_ID.toString() );
         when( resourceHost.getId() ).thenReturn( RESOURCE_HOST_ID );
-        when( resourceHost.getHostId() ).thenReturn( RESOURCE_HOST_ID.toString() );
         when( containerHost.getId() ).thenReturn( CONTAINER_HOST_ID );
-        when( containerHost.getHostId() ).thenReturn( CONTAINER_HOST_ID.toString() );
         when( resourceHost.getContainerHostById( CONTAINER_HOST_ID ) ).thenReturn( containerHost );
         when( resourceHost.getHostname() ).thenReturn( RESOURCE_HOST_NAME );
         when( localPeer.getPeerInfo() ).thenReturn( peerInfo );
@@ -239,7 +228,7 @@ public class LocalPeerImplTest
         when( hostRegistry.getHostInfoById( CONTAINER_HOST_ID ) ).thenReturn( containerHostInfo );
         when( containerHostInfo.getId() ).thenReturn( CONTAINER_HOST_ID );
         when( containerHost.getHostname() ).thenReturn( CONTAINER_NAME );
-        when( containerHost.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID.toString() );
+        //        when( containerHost.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
         when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( CONTAINER_HOST_ID ) );
         when( containerGroup.getOwnerId() ).thenReturn( OWNER_ID );
         when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
@@ -324,7 +313,7 @@ public class LocalPeerImplTest
     {
         localPeer.getContainerHostState( containerHost );
 
-        verify( containerHost ).getState();
+        verify( containerHost ).getStatus();
     }
 
 
@@ -362,143 +351,12 @@ public class LocalPeerImplTest
     }
 
 
-    @Test
-    public void testCreateContainerGroup() throws Exception
-    {
-        Map<ResourceHost, Set<String>> distribution = Maps.newHashMap();
-        distribution.put( resourceHost, Sets.newHashSet( CONTAINER_NAME ) );
-        doReturn( distribution ).when( localPeer )
-                                .distributeContainersToResourceHosts( any( CreateContainerGroupRequest.class ) );
-        doReturn( Common.MIN_VLAN_ID ).when( localPeer ).setupTunnels( anyMap(), any( UUID.class ) );
-        doReturn( Sets.newHashSet( hostInfoModel ) ).when( localPeer )
-                                                    .processRequestCompletion( anyList(), any( ExecutorService.class ),
-                                                            any( CreateContainerGroupRequest.class ) );
-
-        localPeer.createContainerGroup(
-                new CreateContainerGroupRequest( peerMap, ENVIRONMENT_ID, UUID.randomUUID(), OWNER_ID, SUBNET,
-                        Lists.newArrayList( template ), 1, "ROUND_ROBIN", Lists.<Criteria>newArrayList(), 0 ) );
-
-        try
-        {
-            localPeer.createContainerGroup(
-                    new CreateContainerGroupRequest( peerMap, ENVIRONMENT_ID, UUID.randomUUID(), OWNER_ID, "",
-                            Lists.newArrayList( template ), 1, "ROUND_ROBIN", Lists.<Criteria>newArrayList(), 0 ) );
-            fail( "Expected PeerException" );
-        }
-        catch ( PeerException e )
-        {
-        }
-
-        doThrow( new StrategyNotFoundException( "" ) ).when( strategyManager ).findStrategyById( anyString() );
-
-        try
-        {
-            localPeer.createContainerGroup(
-                    new CreateContainerGroupRequest( peerMap, ENVIRONMENT_ID, UUID.randomUUID(), OWNER_ID,
-                            SUBNET, Lists.newArrayList( template ), 1, "ROUND_ROBIN", Lists.<Criteria>newArrayList(),
-                            0 ) );
-            fail( "Expected PeerException" );
-        }
-        catch ( PeerException e )
-        {
-        }
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testRegisterRemoteTemplates() throws Exception
-    {
-        CreateContainerGroupRequest request = mock( CreateContainerGroupRequest.class );
-        when( request.getTemplates() ).thenReturn( Lists.newArrayList( template ) );
-        when( template.isRemote() ).thenReturn( true );
-        when( templateRegistry.getTemplate( TEMPLATE_NAME ) ).thenReturn( null );
-
-
-        localPeer.registerRemoteTemplates( request );
-
-        verify( templateRegistry ).registerTemplate( template );
-
-        doThrow( new RegistryException( "" ) ).when( templateRegistry ).registerTemplate( template );
-
-        localPeer.registerRemoteTemplates( request );
-    }
-
-
-    @Test
-    public void testDistributeContainersToResourceHosts() throws Exception
-    {
-        CreateContainerGroupRequest request = mock( CreateContainerGroupRequest.class );
-        when( request.getTemplates() ).thenReturn( Lists.newArrayList( template ) );
-        ResourceHostMetric resourceHostMetric = mock( ResourceHostMetric.class );
-        when( resourceHostMetric.getHost() ).thenReturn( RESOURCE_HOST_NAME );
-
-        Map<ResourceHostMetric, Integer> placementMap = Maps.newHashMap();
-        placementMap.put( resourceHostMetric, 1 );
-        doReturn( placementMap ).when( strategyManager )
-                                .getPlacementDistribution( anyList(), anyInt(), anyString(), anyList() );
-
-        Map<ResourceHost, Set<String>> distribution = localPeer.distributeContainersToResourceHosts( request );
-
-        assertTrue( distribution.keySet().contains( resourceHost ) );
-
-        doThrow( new StrategyException( "" ) ).when( strategyManager )
-                                              .getPlacementDistribution( anyList(), anyInt(), anyString(), anyList() );
-
-        try
-        {
-            localPeer.distributeContainersToResourceHosts( request );
-            fail( "Expected PeerException" );
-        }
-        catch ( PeerException e )
-        {
-        }
-
-        doThrow( new ResourceHostException( "" ) ).when( resourceHost ).getHostMetric();
-
-        try
-        {
-            localPeer.distributeContainersToResourceHosts( request );
-            fail( "Expected PeerException" );
-        }
-        catch ( PeerException e )
-        {
-        }
-    }
-
-
-    @Test
-    public void testProcessRequestCompletion() throws Exception
-    {
-        Future<ContainerHost> taskFuture = mock( Future.class );
-        ExecutorService executorService = mock( ExecutorService.class );
-        CreateContainerGroupRequest request = mock( CreateContainerGroupRequest.class );
-        when( taskFuture.get() ).thenReturn( containerHost );
-        when( request.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
-        when( request.getOwnerId() ).thenReturn( OWNER_ID );
-        when( request.getInitiatorPeerId() ).thenReturn( UUID.randomUUID() );
-        doReturn( containerGroup ).when( localPeer ).findContainerGroupByEnvironmentId( ENVIRONMENT_ID );
-
-        localPeer.processRequestCompletion( Lists.newArrayList( taskFuture ), executorService, request );
-
-        when( request.getEnvironmentId() ).thenReturn( UUID.randomUUID() );
-
-        localPeer.processRequestCompletion( Lists.newArrayList( taskFuture ), executorService, request );
-
-        ExecutionException exception = mock( ExecutionException.class );
-        doThrow( exception ).when( taskFuture ).get();
-
-        localPeer.processRequestCompletion( Lists.newArrayList( taskFuture ), executorService, request );
-
-        verify( exception ).printStackTrace( any( PrintStream.class ) );
-    }
-
-
     @Test( expected = ContainerGroupNotFoundException.class )
     public void testFindContainerGroupByContainerId() throws Exception
     {
         assertNotNull( localPeer.findContainerGroupByContainerId( CONTAINER_HOST_ID ) );
 
-        when( containerGroup.getContainerIds() ).thenReturn( Sets.<UUID>newHashSet() );
+        when( containerGroup.getContainerIds() ).thenReturn( Sets.<String>newHashSet() );
 
         localPeer.findContainerGroupByContainerId( CONTAINER_HOST_ID );
     }
@@ -509,7 +367,7 @@ public class LocalPeerImplTest
     {
         assertFalse( localPeer.findContainerGroupsByOwnerId( OWNER_ID ).isEmpty() );
 
-        when( containerGroup.getOwnerId() ).thenReturn( UUID.randomUUID() );
+        when( containerGroup.getOwnerId() ).thenReturn( UUID.randomUUID().toString() );
 
         assertTrue( localPeer.findContainerGroupsByOwnerId( OWNER_ID ).isEmpty() );
     }
@@ -520,7 +378,7 @@ public class LocalPeerImplTest
     {
         assertNotNull( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) );
 
-        when( containerGroup.getEnvironmentId() ).thenReturn( UUID.randomUUID() );
+        when( containerGroup.getEnvironmentId() ).thenReturn( UUID.randomUUID().toString() );
 
         assertNull( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) );
     }
@@ -569,7 +427,7 @@ public class LocalPeerImplTest
     {
         assertEquals( resourceHost, localPeer.getResourceHostById( RESOURCE_HOST_ID ) );
 
-        localPeer.getResourceHostById( UUID.randomUUID() );
+        localPeer.getResourceHostById( UUID.randomUUID().toString() );
     }
 
 
@@ -636,7 +494,8 @@ public class LocalPeerImplTest
 
         verify( containerGroupDataService ).remove( ENVIRONMENT_ID.toString() );
 
-        when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( CONTAINER_HOST_ID, UUID.randomUUID() ) );
+        when( containerGroup.getContainerIds() )
+                .thenReturn( Sets.newHashSet( CONTAINER_HOST_ID, UUID.randomUUID().toString() ) );
 
         localPeer.destroyContainer( containerHost );
 
@@ -704,6 +563,7 @@ public class LocalPeerImplTest
 
         when( hostRegistry.getHostInfoById( CONTAINER_HOST_ID ) ).thenReturn( hostInfo );
 
+        TestCase.assertTrue( localPeer.isConnected( containerHost ) );
 
         HostDisconnectedException hostDisconnectedException = mock( HostDisconnectedException.class );
 
@@ -771,11 +631,11 @@ public class LocalPeerImplTest
     {
         localPeer.execute( requestBuilder, containerHost, commandCallback );
 
-        verify( commandExecutor ).execute( CONTAINER_HOST_ID, requestBuilder, commandCallback );
+        verify( commandExecutor ).execute( CONTAINER_HOST_ID.toString(), requestBuilder, commandCallback );
 
         localPeer.execute( requestBuilder, containerHost );
 
-        verify( commandExecutor ).execute( CONTAINER_HOST_ID, requestBuilder );
+        verify( commandExecutor ).execute( CONTAINER_HOST_ID.toString(), requestBuilder );
 
         when( containerHost.isConnected() ).thenReturn( false );
 
@@ -806,11 +666,11 @@ public class LocalPeerImplTest
     {
         localPeer.executeAsync( requestBuilder, containerHost, commandCallback );
 
-        verify( commandExecutor ).executeAsync( CONTAINER_HOST_ID, requestBuilder, commandCallback );
+        verify( commandExecutor ).executeAsync( CONTAINER_HOST_ID.toString(), requestBuilder, commandCallback );
 
         localPeer.executeAsync( requestBuilder, containerHost );
 
-        verify( commandExecutor ).executeAsync( CONTAINER_HOST_ID, requestBuilder );
+        verify( commandExecutor ).executeAsync( CONTAINER_HOST_ID.toString(), requestBuilder );
 
         when( containerHost.isConnected() ).thenReturn( false );
 
@@ -847,19 +707,6 @@ public class LocalPeerImplTest
     public void testIsOnline() throws Exception
     {
         assertTrue( localPeer.isOnline() );
-    }
-
-
-    @Test
-    public void testCleanDb() throws Exception
-    {
-        localPeer.cleanDb();
-
-        verify( managementHostDataService ).remove( MANAGEMENT_HOST_ID.toString() );
-
-        verify( resourceHostDataService ).remove( RESOURCE_HOST_ID.toString() );
-
-        verify( containerHostDataService ).remove( CONTAINER_HOST_ID.toString() );
     }
 
 
@@ -932,23 +779,26 @@ public class LocalPeerImplTest
     {
 
         ContainerHostInfo containerHostInfo1 = mock( ContainerHostInfo.class );
-        when( containerHostInfo1.getId() ).thenReturn( UUID.randomUUID() );
+        when( containerHostInfo1.getId() ).thenReturn( UUID.randomUUID().toString() );
 
         when( resourceHostInfo.getContainers() ).thenReturn( Sets.newHashSet( containerHostInfo1 ) );
 
-        localPeer.saveResourceHostContainers( resourceHost, resourceHostInfo.getContainers() );
+        //        localPeer.updateResourceHostContainers( resourceHost, resourceHostInfo.getContainers() );
 
-        verify( containerHostDataService ).persist( any( ContainerHostEntity.class ) );
+        resourceHost.updateHostInfo( resourceHostInfo );
 
-        verify( containerHostDataService ).remove( CONTAINER_HOST_ID.toString() );
+//        verify( containerHostDataService ).persist( any( ContainerHostEntity.class ) );
+//
+//        verify( containerHostDataService ).remove( CONTAINER_HOST_ID.toString() );
 
         when( resourceHostInfo.getContainers() ).thenReturn( Sets.newHashSet( containerHostInfo ) );
 
-        doReturn( containerHost ).when( containerHostDataService ).find( anyString() );
+//        doReturn( containerHost ).when( containerHostDataService ).find( anyString() );
 
-        localPeer.saveResourceHostContainers( resourceHost, resourceHostInfo.getContainers() );
+        //        localPeer.updateResourceHostContainers( resourceHost, resourceHostInfo.getContainers() );
+        resourceHost.updateHostInfo( resourceHostInfo );
 
-        verify( containerHostDataService ).update( any( ContainerHostEntity.class ) );
+//        verify( containerHostDataService ).update( any( ContainerHostEntity.class ) );
     }
 
 
@@ -1153,23 +1003,6 @@ public class LocalPeerImplTest
 
 
     @Test
-    public void testDestroyEnvironmentContainers() throws Exception
-    {
-        ExecutorService executorService = mock( ExecutorService.class );
-        doReturn( executorService ).when( localPeer ).getFixedExecutor( anyInt() );
-        Future<UUID> future = mock( Future.class );
-        doReturn( future ).when( executorService ).submit( any( DestroyContainerWrapperTask.class ) );
-        doReturn( CONTAINER_HOST_ID ).when( future ).get();
-
-        ContainersDestructionResult result = localPeer.destroyEnvironmentContainers( ENVIRONMENT_ID );
-
-        assertTrue( result.getDestroyedContainersIds().contains( CONTAINER_HOST_ID ) );
-
-        verify( managementHost ).cleanupEnvironmentNetworkSettings( ENVIRONMENT_ID );
-    }
-
-
-    @Test
     public void testGetGateways() throws Exception
     {
         localPeer.getGateways();
@@ -1205,6 +1038,4 @@ public class LocalPeerImplTest
 
         verify( managementHost ).setupTunnels( peerMap, ENVIRONMENT_ID );
     }
-
-
 }

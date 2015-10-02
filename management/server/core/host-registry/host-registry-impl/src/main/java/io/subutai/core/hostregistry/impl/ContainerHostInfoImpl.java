@@ -2,17 +2,16 @@ package io.subutai.core.hostregistry.impl;
 
 
 import java.util.Set;
-import java.util.UUID;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.Sets;
+
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
 import io.subutai.common.util.CollectionUtil;
-import io.subutai.core.hostregistry.api.ContainerHostInfo;
-
-import com.google.common.base.Objects;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -20,15 +19,16 @@ import com.google.common.collect.Sets;
  */
 public class ContainerHostInfoImpl implements ContainerHostInfo
 {
-    private UUID id;
+    private String id;
     private String hostname;
+    private String containerName;
     private Set<InterfaceImpl> interfaces;
     private ContainerHostState status;
     private HostArchitecture arch;
 
 
     @Override
-    public UUID getId()
+    public String getId()
     {
         return id;
     }
@@ -61,6 +61,13 @@ public class ContainerHostInfoImpl implements ContainerHostInfo
 
 
     @Override
+    public String getContainerName()
+    {
+        return containerName;
+    }
+
+
+    @Override
     public HostArchitecture getArch()
     {
         return arch;
@@ -71,7 +78,8 @@ public class ContainerHostInfoImpl implements ContainerHostInfo
     public String toString()
     {
         return Objects.toStringHelper( this ).add( "id", id ).add( "hostname", hostname )
-                      .add( "interfaces", interfaces ).add( "status", status ).add( "arch", arch ).toString();
+                      .add( "containerName", containerName ).add( "interfaces", interfaces ).add( "status", status )
+                      .add( "arch", arch ).toString();
     }
 
 

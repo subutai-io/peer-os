@@ -17,8 +17,8 @@ import static junit.framework.TestCase.assertNotNull;
 @RunWith( MockitoJUnitRunner.class )
 public class CommandRequestTest
 {
-    private static final UUID HOST_ID = UUID.randomUUID();
-    private static final UUID ENV_ID = UUID.randomUUID();
+    private static final String HOST_ID = UUID.randomUUID().toString();
+    private static final String ENV_ID = UUID.randomUUID().toString();
     @Mock
     RequestBuilder requestBuilder;
 

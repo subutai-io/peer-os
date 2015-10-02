@@ -1,28 +1,21 @@
 package io.subutai.core.executor.cli;
 
 
-import java.util.UUID;
-
-import io.subutai.common.command.CommandException;
-import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.util.UUIDUtil;
-import io.subutai.core.executor.api.CommandExecutor;
-import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.core.executor.api.CommandExecutor;
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+
 
 /**
- * Karaf CLI support command
- * Execute command synchronously
- * hostId: target hostId to execute desired command
- * command: command to execute
- * timeout: set command execution timeout
- * daemon: trigger command execution process as daemon or not
+ * Karaf CLI support command Execute command synchronously hostId: target hostId to execute desired command command:
+ * command to execute timeout: set command execution timeout daemon: trigger command execution process as daemon or not
  */
 @Command( scope = "command", name = "exec-sync", description = "Executes command synchronously" )
 public class ExecSyncCommand extends SubutaiShellCommandSupport
@@ -52,19 +45,11 @@ public class ExecSyncCommand extends SubutaiShellCommandSupport
     protected Object doExecute() throws CommandException
     {
 
-        if ( UUIDUtil.isStringAUuid( hostId ) )
-        {
-            UUID id = UUIDUtil.generateUUIDFromString( hostId );
+        RequestBuilder requestBuilder = new RequestBuilder( command ).withTimeout( timeout );
+        CommandResult result = executor.execute( hostId, daemon ? requestBuilder.daemon() : requestBuilder );
 
-            RequestBuilder requestBuilder = new RequestBuilder( command ).withTimeout( timeout );
-            CommandResult result = executor.execute( id, daemon ? requestBuilder.daemon() : requestBuilder );
+        System.out.println( result );
 
-            System.out.println( result );
-        }
-        else
-        {
-            System.out.println( "Invalid host id" );
-        }
 
         return null;
     }

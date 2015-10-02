@@ -11,7 +11,6 @@
 
   <cm:property-placeholder persistent-id="peer" update-strategy="none">
     <cm:default-properties>
-      <cm:property name="peerIdFile" value="peer_id" />
       <cm:property name="externalIpInterface" value="eth1" />
     </cm:default-properties>
   </cm:property-placeholder>
@@ -42,14 +41,8 @@
   <reference id="identityManager" availability="mandatory"
              interface="io.subutai.core.identity.api.IdentityManager" />
 
-  <reference id="httpContextManager" availability="mandatory"
-             interface="io.subutai.core.http.manager.api.HttpContextManager" />
-
-  <reference id="securityManager" availability="optional"
-             interface="io.subutai.core.security.api.SecurityManager"/>
-
-
-
+  <reference id="securityManager" availability="mandatory"
+             interface="io.subutai.core.security.api.SecurityManager" />
 
   <bean id="localPeer" class="io.subutai.core.peer.impl.LocalPeerImpl" init-method="init"
         destroy-method="dispose" scope="singleton" activation="eager">
@@ -60,13 +53,9 @@
     <argument ref="commandExecutor" />
     <argument ref="hostRegistry" />
     <argument ref="monitor" />
-    <argument ref="httpContextManager" />
     <argument ref="securityManager" />
 
-    <property name="peerIdPath" value="$[subutaiAppDataPath]/id" />
-    <property name="peerIdFile" value="${peerIdFile}" />
     <property name="externalIpInterface" value="${externalIpInterface}" />
-
   </bean>
 
   <bean id="messageResponseListener" class="io.subutai.core.peer.impl.request.MessageResponseListener"

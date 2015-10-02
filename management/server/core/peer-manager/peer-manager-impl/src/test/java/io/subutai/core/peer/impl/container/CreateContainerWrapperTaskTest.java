@@ -6,8 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import io.subutai.core.peer.api.ResourceHost;
-import io.subutai.core.peer.impl.container.CreateContainerWrapperTask;
+import io.subutai.common.peer.ResourceHost;
 
 import static org.mockito.Mockito.verify;
 

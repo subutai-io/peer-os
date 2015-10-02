@@ -3,6 +3,11 @@ package io.subutai.core.executor.impl;
 
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+
 import io.subutai.common.cache.ExpiringCache;
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
@@ -14,14 +19,10 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.core.broker.api.Broker;
 import io.subutai.core.broker.api.ByteMessageListener;
 import io.subutai.core.broker.api.Topic;
-import io.subutai.core.hostregistry.api.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
+import io.subutai.common.host.ResourceHostInfo;
 
 
 /**
@@ -148,7 +149,7 @@ public class CommandProcessor implements ByteMessageListener
     }
 
 
-    protected ResourceHostInfo getTargetHost( UUID hostId ) throws HostDisconnectedException
+    protected ResourceHostInfo getTargetHost( String hostId ) throws HostDisconnectedException
     {
         ResourceHostInfo targetHost;
 

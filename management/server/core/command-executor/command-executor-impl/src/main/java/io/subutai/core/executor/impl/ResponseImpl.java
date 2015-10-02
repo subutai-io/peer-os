@@ -4,10 +4,10 @@ package io.subutai.core.executor.impl;
 import java.util.Set;
 import java.util.UUID;
 
+import com.google.common.base.Objects;
+
 import io.subutai.common.command.Response;
 import io.subutai.common.command.ResponseType;
-
-import com.google.common.base.Objects;
 
 
 /**
@@ -16,7 +16,7 @@ import com.google.common.base.Objects;
 public class ResponseImpl implements Response
 {
     private ResponseType type;
-    private UUID id;
+    private String id;
     private UUID commandId;
     private Integer pid;
     private Integer responseNumber;
@@ -34,7 +34,7 @@ public class ResponseImpl implements Response
 
 
     @Override
-    public UUID getId()
+    public String getId()
     {
         return id;
     }

@@ -4,9 +4,6 @@ package io.subutai.core.registration.api.service;
 import java.sql.Timestamp;
 
 
-/**
- * Created by talas on 8/28/15.
- */
 public interface ContainerToken
 {
     public String getToken();

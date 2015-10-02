@@ -7,7 +7,7 @@ import javax.ws.rs.core.Response;
 
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 
 import com.google.common.base.Preconditions;
 

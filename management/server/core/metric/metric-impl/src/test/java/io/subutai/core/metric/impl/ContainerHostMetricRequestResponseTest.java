@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 public class ContainerHostMetricRequestResponseTest
 {
 
-    private static final UUID ENVIRONMENT_ID = UUID.randomUUID();
+    private static final String ENVIRONMENT_ID = UUID.randomUUID().toString();
     ContainerHostMetricRequest request;
     ContainerHostMetricResponse response;
     @Mock

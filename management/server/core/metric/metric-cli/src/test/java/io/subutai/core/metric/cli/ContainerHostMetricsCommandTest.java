@@ -11,8 +11,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.test.SystemOutRedirectTest;
-import io.subutai.core.env.api.EnvironmentManager;
-import io.subutai.core.metric.api.ContainerHostMetric;
+import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.common.metric.ContainerHostMetric;
 import io.subutai.core.metric.api.Monitor;
 
 import com.google.common.collect.Sets;
@@ -34,7 +34,7 @@ public class ContainerHostMetricsCommandTest extends SystemOutRedirectTest
     Monitor monitor;
     @Mock
     EnvironmentManager environmentManager;
-    private static final UUID ENVIRONMENT_ID = UUID.randomUUID();
+    private static final String ENVIRONMENT_ID = UUID.randomUUID().toString();
     private static final String METRIC_TO_STRING = "metric";
     private static final String ENVIRONMENT_NOT_FOUND_MSG = "Environment not found";
     private ContainerHostMetricsCommand containerHostMetricsCommand;
@@ -47,7 +47,7 @@ public class ContainerHostMetricsCommandTest extends SystemOutRedirectTest
         ContainerHostMetric metric = mock( ContainerHostMetric.class );
         when( metric.toString() ).thenReturn( METRIC_TO_STRING );
         when( monitor.getContainerHostsMetrics( environment ) ).thenReturn( Sets.newHashSet( metric ) );
-        when( environmentManager.findEnvironment( ENVIRONMENT_ID ) ).thenReturn( environment );
+        when( environmentManager.loadEnvironment( ENVIRONMENT_ID ) ).thenReturn( environment );
         containerHostMetricsCommand = new ContainerHostMetricsCommand( monitor, environmentManager );
         containerHostMetricsCommand.environmentIdString = ENVIRONMENT_ID.toString();
     }
@@ -80,7 +80,7 @@ public class ContainerHostMetricsCommandTest extends SystemOutRedirectTest
     public void testDoExecuteWithMissingEnvironment() throws Exception
     {
         doThrow( new EnvironmentNotFoundException( null ) ).when( environmentManager )
-                                                           .findEnvironment( ENVIRONMENT_ID );
+                                                           .loadEnvironment( ENVIRONMENT_ID );
 
         containerHostMetricsCommand.doExecute();
 

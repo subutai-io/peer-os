@@ -2,9 +2,10 @@ package io.subutai.core.hostregistry.api;
 
 
 import java.util.Set;
-import java.util.UUID;
 
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 
 
 /**
@@ -22,7 +23,7 @@ public interface HostRegistry
      * @throws HostDisconnectedException - thrown when container host is not present on any of connected resource hosts.
      * However if it is present but status is other then RUNNING this exception is not thrown
      */
-    public ContainerHostInfo getContainerHostInfoById( UUID id ) throws HostDisconnectedException;
+    public ContainerHostInfo getContainerHostInfoById( String id ) throws HostDisconnectedException;
 
     /**
      * Returns container host info by name
@@ -51,7 +52,7 @@ public interface HostRegistry
      *
      * @throws HostDisconnectedException - thrown if resource host is not connected
      */
-    public ResourceHostInfo getResourceHostInfoById( UUID id ) throws HostDisconnectedException;
+    public ResourceHostInfo getResourceHostInfoById( String id ) throws HostDisconnectedException;
 
 
     /**
@@ -102,5 +103,5 @@ public interface HostRegistry
      * @throws HostDisconnectedException - thrown if container host is not present or resource host is not connected
      * (depending if this is a container or resource host info)
      */
-    public HostInfo getHostInfoById( UUID hostId ) throws HostDisconnectedException;
+    public HostInfo getHostInfoById( String hostId ) throws HostDisconnectedException;
 }

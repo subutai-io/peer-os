@@ -156,4 +156,7 @@ public interface EncryptionTool
      */
     public boolean verifyPublicKey( PGPPublicKey keyToVerify, String id, PGPPublicKey keyToVerifyWith );
 
+
+    public String armorByteArrayToString( byte[] array ) throws PGPException;
+
 }

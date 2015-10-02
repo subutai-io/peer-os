@@ -15,10 +15,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.command.OutputRedirection;
-import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.command.RequestType;
-
 import static org.junit.Assert.assertNotNull;
 
 
@@ -134,7 +130,7 @@ public class RequestBuilderTest
     @Test
     public void testBuild() throws Exception
     {
-        assertNotNull( requestBuilder.build( UUID.randomUUID() ) );
+        assertNotNull( requestBuilder.build( UUID.randomUUID().toString() ) );
     }
 
 
@@ -162,19 +158,19 @@ public class RequestBuilderTest
     @Test
     public void testProperties()
     {
-        requestBuilder.build(UUID.randomUUID()).getId();
-        requestBuilder.build(UUID.randomUUID()).getCommandId();
-        requestBuilder.build(UUID.randomUUID()).getType();
-        requestBuilder.build(UUID.randomUUID()).getWorkingDirectory();
-        requestBuilder.build(UUID.randomUUID()).getCommand();
-        requestBuilder.build(UUID.randomUUID()).getArgs();
-        requestBuilder.build(UUID.randomUUID()).getEnvironment();
-        requestBuilder.build(UUID.randomUUID()).getStdOut();
-        requestBuilder.build(UUID.randomUUID()).getStdErr();
-        requestBuilder.build(UUID.randomUUID()).getRunAs();
-        requestBuilder.build(UUID.randomUUID()).getTimeout();
-        requestBuilder.build(UUID.randomUUID()).isDaemon();
-        requestBuilder.build(UUID.randomUUID()).getConfigPoints();
-        requestBuilder.build(UUID.randomUUID()).getPid();
+        requestBuilder.build( UUID.randomUUID().toString() ).getId();
+        requestBuilder.build( UUID.randomUUID().toString() ).getCommandId();
+        requestBuilder.build( UUID.randomUUID().toString() ).getType();
+        requestBuilder.build( UUID.randomUUID().toString() ).getWorkingDirectory();
+        requestBuilder.build( UUID.randomUUID().toString() ).getCommand();
+        requestBuilder.build( UUID.randomUUID().toString() ).getArgs();
+        requestBuilder.build( UUID.randomUUID().toString() ).getEnvironment();
+        requestBuilder.build( UUID.randomUUID().toString() ).getStdOut();
+        requestBuilder.build( UUID.randomUUID().toString() ).getStdErr();
+        requestBuilder.build( UUID.randomUUID().toString() ).getRunAs();
+        requestBuilder.build( UUID.randomUUID().toString() ).getTimeout();
+        requestBuilder.build( UUID.randomUUID().toString() ).isDaemon();
+        requestBuilder.build( UUID.randomUUID().toString() ).getConfigPoints();
+        requestBuilder.build( UUID.randomUUID().toString() ).getPid();
     }
 }

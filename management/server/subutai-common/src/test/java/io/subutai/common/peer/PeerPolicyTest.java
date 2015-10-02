@@ -22,7 +22,7 @@ public class PeerPolicyTest
     @Before
     public void setUp() throws Exception
     {
-        peerPolicy = new PeerPolicy( UUID.randomUUID() );
+        peerPolicy = new PeerPolicy( UUID.randomUUID().toString() );
         peerPolicy.setContainerCountLimit( -1 );
         peerPolicy.setCpuUsagePercentageLimit( 150 );
         peerPolicy.setDiskUsagePercentageLimit( 150 );

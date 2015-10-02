@@ -13,7 +13,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.quota.QuotaType;
 import io.subutai.common.test.SystemOutRedirectTest;
-import io.subutai.core.env.api.EnvironmentManager;
+import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.peer.api.PeerManager;
 
 import static junit.framework.TestCase.assertTrue;
@@ -46,7 +46,7 @@ public class GetContainerQuotaCommandTest extends SystemOutRedirectTest
     {
         command = new GetContainerQuotaCommand( peerManager, environmentManager );
         when( peerManager.getPeer( anyString() ) ).thenReturn( peer );
-        when( environmentManager.findEnvironment( any( UUID.class ) ) ).thenReturn( environment );
+        when( environmentManager.loadEnvironment( any( String.class ) ) ).thenReturn( environment );
         when( environment.getContainerHostByHostname( anyString() ) ).thenReturn( containerHost );
         command.environmentId = UUID.randomUUID().toString();
         command.quotaType = QuotaType.QUOTA_TYPE_CPU.getKey();

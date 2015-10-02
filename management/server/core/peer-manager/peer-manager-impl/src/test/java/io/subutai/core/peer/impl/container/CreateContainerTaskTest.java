@@ -17,8 +17,8 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
-import io.subutai.core.peer.api.ResourceHost;
-import io.subutai.core.peer.api.ResourceHostException;
+import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.ResourceHostException;
 
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
@@ -37,7 +37,7 @@ public class CreateContainerTaskTest
     private static final String IP = "127.0.0.1";
     private static final String CIDR = "192.168.1.0/24";
     private static final int VLAN = 100;
-    private static final String GATEWAY = "192.168.1.1";
+//    private static final String GATEWAY = "192.168.1.1";
     private static final String TEMPLATE_NAME = "master";
     private static final int TIMEOUT = 30;
     private static final String OUT = "TEMPLATE\n" + "--------\n" + "master";
@@ -59,14 +59,14 @@ public class CreateContainerTaskTest
     @Before
     public void setUp() throws Exception
     {
-        task = new CreateContainerTask( resourceHost, template, HOSTNAME, IP, VLAN, GATEWAY, TIMEOUT );
+        task = new CreateContainerTask( resourceHost, template, HOSTNAME, IP, VLAN, /*GATEWAY, */TIMEOUT );
         task.commandUtil = commandUtil;
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
         when( commandResult.hasSucceeded() ).thenReturn( true );
         when( commandResult.getStdOut() ).thenReturn( OUT );
         when( template.getTemplateName() ).thenReturn( TEMPLATE_NAME );
         when( template.isRemote() ).thenReturn( true );
-        when( template.getPeerId() ).thenReturn( UUID.randomUUID() );
+        when( template.getPeerId() ).thenReturn( UUID.randomUUID().toString() );
         when( resourceHost.getContainerHostByName( HOSTNAME ) ).thenReturn( containerHost );
         when( containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ) ).thenReturn( IP );
     }
@@ -115,14 +115,14 @@ public class CreateContainerTaskTest
     {
         task.call();
 
-        verify( containerHost ).setDefaultGateway( GATEWAY );
+//        verify( containerHost ).setDefaultGateway( GATEWAY );
 
         CreateContainerTask task =
-                new CreateContainerTask( resourceHost, template, HOSTNAME, CIDR, VLAN, GATEWAY, TIMEOUT );
+                new CreateContainerTask( resourceHost, template, HOSTNAME, CIDR, VLAN, /*GATEWAY,*/ TIMEOUT );
         task.commandUtil = commandUtil;
 
         task.call();
 
-        verify( containerHost, times( 2 ) ).setDefaultGateway( GATEWAY );
+//        verify( containerHost, times( 2 ) ).setDefaultGateway( GATEWAY );
     }
 }

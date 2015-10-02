@@ -11,19 +11,20 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.util.JsonUtil;
-import io.subutai.core.env.api.EnvironmentManager;
-import io.subutai.core.metric.api.ContainerHostMetric;
-import io.subutai.core.metric.api.Monitor;
-import io.subutai.core.metric.api.MonitorException;
-import io.subutai.common.metric.ResourceHostMetric;
-import io.subutai.core.metric.impl.ContainerHostMetricImpl;
-import io.subutai.core.metric.impl.ResourceHostMetricImpl;
 
 import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
+
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.util.JsonUtil;
+import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.common.metric.ContainerHostMetric;
+import io.subutai.core.metric.api.Monitor;
+import io.subutai.core.metric.api.MonitorException;
+import io.subutai.core.metric.impl.ContainerHostMetricImpl;
+import io.subutai.core.metric.impl.ResourceHostMetricImpl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -125,9 +126,9 @@ public class RestServiceImplTest
     @Test
     public void testGetContainerHostMetrics() throws Exception
     {
-        UUID environmentId = UUID.randomUUID();
+        String environmentId = UUID.randomUUID().toString();
         Environment environment = mock( Environment.class );
-        when( environmentManager.findEnvironment( environmentId ) ).thenReturn( environment );
+        when( environmentManager.loadEnvironment( environmentId ) ).thenReturn( environment );
         when( monitor.getContainerHostsMetrics( environment ) ).thenReturn( Sets.newHashSet( containerHostMetric ) );
 
         Response response = restService.getContainerHostsMetrics( environmentId.toString() );
@@ -142,8 +143,8 @@ public class RestServiceImplTest
     @Test
     public void testGetContainerHostMetricsWithNullEnvironment() throws Exception
     {
-        UUID environmentId = UUID.randomUUID();
-        doThrow( new EnvironmentNotFoundException( null ) ).when( environmentManager ).findEnvironment( environmentId );
+        String environmentId = UUID.randomUUID().toString();
+        doThrow( new EnvironmentNotFoundException( null ) ).when( environmentManager ).loadEnvironment( environmentId );
 
         Response response = restService.getContainerHostsMetrics( environmentId.toString() );
 
@@ -154,9 +155,9 @@ public class RestServiceImplTest
     @Test
     public void testGetContainerHostMetricsWithMonitorException() throws Exception
     {
-        UUID environmentId = UUID.randomUUID();
+        String environmentId = UUID.randomUUID().toString();
         Environment environment = mock( Environment.class );
-        when( environmentManager.findEnvironment( environmentId ) ).thenReturn( environment );
+        when( environmentManager.loadEnvironment( environmentId ) ).thenReturn( environment );
         when( monitor.getContainerHostsMetrics( environment ) ).thenThrow( new MonitorException( "" ) );
 
         Response response = restService.getContainerHostsMetrics( environmentId.toString() );
@@ -165,11 +166,9 @@ public class RestServiceImplTest
     }
 
 
-    @Test
+    @Test( expected = IllegalArgumentException.class )
     public void testGetContainerHostMetricsWithIllegalEnvironmentId() throws Exception
     {
-        Response response = restService.getContainerHostsMetrics( null );
-
-        assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
+        restService.getContainerHostsMetrics( null );
     }
 }

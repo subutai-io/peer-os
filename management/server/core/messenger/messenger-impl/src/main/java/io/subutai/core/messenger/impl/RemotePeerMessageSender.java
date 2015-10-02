@@ -3,7 +3,6 @@ package io.subutai.core.messenger.impl;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 
 import io.subutai.common.peer.Peer;
@@ -29,11 +28,11 @@ public class RemotePeerMessageSender implements Callable<Boolean>
     private Set<Envelope> envelopes;
     private RestUtil restUtil;
     private MessengerDao messengerDao;
-    private UUID localPeerId;
+    private String localPeerId;
 
 
     public RemotePeerMessageSender( RestUtil restUtil, MessengerDao messengerDao, final Peer targetPeer,
-                                    final Set<Envelope> envelopes, UUID localPeerId )
+                                    final Set<Envelope> envelopes, String localPeerId )
     {
         this.targetPeer = targetPeer;
         this.envelopes = envelopes;
@@ -65,8 +64,8 @@ public class RemotePeerMessageSender implements Callable<Boolean>
                 Map<String, String> headers = Maps.newHashMap();
 
                 headers.put( Common.HEADER_SPECIAL, "ENC");
-                headers.put( Common.HEADER_PEER_ID_SOURCE,localPeerId.toString() );
-                headers.put( Common.HEADER_PEER_ID_TARGET,targetPeer.getId().toString() );
+                headers.put( Common.HEADER_PEER_ID_SOURCE,localPeerId );
+                headers.put( Common.HEADER_PEER_ID_TARGET,targetPeer.getId() );
                 //*************************************************************
 
                 switch ( port )

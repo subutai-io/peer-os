@@ -1,15 +1,13 @@
 package io.subutai.core.peer.cli;
 
 
-import java.util.UUID;
+import org.apache.karaf.shell.commands.Argument;
+import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.common.protocol.Template;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
-
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
 
 
 /**
@@ -24,7 +22,7 @@ public class ImportTemplateCommand extends SubutaiShellCommandSupport
 
     private TemplateRegistry templateRegistry;
 
-    @Argument( index = 0, name = "peerId", multiValued = false, description = "Remote Peer UUID" )
+    @Argument( index = 0, name = "peerId", multiValued = false, description = "Remote Peer" )
     protected String peerId;
 
     @Argument( index = 1, name = "templateName", multiValued = false, description = "Remote template name" )
@@ -54,7 +52,7 @@ public class ImportTemplateCommand extends SubutaiShellCommandSupport
         }
 
 
-        template = peerManager.getPeer( UUID.fromString( peerId ) ).getTemplate( templateName );
+        template = peerManager.getPeer( peerId ).getTemplate( templateName );
         if ( template != null )
         {
             System.out.println( "Template successfully obtained: " + template );

@@ -19,10 +19,10 @@ import static junit.framework.TestCase.assertTrue;
 @RunWith( MockitoJUnitRunner.class )
 public class ContainerGroupEntityTest
 {
-    private static final UUID ENVIRONMENT_ID = UUID.randomUUID();
-    private static final UUID OWNER_ID = UUID.randomUUID();
-    private static final UUID INITIATOR_PEER_ID = UUID.randomUUID();
-    private static final UUID CONTAINER_ID = UUID.randomUUID();
+    private static final String ENVIRONMENT_ID = UUID.randomUUID().toString();
+    private static final String OWNER_ID = UUID.randomUUID().toString();
+    private static final String INITIATOR_PEER_ID = UUID.randomUUID().toString();
+    private static final String CONTAINER_ID = UUID.randomUUID().toString();
 
     ContainerGroupEntity containerGroupEntity;
 
@@ -44,7 +44,7 @@ public class ContainerGroupEntityTest
     @Test
     public void testSetEnvironmentId() throws Exception
     {
-        UUID ENV_ID = UUID.randomUUID();
+        String ENV_ID = UUID.randomUUID().toString();
         containerGroupEntity.setEnvironmentId( ENV_ID.toString() );
 
         assertEquals( ENV_ID, containerGroupEntity.getEnvironmentId() );
@@ -61,7 +61,7 @@ public class ContainerGroupEntityTest
     @Test
     public void testSetInitiatorPeerId() throws Exception
     {
-        UUID initiatorPeerId = UUID.randomUUID();
+        String initiatorPeerId = UUID.randomUUID().toString();
 
         containerGroupEntity.setInitiatorPeerId( initiatorPeerId.toString() );
 
@@ -79,7 +79,7 @@ public class ContainerGroupEntityTest
     @Test
     public void testSetOwnerId() throws Exception
     {
-        UUID ownerId = UUID.randomUUID();
+        String ownerId = UUID.randomUUID().toString();
 
         containerGroupEntity.setOwnerId( ownerId.toString() );
 

@@ -28,10 +28,10 @@ import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.network.api.Tunnel;
+import io.subutai.core.peer.api.Tunnel;
 import io.subutai.core.repository.api.RepositoryException;
 import io.subutai.core.repository.api.RepositoryManager;
 
@@ -54,9 +54,9 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class ManagementHostEntityTest
 {
-    private static final UUID PEER_ID = UUID.randomUUID();
-    private static final UUID HOST_ID = UUID.randomUUID();
-    private static final UUID ENV_ID = UUID.randomUUID();
+    private static final String PEER_ID = UUID.randomUUID().toString();
+    private static final String HOST_ID = UUID.randomUUID().toString();
+    private static final String ENV_ID = UUID.randomUUID().toString();
     private static final String NAME = "name";
     private static final String HOSTNAME = "hostname";
     private static final HostArchitecture ARCH = HostArchitecture.AMD64;
@@ -368,7 +368,7 @@ public class ManagementHostEntityTest
     @Test
     public void testGetGateways() throws Exception
     {
-        HostInterface hostInterface = mock( HostInterface.class );
+        HostInterfaceImpl hostInterface = mock( HostInterfaceImpl.class );
         when( hostInterface.getInterfaceName() ).thenReturn( "br-100" );
 
         managementHostEntity.addInterface( hostInterface );

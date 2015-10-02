@@ -13,14 +13,15 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import io.subutai.common.host.Interface;
 import io.subutai.common.peer.InterfacePattern;
 import io.subutai.common.protocol.N2NConfig;
+
+//todo please check all endpoints for returned media type, do we return correct type if we just return response code
+// then no need to indicate it at all!!!
 
 
 public interface RestService
@@ -48,6 +49,7 @@ public interface RestService
     public Response getPeerPolicy( @QueryParam( "peerId" ) String peerId );
 
 
+    //todo check why is this endpoint used
     @Path( "/" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getRegisteredPeerInfo( @QueryParam( "peerId" ) String peerId );
@@ -77,13 +79,33 @@ public interface RestService
     Response getGateways();
 
     @POST
-    @Path( "createpek" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response createEnvironmentKeyPair( @FormParam( "environmentId" ) String environmentId );
+    @Path( "gateways" )
+    Response createGateway( @FormParam( "gatewayIp" ) String gatewayIp, @FormParam( "vlan" ) int vlan );
+
+
+    @POST
+    @Path( "tunnels" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response setupTunnels( @FormParam( "peerIps" ) String peerIps, @FormParam( "environmentId" ) String environmentId );
+
+    //todo remove verbs from urls, http method type should be descriptive say DELETE means remove
+    @POST
+    @Path( "pek/{environmentId}" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response createEnvironmentKeyPair( @PathParam( "environmentId" ) String environmentId );
+
+    @DELETE
+    @Path( "pek/{environmentId}" )
+    Response removeEnvironmentKeyPair( @PathParam( "environmentId" ) String environmentId );
+
+    @DELETE
+    @Path( "network/{environmentId}" )
+    Response cleanupNetwork( @PathParam( "environmentId" ) String environmentId );
 
     //*************** Peer Registration Handshake REST - BEGIN ***************************
 
     //TODO move all registration process operations to peerManager and remove duplicated code pieces from
+    // TODO !!! @Nurkaly do this please !!!
     // PeerRegistrationUI and RestServiceImpl
     @POST
     @Path( "register" )
@@ -266,9 +288,4 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response removeN2NConnection( @PathParam( "interfaceName" ) String interfaceName,
                                   @PathParam( "communityName" ) String communityName );
-
-    @POST
-    @Path( "tunnels" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    Response setupTunnels( @FormParam( "peerIps" ) String peerIps, @FormParam( "environmentId" ) String environmentId );
 }

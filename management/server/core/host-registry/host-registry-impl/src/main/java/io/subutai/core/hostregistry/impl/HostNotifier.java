@@ -1,7 +1,7 @@
 package io.subutai.core.hostregistry.impl;
 
 
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.core.hostregistry.api.HostListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

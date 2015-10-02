@@ -2,7 +2,7 @@ package io.subutai.core.network.impl;
 
 
 import io.subutai.core.network.api.NetworkManager;
-import io.subutai.core.network.api.Tunnel;
+import io.subutai.core.peer.api.Tunnel;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;

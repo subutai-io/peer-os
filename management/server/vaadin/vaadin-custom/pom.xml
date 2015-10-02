@@ -17,10 +17,6 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>vaadin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>vaadin-ui</artifactId>
       <classifier>classes</classifier>
     </dependency>

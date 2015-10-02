@@ -10,9 +10,6 @@ import io.subutai.core.registration.api.exception.NodeRegistrationException;
 import io.subutai.core.registration.api.service.ContainerToken;
 
 
-/**
- * Created by talas on 8/28/15.
- */
 @Command( scope = "node", name = "verify", description = "Verifies container token" )
 public class VerifyContainerToken extends SubutaiShellCommandSupport
 {

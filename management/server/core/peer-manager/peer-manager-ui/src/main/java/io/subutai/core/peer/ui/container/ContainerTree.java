@@ -5,19 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.Host;
-import io.subutai.common.peer.PeerException;
-import io.subutai.common.settings.Common;
-import io.subutai.core.hostregistry.api.HostListener;
-import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
-import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.core.peer.api.ManagementHost;
-import io.subutai.core.peer.api.ResourceHost;
-import io.subutai.server.ui.component.ConcurrentComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +18,18 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Tree;
+
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.Host;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.settings.Common;
+import io.subutai.core.hostregistry.api.HostListener;
+import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.common.peer.ResourceHost;
+import io.subutai.server.ui.component.ConcurrentComponent;
 
 
 public class ContainerTree extends ConcurrentComponent implements HostListener
@@ -82,8 +82,8 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                             intfName = Common.DEFAULT_CONTAINER_INTERFACE;
                         }
                         description = "Hostname: " + host.getHostname() + "<br>" + "MAC: " + host
-                                .getMacByInterfaceName( intfName ) + "<br>" + "UUID: " + host.getHostId() + "<br>"
-                                + "IP: " + host.getIpByInterfaceName( intfName );
+                                .getMacByInterfaceName( intfName ) + "<br>" + "ID: " + host.getId() + "<br>" + "IP: "
+                                + host.getIpByInterfaceName( intfName );
                     }
                 }
 
@@ -171,7 +171,7 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
 
             for ( Object itemObj : container.getItemIds() )
             {
-                UUID itemId = ( UUID ) itemObj;
+                String itemId = ( String ) itemObj;
                 Item item = container.getItem( itemId );
                 Object o = item.getItemProperty( "value" ).getValue();
                 if ( ( o instanceof Host ) && ( ( ( Host ) o ).isConnected() ) )

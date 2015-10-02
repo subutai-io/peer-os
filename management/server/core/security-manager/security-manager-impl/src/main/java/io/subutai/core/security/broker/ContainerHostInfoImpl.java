@@ -2,17 +2,16 @@ package io.subutai.core.security.broker;
 
 
 import java.util.Set;
-import java.util.UUID;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
 import io.subutai.common.util.CollectionUtil;
-import io.subutai.core.hostregistry.api.ContainerHostInfo;
 
 
 /**
@@ -20,15 +19,16 @@ import io.subutai.core.hostregistry.api.ContainerHostInfo;
  */
 public class ContainerHostInfoImpl implements ContainerHostInfo
 {
-    private UUID id;
+    private String id;
     private String hostname;
+    private String containerName;
     private Set<InterfaceImpl> interfaces;
     private ContainerHostState status;
     private HostArchitecture arch;
 
 
     @Override
-    public UUID getId()
+    public String getId()
     {
         return id;
     }
@@ -38,6 +38,13 @@ public class ContainerHostInfoImpl implements ContainerHostInfo
     public String getHostname()
     {
         return hostname;
+    }
+
+
+    @Override
+    public String getContainerName()
+    {
+        return containerName;
     }
 
 

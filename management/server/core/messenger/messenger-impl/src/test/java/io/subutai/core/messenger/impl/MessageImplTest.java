@@ -23,7 +23,7 @@ import static org.mockito.Mockito.doThrow;
 public class MessageImplTest
 {
 
-    private static final UUID SOURCE_PEER_ID = UUID.randomUUID();
+    private static final String SOURCE_PEER_ID = UUID.randomUUID().toString();
     private static final Object PAYLOAD = new Object();
     private static final String SENDER = "sender";
     MessageImpl message = new MessageImpl( SOURCE_PEER_ID, PAYLOAD );
@@ -96,7 +96,7 @@ public class MessageImplTest
     {
         CustomObject customObject = new CustomObject( 123, "hello" );
 
-        MessageImpl message = new MessageImpl( UUID.randomUUID(), customObject );
+        MessageImpl message = new MessageImpl( UUID.randomUUID().toString(), customObject );
 
         assertEquals( customObject, message.getPayload( CustomObject.class ) );
     }
