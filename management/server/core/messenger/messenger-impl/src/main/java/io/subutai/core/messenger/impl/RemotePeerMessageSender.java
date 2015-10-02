@@ -5,17 +5,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Maps;
-
 import io.subutai.common.peer.Peer;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Maps;
 
 
 /**
@@ -64,9 +63,9 @@ public class RemotePeerMessageSender implements Callable<Boolean>
                 //*********construct Secure Header ****************************
                 Map<String, String> headers = Maps.newHashMap();
 
-                headers.put( Common.HEADER_SPECIAL, "ENC" );
-                headers.put( Common.HEADER_ENV_ID_SOURCE, localPeerId );
-                headers.put( Common.HEADER_ENV_ID_TARGET, targetPeer.getId() );
+                headers.put( Common.HEADER_SPECIAL, "ENC");
+                headers.put( Common.HEADER_PEER_ID_SOURCE,localPeerId );
+                headers.put( Common.HEADER_PEER_ID_TARGET,targetPeer.getId() );
                 //*************************************************************
 
                 switch ( port )

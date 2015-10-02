@@ -55,7 +55,7 @@ public class MessageEncryptor implements TextMessagePostProcessor
     @Override
     public String process( final String topic, final String message )
     {
-        LOG.debug( String.format( "OUTGOING %s", message ) );
+        //        LOG.debug( String.format( "OUTGOING %s", message ) );
 
         if ( encryptionEnabled )
         {
@@ -63,13 +63,13 @@ public class MessageEncryptor implements TextMessagePostProcessor
             {
                 EncryptionTool encryptionTool = getSecurityManager().getEncryptionTool();
 
-                //obtain target host pub key for encrypting
-                PGPPublicKey hostKeyForEncrypting =
-                        MessageEncryptor.getSecurityManager().getKeyManager().getPublicKey( topic );
-
                 RequestWrapper requestWrapper = JsonUtil.fromJson( message, RequestWrapper.class );
 
                 Request originalRequest = requestWrapper.getRequest();
+
+                //obtain target host pub key for encrypting
+                PGPPublicKey hostKeyForEncrypting = MessageEncryptor.getSecurityManager().getKeyManager()
+                                                                    .getPublicKey( originalRequest.getId().toString() );
 
                 if ( originalRequest.getCommand().toLowerCase().matches( CLONE_CMD_REGEX ) )
                 {
@@ -82,6 +82,12 @@ public class MessageEncryptor implements TextMessagePostProcessor
                                                       .getToken() );
 
                     //add token for container creation
+                    List<String> args = Lists.newArrayList( originalRequest.getArgs() );
+                    args.add( "-t" );
+                    args.add( getRegistrationManager().generateContainerTTLToken(
+                            ( originalRequest.getTimeout() + Common.WAIT_CONTAINER_CONNECTION_SEC + 10 ) * 1000L )
+                                                      .getToken() );
+
                     originalRequest =
                             new RequestBuilder.RequestImpl( originalRequest.getType(), originalRequest.getId(),
                                     originalRequest.getCommandId(), originalRequest.getWorkingDirectory(),

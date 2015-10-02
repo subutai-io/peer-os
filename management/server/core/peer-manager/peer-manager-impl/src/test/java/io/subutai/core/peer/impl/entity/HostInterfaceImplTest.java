@@ -18,7 +18,7 @@ public class HostInterfaceImplTest
     private static final String INTERFACE_NAME = "eth0";
     private static final String IP = "127.0.0.1";
     private static final String MAC = "mac";
-    private static final Long ID = 123L;
+    private static final String ID = "123";
     @Mock
     Interface anInterface;
     @Mock

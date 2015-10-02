@@ -2,6 +2,7 @@ package io.subutai.core.channel.impl.util;
 
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 
@@ -158,11 +160,11 @@ public class MessageContentUtil
         try
         {
             cs.flush();
-            org.apache.commons.io.IOUtils.closeQuietly( cs );
             CachedOutputStream csnew = ( CachedOutputStream ) message.getContent( OutputStream.class );
 
             byte[] originalMessage = org.apache.commons.io.IOUtils.toByteArray( csnew.getInputStream() );
             csnew.flush();
+            org.apache.commons.io.IOUtils.closeQuietly( cs );
             org.apache.commons.io.IOUtils.closeQuietly( csnew );
 
             //do something with original message to produce finalMessage

@@ -6,7 +6,7 @@ package io.subutai.core.registration.api;
  */
 public enum RegistrationStatus
 {
-    REQUESTED, APPROVED, REJECTED, BLOCKED;
+    REQUESTED, APPROVED, REJECTED, BLOCKED, REGISTERED;
 
 
     public RegistrationStatus setRegistered()

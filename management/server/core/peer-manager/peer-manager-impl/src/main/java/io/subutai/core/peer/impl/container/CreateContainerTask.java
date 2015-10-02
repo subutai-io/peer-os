@@ -84,7 +84,7 @@ public class CreateContainerTask implements Callable<ContainerHost>
             Thread.sleep( 100 );
             try
             {
-                containerHost =  resourceHost.getContainerHostByName( hostname );
+                containerHost = resourceHost.getContainerHostByName( hostname );
             }
             catch ( HostNotFoundException e )
             {

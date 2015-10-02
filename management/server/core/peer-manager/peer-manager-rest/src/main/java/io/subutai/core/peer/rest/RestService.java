@@ -288,4 +288,9 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response removeN2NConnection( @PathParam( "interfaceName" ) String interfaceName,
                                   @PathParam( "communityName" ) String communityName );
+
+    @POST
+    @Path( "tunnels" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response setupTunnels( @FormParam( "peerIps" ) String peerIps, @FormParam( "environmentId" ) String environmentId );
 }

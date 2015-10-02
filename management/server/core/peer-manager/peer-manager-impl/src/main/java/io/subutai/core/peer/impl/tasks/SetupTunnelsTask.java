@@ -51,7 +51,6 @@ public class SetupTunnelsTask implements Callable<Integer>
         //remove local IP, just in case
         //        peerIps.remove( managementHost.getExternalIp() );
 
-
         for ( String peerIp : peerIps.keySet() )
         {
             if ( peerIp.equals( managementHost.getPeerId() ) )
