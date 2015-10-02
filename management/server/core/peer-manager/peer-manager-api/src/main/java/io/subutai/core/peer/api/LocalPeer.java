@@ -100,7 +100,8 @@ public interface LocalPeer extends Peer
      *
      * @throws ContainerGroupNotFoundException - thrown if container is created not as a part of environment
      */
-    public ContainerGroup findContainerGroupByContainerId( String containerId ) throws ContainerGroupNotFoundException;
+    //    public ContainerGroup findContainerGroupByContainerId( String containerId ) throws
+    // ContainerGroupNotFoundException;
 
     /**
      * Returns container group by environment id
@@ -111,19 +112,17 @@ public interface LocalPeer extends Peer
      *
      * @throws ContainerGroupNotFoundException - thrown if group is not found
      */
-    public ContainerGroup findContainerGroupByEnvironmentId( String environmentId )
-            throws ContainerGroupNotFoundException;
+    //    public ContainerGroup findContainerGroupByEnvironmentId( String environmentId )
+    //            throws ContainerGroupNotFoundException;
 
     /**
      * Returns set of container groups by owner id
      *
-     * @param ownerId - id of owner
+     * //     * @param ownerId - id of owner
      *
      * @return - set of {@code ContainerGroup}
      */
-    public Set<ContainerGroup> findContainerGroupsByOwnerId( String ownerId );
-
-
+    //    public Set<ContainerGroup> findContainerGroupsByOwnerId( String ownerId );
     public void addRequestListener( RequestListener listener );
 
     public void removeRequestListener( RequestListener listener );
@@ -165,4 +164,8 @@ public interface LocalPeer extends Peer
     public void addIpToVniDomain( String hostIp, Long vni ) throws PeerException;
 
     public void removeIpFromVniDomain( String hostIp, Long vni ) throws PeerException;
+
+    Set<ContainerHost> findContainersByEnvironmentId( final String environmentId );
+
+    Set<ContainerHost> findContainersByOwnerId( final String ownerId );
 }

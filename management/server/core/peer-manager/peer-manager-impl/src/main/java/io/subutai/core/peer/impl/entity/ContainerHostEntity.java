@@ -37,7 +37,7 @@ import io.subutai.common.quota.RamQuota;
  * ContainerHost class.
  */
 @Entity
-@Table( name = "container_host" )
+@Table( name = "peer_con" )
 @Access( AccessType.FIELD )
 public class ContainerHostEntity extends AbstractSubutaiHost implements ContainerHost
 {
@@ -49,20 +49,20 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Column( name = "containerName" )
     private String containerName;
 
-    //    @Column( name = "environment_id" )
-    //    private String environmentId;
+    @Column( name = "env_id", nullable = true )
+    private String environmentId;
+
+    @Column( name = "initiator_peer_id", nullable = true )
+    private String initiatorPeerId;
+
+    @Column( name = "owner_id", nullable = true )
+    private String ownerId;
 
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
     private Set<String> tags = new HashSet<>();
 
     @Transient
     private volatile ContainerHostState state = ContainerHostState.STOPPED;
-
-    //    @Transient
-    //    private DataService dataService;
-
-    //    @Transient
-    //    private LocalPeer localPeer;
 
 
     protected ContainerHostEntity()
@@ -77,18 +77,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    //    public void setLocalPeer( final LocalPeer localPeer )
-    //    {
-    //        this.localPeer = localPeer;
-    //    }
-
-
-    //    public void setDataService( final DataService dataService )
-    //    {
-    //        this.dataService = dataService;
-    //    }
-
-
     public ContainerHostEntity( String peerId, HostInfo hostInfo )
     {
         super( peerId, hostInfo );
@@ -100,26 +88,42 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    //    public void setEnvironmentId( final String environmentId )
-    //    {
-    //        this.environmentId = environmentId;
-    //    }
+    public void setEnvironmentId( final String environmentId )
+    {
+        this.environmentId = environmentId;
+    }
 
 
-    //    public String getEnvironmentId()
-    //    {
-    //        //        try
-    //        //        {
-    //        //            ContainerGroup containerGroup = localPeer.findContainerGroupByContainerId( getId() );
-    //        //
-    //        //            return containerGroup.getEnvironmentId();
-    //        //        }
-    //        //        catch ( ContainerGroupNotFoundException e )
-    //        //        {
-    //        //            return null;
-    //        //        }
-    //        return environmentId;
-    //    }
+    public String getEnvironmentId()
+    {
+        return environmentId;
+    }
+
+
+    @Override
+    public String getInitiatorPeerId()
+    {
+        return initiatorPeerId;
+    }
+
+
+    public void setInitiatorPeerId( final String initiatorPeerId )
+    {
+        this.initiatorPeerId = initiatorPeerId;
+    }
+
+
+    @Override
+    public String getOwnerId()
+    {
+        return ownerId;
+    }
+
+
+    public void setOwnerId( final String ownerId )
+    {
+        this.ownerId = ownerId;
+    }
 
 
     @Override

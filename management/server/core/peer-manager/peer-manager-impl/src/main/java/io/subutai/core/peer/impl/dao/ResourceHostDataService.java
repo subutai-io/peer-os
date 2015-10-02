@@ -6,8 +6,10 @@ import java.util.Collection;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.api.DataService;
 import io.subutai.core.peer.impl.entity.ResourceHostEntity;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,14 +19,14 @@ import com.google.common.collect.Lists;
 public class ResourceHostDataService implements DataService<String, ResourceHostEntity>
 {
     private static final Logger LOG = LoggerFactory.getLogger( ResourceHostDataService.class );
-//    private EntityManagerFactory emf;
+    //    private EntityManagerFactory emf;
     private EntityManager em;
 
 
     public ResourceHostDataService( EntityManagerFactory entityManagerFactory )
     {
-//        this.emf = entityManagerFactory;
-        this.em =  entityManagerFactory.createEntityManager();
+        //        this.emf = entityManagerFactory;
+        this.em = entityManagerFactory.createEntityManager();
     }
 
 
@@ -32,7 +34,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
     public ResourceHostEntity find( final String id )
     {
         ResourceHostEntity result = null;
-//        EntityManager em = emf.createEntityManager();
+        //        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
@@ -47,10 +49,10 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
                 em.getTransaction().rollback();
             }
         }
-//        finally
-//        {
-//            em.close();
-//        }
+        //        finally
+        //        {
+        //            em.close();
+        //        }
         return result;
     }
 
@@ -59,7 +61,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
     public Collection<ResourceHostEntity> getAll()
     {
         Collection<ResourceHostEntity> result = Lists.newArrayList();
-//        EntityManager em = emf.createEntityManager();
+        //        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
@@ -74,10 +76,10 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
                 em.getTransaction().rollback();
             }
         }
-//        finally
-//        {
-//            em.close();
-//        }
+        //        finally
+        //        {
+        //            em.close();
+        //        }
         return result;
     }
 
@@ -85,7 +87,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
     @Override
     public void persist( final ResourceHostEntity item )
     {
-//        EntityManager em = emf.createEntityManager();
+        //        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
@@ -101,17 +103,17 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
                 em.getTransaction().rollback();
             }
         }
-//        finally
-//        {
-//            em.close();
-//        }
+        //        finally
+        //        {
+        //            em.close();
+        //        }
     }
 
 
     @Override
     public void remove( final String id )
     {
-//        EntityManager em = emf.createEntityManager();
+        //        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
@@ -137,7 +139,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
     @Override
     public void update( ResourceHostEntity item )
     {
-//        EntityManager em = emf.createEntityManager();
+        //        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
@@ -152,9 +154,29 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
                 em.getTransaction().rollback();
             }
         }
-//        finally
-//        {
-//            em.close();
-//        }
+        //        finally
+        //        {
+        //            em.close();
+        //        }
+    }
+
+
+    public void saveOrUpdate( ResourceHost item )
+    {
+        try
+        {
+            em.getTransaction().begin();
+            em.merge( item );
+            em.getTransaction().commit();
+            em.refresh( item );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.toString(), e );
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
+        }
     }
 }

@@ -53,7 +53,7 @@ import io.subutai.core.environment.impl.EnvironmentManagerImpl;
  * @see io.subutai.common.peer.ContainerHost
  */
 @Entity
-@Table( name = "environment" )
+@Table( name = "env" )
 @Access( AccessType.FIELD )
 public class EnvironmentImpl implements Environment, Serializable
 {

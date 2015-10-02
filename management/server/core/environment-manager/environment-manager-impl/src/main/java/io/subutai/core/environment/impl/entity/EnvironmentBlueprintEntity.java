@@ -16,7 +16,7 @@ import javax.persistence.Table;
  * @see io.subutai.common.environment.Blueprint
  */
 @Entity
-@Table( name = "environment_blueprint" )
+@Table( name = "env_blueprint" )
 @Access( AccessType.FIELD )
 public class EnvironmentBlueprintEntity
 {

@@ -3,48 +3,17 @@ package io.subutai.core.peer.impl.entity;
 
 import java.io.Serializable;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import io.subutai.common.host.Interface;
 
 
-@Entity
-@Table( name = "interface" )
-@IdClass( InterfaceId.class )
-@Access( AccessType.FIELD )
 @XmlRootElement
 public class HostInterfaceImpl implements Interface, Serializable
 {
-    //    @Id
-    //    @GeneratedValue
-    //    @JsonIgnore
-    //    private Long id;
-
-    @Column( name = "name", nullable = false )
     private String interfaceName;
-
-    @Id
-    @Column( name = "ip", nullable = false )
     private String ip;
-
-    @Id
-    @Column( name = "mac", nullable = false )
     private String mac;
-
-    @ManyToOne
-    @JoinColumn( name = "host_id" )
-    @JsonIgnore
     private AbstractSubutaiHost host;
 
 
@@ -59,19 +28,7 @@ public class HostInterfaceImpl implements Interface, Serializable
         this.ip = s.getIp().replace( "addr:", "" );
         this.mac = s.getMac();
     }
-//
-//
-//    public Long getId()
-//    {
-//        return id;
-//    }
-//
-//
-//    public void setId( final Long id )
-//    {
-//        this.id = id;
-//    }
-//
+
 
     @Override
     public String getInterfaceName()
