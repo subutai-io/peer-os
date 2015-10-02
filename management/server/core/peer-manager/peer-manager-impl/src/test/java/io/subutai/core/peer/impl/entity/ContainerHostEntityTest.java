@@ -10,20 +10,18 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.google.common.collect.Sets;
+
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.Interface;
 import io.subutai.common.peer.Peer;
-import io.subutai.common.protocol.api.DataService;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.RamQuota;
-import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.core.peer.api.ContainerGroup;
 import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.common.peer.ResourceHost;
-
-import com.google.common.collect.Sets;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
@@ -55,8 +53,8 @@ public class ContainerHostEntityTest
 //    DataService dataService;
     @Mock
     LocalPeer localPeer;
-    @Mock
-    ContainerGroup containerGroup;
+//    @Mock
+//    ContainerGroup containerGroup;
     @Mock
     ContainerHostInfo containerHostInfo;
     @Mock
@@ -85,8 +83,8 @@ public class ContainerHostEntityTest
         //        containerHostEntity.setLocalPeer( localPeer );
         //        containerHostEntity.setDataService( dataService );
         containerHostEntity.setParent( resourceHost );
-        when( localPeer.findContainerGroupByContainerId( HOST_ID ) ).thenReturn( containerGroup );
-        when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
+//        when( localPeer.findContainerGroupByContainerId( HOST_ID ) ).thenReturn( containerGroup );
+//        when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
         when( resourceHost.getPeer() ).thenReturn( peer );
     }
 

@@ -56,7 +56,7 @@ import io.subutai.core.repository.api.RepositoryManager;
 
 
 @Entity
-@Table( name = "management_host" )
+@Table( name = "m_host" )
 @Access( AccessType.FIELD )
 public class ManagementHostEntity extends AbstractSubutaiHost implements ManagementHost, Disposable
 {

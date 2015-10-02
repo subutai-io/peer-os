@@ -50,7 +50,7 @@ import io.subutai.core.security.api.SecurityManager;
  */
 public class PeerManagerImpl implements PeerManager
 {
-    private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class );
 
     public static final String PEER_SUBNET_MASK = "255.255.255.0";
     private static final int N2N_PORT = 5000;

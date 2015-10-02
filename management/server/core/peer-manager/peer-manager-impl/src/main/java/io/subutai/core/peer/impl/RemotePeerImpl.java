@@ -1414,7 +1414,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public ContainersDestructionResult destroyEnvironmentContainerGroup( final String environmentId )
+    public ContainersDestructionResult destroyContainersByEnvironment( final String environmentId )
             throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );

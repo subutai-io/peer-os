@@ -21,7 +21,7 @@ import io.subutai.common.protocol.N2NConfig;
 
 
 @Entity
-@Table( name = "environment_peer" )
+@Table( name = "env_peer" )
 @Access( AccessType.FIELD )
 public class PeerConfImpl implements PeerConf, Serializable
 {

@@ -345,7 +345,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      *
      * @return {@code ContainersDestructionResult}
      */
-    public ContainersDestructionResult destroyEnvironmentContainerGroup( final String environmentId )
+    public ContainersDestructionResult destroyContainersByEnvironment( final String environmentId )
             throws PeerException;
 
     //networking

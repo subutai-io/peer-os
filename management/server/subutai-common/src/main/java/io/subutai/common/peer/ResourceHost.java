@@ -1,6 +1,7 @@
 package io.subutai.common.peer;
 
 
+import java.util.Collection;
 import java.util.Set;
 
 import io.subutai.common.host.ContainerHostState;
@@ -77,4 +78,8 @@ public interface ResourceHost extends Host, ResourceHostInfo
      */
     public ContainerHost createContainer( String templateName, String hostname, String ip, int vlan, String gateway,
                                           int timeout ) throws ResourceHostException;
+
+    Set<ContainerHost> getContainerHostsByEnvironmentId( String environmentId );
+
+    Set<ContainerHost> getContainerHostsByOwnerId( String ownerId );
 }

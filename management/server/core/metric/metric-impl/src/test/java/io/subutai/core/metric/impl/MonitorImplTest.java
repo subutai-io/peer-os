@@ -28,6 +28,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.exception.DaoException;
+import io.subutai.common.metric.ContainerHostMetric;
 import io.subutai.common.metric.HistoricalMetric;
 import io.subutai.common.metric.MetricType;
 import io.subutai.common.metric.OwnerResourceUsage;
@@ -35,23 +36,21 @@ import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Host;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.User;
 import io.subutai.core.metric.api.AlertListener;
-import io.subutai.common.metric.ContainerHostMetric;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.metric.api.MonitoringSettings;
-import io.subutai.core.peer.api.ContainerGroup;
-import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.RemotePeer;
-import io.subutai.common.peer.ResourceHost;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -275,10 +274,10 @@ public class MonitorImplTest
     public void testAlertThresholdExcessLocalPeer() throws Exception
     {
         //set owner id as local peer
-        ContainerGroup containerGroup = mock( ContainerGroup.class );
-        when( containerGroup.getInitiatorPeerId() ).thenReturn( LOCAL_PEER_ID );
-        when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
-        when( localPeer.findContainerGroupByContainerId( HOST_ID ) ).thenReturn( containerGroup );
+//        ContainerGroup containerGroup = mock( ContainerGroup.class );
+//        when( containerGroup.getInitiatorPeerId() ).thenReturn( LOCAL_PEER_ID );
+//        when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
+//        when( localPeer.findContainerGroupByContainerId( HOST_ID ) ).thenReturn( containerGroup );
         when( localPeer.getContainerHostByName( HOST ) ).thenReturn( containerHost );
         Peer ownerPeer = mock( Peer.class );
         when( peerManager.getPeer( LOCAL_PEER_ID ) ).thenReturn( ownerPeer );
@@ -295,10 +294,10 @@ public class MonitorImplTest
     public void testAlertThresholdExcessRemotePeer() throws Exception
     {
         //set owner id as local peer
-        ContainerGroup containerGroup = mock( ContainerGroup.class );
-        when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
-        when( containerGroup.getInitiatorPeerId() ).thenReturn( REMOTE_PEER_ID );
-        when( localPeer.findContainerGroupByContainerId( HOST_ID ) ).thenReturn( containerGroup );
+//        ContainerGroup containerGroup = mock( ContainerGroup.class );
+//        when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
+//        when( containerGroup.getInitiatorPeerId() ).thenReturn( REMOTE_PEER_ID );
+//        when( localPeer.findContainerGroupByContainerId( HOST_ID ) ).thenReturn( containerGroup );
         when( localPeer.getContainerHostByName( HOST ) ).thenReturn( containerHost );
         Peer ownerPeer = mock( Peer.class );
         when( peerManager.getPeer( REMOTE_PEER_ID ) ).thenReturn( ownerPeer );
@@ -428,9 +427,9 @@ public class MonitorImplTest
         when( commandResult.hasSucceeded() ).thenReturn( true );
         when( commandResult.getStdOut() ).thenReturn( METRIC_JSON );
         when( containerHost.getPeer() ).thenReturn( localPeer );
-        ContainerGroup containerGroup = mock( ContainerGroup.class );
-        when( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) ).thenReturn( containerGroup );
-        when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( HOST_ID ) );
+//        ContainerGroup containerGroup = mock( ContainerGroup.class );
+//        when( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) ).thenReturn( containerGroup );
+//        when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( HOST_ID ) );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
         when( resourceHost.getPeer()).thenReturn( localPeer );
         when( localPeer.getResourceHostByContainerId( HOST_ID ) ).thenReturn( resourceHost );
@@ -494,9 +493,9 @@ public class MonitorImplTest
         CommandResult commandResult = mock( CommandResult.class );
         when( commandResult.hasSucceeded() ).thenReturn( true );
         when( commandResult.getStdOut() ).thenReturn( METRIC_JSON );
-        ContainerGroup containerGroup = mock( ContainerGroup.class );
-        when( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) ).thenReturn( containerGroup );
-        when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( HOST_ID ) );
+//        ContainerGroup containerGroup = mock( ContainerGroup.class );
+//        when( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) ).thenReturn( containerGroup );
+//        when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( HOST_ID ) );
         when( localPeer.getResourceHostByContainerId( HOST_ID ) ).thenReturn( resourceHost );
         when( resourceHost.getContainerHostById( HOST_ID ) ).thenReturn( containerHost );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
@@ -516,12 +515,12 @@ public class MonitorImplTest
         when( commandResult.hasSucceeded() ).thenReturn( true );
         when( commandResult.getStdOut() ).thenReturn( METRIC_JSON );
         when( containerHost.isLocal() ).thenReturn( true );
-        ContainerGroup containerGroup = mock( ContainerGroup.class );
-        when( localPeer.findContainerGroupByContainerId( HOST_ID ) ).thenReturn( containerGroup );
+//        ContainerGroup containerGroup = mock( ContainerGroup.class );
+//        when( localPeer.findContainerGroupByContainerId( HOST_ID ) ).thenReturn( containerGroup );
         when( resourceHost.getContainerHostById( HOST_ID ) ).thenReturn( containerHost );
         when( localPeer.getResourceHostByContainerId( HOST_ID ) ).thenReturn( resourceHost );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
-        when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
+//        when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
 
 
         Set<ContainerHostMetric> metrics = monitor.getLocalContainerHostsMetrics( Sets.newHashSet( containerHost ) );
@@ -537,9 +536,9 @@ public class MonitorImplTest
     @Test
     public void testGetLocalContainerHostMetricsWithException() throws Exception
     {
-        ContainerGroup containerGroup = mock( ContainerGroup.class );
-        when( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) ).thenReturn( containerGroup );
-        when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( HOST_ID ) );
+//        ContainerGroup containerGroup = mock( ContainerGroup.class );
+//        when( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) ).thenReturn( containerGroup );
+//        when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( HOST_ID ) );
         HostNotFoundException exception = mock( HostNotFoundException.class );
         doThrow( exception ).when( localPeer ).getResourceHostByContainerId( any( String.class ) );
 
@@ -555,9 +554,9 @@ public class MonitorImplTest
     @Test
     public void testGetLocalContainerHostMetricsWithException2() throws Exception
     {
-        ContainerGroup containerGroup = mock( ContainerGroup.class );
-        when( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) ).thenReturn( containerGroup );
-        when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( HOST_ID ) );
+//        ContainerGroup containerGroup = mock( ContainerGroup.class );
+//        when( localPeer.findContainerGroupByEnvironmentId( ENVIRONMENT_ID ) ).thenReturn( containerGroup );
+//        when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( HOST_ID ) );
 
         HostNotFoundException exception = mock( HostNotFoundException.class );
         doThrow( exception ).when( localPeer ).getResourceHostByContainerId( HOST_ID );
@@ -831,13 +830,13 @@ public class MonitorImplTest
         when( commandResult.hasSucceeded() ).thenReturn( true );
         when( commandResult.getStdOut() ).thenReturn( METRIC_JSON );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
-        ContainerGroup containerGroup = mock( ContainerGroup.class );
-        when( localPeer.findContainerGroupsByOwnerId( OWNER_ID ) ).thenReturn( Sets.newHashSet( containerGroup ) );
-        when( localPeer.findContainerGroupByContainerId( HOST_ID ) ).thenReturn( containerGroup );
-        when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( HOST_ID ) );
+//        ContainerGroup containerGroup = mock( ContainerGroup.class );
+//        when( localPeer.findContainerGroupsByOwnerId( OWNER_ID ) ).thenReturn( Sets.newHashSet( containerGroup ) );
+//        when( localPeer.findContainerGroupByContainerId( HOST_ID ) ).thenReturn( containerGroup );
+//        when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( HOST_ID ) );
         when( localPeer.getContainerHostById( HOST_ID ) ).thenReturn( containerHost );
         when( containerHost.isLocal() ).thenReturn( true );
-        when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
+//        when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
         when( localPeer.getResourceHostByContainerId( HOST_ID ) ).thenReturn( resourceHost );
         when( resourceHost.getContainerHostById( HOST_ID ) ).thenReturn( containerHost );
 
