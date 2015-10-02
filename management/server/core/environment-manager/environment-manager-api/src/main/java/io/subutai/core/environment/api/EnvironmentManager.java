@@ -12,7 +12,6 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
-import io.subutai.common.peer.Peer;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -46,6 +45,11 @@ public interface EnvironmentManager
      */
     Environment createEnvironment( String name, Topology topology, String subnetCidr, String sshKey, boolean async )
             throws EnvironmentCreationException;
+
+
+    //    Environment importEnvironment( String name, Topology topology, Map<NodeGroup, Set<HostInfo>> containers,
+    // String ssh,
+    //                                   Integer vlan ) throws EnvironmentCreationException;
 
 
     /**

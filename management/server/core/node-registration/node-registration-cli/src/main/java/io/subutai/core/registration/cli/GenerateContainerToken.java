@@ -8,9 +8,6 @@ import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.service.ContainerToken;
 
 
-/**
- * Created by talas on 8/28/15.
- */
 @Command( scope = "node", name = "generate-token", description = "Generates container token" )
 public class GenerateContainerToken extends SubutaiShellCommandSupport
 {

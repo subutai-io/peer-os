@@ -40,7 +40,7 @@
     <module>subutai-cli-rbac</module>
     <module>key-server</module>
     <module>security-manager</module>
-    <module>node-registration</module>
+    <!--<module>node-registration</module>-->
     <module>http-context-factory</module>
     <module>gateway</module>
     <module>h-integration</module>

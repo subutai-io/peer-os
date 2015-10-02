@@ -15,9 +15,7 @@ import io.subutai.common.protocol.api.DataService;
 import io.subutai.core.registration.impl.entity.ContainerInfoImpl;
 
 
-/**
- * Created by talas on 9/20/15.
- */
+
 public class ContainerInfoDataService implements DataService<String, ContainerInfoImpl>
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( ContainerInfoDataService.class );

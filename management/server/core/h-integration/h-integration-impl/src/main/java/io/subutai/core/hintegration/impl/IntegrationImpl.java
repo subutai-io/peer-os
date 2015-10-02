@@ -146,9 +146,12 @@ public class IntegrationImpl implements Integration
                 this.ownerPublicKey = securityManager.getKeyManager().getPublicKey( "owner-" + peerId );
                 this.peerPublicKey = securityManager.getKeyManager().getPublicKey( null );
 
-                LOG.debug( String.format( "Peer fingerprint: %s", PGPKeyUtil.getFingerprint( peerPublicKey.getFingerprint() ) ) );
-                LOG.debug( String.format( "Hub fingerprint: %s", PGPKeyUtil.getFingerprint( hubPublicKey.getFingerprint() ) ) );
-                LOG.debug( String.format( "Owner fingerprint: %s", PGPKeyUtil.getFingerprint( ownerPublicKey.getFingerprint() ) ) );
+                LOG.debug( String.format( "Peer fingerprint: %s",
+                        PGPKeyUtil.getFingerprint( peerPublicKey.getFingerprint() ) ) );
+                LOG.debug( String.format( "Hub fingerprint: %s",
+                        PGPKeyUtil.getFingerprint( hubPublicKey.getFingerprint() ) ) );
+                LOG.debug( String.format( "Owner fingerprint: %s",
+                        PGPKeyUtil.getFingerprint( ownerPublicKey.getFingerprint() ) ) );
 
                 serverFingerprint = hubPublicKey.getFingerprint();
 
@@ -159,8 +162,8 @@ public class IntegrationImpl implements Integration
                 generateX509Certificate();
 
                 String path = String.format( "/rest/v1/peers/%s/hearbeat", peerManager.getLocalPeerInfo().getId() );
-                WebClient client = io.subutai.core.hintegration.impl.HttpClient.createTrustedWebClient( baseUrl +
-                        path );
+                WebClient client =
+                        io.subutai.core.hintegration.impl.HttpClient.createTrustedWebClient( baseUrl + path );
 
                 processor = new HeartbeatProcessor( this );
                 this.hearbeatExecutorService.scheduleWithFixedDelay( processor, 10, 180, TimeUnit.SECONDS );

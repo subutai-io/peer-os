@@ -10,9 +10,6 @@ import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.service.RequestedHost;
 
 
-/**
- * Created by talas on 8/25/15.
- */
 @Command( scope = "node", name = "list", description = "approve new registration request" )
 public class ListRequests extends SubutaiShellCommandSupport
 {

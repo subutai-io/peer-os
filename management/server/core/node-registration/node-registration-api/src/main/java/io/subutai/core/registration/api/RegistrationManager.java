@@ -11,12 +11,8 @@ import io.subutai.core.registration.api.service.ContainerToken;
 import io.subutai.core.registration.api.service.RequestedHost;
 
 
-/**
- * Created by talas on 8/24/15.
- */
 public interface RegistrationManager
 {
-
     public List<RequestedHost> getRequests();
 
     public RequestedHost getRequest( UUID requestId );
@@ -36,10 +32,10 @@ public interface RegistrationManager
 
     /**
      * Import empty environment by applying network configuration and persisting relevant containers
+     *
      * @param environment - environment
      * @param containerHosts - containers
      */
-    public void importEnvironment(Environment environment, List<ContainerHost> containerHosts)
+    public void importEnvironment( Environment environment, List<ContainerHost> containerHosts )
             throws NodeRegistrationException;
-
 }

@@ -212,6 +212,31 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public String getPeerId()
     {
+        return peerId;
+    }
+
+
+    public void setPeerId( final String peerId )
+    {
+        this.peerId = peerId;
+    }
+
+
+    public Long getVersion()
+    {
+        return version;
+    }
+
+
+    public void setVersion( final Long version )
+    {
+        this.version = version;
+    }
+
+
+    @Override
+    public ContainerHost getContainerHostById( String id ) throws ContainerHostNotFoundException
+    {
         Preconditions.checkNotNull( id, "Invalid id" );
 
         for ( final ContainerHost containerHost : getContainerHosts() )
@@ -269,9 +294,9 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public UUID getId()
+    public String getId()
     {
-        return UUID.fromString( environmentId );
+        return environmentId;
     }
 
 

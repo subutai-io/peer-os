@@ -16,9 +16,6 @@ import io.subutai.common.protocol.api.DataService;
 import io.subutai.core.registration.impl.entity.RequestedHostImpl;
 
 
-/**
- * Created by talas on 8/24/15.
- */
 public class RequestDataService implements DataService<UUID, RequestedHostImpl>
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RequestDataService.class );

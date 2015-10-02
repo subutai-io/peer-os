@@ -10,9 +10,6 @@ import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.registration.api.RegistrationManager;
 
 
-/**
- * Created by talas on 8/25/15.
- */
 @Command( scope = "node", name = "reject", description = "approve new registration request" )
 public class RejectRequest extends SubutaiShellCommandSupport
 {

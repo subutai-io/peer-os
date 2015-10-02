@@ -12,9 +12,6 @@ import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.service.RequestedHost;
 
 
-/**
- * Created by talas on 9/19/15.
- */
 @Command( scope = "node", name = "clear-requests", description = "approve new registration request" )
 public class ClearRequests extends SubutaiShellCommandSupport
 {

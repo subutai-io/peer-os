@@ -8,9 +8,6 @@ import io.subutai.common.host.Interface;
 import io.subutai.core.registration.api.RegistrationStatus;
 
 
-/**
- * Created by talas on 8/24/15.
- */
 public interface RequestedHost
 {
     public String getId();
