@@ -3,6 +3,7 @@ package io.subutai.core.peer.api;
 
 import java.util.Set;
 
+import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
@@ -150,8 +151,11 @@ public interface LocalPeer extends Peer
      *
      * @param vni - vni
      * @param domain -  domain to assign
+     * @param domainLoadBalanceStrategy - strategy to load balance requests to the domain
      */
-    public void setVniDomain( Long vni, String domain ) throws PeerException;
+
+    public void setVniDomain( Long vni, String domain, DomainLoadBalanceStrategy domainLoadBalanceStrategy )
+            throws PeerException;
 
     /**
      * Returns true if hostIp is added to domain by vni

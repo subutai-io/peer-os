@@ -35,6 +35,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.host.Interface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.mdc.SubutaiExecutors;
+import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
@@ -134,11 +135,12 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
-    public void setVlanDomain( final int vlan, final String domain ) throws PeerException
+    public void setVlanDomain( final int vlan, final String domain,
+                               final DomainLoadBalanceStrategy domainLoadBalanceStrategy ) throws PeerException
     {
         try
         {
-            getNetworkManager().setVlanDomain( vlan, domain );
+            getNetworkManager().setVlanDomain( vlan, domain, domainLoadBalanceStrategy );
         }
         catch ( NetworkManagerException e )
         {
