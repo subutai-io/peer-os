@@ -1,7 +1,6 @@
 package io.subutai.core.environment.impl.workflow.modification.steps;
 
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -19,7 +18,6 @@ import org.apache.commons.net.util.SubnetUtils;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -29,14 +27,14 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.entity.PeerConfImpl;
 
 
-public class N2NSetupStep
+public class SetupN2NStep
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( N2NSetupStep.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( SetupN2NStep.class );
     private final Topology topology;
     private final Environment environment;
 
 
-    public N2NSetupStep( final Topology topology, final Environment environment )
+    public SetupN2NStep( final Topology topology, final Environment environment )
     {
         this.topology = topology;
         this.environment = environment;
