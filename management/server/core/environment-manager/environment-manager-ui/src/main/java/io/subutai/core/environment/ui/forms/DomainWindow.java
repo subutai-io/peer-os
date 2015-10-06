@@ -11,6 +11,7 @@ import com.vaadin.ui.Window;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -100,7 +101,8 @@ public class DomainWindow extends Window
                                 //assign domain to the environment
                                 try
                                 {
-                                    environmentManager.assignEnvironmentDomain( environment.getId(), newDomain );
+                                    environmentManager.assignEnvironmentDomain( environment.getId(), newDomain,
+                                            DomainLoadBalanceStrategy.ROUND_ROBIN );
                                     Notification.show( "Please, wait..." );
                                     close();
                                 }

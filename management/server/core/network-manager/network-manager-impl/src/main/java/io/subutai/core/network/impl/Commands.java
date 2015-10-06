@@ -10,6 +10,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.settings.Common;
+import io.subutai.common.network.DomainLoadBalanceStrategy;
 
 
 /**
@@ -177,10 +178,12 @@ public class Commands
     }
 
 
-    public RequestBuilder getSetVlanDomainCommand( final int vLanId, final String domain )
+    public RequestBuilder getSetVlanDomainCommand( final int vLanId, final String domain,
+                                                   final DomainLoadBalanceStrategy domainLoadBalanceStrategy )
     {
-        return new RequestBuilder( MANAGEMENT_PROXY_BINDING )
-                .withCmdArgs( Lists.newArrayList( "add", String.valueOf( vLanId ), "-d", domain ) );
+        return new RequestBuilder( MANAGEMENT_PROXY_BINDING ).withCmdArgs(
+                Lists.newArrayList( "add", String.valueOf( vLanId ), "-d", domain, "-p",
+                        domainLoadBalanceStrategy.getValue() ) );
     }
 
 
@@ -250,7 +253,8 @@ public class Commands
     }
 
 
-    public RequestBuilder getAddIpHostToEtcHostsCommand( String domainName, Set<EnvironmentContainerHost> containerHosts )
+    public RequestBuilder getAddIpHostToEtcHostsCommand( String domainName,
+                                                         Set<EnvironmentContainerHost> containerHosts )
     {
         StringBuilder cleanHosts = new StringBuilder( "localhost|127.0.0.1|" );
         StringBuilder appendHosts = new StringBuilder();

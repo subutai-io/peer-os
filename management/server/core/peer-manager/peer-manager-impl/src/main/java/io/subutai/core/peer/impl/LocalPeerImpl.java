@@ -48,6 +48,7 @@ import io.subutai.common.host.Interface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
@@ -94,7 +95,6 @@ import io.subutai.core.peer.impl.container.DestroyContainerWrapperTask;
 import io.subutai.core.peer.impl.dao.ManagementHostDataService;
 import io.subutai.core.peer.impl.dao.PeerDAO;
 import io.subutai.core.peer.impl.dao.ResourceHostDataService;
-import io.subutai.core.peer.impl.entity.AbstractSubutaiHost;
 import io.subutai.core.peer.impl.entity.ContainerHostEntity;
 import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.entity.ResourceHostEntity;
@@ -1742,13 +1742,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void setVniDomain( final Long vni, final String domain ) throws PeerException
+    public void setVniDomain( final Long vni, final String domain,
+                              final DomainLoadBalanceStrategy domainLoadBalanceStrategy ) throws PeerException
     {
         Integer vlan = getVlanByVni( vni );
 
         if ( vlan != null )
         {
-            getManagementHost().setVlanDomain( vlan, domain );
+            getManagementHost().setVlanDomain( vlan, domain, domainLoadBalanceStrategy );
         }
         else
         {
