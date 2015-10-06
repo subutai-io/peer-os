@@ -6,17 +6,14 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.servicemix.beanflow.Workflow;
 
-import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
-import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
-import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
-import io.subutai.core.environment.impl.workflow.creation.steps.N2NSetupStep;
+import io.subutai.core.environment.impl.workflow.creation.steps.SetupN2NStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.PEKGenerationStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
@@ -143,7 +140,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new N2NSetupStep( topology, environment, /*peerManager.getLocalPeer().getPeerInfo().getIp(),
+            new SetupN2NStep( topology, environment, /*peerManager.getLocalPeer().getPeerInfo().getIp(),
                     Common.SUPER_NODE_PORT, */peerManager.getLocalPeer() ).execute();
 
             environmentManager.saveOrUpdate( environment );
