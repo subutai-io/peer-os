@@ -102,7 +102,6 @@ import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
-import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.strategy.api.StrategyNotFoundException;
 
@@ -482,34 +481,73 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             final CreateEnvironmentContainerGroupRequest request ) throws PeerException
     {
         //collect resource host metrics  & prepare templates on each of them
-        List<ResourceHostMetric> serverMetricMap = Lists.newArrayList();
-        for ( ResourceHost resourceHost : getResourceHosts() )
-        {
-            //take connected resource hosts for container creation
-            //and prepare needed templates
-            if ( resourceHost.isConnected() )
-            {
-                try
-                {
-                    serverMetricMap.add( resourceHost.getHostMetric() );
-                }
-                catch ( ResourceHostException e )
-                {
-                    throw new PeerException( e );
-                }
-            }
-        }
+        //        List<ResourceHostMetric> serverMetricMap = Lists.newArrayList();
+        //        for ( ResourceHost resourceHost : getResourceHosts() )
+        //        {
+        //            //take connected resource hosts for container creation
+        //            //and prepare needed templates
+        //            if ( resourceHost.isConnected() )
+        //            {
+        //                try
+        //                {
+        //                    serverMetricMap.add( resourceHost.getHostMetric() );
+        //                }
+        //                catch ( ResourceHostException e )
+        //                {
+        //                    throw new PeerException( e );
+        //                }
+        //            }
+        //        }
+        //
+        //        //calculate placement strategy
+        //        Map<ResourceHostMetric, Integer> slots;
+        //        try
+        //        {
+        //            slots = strategyManager.getPlacementDistribution( serverMetricMap, request
+        // .getNumberOfContainers(),
+        //                    request.getStrategyId(), request.getCriteria() );
+        //        }
+        //        catch ( StrategyException e )
+        //        {
+        //            throw new PeerException( e );
+        //        }
 
-        //calculate placement strategy
-        Map<ResourceHostMetric, Integer> slots;
-        try
+        //temporarily disabled metric calculation
+        //todo use new monitor binding and new approach to calculate container placement
+        //todo approach should consider instance types requested in blueprint @TimurB see this
+        int numOfRequestedContainers = request.getNumberOfContainers();
+        Set<ResourceHost> resourceHosts = getResourceHosts();
+
+        Map<ResourceHostMetric, Integer> slots = Maps.newHashMap();
+        int j = 0;
+        int leftOver = numOfRequestedContainers;
+        int avgNumOfContainersPerRh = numOfRequestedContainers / resourceHosts.size();
+        for ( final ResourceHost resourceHost : resourceHosts )
         {
-            slots = strategyManager.getPlacementDistribution( serverMetricMap, request.getNumberOfContainers(),
-                    request.getStrategyId(), request.getCriteria() );
-        }
-        catch ( StrategyException e )
-        {
-            throw new PeerException( e );
+            j++;
+            if ( j < resourceHosts.size() )
+            {
+                slots.put( new ResourceHostMetric()
+                {
+                    @Override
+                    public String getHost()
+                    {
+                        return resourceHost.getHostname();
+                    }
+                }, avgNumOfContainersPerRh );
+                leftOver -= avgNumOfContainersPerRh;
+            }
+            else
+            {
+                slots.put( new ResourceHostMetric()
+                {
+                    @Override
+                    public String getHost()
+                    {
+                        return resourceHost.getHostname();
+                    }
+                }, leftOver );
+            }
         }
 
         //distribute new containers' names across selected resource hosts
