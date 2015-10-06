@@ -3,7 +3,9 @@ package io.subutai.core.environment.ui.forms;
 
 import com.google.common.base.Strings;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
@@ -26,12 +28,12 @@ public class DomainWindow extends Window
     {
 
         setCaption( "Environment domain" );
-        setWidth( "300px" );
-        setHeight( "120px" );
+        setWidth( "400px" );
+        setHeight( "200px" );
         setModal( true );
         setClosable( true );
 
-        GridLayout content = new GridLayout( 2, 1 );
+        GridLayout content = new GridLayout( 2, 3 );
         content.setSizeFull();
         content.setMargin( true );
         content.setSpacing( true );
@@ -48,6 +50,15 @@ public class DomainWindow extends Window
             Notification.show( "Error obtaining current domain", e.getMessage(), Notification.Type.ERROR_MESSAGE );
             close();
         }
+
+        final ComboBox loadBalanceStrategyCombo = new ComboBox();
+        loadBalanceStrategyCombo.setNullSelectionAllowed( false );
+        loadBalanceStrategyCombo.setTextInputAllowed( false );
+        for ( final DomainLoadBalanceStrategy domainLoadBalanceStrategy : DomainLoadBalanceStrategy.values() )
+        {
+            loadBalanceStrategyCombo.addItem( domainLoadBalanceStrategy );
+        }
+        loadBalanceStrategyCombo.setValue( DomainLoadBalanceStrategy.ROUND_ROBIN );
 
         Button domainBtn = new Button( "Assign" );
         domainBtn.addClickListener( new Button.ClickListener()
@@ -102,7 +113,7 @@ public class DomainWindow extends Window
                                 try
                                 {
                                     environmentManager.assignEnvironmentDomain( environment.getId(), newDomain,
-                                            DomainLoadBalanceStrategy.ROUND_ROBIN );
+                                            ( DomainLoadBalanceStrategy ) loadBalanceStrategyCombo.getValue() );
                                     Notification.show( "Please, wait..." );
                                     close();
                                 }
@@ -123,8 +134,11 @@ public class DomainWindow extends Window
             }
         } );
 
-        content.addComponent( domainTxt );
-        content.addComponent( domainBtn );
+        content.addComponent( new Label( "Load-balance" ), 0, 0 );
+        content.addComponent( loadBalanceStrategyCombo, 1, 0 );
+        content.addComponent( new Label( "Domain" ), 0, 1 );
+        content.addComponent( domainTxt, 1, 1 );
+        content.addComponent( domainBtn, 1, 2 );
 
         setContent( content );
     }
