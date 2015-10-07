@@ -296,9 +296,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
 
-            UUID id = UUID.fromString( peerId );
-
-            boolean result = peerManager.unregister( id.toString() );
+            boolean result = peerManager.unregister( peerId );
             if ( result )
             {
                 //************ Delete Trust SSL Cert **************************************
