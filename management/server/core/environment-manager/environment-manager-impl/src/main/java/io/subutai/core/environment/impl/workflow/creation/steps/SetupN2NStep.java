@@ -25,7 +25,6 @@ import com.google.common.collect.Sets;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.Interface;
-import io.subutai.common.peer.InterfacePattern;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.util.N2NUtil;
@@ -37,15 +36,15 @@ import io.subutai.core.peer.api.LocalPeer;
 /**
  * N2N setup step
  */
-public class N2NSetupStep
+public class SetupN2NStep
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( N2NSetupStep.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( SetupN2NStep.class );
     private final Topology topology;
     private final Environment env;
     private final LocalPeer localPeer;
 
 
-    public N2NSetupStep( final Topology topology, final Environment environment, final LocalPeer localPeer )
+    public SetupN2NStep( final Topology topology, final Environment environment, final LocalPeer localPeer )
     {
         this.topology = topology;
         this.env = environment;

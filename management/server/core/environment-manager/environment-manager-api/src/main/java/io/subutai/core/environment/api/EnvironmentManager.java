@@ -10,6 +10,7 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
@@ -188,8 +189,10 @@ public interface EnvironmentManager
      *
      * @param environmentId - id of the environment to assign the passed domain to
      * @param newDomain - domain url
+     * @param domainLoadBalanceStrategy - strategy to load balance requests to the domain
      */
-    void assignEnvironmentDomain( String environmentId, String newDomain )
+    void assignEnvironmentDomain( String environmentId, String newDomain,
+                                  DomainLoadBalanceStrategy domainLoadBalanceStrategy )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     /**
