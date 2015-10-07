@@ -18,7 +18,7 @@ public class InterfaceImpl implements Interface
 
 
     @Override
-    public String getInterfaceName()
+    public String getName()
     {
         return interfaceName;
     }

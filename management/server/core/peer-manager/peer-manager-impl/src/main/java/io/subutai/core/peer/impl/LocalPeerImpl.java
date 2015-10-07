@@ -94,7 +94,6 @@ import io.subutai.core.peer.impl.container.DestroyContainerWrapperTask;
 import io.subutai.core.peer.impl.dao.ManagementHostDataService;
 import io.subutai.core.peer.impl.dao.PeerDAO;
 import io.subutai.core.peer.impl.dao.ResourceHostDataService;
-import io.subutai.core.peer.impl.entity.AbstractSubutaiHost;
 import io.subutai.core.peer.impl.entity.ContainerHostEntity;
 import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.entity.ResourceHostEntity;
@@ -450,16 +449,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
                 ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) containerHost;
-                //                final ContainerHostInfo containerHostInfo =
-                //                        hostRegistry.getContainerHostInfoById( containerHost.getId() );
-                //
                 containerHostEntity.setEnvironmentId( request.getEnvironmentId() );
                 containerHostEntity.setOwnerId( request.getOwnerId() );
                 containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
                 newContainers.add( containerHost );
                 result.add( new HostInfoModel( containerHost ) );
             }
-            catch ( ExecutionException | InterruptedException /*| HostDisconnectedException*/ e )
+            catch ( ExecutionException | InterruptedException e )
             {
                 LOG.error( "Error creating container", e );
             }
@@ -474,7 +470,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         return result;
-        //        return processRequestCompletion1( taskFutures, executorService, request );
     }
 
 
@@ -532,100 +527,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //    protected Set<HostInfoModel> processRequestCompletion1( final List<Future<ContainerHost>> taskFutures,
-    //                                                            final ExecutorService executorService,
-    //                                                            final CreateEnvironmentContainerGroupRequest request )
-    //    {
-    //        Set<HostInfoModel> result = Sets.newHashSet();
-    //        Set<ContainerHost> newContainers = Sets.newHashSet();
-    //
-    //        //wait for succeeded containers
-    //        for ( Future<ContainerHost> future : taskFutures )
-    //        {
-    //            try
-    //            {
-    //                ContainerHost containerHost = future.get();
-    //
-    //                newContainers.add( new ContainerHostEntity( getId(),
-    //                        hostRegistry.getContainerHostInfoById( containerHost.getId() ) ) );
-    //                result.add( new HostInfoModel( containerHost ) );
-    //            }
-    //            catch ( ExecutionException | InterruptedException | HostDisconnectedException e )
-    //            {
-    //                LOG.error( "Error creating container", e );
-    //            }
-    //        }
-    //
-    //        executorService.shutdown();
-    //
-    //        if ( !CollectionUtil.isCollectionEmpty( newContainers ) )
-    //        {
-    //            ContainerGroupEntity containerGroup;
-    //            try
-    //            {
-    //                //update existing container group to include new containers
-    //                containerGroup =
-    //                        ( ContainerGroupEntity ) findContainerGroupByEnvironmentId( request.getEnvironmentId() );
-    //
-    //
-    //                Set<String> containerIds = Sets.newHashSet( containerGroup.getContainerIds() );
-    //
-    //                for ( ContainerHost containerHost : newContainers )
-    //                {
-    //                    containerIds.add( containerHost.getId() );
-    //                }
-    //
-    //                containerGroup.setContainerIds( containerIds );
-    //
-    //                containerGroupDataService.update( containerGroup );
-    //            }
-    //            catch ( ContainerGroupNotFoundException e )
-    //            {
-    //                //create container group for new containers
-    //                containerGroup = new ContainerGroupEntity( request.getEnvironmentId(), request
-    // .getInitiatorPeerId(),
-    //                        request.getOwnerId() );
-    //
-    //                Set<String> containerIds = Sets.newHashSet();
-    //
-    //                for ( ContainerHost containerHost : newContainers )
-    //                {
-    //                    containerIds.add( containerHost.getId() );
-    //                }
-    //
-    //                containerGroup.setContainerIds( containerIds );
-    //
-    //                containerGroupDataService.persist( containerGroup );
-    //            }
-    //        }
-    //        return result;
-    //    }
-
-
-    //    @Override
-    //    public ContainerGroup findContainerGroupByContainerId( final String containerId )
-    //            throws ContainerGroupNotFoundException
-    //    {
-    //        Preconditions.checkNotNull( containerId, "Container is always null with null container id" );
-    //
-    //        List<ContainerGroupEntity> containerGroups = ( List<ContainerGroupEntity> ) containerGroupDataService
-    // .getAll();
-    //
-    //        for ( ContainerGroupEntity containerGroup : containerGroups )
-    //        {
-    //            for ( String containerHostId : containerGroup.getContainerIds() )
-    //            {
-    //                if ( containerId.equals( containerHostId ) )
-    //                {
-    //                    return containerGroup;
-    //                }
-    //            }
-    //        }
-    //
-    //        throw new ContainerGroupNotFoundException();
-    //    }
-
-
     @Override
     public Set<ContainerHost> findContainersByEnvironmentId( final String environmentId )
     {
@@ -641,50 +542,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //    @Override
-    //    public ContainerGroup findContainerGroupByEnvironmentId( final String environmentId )
-    //            throws ContainerGroupNotFoundException
-    //    {
-    //        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-    //
-    //        List<ContainerGroupEntity> containerGroups = ( List<ContainerGroupEntity> ) containerGroupDataService
-    // .getAll();
-    //
-    //        for ( ContainerGroupEntity containerGroup : containerGroups )
-    //        {
-    //            if ( environmentId.equals( containerGroup.getEnvironmentId() ) )
-    //            {
-    //                return containerGroup;
-    //            }
-    //        }
-    //
-    //        throw new ContainerGroupNotFoundException();
-    //    }
-
-
-    //
-    //    @Override
-    //    public Set<ContainerGroup> findContainerGroupsByOwnerId( final String ownerId )
-    //    {
-    //        Preconditions.checkNotNull( ownerId, "Specify valid owner" );
-    //
-    //        Set<ContainerGroup> result = Sets.newHashSet();
-    //
-    //        List<ContainerGroupEntity> containerGroups = ( List<ContainerGroupEntity> ) containerGroupDataService
-    // .getAll();
-    //
-    //        for ( ContainerGroupEntity containerGroup : containerGroups )
-    //        {
-    //
-    //            if ( ownerId.equals( containerGroup.getOwnerId() ) )
-    //            {
-    //                result.add( containerGroup );
-    //            }
-    //        }
-    //
-    //        return result;
-    //    }
-    //
     @Override
     public Set<ContainerHost> findContainersByOwnerId( final String ownerId )
     {
@@ -887,27 +744,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         try
         {
             resourceHost.destroyContainerHost( host );
-            //            containerHostDataService.remove( host.getId() );
             ( ( ResourceHostEntity ) entity.getParent() ).removeContainerHost( entity );
 
-            //update container group
-            //            ContainerGroupEntity containerGroup =
-            //                    ( ContainerGroupEntity ) findContainerGroupByContainerId( host.getId() );
-            //
-            //            Set<String> containerIds = containerGroup.getContainerIds();
-            //            containerIds.remove( host.getId() );
-            cleanupEnvironmentNetworkSettings( /*containerGroup*/ host.getEnvironmentId() );
-
-            //            if ( containerIds.isEmpty() )
-            //            {
-            //                cleanupEnvironmentNetworkSettings( /*containerGroup*/ host.getEnvironmentId() );
-            //            }
-            //            else
-            //            {
-            //                containerGroup.setContainerIds( containerIds );
-            //
-            //                containerGroupDataService.update( containerGroup );
-            //            }
+            cleanupEnvironmentNetworkSettings( host.getEnvironmentId() );
         }
         catch ( ResourceHostException e )
         {
@@ -916,10 +755,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             LOG.error( errMsg, e );
             throw new PeerException( errMsg, e.toString() );
         }
-        //        catch ( ContainerGroupNotFoundException e )
-        //        {
-        //            LOG.warn( "Could not find container group for: " + host.getHostname(), e );
-        //        }
         resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
     }
 
@@ -942,22 +777,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //    protected void cleanupEnvironmentNetworkSettings( final ContainerGroupEntity containerGroup )
-    //    {
-    //        containerGroupDataService.remove( containerGroup.getEnvironmentId() );
-    //
-    //        //cleanup environment network settings
-    //        try
-    //        {
-    //            getManagementHost().cleanupEnvironmentNetworkSettings( containerGroup.getEnvironmentId() );
-    //        }
-    //        catch ( PeerException e )
-    //        {
-    //            LOG.error( "Error cleaning up environment network configuration", exceptionUtil.getRootCause( e ) );
-    //        }
-    //    }
-
-
     @Override
     public void setDefaultGateway( final ContainerHost host, final String gatewayIp ) throws PeerException
     {
@@ -968,8 +787,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
-                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder(
+                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
+                    bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1272,53 +1092,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
     }
 
-
-    //    protected void updateResourceHostContainers( ResourceHost resourceHost, Set<ContainerHostInfo>
-    // containerHostInfos )
-    //    {
-    //        Set<ContainerHost> oldHosts = resourceHost.getContainerHosts();
-    //        Set<String> newContainerIds = Sets.newHashSet();
-    //        for ( ContainerHostInfo containerHostInfo : containerHostInfos )
-    //        {
-    //            newContainerIds.add( containerHostInfo.getId() );
-    //
-    //            ContainerHostEntity containerHost = new ContainerHostEntity( getId(), containerHostInfo );
-    //            setContainersTransientFields( Sets.newHashSet( containerHost ) );
-    //            ( ( ResourceHostEntity ) resourceHost ).addContainerHost( containerHost );
-    //
-    //            //            if ( containerHostDataService.find( containerHostInfo.getId() ) != null )
-    //            //            {
-    //            //                containerHostDataService.update( ( ContainerHostEntity ) containerHost );
-    //            //            }
-    //            //            else
-    //            //            {
-    //            //                containerHostDataService.persist( ( ContainerHostEntity ) containerHost );
-    //            //            }
-    //        }
-    //
-    //        for ( ContainerHost oldHost : oldHosts )
-    //        {
-    //            if ( !newContainerIds.contains( oldHost.getId() ) )
-    //            {
-    //                //remove container which is missing in heartbeat
-    //                //                containerHostDataService.remove( oldHost.getId() );
-    //                ( ( ResourceHostEntity ) resourceHost ).removeContainerHost( oldHost );
-    //            }
-    //        }
-    //    }
-
-
-    //    private void setContainersTransientFields( final Set<ContainerHost> containerHosts )
-    //    {
-    //        for ( ContainerHost containerHost : containerHosts )
-    //        {
-    //            ( ( AbstractSubutaiHost ) containerHost ).setPeer( this );
-    //            //            ( ( ContainerHostEntity ) containerHost ).setDataService( containerHostDataService );
-    //            //            ( ( ContainerHostEntity ) containerHost ).setLocalPeer( this );
-    //        }
-    //    }
-
-
     // ********** Quota functions *****************
 
 
@@ -1578,18 +1351,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         Set<Throwable> errors = Sets.newHashSet();
-        Set<ContainerHost> destroyedContainers = Sets.newHashSet();
-        //        ContainerGroup containerGroup;
 
-        //        try
-        //        {
-        //            containerGroup = findContainerGroupByEnvironmentId( environmentId );
-        //        }
-        //        catch ( ContainerGroupNotFoundException e )
-        //        {
-        //            return new ContainersDestructionResultImpl( getId(), destroyedContainers,
-        //                    Common.CONTAINER_GROUP_NOT_FOUND );
-        //        }
 
         Set<ContainerHost> containerHosts = Sets.newHashSet();
 
@@ -1604,19 +1366,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 }
             }
         }
-        //        for ( String containerId : containerGroup.getContainerIds() )
-        //        {
-        //            try
-        //            {
-        //                containerHosts.add( getContainerHostById( containerId ) );
-        //            }
-        //            catch ( HostNotFoundException e )
-        //            {
-        //                errors.add( e );
-        //            }
-        //        }
 
-        destroyedContainers = destroyContainerGroup( containerHosts, errors );
+        Set<ContainerHost> destroyedContainers = destroyedContainers = destroyContainerGroup( containerHosts, errors );
 
         for ( ContainerHost containerHost : destroyedContainers )
         {
@@ -1929,7 +1680,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 @Override
                 public boolean apply( final Interface anInterface )
                 {
-                    return anInterface.getInterfaceName().matches( pattern );
+                    return anInterface.getName().matches( pattern );
                 }
             } );
         }

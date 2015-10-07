@@ -59,7 +59,7 @@ public class ContainerHostInfoImplTest
         assertEquals( CONTAINER_STATUS, containerHostInfo.getStatus() );
         assertEquals( ARCH, containerHostInfo.getArch() );
         assertEquals( Common.DEFAULT_CONTAINER_INTERFACE,
-                containerHostInfo.getInterfaces().iterator().next().getInterfaceName() );
+                containerHostInfo.getInterfaces().iterator().next().getName() );
         assertEquals( MAC, containerHostInfo.getInterfaces().iterator().next().getMac() );
         assertEquals( IP, containerHostInfo.getInterfaces().iterator().next().getIp() );
     }

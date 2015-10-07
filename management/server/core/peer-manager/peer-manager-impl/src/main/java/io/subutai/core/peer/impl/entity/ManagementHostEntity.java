@@ -361,7 +361,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
         for ( Interface iface : getInterfaces() )
         {
-            Matcher matcher = GATEWAY_INTERFACE_NAME_PATTERN.matcher( iface.getInterfaceName().trim() );
+            Matcher matcher = GATEWAY_INTERFACE_NAME_PATTERN.matcher( iface.getName().trim() );
             if ( matcher.find() )
             {
                 int vlan = Integer.parseInt( matcher.group( 1 ) );

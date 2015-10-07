@@ -7,7 +7,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.host.Interface;
-import io.subutai.common.peer.InterfaceModel;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
@@ -26,7 +25,7 @@ public class InterfaceModelTest
     public void setUp() throws Exception
     {
         when( anInterface.getMac() ).thenReturn( "testMac" );
-        when( anInterface.getInterfaceName() ).thenReturn( "testInterfaceName" );
+        when( anInterface.getName() ).thenReturn( "testInterfaceName" );
         when( anInterface.getIp() ).thenReturn( "testIp" );
 
         interfaceModel = new InterfaceModel( anInterface );
@@ -36,7 +35,7 @@ public class InterfaceModelTest
     @Test
     public void testProperties() throws Exception
     {
-        assertNotNull( interfaceModel.getInterfaceName() );
+        assertNotNull( interfaceModel.getName() );
         assertNotNull( interfaceModel.getIp() );
         assertNotNull( interfaceModel.getMac());
         interfaceModel.hashCode();

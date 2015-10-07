@@ -414,7 +414,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             if ( result != null )
             {
                 final ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) result;
-                //                containerHostEntity.setParent( this );
                 if ( IPUtil.isValid( gateway ) )
                 {
                     containerHostEntity.setDefaultGateway( gateway );
@@ -433,8 +432,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public ContainerHost createContainer( final String templateName, final String hostname, final int timeout )
             throws ResourceHostException
     {
-        ContainerHost result = createContainer( templateName, hostname, null, 0, null, timeout );
-        return result;
+        return createContainer( templateName, hostname, null, 0, null, timeout );
     }
 
 

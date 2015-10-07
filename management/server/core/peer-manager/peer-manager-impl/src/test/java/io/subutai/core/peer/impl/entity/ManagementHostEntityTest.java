@@ -101,7 +101,7 @@ public class ManagementHostEntityTest
         when( hostInfo.getHostname() ).thenReturn( HOSTNAME );
         when( hostInfo.getArch() ).thenReturn( ARCH );
         when( hostInfo.getInterfaces() ).thenReturn( Sets.newHashSet( anInterface ) );
-        when( anInterface.getInterfaceName() ).thenReturn( INTERFACE_NAME );
+        when( anInterface.getName() ).thenReturn( INTERFACE_NAME );
         when( anInterface.getIp() ).thenReturn( IP );
         when( anInterface.getMac() ).thenReturn( MAC );
         managementHostEntity = new ManagementHostEntity( PEER_ID.toString(), hostInfo );
@@ -369,7 +369,7 @@ public class ManagementHostEntityTest
     public void testGetGateways() throws Exception
     {
         HostInterfaceImpl hostInterface = mock( HostInterfaceImpl.class );
-        when( hostInterface.getInterfaceName() ).thenReturn( "br-100" );
+        when( hostInterface.getName() ).thenReturn( "br-100" );
 
         managementHostEntity.addInterface( hostInterface );
 

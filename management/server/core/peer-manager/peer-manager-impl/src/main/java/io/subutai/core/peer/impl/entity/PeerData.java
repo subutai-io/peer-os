@@ -1,6 +1,8 @@
 package io.subutai.core.peer.impl.entity;
 
 
+import java.io.Serializable;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
@@ -16,7 +18,7 @@ import javax.persistence.Table;
 @Access( AccessType.FIELD )
 @IdClass(PeerDataPk.class)
 
-public class PeerData
+public class PeerData implements Serializable
 {
     @Id
     @Column( name = "id" )
