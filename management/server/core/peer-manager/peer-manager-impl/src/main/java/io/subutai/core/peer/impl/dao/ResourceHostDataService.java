@@ -143,7 +143,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
         try
         {
             em.getTransaction().begin();
-            item = em.merge( item );
+            em.merge( item );
             em.getTransaction().commit();
         }
         catch ( Exception e )
