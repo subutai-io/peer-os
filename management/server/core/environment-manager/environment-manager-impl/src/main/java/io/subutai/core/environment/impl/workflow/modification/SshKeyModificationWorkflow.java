@@ -18,7 +18,7 @@ public class SshKeyModificationWorkflow extends Workflow<SshKeyModificationWorkf
 {
     private static final Logger LOG = LoggerFactory.getLogger( SshKeyModificationWorkflow.class );
 
-    private final EnvironmentImpl environment;
+    private EnvironmentImpl environment;
     private final String sshKey;
     private final NetworkManager networkManager;
     private final TrackerOperation operationTracker;
@@ -56,6 +56,8 @@ public class SshKeyModificationWorkflow extends Workflow<SshKeyModificationWorkf
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
+        environment = environmentManager.saveOrUpdate( environment );
+
         return SshKeyModificationPhase.REPLACE_KEY;
     }
 
@@ -69,8 +71,7 @@ public class SshKeyModificationWorkflow extends Workflow<SshKeyModificationWorkf
         {
             new SetSshKeyStep( sshKey, environment, networkManager ).execute();
 
-            environmentManager.saveOrUpdate( environment );
-
+            environment = environmentManager.saveOrUpdate( environment );
 
             return SshKeyModificationPhase.FINALIZE;
         }
@@ -89,6 +90,8 @@ public class SshKeyModificationWorkflow extends Workflow<SshKeyModificationWorkf
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
+        environment = environmentManager.saveOrUpdate( environment );
+
         operationTracker.addLogDone( "Ssh key is modified" );
 
         //this is a must have call
@@ -105,6 +108,9 @@ public class SshKeyModificationWorkflow extends Workflow<SshKeyModificationWorkf
     public void setError( final Throwable error )
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
+
+        environment = environmentManager.saveOrUpdate( environment );
+
         this.error = error;
         LOG.error( "Error modifying ssh key", error );
         operationTracker.addLogFailed( error.getMessage() );

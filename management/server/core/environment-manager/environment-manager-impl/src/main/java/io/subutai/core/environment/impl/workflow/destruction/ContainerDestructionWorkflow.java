@@ -19,7 +19,7 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
     private static final Logger LOG = LoggerFactory.getLogger( ContainerDestructionWorkflow.class );
 
     private final EnvironmentManagerImpl environmentManager;
-    private final EnvironmentImpl environment;
+    private EnvironmentImpl environment;
     private final ContainerHost containerHost;
     private final boolean forceMetadataRemoval;
     private final TrackerOperation operationTracker;
@@ -58,6 +58,8 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
+        environment =  environmentManager.saveOrUpdate( environment );
+
         return ContainerDestructionPhase.VALIDATE;
     }
 
@@ -90,6 +92,8 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
             new DestroyContainerStep( environmentManager, environment, containerHost, forceMetadataRemoval,
                     operationTracker ).execute();
 
+            environment = environmentManager.saveOrUpdate( environment );
+
             return ContainerDestructionPhase.FINALIZE;
         }
         catch ( Exception e )
@@ -107,6 +111,8 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
+        environment = environmentManager.saveOrUpdate( environment );
+
         operationTracker.addLogDone( skippedDestruction ? "Container is not destroyed" : "Container is destroyed" );
 
         //this is a must have call
@@ -123,6 +129,8 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
     public void setError( final Throwable error )
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
+        environment = environmentManager.saveOrUpdate( environment );
+
         this.error = error;
         LOG.error( "Error destroying container", error );
         operationTracker.addLogFailed( error.getMessage() );

@@ -2,14 +2,12 @@ package io.subutai.common.peer;
 
 
 import java.io.Serializable;
-import java.util.Set;
 
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.Interface;
 
 
 /**
@@ -17,16 +15,12 @@ import io.subutai.common.host.Interface;
  */
 public interface Host extends HostInfo, Serializable
 {
-
-
     /**
      * Returns reference to parent peer
      *
      * @return returns Peer interface
      */
     public Peer getPeer();
-
-    void setPeer(Peer peer);
 
     public String getPeerId();
 
@@ -46,7 +40,4 @@ public interface Host extends HostInfo, Serializable
     public String getIpByInterfaceName( String interfaceName );
 
     public String getMacByInterfaceName( String interfaceName );
-
-//    void
-//    setNetInterfaces( Set<Interface> interfaces );
 }
