@@ -194,10 +194,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 resourceHosts.addAll( resourceHostDataService.getAll() );
             }
-            //            containerHostDataService = new ContainerHostDataService( daoManager.getEntityManagerFactory
-            // () );
-            //            containerGroupDataService = new ContainerGroupDataService( daoManager
-            // .getEntityManagerFactory() );
 
             setResourceHostTransientFields( resourceHosts );
 
@@ -287,9 +283,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         for ( ResourceHost resourceHost : resourceHosts )
         {
             resourceHost.setPeer( this );
-            ( ( ResourceHostEntity ) resourceHost ).setRegistry( templateRegistry );
-            ( ( ResourceHostEntity ) resourceHost ).setMonitor( monitor );
-            ( ( ResourceHostEntity ) resourceHost ).setHostRegistry( hostRegistry );
+            final ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) resourceHost;
+            resourceHostEntity.setRegistry( templateRegistry );
+            resourceHostEntity.setMonitor( monitor );
+            resourceHostEntity.setHostRegistry( hostRegistry );
         }
     }
 
@@ -1406,22 +1403,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         }
 
-        Set<ContainerHost> destroyedContainers = destroyedContainers = destroyContainerGroup( containerHosts, errors );
+        Set<ContainerHost> destroyedContainers = destroyContainerGroup( containerHosts, errors );
 
-        for ( ContainerHost containerHost : destroyedContainers )
-        {
-            final ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) containerHost;
-            ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) containerHostEntity.getParent();
-            resourceHostEntity.removeContainerHost( containerHostEntity );
-            resourceHostDataService.update( resourceHostEntity );
-        }
-
-        String exception = null;
-
-        if ( !errors.isEmpty() )
-        {
-            exception = String.format( "There were errors while destroying containers: %s", errors );
-        }
+        String exception =
+                errors.isEmpty() ? null : String.format( "There were errors while destroying containers: %s", errors );
 
         return new ContainersDestructionResultImpl( getId(), destroyedContainers, exception );
     }
