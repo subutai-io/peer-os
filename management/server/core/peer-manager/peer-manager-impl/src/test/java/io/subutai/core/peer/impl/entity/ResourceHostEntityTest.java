@@ -107,7 +107,7 @@ public class ResourceHostEntityTest
         when( hostInfo.getHostname() ).thenReturn( HOSTNAME );
         when( hostInfo.getArch() ).thenReturn( ARCH );
         when( hostInfo.getInterfaces() ).thenReturn( Sets.newHashSet( anInterface ) );
-        when( anInterface.getInterfaceName() ).thenReturn( INTERFACE_NAME );
+        when( anInterface.getName() ).thenReturn( INTERFACE_NAME );
         when( anInterface.getIp() ).thenReturn( IP );
         when( anInterface.getMac() ).thenReturn( MAC );
 

@@ -81,7 +81,7 @@ public class AbstractSubutaiHostTest
         when( hostInfo.getHostname() ).thenReturn( HOSTNAME );
         when( hostInfo.getArch() ).thenReturn( ARCH );
         when( hostInfo.getInterfaces() ).thenReturn( Sets.newHashSet( anInterface ) );
-        when( anInterface.getInterfaceName() ).thenReturn( INTERFACE_NAME );
+        when( anInterface.getName() ).thenReturn( INTERFACE_NAME );
         when( anInterface.getIp() ).thenReturn( IP );
         when( anInterface.getMac() ).thenReturn( MAC );
         host = new HostImpl( PEER_ID, hostInfo );
@@ -227,7 +227,7 @@ public class AbstractSubutaiHostTest
 //    public void testSetNetInterfaces() throws Exception
 //    {
 //        Interface anInterface = mock( Interface.class );
-//        when( anInterface.getInterfaceName() ).thenReturn( INTERFACE_NAME );
+//        when( anInterface.getName() ).thenReturn( INTERFACE_NAME );
 //        when( anInterface.getIp() ).thenReturn( IP );
 //        when( anInterface.getMac() ).thenReturn( MAC );
 //

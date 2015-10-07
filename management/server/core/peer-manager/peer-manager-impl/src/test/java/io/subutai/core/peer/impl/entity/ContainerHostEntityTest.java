@@ -75,7 +75,7 @@ public class ContainerHostEntityTest
         when( containerHostInfo.getArch() ).thenReturn( ARCH );
         when( containerHostInfo.getInterfaces() ).thenReturn( Sets.newHashSet( anInterface ) );
         when( containerHostInfo.getStatus() ).thenReturn( CONTAINER_HOST_STATE );
-        when( anInterface.getInterfaceName() ).thenReturn( INTERFACE_NAME );
+        when( anInterface.getName() ).thenReturn( INTERFACE_NAME );
         when( anInterface.getIp() ).thenReturn( IP );
         when( anInterface.getMac() ).thenReturn( MAC );
 

@@ -58,7 +58,7 @@ public class ListCommand extends SubutaiShellCommandSupport
 
                 for ( Interface i : ints )
                 {
-                    System.out.println( String.format( "\t%-15s %-15s %-15s", i.getInterfaceName(), i.getIp(), i.getMac() ) );
+                    System.out.println( String.format( "\t%-15s %-15s %-15s", i.getName(), i.getIp(), i.getMac() ) );
                 }
             }
             catch ( Exception e )
