@@ -57,7 +57,6 @@ import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 @Access( AccessType.FIELD )
 public class EnvironmentImpl implements Environment, Serializable
 {
-    //    @Transient
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentImpl.class );
 
     @Transient
@@ -122,10 +121,11 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public EnvironmentImpl( String name, String subnetCidr, String sshKey, Long userId )
+    public EnvironmentImpl( String name, String subnetCidr, String sshKey, Long userId, String peerId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
         SubnetUtils cidr = new SubnetUtils( subnetCidr );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
 
         this.name = name;
         this.subnetCidr = cidr.getInfo().getCidrSignature();
@@ -135,6 +135,7 @@ public class EnvironmentImpl implements Environment, Serializable
         this.status = EnvironmentStatus.EMPTY;
         this.lastUsedIpIndex = 0;//0 is reserved for gateway
         this.userId = userId;
+        this.peerId = peerId;
     }
 
 
@@ -142,12 +143,6 @@ public class EnvironmentImpl implements Environment, Serializable
     public Set<PeerConf> getPeerConfs()
     {
         return peerConfs;
-    }
-
-
-    public void setPeerConfs( final Set<PeerConf> peerConfs )
-    {
-        this.peerConfs = peerConfs;
     }
 
 
@@ -213,12 +208,6 @@ public class EnvironmentImpl implements Environment, Serializable
     public String getPeerId()
     {
         return peerId;
-    }
-
-
-    public void setPeerId( final String peerId )
-    {
-        this.peerId = peerId;
     }
 
 
@@ -397,14 +386,6 @@ public class EnvironmentImpl implements Environment, Serializable
         Preconditions.checkNotNull( environmentManager );
 
         this.environmentManager = environmentManager;
-    }
-
-
-    protected void setEnvironmentId( String environmentId )
-    {
-        Preconditions.checkNotNull( environmentId );
-
-        this.environmentId = environmentId;
     }
 
 
