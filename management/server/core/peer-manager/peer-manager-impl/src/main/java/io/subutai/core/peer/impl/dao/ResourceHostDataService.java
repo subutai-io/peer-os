@@ -161,7 +161,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
     }
 
 
-    public void saveOrUpdate( ResourceHost item )
+    public ResourceHostEntity saveOrUpdate( ResourceHost item )
     {
         EntityManager em = emf.createEntityManager();
 
@@ -172,11 +172,11 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
             if ( em.find( ResourceHostEntity.class, item.getId() ) == null )
             {
                 em.persist( item );
+                em.refresh( item );
             }
             else
             {
-                em.merge( item );
-                em.refresh( item );
+                item = em.merge( item );
             }
             em.getTransaction().commit();
         }
@@ -192,5 +192,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
         {
             em.close();
         }
+
+        return ( ResourceHostEntity ) item;
     }
 }

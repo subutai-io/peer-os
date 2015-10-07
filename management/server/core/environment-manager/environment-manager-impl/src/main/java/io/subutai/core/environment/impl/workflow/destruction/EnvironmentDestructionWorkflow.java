@@ -22,7 +22,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentDestructionWorkflow.class );
 
     private final EnvironmentManagerImpl environmentManager;
-    private final EnvironmentImpl environment;
+    private EnvironmentImpl environment;
     private final boolean forceMetadataRemoval;
     private final TrackerOperation operationTracker;
 
@@ -62,7 +62,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-        environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.saveOrUpdate( environment );
 
         return EnvironmentDestructionPhase.CLEANUP_N2N;
     }
@@ -76,7 +76,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
         {
             new CleanupN2NStep( environment ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return EnvironmentDestructionPhase.DESTROY_CONTAINERS;
         }
@@ -97,7 +97,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
         {
             new DestroyContainersStep( environment, environmentManager, forceMetadataRemoval ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return EnvironmentDestructionPhase.CLEANUP_NETWORKING;
         }
@@ -118,7 +118,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
         {
             new CleanUpNetworkStep( environment ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return EnvironmentDestructionPhase.REMOVE_KEYS;
         }
@@ -139,7 +139,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
         {
             new RemoveKeysStep( environment ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return EnvironmentDestructionPhase.FINALIZE;
         }
@@ -174,7 +174,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     public void setError( final Throwable error )
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
-        environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.saveOrUpdate( environment );
         this.error = error;
         LOG.error( "Error destroying environment", error );
         operationTracker.addLogFailed( error.getMessage() );

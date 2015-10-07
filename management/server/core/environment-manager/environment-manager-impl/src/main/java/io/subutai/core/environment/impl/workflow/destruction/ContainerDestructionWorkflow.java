@@ -19,7 +19,7 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
     private static final Logger LOG = LoggerFactory.getLogger( ContainerDestructionWorkflow.class );
 
     private final EnvironmentManagerImpl environmentManager;
-    private final EnvironmentImpl environment;
+    private EnvironmentImpl environment;
     private final ContainerHost containerHost;
     private final boolean forceMetadataRemoval;
     private final TrackerOperation operationTracker;
@@ -58,7 +58,7 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-        environmentManager.saveOrUpdate( environment );
+        environment =  environmentManager.saveOrUpdate( environment );
 
         return ContainerDestructionPhase.VALIDATE;
     }
@@ -92,7 +92,7 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
             new DestroyContainerStep( environmentManager, environment, containerHost, forceMetadataRemoval,
                     operationTracker ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return ContainerDestructionPhase.FINALIZE;
         }
@@ -111,7 +111,7 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
-        environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.saveOrUpdate( environment );
 
         operationTracker.addLogDone( skippedDestruction ? "Container is not destroyed" : "Container is destroyed" );
 
@@ -129,7 +129,7 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
     public void setError( final Throwable error )
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
-        environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.saveOrUpdate( environment );
 
         this.error = error;
         LOG.error( "Error destroying container", error );

@@ -192,7 +192,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
     }
 
 
-    public synchronized void saveOrUpdate( Environment item )
+    public synchronized EnvironmentImpl saveOrUpdate( Environment item )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
@@ -201,11 +201,11 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
             if ( em.find( EnvironmentImpl.class, item.getId() ) == null )
             {
                 em.persist( item );
+                em.refresh( item );
             }
             else
             {
-                em.merge( item );
-                em.refresh( item );
+                item = em.merge( item );
             }
             daoManager.commitTransaction( em );
         }
@@ -218,5 +218,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
         {
             daoManager.closeEntityManager( em );
         }
+
+        return ( EnvironmentImpl ) item;
     }
 }

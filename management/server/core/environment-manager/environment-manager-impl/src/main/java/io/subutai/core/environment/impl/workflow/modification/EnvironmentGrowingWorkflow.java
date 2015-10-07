@@ -31,7 +31,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
     private final TemplateRegistry templateRegistry;
     private final NetworkManager networkManager;
     private final PeerManager peerManager;
-    private final EnvironmentImpl environment;
+    private EnvironmentImpl environment;
     private final Topology topology;
     private final String sshKey;
     private final String defaultDomain;
@@ -85,7 +85,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-        environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.saveOrUpdate( environment );
 
         return EnvironmentGrowingPhase.GENERATE_KEYS;
     }
@@ -99,7 +99,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         {
             new PEKGenerationStep( topology, environment, peerManager.getLocalPeer() ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return EnvironmentGrowingPhase.SETUP_VNI;
         }
@@ -120,7 +120,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         {
             new VNISetupStep( topology, environment, peerManager.getLocalPeer() ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment =  environmentManager.saveOrUpdate( environment );
 
             return EnvironmentGrowingPhase.SETUP_N2N;
         }
@@ -141,7 +141,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         {
             new SetupN2NStep( topology, environment ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return EnvironmentGrowingPhase.CLONE_CONTAINERS;
         }
@@ -163,7 +163,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
             new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager.getLocalPeer() )
                     .execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return EnvironmentGrowingPhase.CONFIGURE_HOSTS;
         }
@@ -184,7 +184,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         {
             new RegisterHostsStep( environment, networkManager ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return EnvironmentGrowingPhase.CONFIGURE_SSH;
         }
@@ -205,7 +205,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         {
             new RegisterSshStep( environment, networkManager ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return EnvironmentGrowingPhase.SET_ENVIRONMENT_SSH_KEY;
         }
@@ -226,7 +226,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         {
             new SetSshKeyStep( sshKey, environment, networkManager ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return EnvironmentGrowingPhase.FINALIZE;
         }
@@ -245,7 +245,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
-        environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.saveOrUpdate( environment );
 
         operationTracker.addLogDone( "Environment is grown" );
 
@@ -263,7 +263,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
     public void setError( final Throwable error )
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
-        environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.saveOrUpdate( environment );
 
         this.error = error;
         LOG.error( "Error growing environment", error );

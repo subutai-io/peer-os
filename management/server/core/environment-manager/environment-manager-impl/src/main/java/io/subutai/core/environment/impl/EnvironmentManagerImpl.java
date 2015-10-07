@@ -889,10 +889,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     protected EnvironmentImpl createEmptyEnvironment( final String name, final String subnetCidr, final String sshKey )
     {
 
-        final EnvironmentImpl environment =
+        EnvironmentImpl environment =
                 new EnvironmentImpl( name, subnetCidr, sshKey, getUserId(), peerManager.getLocalPeerInfo().getId() );
 
-        saveOrUpdate( environment );
+        environment = saveOrUpdate( environment );
 
         setEnvironmentTransientFields( environment );
 
@@ -964,9 +964,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void saveOrUpdate( final Environment environment )
+    public EnvironmentImpl saveOrUpdate( final Environment environment )
     {
-        environmentDataService.saveOrUpdate( environment );
+        EnvironmentImpl env = environmentDataService.saveOrUpdate( environment );
+        setEnvironmentTransientFields( env );
+        return env;
     }
 
 
