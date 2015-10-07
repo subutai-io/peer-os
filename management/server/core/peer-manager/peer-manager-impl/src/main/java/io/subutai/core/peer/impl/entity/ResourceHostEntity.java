@@ -410,19 +410,19 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         try
         {
-            ContainerHost result = containerHostFuture.get();
-            if ( result != null )
-            {
-                final ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) result;
-                //                containerHostEntity.setParent( this );
-                if ( IPUtil.isValid( gateway ) )
-                {
-                    containerHostEntity.setDefaultGateway( gateway );
-                }
-            }
-            return result;
+            //we don't need to set gateway on a container, since it is set by clone binding now
+//            if ( result != null )
+//            {
+//                final ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) result;
+//                //                containerHostEntity.setParent( this );
+//                if ( IPUtil.isValid( gateway ) )
+//                {
+//                    containerHostEntity.setDefaultGateway( gateway );
+//                }
+//            }
+            return containerHostFuture.get();
         }
-        catch ( ExecutionException | InterruptedException | PeerException e )
+        catch ( ExecutionException | InterruptedException e )
         {
             throw new ResourceHostException( "Error creating container", e );
         }
@@ -433,8 +433,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public ContainerHost createContainer( final String templateName, final String hostname, final int timeout )
             throws ResourceHostException
     {
-        ContainerHost result = createContainer( templateName, hostname, null, 0, null, timeout );
-        return result;
+        return createContainer( templateName, hostname, null, 0, null, timeout );
     }
 
 

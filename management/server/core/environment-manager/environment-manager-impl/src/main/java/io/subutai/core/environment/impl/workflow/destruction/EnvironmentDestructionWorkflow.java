@@ -14,7 +14,6 @@ import io.subutai.core.environment.impl.workflow.destruction.steps.CleanUpNetwor
 import io.subutai.core.environment.impl.workflow.destruction.steps.CleanupN2NStep;
 import io.subutai.core.environment.impl.workflow.destruction.steps.DestroyContainersStep;
 import io.subutai.core.environment.impl.workflow.destruction.steps.RemoveKeysStep;
-import io.subutai.core.peer.api.PeerManager;
 
 
 public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestructionWorkflow.EnvironmentDestructionPhase>
@@ -22,7 +21,6 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentDestructionWorkflow.class );
 
-//    private final PeerManager peerManager;
     private final EnvironmentManagerImpl environmentManager;
     private final EnvironmentImpl environment;
     private final boolean forceMetadataRemoval;
@@ -42,14 +40,12 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     }
 
 
-    public EnvironmentDestructionWorkflow( /*final PeerManager peerManager,*/
-                                           final EnvironmentManagerImpl environmentManager,
+    public EnvironmentDestructionWorkflow( final EnvironmentManagerImpl environmentManager,
                                            final EnvironmentImpl environment, final boolean forceMetadataRemoval,
                                            final TrackerOperation operationTracker )
     {
         super( EnvironmentDestructionPhase.INIT );
 
-//        this.peerManager = peerManager;
         this.environmentManager = environmentManager;
         this.environment = environment;
         this.forceMetadataRemoval = forceMetadataRemoval;
@@ -66,6 +62,8 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
+        environmentManager.saveOrUpdate( environment );
+
         return EnvironmentDestructionPhase.CLEANUP_N2N;
     }
 
@@ -77,6 +75,8 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
         try
         {
             new CleanupN2NStep( environment ).execute();
+
+            environmentManager.saveOrUpdate( environment );
 
             return EnvironmentDestructionPhase.DESTROY_CONTAINERS;
         }
@@ -97,6 +97,8 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
         {
             new DestroyContainersStep( environment, environmentManager, forceMetadataRemoval ).execute();
 
+            environmentManager.saveOrUpdate( environment );
+
             return EnvironmentDestructionPhase.CLEANUP_NETWORKING;
         }
         catch ( Exception e )
@@ -114,7 +116,9 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
         try
         {
-            new CleanUpNetworkStep( environment/*, peerManager.getLocalPeer()*/ ).execute();
+            new CleanUpNetworkStep( environment ).execute();
+
+            environmentManager.saveOrUpdate( environment );
 
             return EnvironmentDestructionPhase.REMOVE_KEYS;
         }
@@ -133,7 +137,9 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
         try
         {
-            new RemoveKeysStep( environment/*, peerManager.getLocalPeer()*/ ).execute();
+            new RemoveKeysStep( environment ).execute();
+
+            environmentManager.saveOrUpdate( environment );
 
             return EnvironmentDestructionPhase.FINALIZE;
         }
@@ -168,6 +174,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     public void setError( final Throwable error )
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
+        environmentManager.saveOrUpdate( environment );
         this.error = error;
         LOG.error( "Error destroying environment", error );
         operationTracker.addLogFailed( error.getMessage() );

@@ -263,6 +263,8 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
     public void setError( final Throwable error )
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
+        environmentManager.saveOrUpdate( environment );
+
         this.error = error;
         LOG.error( "Error growing environment", error );
         operationTracker.addLogFailed( error.getMessage() );

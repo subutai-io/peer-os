@@ -13,11 +13,11 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
-import io.subutai.core.environment.impl.workflow.creation.steps.SetupN2NStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.PEKGenerationStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.SetSshKeyStep;
+import io.subutai.core.environment.impl.workflow.creation.steps.SetupN2NStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.VNISetupStep;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
@@ -86,7 +86,6 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
         environment.setSuperNode( peerManager.getLocalPeerInfo().getIp() );
         environment.setSuperNodePort( Common.SUPER_NODE_PORT );
-        environment.setPeerId( peerManager.getLocalPeerInfo().getId() );
         environmentManager.saveOrUpdate( environment );
         return EnvironmentCreationPhase.GENERATE_KEYS;
     }
@@ -140,8 +139,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new SetupN2NStep( topology, environment, /*peerManager.getLocalPeer().getPeerInfo().getIp(),
-                    Common.SUPER_NODE_PORT, */peerManager.getLocalPeer() ).execute();
+            new SetupN2NStep( topology, environment, peerManager.getLocalPeer() ).execute();
 
             environmentManager.saveOrUpdate( environment );
 
@@ -265,6 +263,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     public void setError( final Throwable error )
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
+        environmentManager.saveOrUpdate( environment );
         this.error = error;
         LOG.error( "Error creating environment", error );
         operationTracker.addLogFailed( error.getMessage() );
