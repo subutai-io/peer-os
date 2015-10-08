@@ -14,7 +14,6 @@ public class HostInterfaceImpl implements Interface, Serializable
     private String name;
     private String ip;
     private String mac;
-//    private AbstractSubutaiHost host;
 
 
     protected HostInterfaceImpl()
@@ -68,18 +67,6 @@ public class HostInterfaceImpl implements Interface, Serializable
         this.mac = mac;
     }
 
-
- /*   public AbstractSubutaiHost getHost()
-    {
-        return host;
-    }
-
-
-    public void setHost( final AbstractSubutaiHost host )
-    {
-        this.host = host;
-    }
-*/
 
     @Override
     public boolean equals( final Object o )
