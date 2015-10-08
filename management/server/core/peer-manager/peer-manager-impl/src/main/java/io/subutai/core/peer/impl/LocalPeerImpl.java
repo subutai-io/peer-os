@@ -1674,7 +1674,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 @Override
                 public boolean apply( final Interface anInterface )
                 {
-                    return anInterface.getInterfaceName().matches( pattern );
+                    return anInterface.getName().matches( pattern );
                 }
             } );
         }
