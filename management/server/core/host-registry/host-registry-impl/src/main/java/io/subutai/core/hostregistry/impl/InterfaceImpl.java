@@ -1,9 +1,9 @@
 package io.subutai.core.hostregistry.impl;
 
 
-import io.subutai.common.host.Interface;
+import com.google.common.base.MoreObjects;
 
-import com.google.common.base.Objects;
+import io.subutai.common.host.Interface;
 
 
 /**
@@ -18,7 +18,7 @@ public class InterfaceImpl implements Interface
 
 
     @Override
-    public String getInterfaceName()
+    public String getName()
     {
         return interfaceName;
     }
@@ -41,7 +41,7 @@ public class InterfaceImpl implements Interface
     @Override
     public String toString()
     {
-        return Objects.toStringHelper( this ).add( "interfaceName", interfaceName ).add( "ip", ip ).add( "mac", mac )
-                      .toString();
+        return MoreObjects.toStringHelper( this ).add( "interfaceName", interfaceName ).add( "ip", ip )
+                          .add( "mac", mac ).toString();
     }
 }

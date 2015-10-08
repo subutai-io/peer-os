@@ -36,7 +36,6 @@ import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
 import io.subutai.common.metric.ProcessResourceUsage;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.HostInfoModel;
 import io.subutai.common.peer.Peer;
@@ -398,7 +397,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     {
         for ( Interface iface : interfaces )
         {
-            if ( iface.getInterfaceName().equalsIgnoreCase( interfaceName ) )
+            if ( iface.getName().equalsIgnoreCase( interfaceName ) )
             {
                 return iface.getIp();
             }
@@ -413,7 +412,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     {
         for ( Interface iface : interfaces )
         {
-            if ( iface.getInterfaceName().equalsIgnoreCase( interfaceName ) )
+            if ( iface.getName().equalsIgnoreCase( interfaceName ) )
             {
                 return iface.getMac();
             }

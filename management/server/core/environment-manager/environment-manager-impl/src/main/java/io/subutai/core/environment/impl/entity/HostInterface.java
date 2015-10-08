@@ -52,7 +52,7 @@ public class HostInterface implements Interface, Serializable
 
     public HostInterface( final Interface s )
     {
-        this.interfaceName = s.getInterfaceName();
+        this.interfaceName = s.getName();
         this.ip = s.getIp().replace( "addr:", "" );
         this.mac = s.getMac();
     }
@@ -71,15 +71,9 @@ public class HostInterface implements Interface, Serializable
 
 
     @Override
-    public String getInterfaceName()
+    public String getName()
     {
         return interfaceName;
-    }
-
-
-    public void setInterfaceName( final String interfaceName )
-    {
-        this.interfaceName = interfaceName;
     }
 
 
@@ -90,22 +84,10 @@ public class HostInterface implements Interface, Serializable
     }
 
 
-    public void setIp( final String ip )
-    {
-        this.ip = ip;
-    }
-
-
     @Override
     public String getMac()
     {
         return mac;
-    }
-
-
-    public void setMac( final String mac )
-    {
-        this.mac = mac;
     }
 
 

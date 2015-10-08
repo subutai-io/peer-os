@@ -9,7 +9,7 @@ public interface Interface
     /**
      * returns network interface name
      */
-    public String getInterfaceName();
+    public String getName();
 
     /**
      * returns ip address
