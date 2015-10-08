@@ -6,16 +6,13 @@
   <persistence-unit name="peerManagerPUnit" transaction-type="RESOURCE_LOCAL">
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/subutaiDS)
     </non-jta-data-source>
-    <!--<class>io.subutai.core.peer.impl.entity.HostInterfaceImpl</class>-->
     <class>io.subutai.core.peer.impl.entity.AbstractSubutaiHost</class>
     <class>io.subutai.core.peer.impl.entity.ManagementHostEntity</class>
     <class>io.subutai.core.peer.impl.entity.ResourceHostEntity</class>
     <class>io.subutai.core.peer.impl.entity.ContainerHostEntity</class>
     <class>io.subutai.core.peer.impl.entity.PeerData</class>
-    <!--<class>io.subutai.core.peer.impl.entity.ContainerGroupEntity</class>-->
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
-      <!--<property name="openjpa.Log" value="DefaultLevel=WARN, Runtime=TRACE, Tool=INFO, SQL=TRACE" /> -->
       <property name="openjpa.Log" value="DefaultLevel=WARN" />
       <property name="openjpa.ConnectionFactoryProperties" value="PrintParameters=true" />
       <property name="openjpa.RuntimeUnenhancedClasses" value="supported" />
