@@ -30,7 +30,7 @@ public class HostInterfaceImplTest
     @Before
     public void setUp() throws Exception
     {
-        when( anInterface.getInterfaceName() ).thenReturn( INTERFACE_NAME );
+        when( anInterface.getName() ).thenReturn( INTERFACE_NAME );
         when( anInterface.getIp() ).thenReturn( IP );
         when( anInterface.getMac() ).thenReturn( MAC );
 
@@ -50,9 +50,9 @@ public class HostInterfaceImplTest
     @Test
     public void testSetNGetInterfaceName() throws Exception
     {
-        hostInterface.setInterfaceName( INTERFACE_NAME );
+        hostInterface.setName( INTERFACE_NAME );
 
-        assertEquals( INTERFACE_NAME, hostInterface.getInterfaceName() );
+        assertEquals( INTERFACE_NAME, hostInterface.getName() );
     }
 
 
@@ -74,12 +74,12 @@ public class HostInterfaceImplTest
         assertEquals( MAC, hostInterface.getMac() );
     }
 
-
-    @Test
-    public void testSetNGetHost() throws Exception
-    {
-        hostInterface.setHost( abstractSubutaiHost );
-
-        assertEquals( abstractSubutaiHost, hostInterface.getHost() );
-    }
+//
+//    @Test
+//    public void testSetNGetHost() throws Exception
+//    {
+//        hostInterface.setHost( abstractSubutaiHost );
+//
+//        assertEquals( abstractSubutaiHost, hostInterface.getHost() );
+//    }
 }

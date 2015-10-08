@@ -13,11 +13,11 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
-import io.subutai.core.environment.impl.workflow.creation.steps.SetupN2NStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.PEKGenerationStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.SetSshKeyStep;
+import io.subutai.core.environment.impl.workflow.creation.steps.SetupN2NStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.VNISetupStep;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
@@ -31,7 +31,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     private final TemplateRegistry templateRegistry;
     private final NetworkManager networkManager;
     private final PeerManager peerManager;
-    private final EnvironmentImpl environment;
+    private EnvironmentImpl environment;
     private final Topology topology;
     private final String sshKey;
     private final String defaultDomain;
@@ -86,8 +86,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
         environment.setSuperNode( peerManager.getLocalPeerInfo().getIp() );
         environment.setSuperNodePort( Common.SUPER_NODE_PORT );
-        environment.setPeerId( peerManager.getLocalPeerInfo().getId() );
-        environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.saveOrUpdate( environment );
         return EnvironmentCreationPhase.GENERATE_KEYS;
     }
 
@@ -100,7 +99,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             new PEKGenerationStep( topology, environment, peerManager.getLocalPeer() ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return EnvironmentCreationPhase.SETUP_VNI;
         }
@@ -121,7 +120,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             new VNISetupStep( topology, environment, peerManager.getLocalPeer() ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return EnvironmentCreationPhase.SETUP_N2N;
         }
@@ -140,10 +139,9 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new SetupN2NStep( topology, environment, /*peerManager.getLocalPeer().getPeerInfo().getIp(),
-                    Common.SUPER_NODE_PORT, */peerManager.getLocalPeer() ).execute();
+            new SetupN2NStep( topology, environment, peerManager.getLocalPeer() ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return EnvironmentCreationPhase.CLONE_CONTAINERS;
         }
@@ -165,7 +163,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
             new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager.getLocalPeer() )
                     .execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return EnvironmentCreationPhase.CONFIGURE_HOSTS;
         }
@@ -186,7 +184,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             new RegisterHostsStep( environment, networkManager ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return EnvironmentCreationPhase.CONFIGURE_SSH;
         }
@@ -207,7 +205,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             new RegisterSshStep( environment, networkManager ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return EnvironmentCreationPhase.SET_ENVIRONMENT_SSH_KEY;
         }
@@ -228,7 +226,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             new SetSshKeyStep( sshKey, environment, networkManager ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return EnvironmentCreationPhase.FINALIZE;
         }
@@ -247,7 +245,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
-        environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.saveOrUpdate( environment );
 
         operationTracker.addLogDone( "Environment is created" );
 
@@ -265,6 +263,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     public void setError( final Throwable error )
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
+        environment = environmentManager.saveOrUpdate( environment );
         this.error = error;
         LOG.error( "Error creating environment", error );
         operationTracker.addLogFailed( error.getMessage() );
