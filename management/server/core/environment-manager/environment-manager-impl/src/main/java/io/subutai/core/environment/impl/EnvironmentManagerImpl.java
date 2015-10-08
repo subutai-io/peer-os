@@ -26,6 +26,7 @@ import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.Interface;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
@@ -35,6 +36,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
+import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
@@ -90,11 +92,37 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                           final Map<NodeGroup, Set<HostInfo>> containers, final String ssh,
                                           final Integer vlan ) throws EnvironmentCreationException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name " );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
         Preconditions.checkNotNull( topology, "Invalid topology" );
+        Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
+
+        Map.Entry<NodeGroup, Set<HostInfo>> containersEntry = containers.entrySet().iterator().next();
+        Iterator<HostInfo> hostIterator = containersEntry.getValue().iterator();
+
+        String ip = "";
+        while ( hostIterator.hasNext() && StringUtil.isStringNullOrEmpty( ip ) )
+        {
+            HostInfo sampleHostInfo = hostIterator.next();
+
+            //TODO ip is chosen from first standing container host info
+            for ( final Interface iface : sampleHostInfo.getInterfaces() )
+            {
+                if ( StringUtil.isStringNullOrEmpty( iface.getIp() ) )
+                {
+                    continue;
+                }
+                ip = iface.getIp() + "/24";
+                break;
+            }
+        }
+
+        if ( StringUtil.isStringNullOrEmpty( ip ) )
+        {
+            throw new EnvironmentCreationException( "Invalid environment ip range" );
+        }
 
         //create empty environment
-        final EnvironmentImpl environment = createEmptyEnvironment( name, subnetCidr, ssh );
+        final EnvironmentImpl environment = createEmptyEnvironment( name, ip, ssh );
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
                 String.format( "Creating environment %s ", environment.getId() ) );
@@ -102,7 +130,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         EnvironmentImportWorkflow environmentImportWorkflow =
                 getEnvironmentImportWorkflow( environment, topology, ssh, operationTracker );
 
-        return null;
+        environmentImportWorkflow.start();
+        //notify environment event listeners
+        environmentImportWorkflow.onStop( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                notifyOnEnvironmentCreated( environment );
+            }
+        } );
+
+
+        return environment;
     }
 
 
