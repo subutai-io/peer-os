@@ -3,6 +3,7 @@ package io.subutai.core.environment.impl;
 
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -22,6 +23,7 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.mdc.SubutaiExecutors;
@@ -44,6 +46,7 @@ import io.subutai.core.environment.impl.dao.EnvironmentContainerDataService;
 import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.workflow.construction.EnvironmentImportWorkflow;
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.ContainerDestructionWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.EnvironmentDestructionWorkflow;
@@ -80,6 +83,27 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     protected BlueprintDataService blueprintDataService;
 
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
+
+
+    @Override
+    public Environment importEnvironment( final String name, final Topology topology,
+                                          final Map<NodeGroup, Set<HostInfo>> containers, final String ssh,
+                                          final Integer vlan ) throws EnvironmentCreationException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name " );
+        Preconditions.checkNotNull( topology, "Invalid topology" );
+
+        //create empty environment
+        final EnvironmentImpl environment = createEmptyEnvironment( name, subnetCidr, ssh );
+
+        TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Creating environment %s ", environment.getId() ) );
+
+        EnvironmentImportWorkflow environmentImportWorkflow =
+                getEnvironmentImportWorkflow( environment, topology, ssh, operationTracker );
+
+        return null;
+    }
 
 
     @Override
@@ -712,6 +736,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         return new EnvironmentCreationWorkflow( defaultDomain, templateRegistry, this, networkManager, peerManager,
                 environment, topology, sshKey, operationTracker );
+    }
+
+
+    protected EnvironmentImportWorkflow getEnvironmentImportWorkflow( final EnvironmentImpl environment,
+                                                                      final Topology topology, final String sshKey,
+                                                                      final TrackerOperation tracker )
+    {
+        return new EnvironmentImportWorkflow( defaultDomain, templateRegistry, this, networkManager, peerManager,
+                environment, topology, sshKey, tracker );
     }
 
 

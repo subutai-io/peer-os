@@ -9,13 +9,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import io.subutai.core.tracker.api.Tracker;
-import io.subutai.core.pluginmanager.api.OperationType;
-import io.subutai.core.pluginmanager.api.PluginInfo;
-import io.subutai.core.pluginmanager.api.PluginManager;
-import io.subutai.server.ui.component.ConfirmationDialog;
-import io.subutai.server.ui.component.ProgressWindow;
-
 import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Button;
@@ -27,6 +20,13 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
+
+import io.subutai.core.pluginmanager.api.OperationType;
+import io.subutai.core.pluginmanager.api.PluginInfo;
+import io.subutai.core.pluginmanager.api.PluginManager;
+import io.subutai.core.tracker.api.Tracker;
+import io.subutai.server.ui.component.ConfirmationDialog;
+import io.subutai.server.ui.component.ProgressWindow;
 
 
 public class PluginManagerComponent extends CustomComponent

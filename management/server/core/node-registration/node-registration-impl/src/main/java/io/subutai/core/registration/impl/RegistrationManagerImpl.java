@@ -25,22 +25,23 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.broker.api.Broker;
 import io.subutai.core.broker.api.ClientCredentials;
-import io.subutai.core.env.api.EnvironmentManager;
-import io.subutai.core.env.api.exception.EnvironmentCreationException;
+import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.hostregistry.api.HostListener;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.peer.api.HostNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.api.ResourceHost;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.exception.NodeRegistrationException;
@@ -58,9 +59,6 @@ import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 
 
-/**
- * Created by talas on 8/24/15.
- */
 public class RegistrationManagerImpl implements RegistrationManager, HostListener
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RegistrationManagerImpl.class );
@@ -378,14 +376,14 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
     {
-        RequestedHostImpl requestedHost = requestDataService.find( resourceHostInfo.getId() );
+        RequestedHostImpl requestedHost = requestDataService.find( UUID.fromString( resourceHostInfo.getId() ) );
         if ( requestedHost != null && requestedHost.getStatus() == RegistrationStatus.APPROVED )
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
             try
             {
                 ResourceHost resourceHost = localPeer.getResourceHostById( resourceHostInfo.getId() );
-                Map<Integer, Set<ContainerHost>> containerHostList = Maps.newHashMap();
+                Map<Integer, Set<EnvironmentContainerHost>> containerHostList = Maps.newHashMap();
                 for ( final ContainerInfo containerInfo : requestedHost.getHostInfos() )
                 {
                     if ( containerInfo.getStatus().equals( RegistrationStatus.APPROVED )
@@ -395,7 +393,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                         ContainerInfoImpl containerInfoImpl =
                                 containerInfoDataService.find( containerInfo.getId().toString() );
 
-                        ContainerHost containerHost = resourceHost.getContainerHostById( containerInfo.getId() );
+                        EnvironmentContainerHost containerHost = (EnvironmentContainerHost) resourceHost.getContainerHostById( containerInfo.getId() );
 
                         containerInfoImpl.setStatus( RegistrationStatus.REGISTERED );
                         containerInfoDataService.update( containerInfoImpl );
@@ -403,7 +401,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                         //we assume that newly imported environment has always default sshGroupId=1, hostsGroupId=1
 
                         //configure hosts on each group | group containers by ssh group
-                        Set<ContainerHost> containers = containerHostList.get( containerInfoImpl.getVlan() );
+                        Set<EnvironmentContainerHost> containers = containerHostList.get( containerInfoImpl.getVlan() );
                         if ( containers == null )
                         {
                             containers = Sets.newHashSet();
@@ -411,7 +409,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                         containers.add( containerHost );
                     }
                 }
-                for ( final Map.Entry<Integer, Set<ContainerHost>> entry : containerHostList.entrySet() )
+                for ( final Map.Entry<Integer, Set<EnvironmentContainerHost>> entry : containerHostList.entrySet() )
                 {
                     configureHosts( entry.getValue() );
                 }
@@ -428,7 +426,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     }
 
 
-    private void configureHosts( final Set<ContainerHost> containerHosts ) throws NetworkManagerException
+    private void configureHosts( final Set<EnvironmentContainerHost> containerHosts ) throws NetworkManagerException
     {
         //assume that inside one host group the domain name must be the same for all containers
         //so pick one container's domain name as the group domain name
