@@ -411,15 +411,15 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         try
         {
             //we don't need to set gateway on a container, since it is set by clone binding now
-//            if ( result != null )
-//            {
-//                final ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) result;
-//                //                containerHostEntity.setParent( this );
-//                if ( IPUtil.isValid( gateway ) )
-//                {
-//                    containerHostEntity.setDefaultGateway( gateway );
-//                }
-//            }
+            //            if ( result != null )
+            //            {
+            //                final ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) result;
+            //                //                containerHostEntity.setParent( this );
+            //                if ( IPUtil.isValid( gateway ) )
+            //                {
+            //                    containerHostEntity.setDefaultGateway( gateway );
+            //                }
+            //            }
             return containerHostFuture.get();
         }
         catch ( ExecutionException | InterruptedException e )
@@ -477,14 +477,18 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             try
             {
                 containerHost = ( ContainerHostEntity ) getContainerHostByName( info.getHostname() );
+                containerHost.updateHostInfo( info );
             }
             catch ( HostNotFoundException e )
             {
-                containerHost = new ContainerHostEntity( peerId, info );
-                addContainerHost( containerHost );
-                result = true;
+                if ( info.getId() != null && "".equals( info.getId().trim() ) )
+                {
+                    containerHost = new ContainerHostEntity( peerId, info );
+                    addContainerHost( containerHost );
+                    containerHost.updateHostInfo( info );
+                    result = true;
+                }
             }
-            containerHost.updateHostInfo( info );
         }
         return result;
     }
