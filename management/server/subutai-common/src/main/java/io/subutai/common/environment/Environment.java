@@ -4,7 +4,6 @@ package io.subutai.common.environment;
 import java.util.Map;
 import java.util.Set;
 
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 
@@ -64,7 +63,7 @@ public interface Environment
      * @param containerHost - container to destroy
      * @param async - sync or async to the calling party
      */
-    void destroyContainer( ContainerHost containerHost, boolean async )
+    void destroyContainer( EnvironmentContainerHost containerHost, boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException;
 
 
@@ -74,7 +73,8 @@ public interface Environment
      * @param topology = topology to use when growing
      * @param async - sync or async to the calling party
      */
-    Set<EnvironmentContainerHost> growEnvironment( Topology topology, boolean async ) throws EnvironmentModificationException;
+    Set<EnvironmentContainerHost> growEnvironment( Topology topology, boolean async )
+            throws EnvironmentModificationException;
 
 
     /**
@@ -112,7 +112,7 @@ public interface Environment
      *
      * @return - found container host
      */
-    ContainerHost getContainerHostById( String id ) throws ContainerHostNotFoundException;
+    EnvironmentContainerHost getContainerHostById( String id ) throws ContainerHostNotFoundException;
 
     /**
      * Searches container by its hostname withing this environment
@@ -121,15 +121,9 @@ public interface Environment
      *
      * @return - found container host
      */
-    ContainerHost getContainerHostByHostname( String hostname ) throws ContainerHostNotFoundException;
+    EnvironmentContainerHost getContainerHostByHostname( String hostname ) throws ContainerHostNotFoundException;
 
-    Set<ContainerHost> getContainerHostsByIds( Set<String> ids ) throws ContainerHostNotFoundException;
-
-    void addEnvironmentPeer( PeerConf peerConf );
-
-    void setStatus( EnvironmentStatus status );
-
-    void setVni( long freeVni );
+    Set<EnvironmentContainerHost> getContainerHostsByIds( Set<String> ids ) throws ContainerHostNotFoundException;
 
     String getTunnelNetwork();
 
@@ -144,8 +138,4 @@ public interface Environment
     String getTunnelInterfaceName();
 
     String getTunnelCommunityName();
-
-    void setTunnelNetwork( String network );
-
-    void removeContainer( ContainerHost containerHost );
 }
