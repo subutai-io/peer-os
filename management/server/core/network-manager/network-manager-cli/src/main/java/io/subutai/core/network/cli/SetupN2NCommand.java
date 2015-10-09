@@ -1,9 +1,6 @@
 package io.subutai.core.network.cli;
 
 
-import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-import io.subutai.core.network.api.NetworkManager;
-import io.subutai.core.network.api.NetworkManagerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,8 +9,12 @@ import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+import io.subutai.core.network.api.NetworkManager;
+import io.subutai.core.network.api.NetworkManagerException;
 
-@Command( scope = "net", name = "setup-n2n", description = "Sets up N2N connection with Hub" )
+
+@Command( scope = "net", name = "setup-n2n", description = "Sets up N2N connection with supernode" )
 public class SetupN2NCommand extends SubutaiShellCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( SetupN2NCommand.class.getName() );
