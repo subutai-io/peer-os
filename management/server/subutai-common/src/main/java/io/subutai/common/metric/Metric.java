@@ -1,7 +1,7 @@
 package io.subutai.common.metric;
 
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 
 /**
@@ -163,14 +163,15 @@ public abstract class Metric
     @Override
     public String toString()
     {
-        return Objects.toStringHelper( this ).add( "host", host ).add( "hostId", hostId ).add( "totalRam", totalRam )
-                      .add( "availableRam", availableRam ).add( "usedRam", usedRam ).add( "usedCpu", usedCpu )
-                      .add( "availableDiskRootfs", availableDiskRootfs ).add( "availableDiskVar", availableDiskVar )
-                      .add( "availableDiskHome", availableDiskHome ).add( "availableDiskOpt", availableDiskOpt )
-                      .add( "usedDiskRootfs", usedDiskRootfs ).add( "usedDiskVar", usedDiskVar )
-                      .add( "usedDiskHome", usedDiskHome ).add( "usedDiskOpt", usedDiskOpt )
-                      .add( "totalDiskRootfs", totalDiskRootfs ).add( "totalDiskVar", totalDiskVar )
-                      .add( "totalDiskHome", totalDiskHome ).add( "totalDiskOpt", totalDiskOpt ).toString();
+        return MoreObjects.toStringHelper( this ).add( "host", host ).add( "hostId", hostId )
+                          .add( "totalRam", totalRam ).add( "availableRam", availableRam ).add( "usedRam", usedRam )
+                          .add( "usedCpu", usedCpu ).add( "availableDiskRootfs", availableDiskRootfs )
+                          .add( "availableDiskVar", availableDiskVar ).add( "availableDiskHome", availableDiskHome )
+                          .add( "availableDiskOpt", availableDiskOpt ).add( "usedDiskRootfs", usedDiskRootfs )
+                          .add( "usedDiskVar", usedDiskVar ).add( "usedDiskHome", usedDiskHome )
+                          .add( "usedDiskOpt", usedDiskOpt ).add( "totalDiskRootfs", totalDiskRootfs )
+                          .add( "totalDiskVar", totalDiskVar ).add( "totalDiskHome", totalDiskHome )
+                          .add( "totalDiskOpt", totalDiskOpt ).toString();
     }
 
 

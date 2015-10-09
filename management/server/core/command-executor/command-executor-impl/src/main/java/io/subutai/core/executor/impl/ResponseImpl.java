@@ -4,7 +4,7 @@ package io.subutai.core.executor.impl;
 import java.util.Set;
 import java.util.UUID;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 import io.subutai.common.command.Response;
 import io.subutai.common.command.ResponseType;
@@ -92,9 +92,9 @@ public class ResponseImpl implements Response
     @Override
     public String toString()
     {
-        return Objects.toStringHelper( this ).add( "type", type ).add( "id", id ).add( "commandId", commandId )
-                      .add( "pid", pid ).add( "responseNumber", responseNumber ).add( "stdOut", stdOut )
-                      .add( "stdErr", stdErr ).add( "exitCode", exitCode ).add( "configPoints", configPoints )
-                      .toString();
+        return MoreObjects.toStringHelper( this ).add( "type", type ).add( "id", id ).add( "commandId", commandId )
+                          .add( "pid", pid ).add( "responseNumber", responseNumber ).add( "stdOut", stdOut )
+                          .add( "stdErr", stdErr ).add( "exitCode", exitCode ).add( "configPoints", configPoints )
+                          .toString();
     }
 }
