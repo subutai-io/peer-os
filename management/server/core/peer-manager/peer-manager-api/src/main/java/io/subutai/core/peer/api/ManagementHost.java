@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.Host;
@@ -107,8 +108,10 @@ public interface ManagementHost extends Host, HostInfo
      *
      * @param vlan - vlan id
      * @param domain - domain to assign
+     * @param domainLoadBalanceStrategy - strategy to load balance requests to the domain
      */
-    void setVlanDomain( int vlan, String domain ) throws PeerException;
+    void setVlanDomain( int vlan, String domain, DomainLoadBalanceStrategy domainLoadBalanceStrategy )
+            throws PeerException;
 
     /**
      * Returns true if hostIp is added to reverse proxy environment domain  by vni
@@ -141,5 +144,4 @@ public interface ManagementHost extends Host, HostInfo
     int calculateNextTunnelId( Set<Tunnel> tunnels );
 
     void setupVniVlanMapping( int tunnelId, long vni, int vlan, String environmentId ) throws PeerException;
-
 }

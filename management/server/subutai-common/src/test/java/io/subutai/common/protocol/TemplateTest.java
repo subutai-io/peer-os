@@ -12,9 +12,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.datatypes.TemplateVersion;
-import io.subutai.common.protocol.Template;
-import io.subutai.common.protocol.TemplatePK;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;

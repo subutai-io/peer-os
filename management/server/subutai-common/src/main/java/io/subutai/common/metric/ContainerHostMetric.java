@@ -1,7 +1,7 @@
 package io.subutai.common.metric;
 
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 
 /**
@@ -21,7 +21,7 @@ public abstract class ContainerHostMetric extends Metric
     @Override
     public String toString()
     {
-        return Objects.toStringHelper( this ).add( "metric", super.toString() ).add( "hostId", hostId )
-                      .add( "environmentId", environmentId ).toString();
+        return MoreObjects.toStringHelper( this ).add( "metric", super.toString() ).add( "hostId", hostId )
+                          .add( "environmentId", environmentId ).toString();
     }
 }

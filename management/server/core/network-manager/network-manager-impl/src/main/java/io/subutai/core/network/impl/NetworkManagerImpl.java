@@ -16,22 +16,23 @@ import com.google.common.collect.Sets;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
 import io.subutai.core.network.api.ContainerInfo;
 import io.subutai.core.network.api.N2NConnection;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.peer.api.Tunnel;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.common.peer.ResourceHost;
+import io.subutai.core.peer.api.Tunnel;
 
 
 /**
@@ -302,13 +303,16 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void setVlanDomain( final int vLanId, final String domain ) throws NetworkManagerException
+    public void setVlanDomain( final int vLanId, final String domain,
+                               final DomainLoadBalanceStrategy domainLoadBalanceStrategy )
+            throws NetworkManagerException
     {
         Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ), "Invalid domain" );
         Preconditions.checkArgument( domain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
+        Preconditions.checkNotNull( domainLoadBalanceStrategy );
 
-        execute( getManagementHost(), commands.getSetVlanDomainCommand( vLanId, domain ) );
+        execute( getManagementHost(), commands.getSetVlanDomainCommand( vLanId, domain, domainLoadBalanceStrategy ) );
     }
 
 

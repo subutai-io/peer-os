@@ -127,141 +127,155 @@ public class EnvironmentForm
 
     private void updateEnvironmentsTable()
     {
-        environmentsTable.removeAllItems();
-        for ( final Environment environment : environmentManager.getEnvironments() )
+        try
         {
-            final Button containersBtn = new Button( CONTAINERS );
-            final Button sshKeyBtn = new Button( SSH_KEY );
-            final Button destroyBtn = new Button( DESTROY );
-            final Button removeBtn = new Button( REMOVE );
-            final Button refreshContainersButton = new Button( REFRESH_METADATA );
-            final Button domainBtn = new Button( DOMAIN );
-            domainBtn.setId( environment.getName() + "-domain" );
-            domainBtn.addClickListener( new Button.ClickListener()
+            environmentsTable.removeAllItems();
+            for ( final Environment environment : environmentManager.getEnvironments() )
             {
-                @Override
-                public void buttonClick( final Button.ClickEvent event )
+                final Button containersBtn = new Button( CONTAINERS );
+                final Button sshKeyBtn = new Button( SSH_KEY );
+                final Button destroyBtn = new Button( DESTROY );
+                final Button removeBtn = new Button( REMOVE );
+                final Button refreshContainersButton = new Button( REFRESH_METADATA );
+                final Button domainBtn = new Button( DOMAIN );
+                domainBtn.setId( environment.getName() + "-domain" );
+                domainBtn.addClickListener( new Button.ClickListener()
                 {
-                    contentRoot.getUI().addWindow( new DomainWindow( environment, environmentManager ) );
-                }
-            } );
-            containersBtn.setId( environment.getName() + "-containers" );
-            containersBtn.addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( final Button.ClickEvent event )
-                {
-                    contentRoot.getUI()
-                               .addWindow( new ContainersWindow( environmentManager, environment, peerManager ) );
-                }
-            } );
-
-            destroyBtn.setId( environment.getName() + "-destroy" );
-            destroyBtn.addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( final Button.ClickEvent clickEvent )
-                {
-
-                    ConfirmationDialog alert =
-                            new ConfirmationDialog( "Do you really want to destroy this environment?", "Yes", "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener()
+                    @Override
+                    public void buttonClick( final Button.ClickEvent event )
                     {
-                        @Override
-                        public void buttonClick( Button.ClickEvent clickEvent )
-                        {
-                            destroyBtn.setEnabled( false );
-                            containersBtn.setEnabled( false );
-                            sshKeyBtn.setEnabled( false );
-                            refreshContainersButton.setEnabled( false );
-                            destroyEnvironment( environment );
-                        }
-                    } );
-
-                    contentRoot.getUI().addWindow( alert.getAlert() );
-                }
-            } );
-
-            sshKeyBtn.setId( environment.getName() + "-sshkey" );
-            sshKeyBtn.addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( final Button.ClickEvent event )
-                {
-                    contentRoot.getUI().addWindow( new SshKeyWindow( environment ) );
-                }
-            } );
-
-            removeBtn.setId( environment.getName() + "-remove" );
-            removeBtn.addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( final Button.ClickEvent event )
-                {
-                    ConfirmationDialog alert = new ConfirmationDialog(
-                            "Do you really want to remove this environment without destroying it?", "Yes", "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener()
-                    {
-                        @Override
-                        public void buttonClick( Button.ClickEvent clickEvent )
-                        {
-                            try
-                            {
-                                environmentManager.removeEnvironment( environment.getId() );
-                            }
-                            catch ( EnvironmentNotFoundException e )
-                            {
-                                Notification.show( String.format( "Error removing environment: %s", e.getMessage() ) );
-                            }
-                        }
-                    } );
-
-                    contentRoot.getUI().addWindow( alert.getAlert() );
-                }
-            } );
-
-            refreshContainersButton.addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( final Button.ClickEvent event )
-                {
-                    try
-                    {
-                        environmentManager.updateEnvironmentContainersMetadata( environment.getId() );
+                        contentRoot.getUI().addWindow( new DomainWindow( environment, environmentManager ) );
                     }
-                    catch ( EnvironmentManagerException e )
+                } );
+                containersBtn.setId( environment.getName() + "-containers" );
+                containersBtn.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent event )
                     {
-                        LOGGER.error( "Error updating containers metadata", e );
-                        Notification.show( "Error updating containers metadata", Notification.Type.WARNING_MESSAGE );
+                        contentRoot.getUI()
+                                   .addWindow( new ContainersWindow( environmentManager, environment, peerManager ) );
                     }
-                }
-            } );
+                } );
 
-            boolean isEnvironmentUnderModification =
-                    environment.getStatus().equals( EnvironmentStatus.UNDER_MODIFICATION );
+                destroyBtn.setId( environment.getName() + "-destroy" );
+                destroyBtn.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent clickEvent )
+                    {
 
-            destroyBtn.setEnabled( !isEnvironmentUnderModification );
-            containersBtn.setEnabled( !isEnvironmentUnderModification );
-            sshKeyBtn.setEnabled( !isEnvironmentUnderModification );
-            refreshContainersButton.setEnabled( !isEnvironmentUnderModification );
+                        ConfirmationDialog alert =
+                                new ConfirmationDialog( "Do you really want to destroy this environment?", "Yes",
+                                        "No" );
+                        alert.getOk().addClickListener( new Button.ClickListener()
+                        {
+                            @Override
+                            public void buttonClick( Button.ClickEvent clickEvent )
+                            {
+                                destroyBtn.setEnabled( false );
+                                containersBtn.setEnabled( false );
+                                sshKeyBtn.setEnabled( false );
+                                refreshContainersButton.setEnabled( false );
+                                domainBtn.setEnabled( false );
+                                destroyEnvironment( environment );
+                            }
+                        } );
 
-            Embedded icon = isEnvironmentUnderModification ? new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) ) :
-                            environment.getStatus().equals( EnvironmentStatus.HEALTHY ) ?
-                            new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) ) :
-                            environment.getStatus().equals( EnvironmentStatus.UNHEALTHY ) ?
-                            new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) ) :
-                            new Embedded( "", new ThemeResource( QUESTION_ICON_SOURCE ) );
+                        contentRoot.getUI().addWindow( alert.getAlert() );
+                    }
+                } );
 
-            String iconId = isEnvironmentUnderModification ? "indicator" :
-                            environment.getStatus().equals( EnvironmentStatus.HEALTHY ) ? "ok" : "error";
-            icon.setId( iconId );
+                sshKeyBtn.setId( environment.getName() + "-sshkey" );
+                sshKeyBtn.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent event )
+                    {
+                        contentRoot.getUI().addWindow( new SshKeyWindow( environment ) );
+                    }
+                } );
 
-            environmentsTable.addItem( new Object[] {
-                    environment.getId(), environment.getName(), getCreationDate( environment.getCreationTimestamp() ),
-                    icon, containersBtn, sshKeyBtn, domainBtn, destroyBtn, refreshContainersButton, removeBtn
-            }, null );
+                removeBtn.setId( environment.getName() + "-remove" );
+                removeBtn.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent event )
+                    {
+                        ConfirmationDialog alert = new ConfirmationDialog(
+                                "Do you really want to remove this environment without destroying it?", "Yes", "No" );
+                        alert.getOk().addClickListener( new Button.ClickListener()
+                        {
+                            @Override
+                            public void buttonClick( Button.ClickEvent clickEvent )
+                            {
+                                try
+                                {
+                                    environmentManager.removeEnvironment( environment.getId() );
+                                }
+                                catch ( EnvironmentNotFoundException e )
+                                {
+                                    Notification
+                                            .show( String.format( "Error removing environment: %s", e.getMessage() ) );
+                                }
+                            }
+                        } );
+
+                        contentRoot.getUI().addWindow( alert.getAlert() );
+                    }
+                } );
+
+                refreshContainersButton.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent event )
+                    {
+                        try
+                        {
+                            environmentManager.updateEnvironmentContainersMetadata( environment.getId() );
+                        }
+                        catch ( EnvironmentManagerException e )
+                        {
+                            LOGGER.error( "Error updating containers metadata", e );
+                            Notification
+                                    .show( "Error updating containers metadata", Notification.Type.WARNING_MESSAGE );
+                        }
+                    }
+                } );
+
+                boolean isEnvironmentUnderModification =
+                        environment.getStatus().equals( EnvironmentStatus.UNDER_MODIFICATION );
+
+                destroyBtn.setEnabled( !isEnvironmentUnderModification );
+                containersBtn.setEnabled( !isEnvironmentUnderModification );
+                sshKeyBtn.setEnabled( !isEnvironmentUnderModification );
+                refreshContainersButton.setEnabled( !isEnvironmentUnderModification );
+                domainBtn.setEnabled( !isEnvironmentUnderModification );
+
+                Embedded icon =
+                        isEnvironmentUnderModification ? new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) ) :
+                        environment.getStatus().equals( EnvironmentStatus.HEALTHY ) ?
+                        new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) ) :
+                        environment.getStatus().equals( EnvironmentStatus.UNHEALTHY ) ?
+                        new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) ) :
+                        new Embedded( "", new ThemeResource( QUESTION_ICON_SOURCE ) );
+
+                String iconId = isEnvironmentUnderModification ? "indicator" :
+                                environment.getStatus().equals( EnvironmentStatus.HEALTHY ) ? "ok" : "error";
+                icon.setId( iconId );
+
+                environmentsTable.addItem( new Object[] {
+                        environment.getId(), environment.getName(),
+                        getCreationDate( environment.getCreationTimestamp() ), icon, containersBtn, sshKeyBtn,
+                        domainBtn, destroyBtn, refreshContainersButton, removeBtn
+                }, null );
+            }
+            environmentsTable.refreshRowCache();
         }
-        environmentsTable.refreshRowCache();
+        catch ( Exception e )
+        {
+            LOGGER.warn( e.getMessage() );
+        }
     }
 
 

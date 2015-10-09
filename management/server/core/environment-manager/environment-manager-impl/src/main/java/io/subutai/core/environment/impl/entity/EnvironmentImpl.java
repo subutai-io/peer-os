@@ -3,7 +3,6 @@ package io.subutai.core.environment.impl.entity;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -57,7 +56,6 @@ import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 @Access( AccessType.FIELD )
 public class EnvironmentImpl implements Environment, Serializable
 {
-    //    @Transient
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentImpl.class );
 
     @Transient
@@ -122,10 +120,11 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public EnvironmentImpl( String name, String subnetCidr, String sshKey, Long userId )
+    public EnvironmentImpl( String name, String subnetCidr, String sshKey, Long userId, String peerId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
         SubnetUtils cidr = new SubnetUtils( subnetCidr );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
 
         this.name = name;
         this.subnetCidr = cidr.getInfo().getCidrSignature();
@@ -135,6 +134,7 @@ public class EnvironmentImpl implements Environment, Serializable
         this.status = EnvironmentStatus.EMPTY;
         this.lastUsedIpIndex = 0;//0 is reserved for gateway
         this.userId = userId;
+        this.peerId = peerId;
     }
 
 
@@ -142,12 +142,6 @@ public class EnvironmentImpl implements Environment, Serializable
     public Set<PeerConf> getPeerConfs()
     {
         return peerConfs;
-    }
-
-
-    public void setPeerConfs( final Set<PeerConf> peerConfs )
-    {
-        this.peerConfs = peerConfs;
     }
 
 
@@ -216,12 +210,6 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public void setPeerId( final String peerId )
-    {
-        this.peerId = peerId;
-    }
-
-
     public Long getVersion()
     {
         return version;
@@ -235,11 +223,11 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public ContainerHost getContainerHostById( String id ) throws ContainerHostNotFoundException
+    public EnvironmentContainerHost getContainerHostById( String id ) throws ContainerHostNotFoundException
     {
         Preconditions.checkNotNull( id, "Invalid id" );
 
-        for ( final ContainerHost containerHost : getContainerHosts() )
+        for ( final EnvironmentContainerHost containerHost : getContainerHosts() )
         {
             if ( containerHost.getId().equals( id ) )
             {
@@ -251,11 +239,11 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public ContainerHost getContainerHostByHostname( String hostname ) throws ContainerHostNotFoundException
+    public EnvironmentContainerHost getContainerHostByHostname( String hostname ) throws ContainerHostNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
 
-        for ( final ContainerHost containerHost : getContainerHosts() )
+        for ( final EnvironmentContainerHost containerHost : getContainerHosts() )
         {
             if ( containerHost.getHostname().equalsIgnoreCase( hostname ) )
             {
@@ -267,11 +255,11 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public Set<ContainerHost> getContainerHostsByIds( Set<String> ids ) throws ContainerHostNotFoundException
+    public Set<EnvironmentContainerHost> getContainerHostsByIds( Set<String> ids ) throws ContainerHostNotFoundException
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( ids ), "Invalid id set" );
 
-        Set<ContainerHost> hosts = Sets.newHashSet();
+        Set<EnvironmentContainerHost> hosts = Sets.newHashSet();
         for ( String id : ids )
         {
             hosts.add( getContainerHostById( id ) );
@@ -280,7 +268,6 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    @Override
     public void addEnvironmentPeer( final PeerConf peerConf )
     {
         if ( peerConf == null )
@@ -308,7 +295,7 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public void destroyContainer( ContainerHost containerHost, boolean async )
+    public void destroyContainer( EnvironmentContainerHost containerHost, boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
         environmentManager.destroyContainer( getId(), containerHost.getId(), async, false );
@@ -350,21 +337,6 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         Preconditions.checkNotNull( container );
         containers.remove( container );
-
-        //        try
-        //        {
-        ////            ContainerHost container = getContainerHostById( containerId );
-        //
-        //            synchronized ( containers )
-        //            {
-        //                containers.remove( container );
-        //            }
-        //        }
-        //        catch ( ContainerHostNotFoundException e )
-        //        {
-        //            LOG.warn( String.format( "Failed to remove container %s because it does not exist", containerId
-        // ), e );
-        //        }
     }
 
 
@@ -397,14 +369,6 @@ public class EnvironmentImpl implements Environment, Serializable
         Preconditions.checkNotNull( environmentManager );
 
         this.environmentManager = environmentManager;
-    }
-
-
-    protected void setEnvironmentId( String environmentId )
-    {
-        Preconditions.checkNotNull( environmentId );
-
-        this.environmentId = environmentId;
     }
 
 
@@ -523,9 +487,8 @@ public class EnvironmentImpl implements Environment, Serializable
     public boolean isMember( final Peer peer )
     {
         boolean found = false;
-        for ( Iterator<PeerConf> it = peerConfs.iterator(); it.hasNext(); )
+        for ( PeerConf f : peerConfs )
         {
-            PeerConf f = it.next();
             if ( f.getPeerId().equals( peer.getId() ) )
             {
                 found = true;
@@ -561,22 +524,10 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "EnvironmentImpl{" );
-        sb.append( "userId=" ).append( userId );
-        sb.append( ", publicKey='" ).append( publicKey ).append( '\'' );
-        sb.append( ", status=" ).append( status );
-        sb.append( ", peerConfs=" ).append( peerConfs );
-        sb.append( ", containers=" ).append( containers );
-        sb.append( ", superNodePort=" ).append( superNodePort );
-        sb.append( ", superNode='" ).append( superNode ).append( '\'' );
-        sb.append( ", vni=" ).append( vni );
-        sb.append( ", lastUsedIpIndex=" ).append( lastUsedIpIndex );
-        sb.append( ", subnetCidr='" ).append( subnetCidr ).append( '\'' );
-        sb.append( ", creationTimestamp=" ).append( creationTimestamp );
-        sb.append( ", name='" ).append( name ).append( '\'' );
-        sb.append( ", peerId='" ).append( peerId ).append( '\'' );
-        sb.append( ", environmentId='" ).append( environmentId ).append( '\'' );
-        sb.append( '}' );
-        return sb.toString();
+        return "EnvironmentImpl{" + "userId=" + userId + ", publicKey='" + publicKey + '\'' + ", status=" + status
+                + ", peerConfs=" + peerConfs + ", containers=" + containers + ", superNodePort=" + superNodePort
+                + ", superNode='" + superNode + '\'' + ", vni=" + vni + ", lastUsedIpIndex=" + lastUsedIpIndex
+                + ", subnetCidr='" + subnetCidr + '\'' + ", creationTimestamp=" + creationTimestamp + ", name='" + name
+                + '\'' + ", peerId='" + peerId + '\'' + ", environmentId='" + environmentId + '\'' + '}';
     }
 }

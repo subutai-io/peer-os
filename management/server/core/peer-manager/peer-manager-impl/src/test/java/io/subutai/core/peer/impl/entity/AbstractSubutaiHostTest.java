@@ -81,10 +81,10 @@ public class AbstractSubutaiHostTest
         when( hostInfo.getHostname() ).thenReturn( HOSTNAME );
         when( hostInfo.getArch() ).thenReturn( ARCH );
         when( hostInfo.getInterfaces() ).thenReturn( Sets.newHashSet( anInterface ) );
-        when( anInterface.getInterfaceName() ).thenReturn( INTERFACE_NAME );
+        when( anInterface.getName() ).thenReturn( INTERFACE_NAME );
         when( anInterface.getIp() ).thenReturn( IP );
         when( anInterface.getMac() ).thenReturn( MAC );
-        host = new HostImpl( PEER_ID.toString(), hostInfo );
+        host = new HostImpl( PEER_ID, hostInfo );
         host.setPeer( peer );
         host.init();
     }
@@ -147,7 +147,7 @@ public class AbstractSubutaiHostTest
     @Test
     public void testGetPeerId() throws Exception
     {
-        assertEquals( PEER_ID.toString(), host.getPeerId() );
+        assertEquals( PEER_ID, host.getPeerId() );
     }
 
 
@@ -227,7 +227,7 @@ public class AbstractSubutaiHostTest
 //    public void testSetNetInterfaces() throws Exception
 //    {
 //        Interface anInterface = mock( Interface.class );
-//        when( anInterface.getInterfaceName() ).thenReturn( INTERFACE_NAME );
+//        when( anInterface.getName() ).thenReturn( INTERFACE_NAME );
 //        when( anInterface.getIp() ).thenReturn( IP );
 //        when( anInterface.getMac() ).thenReturn( MAC );
 //
@@ -247,14 +247,14 @@ public class AbstractSubutaiHostTest
     @Test
     public void testToString() throws Exception
     {
-        assertThat( host.toString(), containsString( PEER_ID.toString() ) );
+        assertThat( host.toString(), containsString( PEER_ID ) );
     }
 
 
     @Test
     public void testEquals() throws Exception
     {
-        HostImpl host1 = new HostImpl( PEER_ID.toString(), hostInfo );
+        HostImpl host1 = new HostImpl( PEER_ID, hostInfo );
 
         assertEquals( host1, host );
 
@@ -267,7 +267,7 @@ public class AbstractSubutaiHostTest
     @Test
     public void testHashcode() throws Exception
     {
-        HostImpl host1 = new HostImpl( PEER_ID.toString(), hostInfo );
+        HostImpl host1 = new HostImpl( PEER_ID, hostInfo );
 
         assertEquals( host1.hashCode(), host.hashCode() );
     }

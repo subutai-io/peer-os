@@ -25,6 +25,7 @@ import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.mdc.SubutaiExecutors;
+import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
@@ -93,7 +94,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         //create empty environment
         final EnvironmentImpl environment = createEmptyEnvironment( name, subnetCidr, sshKey );
 
-        //        saveEnvironment( environment );
         //create operation tracker
         TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
                 String.format( "Creating environment %s ", environment.getId() ) );
@@ -111,15 +111,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             @Override
             public void run()
             {
-                //                try
-                //                {
-                //                    notifyOnEnvironmentCreated( loadEnvironment( environment.getId() ) );
+
                 notifyOnEnvironmentCreated( environment );
-                //                }
-                //                catch ( EnvironmentNotFoundException e )
-                //                {
-                //                    LOG.error( "Error notifying environment event listeners", e );
-                //                }
             }
         } );
 
@@ -136,22 +129,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
 
         //return created environment
-        //        try
-        //        {
-
-        //        updateEnvironment( environment );
         return environment;
-        //        }
-        //        catch ( EnvironmentNotFoundException e )
-        //        {
-        //            throw new EnvironmentCreationException( e );
-        //        }
     }
 
 
     @Override
     public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology,
-                                               final boolean async )
+                                                          final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
@@ -165,8 +149,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology, final boolean async,
-                                               final boolean checkAccess, final TrackerOperation operationTracker )
+    public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology,
+                                                          final boolean async, final boolean checkAccess,
+                                                          final TrackerOperation operationTracker )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
@@ -230,15 +215,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
         }
 
-        //        updateEnvironment(environment);
         return Sets.newHashSet();
     }
-
-
-    //    private void updateEnvironment( final EnvironmentImpl environment )
-    //    {
-    //        environmentDataService.update( environment );
-    //    }
 
 
     @Override
@@ -278,7 +256,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                         exceptionUtil.getRootCause( sshKeyModificationWorkflow.getError() ) );
             }
         }
-        //        updateEnvironment(environment);
     }
 
 
@@ -540,17 +517,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void assignEnvironmentDomain( final String environmentId, final String newDomain )
+    public void assignEnvironmentDomain( final String environmentId, final String newDomain,
+                                         final DomainLoadBalanceStrategy domainLoadBalanceStrategy )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( newDomain ), "Invalid domain" );
         Preconditions.checkArgument( newDomain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
+        Preconditions.checkNotNull( domainLoadBalanceStrategy );
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
                 String.format( "Assigning environment %s domain", environmentId ) );
 
-        modifyEnvironmentDomain( environmentId, newDomain, operationTracker, true );
+        modifyEnvironmentDomain( environmentId, newDomain, domainLoadBalanceStrategy, operationTracker, true );
     }
 
 
@@ -563,15 +542,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
                 String.format( "Removing environment %s domain", environmentId ) );
 
-        modifyEnvironmentDomain( environmentId, null, operationTracker, true );
+        modifyEnvironmentDomain( environmentId, null, null, operationTracker, true );
     }
 
 
     public void modifyEnvironmentDomain( final String environmentId, final String domain,
+                                         final DomainLoadBalanceStrategy domainLoadBalanceStrategy,
                                          final TrackerOperation operationTracker, boolean checkAccess )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkNotNull( operationTracker );
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, checkAccess );
 
@@ -583,7 +564,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
             else
             {
-                peerManager.getLocalPeer().setVniDomain( environment.getVni(), domain );
+                peerManager.getLocalPeer().setVniDomain( environment.getVni(), domain, domainLoadBalanceStrategy );
             }
 
             operationTracker.addLogDone( "Environment domain modified" );
@@ -725,7 +706,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                                                                 final TrackerOperation
                                                                                         operationTracker )
     {
-        return new EnvironmentDestructionWorkflow( /*peerManager,*/ environmentManager, environment, forceMetadataRemoval,
+        return new EnvironmentDestructionWorkflow( environmentManager, environment, forceMetadataRemoval,
                 operationTracker );
     }
 
@@ -848,7 +829,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void notifyOnEnvironmentGrown( final Environment environment, final Set<EnvironmentContainerHost> containers )
+    public void notifyOnEnvironmentGrown( final Environment environment,
+                                          final Set<EnvironmentContainerHost> containers )
     {
         for ( final EnvironmentEventListener listener : listeners )
         {
@@ -906,7 +888,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     protected EnvironmentImpl createEmptyEnvironment( final String name, final String subnetCidr, final String sshKey )
     {
 
-        final EnvironmentImpl environment = new EnvironmentImpl( name, subnetCidr, sshKey, getUserId() );
+        EnvironmentImpl environment =
+                new EnvironmentImpl( name, subnetCidr, sshKey, getUserId(), peerManager.getLocalPeerInfo().getId() );
+
+        environment = saveOrUpdate( environment );
 
         setEnvironmentTransientFields( environment );
 
@@ -978,9 +963,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void saveOrUpdate( final Environment environment )
+    public EnvironmentImpl saveOrUpdate( final Environment environment )
     {
-        environmentDataService.saveOrUpdate( environment );
+        EnvironmentImpl env = environmentDataService.saveOrUpdate( environment );
+        setEnvironmentTransientFields( env );
+        return env;
     }
 
 

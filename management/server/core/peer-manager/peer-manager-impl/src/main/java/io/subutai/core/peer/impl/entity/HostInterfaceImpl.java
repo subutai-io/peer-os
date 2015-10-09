@@ -14,7 +14,6 @@ public class HostInterfaceImpl implements Interface, Serializable
     private String interfaceName;
     private String ip;
     private String mac;
-    private AbstractSubutaiHost host;
 
 
     protected HostInterfaceImpl()
@@ -24,22 +23,22 @@ public class HostInterfaceImpl implements Interface, Serializable
 
     public HostInterfaceImpl( final Interface s )
     {
-        this.interfaceName = s.getInterfaceName();
+        this.interfaceName = s.getName();
         this.ip = s.getIp().replace( "addr:", "" );
         this.mac = s.getMac();
     }
 
 
     @Override
-    public String getInterfaceName()
+    public String getName()
     {
         return interfaceName;
     }
 
 
-    public void setInterfaceName( final String interfaceName )
+    public void setName( final String name )
     {
-        this.interfaceName = interfaceName;
+        this.interfaceName = name;
     }
 
 
@@ -66,18 +65,6 @@ public class HostInterfaceImpl implements Interface, Serializable
     public void setMac( final String mac )
     {
         this.mac = mac;
-    }
-
-
-    public AbstractSubutaiHost getHost()
-    {
-        return host;
-    }
-
-
-    public void setHost( final AbstractSubutaiHost host )
-    {
-        this.host = host;
     }
 
 

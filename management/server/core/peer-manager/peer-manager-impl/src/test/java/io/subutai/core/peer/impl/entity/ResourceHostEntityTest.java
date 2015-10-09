@@ -25,13 +25,13 @@ import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Template;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
-import io.subutai.common.peer.HostNotFoundException;
-import io.subutai.common.peer.ResourceHostException;
 import io.subutai.core.registry.api.TemplateRegistry;
 
 import static junit.framework.Assert.assertTrue;
@@ -107,11 +107,11 @@ public class ResourceHostEntityTest
         when( hostInfo.getHostname() ).thenReturn( HOSTNAME );
         when( hostInfo.getArch() ).thenReturn( ARCH );
         when( hostInfo.getInterfaces() ).thenReturn( Sets.newHashSet( anInterface ) );
-        when( anInterface.getInterfaceName() ).thenReturn( INTERFACE_NAME );
+        when( anInterface.getName() ).thenReturn( INTERFACE_NAME );
         when( anInterface.getIp() ).thenReturn( IP );
         when( anInterface.getMac() ).thenReturn( MAC );
 
-        resourceHostEntity = new ResourceHostEntity( PEER_ID.toString(), hostInfo );
+        resourceHostEntity = new ResourceHostEntity( PEER_ID, hostInfo );
         resourceHostEntity.setHostRegistry( hostRegistry );
         resourceHostEntity.setMonitor( monitor );
         resourceHostEntity.setRegistry( registry );

@@ -1414,8 +1414,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public ContainersDestructionResult destroyContainersByEnvironment( final String environmentId )
-            throws PeerException
+    public ContainersDestructionResult destroyContainersByEnvironment( final String environmentId ) throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
@@ -1626,43 +1625,9 @@ public class RemotePeerImpl implements RemotePeer
         client.accept( MediaType.APPLICATION_JSON );
 
         Collection interfaces = client.postAndGetCollection( pattern, HostInterfaceImpl.class );
-        LOG.debug( String.format( "%d", interfaces.size() ) );
         return Sets.newHashSet( interfaces );
     }
 
-
-//    @Override
-//    public int setupTunnels( final Map<String, String> peerIps, final UUID environmentId ) throws PeerException
-//    {
-//
-//        Preconditions.checkNotNull( peerIps, "Invalid peer ips set" );
-//        Preconditions.checkArgument( !peerIps.isEmpty(), "Invalid peer ips set" );
-//        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-//
-//        String path = "peer/tunnels";
-//
-//        try
-//        {
-//            //*********construct Secure Header ****************************
-//            Map<String, String> headers = Maps.newHashMap();
-//
-//            headers.put( Common.HEADER_SPECIAL, "ENC" );
-//            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId().toString() );
-//            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId().toString() );
-//            //*************************************************************
-//            Map<String, String> params = Maps.newHashMap();
-//            params.put( "peerIps", jsonUtil.to( peerIps ) );
-//            params.put( "environmentId", environmentId.toString() );
-//
-//            String response = post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
-//
-//            return Integer.parseInt( response );
-//        }
-//        catch ( Exception e )
-//        {
-//            throw new PeerException( String.format( "Error setting up tunnels on peer %s", getName() ), e );
-//        }
-//    }
 
     @Override
     public void setupN2NConnection( final N2NConfig config )
@@ -1673,10 +1638,6 @@ public class RemotePeerImpl implements RemotePeer
         String path = "peer/n2ntunnel";
         LOG.debug( String.format( "%s %s %s", peerInfo.getIp(), peerInfo.getPort(), baseUrl ) );
 
-
-        //TODO: implement as singleton
-        List<Object> providers = Lists.newArrayList();
-        providers.add( new JacksonJaxbJsonProvider() );
 
         WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
                 SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, providers );
@@ -1696,11 +1657,6 @@ public class RemotePeerImpl implements RemotePeer
 
         String path = String.format( "peer/n2ntunnel/%s/%s", config.getInterfaceName(), config.getCommunityName() );
         LOG.debug( String.format( "%s %s %s", peerInfo.getIp(), peerInfo.getPort(), baseUrl ) );
-
-
-        //TODO: implement as singleton
-        List<Object> providers = Lists.newArrayList();
-        providers.add( new JacksonJaxbJsonProvider() );
 
         WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
                 SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, providers );

@@ -16,6 +16,7 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainersDestructionResult;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
@@ -29,13 +30,13 @@ import io.subutai.core.environment.impl.workflow.destruction.steps.helpers.Envir
 
 public class DestroyContainersStep
 {
-    private final Environment environment;
+    private final EnvironmentImpl environment;
     private final EnvironmentManagerImpl environmentManager;
     private final boolean forceMetadataRemoval;
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
-    public DestroyContainersStep( final Environment environment, final EnvironmentManagerImpl environmentManager,
+    public DestroyContainersStep( final EnvironmentImpl environment, final EnvironmentManagerImpl environmentManager,
                                   final boolean forceMetadataRemoval )
     {
         Preconditions.checkNotNull( environment );
@@ -109,7 +110,7 @@ public class DestroyContainersStep
                 }
                 if ( deleteAllPeerContainers )
                 {
-                    for ( ContainerHost containerHost : environment.getContainerHosts() )
+                    for ( EnvironmentContainerHost containerHost : environment.getContainerHosts() )
                     {
                         if ( containerHost.getPeerId().equals( result.peerId() ) )
                         {
@@ -131,16 +132,7 @@ public class DestroyContainersStep
             }
 
 
-            //            if ( forceMetadataRemoval || environment.getContainerHosts().isEmpty() )
-            //            {
-            //                environmentManager.removeEnvironment( environment.getId()/*, false*/ );
-            //            }
-            //            else
-            //            {
-            //                throw new EnvironmentDestructionException(
-            //                        String.format( "There were errors while destroying environment: %s", exceptions
-            // ) );
-            //            }
+
         }
         finally
         {

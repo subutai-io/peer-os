@@ -3,9 +3,9 @@ package io.subutai.core.network.api;
 
 import java.util.Set;
 
+import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.core.peer.api.Tunnel;
 
@@ -163,7 +163,8 @@ public interface NetworkManager
      * @param containers - set of {@code ContainerHost}
      * @param domainName - domain name e.g. "intra.lan"
      */
-    public void registerHosts( Set<EnvironmentContainerHost> containers, String domainName ) throws NetworkManagerException;
+    public void registerHosts( Set<EnvironmentContainerHost> containers, String domainName )
+            throws NetworkManagerException;
 
     /**
      * Returns reverse proxy domain assigned to vlan
@@ -186,8 +187,10 @@ public interface NetworkManager
      * Assigns reverse proxy domain to vlan
      *
      * @param vLanId - vlan id
+     * @param domainLoadBalanceStrategy - strategy to load balance requests to the domain
      */
-    public void setVlanDomain( int vLanId, String domain ) throws NetworkManagerException;
+    public void setVlanDomain( int vLanId, String domain, DomainLoadBalanceStrategy domainLoadBalanceStrategy )
+            throws NetworkManagerException;
 
     /**
      * Checks if IP is in vlan reverse proxy domain

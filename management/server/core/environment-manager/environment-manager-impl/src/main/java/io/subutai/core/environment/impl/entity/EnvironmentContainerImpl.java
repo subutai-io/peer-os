@@ -20,7 +20,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
@@ -36,7 +36,6 @@ import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
 import io.subutai.common.metric.ProcessResourceUsage;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.HostInfoModel;
 import io.subutai.common.peer.Peer;
@@ -398,7 +397,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     {
         for ( Interface iface : interfaces )
         {
-            if ( iface.getInterfaceName().equalsIgnoreCase( interfaceName ) )
+            if ( iface.getName().equalsIgnoreCase( interfaceName ) )
             {
                 return iface.getIp();
             }
@@ -413,7 +412,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     {
         for ( Interface iface : interfaces )
         {
-            if ( iface.getInterfaceName().equalsIgnoreCase( interfaceName ) )
+            if ( iface.getName().equalsIgnoreCase( interfaceName ) )
             {
                 return iface.getMac();
             }
@@ -573,6 +572,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         throw new UnsupportedOperationException( "Not implemented yet." );
     }
 
+
     @Override
     public boolean equals( final Object o )
     {
@@ -608,12 +608,12 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     {
         ContainerHostState state = getStatus();
 
-        return Objects.toStringHelper( this ).add( "hostId", hostId ).add( "hostname", hostname )
-                      .add( "nodeGroupName", nodeGroupName ).add( "creatorPeerId", creatorPeerId )
-                      .add( "templateName", templateName ).add( "environmentId", environment.getId() )
-                      .add( "sshGroupId", sshGroupId ).add( "hostsGroupId", hostsGroupId )
-                      .add( "domainName", domainName ).add( "tags", tags ).add( "templateArch", templateArch )
-                      .add( "hostArchitecture", hostArchitecture ).add( "state", state ).toString();
+        return MoreObjects.toStringHelper( this ).add( "hostId", hostId ).add( "hostname", hostname )
+                          .add( "nodeGroupName", nodeGroupName ).add( "creatorPeerId", creatorPeerId )
+                          .add( "templateName", templateName ).add( "environmentId", environment.getId() )
+                          .add( "sshGroupId", sshGroupId ).add( "hostsGroupId", hostsGroupId )
+                          .add( "domainName", domainName ).add( "tags", tags ).add( "templateArch", templateArch )
+                          .add( "hostArchitecture", hostArchitecture ).add( "state", state ).toString();
     }
 
 

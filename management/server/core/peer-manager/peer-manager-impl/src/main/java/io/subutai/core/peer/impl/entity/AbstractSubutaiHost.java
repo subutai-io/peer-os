@@ -34,7 +34,6 @@ import io.subutai.common.peer.Peer;
 @Entity
 @Inheritance( strategy = InheritanceType.TABLE_PER_CLASS )
 @Access( AccessType.FIELD )
-
 public abstract class AbstractSubutaiHost implements Host
 {
     @Id
@@ -191,7 +190,7 @@ public abstract class AbstractSubutaiHost implements Host
     {
         for ( Interface iface : getInterfaces() )
         {
-            if ( iface.getInterfaceName().equalsIgnoreCase( interfaceName ) )
+            if ( iface.getName().equalsIgnoreCase( interfaceName ) )
             {
                 return iface.getIp();
             }
@@ -206,7 +205,7 @@ public abstract class AbstractSubutaiHost implements Host
     {
         for ( Interface iface : getInterfaces() )
         {
-            if ( iface.getInterfaceName().equalsIgnoreCase( interfaceName ) )
+            if ( iface.getName().equalsIgnoreCase( interfaceName ) )
             {
                 return iface.getMac();
             }
@@ -226,28 +225,8 @@ public abstract class AbstractSubutaiHost implements Host
     {
         Preconditions.checkNotNull( hostInterface, "HostInterface could not be null." );
 
-        hostInterface.setHost( this );
         interfaces.add( hostInterface );
     }
-    //
-    //
-    //    public void removeInterface( Interface hostInterface )
-    //    {
-    //        Preconditions.checkNotNull( hostInterface, "HostInterface could not be null." );
-    //
-    //        interfaces.remove( hostInterface );
-    //    }
-
-    //
-    //    public void setNetInterfaces( Set<Interface> interfaces )
-    //    {
-    //        this.interfaces.clear();
-    //        for ( Interface iface : interfaces )
-    //        {
-    //            addInterface( new HostInterfaceImpl( iface ) );
-    //        }
-    //    }
-
 
     @Override
     public HostArchitecture getArch()
