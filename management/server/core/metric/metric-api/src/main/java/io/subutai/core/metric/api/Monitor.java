@@ -40,8 +40,7 @@ public interface Monitor
     /**
      * Returns current metrics of local resource hosts
      *
-     * These metrics are to be used by container placement strategies in the context of local peer and for heartbeats to
-     * HUB.
+     * These metrics are to be used by container placement strategies in the context of local peer
      *
      * Resource hosts are "visible" to the local peer only
      *
