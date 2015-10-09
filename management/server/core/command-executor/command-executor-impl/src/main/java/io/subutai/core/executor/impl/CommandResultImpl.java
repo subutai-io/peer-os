@@ -1,10 +1,10 @@
 package io.subutai.core.executor.impl;
 
 
+import com.google.common.base.MoreObjects;
+
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandStatus;
-
-import com.google.common.base.Objects;
 
 
 /**
@@ -72,7 +72,7 @@ public class CommandResultImpl implements CommandResult
     @Override
     public String toString()
     {
-        return Objects.toStringHelper( this ).add( "exitCode", exitCode ).add( "stdOut", stdOut )
-                      .add( "stdErr", stdErr ).add( "status", status ).toString();
+        return MoreObjects.toStringHelper( this ).add( "exitCode", exitCode ).add( "stdOut", stdOut )
+                          .add( "stdErr", stdErr ).add( "status", status ).toString();
     }
 }

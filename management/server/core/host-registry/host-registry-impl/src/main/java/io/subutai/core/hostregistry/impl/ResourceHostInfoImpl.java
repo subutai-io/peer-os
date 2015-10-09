@@ -3,15 +3,15 @@ package io.subutai.core.hostregistry.impl;
 
 import java.util.Set;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
-import io.subutai.common.util.CollectionUtil;
-import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.util.CollectionUtil;
 
 
 /**
@@ -76,8 +76,8 @@ public class ResourceHostInfoImpl implements ResourceHostInfo
     @Override
     public String toString()
     {
-        return Objects.toStringHelper( this ).add( "id", id ).add( "hostname", hostname )
-                      .add( "interfaces", interfaces ).add( "containers", containers ).toString();
+        return MoreObjects.toStringHelper( this ).add( "id", id ).add( "hostname", hostname )
+                          .add( "interfaces", interfaces ).add( "containers", containers ).toString();
     }
 
 

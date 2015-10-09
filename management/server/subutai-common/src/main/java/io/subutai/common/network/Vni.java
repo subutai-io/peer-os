@@ -1,7 +1,7 @@
 package io.subutai.common.network;
 
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.settings.Common;
@@ -58,8 +58,8 @@ public class Vni
     @Override
     public String toString()
     {
-        return Objects.toStringHelper( this ).add( "vni", vni ).add( "environmentId", environmentId )
-                      .add( "vlan", vlan ).toString();
+        return MoreObjects.toStringHelper( this ).add( "vni", vni ).add( "environmentId", environmentId )
+                          .add( "vlan", vlan ).toString();
     }
 
 

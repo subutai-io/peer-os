@@ -3,7 +3,7 @@ package io.subutai.core.security.broker;
 
 import java.util.Set;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.host.ContainerHostInfo;
@@ -77,8 +77,8 @@ public class ContainerHostInfoImpl implements ContainerHostInfo
     @Override
     public String toString()
     {
-        return Objects.toStringHelper( this ).add( "id", id ).add( "hostname", hostname )
-                      .add( "interfaces", interfaces ).add( "status", status ).add( "arch", arch ).toString();
+        return MoreObjects.toStringHelper( this ).add( "id", id ).add( "hostname", hostname )
+                          .add( "interfaces", interfaces ).add( "status", status ).add( "arch", arch ).toString();
     }
 
 

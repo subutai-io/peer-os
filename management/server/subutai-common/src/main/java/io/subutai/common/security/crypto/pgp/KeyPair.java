@@ -1,7 +1,7 @@
 package io.subutai.common.security.crypto.pgp;
 
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 
 /**
@@ -93,9 +93,9 @@ public class KeyPair
     @Override
     public String toString()
     {
-        return Objects.toStringHelper( this ).add( "primaryKeyId", primaryKeyId )
-                      .add( "primaryKeyFingerprint", primaryKeyFingerprint ).add( "subKeyId", subKeyId )
-                      .add( "subKeyFingerprint", subKeyFingerprint ).add( "pubKeyring", new String( pubKeyring ) )
-                      .add( "secKeyring", new String( secKeyring ) ).toString();
+        return MoreObjects.toStringHelper( this ).add( "primaryKeyId", primaryKeyId )
+                          .add( "primaryKeyFingerprint", primaryKeyFingerprint ).add( "subKeyId", subKeyId )
+                          .add( "subKeyFingerprint", subKeyFingerprint ).add( "pubKeyring", new String( pubKeyring ) )
+                          .add( "secKeyring", new String( secKeyring ) ).toString();
     }
 }

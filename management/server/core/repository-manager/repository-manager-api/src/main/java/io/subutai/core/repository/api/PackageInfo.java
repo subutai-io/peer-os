@@ -1,7 +1,7 @@
 package io.subutai.core.repository.api;
 
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 
 
@@ -39,7 +39,7 @@ public class PackageInfo
     @Override
     public String toString()
     {
-        return Objects.toStringHelper( this ).add( "name", name ).add( "description", description ).toString();
+        return MoreObjects.toStringHelper( this ).add( "name", name ).add( "description", description ).toString();
     }
 
 

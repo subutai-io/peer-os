@@ -11,7 +11,7 @@ import io.subutai.common.host.Interface;
 @XmlRootElement
 public class HostInterfaceImpl implements Interface, Serializable
 {
-    private String name;
+    private String interfaceName;
     private String ip;
     private String mac;
 
@@ -23,7 +23,7 @@ public class HostInterfaceImpl implements Interface, Serializable
 
     public HostInterfaceImpl( final Interface s )
     {
-        this.name = s.getName();
+        this.interfaceName = s.getName();
         this.ip = s.getIp().replace( "addr:", "" );
         this.mac = s.getMac();
     }
@@ -32,13 +32,13 @@ public class HostInterfaceImpl implements Interface, Serializable
     @Override
     public String getName()
     {
-        return name;
+        return interfaceName;
     }
 
 
     public void setName( final String name )
     {
-        this.name = name;
+        this.interfaceName = name;
     }
 
 

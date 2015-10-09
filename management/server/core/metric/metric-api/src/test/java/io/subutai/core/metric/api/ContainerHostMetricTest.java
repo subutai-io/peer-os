@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 import io.subutai.common.metric.ContainerHostMetric;
 
@@ -28,8 +28,8 @@ public class ContainerHostMetricTest
         @Override
         public String toString()
         {
-            return Objects.toStringHelper( this ).add( "metric", super.toString() ).add( "hostId", hostId )
-                          .add( "environmentId", getEnvironmentId() ).toString();
+            return MoreObjects.toStringHelper( this ).add( "metric", super.toString() ).add( "hostId", hostId )
+                              .add( "environmentId", getEnvironmentId() ).toString();
         }
     }
 

@@ -17,13 +17,13 @@ import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Sets;
 
-import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.util.N2NUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
+import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.entity.PeerConfImpl;
 
 
@@ -31,10 +31,10 @@ public class SetupN2NStep
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( SetupN2NStep.class );
     private final Topology topology;
-    private final Environment environment;
+    private final EnvironmentImpl environment;
 
 
-    public SetupN2NStep( final Topology topology, final Environment environment )
+    public SetupN2NStep( final Topology topology, final EnvironmentImpl environment )
     {
         this.topology = topology;
         this.environment = environment;

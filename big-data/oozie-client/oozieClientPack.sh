@@ -25,6 +25,9 @@ downloadFileAndMakeChanges() {
 	tar -xpzf $tarFile -C .
 	rm $tarFile
 
+        sed -i -e 's/-DgenerateDocs//g'     $extractedDirectory/bin/mkdistro.sh
+        sed -i -e 's/repository.codehaus.org/repository.mulesoft.org\/nexus\/content\/repositories\/public/g' $extractedDirectory/pom.xml
+
 	#Creating oozie distro
 	$extractedDirectory/bin/mkdistro.sh -DskipTests
 	if [ -d "$tempDirectory/../local.repository" ]; then
