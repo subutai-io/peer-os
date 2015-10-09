@@ -4,10 +4,8 @@ package io.subutai.core.identity.rbac.cli;
 import java.util.Set;
 
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.identity.api.CliCommand;
-import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.Role;
-import io.subutai.core.identity.api.User;
+import io.subutai.core.identity.api.model.Role;
+import io.subutai.core.identity.api.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

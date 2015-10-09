@@ -38,6 +38,11 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.apache.karaf.shell</groupId>
+      <artifactId>org.apache.karaf.shell.console</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
       <scope>provided</scope>
@@ -52,14 +57,22 @@
       <artifactId>identity-manager-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-<!--    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-    </dependency>-->
+
+    <!--******** WT Library ****************-->
+    <dependency>
+      <groupId>com.nimbusds</groupId>
+      <artifactId>nimbus-jose-jwt</artifactId>
+    </dependency>
+    <!--************************************-->
+
+    <!--************************************-->
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
+    <!--************************************-->
+
+    <!--******** Shiro *********************-->
     <dependency>
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-core</artifactId>
@@ -72,10 +85,8 @@
       <version>${org.apache.shiro.version}</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.apache.karaf.shell</groupId>
-      <artifactId>org.apache.karaf.shell.console</artifactId>
-    </dependency>
+    <!--************************************-->
+
     <!--Tests-->
     <dependency>
       <groupId>junit</groupId>
@@ -98,6 +109,7 @@
       <artifactId>geronimo-jpa_2.0_spec</artifactId>
       <version>1.1</version>
     </dependency>
+
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>

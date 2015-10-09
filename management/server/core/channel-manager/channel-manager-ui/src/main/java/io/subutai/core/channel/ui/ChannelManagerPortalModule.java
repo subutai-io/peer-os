@@ -5,7 +5,6 @@ import java.io.File;
 
 import io.subutai.common.util.FileUtil;
 import io.subutai.core.channel.api.ChannelManager;
-import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;

@@ -8,11 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import io.subutai.core.identity.api.CliCommand;
-import io.subutai.core.identity.api.Permission;
-import io.subutai.core.identity.api.PortalModuleScope;
-import io.subutai.core.identity.api.RestEndpointScope;
-import io.subutai.core.identity.api.Role;
+import io.subutai.core.identity.api.model.Permission;
+import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.ui.tabs.TabCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

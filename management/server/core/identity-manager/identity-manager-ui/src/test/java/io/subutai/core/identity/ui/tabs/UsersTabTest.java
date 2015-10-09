@@ -6,9 +6,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.User;
-import io.subutai.core.identity.ui.tabs.UsersTab;
+
+import io.subutai.core.identity.api.model.User;
 
 import com.vaadin.data.util.BeanItem;
 

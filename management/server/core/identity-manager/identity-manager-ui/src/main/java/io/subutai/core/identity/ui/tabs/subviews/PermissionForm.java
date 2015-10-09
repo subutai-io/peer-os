@@ -3,8 +3,7 @@ package io.subutai.core.identity.ui.tabs.subviews;
 
 import java.util.EnumSet;
 
-import io.subutai.core.identity.api.Permission;
-import io.subutai.core.identity.api.PermissionGroup;
+import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.ui.tabs.TabCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

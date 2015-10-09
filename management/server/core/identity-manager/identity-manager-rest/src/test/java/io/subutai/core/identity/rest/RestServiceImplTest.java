@@ -9,15 +9,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
-import io.subutai.core.identity.api.CliCommand;
-import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.Permission;
-import io.subutai.core.identity.api.PermissionGroup;
-import io.subutai.core.identity.api.PortalModuleScope;
-import io.subutai.core.identity.api.RestEndpointScope;
-import io.subutai.core.identity.api.Role;
-import io.subutai.core.identity.api.User;
-import io.subutai.core.identity.rest.RestServiceImpl;
+
+import io.subutai.core.identity.api.model.Permission;
+import io.subutai.core.identity.api.model.Role;
+import io.subutai.core.identity.api.model.User;
 
 import org.apache.shiro.subject.Subject;
 

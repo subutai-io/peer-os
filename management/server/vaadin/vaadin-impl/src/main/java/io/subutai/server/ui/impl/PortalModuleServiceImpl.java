@@ -8,7 +8,6 @@ import java.util.List;
 import javax.naming.NamingException;
 
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.server.ui.api.PortalModule;
 import io.subutai.server.ui.api.PortalModuleListener;
 import io.subutai.server.ui.api.PortalModuleService;

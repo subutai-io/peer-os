@@ -5,7 +5,6 @@ import io.subutai.common.security.NullSubutaiLoginContext;
 import io.subutai.common.security.SubutaiLoginContext;
 import io.subutai.common.security.SubutaiThreadContext;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.server.ui.util.SubutaiVaadinUtils;
 
 import com.vaadin.server.DeploymentConfiguration;

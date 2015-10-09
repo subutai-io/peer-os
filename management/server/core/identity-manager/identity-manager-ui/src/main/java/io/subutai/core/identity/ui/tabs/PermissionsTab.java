@@ -2,8 +2,7 @@ package io.subutai.core.identity.ui.tabs;
 
 
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.Permission;
-import io.subutai.core.identity.api.PermissionGroup;
+import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.ui.tabs.subviews.PermissionForm;
 
 import com.vaadin.data.Property;

@@ -2,7 +2,7 @@ package io.subutai.core.identity.ui.tabs;
 
 
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.User;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.ui.tabs.subviews.UserForm;
 
 import org.slf4j.Logger;

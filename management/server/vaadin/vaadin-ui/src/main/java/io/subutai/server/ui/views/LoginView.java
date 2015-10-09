@@ -8,7 +8,6 @@ import javax.servlet.http.Cookie;
 import io.subutai.common.security.SubutaiLoginContext;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.server.ui.MainUI;
 import io.subutai.server.ui.util.HelpManager;
 

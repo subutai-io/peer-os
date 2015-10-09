@@ -2,7 +2,7 @@ package io.subutai.core.identity.ui.tabs;
 
 
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.Role;
+import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.ui.tabs.subviews.RoleForm;
 
 import com.google.common.collect.Sets;

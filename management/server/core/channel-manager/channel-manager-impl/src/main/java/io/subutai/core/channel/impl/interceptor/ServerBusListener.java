@@ -26,6 +26,7 @@ public class ServerBusListener extends AbstractFeature
         //********Set BUS Message Size to 500 KB ************************
         bus.setProperty( "bus.io.CachedOutputStream.Threshold", "500000" );
         System.setProperty( "org.apache.cxf.io.CachedOutputStream.Threshold", "500000" );
+        LOG.info( "Setting CXF CachedOutputStream.Threshold size to: 500Kb ");
         //***************************************************************
 
         // initialise the feature on the bus, which will add the interceptors

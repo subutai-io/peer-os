@@ -6,9 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.Role;
-import io.subutai.core.identity.api.User;
+import io.subutai.core.identity.api.model.Role;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.ui.ErrorUtils;
 import io.subutai.core.identity.ui.tabs.TabCallback;
 import org.slf4j.Logger;
