@@ -15,15 +15,15 @@ public interface RegistrationManager
 {
     public List<RequestedHost> getRequests();
 
-    public RequestedHost getRequest( UUID requestId );
+    public RequestedHost getRequest( String requestId );
 
     public void queueRequest( RequestedHost requestedHost ) throws NodeRegistrationException;
 
-    public void rejectRequest( UUID requestId );
+    public void rejectRequest( String requestId );
 
-    public void approveRequest( UUID requestId );
+    public void approveRequest( String requestId );
 
-    public void removeRequest( UUID requestId );
+    public void removeRequest( String requestId );
 
     public ContainerToken generateContainerTTLToken( Long ttl );
 

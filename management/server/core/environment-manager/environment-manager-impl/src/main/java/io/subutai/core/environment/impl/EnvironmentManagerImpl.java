@@ -100,6 +100,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         Iterator<HostInfo> hostIterator = containersEntry.getValue().iterator();
 
         String ip = "";
+
         while ( hostIterator.hasNext() && StringUtil.isStringNullOrEmpty( ip ) )
         {
             HostInfo sampleHostInfo = hostIterator.next();

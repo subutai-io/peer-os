@@ -14,9 +14,7 @@ import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 
 
-/**
- * Created by talas on 8/25/15.
- */
+
 public class RegistrationRestServiceImpl implements RegistrationRestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RegistrationRestServiceImpl.class );

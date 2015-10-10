@@ -163,7 +163,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
 
     @Override
-    public RequestedHost getRequest( final UUID requestId )
+    public RequestedHost getRequest( final String requestId )
     {
         return requestDataService.find( requestId );
     }
@@ -172,7 +172,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     @Override
     public void queueRequest( final RequestedHost requestedHost ) throws NodeRegistrationException
     {
-        if ( requestDataService.find( UUID.fromString( requestedHost.getId() ) ) != null )
+        if ( requestDataService.find( requestedHost.getId() ) != null )
         {
             LOGGER.info( "Already requested registration" );
         }
@@ -193,7 +193,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
 
     @Override
-    public void rejectRequest( final UUID requestId )
+    public void rejectRequest( final String requestId )
     {
         RequestedHostImpl registrationRequest = requestDataService.find( requestId );
         registrationRequest.setStatus( RegistrationStatus.REJECTED );
@@ -221,7 +221,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
 
     @Override
-    public void approveRequest( final UUID requestId )
+    public void approveRequest( final String requestId )
     {
         RequestedHostImpl registrationRequest = requestDataService.find( requestId );
 
@@ -378,7 +378,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
     {
-        RequestedHostImpl requestedHost = requestDataService.find( UUID.fromString( resourceHostInfo.getId() ) );
+        RequestedHostImpl requestedHost = requestDataService.find( resourceHostInfo.getId() );
         if ( requestedHost != null && requestedHost.getStatus() == RegistrationStatus.APPROVED )
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
@@ -395,7 +395,8 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                         ContainerInfoImpl containerInfoImpl =
                                 containerInfoDataService.find( containerInfo.getId().toString() );
 
-                        EnvironmentContainerHost containerHost = (EnvironmentContainerHost) resourceHost.getContainerHostById( containerInfo.getId() );
+                        EnvironmentContainerHost containerHost =
+                                ( EnvironmentContainerHost ) resourceHost.getContainerHostById( containerInfo.getId() );
 
                         containerInfoImpl.setStatus( RegistrationStatus.REGISTERED );
                         containerInfoDataService.update( containerInfoImpl );
@@ -439,7 +440,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
 
     @Override
-    public void removeRequest( final UUID requestId )
+    public void removeRequest( final String requestId )
     {
         requestDataService.remove( requestId );
     }

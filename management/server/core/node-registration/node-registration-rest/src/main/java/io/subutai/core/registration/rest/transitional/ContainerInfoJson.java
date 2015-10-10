@@ -3,7 +3,6 @@ package io.subutai.core.registration.rest.transitional;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import com.google.common.collect.Sets;
 
@@ -58,9 +57,9 @@ public class ContainerInfoJson implements ContainerInfo
 
 
     @Override
-    public UUID getId()
+    public String getId()
     {
-        return UUID.fromString( id );
+        return id;
     }
 
 

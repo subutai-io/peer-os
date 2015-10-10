@@ -70,7 +70,7 @@ public class RegistrationManagerImplTest
         requestedHosts.add( host1 );
         requestedHosts.add( host2 );
         when( requestDataService.getAll() ).thenReturn( requestedHosts );
-        when( requestDataService.find( uuid ) ).thenReturn( host1 );
+        when( requestDataService.find( uuid.toString() ) ).thenReturn( host1 );
         when( host1.getRestHook() ).thenReturn( "this is url" );
         when( host1.getId() ).thenReturn( "This is id" );
         when( securityManager.getEncryptionTool() ).thenReturn( encryptionTool );
@@ -111,7 +111,7 @@ public class RegistrationManagerImplTest
     @Test
     public void testGetRequest() throws Exception
     {
-        assertEquals( requestedHosts.iterator().next(), registrationManager.getRequest( uuid ) );
+        assertEquals( requestedHosts.iterator().next(), registrationManager.getRequest( uuid.toString() ) );
     }
 
 
@@ -142,6 +142,6 @@ public class RegistrationManagerImplTest
     @Test
     public void testRemoveRequest() throws Exception
     {
-        registrationManager.removeRequest( uuid );
+        registrationManager.removeRequest( uuid.toString() );
     }
 }

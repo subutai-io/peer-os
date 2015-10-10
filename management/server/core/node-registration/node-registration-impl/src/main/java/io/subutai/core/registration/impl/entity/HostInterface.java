@@ -56,7 +56,8 @@ public class HostInterface implements Interface, Serializable
     public HostInterface( final Interface aInterface )
     {
         Preconditions.checkNotNull( aInterface, "Invalid null argument aInterface" );
-        this.interfaceName = aInterface.getInterfaceName();
+
+        this.interfaceName = aInterface.getName();
         this.ip = aInterface.getIp();
         this.mac = aInterface.getMac();
     }
@@ -92,10 +93,16 @@ public class HostInterface implements Interface, Serializable
     }
 
 
-    @Override
     public String getInterfaceName()
     {
         return interfaceName;
+    }
+
+
+    @Override
+    public String getName()
+    {
+        return null;
     }
 
 

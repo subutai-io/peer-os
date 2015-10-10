@@ -39,7 +39,7 @@
              interface="io.subutai.core.broker.api.Broker" />
 
   <reference id="envRef" availability="mandatory"
-             interface="io.subutai.core.env.api.EnvironmentManager" />
+             interface="io.subutai.core.environment.api.EnvironmentManager" />
 
   <reference id="peerRef" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
