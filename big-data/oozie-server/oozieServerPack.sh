@@ -24,8 +24,8 @@ downloadFileAndMakeChanges() {
 	# Get necessary files
         wget http://archive.apache.org/dist/hadoop/core/hadoop-1.2.1/$hadoopTarFile -P $tempDirectory
         wget http://archive.apache.org/dist/oozie/3.3.2/$oozieTarFile -P $tempDirectory
-        wget extjs.com/deploy/$extZipFile -P $optDirectory
-
+#        wget extjs.com/deploy/$extZipFile -P $optDirectory
+        wget http://archive.cloudera.com/gplextras/misc/$extZipFile -P $optDirectory
 	if  ls $optDirectory/README* ; then
                 rm $optDirectory/README*
         fi

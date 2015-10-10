@@ -8,8 +8,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.environment.Environment;
-import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.quota.QuotaType;
 import io.subutai.common.test.SystemOutRedirectTest;
@@ -36,7 +37,7 @@ public class GetContainerQuotaCommandTest extends SystemOutRedirectTest
     @Mock
     Environment environment;
     @Mock
-    ContainerHost containerHost;
+    EnvironmentContainerHost containerHost;
 
     GetContainerQuotaCommand command;
 

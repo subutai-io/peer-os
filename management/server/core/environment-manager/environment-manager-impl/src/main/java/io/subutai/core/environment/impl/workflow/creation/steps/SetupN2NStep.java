@@ -29,6 +29,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.util.N2NUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
+import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.entity.PeerConfImpl;
 import io.subutai.core.peer.api.LocalPeer;
 
@@ -41,11 +42,11 @@ public class SetupN2NStep
     private static final Logger LOGGER = LoggerFactory.getLogger( SetupN2NStep.class );
 
     private final Topology topology;
-    private final Environment env;
+    private final EnvironmentImpl env;
     private final LocalPeer localPeer;
 
 
-    public SetupN2NStep( final Topology topology, final Environment environment, final LocalPeer localPeer )
+    public SetupN2NStep( final Topology topology, final EnvironmentImpl environment, final LocalPeer localPeer )
     {
         this.topology = topology;
         this.env = environment;

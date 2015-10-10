@@ -208,7 +208,6 @@ public class PluginManagerComponent extends CustomComponent
     {
         contentRoot.removeComponent( pluginsTable );
         isTableRemoved = true;
-        //TODO go HUB marketplace page
         browser = new BrowserFrame( "vaadin.com", new ExternalResource( "https://vaadin.com/home" ) );
         browser.setWidth( "800px" );
         browser.setHeight( "800px" );

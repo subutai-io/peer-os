@@ -42,8 +42,6 @@
     <module>security-manager</module>
     <module>node-registration</module>
     <module>http-context-factory</module>
-    <module>h-integration</module>
-    <module>h-place</module>
     <module>environment-manager</module>
   </modules>
 

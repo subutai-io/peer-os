@@ -3,7 +3,7 @@ package io.subutai.core.messenger.impl;
 
 import java.util.UUID;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.util.JsonUtil;
@@ -91,7 +91,7 @@ public class MessageImpl implements Message
     @Override
     public String toString()
     {
-        return Objects.toStringHelper( this ).add( "id", id ).add( "sourcePeerId", sourcePeerId )
-                      .add( "sender", sender ).add( "payloadString", payloadString ).toString();
+        return MoreObjects.toStringHelper( this ).add( "id", id ).add( "sourcePeerId", sourcePeerId )
+                          .add( "sender", sender ).add( "payloadString", payloadString ).toString();
     }
 }
