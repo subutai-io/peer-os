@@ -758,7 +758,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                                                       final Topology topology, final String sshKey,
                                                                       final TrackerOperation tracker )
     {
-        return new EnvironmentImportWorkflow( defaultDomain, templateRegistry, this, networkManager, peerManager,
+        return new EnvironmentImportWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, this, networkManager, peerManager,
                 environment, topology, sshKey, tracker );
     }
 
