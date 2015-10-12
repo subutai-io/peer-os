@@ -84,7 +84,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         updateHostInfo( hostInfo );
 
         this.containerName = ( ( ContainerHostInfo ) hostInfo ).getContainerName();
-        //        this.environmentId = environmentId;
     }
 
 
@@ -138,7 +137,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
         this.tags.add( tag );
-        //        this.dataService.update( this );
     }
 
 
@@ -147,7 +145,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
         this.tags.remove( tag );
-        //        this.dataService.update( this );
     }
 
 
