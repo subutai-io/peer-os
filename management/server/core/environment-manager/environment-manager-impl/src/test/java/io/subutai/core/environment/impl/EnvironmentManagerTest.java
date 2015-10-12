@@ -12,7 +12,6 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
-import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
@@ -73,7 +72,7 @@ public class EnvironmentManagerTest
     {
         topology.addNodeGroupPlacement( peer, nodeGroup );
         environmentManager = spy( new EnvironmentManagerImpl( templateRegistry, peerManager, networkManager, daoManager,
-                Common.DEFAULT_DOMAIN_NAME, identityManager, tracker ) );
+                identityManager, tracker ) );
         doReturn( environment ).when( environmentManager )
                                .createEmptyEnvironment( anyString(), anyString(), anyString() );
         doReturn( environmentCreationWorkflow ).when( environmentManager )
