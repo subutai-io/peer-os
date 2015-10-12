@@ -72,7 +72,7 @@ public class HostRegistryImplTest
     @Before
     public void setUp() throws Exception
     {
-        registry = new HostRegistryImpl( HOST_EXPIRATION );
+        registry = new HostRegistryImpl( );
         registry.hostListeners = hostListeners;
         registry.notifier = notifier;
         registry.hosts = hosts;
@@ -90,11 +90,6 @@ public class HostRegistryImplTest
     }
 
 
-    @Test( expected = IllegalArgumentException.class )
-    public void testConstructor() throws Exception
-    {
-        new HostRegistryImpl( 0 );
-    }
 
 
     @Test

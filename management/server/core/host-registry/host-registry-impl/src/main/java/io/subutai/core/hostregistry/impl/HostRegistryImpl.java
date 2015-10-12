@@ -14,13 +14,13 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.hostregistry.api.HostRegistryException;
-import io.subutai.common.host.ResourceHostInfo;
 
 
 /**
@@ -30,20 +30,12 @@ public class HostRegistryImpl implements HostRegistry
 {
     private static final String HOST_NOT_CONNECTED_MSG = "Host %s is not connected";
     //timeout after which host expires in seconds
-    private final int hostExpiration;
+    private static final int hostExpiration = 40;
 
     protected Set<HostListener> hostListeners =
             Collections.newSetFromMap( new ConcurrentHashMap<HostListener, Boolean>() );
     protected ExecutorService notifier = Executors.newCachedThreadPool();
     protected Cache<String, ResourceHostInfo> hosts;
-
-
-    public HostRegistryImpl( final int hostExpiration )
-    {
-        Preconditions.checkArgument( hostExpiration > 0, "Host expiration timeout must be greater than 0" );
-
-        this.hostExpiration = hostExpiration;
-    }
 
 
     @Override
@@ -62,7 +54,7 @@ public class HostRegistryImpl implements HostRegistry
             }
         }
 
-        throw new HostDisconnectedException( String.format( HOST_NOT_CONNECTED_MSG, id.toString() ) );
+        throw new HostDisconnectedException( String.format( HOST_NOT_CONNECTED_MSG, id ) );
     }
 
 
@@ -113,7 +105,7 @@ public class HostRegistryImpl implements HostRegistry
             }
         }
 
-        throw new HostDisconnectedException( String.format( HOST_NOT_CONNECTED_MSG, id.toString() ) );
+        throw new HostDisconnectedException( String.format( HOST_NOT_CONNECTED_MSG, id ) );
     }
 
 
