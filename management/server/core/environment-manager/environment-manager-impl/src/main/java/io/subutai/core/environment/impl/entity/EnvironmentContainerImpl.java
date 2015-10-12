@@ -99,8 +99,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     @Transient
     private Peer peer;
-    //    @Transient
-    //    private DataService<String, EnvironmentContainerImpl> dataService;
+
     @Transient
     private EnvironmentManager environmentManager;
 
@@ -156,14 +155,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
             this.interfaces.add( hostInterface );
         }
     }
-
-    //
-    //    public void setDataService( final DataService dataService )
-    //    {
-    //        Preconditions.checkNotNull( dataService );
-    //
-    //        this.dataService = dataService;
-    //    }
 
 
     public void setPeer( final Peer peer )
@@ -277,7 +268,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public Peer getPeer()
     {
         return peer;
-        //        return environment.getPeer( this.peerId );
     }
 
 
@@ -300,17 +290,14 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
         this.tags.add( tag );
-        //        dataService.update( this );
     }
 
 
-    //TODO @Timur Jamakeev make sure this tag gets persisted
     @Override
     public void removeTag( final String tag )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
         this.tags.remove( tag );
-        //        dataService.update( this );
     }
 
 

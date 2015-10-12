@@ -15,14 +15,13 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
 import io.subutai.core.peer.api.ContainerCreationException;
-import io.subutai.common.peer.HostNotFoundException;
-import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.peer.ResourceHostException;
-import io.subutai.core.peer.impl.entity.ContainerHostEntity;
 
 
 public class CreateContainerTask implements Callable<ContainerHost>
@@ -34,13 +33,12 @@ public class CreateContainerTask implements Callable<ContainerHost>
     private final Template template;
     private final String ip;
     private final int vlan;
-//    private final String gateway;
     private final int timeoutSec;
     protected CommandUtil commandUtil = new CommandUtil();
 
 
     public CreateContainerTask( final ResourceHost resourceHost, final Template template, final String hostname,
-                                final String ip, final int vlan, /*final String gateway,*/ final int timeoutSec )
+                                final String ip, final int vlan, final int timeoutSec )
     {
         Preconditions.checkNotNull( resourceHost );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
@@ -52,7 +50,6 @@ public class CreateContainerTask implements Callable<ContainerHost>
         this.hostname = hostname;
         this.ip = ip;
         this.vlan = vlan;
-//        this.gateway = gateway;
         this.timeoutSec = timeoutSec;
     }
 

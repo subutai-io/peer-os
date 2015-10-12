@@ -127,11 +127,6 @@
                   <outputDirectory>target/assembly/deploy</outputDirectory>
                   <type>war</type>
                 </artifactItem>
-                <!--<artifactItem>-->
-                <!--<groupId>${project.groupId}</groupId>-->
-                <!--<artifactId>vaadin-custom</artifactId>-->
-                <!--<outputDirectory>target/assembly/system/</outputDirectory>-->
-                <!--</artifactItem>-->
               </artifactItems>
             </configuration>
           </execution>

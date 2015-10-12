@@ -40,7 +40,6 @@ public class DestroyContainerTask implements Callable
         RequestBuilder destroyCommand =
                 new RequestBuilder( "subutai destroy" ).withCmdArgs( Lists.newArrayList( hostname ) )
                                                        .withTimeout( DESTROY_TIMEOUT );
-        //            commandUtil.execute( destroyCommand, resourceHost );
         CommandResult result = resourceHost.execute( destroyCommand );
 
         if ( result != null && !result.hasSucceeded() )

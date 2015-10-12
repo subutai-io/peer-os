@@ -1,21 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<blueprint xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
-           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
-           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
-
-  <!-- Allow the use of system properties -->
-  <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
-
-  <cm:property-placeholder persistent-id="hostregistry" update-strategy="none">
-    <cm:default-properties>
-      <cm:property name="hostExpiration" value="40" />
-    </cm:default-properties>
-  </cm:property-placeholder>
+<blueprint
+    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <bean id="hostRegistry"
         class="io.subutai.core.hostregistry.impl.HostRegistryImpl"
         init-method="init" destroy-method="dispose" scope="singleton" activation="eager">
-    <argument value="${hostExpiration}" />
   </bean>
 
   <reference-list id="hostLstnr"
