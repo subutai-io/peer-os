@@ -20,13 +20,11 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
 {
     private static final Logger LOG = LoggerFactory.getLogger( ResourceHostDataService.class );
     private EntityManagerFactory emf;
-    //    private EntityManager em;
 
 
     public ResourceHostDataService( EntityManagerFactory entityManagerFactory )
     {
         this.emf = entityManagerFactory;
-        //        this.em = entityManagerFactory.createEntityManager();
     }
 
 

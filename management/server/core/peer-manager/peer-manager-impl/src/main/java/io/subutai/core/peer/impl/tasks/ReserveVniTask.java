@@ -39,7 +39,6 @@ public class ReserveVniTask implements Callable<Integer>
         int vlan = managementHost.findAvailableVlanId();
 
         //reserve vni & vlan for environment
-
         networkManager.reserveVni( new Vni( vni.getVni(), vlan, vni.getEnvironmentId() ) );
 
         return vlan;
