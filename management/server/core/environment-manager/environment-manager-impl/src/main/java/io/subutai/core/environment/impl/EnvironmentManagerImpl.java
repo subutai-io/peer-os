@@ -964,6 +964,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         EnvironmentImpl env = environmentDataService.saveOrUpdate( environment );
         setEnvironmentTransientFields( env );
+        setContainersTransientFields( env );
         return env;
     }
 
