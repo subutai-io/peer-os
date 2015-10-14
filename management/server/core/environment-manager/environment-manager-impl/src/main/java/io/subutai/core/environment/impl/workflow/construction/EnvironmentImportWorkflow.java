@@ -35,7 +35,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
     private final TemplateRegistry templateRegistry;
     private final NetworkManager networkManager;
     private final PeerManager peerManager;
-    private final EnvironmentImpl environment;
+    private  EnvironmentImpl environment;
     private final Topology topology;
     private final String sshKey;
     private final String defaultDomain;
@@ -81,7 +81,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
         environment.setSuperNode( peerManager.getLocalPeerInfo().getIp() );
         environment.setSuperNodePort( Common.SUPER_NODE_PORT );
 
-        environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.saveOrUpdate( environment );
 
         return Phase.GENERATE_KEYS;
     }
@@ -94,7 +94,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
         {
             new io.subutai.core.environment.impl.workflow.creation.steps.PEKGenerationStep( topology, environment, peerManager.getLocalPeer() ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return Phase.SETUP_VNI;
         }
@@ -114,7 +114,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
         {
             new VNISetupStep( topology, environment, peerManager.getLocalPeer() ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return Phase.SETUP_N2N;
         }
@@ -135,7 +135,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
             new SetupN2NStep( topology, environment, /*peerManager.getLocalPeer().getPeerInfo().getIp(),
                     Common.SUPER_NODE_PORT, */peerManager.getLocalPeer() ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return Phase.CONFIGURE_HOSTS;
         }
@@ -156,7 +156,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
         {
             new RegisterHostsStep( environment, networkManager ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return Phase.CONFIGURE_SSH;
         }
@@ -177,7 +177,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
         {
             new RegisterSshStep( environment, networkManager ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return Phase.SET_ENVIRONMENT_SSH_KEY;
         }
@@ -197,7 +197,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
         {
             new SetSshKeyStep( sshKey, environment, networkManager ).execute();
 
-            environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return Phase.FINALIZE;
         }
@@ -215,7 +215,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
-        environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.saveOrUpdate( environment );
 
         operationTracker.addLogDone( "Environment is created" );
 
@@ -233,6 +233,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
     public void setError( final Throwable error )
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
+        environment = environmentManager.saveOrUpdate( environment );
         this.error = error;
         LOG.error( "Error creating environment", error );
         operationTracker.addLogFailed( error.getMessage() );

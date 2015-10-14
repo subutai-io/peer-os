@@ -26,7 +26,7 @@ public interface RegistrationManager
 
     public void removeRequest( String requestId );
 
-    public void deployResourceHost(List<String> args);
+    public void deployResourceHost(List<String> args) throws NodeRegistrationException;
 
     public ContainerToken generateContainerTTLToken( Long ttl );
 

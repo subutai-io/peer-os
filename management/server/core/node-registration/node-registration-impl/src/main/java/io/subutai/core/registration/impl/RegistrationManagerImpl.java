@@ -389,7 +389,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             try
             {
                 ResourceHost resourceHost = localPeer.getResourceHostById( resourceHostInfo.getId() );
-                Map<Integer, Set<EnvironmentContainerHost>> containerHostList = Maps.newHashMap();
+                Map<Integer, Set<ContainerHost>> containerHostList = Maps.newHashMap();
                 for ( final ContainerInfo containerInfo : requestedHost.getHostInfos() )
                 {
                     if ( containerInfo.getStatus().equals( RegistrationStatus.APPROVED )
@@ -397,10 +397,10 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                     {
 
                         ContainerInfoImpl containerInfoImpl =
-                                containerInfoDataService.find( containerInfo.getId().toString() );
+                                containerInfoDataService.find( containerInfo.getId() );
 
-                        EnvironmentContainerHost containerHost =
-                                ( EnvironmentContainerHost ) resourceHost.getContainerHostById( containerInfo.getId() );
+                        ContainerHost containerHost =
+                                resourceHost.getContainerHostById( containerInfo.getId() );
 
                         containerInfoImpl.setStatus( RegistrationStatus.REGISTERED );
                         containerInfoDataService.update( containerInfoImpl );
@@ -408,7 +408,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                         //we assume that newly imported environment has always default sshGroupId=1, hostsGroupId=1
 
                         //configure hosts on each group | group containers by ssh group
-                        Set<EnvironmentContainerHost> containers = containerHostList.get( containerInfoImpl.getVlan() );
+                        Set<ContainerHost> containers = containerHostList.get( containerInfoImpl.getVlan() );
                         if ( containers == null )
                         {
                             containers = Sets.newHashSet();
@@ -416,7 +416,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                         containers.add( containerHost );
                     }
                 }
-                for ( final Map.Entry<Integer, Set<EnvironmentContainerHost>> entry : containerHostList.entrySet() )
+                for ( final Map.Entry<Integer, Set<ContainerHost>> entry : containerHostList.entrySet() )
                 {
                     configureHosts( entry.getValue() );
                 }
@@ -433,7 +433,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     }
 
 
-    private void configureHosts( final Set<EnvironmentContainerHost> containerHosts ) throws NetworkManagerException
+    private void configureHosts( final Set<ContainerHost> containerHosts ) throws NetworkManagerException
     {
         //assume that inside one host group the domain name must be the same for all containers
         //so pick one container's domain name as the group domain name
@@ -451,7 +451,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
 
     @Override
-    public void deployResourceHost( List<String> args )
+    public void deployResourceHost( List<String> args ) throws NodeRegistrationException
     {
         ManagementHost managementHost = null;
         CommandResult result;
@@ -459,13 +459,13 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         try
         {
             managementHost = peerManager.getLocalPeer().getManagementHost();
-            result = managementHost.execute( new RequestBuilder( "/home/ubuntu/awsdeploy" ).withCmdArgs( args ).withTimeout( 1800 ) );
+            result = managementHost.execute( new RequestBuilder( "" ).withCmdArgs( args ) );
             if ( result.getExitCode() != 0 )
             {
-                throw new NodeRegistrationException( result.getStdErr() );
+                throw new NodeRegistrationException(result.getStdErr());
             }
         }
-        catch ( HostNotFoundException | CommandException | NodeRegistrationException e )
+        catch ( HostNotFoundException | CommandException   e )
         {
             e.printStackTrace();
         }
