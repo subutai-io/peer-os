@@ -1,14 +1,24 @@
 package io.subutai.core.identity.impl.model;
 
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
 
 
@@ -40,90 +50,107 @@ public class UserEntity implements User
     @Column( name = "email" )
     private String email;
 
-    @Column( name = "key" )
-    private String key = "Empty key: not implemented yet.";
+    //****************************************
+    @ManyToMany(mappedBy="assignedUsers")
+    private List<Role> roles = new ArrayList<Role>();
+    //****************************************
 
 
+    @Override
     public Long getId()
     {
         return id;
     }
 
 
+    @Override
     public void setId( final Long id )
     {
         this.id = id;
     }
 
 
+    @Override
     public String getUserName()
     {
         return userName;
     }
 
 
+    @Override
     public void setUserName( final String userName )
     {
         this.userName = userName;
     }
 
 
+    @Override
     public String getFullName()
     {
         return fullName;
     }
 
 
+    @Override
     public void setFullName( final String fullName )
     {
         this.fullName = fullName;
     }
 
 
+    @Override
     public String getPassword()
     {
         return password;
     }
 
 
+    @Override
     public void setPassword( final String password )
     {
         this.password = password;
     }
 
 
+    @Override
     public String getSalt()
     {
         return salt;
     }
 
 
+    @Override
     public void setSalt( final String salt )
     {
         this.salt = salt;
     }
 
 
+    @Override
     public String getEmail()
     {
         return email;
     }
 
 
+    @Override
     public void setEmail( final String email )
     {
         this.email = email;
     }
 
 
-    public String getKey()
+
+    @Override
+    public List<Role> getRoles()
     {
-        return key;
+        return roles;
     }
 
 
-    public void setKey( final String key )
+    @Override
+    public void setRoles( final List<Role> roles )
     {
-        this.key = key;
+        this.roles = roles;
     }
 }

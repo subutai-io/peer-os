@@ -10,6 +10,7 @@ import io.subutai.core.channel.api.ChannelManager;
 import io.subutai.core.channel.api.token.ChannelTokenManager;
 import io.subutai.core.channel.impl.token.ChannelTokenController;
 import io.subutai.core.channel.impl.token.ChannelTokenManagerImpl;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.security.api.SecurityManager;
 
 

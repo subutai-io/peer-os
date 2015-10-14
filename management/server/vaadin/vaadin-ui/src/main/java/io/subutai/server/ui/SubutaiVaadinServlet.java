@@ -43,8 +43,8 @@ public class SubutaiVaadinServlet extends VaadinServlet
                 {
                     try
                     {
-                        IdentityManager identityManager = serviceLocator.getService( IdentityManager.class );
-                        identityManager.touch( subutaiLoginContext.getSessionId() );
+                        //IdentityManager identityManager = serviceLocator.getService( IdentityManager.class );
+                        //identityManager.touch( subutaiLoginContext.getSessionId() );
                     }
                     catch ( Exception e )
                     {

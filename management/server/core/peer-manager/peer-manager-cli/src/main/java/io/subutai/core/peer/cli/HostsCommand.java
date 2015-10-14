@@ -9,6 +9,7 @@ import org.apache.karaf.shell.commands.Command;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.LocalPeer;
@@ -41,7 +42,7 @@ public class HostsCommand extends SubutaiShellCommandSupport
     protected Object doExecute() throws Exception
     {
 
-        User user = identityManager.getUser();
+        //User user = identityManager.getUser();
 
         LocalPeer localPeer = peerManager.getLocalPeer();
 
@@ -52,8 +53,8 @@ public class HostsCommand extends SubutaiShellCommandSupport
             return null;
         }
 
-        System.out.println( String.format( "Current user %s. Time: %s", user.getUsername(),
-                fmt.format( System.currentTimeMillis() ) ) );
+        //System.out.println( String.format( "Current user %s. Time: %s", user.getUsername(),
+                //fmt.format( System.currentTimeMillis() ) ) );
         System.out.println( "List of hosts in local peer:" );
         print( managementHost, "" );
         for ( ResourceHost resourceHost : localPeer.getResourceHosts() )

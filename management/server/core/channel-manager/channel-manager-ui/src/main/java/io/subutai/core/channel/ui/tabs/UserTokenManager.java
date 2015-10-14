@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import io.subutai.core.channel.api.ChannelManager;
 import io.subutai.core.channel.api.entity.IUserChannelToken;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.server.ui.component.ConfirmationDialog;
 import org.slf4j.Logger;
@@ -64,7 +65,7 @@ public class UserTokenManager extends Panel
     {
         this.channelManager = channelManager;
         this.identityManager = identityManager;
-        user = identityManager.getUser();
+        //user = identityManager.getUser();
 
 
         installationControls = new GridLayout( 1, 2 );
@@ -142,24 +143,24 @@ public class UserTokenManager extends Panel
             public void valueChange( Property.ValueChangeEvent event )
             {
                 User selectedUser = ( User ) event.getProperty().getValue();
-                userName = selectedUser.getUsername();
-                userId = selectedUser.getId();
+                //userName = selectedUser.getUsername();
+                //userId = selectedUser.getId();
             }
         } );
         //----------------------------------------------------------------------------------------------
-        if ( user.isAdmin() )
+        //if ( user.isAdmin() )
         {
             userCombo.setVisible( true );
 
-            List<User> userList = identityManager.getAllUsers();
+            //List<User> userList = identityManager.getAllUsers();
 
-            for ( User user : userList )
+           // for ( User user : userList )
             {
                 userCombo.addItem( user );
-                userCombo.setItemCaption( user, user.getUsername() );
+                //userCombo.setItemCaption( user, user.getUsername() );
             }
         }
-        else
+        //else
         {
             userCombo.setVisible( false );
         }
@@ -213,8 +214,8 @@ public class UserTokenManager extends Panel
 
         //--------------------------------------------------------------------------------
 
-        userName = user.getUsername();
-        userId = user.getId();
+        //userName = user.getUsername();
+        //userId = user.getId();
         setUserChannelList();
         //--------------------------------------------------------------------------------
 
@@ -329,13 +330,13 @@ public class UserTokenManager extends Panel
     {
         List<IUserChannelToken> userChannelTokenList = null;
 
-        if ( user.isAdmin() )
+        //if ( user.isAdmin() )
         {
             userChannelTokenList = channelManager.getChannelTokenManager().getAllUserChannelTokenData();
         }
-        else
+        //else
         {
-            userChannelTokenList = channelManager.getChannelTokenManager().getUserChannelTokenData( user.getId() );
+            //userChannelTokenList = channelManager.getChannelTokenManager().getUserChannelTokenData( user.getId() );
         }
 
         if ( userChannelTokenList != null )
@@ -389,7 +390,7 @@ public class UserTokenManager extends Panel
                 } );
 
                 tokenTable.addItem( new Object[] {
-                        identityManager.getUser( userChannelToken.getUserId() ).getUsername(),
+                        //identityManager.getUser( userChannelToken.getUserId() ).getUsername(),
                         userChannelToken.getTokenName(),
                         userChannelToken.getIpRangeStart() + "-" + userChannelToken.getIpRangeEnd(),
                         Short.toString( userChannelToken.getValidPeriod() ), userChannelToken.getDate().toString(),

@@ -66,6 +66,7 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
                 }
             }
 
+            /*
             IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
             User user = identityManager.getUser();
             for ( final Role role : user.getRoles() )
@@ -78,9 +79,9 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
                         layout.setVisible( true );
                     }
                 }
-            }
+            }*/
         }
-        catch ( NamingException e )
+        catch ( Exception e )
         {
             LOG.error( "Error getting identityManager service", e );
         }

@@ -1,15 +1,24 @@
 package io.subutai.core.identity.impl.model;
 
 
+import java.util.Set;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import io.subutai.core.identity.api.model.Permission;
+import io.subutai.core.identity.api.model.PermissionObject;
+import io.subutai.core.identity.api.model.PermissionOperation;
+import io.subutai.core.identity.api.model.Role;
 
 
 /**
@@ -25,11 +34,24 @@ public class PermissionEntity implements Permission
     @Column( name = "id" )
     private Long id;
 
-    @Column( name = "name" )
-    private String name;
+    //*********************************************
+    @ManyToOne
+    @JoinColumn(name="operation_id", referencedColumnName="id")
+    private PermissionOperation operation;
+    //*********************************************
 
-    @Column( name = "type" )
-    private Short type = 1;
+
+    //*********************************************
+    @ManyToOne
+    @JoinColumn(name="object_id", referencedColumnName="id")
+    private PermissionObject object;
+    //*********************************************
+
+
+    //*********************************************
+    @ManyToMany(cascade={ CascadeType.ALL}, mappedBy="permissions")
+    private Set<Role> roles;
+    //*********************************************
 
 
     public Long getId()
@@ -44,26 +66,38 @@ public class PermissionEntity implements Permission
     }
 
 
-    public String getName()
+    public PermissionOperation getOperation()
     {
-        return name;
+        return operation;
     }
 
 
-    public void setName( final String name )
+    public void setOperation( final PermissionOperation operation )
     {
-        this.name = name;
+        this.operation = operation;
     }
 
 
-    public Short getType()
+    public PermissionObject getObject()
     {
-        return type;
+        return object;
     }
 
 
-    public void setType( final Short type )
+    public void setObject( final PermissionObject object )
     {
-        this.type = type;
+        this.object = object;
+    }
+
+
+    public Set<Role> getRoles()
+    {
+        return roles;
+    }
+
+
+    public void setRoles( final Set<Role> roles )
+    {
+        this.roles = roles;
     }
 }

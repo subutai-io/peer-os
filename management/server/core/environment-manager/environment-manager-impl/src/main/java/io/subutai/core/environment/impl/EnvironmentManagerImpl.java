@@ -49,6 +49,7 @@ import io.subutai.core.environment.impl.workflow.destruction.ContainerDestructio
 import io.subutai.core.environment.impl.workflow.destruction.EnvironmentDestructionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.EnvironmentGrowingWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyModificationWorkflow;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
@@ -770,7 +771,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     protected boolean isUserAdmin()
     {
-        return getUser().isAdmin();
+        return true;//getUser().isAdmin();
     }
 
 
@@ -903,20 +904,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     protected User getUser()
     {
-        User user = identityManager.getUser();
+        //User user = identityManager.getUser();
 
-        if ( user == null )
+        //if ( user == null )
         {
             throw new EnvironmentSecurityException( "User not authenticated" );
         }
 
-        return user;
+        //return user;
     }
 
 
     protected Long getUserId()
     {
-        return getUser().getId();
+        return (long)0;//getUser().getId();
     }
 
 

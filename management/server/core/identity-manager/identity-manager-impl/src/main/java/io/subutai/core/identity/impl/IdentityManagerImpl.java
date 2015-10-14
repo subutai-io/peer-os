@@ -7,7 +7,11 @@ import org.slf4j.LoggerFactory;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.dao.IdentityDataService;
+import io.subutai.core.identity.api.model.Role;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.impl.dao.IdentityDataServiceImpl;
+import io.subutai.core.identity.impl.model.RoleEntity;
+import io.subutai.core.identity.impl.model.UserEntity;
 
 
 /**
@@ -38,5 +42,50 @@ public class IdentityManagerImpl implements IdentityManager
         LOG.info( "Initializing identity manager..." );
 
         identityDataService = new IdentityDataServiceImpl( daoManager );
+    }
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public IdentityDataService getIdentityDataService()
+    {
+        return identityDataService;
+    }
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public User createUser( String userName, String password, String fullName, String email )
+    {
+        User user = new UserEntity();
+        user.setUserName( userName );
+        user.setFullName( fullName );
+        user.setEmail( email );
+
+        String salt = "SALT";
+        user.setPassword( password );
+        user.setSalt( salt );
+
+        identityDataService.persistUser( user );
+
+        return user;
+    }
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public Role createRole( String roleName, short roleType)
+    {
+        Role role = new RoleEntity();
+        role.setName( roleName );
+        role.setType( roleType );
+
+        return role;
     }
 }

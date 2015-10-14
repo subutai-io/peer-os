@@ -46,6 +46,7 @@ import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.metric.api.AlertListener;
 import io.subutai.core.metric.api.Monitor;
@@ -763,23 +764,23 @@ public class MonitorImpl implements Monitor
         {
             //obtain user from environment
             Environment environment = environmentManager.loadEnvironment( metric.getEnvironmentId() );
-            User user = identityManager.getUser( environment.getUserId() );
+            //User user = identityManager.getUser( environment.getUserId() );
 
-            if ( user == null )
+            //if ( user == null )
             {
                 throw new MonitorException(
                         String.format( "Failed to retrieve environment's '%s' user", environment.getName() ) );
             }
             //login under him
-            identityManager.loginWithToken( user.getUsername() );
+            //identityManager.loginWithToken( user.getUsername() );
 
             //search for subscriber if not found then no-op
-            Set<String> subscribersIds = monitorDao.getEnvironmentSubscribersIds( metric.getEnvironmentId() );
-            for ( String subscriberId : subscribersIds )
-            {
+            //Set<String> subscribersIds = monitorDao.getEnvironmentSubscribersIds( metric.getEnvironmentId() );
+            //for ( String subscriberId : subscribersIds )
+            //{
                 //notify subscriber on alert
-                notifyListener( metric, subscriberId );
-            }
+                //notifyListener( metric, subscriberId );
+            //}
         }
         catch ( MonitorException e )
         {

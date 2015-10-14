@@ -32,25 +32,25 @@ public abstract class SubutaiShellCommandSupport extends OsgiCommandSupport
             LOG.debug( String.format( "Executing command: %s:%s", command.scope(), command.name() ) );
 
             this.session = session;
-            IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-            if ( identityManager != null )
+            //IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+            //if ( identityManager != null )
             {
-                User user = identityManager.getUser();
-                CliCommand temp = identityManager.createCliCommand( command.scope(), command.name() );
-                if ( user != null )
+                //User user = identityManager.getUser();
+                //CliCommand temp = identityManager.createCliCommand( command.scope(), command.name() );
+                //if ( user != null )
                 {
-                    Set<Role> roles = user.getRoles();
-                    for ( final Role role : roles )
+                    //Set<Role> roles = user.getRoles();
+                    //for ( final Role role : roles )
                     {
-                        if ( role.getCliCommands().contains( temp ) )
+                        //if ( role.getCliCommands().contains( temp ) )
                         {
                             return doExecute();
                         }
                     }
                 }
             }
-            LOG.warn( "Access denied." );
-            return null;
+            //LOG.warn( "Access denied." );
+            //return null;
         }
         finally
         {

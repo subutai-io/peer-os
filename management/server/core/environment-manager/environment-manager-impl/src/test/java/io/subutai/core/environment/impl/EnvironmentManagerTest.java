@@ -17,6 +17,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
@@ -80,7 +81,7 @@ public class EnvironmentManagerTest
                                                        any( Topology.class ), anyString(),
                                                        any( TrackerOperation.class ) );
         environmentManager.environmentDataService = environmentDataService;
-        doReturn( user ).when( identityManager ).getUser();
+        //doReturn( user ).when( identityManager ).getUser();
         doReturn( environment ).when( environmentDataService ).find( anyString() );
         doReturn( ENV_ID ).when( environment ).getId();
     }

@@ -10,8 +10,8 @@ import javax.ws.rs.core.MediaType;
 
 public interface RestService
 {
-    @GET
-    @Path( "key/{username}" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    public String getKey( @PathParam( "username" ) String username );
+    //@GET
+    //@Path( "key/{username}" )
+    //@Produces( { MediaType.TEXT_PLAIN } )
+    //public String getKey( @PathParam( "username" ) String username );
 }

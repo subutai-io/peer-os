@@ -5,6 +5,7 @@ import io.subutai.common.protocol.Disposable;
 import io.subutai.core.channel.api.ChannelManager;
 import io.subutai.core.channel.ui.tabs.PortManager;
 import io.subutai.core.channel.ui.tabs.UserTokenManager;
+import io.subutai.core.identity.api.IdentityManager;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
@@ -33,7 +34,7 @@ public class ChannelManagerComponent extends CustomComponent implements Disposab
 
 
         //--------------------------------------------------------------------------------------------
-        if(identityManager.getUser().isAdmin())
+        //if(identityManager.getUser().isAdmin())
         {
             sheet.addTab( portManager, "Port Manager" ).setId( "PortManager" );
         }

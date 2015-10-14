@@ -54,7 +54,7 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
         // Create a container for such beans
         // Add some beans to it
         beans = new BeanItemContainer<>( User.class );
-        beans.addAll( identityManager.getAllUsers() );
+        //beans.addAll( identityManager.getAllUsers() );
 
         // A layout for the table and form
         HorizontalLayout layout = new HorizontalLayout();
@@ -104,7 +104,7 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
             {
 
                 // Create a new item; this will create a new bean
-                BeanItem<User> newUser = new BeanItem<>( identityManager.createMockUser( "", "", "", "" ) );
+                //BeanItem<User> newUser = new BeanItem<>( identityManager.createMockUser( "", "", "", "" ) );
 
                 // The form was opened for editing a new item
                 refreshControls( FormState.STATE_NEW_ENTITY );
@@ -112,7 +112,7 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
 
                 // Make the form a bit nicer
                 //this is an example for future how to improve UI
-                form.setUser( newUser, true );
+                //form.setUser( newUser, true );
             }
         } );
 
@@ -172,11 +172,11 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
     @Override
     public void saveOperation( final BeanItem<User> value, final boolean newValue )
     {
-        identityManager.updateUser( value.getBean() );
+        //identityManager.updateUser( value.getBean() );
         if ( newValue )
         {
             beans.removeAllItems();
-            beans.addAll( identityManager.getAllUsers() );
+            //beans.addAll( identityManager.getAllUsers() );
             refreshControls( FormState.STATE_SAVE_NEW_ENTITY );
         }
         else
@@ -191,7 +191,7 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
     {
         if ( !newValue )
         {
-            identityManager.deleteUser( value.getBean() );
+            //identityManager.deleteUser( value.getBean() );
             beans.removeItem( value.getBean() );
         }
         refreshControls( FormState.STATE_REMOVE_ENTITY );

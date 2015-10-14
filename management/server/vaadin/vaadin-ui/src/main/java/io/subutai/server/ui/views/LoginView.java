@@ -120,12 +120,13 @@ public class LoginView extends VerticalLayout implements View
 
                 try
                 {
-                    IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-                    Serializable sessionId = identityManager.login( username.getValue(), password.getValue() );
+                    //IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+                    //Serializable sessionId = identityManager.login( username.getValue(), password.getValue() );
 
                     VaadinRequest request = VaadinService.getCurrentRequest();
 
                     //has to save login context because karaf has own thread context
+                    /*
                     SubutaiLoginContext loginContext =
                             new SubutaiLoginContext( sessionId.toString(), username.getValue(),
                                     request.getRemoteAddr() );
@@ -138,6 +139,7 @@ public class LoginView extends VerticalLayout implements View
                     mainUI.getUsername().setValue( username.getValue() );
                     VaadinService.reinitializeSession( request );
                     getUI().getNavigator().navigateTo( "/core" );
+                    */
                 }
                 catch ( Exception e )
                 {

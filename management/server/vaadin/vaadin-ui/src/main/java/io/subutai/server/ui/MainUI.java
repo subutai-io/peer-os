@@ -143,10 +143,10 @@ public class MainUI extends UI implements ViewChangeListener
         {
             try
             {
-                IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-                isAuthenticated = identityManager != null && identityManager.isAuthenticated();
+                //IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+                //isAuthenticated = identityManager != null && identityManager.isAuthenticated();
             }
-            catch ( NamingException e )
+            catch ( Exception e )
             {
                 LOG.error( e.toString(), e );
             }
@@ -268,6 +268,7 @@ public class MainUI extends UI implements ViewChangeListener
 
         try
         {
+            /*
             IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
 
             if ( identityManager != null )
@@ -278,7 +279,7 @@ public class MainUI extends UI implements ViewChangeListener
                 {
                     username.setValue( user.getUsername() );
                 }
-            }
+            }*/
         }
         catch ( Exception e )
         {
@@ -311,11 +312,12 @@ public class MainUI extends UI implements ViewChangeListener
 
                 try
                 {
+                    /*
                     IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
                     if ( identityManager != null )
                     {
                         identityManager.logout( SubutaiVaadinUtils.getSubutaiLoginContext().getSessionId() );
-                    }
+                    }*/
 
                     VaadinService.getCurrentRequest().getWrappedSession()
                                  .removeAttribute( SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME );
@@ -324,7 +326,7 @@ public class MainUI extends UI implements ViewChangeListener
                     VaadinService.getCurrentResponse().addCookie( removeCookie );
                     VaadinSession.getCurrent().close();
                 }
-                catch ( NamingException e )
+                catch ( Exception e )
                 {
                     LOG.error( e.toString(), e );
                 }

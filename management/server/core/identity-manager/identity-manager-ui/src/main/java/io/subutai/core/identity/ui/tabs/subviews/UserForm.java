@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.ui.ErrorUtils;
@@ -92,11 +93,11 @@ public class UserForm extends VerticalLayout
                     if ( callback != null )
                     {
                         User user = userFieldGroup.getItemDataSource().getBean();
-                        user.removeAllRoles();
+                        //user.removeAllRoles();
                         for ( final String roleName : selectedRoleNames )
                         {
                             BeanItem beanItem = ( BeanItem ) rolesSelector.getItem( roleName );
-                            user.addRole( ( Role ) beanItem.getBean() );
+                            //user.addRole( ( Role ) beanItem.getBean() );
                         }
                         callback.saveOperation( userFieldGroup.getItemDataSource(), newValue );
                         Notification.show( "Successfully saved." );
@@ -207,16 +208,16 @@ public class UserForm extends VerticalLayout
         this.newValue = newValue;
         if ( user != null )
         {
-            List<Role> roles = identityManager.getAllRoles();
+            //List<Role> roles = identityManager.getAllRoles();
             permissionsContainer.removeAllItems();
-            permissionsContainer.addAll( roles );
+            //permissionsContainer.addAll( roles );
             userFieldGroup.setItemDataSource( user );
 
             userFieldGroup.bind( username, "username" );
             userFieldGroup.bind( fullName, "fullname" );
             userFieldGroup.bind( email, "email" );
             userFieldGroup.bind( password, "password" );
-            confirmPassword.setValue( user.getBean().getPassword() );
+            //confirmPassword.setValue( user.getBean().getPassword() );
 
             if ( newValue )
             {
@@ -226,9 +227,9 @@ public class UserForm extends VerticalLayout
             // Pre-select user roles
             User userBean = user.getBean();
             Set<String> roleNames = new HashSet<>();
-            for ( final Role role : userBean.getRoles() )
+            //for ( final Role role : userBean.getRoles() )
             {
-                roleNames.add( role.getName() );
+                //roleNames.add( role.getName() );
             }
             rolesSelector.setValue( roleNames );
 

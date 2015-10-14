@@ -50,7 +50,7 @@ public class PermissionsTab extends CustomComponent implements TabCallback<BeanI
         // Add some beans to it
         beans = new BeanItemContainer<>( Permission.class );
 
-        beans.addAll( identityManager.getAllPermissions() );
+        //beans.addAll( identityManager.getAllPermissions() );
         beans.addNestedContainerProperty( "permissionGroup.name" );
 
         // A layout for the table and form
@@ -101,8 +101,8 @@ public class PermissionsTab extends CustomComponent implements TabCallback<BeanI
             {
 
                 // Create a new item; this will create a new bean
-                BeanItem<Permission> newPermission = new BeanItem<>(
-                        identityManager.createPermission( "", PermissionGroup.DEFAULT_PERMISSIONS, "" ) );
+                //BeanItem<Permission> newPermission = new BeanItem<>(
+                        //identityManager.createPermission( "", PermissionGroup.DEFAULT_PERMISSIONS, "" ) );
 
                 // The form was opened for editing a new item
                 refreshControls( FormState.STATE_NEW_ENTITY );
@@ -110,7 +110,7 @@ public class PermissionsTab extends CustomComponent implements TabCallback<BeanI
 
                 // Make the form a bit nicer
                 //this is an example for future how to improve UI
-                form.setPermission( newPermission, true );
+                //form.setPermission( newPermission, true );
             }
         } );
 
@@ -171,7 +171,7 @@ public class PermissionsTab extends CustomComponent implements TabCallback<BeanI
     @Override
     public void saveOperation( final BeanItem<Permission> value, final boolean newValue )
     {
-        identityManager.updatePermission( value.getBean() );
+        //identityManager.updatePermission( value.getBean() );
         if ( newValue )
         {
             beans.addBean( value.getBean() );
@@ -189,7 +189,7 @@ public class PermissionsTab extends CustomComponent implements TabCallback<BeanI
     {
         if ( !newValue )
         {
-            identityManager.deletePermission( value.getBean() );
+            //identityManager.deletePermission( value.getBean() );
             beans.removeItem( value.getBean() );
         }
         refreshControls( FormState.STATE_REMOVE_ENTITY );

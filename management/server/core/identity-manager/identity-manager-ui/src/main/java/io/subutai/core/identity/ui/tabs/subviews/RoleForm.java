@@ -48,11 +48,12 @@ public class RoleForm extends VerticalLayout
     private TwinColSelect commandsSelector;
 
 
-    public RoleForm( TabCallback<BeanItem<Role>> callback, Set<Permission> permissions,
-                     final Set<PortalModuleScope> allPortalModules, final Set<RestEndpointScope> allRestEndpoints,
-                     final List<CliCommand> allCliCommands )
+    public RoleForm( TabCallback<BeanItem<Role>> callback, Set<Permission> permissions)
+                     //final Set<PortalModuleScope> allPortalModules, final Set<RestEndpointScope> allRestEndpoints,
+                     //final List<CliCommand> allCliCommands )
     {
         init();
+        /*
         BeanContainer<String, Permission> permissionsContainer = new BeanContainer<>( Permission.class );
         permissionsContainer.setBeanIdProperty( "name" );
         permissionsContainer.addAll( permissions );
@@ -78,7 +79,7 @@ public class RoleForm extends VerticalLayout
         commandsSelector.setContainerDataSource( cliCommandBeanContainer );
         commandsSelector.setItemCaptionPropertyId( COMMAND_PROP_KEY );
 
-        this.callback = callback;
+        this.callback = callback;*/
     }
 
 
@@ -218,6 +219,8 @@ public class RoleForm extends VerticalLayout
             Role roleBean = role.getBean();
             Set<String> permissionNames = new HashSet<>();
 
+            /*
+
             for ( final Permission permission : roleBean.getPermissions() )
             {
                 permissionNames.add( permission.getName() );
@@ -255,7 +258,7 @@ public class RoleForm extends VerticalLayout
             {
                 permissionFieldGroup.setReadOnly( false );
                 removeButton.setVisible( false );
-            }
+            }*/
         }
     }
 
@@ -269,6 +272,7 @@ public class RoleForm extends VerticalLayout
             permissionFieldGroup.commit();
             if ( callback != null )
             {
+                /*
                 // Set selected permissions for role
                 Collection<String> selectedPermissions = ( Collection<String> ) permissionsSelector.getValue();
                 Role role = permissionFieldGroup.getItemDataSource().getBean();
@@ -304,7 +308,7 @@ public class RoleForm extends VerticalLayout
                 }
 
                 callback.saveOperation( permissionFieldGroup.getItemDataSource(), newValue );
-                Notification.show( "Successfully saved." );
+                Notification.show( "Successfully saved." );*/
             }
         }
         catch ( FieldGroup.CommitException e )

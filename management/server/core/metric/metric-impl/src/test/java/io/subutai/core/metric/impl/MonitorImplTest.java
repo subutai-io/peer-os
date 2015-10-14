@@ -42,6 +42,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.metric.api.AlertListener;
 import io.subutai.core.metric.api.Monitor;
@@ -187,7 +188,7 @@ public class MonitorImplTest
                 .thenReturn( Sets.newHashSet( SUBSCRIBER_ID ) );
         when( environment.getId() ).thenReturn( ENVIRONMENT_ID );
         when( environment.getUserId() ).thenReturn( USER_ID );
-        when( identityManager.getUser( USER_ID ) ).thenReturn( user );
+        //when( identityManager.getUser( USER_ID ) ).thenReturn( user );
         when( localPeer.getId() ).thenReturn( LOCAL_PEER_ID );
         when( localPeer.isLocal() ).thenReturn( true );
         when( remotePeer.isLocal() ).thenReturn( false );
@@ -253,7 +254,7 @@ public class MonitorImplTest
 
         monitor.notifyOnAlert( containerHostMetric );
 
-        verify( identityManager ).loginWithToken( anyString() );
+        //verify( identityManager ).loginWithToken( anyString() );
     }
 
 
