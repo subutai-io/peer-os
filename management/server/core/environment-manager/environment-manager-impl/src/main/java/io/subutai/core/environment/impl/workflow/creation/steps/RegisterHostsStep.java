@@ -7,6 +7,7 @@ import java.util.Set;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
@@ -63,7 +64,9 @@ public class RegisterHostsStep
             {
                 //assume that inside one host group the domain name must be the same for all containers
                 //so pick one container's domain name as the group domain name
-                networkManager.registerHosts( groupedContainers,
+                Set<ContainerHost> ch = Sets.newHashSet();
+                ch.addAll( groupedContainers );
+                networkManager.registerHosts( ch,
                         ( ( EnvironmentContainerImpl ) groupedContainers.iterator().next() ).getDomainName() );
             }
         }

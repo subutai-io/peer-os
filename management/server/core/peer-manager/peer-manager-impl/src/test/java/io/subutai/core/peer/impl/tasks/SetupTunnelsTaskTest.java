@@ -16,9 +16,6 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;

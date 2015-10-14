@@ -3,8 +3,6 @@ package io.subutai.core.network.impl;
 
 import org.junit.Test;
 
-import io.subutai.core.network.impl.TunnelImpl;
-
 import static org.junit.Assert.assertEquals;
 
 

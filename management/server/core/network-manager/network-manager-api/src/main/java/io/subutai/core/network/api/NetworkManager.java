@@ -6,7 +6,7 @@ import java.util.Set;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
-import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.peer.api.Tunnel;
 
 
@@ -15,7 +15,6 @@ public interface NetworkManager
     String TUNNEL_PREFIX = "tunnel";
     String TUNNEL_TYPE = "vxlan";
     String N2N_STRING_KEY = "string";
-    String N2N_FILE_KEY = "file";
 
 
     /**
@@ -127,7 +126,7 @@ public interface NetworkManager
      *
      * @param containers - set of {@code ContainerHost}
      */
-    public void exchangeSshKeys( Set<EnvironmentContainerHost> containers ) throws NetworkManagerException;
+    public void exchangeSshKeys( Set<ContainerHost> containers ) throws NetworkManagerException;
 
     /**
      * Adds supplied ssh key to authorized_keys file of given containers
@@ -135,7 +134,7 @@ public interface NetworkManager
      * @param containers- set of {@code ContainerHost}
      * @param sshKey - ssh key to add
      */
-    public void addSshKeyToAuthorizedKeys( Set<EnvironmentContainerHost> containers, String sshKey )
+    public void addSshKeyToAuthorizedKeys( Set<ContainerHost> containers, String sshKey )
             throws NetworkManagerException;
 
     /**
@@ -145,7 +144,7 @@ public interface NetworkManager
      * @param oldSshKey - old ssh key
      * @param newSshKey - new ssh key
      */
-    public void replaceSshKeyInAuthorizedKeys( final Set<EnvironmentContainerHost> containers, final String oldSshKey,
+    public void replaceSshKeyInAuthorizedKeys( final Set<ContainerHost> containers, final String oldSshKey,
                                                final String newSshKey ) throws NetworkManagerException;
 
     /**
@@ -154,7 +153,7 @@ public interface NetworkManager
      * @param containers set of {@code ContainerHost}
      * @param sshKey - ssh key to remove
      */
-    public void removeSshKeyFromAuthorizedKeys( final Set<EnvironmentContainerHost> containers, final String sshKey )
+    public void removeSshKeyFromAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
             throws NetworkManagerException;
 
     /**
@@ -163,8 +162,7 @@ public interface NetworkManager
      * @param containers - set of {@code ContainerHost}
      * @param domainName - domain name e.g. "intra.lan"
      */
-    public void registerHosts( Set<EnvironmentContainerHost> containers, String domainName )
-            throws NetworkManagerException;
+    public void registerHosts( Set<ContainerHost> containers, String domainName ) throws NetworkManagerException;
 
     /**
      * Returns reverse proxy domain assigned to vlan
