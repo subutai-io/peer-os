@@ -3,18 +3,18 @@ package io.subutai.core.network.impl;
 
 import java.util.Set;
 
-import io.subutai.common.command.CommandException;
-import io.subutai.common.command.CommandUtil;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.EnvironmentContainerHost;
-import io.subutai.common.util.CollectionUtil;
-import io.subutai.core.network.api.NetworkManagerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandUtil;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.util.CollectionUtil;
+import io.subutai.core.network.api.NetworkManagerException;
 
 
 /**
@@ -24,13 +24,13 @@ public class HostManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( HostManager.class.getName() );
 
-    private Set<EnvironmentContainerHost> containerHosts;
+    private Set<ContainerHost> containerHosts;
     private String domainName;
     private Commands commands;
     protected CommandUtil commandUtil;
 
 
-    public HostManager( Set<EnvironmentContainerHost> containerHosts, String domainName )
+    public HostManager( Set<ContainerHost> containerHosts, String domainName )
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ), "Containers are empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ), "Domain name is empty" );

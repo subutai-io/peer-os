@@ -1,8 +1,12 @@
 package io.subutai.core.environment.impl.workflow.creation.steps;
 
 
-import com.google.common.base.Strings;
+import java.util.Set;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
+
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
@@ -30,21 +34,23 @@ public class SetSshKeyStep
             String oldSshKey = environment.getSshKey();
 
             environment.saveSshKey( sshKey );
+            Set<ContainerHost> ch = Sets.newHashSet();
+            ch.addAll( environment.getContainerHosts() );
 
             if ( Strings.isNullOrEmpty( sshKey ) && !Strings.isNullOrEmpty( oldSshKey ) )
             {
                 //remove old key from containers
-                networkManager.removeSshKeyFromAuthorizedKeys( environment.getContainerHosts(), oldSshKey );
+                networkManager.removeSshKeyFromAuthorizedKeys( ch, oldSshKey );
             }
             else if ( !Strings.isNullOrEmpty( sshKey ) && Strings.isNullOrEmpty( oldSshKey ) )
             {
                 //insert new key to containers
-                networkManager.addSshKeyToAuthorizedKeys( environment.getContainerHosts(), sshKey );
+                networkManager.addSshKeyToAuthorizedKeys( ch, sshKey );
             }
             else if ( !Strings.isNullOrEmpty( sshKey ) && !Strings.isNullOrEmpty( oldSshKey ) )
             {
                 //replace old ssh key with new one
-                networkManager.replaceSshKeyInAuthorizedKeys( environment.getContainerHosts(), oldSshKey, sshKey );
+                networkManager.replaceSshKeyInAuthorizedKeys( ch, oldSshKey, sshKey );
             }
         }
     }

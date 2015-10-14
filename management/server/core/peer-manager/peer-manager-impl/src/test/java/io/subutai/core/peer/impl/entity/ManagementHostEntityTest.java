@@ -22,13 +22,13 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.Interface;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.Tunnel;

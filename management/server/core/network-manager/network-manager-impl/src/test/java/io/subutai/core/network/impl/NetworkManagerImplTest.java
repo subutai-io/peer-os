@@ -18,18 +18,17 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.network.api.ContainerInfo;
 import io.subutai.core.network.api.N2NConnection;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.peer.api.Tunnel;
-import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.common.peer.ResourceHost;
+import io.subutai.core.peer.api.Tunnel;
 import junit.framework.TestCase;
 
 import static junit.framework.Assert.assertFalse;
@@ -93,7 +92,7 @@ public class NetworkManagerImplTest
     @Mock
     ResourceHost resourceHost;
     @Mock
-    EnvironmentContainerHost containerHost;
+    ContainerHost containerHost;
     @Mock
     CommandResult commandResult;
     @Mock
@@ -107,7 +106,7 @@ public class NetworkManagerImplTest
 
     private NetworkManagerImpl spyNetworkManager;
 
-    private Set<EnvironmentContainerHost> containers;
+    private Set<ContainerHost> containers;
 
     private NetworkManagerImpl networkManager;
 

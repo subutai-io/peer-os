@@ -7,10 +7,9 @@ import com.google.common.collect.Lists;
 
 import io.subutai.common.command.OutputRedirection;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.EnvironmentContainerHost;
-import io.subutai.common.settings.Common;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.settings.Common;
 
 
 /**
@@ -253,8 +252,7 @@ public class Commands
     }
 
 
-    public RequestBuilder getAddIpHostToEtcHostsCommand( String domainName,
-                                                         Set<EnvironmentContainerHost> containerHosts )
+    public RequestBuilder getAddIpHostToEtcHostsCommand( String domainName, Set<ContainerHost> containerHosts )
     {
         StringBuilder cleanHosts = new StringBuilder( "localhost|127.0.0.1|" );
         StringBuilder appendHosts = new StringBuilder();
