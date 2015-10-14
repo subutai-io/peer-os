@@ -179,7 +179,16 @@
         <artifactId>node-registration-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
-
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>node-registration-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>node-registration-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- key-server -->
 

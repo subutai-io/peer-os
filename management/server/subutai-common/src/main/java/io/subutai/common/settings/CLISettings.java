@@ -51,7 +51,7 @@ public class CLISettings
 
             put( "test", Sets.newHashSet( "exec" ) );
 
-            put( "node", Sets.newHashSet( "approve", "reject", "list", "generate-token", "verify", "clear-requests" ) );
+            put( "node", Sets.newHashSet( "approve", "reject", "list", "generate-token", "verify", "clear-requests","deploy" ) );
 
             put( "registry",
                     Sets.newHashSet( "get-template", "register-template", "get-child-templates", "get-parent-template",

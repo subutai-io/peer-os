@@ -20,6 +20,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
@@ -41,6 +44,7 @@ import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
@@ -443,6 +447,28 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     public void removeRequest( final String requestId )
     {
         requestDataService.remove( requestId );
+    }
+
+
+    @Override
+    public void deployResourceHost( List<String> args )
+    {
+        ManagementHost managementHost = null;
+        CommandResult result;
+
+        try
+        {
+            managementHost = peerManager.getLocalPeer().getManagementHost();
+            result = managementHost.execute( new RequestBuilder( "/home/ubuntu/awsdeploy" ).withCmdArgs( args ).withTimeout( 1800 ) );
+            if ( result.getExitCode() != 0 )
+            {
+                throw new NodeRegistrationException( result.getStdErr() );
+            }
+        }
+        catch ( HostNotFoundException | CommandException | NodeRegistrationException e )
+        {
+            e.printStackTrace();
+        }
     }
 
 

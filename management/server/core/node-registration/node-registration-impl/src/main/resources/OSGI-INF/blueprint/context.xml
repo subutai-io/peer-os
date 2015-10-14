@@ -47,4 +47,5 @@
   <reference id="networkRef" availability="mandatory"
              interface="io.subutai.core.network.api.NetworkManager" />
 
+
 </blueprint>

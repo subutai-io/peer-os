@@ -7,13 +7,20 @@
     <groupId>io.subutai</groupId>
     <version>4.0.0-RC1</version>
   </parent>
+
   <modelVersion>4.0.0</modelVersion>
+  <artifactId>node-registration-ui</artifactId>
+  <packaging>bundle</packaging>
+  <name>Subutai Node Registration UI</name>
+  <description>Subutai Node Registration UI</description>
+
+
+
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>node-registration-api</artifactId>
     </dependency>
-
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
@@ -43,7 +50,7 @@
     </dependency>
   </dependencies>
 
-  <artifactId>node-registration-ui</artifactId>
+
   <build>
     <plugins>
       <plugin>
