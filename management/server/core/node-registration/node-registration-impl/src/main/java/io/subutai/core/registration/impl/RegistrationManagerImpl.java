@@ -459,7 +459,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         try
         {
             managementHost = peerManager.getLocalPeer().getManagementHost();
-            result = managementHost.execute( new RequestBuilder( "" ).withCmdArgs( args ) );
+            result = managementHost.execute( new RequestBuilder( "/home/ubuntu/awsdeploy" ).withCmdArgs( args ) );
             if ( result.getExitCode() != 0 )
             {
                 throw new NodeRegistrationException(result.getStdErr());
