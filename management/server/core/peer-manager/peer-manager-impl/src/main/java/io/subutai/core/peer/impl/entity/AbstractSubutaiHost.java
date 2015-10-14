@@ -101,6 +101,7 @@ public abstract class AbstractSubutaiHost implements Host
         this.peer = peer;
     }
 
+
     @Override
     public CommandResult execute( final RequestBuilder requestBuilder ) throws CommandException
     {
@@ -215,18 +216,13 @@ public abstract class AbstractSubutaiHost implements Host
     }
 
 
-    public String getHostId()
-    {
-        return hostId;
-    }
-
-
     public void addInterface( HostInterfaceImpl hostInterface )
     {
         Preconditions.checkNotNull( hostInterface, "HostInterface could not be null." );
 
         interfaces.add( hostInterface );
     }
+
 
     @Override
     public HostArchitecture getArch()

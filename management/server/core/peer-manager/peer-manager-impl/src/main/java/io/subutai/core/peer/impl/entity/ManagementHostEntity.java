@@ -301,7 +301,6 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
             LOG.debug( String.format( "Found %d tunnels.", tunnels.size() ) );
             for ( final Tunnel tunnel : tunnels )
             {
-                //                if ( tunnel.getTunnelIp().equalsIgnoreCase( tunnelIp ) )
                 if ( subnetInfo.isInRange( tunnel.getTunnelIp() ) )
                 {
                     getNetworkManager().removeTunnel( tunnel.getTunnelId() );

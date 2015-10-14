@@ -48,7 +48,6 @@ public class TemplateServiceImpl implements TemplateService
                 if ( parent != null )
                 {
                     daoManager.startTransaction(  entityManager );
-                    entityManager.getTransaction().begin();
                     savedTemplate = entityManager.merge( template );
                     entityManager.flush();
                     daoManager.commitTransaction( entityManager );

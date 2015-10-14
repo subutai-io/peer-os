@@ -70,7 +70,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private final TemplateRegistry templateRegistry;
 
     private final DaoManager daoManager;
-    private final String defaultDomain;
 
     protected Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
     protected ExecutorService executor = SubutaiExecutors.newCachedThreadPool();
@@ -402,7 +401,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public String getDefaultDomainName()
     {
-        return defaultDomain;
+        return Common.DEFAULT_DOMAIN_NAME;
     }
 
 
@@ -685,8 +684,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                                                           final Topology topology, final String sshKey,
                                                                           final TrackerOperation operationTracker )
     {
-        return new EnvironmentCreationWorkflow( defaultDomain, templateRegistry, this, networkManager, peerManager,
-                environment, topology, sshKey, operationTracker );
+        return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, this, networkManager,
+                peerManager, environment, topology, sshKey, operationTracker );
     }
 
 
@@ -694,8 +693,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                                                         final Topology topology, final String sshKey,
                                                                         final TrackerOperation operationTracker )
     {
-        return new EnvironmentGrowingWorkflow( defaultDomain, templateRegistry, networkManager, peerManager,
-                environment, topology, sshKey, operationTracker, this );
+        return new EnvironmentGrowingWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, networkManager,
+                peerManager, environment, topology, sshKey, operationTracker, this );
     }
 
 
@@ -923,14 +922,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager,
                                    final NetworkManager networkManager, final DaoManager daoManager,
-                                   final String defaultDomain, final IdentityManager identityManager,
-                                   final Tracker tracker )
+                                   final IdentityManager identityManager, final Tracker tracker )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( networkManager );
         Preconditions.checkNotNull( daoManager );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( defaultDomain ) );
         Preconditions.checkNotNull( identityManager );
         Preconditions.checkNotNull( tracker );
 
@@ -938,7 +935,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         this.peerManager = peerManager;
         this.networkManager = networkManager;
         this.daoManager = daoManager;
-        this.defaultDomain = defaultDomain;
         this.identityManager = identityManager;
         this.tracker = tracker;
     }

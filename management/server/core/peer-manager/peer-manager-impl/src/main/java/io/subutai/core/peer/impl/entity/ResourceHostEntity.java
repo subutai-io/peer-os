@@ -38,12 +38,10 @@ import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
-import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.util.IPUtil;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.Monitor;
@@ -410,16 +408,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         try
         {
-            //we don't need to set gateway on a container, since it is set by clone binding now
-//            if ( result != null )
-//            {
-//                final ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) result;
-//                //                containerHostEntity.setParent( this );
-//                if ( IPUtil.isValid( gateway ) )
-//                {
-//                    containerHostEntity.setDefaultGateway( gateway );
-//                }
-//            }
             return containerHostFuture.get();
         }
         catch ( ExecutionException | InterruptedException e )
@@ -477,14 +465,18 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             try
             {
                 containerHost = ( ContainerHostEntity ) getContainerHostByName( info.getHostname() );
+                containerHost.updateHostInfo( info );
             }
             catch ( HostNotFoundException e )
             {
-                containerHost = new ContainerHostEntity( peerId, info );
-                addContainerHost( containerHost );
-                result = true;
+                if ( !Strings.isNullOrEmpty( info.getId() ) )
+                {
+                    containerHost = new ContainerHostEntity( peerId, info );
+                    addContainerHost( containerHost );
+                    containerHost.updateHostInfo( info );
+                    result = true;
+                }
             }
-            containerHost.updateHostInfo( info );
         }
         return result;
     }
