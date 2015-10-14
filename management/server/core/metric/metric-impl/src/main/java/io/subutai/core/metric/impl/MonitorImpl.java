@@ -436,8 +436,8 @@ public class MonitorImpl implements Monitor
         //save subscription to database
         try
         {
-            String environmentId = containerHost instanceof EnvironmentContainerHost ?
-                                   ( ( EnvironmentContainerHost ) containerHost ).getEnvironmentId() : null;
+            String environmentId =
+                    containerHost instanceof EnvironmentContainerHost ? containerHost.getEnvironmentId() : null;
             monitorDao.addSubscription( environmentId, trimmedSubscriberId );
         }
         catch ( DaoException e )
@@ -447,8 +447,8 @@ public class MonitorImpl implements Monitor
         }
 
         //activate monitoring
-        String environmentId = containerHost instanceof EnvironmentContainerHost ?
-                               ( ( EnvironmentContainerHost ) containerHost ).getEnvironmentId() : null;
+        String environmentId =
+                containerHost instanceof EnvironmentContainerHost ? containerHost.getEnvironmentId() : null;
         activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings, environmentId );
     }
 
@@ -483,8 +483,8 @@ public class MonitorImpl implements Monitor
         Preconditions.checkNotNull( containerHost, CONTAINER_IS_NULL_MSG );
         Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
 
-        String environmentId = containerHost instanceof EnvironmentContainerHost ?
-                               ( ( EnvironmentContainerHost ) containerHost ).getEnvironmentId() : null;
+        String environmentId =
+                containerHost instanceof EnvironmentContainerHost ? containerHost.getEnvironmentId() : null;
         activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings, environmentId );
     }
 
