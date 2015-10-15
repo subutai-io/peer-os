@@ -30,7 +30,6 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.N2NConfig;
@@ -396,11 +395,9 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                             && containerInfo.getVlan() != 0 )
                     {
 
-                        ContainerInfoImpl containerInfoImpl =
-                                containerInfoDataService.find( containerInfo.getId() );
+                        ContainerInfoImpl containerInfoImpl = containerInfoDataService.find( containerInfo.getId() );
 
-                        ContainerHost containerHost =
-                                resourceHost.getContainerHostById( containerInfo.getId() );
+                        ContainerHost containerHost = resourceHost.getContainerHostById( containerInfo.getId() );
 
                         containerInfoImpl.setStatus( RegistrationStatus.REGISTERED );
                         containerInfoDataService.update( containerInfoImpl );
@@ -459,13 +456,14 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         try
         {
             managementHost = peerManager.getLocalPeer().getManagementHost();
-            result = managementHost.execute( new RequestBuilder( "/home/ubuntu/awsdeploy" ).withCmdArgs( args ) );
+            result = managementHost
+                    .execute( new RequestBuilder( "/home/ubuntu/awsdeploy" ).withCmdArgs( args ).withTimeout( 1800 ) );
             if ( result.getExitCode() != 0 )
             {
-                throw new NodeRegistrationException(result.getStdErr());
+                throw new NodeRegistrationException( result.getStdErr() );
             }
         }
-        catch ( HostNotFoundException | CommandException   e )
+        catch ( HostNotFoundException | CommandException e )
         {
             e.printStackTrace();
         }

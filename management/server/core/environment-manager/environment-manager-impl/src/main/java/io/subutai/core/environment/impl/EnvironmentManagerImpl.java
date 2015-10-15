@@ -31,6 +31,7 @@ import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.HostInfoModel;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
@@ -123,7 +124,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         //create empty environment
         final EnvironmentImpl environment = createEmptyEnvironment( name, ip, ssh );
-
+        for ( Map.Entry<NodeGroup, Set<HostInfo>> entry : containers.entrySet() )
+        {
+            for ( HostInfo newHost : entry.getValue() )
+            {
+                environment.addContainers( Sets.newHashSet(
+                        new EnvironmentContainerImpl( peerManager.getLocalPeer().getId(), peerManager.getLocalPeer(),
+                                entry.getKey().getName(), new HostInfoModel( newHost ),
+                                templateRegistry.getTemplate( entry.getKey().getTemplateName() ),
+                                entry.getKey().getSshGroupId(), entry.getKey().getHostsGroupId(),
+                                Common.DEFAULT_DOMAIN_NAME ) ) );
+            }
+        }
         TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
                 String.format( "Creating environment %s ", environment.getId() ) );
 
@@ -758,8 +770,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                                                       final Topology topology, final String sshKey,
                                                                       final TrackerOperation tracker )
     {
-        return new EnvironmentImportWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, this, networkManager, peerManager,
-                environment, topology, sshKey, tracker );
+        return new EnvironmentImportWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, this, networkManager,
+                peerManager, environment, topology, sshKey, tracker );
     }
 
 

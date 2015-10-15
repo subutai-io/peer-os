@@ -102,7 +102,7 @@ public class HostInterface implements Interface, Serializable
     @Override
     public String getName()
     {
-        return null;
+        return interfaceName;
     }
 
 
