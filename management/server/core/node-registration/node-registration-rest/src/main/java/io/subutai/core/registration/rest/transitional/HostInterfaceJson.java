@@ -6,9 +6,7 @@ import com.google.common.base.Preconditions;
 import io.subutai.common.host.Interface;
 
 
-/**
- * Created by talas on 9/18/15.
- */
+
 public class HostInterfaceJson implements Interface
 {
     private String interfaceName;
@@ -19,14 +17,13 @@ public class HostInterfaceJson implements Interface
     public HostInterfaceJson( final Interface aInterface )
     {
         Preconditions.checkNotNull( aInterface, "Invalid null argument aInterface" );
-        this.interfaceName = aInterface.getInterfaceName();
+        this.interfaceName = aInterface.getName();
         this.ip = aInterface.getIp();
         this.mac = aInterface.getMac();
     }
 
-
     @Override
-    public String getInterfaceName()
+    public String getName()
     {
         return interfaceName;
     }

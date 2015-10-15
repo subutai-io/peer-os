@@ -16,7 +16,7 @@ import io.subutai.common.protocol.api.DataService;
 import io.subutai.core.registration.impl.entity.RequestedHostImpl;
 
 
-public class RequestDataService implements DataService<UUID, RequestedHostImpl>
+public class RequestDataService implements DataService<String, RequestedHostImpl>
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RequestDataService.class );
 
@@ -57,14 +57,14 @@ public class RequestDataService implements DataService<UUID, RequestedHostImpl>
 
 
     @Override
-    public RequestedHostImpl find( final UUID id )
+    public RequestedHostImpl find( final String id )
     {
         RequestedHostImpl result = null;
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             em.getTransaction().begin();
-            result = em.find( RequestedHostImpl.class, id.toString() );
+            result = em.find( RequestedHostImpl.class, id );
             em.getTransaction().commit();
         }
         catch ( Exception e )
@@ -110,7 +110,7 @@ public class RequestDataService implements DataService<UUID, RequestedHostImpl>
 
 
     @Override
-    public void remove( final UUID id )
+    public void remove( final String id )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try

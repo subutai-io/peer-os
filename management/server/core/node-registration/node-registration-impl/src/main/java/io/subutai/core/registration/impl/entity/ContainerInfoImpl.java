@@ -21,7 +21,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.Interface;
+import io.subutai.core.registration.api.RegistrationStatus;
+import io.subutai.core.registration.api.service.ContainerInfo;
 
 
 @Entity
@@ -122,9 +126,9 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
 
 
     @Override
-    public UUID getId()
+    public String getId()
     {
-        return UUID.fromString( id );
+        return id;
     }
 
 

@@ -4,6 +4,7 @@ package io.subutai.core.registration.api;
 import java.util.List;
 import java.util.UUID;
 
+import io.subutai.common.command.CommandResult;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.registration.api.exception.NodeRegistrationException;
@@ -15,15 +16,17 @@ public interface RegistrationManager
 {
     public List<RequestedHost> getRequests();
 
-    public RequestedHost getRequest( UUID requestId );
+    public RequestedHost getRequest( String requestId );
 
     public void queueRequest( RequestedHost requestedHost ) throws NodeRegistrationException;
 
-    public void rejectRequest( UUID requestId );
+    public void rejectRequest( String requestId );
 
-    public void approveRequest( UUID requestId );
+    public void approveRequest( String requestId );
 
-    public void removeRequest( UUID requestId );
+    public void removeRequest( String requestId );
+
+    public void deployResourceHost(List<String> args) throws NodeRegistrationException;
 
     public ContainerToken generateContainerTTLToken( Long ttl );
 

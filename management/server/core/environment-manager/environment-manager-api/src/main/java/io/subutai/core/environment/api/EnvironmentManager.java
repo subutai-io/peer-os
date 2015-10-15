@@ -1,6 +1,7 @@
 package io.subutai.core.environment.api;
 
 
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -9,7 +10,9 @@ import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.host.HostInfo;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -47,10 +50,21 @@ public interface EnvironmentManager
     Environment createEnvironment( String name, Topology topology, String subnetCidr, String sshKey, boolean async )
             throws EnvironmentCreationException;
 
-
-    //    Environment importEnvironment( String name, Topology topology, Map<NodeGroup, Set<HostInfo>> containers,
-    // String ssh,
-    //                                   Integer vlan ) throws EnvironmentCreationException;
+    /**
+     * Imports environment based on a passed topology
+     *
+     * @param name - environment name
+     * @param topology - {@code Topology}
+     * //@param subnetCidr - subnet in CIDR-notation string, e.g. "192.168.0.1/16"
+     * @param ssh - optional ssh key content
+     * //@param async - indicates whether environment is created synchronously or asynchronously to the calling party
+     *
+     * @return - created environment
+     *
+     * @throws EnvironmentCreationException - thrown if error occurs during environment creation
+     */
+    Environment importEnvironment( String name, Topology topology, Map<NodeGroup, Set<HostInfo>> containers, String ssh,
+                                   Integer vlan ) throws EnvironmentCreationException;
 
 
     /**

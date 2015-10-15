@@ -27,9 +27,6 @@ import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.RequestedHost;
 
 
-/**
- * Created by talas on 8/24/15.
- */
 @Entity
 @Table( name = "node_resource_host_requests" )
 @Access( AccessType.FIELD )

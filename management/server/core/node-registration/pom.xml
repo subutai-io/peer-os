@@ -18,6 +18,7 @@
     <module>node-registration-impl</module>
     <module>node-registration-cli</module>
     <module>node-registration-rest</module>
+    <module>node-registration-ui</module>
   </modules>
 
 </project>
