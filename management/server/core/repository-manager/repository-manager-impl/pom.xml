@@ -5,7 +5,7 @@
   <parent>
     <artifactId>repository-manager</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.0-RC1</version>
+    <version>4.0.0-RC2</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -31,10 +31,6 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
-<!--    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-    </dependency>-->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -45,7 +41,7 @@
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
     </dependency>
-   </dependencies>
+  </dependencies>
 
   <build>
     <plugins>

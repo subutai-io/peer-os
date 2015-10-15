@@ -6,7 +6,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-parent</artifactId>
-    <version>4.0.0-RC1</version>
+    <version>4.0.0-RC2</version>
   </parent>
 
   <artifactId>mgmt-server-parent</artifactId>
@@ -19,7 +19,6 @@
     <module>subutai-common-implementation</module>
     <module>subutai-common-datasource</module>
     <module>vaadin</module>
-    <!--<module>plugins</module>-->
     <module>subutai-features</module>
     <module>server-karaf</module>
   </modules>
