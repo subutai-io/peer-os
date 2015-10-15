@@ -45,6 +45,8 @@ import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Interface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -788,9 +790,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder(
-                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
-                    bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
+                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1625,69 +1626,66 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    private Set<Interface> getInterfacesByIp( final String pattern )
-    {
-        LOG.debug( pattern );
-        Set<Interface> result = new HashSet<>();
-        try
-        {
-            result = Sets.filter( getManagementHost().getInterfaces(), new Predicate<Interface>()
-            {
-                @Override
-                public boolean apply( final Interface anInterface )
-                {
-                    if ( LOG.isDebugEnabled() )
-                    {
-                        LOG.debug( String.format( "%s matches %s = %s", anInterface.getIp(), pattern,
-                                anInterface.getIp().matches( pattern ) ) );
-                    }
-                    return anInterface.getIp().matches( pattern );
-                }
-            } );
-        }
-        catch ( HostNotFoundException e )
-        {
-            LOG.error( e.getMessage(), e );
-        }
-        return Collections.unmodifiableSet( result );
-    }
-
-
-    private Set<Interface> getInterfacesByName( final String pattern )
-    {
-        LOG.debug( pattern );
-        Set<Interface> result = new HashSet<>();
-        try
-        {
-            result = Sets.filter( getManagementHost().getInterfaces(), new Predicate<Interface>()
-            {
-                @Override
-                public boolean apply( final Interface anInterface )
-                {
-                    return anInterface.getName().matches( pattern );
-                }
-            } );
-        }
-        catch ( HostNotFoundException e )
-        {
-            LOG.error( e.getMessage(), e );
-        }
-        return result;
-    }
+    //    private Set<Interface> getInterfacesByIp( final String pattern )
+    //    {
+    //        LOG.debug( pattern );
+    //        Set<Interface> result = new HashSet<>();
+    //        try
+    //        {
+    //            result = Sets.filter( getManagementHost().getInterfaces(), new Predicate<Interface>()
+    //            {
+    //                @Override
+    //                public boolean apply( final Interface anInterface )
+    //                {
+    //                    if ( LOG.isDebugEnabled() )
+    //                    {
+    //                        LOG.debug( String.format( "%s matches %s = %s", anInterface.getIp(), pattern,
+    //                                anInterface.getIp().matches( pattern ) ) );
+    //                    }
+    //                    return anInterface.getIp().matches( pattern );
+    //                }
+    //            } );
+    //        }
+    //        catch ( HostNotFoundException e )
+    //        {
+    //            LOG.error( e.getMessage(), e );
+    //        }
+    //        return Collections.unmodifiableSet( result );
+    //    }
+    //
+    //
+    //    private Set<Interface> getInterfacesByName( final String pattern )
+    //    {
+    //        LOG.debug( pattern );
+    //        Set<Interface> result = new HashSet<>();
+    //        try
+    //        {
+    //            result = Sets.filter( getManagementHost().getInterfaces(), new Predicate<Interface>()
+    //            {
+    //                @Override
+    //                public boolean apply( final Interface anInterface )
+    //                {
+    //                    return anInterface.getName().matches( pattern );
+    //                }
+    //            } );
+    //        }
+    //        catch ( HostNotFoundException e )
+    //        {
+    //            LOG.error( e.getMessage(), e );
+    //        }
+    //        return result;
+    //    }
 
 
     @Override
-    public Set<Interface> getNetworkInterfaces( final InterfacePattern pattern )
+    public HostInterfaces getInterfaces()
     {
-        if ( "ip".equals( pattern.getField() ) )
+        HostInterfaces result = new HostInterfaces();
+        for ( Interface intf : managementHost.getInterfaces() )
         {
-            return getInterfacesByIp( pattern.getPattern() );
+            result.addInterface( new HostInterface( intf.getName(), intf.getIp(), intf.getMac() ) );
         }
-        else if ( "name".equals( pattern.getField() ) )
-        {
-            return getInterfacesByName( pattern.getPattern() );
-        }
-        throw new IllegalArgumentException( "Unknown field." );
+        return result;
     }
 
 

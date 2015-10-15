@@ -11,6 +11,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Interface;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -389,10 +390,10 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
 
 
     /**
-     * Gets network interfaces by given field name and regexp pattern. Allowed field names are "id" and "name".
+     * Gets network interfaces
      */
 
-    Set<Interface> getNetworkInterfaces( InterfacePattern pattern );
+    HostInterfaces getInterfaces();
 
     void setupN2NConnection( N2NConfig config ) throws PeerException;
 

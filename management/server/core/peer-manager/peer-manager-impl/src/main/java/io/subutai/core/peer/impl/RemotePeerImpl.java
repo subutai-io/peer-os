@@ -32,6 +32,8 @@ import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.exception.HTTPException;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Interface;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -1612,10 +1614,8 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public Set<Interface> getNetworkInterfaces( final InterfacePattern pattern )
+    public HostInterfaces getInterfaces()
     {
-        Preconditions.checkNotNull( pattern, "Pattern could not be null" );
-
         String path = buildPath( "peer/interfaces" );
 
         WebClient client =
@@ -1625,8 +1625,7 @@ public class RemotePeerImpl implements RemotePeer
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        Collection interfaces = client.postAndGetCollection( pattern, HostInterfaceImpl.class );
-        return Sets.newHashSet( interfaces );
+        return client.get( HostInterfaces.class );
     }
 
 

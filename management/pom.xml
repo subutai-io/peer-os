@@ -94,6 +94,7 @@
     <nimbus.jwt.version>3.10</nimbus.jwt.version>
     <!-- Jackson JSON lib lib -->
     <jackson.version>2.6.1</jackson.version>
+    <jackson-jaxrs.version>1.9.13</jackson-jaxrs.version>
 
     <!-- Database  -->
     <h2database.version>1.4.184</h2database.version>
@@ -779,6 +780,12 @@
         <version>2.2</version>
       </dependency>
       <!-- Json Mapper -->
+      <dependency>
+       	<groupId>org.codehaus.jackson</groupId>
+       	<artifactId>jackson-jaxrs</artifactId>
+       	<version>${jackson-jaxrs.version}</version>
+       </dependency>
+
       <dependency>
         <groupId>com.fasterxml.jackson.jaxrs</groupId>
         <artifactId>jackson-jaxrs-json-provider</artifactId>

@@ -25,6 +25,7 @@ import com.google.common.base.Strings;
 import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Interface;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.Ram;
@@ -1071,12 +1072,12 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Set<Interface> getNetworkInterfaces( final InterfacePattern request )
+    public HostInterfaces getNetworkInterfaces()
     {
         LocalPeer localPeer = peerManager.getLocalPeer();
         try
         {
-            return localPeer.getNetworkInterfaces( request );
+            return localPeer.getInterfaces();
         }
         catch ( Exception e )
         {

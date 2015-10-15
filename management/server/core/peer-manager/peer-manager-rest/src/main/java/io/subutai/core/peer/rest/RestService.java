@@ -16,6 +16,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Interface;
 import io.subutai.common.peer.InterfacePattern;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -277,11 +278,11 @@ public interface RestService
 
     //*********** Environment Specific REST - END ***************
 
-    @POST
+    @GET
     @Path( "interfaces" )
     @Produces( { MediaType.APPLICATION_JSON } )
     @Consumes( { MediaType.APPLICATION_JSON } )
-    Set<Interface> getNetworkInterfaces( InterfacePattern pattern );
+    HostInterfaces getNetworkInterfaces();
 
     @POST
     @Path( "n2ntunnel" )
