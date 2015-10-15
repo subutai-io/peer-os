@@ -27,7 +27,7 @@ public class HostInterfaceTest
     public void setUp() throws Exception
     {
         Interface iface = mock( Interface.class );
-        when( iface.getInterfaceName() ).thenReturn( iname );
+        when( iface.getName() ).thenReturn( iname );
         when( iface.getIp() ).thenReturn( ip );
         when( iface.getMac() ).thenReturn( mac );
         hostInterface = new HostInterface( iface );

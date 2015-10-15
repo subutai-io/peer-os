@@ -3,6 +3,7 @@ package io.subutai.core.environment.impl;
 
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -22,17 +23,21 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.Interface;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.HostInfoModel;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
+import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
@@ -44,6 +49,7 @@ import io.subutai.core.environment.impl.dao.EnvironmentContainerDataService;
 import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.workflow.construction.EnvironmentImportWorkflow;
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.ContainerDestructionWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.EnvironmentDestructionWorkflow;
@@ -79,6 +85,77 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     protected BlueprintDataService blueprintDataService;
 
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
+
+
+    @Override
+    public Environment importEnvironment( final String name, final Topology topology,
+                                          final Map<NodeGroup, Set<HostInfo>> containers, final String ssh,
+                                          final Integer vlan ) throws EnvironmentCreationException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
+        Preconditions.checkNotNull( topology, "Invalid topology" );
+        Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
+
+        Map.Entry<NodeGroup, Set<HostInfo>> containersEntry = containers.entrySet().iterator().next();
+        Iterator<HostInfo> hostIterator = containersEntry.getValue().iterator();
+
+        String ip = "";
+
+        while ( hostIterator.hasNext() && StringUtil.isStringNullOrEmpty( ip ) )
+        {
+            HostInfo sampleHostInfo = hostIterator.next();
+
+            //TODO ip is chosen from first standing container host info
+            for ( final Interface iface : sampleHostInfo.getInterfaces() )
+            {
+                if ( StringUtil.isStringNullOrEmpty( iface.getIp() ) )
+                {
+                    continue;
+                }
+                ip = iface.getIp() + "/24";
+                break;
+            }
+        }
+
+        if ( StringUtil.isStringNullOrEmpty( ip ) )
+        {
+            throw new EnvironmentCreationException( "Invalid environment ip range" );
+        }
+
+        //create empty environment
+        final EnvironmentImpl environment = createEmptyEnvironment( name, ip, ssh );
+        for ( Map.Entry<NodeGroup, Set<HostInfo>> entry : containers.entrySet() )
+        {
+            for ( HostInfo newHost : entry.getValue() )
+            {
+                environment.addContainers( Sets.newHashSet(
+                        new EnvironmentContainerImpl( peerManager.getLocalPeer().getId(), peerManager.getLocalPeer(),
+                                entry.getKey().getName(), new HostInfoModel( newHost ),
+                                templateRegistry.getTemplate( entry.getKey().getTemplateName() ),
+                                entry.getKey().getSshGroupId(), entry.getKey().getHostsGroupId(),
+                                Common.DEFAULT_DOMAIN_NAME ) ) );
+            }
+        }
+        TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Creating environment %s ", environment.getId() ) );
+
+        EnvironmentImportWorkflow environmentImportWorkflow =
+                getEnvironmentImportWorkflow( environment, topology, ssh, operationTracker );
+
+        environmentImportWorkflow.start();
+        //notify environment event listeners
+        environmentImportWorkflow.onStop( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                notifyOnEnvironmentCreated( environment );
+            }
+        } );
+
+
+        return environment;
+    }
 
 
     @Override
@@ -686,6 +763,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, this, networkManager,
                 peerManager, environment, topology, sshKey, operationTracker );
+    }
+
+
+    protected EnvironmentImportWorkflow getEnvironmentImportWorkflow( final EnvironmentImpl environment,
+                                                                      final Topology topology, final String sshKey,
+                                                                      final TrackerOperation tracker )
+    {
+        return new EnvironmentImportWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, this, networkManager,
+                peerManager, environment, topology, sshKey, tracker );
     }
 
 

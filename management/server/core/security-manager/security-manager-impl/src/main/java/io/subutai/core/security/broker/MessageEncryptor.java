@@ -17,9 +17,11 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.broker.api.TextMessagePostProcessor;
-//import io.subutai.core.registration.api.RegistrationManager;
+import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
+
+//import io.subutai.core.registration.api.RegistrationManager;
 
 
 /**
@@ -45,12 +47,12 @@ public class MessageEncryptor implements TextMessagePostProcessor
     }
 
 
-//    public static RegistrationManager getRegistrationManager() throws NamingException
-//    {
-//
-//        return ServiceLocator.getServiceNoCache( RegistrationManager.class );
-//    }
-//
+    public static RegistrationManager getRegistrationManager() throws NamingException
+    {
+
+        return ServiceLocator.getServiceNoCache( RegistrationManager.class );
+    }
+
 
     @Override
     public String process( final String topic, final String message )
@@ -68,18 +70,18 @@ public class MessageEncryptor implements TextMessagePostProcessor
                 Request originalRequest = requestWrapper.getRequest();
 
                 //obtain target host pub key for encrypting
-                PGPPublicKey hostKeyForEncrypting = MessageEncryptor.getSecurityManager().getKeyManager()
-                                                                    .getPublicKey( originalRequest.getId() );
+                PGPPublicKey hostKeyForEncrypting =
+                        MessageEncryptor.getSecurityManager().getKeyManager().getPublicKey( originalRequest.getId() );
 
                 if ( originalRequest.getCommand().toLowerCase().matches( CLONE_CMD_REGEX ) )
                 {
 
                     //add token for container creation
                     List<String> args = Lists.newArrayList( originalRequest.getArgs() );
-//                    args.add( "-t" );
-//                    args.add( getRegistrationManager().generateContainerTTLToken(
-//                            ( originalRequest.getTimeout() + Common.WAIT_CONTAINER_CONNECTION_SEC + 10 ) * 1000L )
-//                                                      .getToken() );
+                    args.add( "-t" );
+                    args.add( getRegistrationManager().generateContainerTTLToken(
+                            ( originalRequest.getTimeout() + Common.WAIT_CONTAINER_CONNECTION_SEC + 10 ) * 1000L )
+                                                      .getToken() );
 
                     originalRequest =
                             new RequestBuilder.RequestImpl( originalRequest.getType(), originalRequest.getId(),
