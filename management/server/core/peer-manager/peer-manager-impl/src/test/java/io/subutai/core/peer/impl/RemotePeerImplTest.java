@@ -140,7 +140,7 @@ public class RemotePeerImplTest
         headers = Maps.newHashMap();
         headers.put( HEADER_NAME, HEADER_VALUE );
         remotePeer = spy( new RemotePeerImpl( localPeer, peerInfo, messenger, commandResponseListener,
-                messageResponseListener ) );
+                messageResponseListener, null ) );
         remotePeer.restUtil = restUtil;
         remotePeer.jsonUtil = jsonUtil;
         when( containerHost.getId() ).thenReturn( CONTAINER_ID );

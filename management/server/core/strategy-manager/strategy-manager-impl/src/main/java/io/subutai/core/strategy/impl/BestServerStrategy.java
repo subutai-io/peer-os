@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.protocol.Criteria;
 import io.subutai.core.strategy.api.CriteriaDef;
 import io.subutai.core.strategy.api.StrategyException;
@@ -33,11 +34,11 @@ public class BestServerStrategy extends RoundRobinStrategy
 
 
     @Override
-    protected List<ResourceHostMetric> sortServers( List<ResourceHostMetric> serverMetrics ) throws StrategyException
+    protected List<ResourceHostMetric> sortServers( ResourceHostMetrics serverMetrics ) throws StrategyException
     {
         // using each strategy criteria, grade servers one by one
         Map<ResourceHostMetric, Integer> grades = new HashMap<>();
-        for ( ResourceHostMetric a : serverMetrics )
+        for ( ResourceHostMetric a : serverMetrics.getResources() )
         {
             grades.put( a, 0 );
         }
@@ -86,10 +87,10 @@ public class BestServerStrategy extends RoundRobinStrategy
     }
 
 
-    private ResourceHostMetric getBestMatch( List<ResourceHostMetric> serverMetrics, final MetricComparator mc )
+    private ResourceHostMetric getBestMatch( ResourceHostMetrics serverMetrics, final MetricComparator mc )
     {
 
-        List<ResourceHostMetric> ls = Lists.newArrayList( serverMetrics );
+        List<ResourceHostMetric> ls = Lists.newArrayList( serverMetrics.getResources() );
         Collections.sort( ls, new Comparator<ResourceHostMetric>()
         {
 

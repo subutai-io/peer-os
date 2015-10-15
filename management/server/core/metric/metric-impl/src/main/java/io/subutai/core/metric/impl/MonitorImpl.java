@@ -372,9 +372,9 @@ public class MonitorImpl implements Monitor
                     resourceHost.execute( commands.getCurrentMetricCommand( resourceHost.getHostname() ) );
             if ( result.hasSucceeded() )
             {
-                ResourceHostMetricImpl metric = JsonUtil.fromJson( result.getStdOut(), ResourceHostMetricImpl.class );
+                ResourceHostMetric metric = JsonUtil.fromJson( result.getStdOut(), ResourceHostMetric.class );
                 //set peer id for future reference
-                metric.setPeerId( peerManager.getLocalPeer().getId() );
+//                metric.setPeerId( peerManager.getLocalPeer().getId() );
                 metric.setHostId( resourceHost.getId() );
                 metrics.add( metric );
             }

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.protocol.Criteria;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.strategy.api.AbstractContainerPlacementStrategy;
@@ -31,10 +32,10 @@ public class RoundRobinStrategy extends AbstractContainerPlacementStrategy
 
 
     @Override
-    public void calculatePlacement( int nodesCount, List<ResourceHostMetric> serverMetrics, List<Criteria> criteria )
+    public void calculatePlacement( int nodesCount, ResourceHostMetrics serverMetrics, List<Criteria> criteria )
             throws StrategyException
     {
-        if ( CollectionUtil.isCollectionEmpty( serverMetrics ) )
+        if ( serverMetrics.isEmpty() )
         {
             return;
         }

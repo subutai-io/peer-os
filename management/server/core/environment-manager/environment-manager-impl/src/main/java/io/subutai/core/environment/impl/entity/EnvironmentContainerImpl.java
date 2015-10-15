@@ -3,6 +3,7 @@ package io.subutai.core.environment.impl.entity;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import javax.persistence.Access;
@@ -406,6 +407,23 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         }
 
         return null;
+    }
+
+
+    @Override
+    public Interface getInterfaceByName( final String interfaceName )
+    {
+        Interface result = null;
+        for ( Iterator<Interface> i = getInterfaces().iterator(); result == null && i.hasNext(); )
+        {
+            Interface n = i.next();
+            if ( n.getName().equalsIgnoreCase( interfaceName ) )
+            {
+                result = n;
+            }
+        }
+
+        return result;
     }
 
 

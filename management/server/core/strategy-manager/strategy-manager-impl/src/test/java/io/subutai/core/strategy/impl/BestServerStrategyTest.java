@@ -12,7 +12,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.protocol.Criteria;
 import io.subutai.core.strategy.api.CriteriaDef;
 import io.subutai.core.strategy.api.StrategyException;
@@ -80,17 +82,19 @@ public class BestServerStrategyTest
     @Test
     public void testCalculatePlacement() throws StrategyException
     {
-        when( metric.getHost() ).thenReturn( LESS_METRIC_HOST_NAME );
+        when( metric.getHostName() ).thenReturn( LESS_METRIC_HOST_NAME );
         when( metric.getAvailableRam() ).thenReturn( GB * 1024.0 );
-        when( metric.getAvailableDiskVar() ).thenReturn( GB * 1024.0 );
+        when( metric.getAvailableSpace() ).thenReturn( GB * 1024.0 );
 
-        when( bestMetric.getHost() ).thenReturn( LESS_METRIC_HOST_NAME );
+        when( bestMetric.getHostName() ).thenReturn( LESS_METRIC_HOST_NAME );
         when( bestMetric.getAvailableRam() ).thenReturn( GB * 2048.0 );
-        when( bestMetric.getAvailableDiskVar() ).thenReturn( GB * 4096.0 );
+        when( bestMetric.getAvailableSpace() ).thenReturn( GB * 4096.0 );
 
-        List<ResourceHostMetric> metrics = new ArrayList<>();
-        metrics.add( metric );
-        metrics.add( bestMetric );
+
+        ResourceHostMetrics metrics = new ResourceHostMetrics();
+        metrics.addMetric( metric );
+        metrics.addMetric( bestMetric );
+
 
         Criteria criteria = new Criteria( "MORE_HDD", true );
         bestServerStrategy.calculatePlacement( 5, metrics, Arrays.asList( criteria ) );

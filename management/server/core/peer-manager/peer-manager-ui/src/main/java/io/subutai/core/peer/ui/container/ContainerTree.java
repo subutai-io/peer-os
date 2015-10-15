@@ -19,9 +19,12 @@ import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Tree;
 
+import io.subutai.common.host.Interface;
+import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.settings.Common;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
@@ -69,28 +72,62 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
             @Override
             public String generateDescription( Component source, Object itemId, Object propertyId )
             {
-                String description = "";
                 Item item = tree.getItem( itemId );
+                StringBuilder result = new StringBuilder();
                 if ( item != null )
                 {
                     Host host = ( Host ) item.getItemProperty( "value" ).getValue();
                     if ( host != null )
                     {
-                        String intfName = "br-int";
-                        if ( host instanceof ContainerHost )
+                        try
                         {
-                            intfName = Common.DEFAULT_CONTAINER_INTERFACE;
+                            String intfName = "br-int";
+                            if ( host instanceof ContainerHost )
+                            {
+                                intfName = Common.DEFAULT_CONTAINER_INTERFACE;
+                            }
+                            Interface intf = host.getInterfaceByName( intfName );
+                            String mac = null;
+                            String ip = null;
+                            if ( intf != null )
+                            {
+                                mac = intf.getMac();
+                                ip = intf.getIp();
+                            }
+
+                            result.append( getText( "Hostname: %s", host.getHostname() ) );
+                            result.append( getText( "<br/>ID: %s", host.getId() ) );
+                            result.append( getText( "<br/>IP: %s", ip ) );
+                            result.append( getText( "<br/>MAC: %s", mac ) );
+
+
+                            if ( host instanceof ResourceHost )
+                            {
+
+                                ResourceHost resourceHost = ( ResourceHost ) host;
+                                final ResourceHostMetric metric = resourceHost.getHostMetric();
+
+                                result.append( getText( "<br>CPU model: %s", metric.getCpuModel() ) );
+                                result.append( getText( "<br>CPU load: %.2f", metric.getUsedCpu() ) );
+                                result.append( getText( "<br>Total RAM: %.3f Gb",
+                                        metric.getTotalRam() / 1024 / 1024 / 1024 ) );
+                                result.append( getText( "<br>Available RAM: %.3f Gb",
+                                        metric.getAvailableRam() / 1024 / 1024 / 1024 ) );
+                                result.append( getText( "<br>Available space: %.3f Gb",
+                                        metric.getAvailableSpace() / 1024 / 1024 / 1024 ) );
+                            }
                         }
-                        description = "Hostname: " + host.getHostname() + "<br>" + "MAC: " + host
-                                .getMacByInterfaceName( intfName ) + "<br>" + "ID: " + host.getId() + "<br>" + "IP: "
-                                + host.getIpByInterfaceName( intfName );
+                        catch ( Exception e )
+                        {
+                            LOG.warn( "Host description generation problem: " + e.getMessage() );
+                        }
                     }
                 }
 
-                return description;
+                return result.toString();
             }
         } );
-        tree.setMultiSelect( true );
+        tree.setMultiSelect( false );
         tree.setImmediate( true );
         tree.addValueChangeListener( new Property.ValueChangeListener()
         {
@@ -142,6 +179,19 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
         catch ( PeerException ignore )
         {
             LOG.warn( "Error accessing management host" );
+        }
+    }
+
+
+    private String getText( final String format, final Object o )
+    {
+        if ( o != null )
+        {
+            return String.format( format, o );
+        }
+        else
+        {
+            return "";
         }
     }
 

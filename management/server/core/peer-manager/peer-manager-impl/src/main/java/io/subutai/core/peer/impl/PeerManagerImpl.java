@@ -62,16 +62,18 @@ public class PeerManagerImpl implements PeerManager
     private MessageResponseListener messageResponseListener;
     private DaoManager daoManager;
     private SecurityManager securityManager;
+    private Object provider;
 
 
     public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
-                            MessageResponseListener messageResponseListener, SecurityManager securityManager )
+                            MessageResponseListener messageResponseListener, SecurityManager securityManager, Object provider )
     {
         this.messenger = messenger;
         this.localPeer = localPeer;
         this.daoManager = daoManager;
         this.messageResponseListener = messageResponseListener;
         this.securityManager = securityManager;
+        this.provider = provider;
     }
 
 
@@ -200,7 +202,7 @@ public class PeerManagerImpl implements PeerManager
 
         if ( pi != null )
         {
-            return new RemotePeerImpl( localPeer, pi, messenger, commandResponseListener, messageResponseListener );
+            return new RemotePeerImpl( localPeer, pi, messenger, commandResponseListener, messageResponseListener, provider );
         }
         return null;
     }

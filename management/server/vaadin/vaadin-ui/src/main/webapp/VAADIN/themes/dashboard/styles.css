@@ -1,4 +1,5 @@
 .v-loading-indicator
+.v-loading-indicator
 {
     height: 0px !important;
     width: 0px !important;
@@ -7854,4 +7855,11 @@ body .dashboard.v-app .v-app-loading
 .jqconsole-ansi-overline
 {
     text-decoration: overline !important;
+}
+
+.v-tooltip
+{
+    background: #262729;
+    color: #ffffff !important;
+    padding: 4px;
 }

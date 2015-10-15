@@ -11,7 +11,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.util.UnitUtil;
 
 import static org.junit.Assert.assertEquals;
@@ -53,25 +55,26 @@ public class DefaultContainerPlacementStrategyTest
         assertEquals( "Default container placement strategy", defaultContainerPlacementStrategy.getTitle() );
     }
 
+
     @Test
     public void testCalculateSlotsByRam()
     {
-        List<ResourceHostMetric> serverMetrics = new ArrayList<>();
+        ResourceHostMetrics serverMetrics = new ResourceHostMetrics();
+        serverMetrics.addMetric( metric );
 
         when( metric.getAvailableRam() ).thenReturn( GB * 8.0 );
-        when( metric.getAvailableDiskVar() ).thenReturn( GB * 4096.0 );
+        when( metric.getAvailableSpace() ).thenReturn( GB * 4096.0 );
 
 
-        Map<ResourceHostMetric, Integer> result =
-                defaultContainerPlacementStrategy.calculateSlots( 1, Arrays.asList( metric ) );
+        Map<ResourceHostMetric, Integer> result = defaultContainerPlacementStrategy.calculateSlots( 1, serverMetrics );
 
         assertNotNull( result );
 
         assertEquals( 1, result.size() );
 
-        assertEquals( new Double( ( UnitUtil.getBytesInMb( GB * 8.0 )
-                        - DefaultContainerPlacementStrategy.MIN_RAM_IN_RESERVE_MB )
-                        / DefaultContainerPlacementStrategy.MIN_RAM_LXC_MB ).intValue(),
+        assertEquals( new Double(
+                        ( UnitUtil.getBytesInMb( GB * 8.0 ) - DefaultContainerPlacementStrategy.MIN_RAM_IN_RESERVE_MB )
+                                / DefaultContainerPlacementStrategy.MIN_RAM_LXC_MB ).intValue(),
                 result.entrySet().iterator().next().getValue().intValue() );
     }
 
@@ -79,14 +82,13 @@ public class DefaultContainerPlacementStrategyTest
     @Test
     public void testCalculateSlotsByHdd()
     {
-        List<ResourceHostMetric> serverMetrics = new ArrayList<>();
-
         when( metric.getAvailableRam() ).thenReturn( GB * 1024.0 );
-        when( metric.getAvailableDiskVar() ).thenReturn( GB * 1024.0 );
+        when( metric.getAvailableSpace() ).thenReturn( GB * 1024.0 );
 
+        ResourceHostMetrics serverMetrics = new ResourceHostMetrics();
+        serverMetrics.addMetric( metric );
 
-        Map<ResourceHostMetric, Integer> result =
-                defaultContainerPlacementStrategy.calculateSlots( 1, Arrays.asList( metric ) );
+        Map<ResourceHostMetric, Integer> result = defaultContainerPlacementStrategy.calculateSlots( 1, serverMetrics );
 
         assertNotNull( result );
 
@@ -103,11 +105,12 @@ public class DefaultContainerPlacementStrategyTest
     public void testCalculatePlacement()
     {
         when( metric.getAvailableRam() ).thenReturn( GB * 1024.0 );
-        when( metric.getAvailableDiskVar() ).thenReturn( GB * 1024.0 );
+        when( metric.getAvailableSpace() ).thenReturn( GB * 1024.0 );
 
-        List<ResourceHostMetric> metrics = new ArrayList<>();
-        metrics.add( metric );
-        defaultContainerPlacementStrategy.calculatePlacement( 10, metrics, null );
+        ResourceHostMetrics serverMetrics = new ResourceHostMetrics();
+        serverMetrics.addMetric( metric );
+
+        defaultContainerPlacementStrategy.calculatePlacement( 10, serverMetrics, null );
         Map<ResourceHostMetric, Integer> result = defaultContainerPlacementStrategy.getPlacementDistribution();
         assertNotNull( result );
         assertEquals( 1, result.size() );

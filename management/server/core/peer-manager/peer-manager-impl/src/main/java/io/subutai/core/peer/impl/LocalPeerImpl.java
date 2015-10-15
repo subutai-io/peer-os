@@ -61,6 +61,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
+import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
@@ -198,6 +199,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             for ( ResourceHost resourceHost : getResourceHosts() )
             {
+                ( ( ResourceHostEntity ) resourceHost ).init();
+
                 for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
                 {
                     LOG.debug( String.format( "%s %s", resourceHost.getHostname(), containerHost.getHostname() ) );
@@ -785,8 +788,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
-                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder(
+                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
+                    bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1712,6 +1716,23 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void createGateway( final String environmentGatewayIp, final int vlan ) throws PeerException
     {
         getManagementHost().createGateway( environmentGatewayIp, vlan );
+    }
+
+
+    @Override
+    public ResourceHostMetrics getResourceHostMetrics()
+    {
+        ResourceHostMetrics result = new ResourceHostMetrics();
+
+        for ( ResourceHost resourceHost : getResourceHosts() )
+        {
+            if ( resourceHost.isConnected() )
+            {
+                result.addMetric( resourceHost.getHostMetric() );
+            }
+        }
+
+        return result;
     }
 
 

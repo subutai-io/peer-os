@@ -76,7 +76,6 @@ public class RestUtil
         return client;
     }
 
-
     public static enum RequestType
     {
         GET, DELETE, POST

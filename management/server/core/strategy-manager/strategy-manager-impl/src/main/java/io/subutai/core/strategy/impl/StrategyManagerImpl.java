@@ -2,11 +2,13 @@ package io.subutai.core.strategy.impl;
 
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.protocol.Criteria;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
 import io.subutai.core.strategy.api.StrategyException;
@@ -59,7 +61,7 @@ public class StrategyManagerImpl implements StrategyManager
 
 
     @Override
-    public Map<ResourceHostMetric, Integer> getPlacementDistribution( List<ResourceHostMetric> serverMetrics,
+    public Map<ResourceHostMetric, Integer> getPlacementDistribution( ResourceHostMetrics serverMetrics,
                                                                       int nodesCount, String strategyId,
                                                                       List<Criteria> criteria ) throws StrategyException
     {

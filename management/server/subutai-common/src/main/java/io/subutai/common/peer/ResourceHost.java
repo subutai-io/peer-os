@@ -19,7 +19,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
     /**
      * Returns resource usage metric of the resource host
      */
-    public ResourceHostMetric getHostMetric() throws ResourceHostException;
+    public ResourceHostMetric getHostMetric();
 
     /**
      * Returns hosts containers

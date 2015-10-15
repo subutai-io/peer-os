@@ -27,6 +27,8 @@ import com.google.gson.reflect.TypeToken;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.Interface;
 import io.subutai.common.metric.ProcessResourceUsage;
+import io.subutai.common.metric.Ram;
+import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
@@ -34,6 +36,7 @@ import io.subutai.common.peer.InterfacePattern;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
+import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.peer.PeerStatus;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
@@ -1074,6 +1077,21 @@ public class RestServiceImpl implements RestService
         try
         {
             return localPeer.getNetworkInterfaces( request );
+        }
+        catch ( Exception e )
+        {
+            throw new WebApplicationException( e );
+        }
+    }
+
+
+    @Override
+    public ResourceHostMetrics getResources()
+    {
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        try
+        {
+            return localPeer.getResourceHostMetrics();
         }
         catch ( Exception e )
         {

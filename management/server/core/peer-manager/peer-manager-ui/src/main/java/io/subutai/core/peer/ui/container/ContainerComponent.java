@@ -3,18 +3,18 @@ package io.subutai.core.peer.ui.container;
 
 import javax.naming.NamingException;
 
+import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.HorizontalSplitPanel;
+import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.Runo;
+
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.ui.PeerManagerPortalModule;
 import io.subutai.core.peer.ui.container.clone.Cloner;
 import io.subutai.core.peer.ui.container.manage.Manager;
 import io.subutai.core.strategy.api.StrategyManager;
-
-import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.HorizontalSplitPanel;
-import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.Runo;
 
 
 public class ContainerComponent extends CustomComponent

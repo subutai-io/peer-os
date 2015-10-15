@@ -1,26 +1,42 @@
 package io.subutai.common.metric;
 
 
-import com.google.common.base.MoreObjects;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 
 /**
- * Interface for ResourceHostMetric
+ * ResourceHostMetric
  */
-public abstract class ResourceHostMetric extends Metric
+@XmlRootElement
+public class ResourceHostMetric extends BaseMetric
 {
-    protected String peerId;
+    @JsonProperty
+    private Integer containersCount;
 
 
-    public String getPeerId()
+    public ResourceHostMetric()
     {
-        return peerId;
     }
 
 
-    @Override
-    public String toString()
+    public ResourceHostMetric( final Ram ram )
     {
-        return MoreObjects.toStringHelper( this ).add( "metric", super.toString() ).add( "peerId", peerId ).toString();
+        super( ram );
+    }
+
+
+    @JsonIgnore
+    public Integer getContainersCount()
+    {
+        return containersCount;
+    }
+
+
+    public void setContainersCount( final Integer containersCount )
+    {
+        this.containersCount = containersCount;
     }
 }

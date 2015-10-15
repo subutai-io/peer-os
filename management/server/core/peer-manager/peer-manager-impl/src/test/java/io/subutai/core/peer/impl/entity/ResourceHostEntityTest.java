@@ -129,8 +129,10 @@ public class ResourceHostEntityTest
     @Test
     public void testDispose() throws Exception
     {
+        resourceHostEntity.init();
         resourceHostEntity.dispose();
 
+        verify( singleThreadExecutorService ).shutdown();
         verify( singleThreadExecutorService ).shutdown();
     }
 
@@ -193,21 +195,7 @@ public class ResourceHostEntityTest
         }
     }
 
-
-    @Test( expected = ResourceHostException.class )
-    public void testGetResourceHostMetric() throws Exception
-    {
-        resourceHostEntity.getHostMetric();
-
-        verify( monitor ).getResourceHostMetric( resourceHostEntity );
-
-        doThrow( new MonitorException( "" ) ).when( monitor ).getResourceHostMetric( resourceHostEntity );
-
-        resourceHostEntity.getHostMetric();
-    }
-
-
-    @Test
+   @Test
     public void testGetContainerHosts() throws Exception
     {
         resourceHostEntity.addContainerHost( containerHost );

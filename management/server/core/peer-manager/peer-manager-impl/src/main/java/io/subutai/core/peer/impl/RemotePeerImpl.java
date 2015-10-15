@@ -10,12 +10,12 @@ import java.util.concurrent.Semaphore;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -34,6 +34,7 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
 import io.subutai.common.metric.ProcessResourceUsage;
+import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
@@ -98,7 +99,7 @@ public class RemotePeerImpl implements RemotePeer
 
     public RemotePeerImpl( LocalPeer localPeer, final PeerInfo peerInfo, final Messenger messenger,
                            CommandResponseListener commandResponseListener,
-                           MessageResponseListener messageResponseListener )
+                           MessageResponseListener messageResponseListener, Object provider )
     {
         this.localPeer = localPeer;
         this.peerInfo = peerInfo;
@@ -124,7 +125,7 @@ public class RemotePeerImpl implements RemotePeer
         }
         this.baseUrl = url;
         this.providers = Lists.newArrayList();
-        providers.add( new JacksonJaxbJsonProvider() );
+        providers.add( provider );
     }
 
 
@@ -1696,6 +1697,28 @@ public class RemotePeerImpl implements RemotePeer
         {
             throw new PeerException( String.format( "Error creating gateway on peer %s", getName() ), e );
         }
+    }
+
+
+    @Override
+    public ResourceHostMetrics getResourceHostMetrics()
+    {
+        String path = String.format( "peer/resources" );
+
+
+        WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
+                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, providers );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+
+        //*********construct Secure Header ****************************
+        client.getHeaders().add( Common.HEADER_SPECIAL, "ENC" );
+        client.getHeaders().add( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
+        client.getHeaders().add( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
+
+        ResourceHostMetrics result = client.get( ResourceHostMetrics.class );
+        return result;
     }
 
 
