@@ -19,3 +19,4 @@ target
 server/core/broker/broker-impl/activemq-data
 *.uml
 out
+.DS_Store
