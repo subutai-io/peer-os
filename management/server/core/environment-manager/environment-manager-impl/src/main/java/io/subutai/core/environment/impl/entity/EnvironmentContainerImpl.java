@@ -35,10 +35,10 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInterface;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.EnvironmentContainerHost;
-import io.subutai.common.peer.HostInfoModel;
+import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.Template;
@@ -86,9 +86,9 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Enumerated
     private HostArchitecture hostArchitecture;
 
-    @OneToMany( mappedBy = "host", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity = HostInterface
+    @OneToMany( mappedBy = "host", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity = io.subutai.core.environment.impl.entity.HostInterface
             .class, orphanRemoval = true )
-    protected Set<Interface> interfaces = new HashSet<>();
+    protected Set<HostInterface> interfaces = new HashSet<>();
 
     @Column( name = "ssh_group_id" )
     private int sshGroupId;
@@ -144,14 +144,15 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     }
 
 
-    public void setNetInterfaces( Set<Interface> interfaces )
+    public void setNetInterfaces( Set<HostInterface> interfaces )
     {
         Preconditions.checkNotNull( interfaces );
 
         this.interfaces.clear();
-        for ( Interface iface : interfaces )
+        for ( HostInterface iface : interfaces )
         {
-            HostInterface hostInterface = new HostInterface( iface );
+            io.subutai.core.environment.impl.entity.HostInterface
+                    hostInterface = new io.subutai.core.environment.impl.entity.HostInterface( iface );
             hostInterface.setHost( this );
             this.interfaces.add( hostInterface );
         }
@@ -374,7 +375,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public Set<Interface> getInterfaces()
+    public Set<HostInterface> getInterfaces()
     {
         return interfaces;
     }
@@ -383,7 +384,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public String getIpByInterfaceName( String interfaceName )
     {
-        for ( Interface iface : interfaces )
+        for ( HostInterface iface : interfaces )
         {
             if ( iface.getName().equalsIgnoreCase( interfaceName ) )
             {
@@ -398,7 +399,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public String getMacByInterfaceName( final String interfaceName )
     {
-        for ( Interface iface : interfaces )
+        for ( HostInterface iface : interfaces )
         {
             if ( iface.getName().equalsIgnoreCase( interfaceName ) )
             {
@@ -411,12 +412,12 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public Interface getInterfaceByName( final String interfaceName )
+    public HostInterface getInterfaceByName( final String interfaceName )
     {
-        Interface result = null;
-        for ( Iterator<Interface> i = getInterfaces().iterator(); result == null && i.hasNext(); )
+        HostInterface result = null;
+        for ( Iterator<HostInterface> i = getInterfaces().iterator(); result == null && i.hasNext(); )
         {
-            Interface n = i.next();
+            HostInterface n = i.next();
             if ( n.getName().equalsIgnoreCase( interfaceName ) )
             {
                 result = n;

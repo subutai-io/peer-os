@@ -8,7 +8,7 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInterface;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 
@@ -49,7 +49,7 @@ public class ContainerInfoJson implements ContainerInfo
         {
             arch = HostArchitecture.AMD64;
         }
-        for ( Interface anInterface : hostInfo.getInterfaces() )
+        for ( HostInterface anInterface : hostInfo.getInterfaces() )
         {
             this.interfaces.add( new HostInterfaceJson( anInterface ) );
         }
@@ -84,9 +84,9 @@ public class ContainerInfoJson implements ContainerInfo
 
 
     @Override
-    public Set<Interface> getInterfaces()
+    public Set<HostInterface> getInterfaces()
     {
-        Set<Interface> result = Sets.newHashSet();
+        Set<HostInterface> result = Sets.newHashSet();
         result.addAll( this.interfaces );
         return result;
     }

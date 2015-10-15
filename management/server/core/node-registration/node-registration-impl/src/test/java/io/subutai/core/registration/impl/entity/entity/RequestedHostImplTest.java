@@ -10,7 +10,7 @@ import org.junit.Test;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInterface;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.impl.entity.RequestedHostImpl;
 
@@ -35,7 +35,7 @@ public class RequestedHostImplTest
     {
         requestedHost =
                 new RequestedHostImpl( uuid.toString(), "hostname", HostArchitecture.AMD64, "secret", "publicKey",
-                        "restHook", RegistrationStatus.REQUESTED, new HashSet<Interface>() );
+                        "restHook", RegistrationStatus.REQUESTED, new HashSet<HostInterface>() );
     }
 
 
@@ -63,7 +63,7 @@ public class RequestedHostImplTest
     @Test
     public void testSetInterfaces() throws Exception
     {
-        requestedHost.setNetInterfaces( Sets.newHashSet( mock( Interface.class ) ) );
+        requestedHost.setNetInterfaces( Sets.newHashSet( mock( HostInterface.class ) ) );
         assertEquals( 1, requestedHost.getNetInterfaces().size() );
     }
 

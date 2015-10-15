@@ -7,8 +7,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.metric.HistoricalMetric;
-import io.subutai.common.metric.MetricType;
 import io.subutai.common.peer.Host;
 
 import static org.junit.Assert.assertNotNull;

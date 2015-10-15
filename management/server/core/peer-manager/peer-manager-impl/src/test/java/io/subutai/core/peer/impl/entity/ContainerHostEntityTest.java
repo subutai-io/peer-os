@@ -15,7 +15,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInterface;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.quota.DiskPartition;
@@ -60,7 +60,7 @@ public class ContainerHostEntityTest
     @Mock
     Peer peer;
     @Mock
-    Interface anInterface;
+    HostInterface anInterface;
     @Mock
     ResourceHost resourceHost;
 

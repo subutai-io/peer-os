@@ -22,11 +22,8 @@ import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Sets;
 
-import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.host.HostInterface;
-import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.util.N2NUtil;
@@ -146,14 +143,14 @@ public class SetupN2NStep
 
         for ( Peer peer : peers )
         {
-            //            Set<Interface> r = peer.getNetworkInterfaces( N2NUtil.N2N_SUBNET_INTERFACES_PATTERN );
-            Set<HostInterface> r = peer.getInterfaces().filterByIp( N2NUtil.N2N_INTERFACE_IP_PATTERN );
+            Set<HostInterfaceModel> r = peer.getInterfaces().filterByIp( N2NUtil.N2N_INTERFACE_IP_PATTERN );
+
             Collection tunnels = CollectionUtils.collect( r, new Transformer()
             {
                 @Override
                 public Object transform( final Object o )
                 {
-                    HostInterface i = ( HostInterface ) o;
+                    HostInterfaceModel i = ( HostInterfaceModel ) o;
                     SubnetUtils u = new SubnetUtils( i.getIp(), N2NUtil.N2N_SUBNET_MASK );
                     return u.getInfo().getNetworkAddress();
                 }

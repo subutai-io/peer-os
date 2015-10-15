@@ -3,13 +3,13 @@ package io.subutai.core.security.broker;
 
 import com.google.common.base.MoreObjects;
 
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInterface;
 
 
 /**
  * Network interface
  */
-public class InterfaceImpl implements Interface
+public class InterfaceImpl implements HostInterface
 {
 
     private String interfaceName;

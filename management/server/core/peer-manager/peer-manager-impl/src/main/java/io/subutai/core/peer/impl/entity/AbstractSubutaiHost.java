@@ -24,7 +24,8 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.host.HostInterface;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.Peer;
 
@@ -52,7 +53,7 @@ public abstract class AbstractSubutaiHost implements Host
     private HostArchitecture hostArchitecture;
 
     @Transient
-    protected Set<Interface> interfaces = new CopyOnWriteArraySet<>();
+    protected Set<HostInterface> interfaces = new CopyOnWriteArraySet<>();
 
     @Transient
     protected volatile long lastHeartbeat = 0;
@@ -78,9 +79,9 @@ public abstract class AbstractSubutaiHost implements Host
         this.hostname = hostInfo.getHostname();
         this.hostArchitecture = hostInfo.getArch();
 
-        for ( Interface s : hostInfo.getInterfaces() )
+        for ( HostInterface s : hostInfo.getInterfaces() )
         {
-            addInterface( new HostInterfaceImpl( s ) );
+            addInterface( new HostInterfaceModel( s ) );
         }
     }
 
@@ -159,9 +160,9 @@ public abstract class AbstractSubutaiHost implements Host
         this.lastHeartbeat = System.currentTimeMillis();
         this.interfaces.clear();
         // add interfaces
-        for ( Interface intf : hostInfo.getInterfaces() )
+        for ( HostInterface intf : hostInfo.getInterfaces() )
         {
-            interfaces.add( new HostInterfaceImpl( intf ) );
+            interfaces.add( new HostInterfaceModel( intf ) );
         }
         return false;
     }
@@ -181,7 +182,7 @@ public abstract class AbstractSubutaiHost implements Host
 
 
     @Override
-    public Set<Interface> getInterfaces()
+    public Set<HostInterface> getInterfaces()
     {
         return interfaces;
     }
@@ -190,7 +191,7 @@ public abstract class AbstractSubutaiHost implements Host
     @Override
     public String getIpByInterfaceName( String interfaceName )
     {
-        for ( Interface iface : getInterfaces() )
+        for ( HostInterface iface : getInterfaces() )
         {
             if ( iface.getName().equalsIgnoreCase( interfaceName ) )
             {
@@ -205,7 +206,7 @@ public abstract class AbstractSubutaiHost implements Host
     @Override
     public String getMacByInterfaceName( final String interfaceName )
     {
-        for ( Interface iface : getInterfaces() )
+        for ( HostInterface iface : getInterfaces() )
         {
             if ( iface.getName().equalsIgnoreCase( interfaceName ) )
             {
@@ -218,12 +219,12 @@ public abstract class AbstractSubutaiHost implements Host
 
 
     @Override
-    public Interface getInterfaceByName( final String interfaceName )
+    public HostInterface getInterfaceByName( final String interfaceName )
     {
-        Interface result = null;
-        for ( Iterator<Interface> i = getInterfaces().iterator(); result == null && i.hasNext(); )
+        HostInterface result = null;
+        for ( Iterator<HostInterface> i = getInterfaces().iterator(); result == null && i.hasNext(); )
         {
-            Interface n = i.next();
+            HostInterface n = i.next();
             if ( n.getName().equalsIgnoreCase( interfaceName ) )
             {
                 result = n;
@@ -234,7 +235,7 @@ public abstract class AbstractSubutaiHost implements Host
     }
 
 
-    public void addInterface( HostInterfaceImpl hostInterface )
+    public void addInterface( HostInterface hostInterface )
     {
         Preconditions.checkNotNull( hostInterface, "HostInterface could not be null." );
 

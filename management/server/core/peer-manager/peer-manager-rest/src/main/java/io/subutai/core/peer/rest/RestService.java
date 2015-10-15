@@ -1,8 +1,6 @@
 package io.subutai.core.peer.rest;
 
 
-import java.util.Set;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -17,8 +15,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.host.Interface;
-import io.subutai.common.peer.InterfacePattern;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.protocol.N2NConfig;
 

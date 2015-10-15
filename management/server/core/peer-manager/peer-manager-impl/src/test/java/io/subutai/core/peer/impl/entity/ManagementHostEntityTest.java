@@ -21,7 +21,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
@@ -72,7 +73,7 @@ public class ManagementHostEntityTest
     @Mock
     ResourceHostInfo hostInfo;
     @Mock
-    Interface anInterface;
+    HostInterface anInterface;
     @Mock
     ExecutorService singleThreadExecutorService;
     @Mock
@@ -368,10 +369,10 @@ public class ManagementHostEntityTest
     @Test
     public void testGetGateways() throws Exception
     {
-        HostInterfaceImpl hostInterface = mock( HostInterfaceImpl.class );
-        when( hostInterface.getName() ).thenReturn( "br-100" );
+        HostInterfaceModel hostInterfaceModel = mock( HostInterfaceModel.class );
+        when( hostInterfaceModel.getName() ).thenReturn( "br-100" );
 
-        managementHostEntity.addInterface( hostInterface );
+        managementHostEntity.addInterface( hostInterfaceModel );
 
         Set<Gateway> gateways = managementHostEntity.getGateways();
 

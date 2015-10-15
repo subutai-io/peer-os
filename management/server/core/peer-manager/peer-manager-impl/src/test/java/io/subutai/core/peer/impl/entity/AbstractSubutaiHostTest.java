@@ -15,7 +15,7 @@ import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInterface;
 import io.subutai.common.peer.Peer;
 
 import static junit.framework.TestCase.assertEquals;
@@ -46,7 +46,7 @@ public class AbstractSubutaiHostTest
     @Mock
     Peer peer;
     @Mock
-    Interface anInterface;
+    HostInterface anInterface;
     @Mock
     HostInfo hostInfo;
     @Mock

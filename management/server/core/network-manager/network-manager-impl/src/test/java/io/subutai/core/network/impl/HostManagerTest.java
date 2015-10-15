@@ -11,7 +11,6 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.network.api.NetworkManagerException;
 
 import com.google.common.collect.Sets;

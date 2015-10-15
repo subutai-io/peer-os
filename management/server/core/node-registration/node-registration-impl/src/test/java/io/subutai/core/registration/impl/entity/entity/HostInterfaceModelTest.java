@@ -4,8 +4,7 @@ package io.subutai.core.registration.impl.entity.entity;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.subutai.common.host.Interface;
-import io.subutai.core.registration.impl.entity.HostInterface;
+import io.subutai.common.host.HostInterface;
 
 import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.mock;
@@ -15,10 +14,10 @@ import static org.mockito.Mockito.when;
 /**
  * Created by talas on 8/26/15.
  */
-public class HostInterfaceTest
+public class HostInterfaceModelTest
 {
 
-    private HostInterface hostInterface;
+    private io.subutai.core.registration.impl.entity.HostInterface hostInterface;
 
     String iname = "iname", ip = "ip", mac = "mac";
 
@@ -26,11 +25,11 @@ public class HostInterfaceTest
     @Before
     public void setUp() throws Exception
     {
-        Interface iface = mock( Interface.class );
+        HostInterface iface = mock( HostInterface.class );
         when( iface.getName() ).thenReturn( iname );
         when( iface.getIp() ).thenReturn( ip );
         when( iface.getMac() ).thenReturn( mac );
-        hostInterface = new HostInterface( iface );
+        hostInterface = new io.subutai.core.registration.impl.entity.HostInterface( iface );
     }
 
 

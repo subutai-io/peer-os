@@ -23,23 +23,23 @@ public class HostInterfaces
     private static final Logger LOG = LoggerFactory.getLogger( HostInterfaces.class );
 
     @JsonProperty
-    private Set<HostInterface> interfaces = new HashSet<>();
+    private Set<HostInterfaceModel> interfaces = new HashSet<>();
 
 
-    public void addInterface( HostInterface hostInterface )
+    public void addInterface( HostInterfaceModel hostInterfaceModel )
     {
-        this.interfaces.add( hostInterface );
+        this.interfaces.add( hostInterfaceModel );
     }
 
 
-    public HostInterface findByIp( final String ip )
+    public HostInterfaceModel findByIp( final String ip )
     {
         Preconditions.checkNotNull( ip );
-        HostInterface result = null;
+        HostInterfaceModel result = null;
 
-        for ( Iterator<HostInterface> i = interfaces.iterator(); i.hasNext() && result == null; )
+        for ( Iterator<HostInterfaceModel> i = interfaces.iterator(); i.hasNext() && result == null; )
         {
-            HostInterface c = i.next();
+            HostInterfaceModel c = i.next();
             if ( ip.equals( c.getIp() ) )
             {
                 result = c;
@@ -49,14 +49,14 @@ public class HostInterfaces
     }
 
 
-    public HostInterface findByName( final String name )
+    public HostInterfaceModel findByName( final String name )
     {
         Preconditions.checkNotNull( name );
-        HostInterface result = null;
+        HostInterfaceModel result = null;
 
-        for ( Iterator<HostInterface> i = interfaces.iterator(); i.hasNext() && result == null; )
+        for ( Iterator<HostInterfaceModel> i = interfaces.iterator(); i.hasNext() && result == null; )
         {
-            HostInterface c = i.next();
+            HostInterfaceModel c = i.next();
             if ( name.equals( c.getIp() ) )
             {
                 result = c;
@@ -66,15 +66,15 @@ public class HostInterfaces
     }
 
 
-    public Set<HostInterface> filterByIp( final String pattern )
+    public Set<HostInterfaceModel> filterByIp( final String pattern )
     {
         Preconditions.checkNotNull( pattern );
-        Set<HostInterface> result = new HashSet<>();
+        Set<HostInterfaceModel> result = new HashSet<>();
 
-        result = Sets.filter( interfaces, new Predicate<Interface>()
+        result = Sets.filter( interfaces, new Predicate<HostInterface>()
         {
             @Override
-            public boolean apply( final Interface intf )
+            public boolean apply( final HostInterface intf )
             {
                 return intf.getIp().matches( pattern );
             }
@@ -84,14 +84,14 @@ public class HostInterfaces
     }
 
 
-    public Set<HostInterface> filterByName( final String pattern )
+    public Set<HostInterfaceModel> filterByName( final String pattern )
     {
         Preconditions.checkNotNull( pattern );
-        Set<HostInterface> result = new HashSet<>();
-        result = Sets.filter( interfaces, new Predicate<HostInterface>()
+        Set<HostInterfaceModel> result = new HashSet<>();
+        result = Sets.filter( interfaces, new Predicate<HostInterfaceModel>()
         {
             @Override
-            public boolean apply( final HostInterface intf )
+            public boolean apply( final HostInterfaceModel intf )
             {
                 return intf.getName().matches( pattern );
             }

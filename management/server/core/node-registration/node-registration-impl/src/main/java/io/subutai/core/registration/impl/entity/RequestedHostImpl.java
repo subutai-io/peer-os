@@ -21,7 +21,7 @@ import javax.persistence.Table;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInterface;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.RequestedHost;
@@ -41,10 +41,10 @@ public class RequestedHostImpl implements RequestedHost, Serializable
 
     @JoinColumn( name = "net_interfaces" )
     @OneToMany( orphanRemoval = true,
-            targetEntity = HostInterface.class,
+            targetEntity = io.subutai.core.registration.impl.entity.HostInterface.class,
             cascade = CascadeType.ALL,
             fetch = FetchType.EAGER )
-    private Set<Interface> netInterfaces = Sets.newHashSet();
+    private Set<HostInterface> netInterfaces = Sets.newHashSet();
 
     @Column( name = "arch" )
     @Enumerated( EnumType.STRING )
@@ -92,10 +92,11 @@ public class RequestedHostImpl implements RequestedHost, Serializable
             this.arch = HostArchitecture.AMD64;
         }
 
-        Set<Interface> netInterfaces = requestedHost.getNetInterfaces();
-        for ( final Interface netInterface : netInterfaces )
+        Set<HostInterface> netInterfaces = requestedHost.getNetInterfaces();
+        for ( final HostInterface netInterface : netInterfaces )
         {
-            HostInterface hostInterface = new HostInterface( netInterface );
+            io.subutai.core.registration.impl.entity.HostInterface
+                    hostInterface = new io.subutai.core.registration.impl.entity.HostInterface( netInterface );
             this.netInterfaces.add( hostInterface );
         }
 
@@ -112,7 +113,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
 
     public RequestedHostImpl( final String id, final String hostname, final HostArchitecture arch, final String secret,
                               final String publicKey, final String restHook, final RegistrationStatus status,
-                              Set<Interface> netInterfaces )
+                              Set<HostInterface> netInterfaces )
     {
         this.id = id;
         this.hostname = hostname;
@@ -122,9 +123,9 @@ public class RequestedHostImpl implements RequestedHost, Serializable
         this.restHook = restHook;
         this.status = status;
 
-        for ( final Interface anInterface : netInterfaces )
+        for ( final HostInterface anInterface : netInterfaces )
         {
-            this.netInterfaces.add( new HostInterface( anInterface ) );
+            this.netInterfaces.add( new io.subutai.core.registration.impl.entity.HostInterface( anInterface ) );
         }
 
         if ( this.arch == null )
@@ -135,7 +136,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
 
 
     @Override
-    public Set<Interface> getNetInterfaces()
+    public Set<HostInterface> getNetInterfaces()
     {
         return netInterfaces;
     }
@@ -222,7 +223,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     }
 
 
-    public void setNetInterfaces( final Set<Interface> netInterfaces )
+    public void setNetInterfaces( final Set<HostInterface> netInterfaces )
     {
         this.netInterfaces = netInterfaces;
     }

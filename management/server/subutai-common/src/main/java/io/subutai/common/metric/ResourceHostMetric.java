@@ -8,7 +8,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 
 /**
- * ResourceHostMetric
+ * Resource host metric
  */
 @XmlRootElement
 public class ResourceHostMetric extends BaseMetric
@@ -22,7 +22,7 @@ public class ResourceHostMetric extends BaseMetric
     }
 
 
-    public ResourceHostMetric( final Ram ram )
+    protected ResourceHostMetric( final Ram ram )
     {
         super( ram );
     }

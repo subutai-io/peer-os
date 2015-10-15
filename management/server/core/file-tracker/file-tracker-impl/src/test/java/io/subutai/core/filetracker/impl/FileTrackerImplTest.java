@@ -3,7 +3,6 @@ package io.subutai.core.filetracker.impl;
 
 import java.io.PrintStream;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import org.junit.Before;
