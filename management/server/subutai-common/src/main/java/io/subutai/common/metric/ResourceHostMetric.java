@@ -13,6 +13,8 @@ import org.codehaus.jackson.annotate.JsonProperty;
 @XmlRootElement
 public class ResourceHostMetric extends BaseMetric
 {
+    @JsonIgnore
+    private String peerId;
     @JsonProperty
     private Integer containersCount;
 
@@ -38,5 +40,17 @@ public class ResourceHostMetric extends BaseMetric
     public void setContainersCount( final Integer containersCount )
     {
         this.containersCount = containersCount;
+    }
+
+
+    public String getPeerId()
+    {
+        return peerId;
+    }
+
+
+    public void setPeerId( final String peerId )
+    {
+        this.peerId = peerId;
     }
 }

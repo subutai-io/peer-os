@@ -746,7 +746,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             resourceHost.destroyContainerHost( host );
             ( ( ResourceHostEntity ) entity.getParent() ).removeContainerHost( entity );
 
-            cleanupEnvironmentNetworkSettings( host.getEnvironmentId() );
+//            cleanupEnvironmentNetworkSettings( host.getEnvironmentId() );
         }
         catch ( ResourceHostException e )
         {

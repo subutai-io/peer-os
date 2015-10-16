@@ -35,6 +35,7 @@ public class BlueprintForm
     private static final String VIEW_BLUEPRINTS = "View blueprints";
     private static final String NAME = "Name";
     private static final String BUILD = "Build";
+    private static final String BUILD_DISTRIBUTION = "Create";
     private static final String VIEW = "View";
     private static final String DELETE = "Delete";
     private static final String GROW = "Grow";
@@ -162,6 +163,17 @@ public class BlueprintForm
                     }
                 } );
 
+                final Button buildDistribution = new Button( BUILD_DISTRIBUTION );
+                buildDistribution.setId( blueprint.getName() + "-build-distribution" );
+                buildDistribution.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent clickEvent )
+                    {
+                        buildDistribution( blueprint, false );
+                    }
+                } );
+
                 final Button grow = new Button( GROW );
                 grow.setId( blueprint.getName() + "-grow" );
                 grow.addClickListener( new Button.ClickListener()
@@ -175,7 +187,7 @@ public class BlueprintForm
 
 
                 blueprintsTable.addItem( new Object[] {
-                        blueprint.getName(), view, delete, build, grow
+                        blueprint.getName(), view, delete, build, buildDistribution, grow
                 }, null );
             }
         }
@@ -190,6 +202,12 @@ public class BlueprintForm
     private void buildBlueprint( Blueprint blueprint, boolean grow )
     {
         contentRoot.getUI().addWindow( new TopologyWindow( blueprint, peerManager, environmentManager, grow ) );
+    }
+
+
+    private void buildDistribution( Blueprint blueprint, boolean grow )
+    {
+        contentRoot.getUI().addWindow( new DistributionWindow( blueprint, peerManager, environmentManager, grow ) );
     }
 
 
