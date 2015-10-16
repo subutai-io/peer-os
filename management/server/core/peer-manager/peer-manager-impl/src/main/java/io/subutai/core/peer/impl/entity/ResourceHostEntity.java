@@ -530,6 +530,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             try
             {
                 final ResourceHostMetric resourceHostMetric = monitor.getResourceHostMetric( host );
+                resourceHostMetric.setPeerId( peerId );
                 resourceHostMetric.setContainersCount( host.getContainers().size() );
                 host.setHostMetric( resourceHostMetric );
                 LOG.debug( String.format( "Updating metrics for resource host %s succeeded.", host.getHostname() ) );
