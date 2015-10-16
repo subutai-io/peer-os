@@ -6,15 +6,19 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import io.subutai.common.security.objects.PermissionObjectType;
+import io.subutai.common.security.objects.PermissionOperationType;
+
 
 /**
  *
  */
-@Retention( RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD})
+@Retention( RetentionPolicy.RUNTIME )
+@Target( { ElementType.METHOD } )
 
 public @interface AccessControl
 {
-    String objects();
-    String operations();
+    PermissionObjectType[] objects();
+
+    PermissionOperationType[] operations();
 }

@@ -12,6 +12,9 @@ import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.impl.dao.IdentityDataServiceImpl;
 import io.subutai.core.identity.impl.model.RoleEntity;
 import io.subutai.core.identity.impl.model.UserEntity;
+import javax.annotation.security.DenyAll;
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 
 
 /**
@@ -52,6 +55,21 @@ public class IdentityManagerImpl implements IdentityManager
     public IdentityDataService getIdentityDataService()
     {
         return identityDataService;
+    }
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    @RolesAllowed("Administrator")
+    public User login(String userName, String password)
+    {
+        User user = new UserEntity();
+        user.setUserName( userName );
+
+        return user;
+
     }
 
 

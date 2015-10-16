@@ -8,6 +8,7 @@ import javax.servlet.http.Cookie;
 import io.subutai.common.security.SubutaiLoginContext;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.server.ui.MainUI;
 import io.subutai.server.ui.util.HelpManager;
 
@@ -120,8 +121,9 @@ public class LoginView extends VerticalLayout implements View
 
                 try
                 {
-                    //IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+                    IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
                     //Serializable sessionId = identityManager.login( username.getValue(), password.getValue() );
+                    identityManager.login( username.getValue(), password.getValue() );
 
                     VaadinRequest request = VaadinService.getCurrentRequest();
 
