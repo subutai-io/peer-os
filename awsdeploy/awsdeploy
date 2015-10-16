@@ -4,8 +4,8 @@ export EC2_HOME=/main/awsdeploy/ec2-api-tools-1.7.5.1
 export PATH=$PATH:$EC2_HOME/bin
 export JAVA_HOME="/apps/subutai-mng/current/java/jre/"
 
-AWS_A_KEY="AKIAJRJMVCV3VRAN4VFQ"
-AWS_S_KEY="GA6RvYVC7li2nYA9uhqLTGLUPu6ADsRqBFja8ad4"
+AWS_A_KEY=<aws_account>
+AWS_S_KEY=<aws_password>
 KEY="snappy"
 AMI="ami-0e959813"
 REGION="eu-central-1"
