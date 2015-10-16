@@ -14,6 +14,8 @@ import javax.persistence.Table;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.common.host.Interface;
+
 
 /**
  * Created by talas on 8/25/15.
@@ -21,7 +23,7 @@ import com.google.common.base.Preconditions;
 @Entity
 @Table( name = "node_net_interfaces" )
 @Access( AccessType.FIELD )
-public class HostInterface implements io.subutai.common.host.HostInterface, Serializable
+public class HostInterface implements Interface, Serializable
 {
     @Id
     @GeneratedValue( strategy = GenerationType.IDENTITY )
@@ -51,7 +53,7 @@ public class HostInterface implements io.subutai.common.host.HostInterface, Seri
     }
 
 
-    public HostInterface( final io.subutai.common.host.HostInterface aInterface )
+    public HostInterface( final Interface aInterface )
     {
         Preconditions.checkNotNull( aInterface, "Invalid null argument aInterface" );
 

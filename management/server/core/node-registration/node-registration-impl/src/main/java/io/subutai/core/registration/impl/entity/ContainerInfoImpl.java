@@ -22,7 +22,7 @@ import javax.persistence.Table;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.Interface;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 
@@ -58,7 +58,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
             targetEntity = io.subutai.core.registration.impl.entity.HostInterface.class,
             cascade = CascadeType.ALL,
             fetch = FetchType.EAGER )
-    private Set<HostInterface> netInterfaces = new HashSet<>();
+    private Set<Interface> netInterfaces = new HashSet<>();
 
     @Column( name = "arch" )
     @Enumerated( EnumType.STRING )
@@ -92,7 +92,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
         {
             arch = HostArchitecture.AMD64;
         }
-        for ( HostInterface anInterface : hostInfo.getInterfaces() )
+        for ( Interface anInterface : hostInfo.getInterfaces() )
         {
             this.netInterfaces.add( new io.subutai.core.registration.impl.entity.HostInterface( anInterface ) );
         }
@@ -139,7 +139,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
 
 
     @Override
-    public Set<HostInterface> getInterfaces()
+    public Set<Interface> getInterfaces()
     {
         return netInterfaces;
     }

@@ -1324,6 +1324,7 @@ public class RemotePeerImpl implements RemotePeer
         MessageResponse messageResponse =
                 messageResponseListener.waitResponse( messageRequest, requestTimeout, responseTimeout );
 
+        LOG.debug( String.format( "%s", messageResponse ) );
         if ( messageResponse != null )
         {
             if ( messageResponse.getException() != null )
@@ -1332,7 +1333,10 @@ public class RemotePeerImpl implements RemotePeer
             }
             else if ( messageResponse.getPayload() != null )
             {
-                return messageResponse.getPayload().getMessage( responseType );
+                LOG.debug( String.format( "Trying get response object: %s", responseType ) );
+                final V message = messageResponse.getPayload().getMessage( responseType );
+                LOG.debug( String.format( "Response object: %s", message ) );
+                return message;
             }
         }
 

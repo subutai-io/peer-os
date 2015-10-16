@@ -19,7 +19,7 @@ import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Tree;
 
-import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.Interface;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
@@ -85,7 +85,7 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                             {
                                 intfName = Common.DEFAULT_CONTAINER_INTERFACE;
                             }
-                            HostInterface intf = host.getInterfaceByName( intfName );
+                            Interface intf = host.getInterfaceByName( intfName );
                             String mac = null;
                             String ip = null;
                             if ( intf != null )

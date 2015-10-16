@@ -8,8 +8,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInterface;
-import io.subutai.common.peer.Peer;
+import io.subutai.common.host.Interface;
 
 
 /**
@@ -51,5 +50,5 @@ public interface Host extends HostInfo, Serializable
     @Deprecated
     public String getMacByInterfaceName( String interfaceName );
 
-    HostInterface getInterfaceByName( String interfaceName );
+    Interface getInterfaceByName( String interfaceName );
 }

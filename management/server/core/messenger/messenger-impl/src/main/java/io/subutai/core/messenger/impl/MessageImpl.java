@@ -3,6 +3,9 @@ package io.subutai.core.messenger.impl;
 
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 
@@ -16,6 +19,7 @@ import io.subutai.core.messenger.api.Message;
  */
 public class MessageImpl implements Message
 {
+    private static final Logger LOG = LoggerFactory.getLogger( MessageImpl.class );
     public static final int MAX_SENDER_LEN = 50;
     private final UUID id;
     private final String sourcePeerId;
@@ -60,7 +64,9 @@ public class MessageImpl implements Message
     @Override
     public <T> T getPayload( Class<T> clazz )
     {
-        return JsonUtil.fromJson( payloadString, clazz );
+        T result = JsonUtil.fromJson( payloadString, clazz );
+        LOG.debug( String.format( "Unmarshalled object: %s", result ) );
+        return result;
     }
 
 

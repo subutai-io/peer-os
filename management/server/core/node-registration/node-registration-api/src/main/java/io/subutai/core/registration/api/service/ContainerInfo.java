@@ -5,7 +5,7 @@ import java.util.Set;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.Interface;
 import io.subutai.core.registration.api.RegistrationStatus;
 
 
@@ -26,7 +26,7 @@ public interface ContainerInfo extends HostInfo
     /**
      * Returns network interfaces of host
      */
-    public Set<HostInterface> getInterfaces();
+    public Set<Interface> getInterfaces();
 
 
     /**

@@ -13,7 +13,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInfoModel;
-import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.Interface;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
@@ -29,13 +29,13 @@ public class HostInfoModelTest
     @Mock
     ContainerHost containerHost;
     @Mock
-    HostInterface anInterface;
+    Interface anInterface;
 
 
     @Before
     public void setUp() throws Exception
     {
-        Set<HostInterface> mySet = new HashSet<>();
+        Set<Interface> mySet = new HashSet<>();
         mySet.add( anInterface );
 
         when( containerHost.getId() ).thenReturn( UUID.randomUUID().toString() );

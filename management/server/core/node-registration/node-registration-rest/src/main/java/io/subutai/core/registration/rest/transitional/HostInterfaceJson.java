@@ -3,18 +3,18 @@ package io.subutai.core.registration.rest.transitional;
 
 import com.google.common.base.Preconditions;
 
-import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.Interface;
 
 
 
-public class HostInterfaceJson implements HostInterface
+public class HostInterfaceJson implements Interface
 {
     private String interfaceName;
     private String ip;
     private String mac;
 
 
-    public HostInterfaceJson( final HostInterface aInterface )
+    public HostInterfaceJson( final Interface aInterface )
     {
         Preconditions.checkNotNull( aInterface, "Invalid null argument aInterface" );
         this.interfaceName = aInterface.getName();

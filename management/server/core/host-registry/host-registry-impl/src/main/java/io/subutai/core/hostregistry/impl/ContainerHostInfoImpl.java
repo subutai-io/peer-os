@@ -10,7 +10,7 @@ import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.Interface;
 import io.subutai.common.util.CollectionUtil;
 
 
@@ -42,9 +42,9 @@ public class ContainerHostInfoImpl implements ContainerHostInfo
 
 
     @Override
-    public Set<HostInterface> getInterfaces()
+    public Set<Interface> getInterfaces()
     {
-        Set<HostInterface> result = Sets.newHashSet();
+        Set<Interface> result = Sets.newHashSet();
         if ( !CollectionUtil.isCollectionEmpty( interfaces ) )
         {
             result.addAll( interfaces );

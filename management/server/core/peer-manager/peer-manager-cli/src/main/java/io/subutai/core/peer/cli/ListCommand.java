@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.Interface;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
@@ -55,7 +55,7 @@ public class ListCommand extends SubutaiShellCommandSupport
                 HostInterfaces ints = peer.getInterfaces();
                 System.out.println( String.format( "Interfaces count: %d", ints != null ? ints.size() : -1 ) );
 
-                for ( HostInterface i : ints.filterByName( ".*" ) )
+                for ( Interface i : ints.filterByName( ".*" ) )
                 {
                     System.out.println( String.format( "\t%-15s %-15s %-15s", i.getName(), i.getIp(), i.getMac() ) );
                 }

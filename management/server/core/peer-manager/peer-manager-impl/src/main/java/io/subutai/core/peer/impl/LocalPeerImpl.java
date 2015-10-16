@@ -44,9 +44,9 @@ import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.host.Interface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -1679,9 +1679,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public HostInterfaces getInterfaces()
     {
         HostInterfaces result = new HostInterfaces();
-        for ( HostInterface intf : managementHost.getInterfaces() )
+        for ( Interface intf : managementHost.getInterfaces() )
         {
-            result.addInterface( new HostInterfaceModel( intf.getName(), intf.getIp(), intf.getMac() ) );
+            result.addInterface( new HostInterface( intf.getName(), intf.getIp(), intf.getMac() ) );
         }
         return result;
     }

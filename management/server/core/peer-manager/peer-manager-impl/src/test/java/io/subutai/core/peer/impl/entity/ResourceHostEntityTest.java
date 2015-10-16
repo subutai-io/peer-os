@@ -23,7 +23,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.Interface;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
@@ -85,7 +85,7 @@ public class ResourceHostEntityTest
     @Mock
     HostInfo hostInfo;
     @Mock
-    HostInterface anInterface;
+    Interface anInterface;
     @Mock
     Callable callable;
     @Mock

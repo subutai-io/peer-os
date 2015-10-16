@@ -26,7 +26,7 @@ import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.Interface;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
@@ -106,7 +106,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             HostInfo sampleHostInfo = hostIterator.next();
 
             //TODO ip is chosen from first standing container host info
-            for ( final HostInterface iface : sampleHostInfo.getInterfaces() )
+            for ( final Interface iface : sampleHostInfo.getInterfaces() )
             {
                 if ( StringUtil.isStringNullOrEmpty( iface.getIp() ) )
                 {

@@ -26,9 +26,9 @@ public class HostInfoModel implements ContainerHostInfo
         {
             hostArchitecture = HostArchitecture.AMD64;
         }
-        for ( HostInterface anInterface : hostInfo.getInterfaces() )
+        for ( Interface anInterface : hostInfo.getInterfaces() )
         {
-            this.netInterfaces.add( new HostInterfaceModel( anInterface ) );
+            this.netInterfaces.add( new HostInterface( anInterface ) );
         }
     }
 
@@ -44,9 +44,9 @@ public class HostInfoModel implements ContainerHostInfo
         {
             hostArchitecture = HostArchitecture.AMD64;
         }
-        for ( HostInterface anInterface : containerHost.getInterfaces() )
+        for ( Interface anInterface : containerHost.getInterfaces() )
         {
-            this.netInterfaces.add( new HostInterfaceModel( anInterface ) );
+            this.netInterfaces.add( new HostInterface( anInterface ) );
         }
     }
 
@@ -80,9 +80,9 @@ public class HostInfoModel implements ContainerHostInfo
 
 
     @Override
-    public Set<HostInterface> getInterfaces()
+    public Set<Interface> getInterfaces()
     {
-        Set<HostInterface> result = new HashSet<>();
+        Set<Interface> result = new HashSet<>();
         result.addAll( netInterfaces );
         return result;
     }

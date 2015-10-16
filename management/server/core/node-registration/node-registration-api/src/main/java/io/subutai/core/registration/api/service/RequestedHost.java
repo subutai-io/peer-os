@@ -4,7 +4,7 @@ package io.subutai.core.registration.api.service;
 import java.util.Set;
 
 import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.Interface;
 import io.subutai.core.registration.api.RegistrationStatus;
 
 
@@ -14,7 +14,7 @@ public interface RequestedHost
 
     public String getHostname();
 
-    public Set<HostInterface> getNetInterfaces();
+    public Set<Interface> getNetInterfaces();
 
     public Set<ContainerInfo> getHostInfos();
 

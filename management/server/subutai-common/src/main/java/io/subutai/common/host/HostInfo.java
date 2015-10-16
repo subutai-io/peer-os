@@ -24,7 +24,7 @@ public interface HostInfo extends Comparable<HostInfo>
     /**
      * Returns network interfaces of host
      */
-    public Set<HostInterface> getInterfaces();
+    public Set<Interface> getInterfaces();
 
 
     /**
