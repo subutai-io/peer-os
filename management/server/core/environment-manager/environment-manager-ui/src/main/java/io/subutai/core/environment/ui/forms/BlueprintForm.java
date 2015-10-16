@@ -164,7 +164,7 @@ public class BlueprintForm
                 } );
 
                 final Button buildDistribution = new Button( BUILD_DISTRIBUTION );
-                buildDistribution.setId( blueprint.getName() + "-build-distribution" );
+                buildDistribution.setId( blueprint.getName() + "-create" );
                 buildDistribution.addClickListener( new Button.ClickListener()
                 {
                     @Override
@@ -218,6 +218,7 @@ public class BlueprintForm
         table.addContainerProperty( VIEW, Button.class, null );
         table.addContainerProperty( DELETE, Button.class, null );
         table.addContainerProperty( BUILD, Button.class, null );
+        table.addContainerProperty( BUILD_DISTRIBUTION, Button.class, null );
         table.addContainerProperty( GROW, Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );

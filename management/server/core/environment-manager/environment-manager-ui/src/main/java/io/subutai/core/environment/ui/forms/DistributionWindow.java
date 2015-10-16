@@ -44,6 +44,14 @@ import io.subutai.core.peer.api.PeerManager;
 
 public class DistributionWindow extends Window
 {
+
+
+    enum ContainerType
+    {
+        TINY, SMALL, MEDIUM, HUGE
+    }
+
+
     private static final String DEFAULT_SUBNET_CIDR = "192.168.1.2/24";
     private final Blueprint blueprint;
     private final PeerManager peerManager;
@@ -234,7 +242,7 @@ public class DistributionWindow extends Window
         {
             Item item = placementTable.getItem( itemId );
             String nodeGroupName = item.getItemProperty( "Name" ).getValue().toString();
-            String peerName = item.getItemProperty( "Peer" ).getValue().toString();
+            String peerName = item.getItemProperty( "Host" ).getValue().toString();
             int amount = Integer.parseInt( item.getItemProperty( "Amount" ).getValue().toString() );
 
             NodeGroup nodeGroup = null;
@@ -285,7 +293,8 @@ public class DistributionWindow extends Window
         Table table = new Table();
         table.addContainerProperty( "Name", String.class, null );
         table.addContainerProperty( "Amount", Integer.class, null );
-        table.addContainerProperty( "Peer", String.class, null );
+        table.addContainerProperty( "Host", String.class, null );
+        table.addContainerProperty( "Type", ContainerType.class, null );
         table.addContainerProperty( "Remove", Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
@@ -307,17 +316,20 @@ public class DistributionWindow extends Window
 
             ComboBox peersCombo = createPeersComboBox();
             peersCombo.setId( "peersCombo" );
+            ComboBox typesCombo = createTypesComboBox();
+            typesCombo.setId( "typesCombo" );
 
-            Button placeBtn = createPlaceButton( nodeGroup, slider, peersCombo );
+            Button placeBtn = createPlaceButton( nodeGroup, slider, typesCombo, peersCombo );
 
             nodeGroupsTable.addItem( new Object[] {
-                    nodeGroup.getName(), slider, peersCombo, placeBtn
+                    nodeGroup.getName(), slider, peersCombo, typesCombo, placeBtn
             }, null );
         }
     }
 
 
-    private Button createPlaceButton( final NodeGroup nodeGroup, final Slider slider, final ComboBox peersCombo )
+    private Button createPlaceButton( final NodeGroup nodeGroup, final Slider slider, final ComboBox type,
+                                      final ComboBox peersCombo )
     {
         Button placeButton = new Button( "Place" );
         placeButton.setId( "placeButton" );
@@ -342,7 +354,8 @@ public class DistributionWindow extends Window
                 }
                 else
                 {
-                    placeNodeGroup( nodeGroup, slider, ( ResourceHostMetric ) peersCombo.getValue() );
+                    placeNodeGroup( nodeGroup, slider, type.getValue().toString(),
+                            ( ResourceHostMetric ) peersCombo.getValue() );
                 }
             }
         } );
@@ -351,7 +364,7 @@ public class DistributionWindow extends Window
     }
 
 
-    private void placeNodeGroup( NodeGroup nodeGroup, final Slider slider, ResourceHostMetric metric )
+    private void placeNodeGroup( NodeGroup nodeGroup, final Slider slider, String type, ResourceHostMetric metric )
     {
         final String rowId = String.format( "%s-%s-%s", nodeGroup.getName(), metric.getPeerId(), metric.getHostId() );
         Button removeBtn = new Button( "Remove" );
@@ -379,7 +392,7 @@ public class DistributionWindow extends Window
         if ( row == null )
         {
             placementTable.addItem( new Object[] {
-                    nodeGroup.getName(), amount, metric.getHostId(), removeBtn
+                    nodeGroup.getName(), amount, metric.getHostId(), ContainerType.valueOf( type ), removeBtn
             }, rowId );
         }
         else
@@ -442,12 +455,30 @@ public class DistributionWindow extends Window
     }
 
 
+    private ComboBox createTypesComboBox()
+    {
+        ComboBox typesCombo = new ComboBox();
+        typesCombo.setNullSelectionAllowed( false );
+        typesCombo.setTextInputAllowed( false );
+        typesCombo.setImmediate( true );
+        typesCombo.setRequired( true );
+
+        for ( ContainerType t : ContainerType.values() )
+        {
+            typesCombo.addItem( t );
+        }
+
+        return typesCombo;
+    }
+
+
     private Table createNodeGroupsTable()
     {
         Table table = new Table();
         table.addContainerProperty( "Name", String.class, null );
         table.addContainerProperty( "Amount", Slider.class, null );
-        table.addContainerProperty( "Peer", ComboBox.class, null );
+        table.addContainerProperty( "Host", ComboBox.class, null );
+        table.addContainerProperty( "Type", ComboBox.class, null );
         table.addContainerProperty( "Place", Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
