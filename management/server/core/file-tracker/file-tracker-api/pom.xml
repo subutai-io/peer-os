@@ -6,7 +6,7 @@
   <parent>
     <artifactId>file-tracker-parent</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.0-RC1</version>
+    <version>4.0.0-RC2</version>
   </parent>
 
   <artifactId>file-tracker-api</artifactId>

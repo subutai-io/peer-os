@@ -6,7 +6,7 @@
   <parent>
     <artifactId>peer-manager-parent</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.0-RC1</version>
+    <version>4.0.0-RC2</version>
   </parent>
 
   <artifactId>peer-manager-rest</artifactId>
@@ -35,11 +35,7 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>http-context-manager-api</artifactId>
     </dependency>
-<!--
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-    </dependency>-->
+
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>

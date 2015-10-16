@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-parent</artifactId>
-    <version>4.0.0-RC1</version>
+    <version>4.0.0-RC2</version>
   </parent>
 
   <artifactId>subutai</artifactId>
@@ -13,10 +13,6 @@
   <packaging>karaf-assembly</packaging>
 
   <description>Subutai Server Custom Karaf Distribution</description>
-
-  <repositories>
-
-  </repositories>
 
   <properties>
     <assembly.directory>${project.build.directory}/assembly</assembly.directory>
@@ -145,7 +141,6 @@
             <feature>ssh</feature>
             <feature>subutai-application</feature>
             <feature>openjpa</feature>
-            <!--<feature>osgi</feature>-->
             <feature>aries-annotation</feature>
             <feature>http</feature>
             <feature>jndi</feature>
