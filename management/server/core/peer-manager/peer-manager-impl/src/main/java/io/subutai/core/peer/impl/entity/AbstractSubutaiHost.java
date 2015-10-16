@@ -1,6 +1,7 @@
 package io.subutai.core.peer.impl.entity;
 
 
+import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -23,6 +24,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.Interface;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.Peer;
@@ -79,7 +81,7 @@ public abstract class AbstractSubutaiHost implements Host
 
         for ( Interface s : hostInfo.getInterfaces() )
         {
-            addInterface( new HostInterfaceImpl( s ) );
+            addInterface( new HostInterface( s ) );
         }
     }
 
@@ -160,7 +162,7 @@ public abstract class AbstractSubutaiHost implements Host
         // add interfaces
         for ( Interface intf : hostInfo.getInterfaces() )
         {
-            interfaces.add( new HostInterfaceImpl( intf ) );
+            interfaces.add( new HostInterface( intf ) );
         }
         return false;
     }
@@ -216,7 +218,24 @@ public abstract class AbstractSubutaiHost implements Host
     }
 
 
-    public void addInterface( HostInterfaceImpl hostInterface )
+    @Override
+    public Interface getInterfaceByName( final String interfaceName )
+    {
+        Interface result = null;
+        for ( Iterator<Interface> i = getInterfaces().iterator(); result == null && i.hasNext(); )
+        {
+            Interface n = i.next();
+            if ( n.getName().equalsIgnoreCase( interfaceName ) )
+            {
+                result = n;
+            }
+        }
+
+        return result;
+    }
+
+
+    public void addInterface( Interface hostInterface )
     {
         Preconditions.checkNotNull( hostInterface, "HostInterface could not be null." );
 

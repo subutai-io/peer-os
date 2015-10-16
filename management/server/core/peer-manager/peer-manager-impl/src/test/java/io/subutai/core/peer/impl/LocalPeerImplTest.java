@@ -28,7 +28,7 @@ import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
-import io.subutai.common.peer.HostInfoModel;
+import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;

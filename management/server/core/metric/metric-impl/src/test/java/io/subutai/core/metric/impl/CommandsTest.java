@@ -20,7 +20,7 @@ public class CommandsTest
     @Test
     public void testGetCurrentMetricCommand() throws Exception
     {
-        assertEquals( new RequestBuilder( String.format( "subutai monitor %s", HOSTNAME ) ),
+        assertEquals( new RequestBuilder( String.format( "subutai stats system %s", HOSTNAME ) ),
                 commands.getCurrentMetricCommand( HOSTNAME ) );
     }
 

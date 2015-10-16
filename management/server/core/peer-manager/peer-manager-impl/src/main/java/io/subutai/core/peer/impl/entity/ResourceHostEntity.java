@@ -8,6 +8,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -72,18 +74,39 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     @Transient
     protected ExecutorService singleThreadExecutorService = Executors.newSingleThreadExecutor();
+
+    @Transient
+    protected ScheduledExecutorService stateUpdateExecutorService;
+
     @Transient
     private Monitor monitor;
+
     @Transient
     protected CommandUtil commandUtil = new CommandUtil();
+
     @Transient
     protected TemplateRegistry registry;
+
     @Transient
     protected HostRegistry hostRegistry;
+
+    @Transient
+    volatile private ResourceHostMetric metric = new ResourceHostMetric();
 
 
     protected ResourceHostEntity()
     {
+        init();
+    }
+
+
+    @Override
+    public void init()
+    {
+        super.init();
+        stateUpdateExecutorService = Executors.newScheduledThreadPool( 10 );
+        stateUpdateExecutorService
+                .scheduleWithFixedDelay( new HostMetricUpdater( this, monitor ), 10, 60, TimeUnit.SECONDS );
     }
 
 
@@ -118,6 +141,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public void dispose()
     {
         singleThreadExecutorService.shutdown();
+        stateUpdateExecutorService.shutdown();
     }
 
 
@@ -167,16 +191,15 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public ResourceHostMetric getHostMetric() throws ResourceHostException
+    public ResourceHostMetric getHostMetric()
     {
-        try
-        {
-            return monitor.getResourceHostMetric( this );
-        }
-        catch ( MonitorException e )
-        {
-            throw new ResourceHostException( "Error obtaining host metric", e );
-        }
+        return metric;
+    }
+
+
+    public void setHostMetric( final ResourceHostMetric metric )
+    {
+        this.metric = metric;
     }
 
 
@@ -479,5 +502,42 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
         }
         return result;
+    }
+
+
+    private class HostMetricUpdater implements Runnable
+    {
+        private final ResourceHostEntity host;
+        private final Monitor monitor;
+
+
+        public HostMetricUpdater( final ResourceHostEntity resourceHostEntity, final Monitor monitor )
+        {
+            this.host = resourceHostEntity;
+            this.monitor = monitor;
+        }
+
+
+        @Override
+        public void run()
+        {
+            if ( !host.isConnected() )
+            {
+                LOG.debug( String.format( "Updating metrics for resource host %s failed. Host disconnected",
+                        host.getHostname() ) );
+                return;
+            }
+            try
+            {
+                final ResourceHostMetric resourceHostMetric = monitor.getResourceHostMetric( host );
+                resourceHostMetric.setContainersCount( host.getContainers().size() );
+                host.setHostMetric( resourceHostMetric );
+                LOG.debug( String.format( "Updating metrics for resource host %s succeeded.", host.getHostname() ) );
+            }
+            catch ( MonitorException e )
+            {
+                LOG.error( String.format( "Updating metrics for resource host %s failed.", host.getHostname() ), e );
+            }
+        }
     }
 }

@@ -17,14 +17,13 @@ import com.google.common.reflect.TypeToken;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.metric.ContainerHostMetric;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.common.metric.ContainerHostMetric;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.metric.impl.ContainerHostMetricImpl;
-import io.subutai.core.metric.impl.ResourceHostMetricImpl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -54,7 +53,7 @@ public class RestServiceImplTest
     {
         monitor = mock( Monitor.class );
         environmentManager = mock( EnvironmentManager.class );
-        resourceHostMetric = new ResourceHostMetricImpl();
+        resourceHostMetric = new ResourceHostMetric();
         containerHostMetric = new ContainerHostMetricImpl();
         when( monitor.getResourceHostsMetrics() ).thenReturn( Sets.newHashSet( resourceHostMetric ) );
         restService = new RestServiceImpl( monitor, environmentManager );
@@ -82,7 +81,7 @@ public class RestServiceImplTest
         Response response = restService.getResourceHostsMetrics();
 
         Set<ResourceHostMetric> metrics = JsonUtil.fromJson( response.getEntity().toString(),
-                new TypeToken<Set<ResourceHostMetricImpl>>() {}.getType() );
+                new TypeToken<Set<ResourceHostMetric>>() {}.getType() );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
         assertFalse( metrics.isEmpty() );
     }

@@ -1,7 +1,6 @@
 package io.subutai.common.peer;
 
 
-import java.util.Collection;
 import java.util.Set;
 
 import io.subutai.common.host.ContainerHostState;
@@ -9,6 +8,8 @@ import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
+import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.ResourceHostException;
 
 
 /**
@@ -19,7 +20,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
     /**
      * Returns resource usage metric of the resource host
      */
-    public ResourceHostMetric getHostMetric() throws ResourceHostException;
+    public ResourceHostMetric getHostMetric();
 
     /**
      * Returns hosts containers

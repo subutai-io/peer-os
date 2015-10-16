@@ -11,20 +11,20 @@ import io.subutai.common.metric.ResourceHostMetric;
  */
 public class ResourceHostMetricImpl extends ResourceHostMetric
 {
-
-    protected void setPeerId( final String peerId )
-    {
-        Preconditions.checkNotNull( peerId, "Invalid peer id" );
-
-        this.peerId = peerId;
-    }
-
-
-    protected void setHostId( final String hostId )
-    {
-
-        Preconditions.checkNotNull( host, "Invalid host id" );
-
-        this.hostId = hostId;
-    }
+//
+//    protected void setPeerId( final String peerId )
+//    {
+//        Preconditions.checkNotNull( peerId, "Invalid peer id" );
+//
+//        this.peerId = peerId;
+//    }
+//
+//
+//    protected void setHostId( final String hostId )
+//    {
+//
+//        Preconditions.checkNotNull( host, "Invalid host id" );
+//
+//        this.hostId = hostId;
+//    }
 }

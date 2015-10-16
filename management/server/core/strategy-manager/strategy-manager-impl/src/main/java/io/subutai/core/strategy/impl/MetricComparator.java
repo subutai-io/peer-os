@@ -19,7 +19,7 @@ abstract class MetricComparator
                 @Override
                 public double getValue( ResourceHostMetric m )
                 {
-                    return m.getAvailableDiskVar();
+                    return m.getAvailableSpace();
                 }
             };
         }

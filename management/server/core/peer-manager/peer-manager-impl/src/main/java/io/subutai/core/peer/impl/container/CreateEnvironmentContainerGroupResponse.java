@@ -3,7 +3,7 @@ package io.subutai.core.peer.impl.container;
 
 import java.util.Set;
 
-import io.subutai.common.peer.HostInfoModel;
+import io.subutai.common.host.HostInfoModel;
 
 
 public class CreateEnvironmentContainerGroupResponse

@@ -41,7 +41,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
 
     @JoinColumn( name = "net_interfaces" )
     @OneToMany( orphanRemoval = true,
-            targetEntity = HostInterface.class,
+            targetEntity = io.subutai.core.registration.impl.entity.HostInterface.class,
             cascade = CascadeType.ALL,
             fetch = FetchType.EAGER )
     private Set<Interface> netInterfaces = Sets.newHashSet();
@@ -95,7 +95,8 @@ public class RequestedHostImpl implements RequestedHost, Serializable
         Set<Interface> netInterfaces = requestedHost.getNetInterfaces();
         for ( final Interface netInterface : netInterfaces )
         {
-            HostInterface hostInterface = new HostInterface( netInterface );
+            io.subutai.core.registration.impl.entity.HostInterface
+                    hostInterface = new io.subutai.core.registration.impl.entity.HostInterface( netInterface );
             this.netInterfaces.add( hostInterface );
         }
 
@@ -124,7 +125,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
 
         for ( final Interface anInterface : netInterfaces )
         {
-            this.netInterfaces.add( new HostInterface( anInterface ) );
+            this.netInterfaces.add( new io.subutai.core.registration.impl.entity.HostInterface( anInterface ) );
         }
 
         if ( this.arch == null )

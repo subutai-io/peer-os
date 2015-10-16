@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
-import io.subutai.common.peer.HostInfoModel;
+import io.subutai.common.host.HostInfoModel;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.Payload;
 import io.subutai.core.peer.api.RequestListener;

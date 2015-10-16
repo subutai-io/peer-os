@@ -22,7 +22,6 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.exception.HTTPException;
 import io.subutai.common.network.Vni;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.Peer;
@@ -140,7 +139,7 @@ public class RemotePeerImplTest
         headers = Maps.newHashMap();
         headers.put( HEADER_NAME, HEADER_VALUE );
         remotePeer = spy( new RemotePeerImpl( localPeer, peerInfo, messenger, commandResponseListener,
-                messageResponseListener ) );
+                messageResponseListener, null ) );
         remotePeer.restUtil = restUtil;
         remotePeer.jsonUtil = jsonUtil;
         when( containerHost.getId() ).thenReturn( CONTAINER_ID );

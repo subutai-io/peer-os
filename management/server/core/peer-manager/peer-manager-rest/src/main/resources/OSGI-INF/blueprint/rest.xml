@@ -11,19 +11,12 @@
     </cxf:features>
   </cxf:bus>
 
-  <bean id="jacksonMapper" class="com.fasterxml.jackson.databind.ObjectMapper">
-  </bean>
-
-  <bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider">
-    <property name="mapper" ref="jacksonMapper" />
-  </bean>
-
   <jaxrs:server address="/peer" id="peerRestService">
     <jaxrs:serviceBeans>
       <ref component-id="peerRestServiceImpl" />
     </jaxrs:serviceBeans>
     <jaxrs:providers>
-      <ref component-id="jsonProvider" />
+      <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>
     </jaxrs:providers>
   </jaxrs:server>
 
@@ -41,6 +34,5 @@
 
   <reference id="securityManager" availability="mandatory"
              interface="io.subutai.core.security.api.SecurityManager" />
-
 
 </blueprint>

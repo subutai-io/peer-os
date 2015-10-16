@@ -11,8 +11,10 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInfoModel;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
+import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.protocol.N2NConfig;
@@ -28,8 +30,8 @@ import io.subutai.common.quota.RamQuota;
 /**
  * Peer interface
  *
- * TODO separate methods into PeerSpecific and EnvironmentSpecific interfaces
- * this interface should be a marker interface @Nurkaly do this
+ * TODO separate methods into PeerSpecific and EnvironmentSpecific interfaces this interface should be a marker
+ * interface @Nurkaly do this
  */
 public interface Peer extends PeerSpecific, EnvironmentSpecific
 {
@@ -388,10 +390,10 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
 
 
     /**
-     * Gets network interfaces by given field name and regexp pattern. Allowed field names are "id" and "name".
+     * Gets network interfaces
      */
 
-    Set<Interface> getNetworkInterfaces( InterfacePattern pattern );
+    HostInterfaces getInterfaces();
 
     void setupN2NConnection( N2NConfig config ) throws PeerException;
 
@@ -400,4 +402,6 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     void createGateway( String environmentGatewayIp, int vlan ) throws PeerException;
 
     void removeEnvironmentKeyPair( String environmentId ) throws PeerException;
+
+    ResourceHostMetrics getResourceHostMetrics();
 }

@@ -6,25 +6,22 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import io.subutai.common.environment.Environment;
-import io.subutai.common.metric.ResourceHostMetric;
-import io.subutai.common.util.JsonUtil;
-import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.common.metric.ContainerHostMetric;
-import io.subutai.core.metric.api.Monitor;
-import io.subutai.core.metric.impl.ContainerHostMetricImpl;
-import io.subutai.core.metric.impl.ResourceHostMetricImpl;
 
 import com.google.common.collect.Sets;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Table;
 
+import io.subutai.common.environment.Environment;
+import io.subutai.common.metric.ContainerHostMetric;
+import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.ServiceLocator;
+import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.metric.api.Monitor;
+import io.subutai.core.metric.impl.ContainerHostMetricImpl;
+
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
@@ -76,7 +73,7 @@ public class MonitorFormTest
         monitorForm.metricTable = metricsTable;
 //        monitorForm.executorService = executorService;
         containerHostMetric = JsonUtil.fromJson( METRIC, ContainerHostMetricImpl.class );
-        resourceHostMetric = JsonUtil.fromJson( METRIC, ResourceHostMetricImpl.class );
+        resourceHostMetric = JsonUtil.fromJson( METRIC, ResourceHostMetric.class );
     }
 
 

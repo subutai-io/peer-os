@@ -8,7 +8,6 @@ import java.util.Set;
 import com.vaadin.ui.Component;
 
 import io.subutai.common.environment.Environment;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.util.FileUtil;
 import io.subutai.core.environment.api.EnvironmentEventListener;

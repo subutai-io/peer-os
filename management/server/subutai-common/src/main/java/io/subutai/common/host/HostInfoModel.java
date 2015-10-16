@@ -1,14 +1,10 @@
-package io.subutai.common.peer;
+package io.subutai.common.host;
 
 
 import java.util.HashSet;
 import java.util.Set;
 
-import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.Interface;
+import io.subutai.common.peer.ContainerHost;
 
 
 public class HostInfoModel implements ContainerHostInfo
@@ -17,7 +13,7 @@ public class HostInfoModel implements ContainerHostInfo
     private String id;
     private String hostname;
     private String containerName;
-    private Set<InterfaceModel> netInterfaces = new HashSet<>();
+    private Set<HostInterface> netInterfaces = new HashSet<>();
     private HostArchitecture hostArchitecture;
 
 
@@ -32,7 +28,7 @@ public class HostInfoModel implements ContainerHostInfo
         }
         for ( Interface anInterface : hostInfo.getInterfaces() )
         {
-            this.netInterfaces.add( new InterfaceModel( anInterface ) );
+            this.netInterfaces.add( new HostInterface( anInterface ) );
         }
     }
 
@@ -50,7 +46,7 @@ public class HostInfoModel implements ContainerHostInfo
         }
         for ( Interface anInterface : containerHost.getInterfaces() )
         {
-            this.netInterfaces.add( new InterfaceModel( anInterface ) );
+            this.netInterfaces.add( new HostInterface( anInterface ) );
         }
     }
 

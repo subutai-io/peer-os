@@ -24,6 +24,8 @@ import org.apache.commons.net.util.SubnetUtils;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Interface;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -62,16 +64,19 @@ public class PeerManagerImpl implements PeerManager
     private MessageResponseListener messageResponseListener;
     private DaoManager daoManager;
     private SecurityManager securityManager;
+    private Object provider;
 
 
     public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
-                            MessageResponseListener messageResponseListener, SecurityManager securityManager )
+                            MessageResponseListener messageResponseListener, SecurityManager securityManager,
+                            Object provider )
     {
         this.messenger = messenger;
         this.localPeer = localPeer;
         this.daoManager = daoManager;
         this.messageResponseListener = messageResponseListener;
         this.securityManager = securityManager;
+        this.provider = provider;
     }
 
 
@@ -200,7 +205,8 @@ public class PeerManagerImpl implements PeerManager
 
         if ( pi != null )
         {
-            return new RemotePeerImpl( localPeer, pi, messenger, commandResponseListener, messageResponseListener );
+            return new RemotePeerImpl( localPeer, pi, messenger, commandResponseListener, messageResponseListener,
+                    provider );
         }
         return null;
     }
@@ -287,7 +293,9 @@ public class PeerManagerImpl implements PeerManager
 
         for ( Peer peer : peers )
         {
-            Set<Interface> r = peer.getNetworkInterfaces( N2NUtil.N2N_SUBNET_INTERFACES_PATTERN );
+            HostInterfaces intfs = peer.getInterfaces();
+
+            Set<HostInterface> r = intfs.filterByIp( N2NUtil.N2N_INTERFACE_IP_PATTERN );
 
             Collection peerSubnets = CollectionUtils.<String>collect( r, new Transformer()
             {

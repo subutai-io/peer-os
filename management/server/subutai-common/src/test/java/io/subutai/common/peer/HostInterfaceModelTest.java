@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.Interface;
 
 import static org.junit.Assert.assertNotNull;
@@ -13,9 +15,9 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith( MockitoJUnitRunner.class )
-public class InterfaceModelTest
+public class HostInterfaceModelTest
 {
-    private InterfaceModel interfaceModel;
+    private HostInterface interfaceModel;
 
     @Mock
     Interface anInterface;
@@ -28,7 +30,7 @@ public class InterfaceModelTest
         when( anInterface.getName() ).thenReturn( "testInterfaceName" );
         when( anInterface.getIp() ).thenReturn( "testIp" );
 
-        interfaceModel = new InterfaceModel( anInterface );
+        interfaceModel = new HostInterface( anInterface );
     }
 
 

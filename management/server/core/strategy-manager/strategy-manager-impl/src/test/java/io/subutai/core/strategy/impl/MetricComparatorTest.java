@@ -25,7 +25,7 @@ public class MetricComparatorTest
     public void testHddComparator() throws StrategyException
     {
         when( resourceHostMetric.getAvailableRam() ).thenReturn( 4096.0 );
-        when( resourceHostMetric.getAvailableDiskVar() ).thenReturn( 1234567.0 );
+        when( resourceHostMetric.getAvailableSpace() ).thenReturn( 1234567.0 );
         when( resourceHostMetric.getUsedCpu() ).thenReturn( 123.0 );
 
         Criteria criteria = new Criteria( "MORE_HDD", null );
@@ -39,7 +39,7 @@ public class MetricComparatorTest
     public void testRamComparator() throws StrategyException
     {
         when( resourceHostMetric.getAvailableRam() ).thenReturn( 4096.0 );
-        when( resourceHostMetric.getAvailableDiskVar() ).thenReturn( 1234567.0 );
+        when( resourceHostMetric.getAvailableSpace() ).thenReturn( 1234567.0 );
         when( resourceHostMetric.getUsedCpu() ).thenReturn( 123.0 );
 
         Criteria criteria = new Criteria( "MORE_RAM", null );
@@ -53,7 +53,7 @@ public class MetricComparatorTest
     public void testCpuComparator() throws StrategyException
     {
         when( resourceHostMetric.getAvailableRam() ).thenReturn( 4096.0 );
-        when( resourceHostMetric.getAvailableDiskVar() ).thenReturn( 1234567.0 );
+        when( resourceHostMetric.getAvailableSpace() ).thenReturn( 1234567.0 );
         when( resourceHostMetric.getUsedCpu() ).thenReturn( 123.0 );
 
         Criteria criteria = new Criteria( "MORE_CPU", null );

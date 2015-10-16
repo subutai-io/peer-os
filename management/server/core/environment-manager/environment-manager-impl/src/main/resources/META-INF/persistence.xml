@@ -7,7 +7,7 @@
 
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/subutaiDS)
     </non-jta-data-source>
-    <class>io.subutai.core.environment.impl.entity.HostInterface</class>
+    <class>io.subutai.core.environment.impl.entity.HostInterfaceImpl</class>
     <class>io.subutai.core.environment.impl.entity.EnvironmentImpl</class>
     <class>io.subutai.core.environment.impl.entity.PeerConfImpl</class>
     <class>io.subutai.core.environment.impl.entity.EnvironmentContainerImpl</class>

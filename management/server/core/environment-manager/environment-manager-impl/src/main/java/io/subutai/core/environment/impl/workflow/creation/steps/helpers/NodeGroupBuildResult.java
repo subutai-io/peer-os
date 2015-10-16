@@ -34,4 +34,21 @@ public class NodeGroupBuildResult
     {
         return exception;
     }
+
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer( "NodeGroupBuildResult:\n" );
+
+        for ( EnvironmentContainerImpl c : containers )
+        {
+            sb.append( String.format( "EnvironmentContainer: id=%s, name=%s\n", c.getId(), c.getContainerName() ) );
+        }
+        if ( exception != null )
+        {
+            sb.append( "Exception: " + exception.toString() );
+        }
+        return sb.toString();
+    }
 }

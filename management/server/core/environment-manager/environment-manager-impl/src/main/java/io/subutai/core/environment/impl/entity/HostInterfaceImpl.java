@@ -17,17 +17,17 @@ import io.subutai.common.host.Interface;
 
 
 /**
- * {@link HostInterface} stores host network interface information. <p> {@link #interfaceName} - host interface name</p>
+ * {@link HostInterfaceImpl} stores host network interface information. <p> {@link #interfaceName} - host interface name</p>
  * <p> {@link #ip} - ip address</p> <p> {@link #mac} - mac address</p> <p> {@link #host} - target host whose metadata
  * being saved</p>
  *
- * @see io.subutai.common.host.Interface
+ * @see Interface
  * @see EnvironmentContainerImpl
  */
 @Entity
 @Table( name = "env_con_intf" )
 @Access( AccessType.FIELD )
-public class HostInterface implements Interface, Serializable
+public class HostInterfaceImpl implements Interface, Serializable
 {
     @Id
     @GeneratedValue
@@ -45,12 +45,12 @@ public class HostInterface implements Interface, Serializable
     private EnvironmentContainerImpl host;
 
 
-    protected HostInterface()
+    protected HostInterfaceImpl()
     {
     }
 
 
-    public HostInterface( final Interface s )
+    public HostInterfaceImpl( final Interface s )
     {
         this.interfaceName = s.getName();
         this.ip = s.getIp().replace( "addr:", "" );
