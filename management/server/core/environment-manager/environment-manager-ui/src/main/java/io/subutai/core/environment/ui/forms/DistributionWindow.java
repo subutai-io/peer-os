@@ -15,9 +15,11 @@ import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.shared.ui.slider.SliderOrientation;
+import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Slider;
 import com.vaadin.ui.Table;
@@ -290,17 +292,35 @@ public class DistributionWindow extends Window
 
     private Table createPlacementTable()
     {
-        Table table = new Table();
+        final Table table = new Table();
         table.addContainerProperty( "Name", String.class, null );
         table.addContainerProperty( "Amount", Integer.class, null );
-        table.addContainerProperty( "Host", String.class, null );
-        table.addContainerProperty( "Type", ContainerType.class, null );
+        table.addContainerProperty( "Peer", String.class, null );
+        table.addContainerProperty( "Host", ResourceHostMetric.class, null );
+        table.addContainerProperty( "Type", ComboBox.class, null );
         table.addContainerProperty( "Remove", Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setEnabled( true );
         table.setImmediate( true );
         table.setSizeFull();
+
+        //        table.setColumnWidth( "Host", 50 );
+        table.setItemDescriptionGenerator( new AbstractSelect.ItemDescriptionGenerator()
+        {
+            @Override
+            public String generateDescription( final Component component, final Object itemId, final Object propertyId )
+            {
+                if ( "Host".equals( propertyId ) )
+                {
+                    Item item = ( Item ) table.getItem( itemId );
+                    Property property = item.getItemProperty( propertyId );
+                    ResourceHostMetric metric = ( ResourceHostMetric ) property.getValue();
+                    return metric.getDescription();
+                }
+                return null;
+            }
+        } );
         return table;
     }
 
@@ -392,7 +412,8 @@ public class DistributionWindow extends Window
         if ( row == null )
         {
             placementTable.addItem( new Object[] {
-                    nodeGroup.getName(), amount, metric.getHostId(), ContainerType.valueOf( type ), removeBtn
+                    nodeGroup.getName(), amount, peerManager.getPeer( metric.getPeerId() ).getPeerInfo().getIp(),
+                    metric, createPeersComboBox(), removeBtn
             }, rowId );
         }
         else
