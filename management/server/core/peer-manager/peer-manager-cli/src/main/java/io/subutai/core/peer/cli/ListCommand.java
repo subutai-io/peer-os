@@ -3,6 +3,8 @@ package io.subutai.core.peer.cli;
 
 import java.util.List;
 
+import javax.annotation.security.RolesAllowed;
+
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.common.host.HostInterfaces;
