@@ -129,6 +129,12 @@
       <artifactId>bcprov-ext-jdk15on</artifactId>
     </dependency>
 
+    <dependency>
+    	<groupId>org.apache.aries.blueprint</groupId>
+    	<artifactId>org.apache.aries.blueprint.authz</artifactId>
+    	<version>1.0.0</version>
+    </dependency>
+
   </dependencies>
 
   <build>

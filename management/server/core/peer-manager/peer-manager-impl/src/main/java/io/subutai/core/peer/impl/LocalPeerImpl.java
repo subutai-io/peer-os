@@ -20,6 +20,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import javax.annotation.security.RolesAllowed;
+
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
@@ -746,7 +748,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             resourceHost.destroyContainerHost( host );
             ( ( ResourceHostEntity ) entity.getParent() ).removeContainerHost( entity );
 
-            cleanupEnvironmentNetworkSettings( host.getEnvironmentId() );
+//            cleanupEnvironmentNetworkSettings( host.getEnvironmentId() );
         }
         catch ( ResourceHostException e )
         {

@@ -4,6 +4,7 @@
            xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
            xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
            xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
+           xmlns:authz="http://aries.apache.org/xmlns/authorization/v1.0.0"
     >
 
   <!-- Allow the use of system properties -->
@@ -54,7 +55,6 @@
     <argument ref="hostRegistry" />
     <argument ref="monitor" />
     <argument ref="securityManager" />
-
     <property name="externalIpInterface" value="${externalIpInterface}" />
   </bean>
 

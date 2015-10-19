@@ -374,7 +374,7 @@ public class MonitorImpl implements Monitor
             {
                 ResourceHostMetric metric = JsonUtil.fromJson( result.getStdOut(), ResourceHostMetric.class );
                 //set peer id for future reference
-//                metric.setPeerId( peerManager.getLocalPeer().getId() );
+                metric.setPeerId( peerManager.getLocalPeer().getId() );
                 metric.setHostId( resourceHost.getId() );
                 metrics.add( metric );
             }
