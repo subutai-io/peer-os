@@ -49,7 +49,7 @@ import io.subutai.core.environment.impl.EnvironmentManagerImpl;
  * Database entity to store environment specific fields.
  *
  * @see EnvironmentContainerImpl
- * @see io.subutai.common.peer.ContainerHost
+ * @see ContainerHost
  */
 @Entity
 @Table( name = "env" )

@@ -11,7 +11,6 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.core.network.api.NetworkManagerException;
 
 import com.google.common.collect.Sets;
@@ -28,7 +27,7 @@ public class HostManagerTest
 
     private static final String DOMAIN = "domain";
     @Mock
-    EnvironmentContainerHost containerHost;
+    ContainerHost containerHost;
     @Mock
     CommandUtil commandUtil;
 

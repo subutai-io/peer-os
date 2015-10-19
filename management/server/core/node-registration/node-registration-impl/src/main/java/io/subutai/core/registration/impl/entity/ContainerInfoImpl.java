@@ -4,7 +4,6 @@ package io.subutai.core.registration.impl.entity;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -21,7 +20,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.Interface;
+import io.subutai.core.registration.api.RegistrationStatus;
+import io.subutai.core.registration.api.service.ContainerInfo;
 
 
 @Entity
@@ -52,7 +55,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
 
     @JoinColumn( name = "net_interfaces" )
     @OneToMany( orphanRemoval = true,
-            targetEntity = HostInterface.class,
+            targetEntity = io.subutai.core.registration.impl.entity.HostInterface.class,
             cascade = CascadeType.ALL,
             fetch = FetchType.EAGER )
     private Set<Interface> netInterfaces = new HashSet<>();
@@ -91,7 +94,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
         }
         for ( Interface anInterface : hostInfo.getInterfaces() )
         {
-            this.netInterfaces.add( new HostInterface( anInterface ) );
+            this.netInterfaces.add( new io.subutai.core.registration.impl.entity.HostInterface( anInterface ) );
         }
     }
 
@@ -122,9 +125,9 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
 
 
     @Override
-    public UUID getId()
+    public String getId()
     {
-        return UUID.fromString( id );
+        return id;
     }
 
 

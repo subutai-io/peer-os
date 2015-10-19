@@ -6,7 +6,7 @@
   <parent>
     <artifactId>identity-manager-parent</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.0-RC1</version>
+    <version>4.0.0-RC2</version>
   </parent>
 
   <artifactId>identity-manager-rest</artifactId>
@@ -25,6 +25,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>identity-manager-api</artifactId>
     </dependency>
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>

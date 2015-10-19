@@ -20,27 +20,31 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.broker.api.Broker;
 import io.subutai.core.broker.api.ClientCredentials;
-import io.subutai.core.env.api.EnvironmentManager;
-import io.subutai.core.env.api.exception.EnvironmentCreationException;
+import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.hostregistry.api.HostListener;
-import io.subutai.core.hostregistry.api.ResourceHostInfo;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.peer.api.HostNotFoundException;
 import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.api.ResourceHost;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.exception.NodeRegistrationException;
@@ -58,9 +62,6 @@ import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 
 
-/**
- * Created by talas on 8/24/15.
- */
 public class RegistrationManagerImpl implements RegistrationManager, HostListener
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RegistrationManagerImpl.class );
@@ -165,7 +166,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
 
     @Override
-    public RequestedHost getRequest( final UUID requestId )
+    public RequestedHost getRequest( final String requestId )
     {
         return requestDataService.find( requestId );
     }
@@ -174,7 +175,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     @Override
     public void queueRequest( final RequestedHost requestedHost ) throws NodeRegistrationException
     {
-        if ( requestDataService.find( UUID.fromString( requestedHost.getId() ) ) != null )
+        if ( requestDataService.find( requestedHost.getId() ) != null )
         {
             LOGGER.info( "Already requested registration" );
         }
@@ -195,7 +196,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
 
     @Override
-    public void rejectRequest( final UUID requestId )
+    public void rejectRequest( final String requestId )
     {
         RequestedHostImpl registrationRequest = requestDataService.find( requestId );
         registrationRequest.setStatus( RegistrationStatus.REJECTED );
@@ -223,7 +224,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
 
     @Override
-    public void approveRequest( final UUID requestId )
+    public void approveRequest( final String requestId )
     {
         RequestedHostImpl registrationRequest = requestDataService.find( requestId );
 
@@ -343,9 +344,11 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                 Environment environment = environmentManager
                         .importEnvironment( String.format( "environment_%d", mapEntry.getKey() ), topology,
                                 classification, "", mapEntry.getKey() );
+
                 //Save container gateway from environment configuration to update container network configuration
                 // later when it will be available
                 SubnetUtils cidr;
+
                 try
                 {
                     cidr = new SubnetUtils( environment.getSubnetCidr() );
@@ -392,8 +395,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                             && containerInfo.getVlan() != 0 )
                     {
 
-                        ContainerInfoImpl containerInfoImpl =
-                                containerInfoDataService.find( containerInfo.getId().toString() );
+                        ContainerInfoImpl containerInfoImpl = containerInfoDataService.find( containerInfo.getId() );
 
                         ContainerHost containerHost = resourceHost.getContainerHostById( containerInfo.getId() );
 
@@ -439,9 +441,32 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
 
     @Override
-    public void removeRequest( final UUID requestId )
+    public void removeRequest( final String requestId )
     {
         requestDataService.remove( requestId );
+    }
+
+
+    @Override
+    public void deployResourceHost( List<String> args ) throws NodeRegistrationException
+    {
+        ManagementHost managementHost = null;
+        CommandResult result;
+
+        try
+        {
+            managementHost = peerManager.getLocalPeer().getManagementHost();
+            result = managementHost
+                    .execute( new RequestBuilder( "/home/ubuntu/awsdeploy" ).withCmdArgs( args ).withTimeout( 1800 ) );
+            if ( result.getExitCode() != 0 )
+            {
+                throw new NodeRegistrationException( result.getStdErr() );
+            }
+        }
+        catch ( HostNotFoundException | CommandException e )
+        {
+            e.printStackTrace();
+        }
     }
 
 

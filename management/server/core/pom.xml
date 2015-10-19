@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-parent</artifactId>
-    <version>4.0.0-RC1</version>
+    <version>4.0.0-RC2</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -40,7 +40,7 @@
     <module>subutai-cli-rbac</module>
     <module>key-server</module>
     <module>security-manager</module>
-    <!--<module>node-registration</module>-->
+    <module>node-registration</module>
     <module>http-context-factory</module>
     <module>environment-manager</module>
   </modules>

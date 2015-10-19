@@ -3,6 +3,7 @@ package io.subutai.core.environment.impl.entity;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import javax.persistence.Access;
@@ -37,7 +38,7 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.EnvironmentContainerHost;
-import io.subutai.common.peer.HostInfoModel;
+import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.Template;
@@ -85,8 +86,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Enumerated
     private HostArchitecture hostArchitecture;
 
-    @OneToMany( mappedBy = "host", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity = HostInterface
-            .class, orphanRemoval = true )
+    @OneToMany( mappedBy = "host", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity =
+            HostInterfaceImpl.class, orphanRemoval = true )
     protected Set<Interface> interfaces = new HashSet<>();
 
     @Column( name = "ssh_group_id" )
@@ -150,7 +151,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         this.interfaces.clear();
         for ( Interface iface : interfaces )
         {
-            HostInterface hostInterface = new HostInterface( iface );
+            HostInterfaceImpl hostInterface = new HostInterfaceImpl( iface );
             hostInterface.setHost( this );
             this.interfaces.add( hostInterface );
         }
@@ -406,6 +407,23 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         }
 
         return null;
+    }
+
+
+    @Override
+    public Interface getInterfaceByName( final String interfaceName )
+    {
+        Interface result = null;
+        for ( Iterator<Interface> i = getInterfaces().iterator(); result == null && i.hasNext(); )
+        {
+            Interface n = i.next();
+            if ( n.getName().equalsIgnoreCase( interfaceName ) )
+            {
+                result = n;
+            }
+        }
+
+        return result;
     }
 
 

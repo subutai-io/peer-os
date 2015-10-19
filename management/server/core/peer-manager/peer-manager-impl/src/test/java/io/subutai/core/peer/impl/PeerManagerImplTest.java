@@ -101,8 +101,9 @@ public class PeerManagerImplTest
     @Before
     public void setUp() throws Exception
     {
-        peerManager = spy( new PeerManagerImpl( messenger, localPeer, daoManager, messageResponseListener,
-                securityManager ) );
+        peerManager =
+                spy( new PeerManagerImpl( messenger, localPeer, daoManager, messageResponseListener, securityManager,
+                        null ) );
 
 
         peerManager.commandResponseListener = commandResponseListener;

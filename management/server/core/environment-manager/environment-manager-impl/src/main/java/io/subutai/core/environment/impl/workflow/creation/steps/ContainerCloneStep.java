@@ -11,6 +11,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Sets;
@@ -33,7 +36,7 @@ import io.subutai.core.registry.api.TemplateRegistry;
  */
 public class ContainerCloneStep
 {
-
+    private static final Logger LOG = LoggerFactory.getLogger( ContainerCloneStep.class );
     private final TemplateRegistry templateRegistry;
     private final String defaultDomain;
     private final Topology topology;
@@ -95,7 +98,7 @@ public class ContainerCloneStep
         for ( Map.Entry<Peer, Set<NodeGroup>> peerPlacement : placement.entrySet() )
         {
             Peer peer = peerPlacement.getKey();
-
+              LOG.debug( "Scheduling node group task on peer %s", peer.getId() );
             taskCompletionService.submit(
                     new CreatePeerNodeGroupsTask( peer, peerPlacement.getValue(), localPeer, environment,
                             currentLastUsedIpIndex + 1, templateRegistry, defaultDomain ) );
@@ -120,6 +123,7 @@ public class ContainerCloneStep
                 Set<NodeGroupBuildResult> results = futures.get();
                 for ( NodeGroupBuildResult result : results )
                 {
+                    LOG.debug( String.format( "Node group build result: %s", result) );
                     if ( !CollectionUtil.isCollectionEmpty( result.getContainers() ) )
                     {
                         environment.addContainers( result.getContainers() );

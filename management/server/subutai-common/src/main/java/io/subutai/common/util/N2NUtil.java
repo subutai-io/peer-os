@@ -5,8 +5,6 @@ import java.util.Set;
 
 import com.google.common.base.Preconditions;
 
-import io.subutai.common.peer.InterfacePattern;
-
 
 /**
  * N2N utils.
@@ -14,7 +12,7 @@ import io.subutai.common.peer.InterfacePattern;
 public abstract class N2NUtil
 {
     public static String N2N_SUBNET_MASK = "255.255.255.0";
-    public static InterfacePattern N2N_SUBNET_INTERFACES_PATTERN = new InterfacePattern( "ip", "^10.*" );
+    public static final String N2N_INTERFACE_IP_PATTERN = "^10.*";
 
 
     public static String findFreeTunnelNetwork( final Set<String> excludedNetworks )

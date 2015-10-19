@@ -63,6 +63,8 @@
     <argument ref="messenger" />
   </bean>
 
+  <bean id="jsonProvider" class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
+
   <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
         class="io.subutai.core.peer.impl.PeerManagerImpl">
     <argument ref="messenger" />
@@ -70,6 +72,7 @@
     <argument ref="daoManagerPeer" />
     <argument ref="messageResponseListener" />
     <argument ref="securityManager" />
+    <argument ref="jsonProvider" />
   </bean>
 
   <bean id="messageRequestListener" class="io.subutai.core.peer.impl.request.MessageRequestListener"

@@ -8,6 +8,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.Interface;
 
 
 /**
@@ -37,7 +38,17 @@ public interface Host extends HostInfo, Serializable
     public boolean isConnected();
 
 
+    /**
+     * @deprecated use {@link #getInterfaceByName(String)} (String interfaceName)} instead.
+     */
+    @Deprecated
     public String getIpByInterfaceName( String interfaceName );
 
+    /**
+     * @deprecated use {@link #getInterfaceByName(String)} (String interfaceName)} instead.
+     */
+    @Deprecated
     public String getMacByInterfaceName( String interfaceName );
+
+    Interface getInterfaceByName( String interfaceName );
 }

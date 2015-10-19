@@ -10,12 +10,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.command.CommandCallback;
-import io.subutai.common.command.CommandException;
-import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.CommandUtil;
-import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.command.Response;
 import io.subutai.common.peer.Host;
 
 import static org.mockito.Matchers.any;

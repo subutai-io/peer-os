@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.protocol.Criteria;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
 import io.subutai.core.strategy.api.StrategyException;
@@ -102,9 +103,11 @@ public class StrategyManagerImplTest
         assertEquals( 1, strategies.size() );
         assertTrue( strategies.contains( roundRobinPlacementStrategy ) );
 
-        when( metric1.getHost() ).thenReturn( "host1" );
-        when( metric2.getHost() ).thenReturn( "host2" );
-        List<ResourceHostMetric> metrics = Arrays.asList( metric1, metric2 );
+        when( metric1.getHostName() ).thenReturn( "host1" );
+        when( metric2.getHostName() ).thenReturn( "host2" );
+        ResourceHostMetrics metrics = new ResourceHostMetrics();
+        metrics.addMetric( metric1 );
+        metrics.addMetric( metric2 );
 
         Map<ResourceHostMetric, Integer> distribution =
                 strategyManager.getPlacementDistribution( metrics, 3, "ROUND_ROBIN", new ArrayList<Criteria>(  ) );

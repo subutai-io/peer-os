@@ -11,26 +11,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.subutai.common.metric.ResourceHostMetric;
-import io.subutai.common.peer.Host;
-import io.subutai.common.peer.PeerException;
-import io.subutai.common.protocol.Criteria;
-import io.subutai.common.protocol.Template;
-import io.subutai.common.settings.Common;
-import io.subutai.common.util.CollectionUtil;
-import io.subutai.common.util.StringUtil;
-import io.subutai.common.util.UUIDUtil;
-import io.subutai.common.peer.HostNotFoundException;
-import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.peer.ResourceHostException;
-import io.subutai.core.peer.ui.container.ContainerTree;
-
-import io.subutai.core.registry.api.TemplateRegistry;
-import io.subutai.core.strategy.api.ContainerPlacementStrategy;
-import io.subutai.core.strategy.api.CriteriaDef;
-import io.subutai.core.strategy.api.StrategyException;
-import io.subutai.core.strategy.api.StrategyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +40,26 @@ import com.vaadin.ui.TableFieldFactory;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
+
+import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.metric.ResourceHostMetrics;
+import io.subutai.common.peer.Host;
+import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.protocol.Criteria;
+import io.subutai.common.protocol.Template;
+import io.subutai.common.settings.Common;
+import io.subutai.common.util.CollectionUtil;
+import io.subutai.common.util.StringUtil;
+import io.subutai.common.util.UUIDUtil;
+import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.core.peer.ui.container.ContainerTree;
+import io.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.strategy.api.ContainerPlacementStrategy;
+import io.subutai.core.strategy.api.CriteriaDef;
+import io.subutai.core.strategy.api.StrategyException;
+import io.subutai.core.strategy.api.StrategyManager;
 
 
 @SuppressWarnings( "serial" )
@@ -408,7 +408,7 @@ public class Cloner extends VerticalLayout
             }
         }
 
-        List<ResourceHostMetric> serverMetrics = fillInServerMetrics();
+        ResourceHostMetrics serverMetrics = localPeer.getResourceHostMetrics();
         Map<ResourceHostMetric, Integer> bestServers;
         try
         {
@@ -430,7 +430,7 @@ public class Cloner extends VerticalLayout
 
         for ( final Map.Entry<ResourceHostMetric, Integer> entry : sortedBestServers.entrySet() )
         {
-            ResourceHost rh = localPeer.getResourceHostByName( entry.getKey().getHost() );
+            ResourceHost rh = localPeer.getResourceHostByName( entry.getKey().getHostName() );
             List<String> lxcHostNames = new ArrayList<>();
             for ( int i = 0; i < entry.getValue(); i++ )
             {
@@ -445,25 +445,13 @@ public class Cloner extends VerticalLayout
 
     private List<ResourceHostMetric> fillInServerMetrics()
     {
-        List<ResourceHostMetric> serverMetrics = new ArrayList<>();
+        List<ResourceHostMetric> result = new ArrayList<>();
 
-        for ( Host host : localPeer.getResourceHosts() )
+        for ( ResourceHost host : localPeer.getResourceHosts() )
         {
-            if ( host instanceof ResourceHost )
-            {
-                ResourceHost rh = ( ResourceHost ) host;
-                try
-                {
-                    serverMetrics.add( rh.getHostMetric() );
-                }
-                catch ( ResourceHostException e )
-                {
-                    show( e.toString() );
-                    LOG.warn( "Error getting host metrics #processCloneByStrategy", e );
-                }
-            }
+            result.add( host.getHostMetric() );
         }
-        return serverMetrics;
+        return result;
     }
 
 

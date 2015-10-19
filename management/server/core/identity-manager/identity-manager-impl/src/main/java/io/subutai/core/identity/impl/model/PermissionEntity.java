@@ -10,14 +10,10 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import io.subutai.core.identity.api.model.Permission;
-import io.subutai.core.identity.api.model.PermissionObject;
-import io.subutai.core.identity.api.model.PermissionOperation;
 import io.subutai.core.identity.api.model.Role;
 
 
@@ -34,25 +30,20 @@ public class PermissionEntity implements Permission
     @Column( name = "id" )
     private Long id;
 
-    //*********************************************
-    @ManyToOne
-    @JoinColumn(name="operation_id", referencedColumnName="id")
-    private PermissionOperation operation;
-    //*********************************************
+    @Column( name = "object" )
+    private int object;
 
+    @Column( name = "scope" )
+    private int scope;
 
-    //*********************************************
-    @ManyToOne
-    @JoinColumn(name="object_id", referencedColumnName="id")
-    private PermissionObject object;
-    //*********************************************
+    @Column( name = "operation" )
+    private int operation;
 
 
     //*********************************************
     @ManyToMany(cascade={ CascadeType.ALL}, mappedBy="permissions")
     private Set<Role> roles;
     //*********************************************
-
 
     public Long getId()
     {
@@ -63,30 +54,6 @@ public class PermissionEntity implements Permission
     public void setId( final Long id )
     {
         this.id = id;
-    }
-
-
-    public PermissionOperation getOperation()
-    {
-        return operation;
-    }
-
-
-    public void setOperation( final PermissionOperation operation )
-    {
-        this.operation = operation;
-    }
-
-
-    public PermissionObject getObject()
-    {
-        return object;
-    }
-
-
-    public void setObject( final PermissionObject object )
-    {
-        this.object = object;
     }
 
 

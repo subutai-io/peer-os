@@ -15,13 +15,14 @@ public class Commands
 
     public RequestBuilder getCurrentMetricCommand( String hostname )
     {
-        return new RequestBuilder( String.format( "subutai monitor %s", hostname ) );
+        return new RequestBuilder( String.format( "subutai stats system %s", hostname ) );
     }
 
 
     public RequestBuilder getHistoricalMetricCommand( Host host, MetricType metricType )
     {
-        return new RequestBuilder( String.format( "subutai monitor -q %s %s | grep e+", metricType.getName(), host.getHostname() ) );
+        return new RequestBuilder(
+                String.format( "subutai monitor -q %s %s | grep e+", metricType.getName(), host.getHostname() ) );
     }
 
 

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.protocol.Criteria;
 
 import com.google.common.base.Preconditions;
@@ -88,7 +89,7 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
      * accommodate
      */
     @Override
-    public Map<ResourceHostMetric, Integer> calculateSlots( int nodesCount, List<ResourceHostMetric> serverMetrics )
+    public Map<ResourceHostMetric, Integer> calculateSlots( int nodesCount, ResourceHostMetrics serverMetrics )
     {
         return null;
     }
@@ -117,16 +118,16 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
     }
 
 
-    protected List<ResourceHostMetric> sortServers( List<ResourceHostMetric> serverMetrics ) throws StrategyException
+    protected List<ResourceHostMetric> sortServers( ResourceHostMetrics serverMetrics ) throws StrategyException
     {
-        List<ResourceHostMetric> result = new ArrayList<>( serverMetrics );
+        List<ResourceHostMetric> result = new ArrayList<>( serverMetrics.getResources() );
 
         Collections.sort( result, new Comparator<ResourceHostMetric>()
         {
             @Override
             public int compare( final ResourceHostMetric o1, final ResourceHostMetric o2 )
             {
-                return o1.getHost().compareTo( o2.getHost() );
+                return o1.getHostName().compareTo( o2.getHostName() );
             }
         } );
         return result;

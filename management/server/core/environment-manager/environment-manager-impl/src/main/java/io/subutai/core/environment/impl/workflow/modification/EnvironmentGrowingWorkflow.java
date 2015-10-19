@@ -15,8 +15,8 @@ import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneSt
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.SetSshKeyStep;
-import io.subutai.core.environment.impl.workflow.modification.steps.SetupN2NStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.PEKGenerationStep;
+import io.subutai.core.environment.impl.workflow.modification.steps.SetupN2NStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.VNISetupStep;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
@@ -120,7 +120,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         {
             new VNISetupStep( topology, environment, peerManager.getLocalPeer() ).execute();
 
-            environment =  environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.saveOrUpdate( environment );
 
             return EnvironmentGrowingPhase.SETUP_N2N;
         }

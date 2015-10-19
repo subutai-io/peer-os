@@ -7,6 +7,7 @@ import java.util.Set;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
@@ -58,11 +59,12 @@ public class RegisterSshStep
         {
             int sshGroupId = sshGroup.getKey();
             Set<EnvironmentContainerHost> groupedContainers = sshGroup.getValue();
-
+            Set<ContainerHost> ch = Sets.newHashSet();
+            ch.addAll( groupedContainers );
             //ignore group ids <= 0
             if ( sshGroupId > 0 )
             {
-                networkManager.exchangeSshKeys( groupedContainers );
+                networkManager.exchangeSshKeys( ch );
             }
         }
     }

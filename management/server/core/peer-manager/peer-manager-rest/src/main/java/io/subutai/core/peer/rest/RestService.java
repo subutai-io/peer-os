@@ -1,8 +1,6 @@
 package io.subutai.core.peer.rest;
 
 
-import java.util.Set;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -16,8 +14,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.subutai.common.host.Interface;
-import io.subutai.common.peer.InterfacePattern;
+import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.protocol.N2NConfig;
 
 //todo please check all endpoints for returned media type, do we return correct type if we just return response code
@@ -269,13 +267,18 @@ public interface RestService
     Response getContainerHostInfoById( @QueryParam( "containerId" ) String containerId );
 
 
+    @GET
+    @Path( "resources" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    ResourceHostMetrics getResources();
+
     //*********** Environment Specific REST - END ***************
 
-    @POST
+    @GET
     @Path( "interfaces" )
     @Produces( { MediaType.APPLICATION_JSON } )
     @Consumes( { MediaType.APPLICATION_JSON } )
-    Set<Interface> getNetworkInterfaces( InterfacePattern pattern );
+    HostInterfaces getNetworkInterfaces();
 
     @POST
     @Path( "n2ntunnel" )

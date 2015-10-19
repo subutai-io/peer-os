@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.protocol.Criteria;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.UnitUtil;
@@ -23,7 +24,7 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
     protected static final double MIN_HDD_IN_RESERVE_MB = 20 * 1024;
     protected static final double MIN_RAM_LXC_MB = 512;
     protected static final double MIN_RAM_IN_RESERVE_MB = 1024;
-//    private UnitUtil unitUtil = new UnitUtil();
+    //    private UnitUtil unitUtil = new UnitUtil();
 
 
     @Override
@@ -46,7 +47,7 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
      * calculates on which resource host to places containers, number of containers to place and their type
      */
     @Override
-    public void calculatePlacement( int nodesCount, List<ResourceHostMetric> serverMetrics, List<Criteria> criteria )
+    public void calculatePlacement( int nodesCount, ResourceHostMetrics serverMetrics, List<Criteria> criteria )
     {
 
         Map<ResourceHostMetric, Integer> serversWithSlots = calculateSlots( nodesCount, serverMetrics );
@@ -97,18 +98,20 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
      * accommodate
      */
     @Override
-    public Map<ResourceHostMetric, Integer> calculateSlots( int nodesCount, List<ResourceHostMetric> serverMetrics )
+    public Map<ResourceHostMetric, Integer> calculateSlots( int nodesCount, ResourceHostMetrics serverMetrics )
     {
         Map<ResourceHostMetric, Integer> serverSlots = Maps.newHashMap();
 
-        if ( !CollectionUtil.isCollectionEmpty( serverMetrics ) )
+        if ( !serverMetrics.isEmpty() )
         {
-            for ( ResourceHostMetric metric : serverMetrics )
+            for ( ResourceHostMetric metric : serverMetrics.getResources() )
             {
-                int numOfLxcByRam = ( int ) ( ( UnitUtil.getBytesInMb( metric.getAvailableRam() ) - MIN_RAM_IN_RESERVE_MB )
-                        / MIN_RAM_LXC_MB );
-                int numOfLxcByHdd = ( int ) ( ( UnitUtil.getBytesInMb( metric.getAvailableDiskVar() ) - MIN_HDD_IN_RESERVE_MB )
-                        / MIN_HDD_LXC_MB );
+                int numOfLxcByRam =
+                        ( int ) ( ( UnitUtil.getBytesInMb( metric.getAvailableRam() ) - MIN_RAM_IN_RESERVE_MB )
+                                / MIN_RAM_LXC_MB );
+                int numOfLxcByHdd =
+                        ( int ) ( ( UnitUtil.getBytesInMb( metric.getAvailableSpace() ) - MIN_HDD_IN_RESERVE_MB )
+                                / MIN_HDD_LXC_MB );
 
                 if ( numOfLxcByHdd > 0 && numOfLxcByRam > 0 )
                 {
@@ -119,5 +122,4 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
         }
         return serverSlots;
     }
-
 }

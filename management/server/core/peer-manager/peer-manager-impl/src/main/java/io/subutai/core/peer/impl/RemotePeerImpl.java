@@ -1,7 +1,6 @@
 package io.subutai.core.peer.impl;
 
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,12 +14,10 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 
 import io.subutai.common.command.CommandCallback;
@@ -32,16 +29,16 @@ import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.exception.HTTPException;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
+import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Host;
-import io.subutai.common.peer.HostInfoModel;
-import io.subutai.common.peer.InterfacePattern;
+import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.N2NConfig;
@@ -72,7 +69,6 @@ import io.subutai.core.peer.impl.container.ContainersDestructionResultImpl;
 import io.subutai.core.peer.impl.container.CreateEnvironmentContainerGroupResponse;
 import io.subutai.core.peer.impl.container.DestroyEnvironmentContainerGroupRequest;
 import io.subutai.core.peer.impl.container.DestroyEnvironmentContainerGroupResponse;
-import io.subutai.core.peer.impl.entity.HostInterfaceImpl;
 import io.subutai.core.peer.impl.request.MessageRequest;
 import io.subutai.core.peer.impl.request.MessageResponse;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
@@ -98,7 +94,7 @@ public class RemotePeerImpl implements RemotePeer
 
     public RemotePeerImpl( LocalPeer localPeer, final PeerInfo peerInfo, final Messenger messenger,
                            CommandResponseListener commandResponseListener,
-                           MessageResponseListener messageResponseListener )
+                           MessageResponseListener messageResponseListener, Object provider )
     {
         this.localPeer = localPeer;
         this.peerInfo = peerInfo;
@@ -124,7 +120,7 @@ public class RemotePeerImpl implements RemotePeer
         }
         this.baseUrl = url;
         this.providers = Lists.newArrayList();
-        providers.add( new JacksonJaxbJsonProvider() );
+        providers.add( provider );
     }
 
 
@@ -1328,6 +1324,7 @@ public class RemotePeerImpl implements RemotePeer
         MessageResponse messageResponse =
                 messageResponseListener.waitResponse( messageRequest, requestTimeout, responseTimeout );
 
+        LOG.debug( String.format( "%s", messageResponse ) );
         if ( messageResponse != null )
         {
             if ( messageResponse.getException() != null )
@@ -1336,7 +1333,10 @@ public class RemotePeerImpl implements RemotePeer
             }
             else if ( messageResponse.getPayload() != null )
             {
-                return messageResponse.getPayload().getMessage( responseType );
+                LOG.debug( String.format( "Trying get response object: %s", responseType ) );
+                final V message = messageResponse.getPayload().getMessage( responseType );
+                LOG.debug( String.format( "Response object: %s", message ) );
+                return message;
             }
         }
 
@@ -1611,10 +1611,8 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public Set<Interface> getNetworkInterfaces( final InterfacePattern pattern )
+    public HostInterfaces getInterfaces()
     {
-        Preconditions.checkNotNull( pattern, "Pattern could not be null" );
-
         String path = buildPath( "peer/interfaces" );
 
         WebClient client =
@@ -1624,8 +1622,7 @@ public class RemotePeerImpl implements RemotePeer
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        Collection interfaces = client.postAndGetCollection( pattern, HostInterfaceImpl.class );
-        return Sets.newHashSet( interfaces );
+        return client.get( HostInterfaces.class );
     }
 
 
@@ -1696,6 +1693,28 @@ public class RemotePeerImpl implements RemotePeer
         {
             throw new PeerException( String.format( "Error creating gateway on peer %s", getName() ), e );
         }
+    }
+
+
+    @Override
+    public ResourceHostMetrics getResourceHostMetrics()
+    {
+        String path = String.format( "peer/resources" );
+
+
+        WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
+                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, providers );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+
+        //*********construct Secure Header ****************************
+        client.getHeaders().add( Common.HEADER_SPECIAL, "ENC" );
+        client.getHeaders().add( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
+        client.getHeaders().add( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
+
+        ResourceHostMetrics result = client.get( ResourceHostMetrics.class );
+        return result;
     }
 
 

@@ -22,9 +22,8 @@ import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Sets;
 
-import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInterface;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.util.N2NUtil;
@@ -40,6 +39,7 @@ import io.subutai.core.peer.api.LocalPeer;
 public class SetupN2NStep
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( SetupN2NStep.class );
+
     private final Topology topology;
     private final EnvironmentImpl env;
     private final LocalPeer localPeer;
@@ -143,14 +143,14 @@ public class SetupN2NStep
 
         for ( Peer peer : peers )
         {
-            Set<Interface> r = peer.getNetworkInterfaces( N2NUtil.N2N_SUBNET_INTERFACES_PATTERN );
+            Set<HostInterface> r = peer.getInterfaces().filterByIp( N2NUtil.N2N_INTERFACE_IP_PATTERN );
 
             Collection tunnels = CollectionUtils.collect( r, new Transformer()
             {
                 @Override
                 public Object transform( final Object o )
                 {
-                    Interface i = ( Interface ) o;
+                    HostInterface i = ( HostInterface ) o;
                     SubnetUtils u = new SubnetUtils( i.getIp(), N2NUtil.N2N_SUBNET_MASK );
                     return u.getInfo().getNetworkAddress();
                 }

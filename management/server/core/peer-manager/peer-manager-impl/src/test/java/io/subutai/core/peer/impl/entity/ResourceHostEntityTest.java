@@ -31,7 +31,6 @@ import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Template;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.Monitor;
-import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.registry.api.TemplateRegistry;
 
 import static junit.framework.Assert.assertTrue;
@@ -129,8 +128,10 @@ public class ResourceHostEntityTest
     @Test
     public void testDispose() throws Exception
     {
+        resourceHostEntity.init();
         resourceHostEntity.dispose();
 
+        verify( singleThreadExecutorService ).shutdown();
         verify( singleThreadExecutorService ).shutdown();
     }
 
@@ -193,21 +194,7 @@ public class ResourceHostEntityTest
         }
     }
 
-
-    @Test( expected = ResourceHostException.class )
-    public void testGetResourceHostMetric() throws Exception
-    {
-        resourceHostEntity.getHostMetric();
-
-        verify( monitor ).getResourceHostMetric( resourceHostEntity );
-
-        doThrow( new MonitorException( "" ) ).when( monitor ).getResourceHostMetric( resourceHostEntity );
-
-        resourceHostEntity.getHostMetric();
-    }
-
-
-    @Test
+   @Test
     public void testGetContainerHosts() throws Exception
     {
         resourceHostEntity.addContainerHost( containerHost );
