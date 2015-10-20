@@ -20,8 +20,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import javax.annotation.security.RolesAllowed;
-
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
@@ -46,6 +44,7 @@ import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Interface;
@@ -58,7 +57,6 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.Host;
-import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
@@ -748,7 +746,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             resourceHost.destroyContainerHost( host );
             ( ( ResourceHostEntity ) entity.getParent() ).removeContainerHost( entity );
 
-//            cleanupEnvironmentNetworkSettings( host.getEnvironmentId() );
+            //            cleanupEnvironmentNetworkSettings( host.getEnvironmentId() );
         }
         catch ( ResourceHostException e )
         {
@@ -1478,13 +1476,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @Override
     public void setVniDomain( final Long vni, final String domain,
-                              final DomainLoadBalanceStrategy domainLoadBalanceStrategy ) throws PeerException
+                              final DomainLoadBalanceStrategy domainLoadBalanceStrategy, final String sslCertPath )
+            throws PeerException
     {
         Integer vlan = getVlanByVni( vni );
 
         if ( vlan != null )
         {
-            getManagementHost().setVlanDomain( vlan, domain, domainLoadBalanceStrategy );
+            getManagementHost().setVlanDomain( vlan, domain, domainLoadBalanceStrategy, sslCertPath );
         }
         else
         {

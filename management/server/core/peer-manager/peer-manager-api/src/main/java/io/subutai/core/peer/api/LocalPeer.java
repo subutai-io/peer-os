@@ -152,10 +152,11 @@ public interface LocalPeer extends Peer
      * @param vni - vni
      * @param domain -  domain to assign
      * @param domainLoadBalanceStrategy - strategy to load balance requests to the domain
+     * @param sslCertPath - path to SSL certificate to enable HTTPS access to domai only, null if not needed
      */
 
-    public void setVniDomain( Long vni, String domain, DomainLoadBalanceStrategy domainLoadBalanceStrategy )
-            throws PeerException;
+    public void setVniDomain( Long vni, String domain, DomainLoadBalanceStrategy domainLoadBalanceStrategy,
+                              String sslCertPath ) throws PeerException;
 
     /**
      * Returns true if hostIp is added to domain by vni

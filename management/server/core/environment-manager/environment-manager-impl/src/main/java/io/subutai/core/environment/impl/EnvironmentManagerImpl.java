@@ -26,12 +26,12 @@ import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.Interface;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
-import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
@@ -595,7 +595,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     @Override
     public void assignEnvironmentDomain( final String environmentId, final String newDomain,
-                                         final DomainLoadBalanceStrategy domainLoadBalanceStrategy )
+                                         final DomainLoadBalanceStrategy domainLoadBalanceStrategy,
+                                         final String sslCertPath )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
@@ -606,7 +607,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
                 String.format( "Assigning environment %s domain", environmentId ) );
 
-        modifyEnvironmentDomain( environmentId, newDomain, domainLoadBalanceStrategy, operationTracker, true );
+        modifyEnvironmentDomain( environmentId, newDomain, domainLoadBalanceStrategy, operationTracker, true,
+                sslCertPath );
     }
 
 
@@ -619,13 +621,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
                 String.format( "Removing environment %s domain", environmentId ) );
 
-        modifyEnvironmentDomain( environmentId, null, null, operationTracker, true );
+        modifyEnvironmentDomain( environmentId, null, null, operationTracker, true, null );
     }
 
 
     public void modifyEnvironmentDomain( final String environmentId, final String domain,
                                          final DomainLoadBalanceStrategy domainLoadBalanceStrategy,
-                                         final TrackerOperation operationTracker, boolean checkAccess )
+                                         final TrackerOperation operationTracker, boolean checkAccess,
+                                         final String sslCertPath )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
@@ -641,7 +644,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
             else
             {
-                peerManager.getLocalPeer().setVniDomain( environment.getVni(), domain, domainLoadBalanceStrategy );
+                peerManager.getLocalPeer()
+                           .setVniDomain( environment.getVni(), domain, domainLoadBalanceStrategy, sslCertPath );
             }
 
             operationTracker.addLogDone( "Environment domain modified" );
