@@ -54,10 +54,9 @@ public interface EnvironmentManager
      * Imports environment based on a passed topology
      *
      * @param name - environment name
-     * @param topology - {@code Topology}
-     * //@param subnetCidr - subnet in CIDR-notation string, e.g. "192.168.0.1/16"
-     * @param ssh - optional ssh key content
-     * //@param async - indicates whether environment is created synchronously or asynchronously to the calling party
+     * @param topology - {@code Topology} //@param subnetCidr - subnet in CIDR-notation string, e.g. "192.168.0.1/16"
+     * @param ssh - optional ssh key content //@param async - indicates whether environment is created synchronously or
+     * asynchronously to the calling party
      *
      * @return - created environment
      *
@@ -204,9 +203,10 @@ public interface EnvironmentManager
      * @param environmentId - id of the environment to assign the passed domain to
      * @param newDomain - domain url
      * @param domainLoadBalanceStrategy - strategy to load balance requests to the domain
+     * @param sslCertPath - path to SSL certificate to enable HTTPS access to domai only, null if not needed
      */
     void assignEnvironmentDomain( String environmentId, String newDomain,
-                                  DomainLoadBalanceStrategy domainLoadBalanceStrategy )
+                                  DomainLoadBalanceStrategy domainLoadBalanceStrategy, String sslCertPath )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     /**

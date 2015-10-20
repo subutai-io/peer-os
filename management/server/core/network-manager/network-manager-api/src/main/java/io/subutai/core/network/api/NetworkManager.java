@@ -186,9 +186,10 @@ public interface NetworkManager
      *
      * @param vLanId - vlan id
      * @param domainLoadBalanceStrategy - strategy to load balance requests to the domain
+     * @param sslCertPath - path to SSL certificate to enable HTTPS access to domai only, null if not needed
      */
-    public void setVlanDomain( int vLanId, String domain, DomainLoadBalanceStrategy domainLoadBalanceStrategy )
-            throws NetworkManagerException;
+    public void setVlanDomain( int vLanId, String domain, DomainLoadBalanceStrategy domainLoadBalanceStrategy,
+                               String sslCertPath ) throws NetworkManagerException;
 
     /**
      * Checks if IP is in vlan reverse proxy domain
