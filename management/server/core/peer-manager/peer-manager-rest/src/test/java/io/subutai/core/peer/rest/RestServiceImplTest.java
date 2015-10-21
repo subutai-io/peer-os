@@ -115,7 +115,7 @@ public class RestServiceImplTest
         when( peer.getPeerInfo() ).thenReturn( peerInfo );
         when( peerInfo.getId() ).thenReturn( PEER_ID );
         when( peerManager.getPeerInfo( PEER_ID ) ).thenReturn( peerInfo );
-        when( restUtil.getTrustedWebClient( anyString() ) ).thenReturn( webClient );
+        when( restUtil.getTrustedWebClient( anyString(), any() ) ).thenReturn( webClient );
         when( webClient.type( anyString() ) ).thenReturn( webClient );
         when( peerManager.getLocalPeerInfo() ).thenReturn( peerInfo );
         when( jsonUtil.to( anyObject() ) ).thenReturn( JSON );
@@ -196,119 +196,6 @@ public class RestServiceImplTest
 //    }
 //
 
-    @Test
-    public void testProcessRegisterRequest() throws Exception
-    {
-
-        Response response = restService.processRegistrationRequest( JSON );
-
-        assertEquals( Response.Status.CONFLICT.getStatusCode(), response.getStatus() );
-
-        when( peerManager.getPeerInfo( PEER_ID ) ).thenReturn( null );
-
-        restService.processRegistrationRequest( JSON );
-
-        verify( peerManager ).register( peerInfo );
-
-        doThrow( peerException ).when( peerManager ).register( peerInfo );
-
-        response = restService.processRegistrationRequest( JSON );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus() );
-    }
-
-
-    @Test
-    public void testSendRegistrationRequest() throws Exception
-    {
-        restService.sendRegistrationRequest( IP );
-
-        verify( restService ).registerPeerCert( response );
-
-        when( response.getStatus() ).thenReturn( Response.Status.CONFLICT.getStatusCode() );
-
-        Response response1 = restService.sendRegistrationRequest( IP );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-        assertEquals( ENTITY, response1.getEntity() );
-
-        when( response.getStatus() ).thenReturn( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() );
-
-        response1 = restService.sendRegistrationRequest( IP );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-
-        doThrow( exception ).when( webClient ).path( anyString() );
-
-        response1 = restService.sendRegistrationRequest( IP );
-
-        assertEquals( exception.toString(), response1.getEntity() );
-    }
-
-
-    @Test
-    public void testRegisterPeerCert() throws Exception
-    {
-        doReturn( peerInfo ).when( jsonUtil ).from( anyString(), any( Type.class ) );
-
-        restService.registerPeerCert( response );
-
-        verify( peerManager ).register( peerInfo );
-
-        doThrow( peerException ).when( peerManager ).register( peerInfo );
-
-        restService.registerPeerCert( response );
-
-        verify( peerException ).printStackTrace( any( PrintStream.class ) );
-    }
-
-
-    @Test
-    public void testUnregisterPeer() throws Exception
-    {
-        when( peerManager.unregister( PEER_ID.toString() ) ).thenReturn( true );
-
-        restService.unregisterPeer( PEER_ID.toString() );
-
-        //verify( httpContextManager ).reloadTrustStore();
-
-        when( peerManager.unregister( PEER_ID.toString() ) ).thenReturn( false );
-
-        Response response1 = restService.unregisterPeer( PEER_ID.toString() );
-
-        assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response1.getStatus() );
-
-        doThrow( peerException ).when( peerManager ).unregister( PEER_ID.toString() );
-
-        response1 = restService.unregisterPeer( PEER_ID.toString() );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-    }
-
-
-    @Test
-    public void testRejectForRegistrationRequest() throws Exception
-    {
-        restService.rejectForRegistrationRequest( PEER_ID.toString() );
-
-        verify( peerManager ).update( peerInfo );
-    }
-
-
-    @Test
-    public void testRemoveRegistrationRequest() throws Exception
-    {
-        restService.removeRegistrationRequest( PEER_ID.toString() );
-
-        verify( peerManager ).unregister( PEER_ID.toString() );
-
-        doThrow( peerException ).when( peerManager ).unregister( PEER_ID.toString() );
-
-        Response response1 = restService.unregisterPeer( PEER_ID.toString() );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-    }
-
 
     @Test
     public void testApproveForRegistrationRequest() throws Exception
@@ -325,26 +212,6 @@ public class RestServiceImplTest
     }
 
 
-    @Test
-    public void testApproveForRegistrationRequest2() throws Exception
-    {
-        Response response1 = restService.approveForRegistrationRequest( PEER_ID.toString(), "HEXSTR" );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-
-        when( peerInfo.getStatus() ).thenReturn( PeerStatus.REQUESTED );
-        when( webClient.put( anyObject() ) ).thenReturn( response );
-
-        restService.approveForRegistrationRequest( PEER_ID.toString(), "HEXSTR" );
-
-        //verify( httpContextManager ).reloadTrustStore();
-
-        doThrow( exception ).when( peerManager ).update( peerInfo );
-
-        response1 = restService.approveForRegistrationRequest( PEER_ID.toString(), "HEXSTR" );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-    }
 
 
     @Test

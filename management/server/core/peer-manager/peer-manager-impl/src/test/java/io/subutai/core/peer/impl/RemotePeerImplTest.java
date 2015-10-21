@@ -158,7 +158,7 @@ public class RemotePeerImplTest
     {
         doThrow( httpException ).when( restUtil )
                                 .request( any( RestUtil.RequestType.class ), anyString(), anyString(), anyMap(),
-                                        anyMap() );
+                                        anyMap(), any() );
     }
 
 
@@ -168,7 +168,7 @@ public class RemotePeerImplTest
         remotePeer.request( RestUtil.RequestType.GET, PATH, ALIAS, params, headers );
 
         verify( restUtil )
-                .request( eq( RestUtil.RequestType.GET ), anyString(), eq( ALIAS ), eq( params ), eq( headers ) );
+                .request( eq( RestUtil.RequestType.GET ), anyString(), eq( ALIAS ), eq( params ), eq( headers ), any() );
     }
 
 
@@ -179,7 +179,7 @@ public class RemotePeerImplTest
         remotePeer.get( PATH, ALIAS, params, headers );
 
         verify( restUtil )
-                .request( eq( RestUtil.RequestType.GET ), anyString(), eq( ALIAS ), eq( params ), eq( headers ) );
+                .request( eq( RestUtil.RequestType.GET ), anyString(), eq( ALIAS ), eq( params ), eq( headers ), any() );
     }
 
 
@@ -189,7 +189,7 @@ public class RemotePeerImplTest
         remotePeer.post( PATH, ALIAS, params, headers );
 
         verify( restUtil )
-                .request( eq( RestUtil.RequestType.POST ), anyString(), eq( ALIAS ), eq( params ), eq( headers ) );
+                .request( eq( RestUtil.RequestType.POST ), anyString(), eq( ALIAS ), eq( params ), eq( headers ), any() );
     }
 
 
@@ -199,7 +199,7 @@ public class RemotePeerImplTest
         remotePeer.delete( PATH, ALIAS, params, headers );
 
         verify( restUtil )
-                .request( eq( RestUtil.RequestType.DELETE ), anyString(), eq( ALIAS ), eq( params ), eq( headers ) );
+                .request( eq( RestUtil.RequestType.DELETE ), anyString(), eq( ALIAS ), eq( params ), eq( headers ), any() );
     }
 
 
@@ -768,7 +768,7 @@ public class RemotePeerImplTest
     {
         remotePeer.getGateways();
 
-        verify( restUtil ).request( eq( RestUtil.RequestType.GET ), anyString(), anyString(), anyMap(), anyMap() );
+        verify( restUtil ).request( eq( RestUtil.RequestType.GET ), anyString(), anyString(), anyMap(), anyMap(), any() );
 
         throwException();
 
@@ -781,7 +781,7 @@ public class RemotePeerImplTest
     {
         remotePeer.getReservedVnis();
 
-        verify( restUtil ).request( eq( RestUtil.RequestType.GET ), anyString(), anyString(), anyMap(), anyMap() );
+        verify( restUtil ).request( eq( RestUtil.RequestType.GET ), anyString(), anyString(), anyMap(), anyMap(), any() );
 
         throwException();
 
