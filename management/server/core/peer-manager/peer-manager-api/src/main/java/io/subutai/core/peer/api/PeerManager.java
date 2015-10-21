@@ -4,12 +4,10 @@ package io.subutai.core.peer.api;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.security.RolesAllowed;
-
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.peer.RegistrationRequest;
+import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.protocol.N2NConfig;
 
 
@@ -35,9 +33,9 @@ public interface PeerManager
      */
     public List<PeerInfo> getPeerInfos();
 
-    void doUnregisterRequest( RegistrationRequest request ) throws PeerException;
+    void doUnregisterRequest( RegistrationData request ) throws PeerException;
 
-    List<RegistrationRequest> getRegistrationRequests();
+    List<RegistrationData> getRegistrationRequests();
 
     /**
      * Returns local peer's metadata
@@ -80,21 +78,21 @@ public interface PeerManager
 
     void doRegistrationRequest( String destinationHost, String keyPhrase ) throws PeerException;
 
-    void doApproveRequest( RegistrationRequest request ) throws PeerException;
+    void doApproveRequest( RegistrationData request ) throws PeerException;
 
-    void doRejectRequest( RegistrationRequest request ) throws PeerException;
+    void doRejectRequest( RegistrationData request ) throws PeerException;
 
-    void doCancelRequest( RegistrationRequest request ) throws PeerException;
+    void doCancelRequest( RegistrationData request ) throws PeerException;
 
-    void processCancelRequest( RegistrationRequest registrationRequest ) throws PeerException;
+    void processCancelRequest( RegistrationData registrationData ) throws PeerException;
 
-    RegistrationRequest processApproveRequest( RegistrationRequest registrationRequest ) throws PeerException;
+    RegistrationData processApproveRequest( RegistrationData registrationData ) throws PeerException;
 
-    RegistrationRequest processRegistrationRequest( RegistrationRequest registrationRequest ) throws PeerException;
+    RegistrationData processRegistrationRequest( RegistrationData registrationData ) throws PeerException;
 
-    void processUnregisterRequest( RegistrationRequest registrationRequest ) throws PeerException;
+    void processUnregisterRequest( RegistrationData registrationData ) throws PeerException;
 
-    void processRejectRequest( RegistrationRequest registrationRequest ) throws PeerException;
+    void processRejectRequest( RegistrationData registrationData ) throws PeerException;
 
     @Deprecated
     boolean register( PeerInfo remotePeerInfo ) throws PeerException;

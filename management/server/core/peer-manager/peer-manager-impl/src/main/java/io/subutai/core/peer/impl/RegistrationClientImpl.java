@@ -7,7 +7,7 @@ import javax.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.RegistrationRequest;
+import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.peer.api.RegistrationClient;
 
@@ -29,20 +29,20 @@ public class RegistrationClientImpl implements RegistrationClient
 
 
     @Override
-    public RegistrationRequest sendInitRequest( final String destinationHost,
-                                                final RegistrationRequest registrationRequest ) throws PeerException
+    public RegistrationData sendInitRequest( final String destinationHost,
+                                                final RegistrationData registrationData ) throws PeerException
     {
         WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "/register" ), provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        return client.post( registrationRequest, RegistrationRequest.class );
+        return client.post( registrationData, RegistrationData.class );
     }
 
 
     @Override
-    public void sendCancelRequest( String destinationHost, final RegistrationRequest registrationRequest )
+    public void sendCancelRequest( String destinationHost, final RegistrationData registrationData )
             throws PeerException
     {
         WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "/cancel" ), provider );
@@ -50,7 +50,7 @@ public class RegistrationClientImpl implements RegistrationClient
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        Response response = client.post( registrationRequest );
+        Response response = client.post( registrationData );
         if ( response.getStatus() != Response.Status.NO_CONTENT.getStatusCode() )
         {
             throw new PeerException(
@@ -60,7 +60,7 @@ public class RegistrationClientImpl implements RegistrationClient
 
 
     @Override
-    public void sendRejectRequest( final String destinationHost, final RegistrationRequest registrationRequest )
+    public void sendRejectRequest( final String destinationHost, final RegistrationData registrationData )
             throws PeerException
     {
         WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "/reject" ), provider );
@@ -68,7 +68,7 @@ public class RegistrationClientImpl implements RegistrationClient
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        Response response = client.post( registrationRequest );
+        Response response = client.post( registrationData );
         if ( response.getStatus() != Response.Status.NO_CONTENT.getStatusCode() )
         {
             throw new PeerException(
@@ -78,7 +78,7 @@ public class RegistrationClientImpl implements RegistrationClient
 
 
     @Override
-    public void sendUnregisterRequest( final String destinationHost, final RegistrationRequest registrationRequest )
+    public void sendUnregisterRequest( final String destinationHost, final RegistrationData registrationData )
             throws PeerException
     {
         WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "/unregister" ), provider );
@@ -86,7 +86,7 @@ public class RegistrationClientImpl implements RegistrationClient
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        Response response = client.post( registrationRequest );
+        Response response = client.post( registrationData );
         if ( response.getStatus() != Response.Status.NO_CONTENT.getStatusCode() )
         {
             throw new PeerException( "Error on sending un-register request: " + response.getEntity().toString() );
@@ -95,15 +95,15 @@ public class RegistrationClientImpl implements RegistrationClient
 
 
     @Override
-    public RegistrationRequest sendApproveRequest( String destinationHost,
-                                                   final RegistrationRequest registrationRequest ) throws PeerException
+    public RegistrationData sendApproveRequest( String destinationHost,
+                                                   final RegistrationData registrationData ) throws PeerException
     {
         WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "/approve" ), provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        return client.post( registrationRequest, RegistrationRequest.class );
+        return client.post( registrationData, RegistrationData.class );
     }
 
 

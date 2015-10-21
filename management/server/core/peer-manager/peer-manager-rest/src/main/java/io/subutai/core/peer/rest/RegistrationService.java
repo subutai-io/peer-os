@@ -7,7 +7,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import io.subutai.common.peer.RegistrationRequest;
+import io.subutai.common.peer.RegistrationData;
 
 
 /**
@@ -19,29 +19,29 @@ public interface RegistrationService
     @POST
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    RegistrationRequest processRegistrationRequest( RegistrationRequest registrationRequest );
+    RegistrationData processRegistrationRequest( RegistrationData registrationData );
 
     @Path( "/cancel" )
     @POST
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    void processCancelRequest( RegistrationRequest registrationRequest );
+    void processCancelRequest( RegistrationData registrationData );
 
     @Path( "/reject" )
     @POST
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    void processRejectRequest( RegistrationRequest registrationRequest );
+    void processRejectRequest( RegistrationData registrationData );
 
     @Path( "/approve" )
     @POST
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    RegistrationRequest processApproveRequest( RegistrationRequest registrationRequest );
+    RegistrationData processApproveRequest( RegistrationData registrationData );
 
     @Path( "/unregister" )
     @POST
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    void processUnregisterRequest( RegistrationRequest registrationRequest );
+    void processUnregisterRequest( RegistrationData registrationData );
 }

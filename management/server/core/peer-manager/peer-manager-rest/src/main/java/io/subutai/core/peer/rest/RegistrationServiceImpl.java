@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.RegistrationRequest;
+import io.subutai.common.peer.RegistrationData;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -17,7 +17,7 @@ import io.subutai.core.peer.api.PeerManager;
  */
 public class RegistrationServiceImpl implements RegistrationService
 {
-    private static Logger LOG = LoggerFactory.getLogger( RegistrationRequest.class );
+    private static Logger LOG = LoggerFactory.getLogger( RegistrationData.class );
 
     private PeerManager peerManager;
 
@@ -29,11 +29,11 @@ public class RegistrationServiceImpl implements RegistrationService
 
 
     @Override
-    public RegistrationRequest processRegistrationRequest( final RegistrationRequest registrationRequest )
+    public RegistrationData processRegistrationRequest( final RegistrationData registrationData )
     {
         try
         {
-            return peerManager.processRegistrationRequest( registrationRequest );
+            return peerManager.processRegistrationRequest( registrationData );
         }
         catch ( PeerException e )
         {
@@ -45,11 +45,11 @@ public class RegistrationServiceImpl implements RegistrationService
 
 
     @Override
-    public void processCancelRequest( final RegistrationRequest registrationRequest )
+    public void processCancelRequest( final RegistrationData registrationData )
     {
         try
         {
-            peerManager.processCancelRequest( registrationRequest );
+            peerManager.processCancelRequest( registrationData );
         }
         catch ( PeerException e )
         {
@@ -61,11 +61,11 @@ public class RegistrationServiceImpl implements RegistrationService
 
 
     @Override
-    public void processRejectRequest( final RegistrationRequest registrationRequest )
+    public void processRejectRequest( final RegistrationData registrationData )
     {
         try
         {
-            peerManager.processRejectRequest( registrationRequest );
+            peerManager.processRejectRequest( registrationData );
         }
         catch ( PeerException e )
         {
@@ -77,11 +77,11 @@ public class RegistrationServiceImpl implements RegistrationService
 
 
     @Override
-    public RegistrationRequest processApproveRequest( final RegistrationRequest registrationRequest )
+    public RegistrationData processApproveRequest( final RegistrationData registrationData )
     {
         try
         {
-            return peerManager.processApproveRequest( registrationRequest );
+            return peerManager.processApproveRequest( registrationData );
         }
         catch ( PeerException e )
         {
@@ -93,11 +93,11 @@ public class RegistrationServiceImpl implements RegistrationService
 
 
     @Override
-    public void processUnregisterRequest( final RegistrationRequest registrationRequest )
+    public void processUnregisterRequest( final RegistrationData registrationData )
     {
         try
         {
-            peerManager.processUnregisterRequest( registrationRequest );
+            peerManager.processUnregisterRequest( registrationData );
         }
         catch ( PeerException e )
         {

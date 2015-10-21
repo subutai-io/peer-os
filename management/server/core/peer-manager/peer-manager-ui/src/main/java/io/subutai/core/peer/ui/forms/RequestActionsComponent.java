@@ -5,8 +5,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.UI;
 
-import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.peer.RegistrationRequest;
+import io.subutai.common.peer.RegistrationData;
 import io.subutai.core.peer.ui.PeerManagerPortalModule;
 
 
@@ -15,16 +14,16 @@ public class RequestActionsComponent extends HorizontalLayout
     private Button positiveButton;
     private Button negativeButton;
     private Button managePolicyButton;
-    private RegistrationRequest registrationRequest;
+    private RegistrationData registrationData;
     private RequestActionListener listener;
 
 
     public interface RequestActionListener
     {
-        public void OnPositiveButtonTrigger( RegistrationRequest request,
+        public void OnPositiveButtonTrigger( RegistrationData request,
                                              RequestUpdateViewListener updateViewListener );
 
-        public void OnNegativeButtonTrigger( RegistrationRequest request,
+        public void OnNegativeButtonTrigger( RegistrationData request,
                                              RequestUpdateViewListener updateViewListener );
     }
 
@@ -35,11 +34,11 @@ public class RequestActionsComponent extends HorizontalLayout
     }
 
 
-    public RequestActionsComponent( final PeerManagerPortalModule module, RegistrationRequest request,
+    public RequestActionsComponent( final PeerManagerPortalModule module, RegistrationData request,
                                     RequestActionListener callback )
     {
         this.listener = callback;
-        this.registrationRequest = request;
+        this.registrationData = request;
         positiveButton = new Button();
         negativeButton = new Button();
         managePolicyButton = new Button( "Manage Policy" );
@@ -51,7 +50,7 @@ public class RequestActionsComponent extends HorizontalLayout
             {
                 if ( listener != null )
                 {
-                    listener.OnPositiveButtonTrigger( registrationRequest, new RequestUpdateViewListener()
+                    listener.OnPositiveButtonTrigger( registrationData, new RequestUpdateViewListener()
                     {
                         @Override
                         public void updateViewCallback()
@@ -70,7 +69,7 @@ public class RequestActionsComponent extends HorizontalLayout
             {
                 if ( listener != null )
                 {
-                    listener.OnNegativeButtonTrigger( registrationRequest, new RequestUpdateViewListener()
+                    listener.OnNegativeButtonTrigger( registrationData, new RequestUpdateViewListener()
                     {
                         @Override
                         public void updateViewCallback()
@@ -89,7 +88,7 @@ public class RequestActionsComponent extends HorizontalLayout
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
                 PolicyManagerWindow policyManagerWindow =
-                        new PolicyManagerWindow( module.getPeerManager(), registrationRequest.getPeerInfo() );
+                        new PolicyManagerWindow( module.getPeerManager(), registrationData.getPeerInfo() );
                 UI.getCurrent().addWindow( policyManagerWindow );
             }
         } );
@@ -104,7 +103,7 @@ public class RequestActionsComponent extends HorizontalLayout
         removeComponent( negativeButton );
         removeComponent( managePolicyButton );
 
-        switch ( this.registrationRequest.getStatus() )
+        switch ( this.registrationData.getStatus() )
         {
             case REQUESTED:
                 positiveButton.setCaption( "Approve" );

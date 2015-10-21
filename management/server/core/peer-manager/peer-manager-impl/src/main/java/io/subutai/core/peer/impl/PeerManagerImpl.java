@@ -35,9 +35,10 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
-import io.subutai.common.peer.RegistrationRequest;
+import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.N2NUtil;
 import io.subutai.core.messenger.api.Messenger;
 import io.subutai.core.peer.api.LocalPeer;
@@ -72,7 +73,7 @@ public class PeerManagerImpl implements PeerManager
     private DaoManager daoManager;
     private SecurityManager securityManager;
     private Object provider;
-    private Map<String, RegistrationRequest> registrationRequests = new ConcurrentHashMap<>();
+    private Map<String, RegistrationData> registrationRequests = new ConcurrentHashMap<>();
 
 
     public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
@@ -124,13 +125,19 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    private boolean register( final RegistrationRequest registrationRequest )
+    private boolean register( final RegistrationData registrationData )
     {
         //TODO: handle x509 certificate
+        registrationData.getPeerInfo().setKeyPhrase( registrationData.getKeyPhrase() );
 
-        registrationRequest.getPeerInfo().setKeyPhrase( registrationRequest.getKeyPhrase() );
-        return peerDAO.saveInfo( SOURCE_REMOTE_PEER, registrationRequest.getPeerInfo().getId(),
-                registrationRequest.getPeerInfo() );
+        String rootCertPx2 = registrationData.getCert();
+
+        securityManager.getKeyStoreManager()
+                       .importCertAsTrusted( ChannelSettings.SECURE_PORT_X2, registrationData.getPeerInfo().getId(),
+                               rootCertPx2 );
+
+        return peerDAO
+                .saveInfo( SOURCE_REMOTE_PEER, registrationData.getPeerInfo().getId(), registrationData.getPeerInfo() );
     }
 
 
@@ -185,10 +192,10 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    public boolean unregister( final RegistrationRequest registrationRequest ) throws PeerException
+    public boolean unregister( final RegistrationData registrationData ) throws PeerException
     {
         ManagementHost mgmHost = getLocalPeer().getManagementHost();
-        PeerInfo p = getPeerInfo( registrationRequest.getPeerInfo().getId() );
+        PeerInfo p = getPeerInfo( registrationData.getPeerInfo().getId() );
         //
         //        if ( !p.getKeyPhrase().equals( registrationRequest.getPeerInfo().getKeyPhrase() ) )
         //        {
@@ -396,61 +403,70 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    private void addRequest( final RegistrationRequest registrationRequest )
+    private void addRequest( final RegistrationData registrationData )
     {
-        this.registrationRequests.put( registrationRequest.getPeerInfo().getId(), registrationRequest );
+        this.registrationRequests.put( registrationData.getPeerInfo().getId(), registrationData );
     }
 
 
-    private void removeRequest( final RegistrationRequest registrationRequest )
+    private void removeRequest( final RegistrationData registrationData )
     {
-        this.registrationRequests.remove( registrationRequest.getPeerInfo().getId() );
-    }
-
-
-    @Override
-    public RegistrationRequest processRegistrationRequest( final RegistrationRequest registrationRequest )
-            throws PeerException
-    {
-        addRequest( registrationRequest );
-        return new RegistrationRequest( getLocalPeerInfo(), registrationRequest.getKeyPhrase(),
-                RegistrationStatus.WAIT );
+        this.registrationRequests.remove( registrationData.getPeerInfo().getId() );
     }
 
 
     @Override
-    public void processUnregisterRequest( final RegistrationRequest registrationRequest ) throws PeerException
+    public RegistrationData processRegistrationRequest( final RegistrationData registrationData ) throws PeerException
     {
-        removeRequest( registrationRequest );
-        unregister( registrationRequest );
+        addRequest( registrationData );
+        return new RegistrationData( getLocalPeerInfo(), registrationData.getKeyPhrase(), RegistrationStatus.WAIT );
     }
 
 
     @Override
-    public void processRejectRequest( final RegistrationRequest registrationRequest ) throws PeerException
+    public void processUnregisterRequest( final RegistrationData registrationData ) throws PeerException
     {
-        removeRequest( registrationRequest );
+        removeRequest( registrationData );
+        unregister( registrationData );
     }
 
 
     @Override
-    public void processCancelRequest( final RegistrationRequest registrationRequest ) throws PeerException
+    public void processRejectRequest( final RegistrationData registrationData ) throws PeerException
     {
-        removeRequest( registrationRequest );
+        removeRequest( registrationData );
     }
 
 
     @Override
-    public RegistrationRequest processApproveRequest( final RegistrationRequest registrationRequest )
-            throws PeerException
+    public void processCancelRequest( final RegistrationData registrationData ) throws PeerException
     {
-        //todo: import x509 cert
-        final RegistrationRequest result =
-                new RegistrationRequest( getLocalPeerInfo(), registrationRequest.getKeyPhrase(),
-                        RegistrationStatus.APPROVED );
-        //todo:add certs
-        register( registrationRequest );
-        removeRequest( registrationRequest );
+        removeRequest( registrationData );
+    }
+
+
+    @Override
+    public RegistrationData processApproveRequest( final RegistrationData registrationData ) throws PeerException
+    {
+        register( registrationData );
+        removeRequest( registrationData );
+
+        return buildRegistrationData( registrationData.getKeyPhrase(), RegistrationStatus.APPROVED );
+    }
+
+
+    private RegistrationData buildRegistrationData( final String keyPhrase, RegistrationStatus status )
+    {
+        RegistrationData result = new RegistrationData( getLocalPeerInfo(), keyPhrase, status );
+        switch ( status )
+        {
+            case APPROVED:
+                String cert =
+                        securityManager.getKeyStoreManager().exportCertificate( ChannelSettings.SECURE_PORT_X2, "" );
+
+                result.setCert( cert );
+                break;
+        }
         return result;
     }
 
@@ -459,37 +475,34 @@ public class PeerManagerImpl implements PeerManager
     public void doRegistrationRequest( final String destinationHost, final String keyPhrase ) throws PeerException
     {
         RegistrationClient registrationClient = new RegistrationClientImpl( provider );
-        final RegistrationRequest registrationRequest =
-                new RegistrationRequest( localPeer.getPeerInfo(), keyPhrase, RegistrationStatus.REQUESTED );
-        RegistrationRequest result = registrationClient.sendInitRequest( destinationHost, registrationRequest );
+
+        RegistrationData result =
+                registrationClient.sendInitRequest( destinationHost, buildRegistrationData( keyPhrase,
+                        RegistrationStatus.REQUESTED ) );
 
         addRequest( result );
     }
 
 
     @Override
-    public void doCancelRequest( final RegistrationRequest request ) throws PeerException
+    public void doCancelRequest( final RegistrationData request ) throws PeerException
     {
         RegistrationClient registrationClient = new RegistrationClientImpl( provider );
 
-        RegistrationRequest r = new RegistrationRequest( localPeer.getPeerInfo(), request.getKeyPhrase(),
-                RegistrationStatus.CANCELLED );
-        registrationClient.sendCancelRequest( request.getPeerInfo().getIp(), r );
+        registrationClient.sendCancelRequest( request.getPeerInfo().getIp(),
+                buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.CANCELLED ) );
 
         removeRequest( request );
     }
 
 
     @Override
-    public void doApproveRequest( final RegistrationRequest request ) throws PeerException
+    public void doApproveRequest( final RegistrationData request ) throws PeerException
     {
         RegistrationClient registrationClient = new RegistrationClientImpl( provider );
-        final RegistrationRequest approveRequest =
-                new RegistrationRequest( localPeer.getPeerInfo(), request.getKeyPhrase(), RegistrationStatus.APPROVED );
 
-        //TODO: attache local x509 sert
-        RegistrationRequest response =
-                registrationClient.sendApproveRequest( request.getPeerInfo().getIp(), approveRequest );
+        RegistrationData response = registrationClient.sendApproveRequest( request.getPeerInfo().getIp(),
+                buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.APPROVED ) );
 
         register( response );
         removeRequest( request );
@@ -497,26 +510,23 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public void doRejectRequest( final RegistrationRequest request ) throws PeerException
+    public void doRejectRequest( final RegistrationData request ) throws PeerException
     {
         RegistrationClient registrationClient = new RegistrationClientImpl( provider );
 
-        final RegistrationRequest rejectRequest =
-                new RegistrationRequest( localPeer.getPeerInfo(), request.getKeyPhrase(), RegistrationStatus.REJECTED );
-        registrationClient.sendRejectRequest( request.getPeerInfo().getIp(), rejectRequest );
+        registrationClient.sendRejectRequest( request.getPeerInfo().getIp(),
+                buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.REJECTED ) );
 
         removeRequest( request );
     }
 
 
     @Override
-    public void doUnregisterRequest( final RegistrationRequest request ) throws PeerException
+    public void doUnregisterRequest( final RegistrationData request ) throws PeerException
     {
         RegistrationClient registrationClient = new RegistrationClientImpl( provider );
-        final RegistrationRequest unregisterRequest =
-                new RegistrationRequest( localPeer.getPeerInfo(), request.getKeyPhrase(),
-                        RegistrationStatus.UNREGISTERED );
-        registrationClient.sendUnregisterRequest( request.getPeerInfo().getIp(), unregisterRequest );
+        registrationClient.sendUnregisterRequest( request.getPeerInfo().getIp(),
+                buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.UNREGISTERED ) );
 
         unregister( request );
 
@@ -525,14 +535,14 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public List<RegistrationRequest> getRegistrationRequests()
+    public List<RegistrationData> getRegistrationRequests()
     {
-        List<RegistrationRequest> r = new ArrayList<>( registrationRequests.values() );
+        List<RegistrationData> r = new ArrayList<>( registrationRequests.values() );
         for ( Peer peer : getPeers() )
         {
             if ( !peer.getId().equals( getLocalPeerInfo().getId() ) )
             {
-                r.add( new RegistrationRequest( peer.getPeerInfo(), peer.getPeerInfo().getKeyPhrase(),
+                r.add( new RegistrationData( peer.getPeerInfo(), peer.getPeerInfo().getKeyPhrase(),
                         RegistrationStatus.APPROVED ) );
             }
         }

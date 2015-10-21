@@ -72,12 +72,12 @@ public class RemotePeerMessageSender implements Callable<Boolean>
                 {
                     case ChannelSettings.OPEN_PORT:
                     case ChannelSettings.SPECIAL_PORT_X1:
-                        url = String.format( "http://%s:%d/cxf/messenger/message", targetPeerIP, targetPeerPort );
+                        url = String.format( "http://%s:%d/rest/messenger/message", targetPeerIP, targetPeerPort );
                         break;
                     case ChannelSettings.SECURE_PORT_X1:
                     case ChannelSettings.SECURE_PORT_X2:
                     case ChannelSettings.SECURE_PORT_X3:
-                        url = String.format( "https://%s:%d/cxf/messenger/message", targetPeerIP, targetPeerPort );
+                        url = String.format( "https://%s:%d/rest/messenger/message", targetPeerIP, targetPeerPort );
                         break;
                 }
 

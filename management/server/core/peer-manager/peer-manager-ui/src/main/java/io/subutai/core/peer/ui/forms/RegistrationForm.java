@@ -23,7 +23,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.peer.RegistrationRequest;
+import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.peer.ui.PeerManagerPortalModule;
@@ -118,7 +118,7 @@ public class RegistrationForm extends CustomComponent
         // requestsTable
         requestsTable = new Table();
 
-        requestsTable.setCaption( "Peers on registration state" );
+        requestsTable.setCaption( "List of remote peers" );
 
         requestsTable.setImmediate( true );
         //        requestsTable.setHeight( "283px" );
@@ -159,14 +159,14 @@ public class RegistrationForm extends CustomComponent
     {
 
         requestsTable.removeAllItems();
-        for ( RegistrationRequest registrationRequest : module.getPeerManager().getRegistrationRequests() )
+        for ( RegistrationData registrationData : module.getPeerManager().getRegistrationRequests() )
         {
-            LOG.debug( registrationRequest.getPeerInfo().getIp() );
+            LOG.debug( registrationData.getPeerInfo().getIp() );
             RequestActionsComponent.RequestActionListener listener = new RequestActionsComponent.RequestActionListener()
 
             {
                 @Override
-                public void OnPositiveButtonTrigger( final RegistrationRequest request,
+                public void OnPositiveButtonTrigger( final RegistrationData request,
                                                      RequestActionsComponent.RequestUpdateViewListener
                                                              updateViewListener )
                 {
@@ -175,7 +175,7 @@ public class RegistrationForm extends CustomComponent
 
 
                 @Override
-                public void OnNegativeButtonTrigger( final RegistrationRequest request,
+                public void OnNegativeButtonTrigger( final RegistrationData request,
                                                      RequestActionsComponent.RequestUpdateViewListener
                                                              updateViewListener )
                 {
@@ -183,17 +183,17 @@ public class RegistrationForm extends CustomComponent
                 }
             };
             RequestActionsComponent actionsComponent =
-                    new RequestActionsComponent( module, registrationRequest, listener );
+                    new RequestActionsComponent( module, registrationData, listener );
             requestsTable.addItem( new Object[] {
-                    registrationRequest.getPeerInfo().getId(), registrationRequest.getPeerInfo().getName(),
-                    registrationRequest.getPeerInfo().getIp(), registrationRequest.getKeyPhrase(),
-                    registrationRequest.getStatus(), actionsComponent
-            }, registrationRequest.getPeerInfo().getId() );
+                    registrationData.getPeerInfo().getId(), registrationData.getPeerInfo().getName(),
+                    registrationData.getPeerInfo().getIp(), registrationData.getKeyPhrase(),
+                    registrationData.getStatus(), actionsComponent
+            }, registrationData.getPeerInfo().getId() );
         }
     }
 
 
-    private void positiveActionTrigger( final RegistrationRequest request,
+    private void positiveActionTrigger( final RegistrationData request,
                                         final RequestActionsComponent.RequestUpdateViewListener updateViewListener )
     {
         switch ( request.getStatus() )
@@ -210,7 +210,7 @@ public class RegistrationForm extends CustomComponent
     }
 
 
-    private void negativeActionTrigger( final RegistrationRequest request,
+    private void negativeActionTrigger( final RegistrationData request,
                                         final RequestActionsComponent.RequestUpdateViewListener updateViewListener )
     {
         PeerInfo selfPeer = module.getPeerManager().getLocalPeerInfo();
@@ -244,7 +244,7 @@ public class RegistrationForm extends CustomComponent
     }
 
 
-    private void unregisterMeFromRemote( final RegistrationRequest request,
+    private void unregisterMeFromRemote( final RegistrationData request,
                                          final RequestActionsComponent.RequestUpdateViewListener updateViewListener )
     {
         int relationExists = 0;
@@ -329,7 +329,7 @@ public class RegistrationForm extends CustomComponent
     }
 
 
-    private void unregisterPeerRequestThread( final RegistrationRequest request,
+    private void unregisterPeerRequestThread( final RegistrationData request,
                                               final RequestActionsComponent.RequestUpdateViewListener
                                                       updateViewListener )
     {
@@ -345,7 +345,7 @@ public class RegistrationForm extends CustomComponent
     }
 
 
-    private void unregister( final RegistrationRequest request,
+    private void unregister( final RegistrationData request,
                              final RequestActionsComponent.RequestUpdateViewListener updateViewListener )
     {
         try
@@ -360,7 +360,7 @@ public class RegistrationForm extends CustomComponent
     }
 
 
-    private void approvePeerRegistration( final RegistrationRequest request,
+    private void approvePeerRegistration( final RegistrationData request,
                                           final RequestActionsComponent.RequestUpdateViewListener updateViewListener )
     {
         new Thread( new Runnable()
@@ -375,7 +375,7 @@ public class RegistrationForm extends CustomComponent
     }
 
 
-    private void approveRegistrationRequest( final RegistrationRequest request,
+    private void approveRegistrationRequest( final RegistrationData request,
                                              final RequestActionsComponent.RequestUpdateViewListener
                                                      updateViewListener )
     {
@@ -396,7 +396,7 @@ public class RegistrationForm extends CustomComponent
      * @param request - registration request
      * @param updateViewListener - used to update peers table with relevant buttons captions
      */
-    private void rejectRegistration( final RegistrationRequest request,
+    private void rejectRegistration( final RegistrationData request,
                                      final RequestActionsComponent.RequestUpdateViewListener updateViewListener )
     {
         new Thread( new Runnable()
@@ -418,7 +418,7 @@ public class RegistrationForm extends CustomComponent
     }
 
 
-    private void cancelRegistration( final RegistrationRequest request,
+    private void cancelRegistration( final RegistrationData request,
                                      final RequestActionsComponent.RequestUpdateViewListener updateViewListener )
     {
         new Thread( new Runnable()

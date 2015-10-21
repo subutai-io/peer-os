@@ -2,8 +2,7 @@ package io.subutai.core.peer.api;
 
 
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.peer.RegistrationRequest;
+import io.subutai.common.peer.RegistrationData;
 
 
 /**
@@ -12,15 +11,15 @@ import io.subutai.common.peer.RegistrationRequest;
 public interface RegistrationClient
 {
 
-    RegistrationRequest sendInitRequest( String destinationHost, RegistrationRequest registrationRequest )
+    RegistrationData sendInitRequest( String destinationHost, RegistrationData registrationData )
             throws PeerException;
 
-    void sendCancelRequest( String destinationHost, RegistrationRequest request ) throws PeerException;
+    void sendCancelRequest( String destinationHost, RegistrationData request ) throws PeerException;
 
-    void sendRejectRequest( String destinationHost, RegistrationRequest request ) throws PeerException;
+    void sendRejectRequest( String destinationHost, RegistrationData request ) throws PeerException;
 
-    void sendUnregisterRequest( String destinationHost, RegistrationRequest request ) throws PeerException;
+    void sendUnregisterRequest( String destinationHost, RegistrationData request ) throws PeerException;
 
-    RegistrationRequest sendApproveRequest( String destinationHost, RegistrationRequest registrationRequest )
+    RegistrationData sendApproveRequest( String destinationHost, RegistrationData registrationData )
             throws PeerException;
 }

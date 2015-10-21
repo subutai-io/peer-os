@@ -1,13 +1,10 @@
 package io.subutai.common.peer;
 
 
-import java.util.UUID;
-
-
 /**
- * Created by tzhamakeev on 10/19/15.
+ * Registration DTO
  */
-public class RegistrationRequest
+public class RegistrationData
 {
     private PeerInfo peerInfo;
     private String keyPhrase;
@@ -15,12 +12,12 @@ public class RegistrationRequest
     private RegistrationStatus status;
 
 
-    public RegistrationRequest()
+    public RegistrationData()
     {
     }
 
 
-    public RegistrationRequest( final PeerInfo peerInfo, final String keyPhrase, final RegistrationStatus status )
+    public RegistrationData( final PeerInfo peerInfo, final String keyPhrase, final RegistrationStatus status )
     {
         this.peerInfo = peerInfo;
         this.keyPhrase = keyPhrase;
