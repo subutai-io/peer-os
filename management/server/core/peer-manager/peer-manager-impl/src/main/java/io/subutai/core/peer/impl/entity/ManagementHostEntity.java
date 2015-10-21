@@ -136,11 +136,12 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
     @Override
     public void setVlanDomain( final int vlan, final String domain,
-                               final DomainLoadBalanceStrategy domainLoadBalanceStrategy ) throws PeerException
+                               final DomainLoadBalanceStrategy domainLoadBalanceStrategy, final String sslCertPath )
+            throws PeerException
     {
         try
         {
-            getNetworkManager().setVlanDomain( vlan, domain, domainLoadBalanceStrategy );
+            getNetworkManager().setVlanDomain( vlan, domain, domainLoadBalanceStrategy, sslCertPath );
         }
         catch ( NetworkManagerException e )
         {
