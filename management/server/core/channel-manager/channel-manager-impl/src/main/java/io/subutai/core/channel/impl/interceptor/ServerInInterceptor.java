@@ -57,7 +57,8 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
                 String basePath = url.getPath();
                 int status = 0;
 
-                status = MessageContentUtil.checkUrlAccessibility( status, url, basePath );
+//                status = MessageContentUtil.checkUrlAccessibility( status, url, basePath );
+                status = 0;
                 //----------------------------------------------------------------------------------------------
                 //--------------- if error occurs --------------------------------------------------------------
                 if ( status != 0 )

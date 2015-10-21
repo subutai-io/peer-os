@@ -1,6 +1,8 @@
 package io.subutai.core.peer.rest;
 
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -16,6 +18,7 @@ import javax.ws.rs.core.Response;
 
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
+import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.N2NConfig;
 
 //todo please check all endpoints for returned media type, do we return correct type if we just return response code
@@ -24,21 +27,20 @@ import io.subutai.common.protocol.N2NConfig;
 
 public interface RestService
 {
+    //    @GET
+    //    @Path( "me" )
+    //    @Produces( { MediaType.APPLICATION_JSON } )
+    //    public Response getLocalPeerInfo();
+
     @GET
-    @Path( "me" )
+    @Path( "/info" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getLocalPeerInfo();
-
-
-    @GET
-    @Path( "id" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    public String getId();
+    public PeerInfo getPeerInfo();
 
     @GET
     @Path( "registered_peers" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getRegisteredPeers();
+    public List<PeerInfo> getRegisteredPeers();
 
 
     @GET
@@ -48,13 +50,14 @@ public interface RestService
 
 
     //todo check why is this endpoint used
-    @Path( "/" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getRegisteredPeerInfo( @QueryParam( "peerId" ) String peerId );
-
-    @GET
-    @Path( "ping" )
-    public Response ping();
+    //    @Path( "/" )
+    //    @Produces( { MediaType.APPLICATION_JSON } )
+    //    @Deprecated
+    //    public Response getRegisteredPeerInfo( @QueryParam( "peerId" ) String peerId );
+    //
+    //    @GET
+    //    @Path( "ping" )
+    //    public Response ping();
 
     @GET
     @Path( "template/get" )
@@ -105,41 +108,42 @@ public interface RestService
     //TODO move all registration process operations to peerManager and remove duplicated code pieces from
     // TODO !!! @Nurkaly do this please !!!
     // PeerRegistrationUI and RestServiceImpl
-    @POST
-    @Path( "register" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response processRegisterRequest( @FormParam( "peer" ) String peer );
+    //    @POST
+    //    @Path( "register" )
+    //    @Consumes( { MediaType.APPLICATION_JSON } )
+    //    @Produces( { MediaType.APPLICATION_JSON } )
+    //    public Response processRegistrationRequest( RegistrationRequest registrationRequest );
+
+    //
+    //    @POST
+    //    @Path( "register/{peerIp}" )
+    //    @Produces( { MediaType.APPLICATION_JSON } )
+    //    public Response doRegistrationRequest( @PathParam( "peerIp" ) String peerIp );
 
 
-    @POST
-    @Path( "register/{peerIp}" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response sendRegistrationRequest( @PathParam( "peerIp" ) String peerIp );
-
-
-    @DELETE
-    @Path( "unregister" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response unregisterPeer( @QueryParam( "peerId" ) String peerId );
-
-
-    @PUT
-    @Path( "reject" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response rejectForRegistrationRequest( @FormParam( "rejectedPeerId" ) String rejectedPeerId );
-
-
-    @DELETE
-    @Path( "remove" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response removeRegistrationRequest( @QueryParam( "rejectedPeerId" ) String rejectedPeerId );
-
-
-    @PUT
-    @Path( "approve" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response approveForRegistrationRequest( @FormParam( "approvedPeer" ) String approvedPeer,
-                                                   @FormParam( "cert" ) String certHEX );
+//    @DELETE
+//    @Path( "unregister" )
+//    @Produces( { MediaType.APPLICATION_JSON } )
+//    public Response unregisterPeer( @QueryParam( "peerId" ) String peerId );
+//
+//
+//    @PUT
+//    @Path( "reject" )
+//    @Produces( { MediaType.APPLICATION_JSON } )
+//    public Response rejectForRegistrationRequest( @FormParam( "rejectedPeerId" ) String rejectedPeerId );
+//
+//
+//    @DELETE
+//    @Path( "remove" )
+//    @Produces( { MediaType.APPLICATION_JSON } )
+//    public Response removeRegistrationRequest( @QueryParam( "rejectedPeerId" ) String rejectedPeerId );
+//
+//
+//    @PUT
+//    @Path( "approve" )
+//    @Produces( { MediaType.APPLICATION_JSON } )
+//    public Response approveForRegistrationRequest( @FormParam( "approvedPeer" ) String approvedPeer,
+//                                                   @FormParam( "cert" ) String certHEX );
 
 
     @PUT

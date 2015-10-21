@@ -21,6 +21,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Strings;
 
+import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
@@ -44,19 +45,20 @@ public class KeyManagerImpl implements KeyManager
     private SecretKeyStoreDAO secretKeyStoreDAO = null;
     private KeyServer keyServer = null;
     private SecurityKeyData keyData = null;
+    Object provider;
 
 
     /* *****************************
      *
      */
     public KeyManagerImpl( SecurityManagerDAO securityManagerDAO, SecretKeyStoreDAO secretKeyStoreDAO,
-                           KeyServer keyServer, SecurityKeyData securityKeyData )
+                           KeyServer keyServer, SecurityKeyData securityKeyData, Object Provider )
     {
         this.keyData = securityKeyData;
         this.securityManagerDAO = securityManagerDAO;
         this.keyServer = keyServer;
         this.secretKeyStoreDAO = secretKeyStoreDAO;
-
+        this.provider = provider;
         // Create Key Identity Record , save Public key in the KeyStore.
         init();
     }
@@ -353,14 +355,15 @@ public class KeyManagerImpl implements KeyManager
             PGPSecretKeyRing secretKeyRing;
             String fingerprint = securityManagerDAO.getSecretKeyFingerprint( hostId );
 
-            if(Strings.isNullOrEmpty( fingerprint ))
+            if ( Strings.isNullOrEmpty( fingerprint ) )
             {
                 LOG.error( "Object not found with fprint:" + fingerprint );
                 return null;
             }
             else
             {
-                secretKeyRing = PGPKeyUtil.readSecretKeyRing( secretKeyStoreDAO.getSecretKeyData( fingerprint ).getData() );
+                secretKeyRing =
+                        PGPKeyUtil.readSecretKeyRing( secretKeyStoreDAO.getSecretKeyData( fingerprint ).getData() );
 
                 if ( secretKeyRing != null )
                 {
@@ -589,8 +592,8 @@ public class KeyManagerImpl implements KeyManager
 
             if ( pubRing == null ) // Get from HTTP
             {
-                String baseUrl = String.format( "https://%s:%s/cxf", ip, ChannelSettings.SECURE_PORT_X1 );
-                WebClient client = RestUtil.createTrustedWebClient( baseUrl );
+                String baseUrl = String.format( "https://%s:%s/rest/v1/peer", ip, ChannelSettings.SECURE_PORT_X1 );
+                WebClient client = RestUtil.createTrustedWebClient( baseUrl, provider );
                 client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
 
                 Response response =
@@ -624,14 +627,14 @@ public class KeyManagerImpl implements KeyManager
 
         String peerId = "";
 
-        String baseUrl = String.format( "https://%s:%s/cxf", ip, ChannelSettings.SECURE_PORT_X1 );
-        WebClient clientPeerId = RestUtil.createTrustedWebClient( baseUrl );
-        clientPeerId.type( MediaType.TEXT_PLAIN ).accept( MediaType.TEXT_PLAIN );
-        Response response = clientPeerId.path( "peer/id" ).get();
+        String baseUrl = String.format( "https://%s:%s/rest/v1/peer", ip, ChannelSettings.SECURE_PORT_X1 );
+        WebClient clientPeerId = RestUtil.createTrustedWebClient( baseUrl, provider );
+        clientPeerId.type( MediaType.APPLICATION_JSON ).accept( MediaType.APPLICATION_JSON );
+        PeerInfo peerInfo = clientPeerId.path( "/info" ).get( PeerInfo.class );
 
-        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        if ( clientPeerId.getResponse().getStatus() == Response.Status.OK.getStatusCode() )
         {
-            peerId = response.readEntity( String.class );
+            peerId = peerInfo.getId();
         }
 
         return peerId;

@@ -413,7 +413,7 @@ public class DistributionWindow extends Window
         {
             placementTable.addItem( new Object[] {
                     nodeGroup.getName(), amount, peerManager.getPeer( metric.getPeerId() ).getPeerInfo().getIp(),
-                    metric, createPeersComboBox(), removeBtn
+                    metric, createTypesComboBox(), removeBtn
             }, rowId );
         }
         else

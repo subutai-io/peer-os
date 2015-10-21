@@ -28,7 +28,7 @@ import com.google.gson.GsonBuilder;
 public class PeerDAO
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( PeerDAO.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( PeerDAO.class );
     private DaoManager daoManager;
     protected Gson gson;
 

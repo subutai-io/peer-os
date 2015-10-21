@@ -4,6 +4,7 @@ package io.subutai.common.util;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyStore;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -36,12 +37,10 @@ public class RestUtil
     private static int defaultMaxRetransmits = 3;
 
 
-
-
     public WebClient createTrustedWebClientWithAuthAndProviders( final String url, final String alias,
-                                                     final List<Object> providers )
+                                                                 final Object providers )
     {
-        WebClient client = WebClient.create( url, providers );
+        WebClient client = WebClient.create( url, Arrays.asList( providers ) );
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
 
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
@@ -76,6 +75,7 @@ public class RestUtil
         return client;
     }
 
+
     public static enum RequestType
     {
         GET, DELETE, POST
@@ -95,6 +95,54 @@ public class RestUtil
         setDefaultReceiveTimeout( defaultReceiveTimeout );
         setDefaultConnectionTimeout( defaultConnectionTimeout );
         setDefaultMaxRetransmits( maxRetransmits );
+    }
+
+
+    public String request( RequestType requestType, String url, String alias, Map<String, String> params,
+                           Map<String, String> headers, Object provider ) throws HTTPException
+    {
+        Preconditions.checkNotNull( requestType, "Invalid request type" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( url ), "Invalid url" );
+        Response response = null;
+        try
+        {
+            response = executeClientAndGetResponse( url, requestType, alias, params, headers, provider );
+            if ( !NumUtil.isIntBetween( response.getStatus(), 200, 299 ) )
+            {
+                if ( response.hasEntity() )
+                {
+                    throw new HTTPException( response.readEntity( String.class ) );
+                }
+                else
+                {
+                    throw new HTTPException( String.format( "Http status code: %d", response.getStatus() ) );
+                }
+            }
+            else if ( response.hasEntity() )
+            {
+                return response.readEntity( String.class );
+            }
+        }
+        catch ( MalformedURLException e )
+        {
+            LOG.error( "Error in url path.", e );
+        }
+        finally
+        {
+            if ( response != null )
+            {
+                try
+                {
+                    response.close();
+                }
+                catch ( Exception ignore )
+                {
+                    //ignore
+                    LOG.warn( "Error closing response object", ignore );
+                }
+            }
+        }
+        return null;
     }
 
 
@@ -143,6 +191,61 @@ public class RestUtil
             }
         }
         return null;
+    }
+
+
+    private Response executeClientAndGetResponse( final String url, final RequestType requestType, final String alias,
+                                                  final Map<String, String> params, final Map<String, String> headers,
+                                                  Object provider ) throws MalformedURLException, HTTPException
+    {
+        WebClient client = null;
+
+        try
+        {
+            URL urlObject = new URL( url );
+            String port = String.valueOf( urlObject.getPort() );
+            switch ( port )
+            {
+                case ChannelSettings.SECURE_PORT_X1:
+                    client = createTrustedWebClient( url, provider );
+                    break;
+                case ChannelSettings.SECURE_PORT_X2:
+                    LOG.debug( String.format( "Request type: %s, %s", requestType, url ) );
+                    client = createTrustedWebClientWithAuth( url, alias );
+                    break;
+                default:
+                    client = createWebClient( url );
+                    break;
+            }
+            Form form = new Form();
+            constructClientParams( params, requestType, form, client, headers );
+            switch ( requestType )
+            {
+                case GET:
+                    return client.get();
+                case POST:
+                    return client.form( form );
+                case DELETE:
+                    return client.delete();
+                default:
+                    throw new HTTPException( String.format( "Unrecognized requestType: %s", requestType.name() ) );
+            }
+        }
+        finally
+        {
+            if ( client != null )
+            {
+                try
+                {
+                    client.close();
+                }
+                catch ( Exception ignore )
+                {
+                    //ignore
+                    LOG.warn( "Error disposing web client", ignore );
+                }
+            }
+        }
     }
 
 
@@ -244,15 +347,40 @@ public class RestUtil
     }
 
 
-    public WebClient getTrustedWebClient( String url )
+    public WebClient getTrustedWebClient( String url, Object provider )
     {
-        return createTrustedWebClient( url );
+        return createTrustedWebClient( url, provider );
     }
 
 
     public static WebClient createTrustedWebClient( String url )
     {
         WebClient client = WebClient.create( url );
+
+        HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
+
+        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+        httpClientPolicy.setConnectionTimeout( defaultConnectionTimeout );
+        httpClientPolicy.setReceiveTimeout( defaultReceiveTimeout );
+        httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
+
+
+        httpConduit.setClient( httpClientPolicy );
+
+        SSLManager sslManager = new SSLManager( null, null, null, null );
+
+        TLSClientParameters tlsClientParameters = new TLSClientParameters();
+        tlsClientParameters.setDisableCNCheck( true );
+        tlsClientParameters.setTrustManagers( sslManager.getClientFullTrustManagers() );
+        httpConduit.setTlsClientParameters( tlsClientParameters );
+
+        return client;
+    }
+
+
+    public static WebClient createTrustedWebClient( String url, Object provider )
+    {
+        WebClient client = WebClient.create( url, Arrays.asList( provider ) );
 
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
 

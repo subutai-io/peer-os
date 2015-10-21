@@ -1,7 +1,6 @@
 package io.subutai.core.peer.impl;
 
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
@@ -34,6 +33,7 @@ import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
+import io.subutai.common.peer.ApproveRequest;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -41,6 +41,7 @@ import io.subutai.common.peer.Host;
 import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.peer.RegistrationRequest;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.CpuQuotaInfo;
@@ -89,7 +90,7 @@ public class RemotePeerImpl implements RemotePeer
     protected RestUtil restUtil = new RestUtil();
     protected JsonUtil jsonUtil = new JsonUtil();
     private String baseUrl;
-    List<Object> providers;
+    Object provider;
 
 
     public RemotePeerImpl( LocalPeer localPeer, final PeerInfo peerInfo, final Messenger messenger,
@@ -110,17 +111,16 @@ public class RemotePeerImpl implements RemotePeer
         {
             case ChannelSettings.OPEN_PORT:
             case ChannelSettings.SPECIAL_PORT_X1:
-                url = String.format( "http://%s:%s/cxf", peerInfo.getIp(), peerInfo.getPort() );
+                url = String.format( "http://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
                 break;
             case ChannelSettings.SECURE_PORT_X1:
             case ChannelSettings.SECURE_PORT_X2:
             case ChannelSettings.SECURE_PORT_X3:
-                url = String.format( "https://%s:%s/cxf", peerInfo.getIp(), peerInfo.getPort() );
+                url = String.format( "https://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
                 break;
         }
         this.baseUrl = url;
-        this.providers = Lists.newArrayList();
-        providers.add( provider );
+        this.provider = provider;
     }
 
 
@@ -129,7 +129,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         return restUtil.request( requestType,
                 String.format( "%s/%s", baseUrl, path.startsWith( "/" ) ? path.substring( 1 ) : path ), alias, params,
-                headers );
+                headers, provider );
     }
 
 
@@ -163,26 +163,27 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    @Override
-    public String getRemoteId() throws PeerException
-    {
-        String path = "peer/id";
-
-        try
-        {
-            return get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, null );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error obtaining peer id", e );
-        }
-    }
+    //    @Override
+    //    public String getRemoteId() throws PeerException
+    //    {
+    //        String path = "/id";
+    //
+    //        try
+    //        {
+    //            return get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, null );
+    //        }
+    //        catch ( Exception e )
+    //        {
+    //            throw new PeerException( "Error obtaining peer id", e );
+    //        }
+    //    }
 
 
     @Override
     public boolean isOnline() throws PeerException
     {
-        if ( peerInfo.getId().equals( getRemoteId() ) )
+        //TODO: implement ping
+        if ( peerInfo.getId().equals( getPeerInfo().getId() ) )
         {
             return true;
         }
@@ -217,6 +218,21 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public PeerInfo getPeerInfo()
     {
+        //        String path = String.format( "/%s/info", localPeer.getId() );
+        //
+        //
+        //        WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
+        //                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, provider );
+        //
+        //        client.type( MediaType.APPLICATION_JSON );
+        //        client.accept( MediaType.APPLICATION_JSON );
+        //
+        //        //*********construct Secure Header ****************************
+        //        client.getHeaders().add( Common.HEADER_SPECIAL, "ENC" );
+        //        client.getHeaders().add( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
+        //        client.getHeaders().add( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
+        //
+        //        return client.get( PeerInfo.class );
         return peerInfo;
     }
 
@@ -226,7 +242,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
 
-        String path = "peer/template/get";
+        String path = "/template/get";
 
         Map<String, String> params = Maps.newHashMap();
 
@@ -265,7 +281,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        String path = "peer/container/start";
+        String path = "/container/start";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
@@ -301,7 +317,7 @@ public class RemotePeerImpl implements RemotePeer
 
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
 
-        String path = "peer/container/stop";
+        String path = "/container/stop";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
@@ -336,7 +352,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        String path = "peer/container/destroy";
+        String path = "/container/destroy";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
@@ -374,7 +390,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( !Strings.isNullOrEmpty( gatewayIp ) && gatewayIp.matches( Common.IP_REGEX ),
                 "Invalid gateway IP" );
 
-        String path = "peer/container/gateway";
+        String path = "/container/gateway";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
@@ -408,7 +424,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
 
-        String path = String.format( "peer/pek/%s", environmentId );
+        String path = String.format( "/pek/%s", environmentId );
 
         try
         {
@@ -435,7 +451,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        String path = String.format( "peer/network/%s", environmentId );
+        String path = String.format( "/network/%s", environmentId );
 
         try
         {
@@ -464,7 +480,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        String path = "peer/container/isconnected";
+        String path = "/container/isconnected";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
@@ -506,7 +522,7 @@ public class RemotePeerImpl implements RemotePeer
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkArgument( processPid > 0, "Process pid must be greater than 0" );
 
-        String path = "peer/container/resource/usage";
+        String path = "/container/resource/usage";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
@@ -542,7 +558,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        String path = "peer/container/state";
+        String path = "/container/state";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
@@ -579,7 +595,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        String path = "peer/container/quota/ram";
+        String path = "/container/quota/ram";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
@@ -615,7 +631,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        String path = "peer/container/quota/ram/info";
+        String path = "/container/quota/ram/info";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
@@ -654,7 +670,7 @@ public class RemotePeerImpl implements RemotePeer
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkArgument( ramInMb > 0, "Ram quota value must be greater than 0" );
 
-        String path = "peer/container/quota/ram";
+        String path = "/container/quota/ram";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
@@ -689,7 +705,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        String path = "peer/container/quota/cpu";
+        String path = "/container/quota/cpu";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
@@ -725,7 +741,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        String path = "peer/container/quota/cpu/info";
+        String path = "/container/quota/cpu/info";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
@@ -763,7 +779,7 @@ public class RemotePeerImpl implements RemotePeer
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkArgument( cpuPercent > 0, "Cpu quota value must be greater than 0" );
 
-        String path = "peer/container/quota/cpu";
+        String path = "/container/quota/cpu";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
@@ -799,7 +815,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        String path = "peer/container/quota/cpuset";
+        String path = "/container/quota/cpuset";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
@@ -839,7 +855,7 @@ public class RemotePeerImpl implements RemotePeer
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( cpuSet ), "Empty cpu set" );
 
-        String path = "peer/container/quota/cpuset";
+        String path = "/container/quota/cpuset";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
@@ -878,7 +894,7 @@ public class RemotePeerImpl implements RemotePeer
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkNotNull( diskPartition, "Invalid disk partition" );
 
-        String path = "peer/container/quota/disk";
+        String path = "/container/quota/disk";
 
         Map<String, String> params = Maps.newHashMap();
 
@@ -920,7 +936,7 @@ public class RemotePeerImpl implements RemotePeer
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkNotNull( diskQuota, "Invalid disk quota" );
 
-        String path = "peer/container/quota/disk";
+        String path = "/container/quota/disk";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
@@ -958,7 +974,7 @@ public class RemotePeerImpl implements RemotePeer
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkNotNull( ramQuota, "Invalid ram quota" );
 
-        String path = "peer/container/quota/ram2";
+        String path = "/container/quota/ram2";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
@@ -994,7 +1010,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        String path = "peer/container/quota/ram/available";
+        String path = "/container/quota/ram/available";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
@@ -1030,7 +1046,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        String path = "peer/container/quota/cpu/available";
+        String path = "/container/quota/cpu/available";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
@@ -1070,7 +1086,7 @@ public class RemotePeerImpl implements RemotePeer
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkNotNull( diskPartition, "Invalid disk partition" );
 
-        String path = "peer/container/quota/disk/available";
+        String path = "/container/quota/disk/available";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
@@ -1111,7 +1127,7 @@ public class RemotePeerImpl implements RemotePeer
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkNotNull( quotaType, "Invalid quota type" );
 
-        String path = "peer/container/quota/info";
+        String path = "/container/quota/info";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
@@ -1152,7 +1168,7 @@ public class RemotePeerImpl implements RemotePeer
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkNotNull( quotaInfo, "Invalid quota info" );
 
-        String path = "peer/container/quota";
+        String path = "/container/quota";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
@@ -1184,7 +1200,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public HostInfo getContainerHostInfoById( final String containerHostId ) throws PeerException
     {
-        String path = String.format( "peer/container/info" );
+        String path = String.format( "/container/info" );
         try
         {
             //*********construct Secure Header ****************************
@@ -1459,7 +1475,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( !peerIps.isEmpty(), "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        String path = "peer/tunnels";
+        String path = "/tunnels";
 
         try
         {
@@ -1490,7 +1506,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( vni, "Invalid vni" );
 
-        String path = "peer/vni";
+        String path = "/vni";
 
         try
         {
@@ -1522,7 +1538,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public Set<Gateway> getGateways() throws PeerException
     {
-        String path = "peer/gateways";
+        String path = "/gateways";
         try
         {
             //*********construct Secure Header ****************************
@@ -1548,7 +1564,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public Set<Vni> getReservedVnis() throws PeerException
     {
-        String path = "peer/vni";
+        String path = "/vni";
 
         try
         {
@@ -1580,7 +1596,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( environmentId, "Invalid environmentId" );
 
-        String path = String.format( "peer/pek/%s", environmentId );
+        String path = String.format( "/pek/%s", environmentId );
 
         try
         {
@@ -1613,11 +1629,11 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public HostInterfaces getInterfaces()
     {
-        String path = buildPath( "peer/interfaces" );
+        String path = buildPath( "/interfaces" );
 
         WebClient client =
                 restUtil.createTrustedWebClientWithAuthAndProviders( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS,
-                        providers );
+                        provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -1632,12 +1648,12 @@ public class RemotePeerImpl implements RemotePeer
         LOG.debug( String.format( "Adding remote peer to n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
                 config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
 
-        String path = "peer/n2ntunnel";
+        String path = "/n2ntunnel";
         LOG.debug( String.format( "%s %s %s", peerInfo.getIp(), peerInfo.getPort(), baseUrl ) );
 
 
         WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
-                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, providers );
+                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -1652,11 +1668,11 @@ public class RemotePeerImpl implements RemotePeer
         LOG.debug( String.format( "Removing remote peer from n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
                 config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
 
-        String path = String.format( "peer/n2ntunnel/%s/%s", config.getInterfaceName(), config.getCommunityName() );
+        String path = String.format( "/n2ntunnel/%s/%s", config.getInterfaceName(), config.getCommunityName() );
         LOG.debug( String.format( "%s %s %s", peerInfo.getIp(), peerInfo.getPort(), baseUrl ) );
 
         WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
-                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, providers );
+                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -1672,7 +1688,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentGatewayIp ) );
         Preconditions.checkArgument( vlan > 0 );
 
-        String path = "peer/gateways";
+        String path = "/gateways";
 
         try
         {
@@ -1699,11 +1715,11 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public ResourceHostMetrics getResourceHostMetrics()
     {
-        String path = String.format( "peer/resources" );
+        String path = String.format( "/resources" );
 
 
         WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
-                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, providers );
+                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );

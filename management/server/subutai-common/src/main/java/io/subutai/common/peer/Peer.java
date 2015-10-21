@@ -404,4 +404,5 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     void removeEnvironmentKeyPair( String environmentId ) throws PeerException;
 
     ResourceHostMetrics getResourceHostMetrics();
+
 }

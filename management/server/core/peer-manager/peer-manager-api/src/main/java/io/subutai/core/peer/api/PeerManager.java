@@ -9,6 +9,7 @@ import javax.annotation.security.RolesAllowed;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.peer.RegistrationRequest;
 import io.subutai.common.protocol.N2NConfig;
 
 
@@ -20,7 +21,9 @@ public interface PeerManager
     /**
      * Registers remote peer
      */
-    boolean register( PeerInfo peerInfo ) throws PeerException;
+    //    boolean register( RegistrationRequest registrationRequest );
+
+    //    boolean register( PeerInfo peerInfo, String cert );
 
     /**
      * Updates peer metadata
@@ -31,6 +34,10 @@ public interface PeerManager
      * Returns all registered peers metadata objects
      */
     public List<PeerInfo> getPeerInfos();
+
+    void doUnregisterRequest( RegistrationRequest request ) throws PeerException;
+
+    List<RegistrationRequest> getRegistrationRequests();
 
     /**
      * Returns local peer's metadata
@@ -45,6 +52,11 @@ public interface PeerManager
     /**
      * Unregisters peer
      */
+    @Deprecated
+    boolean unregister( PeerInfo peerInfo, String keyPhrase ) throws PeerException;
+
+    //
+    @Deprecated
     boolean unregister( String id ) throws PeerException;
 
     /**
@@ -64,4 +76,26 @@ public interface PeerManager
     public LocalPeer getLocalPeer();
 
     List<N2NConfig> setupN2NConnection( final Set<Peer> peers ) throws PeerException;
+
+
+    void doRegistrationRequest( String destinationHost, String keyPhrase ) throws PeerException;
+
+    void doApproveRequest( RegistrationRequest request ) throws PeerException;
+
+    void doRejectRequest( RegistrationRequest request ) throws PeerException;
+
+    void doCancelRequest( RegistrationRequest request ) throws PeerException;
+
+    void processCancelRequest( RegistrationRequest registrationRequest ) throws PeerException;
+
+    RegistrationRequest processApproveRequest( RegistrationRequest registrationRequest ) throws PeerException;
+
+    RegistrationRequest processRegistrationRequest( RegistrationRequest registrationRequest ) throws PeerException;
+
+    void processUnregisterRequest( RegistrationRequest registrationRequest ) throws PeerException;
+
+    void processRejectRequest( RegistrationRequest registrationRequest ) throws PeerException;
+
+    @Deprecated
+    boolean register( PeerInfo remotePeerInfo ) throws PeerException;
 }
