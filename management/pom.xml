@@ -385,6 +385,11 @@
         <artifactId>command-executor-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <!--<dependency>-->
+        <!--<groupId>${project.groupId}</groupId>-->
+        <!--<artifactId>command-executor-rest</artifactId>-->
+        <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- monitor -->
@@ -571,6 +576,11 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>template-registry-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>template-registry-rest-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

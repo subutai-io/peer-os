@@ -285,6 +285,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>command-executor-ui</artifactId>
     </dependency>
+    <!--<dependency>-->
+      <!--<groupId>${project.groupId}</groupId>-->
+      <!--<artifactId>command-executor-rest</artifactId>-->
+    <!--</dependency>-->
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- monitor -->
@@ -428,6 +432,10 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>template-registry-rest</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>template-registry-rest-ui</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

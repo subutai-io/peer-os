@@ -1,0 +1,33 @@
+<blueprint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
+           xmlns:cxf="http://cxf.apache.org/blueprint/core" xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+
+  http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
+
+  <cxf:bus id="cxfBusTemplateUIRegistry">
+    <cxf:features>
+      <cxf:logging />
+    </cxf:features>
+  </cxf:bus>
+
+  <reference id="repoManager" availability="mandatory"
+             interface="io.subutai.core.repository.api.RepositoryManager" />
+  <reference id="templateRegistry" availability="mandatory"
+             interface="io.subutai.core.registry.api.TemplateRegistry" />
+  <reference id="peerManager" availability="mandatory"
+             interface="io.subutai.core.peer.api.PeerManager" />
+
+  <bean id="templateRegistryRestUIImpl" class="io.subutai.core.registry.rest.ui.RestServiceImpl">
+    <argument ref="repoManager" />
+    <argument ref="templateRegistry" />
+    <argument ref="peerManager" />
+  </bean>
+
+  <jaxrs:server address="/registry_ui" id="registryRestUIService">
+    <jaxrs:serviceBeans>
+      <ref component-id="templateRegistryRestUIImpl" />
+    </jaxrs:serviceBeans>
+  </jaxrs:server>
+
+</blueprint>
