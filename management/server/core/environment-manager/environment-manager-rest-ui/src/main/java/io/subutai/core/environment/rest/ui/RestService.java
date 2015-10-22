@@ -26,9 +26,9 @@ public interface RestService
     public Response getDefaultDomainName();
 
     @GET
-    @Path( "container/environmentId" )
+    @Path( "container/{containerId}" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    public Response getContainerEnvironmentId( @QueryParam( "containerId" ) String containerId );
+    public Response getContainerEnvironmentId( @PathParam( "containerId" ) String containerId );
 
 
     @GET
@@ -52,28 +52,29 @@ public interface RestService
 
 
     @DELETE
-    @Path( "key" )
-    public Response removeSshKey( @QueryParam( "environmentId" ) String environmentId );
+    @Path( "{environmentId}/keys" )
+    public Response removeSshKey( @PathParam( "environmentId" ) String environmentId );
 
     @DELETE
-    public Response destroyEnvironment( @QueryParam( "environmentId" ) String environmentId );
+    @Path( "{environmentId}" )
+    public Response destroyEnvironment( @PathParam( "environmentId" ) String environmentId );
 
     @DELETE
-    @Path( "container" )
-    public Response destroyContainer( @QueryParam( "containerId" ) String containerId );
+    @Path( "container/{containerId}" )
+    public Response destroyContainer( @PathParam( "containerId" ) String containerId );
 
     @GET
-    @Path( "container/state" )
+    @Path( "container/{containerId}/state" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getContainerState( @QueryParam( "containerId" ) String containerId );
+    public Response getContainerState( @PathParam( "containerId" ) String containerId );
 
     @POST
-    @Path( "container/start" )
+    @Path( "container/{containerId}/start" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response startContainer( @QueryParam( "containerId" ) String containerId );
+    public Response startContainer( @PathParam( "containerId" ) String containerId );
 
     @POST
-    @Path( "container/stop" )
+    @Path( "container/{containerId}/stop" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response stopContainer( @QueryParam( "containerId" ) String containerId );
+    public Response stopContainer( @PathParam( "containerId" ) String containerId );
 }
