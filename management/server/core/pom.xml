@@ -17,7 +17,6 @@
 
   <modules>
     <module>file-tracker</module>
-    <module>environment-terminal</module>
     <module>git-manager</module>
     <module>lxc-quota-manager</module>
     <module>network-manager</module>
