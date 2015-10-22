@@ -18,6 +18,5 @@
     <module>identity-manager-api</module>
     <module>identity-manager-impl</module>
     <module>identity-manager-rest</module>
-    <module>identity-manager-ui</module>
   </modules>
 </project>

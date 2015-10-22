@@ -18,7 +18,7 @@
     <module>channel-manager-api</module>
     <module>channel-manager-impl</module>
     <module>channel-manager-cli</module>
-    <module>channel-manager-ui</module>
+    <!--<module>channel-manager-ui</module>-->
   </modules>
 
 </project>

@@ -19,7 +19,6 @@
     <module>metric-impl</module>
     <module>metric-cli</module>
     <module>metric-rest</module>
-    <module>metric-ui</module>
   </modules>
 
 </project>
