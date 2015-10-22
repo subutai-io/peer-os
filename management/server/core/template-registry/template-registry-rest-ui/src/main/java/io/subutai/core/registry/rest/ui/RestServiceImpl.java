@@ -32,6 +32,7 @@ import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.FileUtil;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.core.git.api.GitChangedFile;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.RegistryException;
@@ -97,12 +98,14 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            return Response.ok().entity( GSON.toJson( templateRegistry.getChangedFiles( templateRegistry.getParentTemplate( template1 ), templateRegistry.getParentTemplate( template2 ) ) ) ).build();
+            List<GitChangedFile> list = templateRegistry.getChangedFiles( templateRegistry.getParentTemplate( template1 ), templateRegistry.getParentTemplate( template2 ) );
+
+            return Response.ok().entity( GSON.toJson( (template1 + template2) ) ).build();
         }
         catch ( RegistryException e )
         {
             e.printStackTrace();
-            return null;
+            return Response.status( Response.Status.BAD_REQUEST ).header( EXCEPTION_HEADER, e.getMessage() ).build();
         }
     }
 

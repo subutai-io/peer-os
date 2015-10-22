@@ -5,7 +5,7 @@
 
   http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
 
-  <cxf:bus id="cxfBusTemplateUIRegistry">
+  <cxf:bus id="cxfBusTemplateRegistryUI">
     <cxf:features>
       <cxf:logging />
     </cxf:features>
