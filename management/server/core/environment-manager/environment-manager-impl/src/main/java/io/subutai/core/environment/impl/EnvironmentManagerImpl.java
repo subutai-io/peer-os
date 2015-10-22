@@ -516,18 +516,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             setContainersTransientFields( environment );
         }
 
-        if ( !isUserAdmin() )
-        {
-            Long userId = getUserId();
-            for ( Iterator<Environment> iterator = environments.iterator(); iterator.hasNext(); )
-            {
-                final Environment environment = iterator.next();
-                if ( !Objects.equals( environment.getUserId(), userId ) )
-                {
-                    iterator.remove();
-                }
-            }
-        }
+        //@todo remove temporarily frontend-ui
+//        if ( !isUserAdmin() )
+//        {
+//            Long userId = getUserId();
+//            for ( Iterator<Environment> iterator = environments.iterator(); iterator.hasNext(); )
+//            {
+//                final Environment environment = iterator.next();
+//                if ( !Objects.equals( environment.getUserId(), userId ) )
+//                {
+//                    iterator.remove();
+//                }
+//            }
+//        }
 
         return environments;
     }
