@@ -110,26 +110,26 @@ public class RestServiceImpl implements RestService
     }
 
 
-    @Override
-    public Response getFileDiff( final String template1, final String template2, final String fileId )
-    {
-
-        try
-        {
+//    @Override
+//    public Response getFileDiff( final String template1, final String template2, final String fileId )
+//    {
+//
+//        try
+//        {
 //            return Response.ok().entity( GSON.toJson(
 //                    templateRegistry.getFileDiff(
 //                        template1,
 //                        template2,
 //                        fileId
 //                    ) ) ).build();
-            return null;
-        }
-        catch ( RegistryException e )
-        {
-            e.printStackTrace();
-            return null;
-        }
-    }
+//            return Response.ok().entity( GSON.toJson( (template1 + template2) ) ).build();
+//        }
+//        catch ( RegistryException e )
+//        {
+//            e.printStackTrace();
+//            return Response.status(Response.Status.BAD_REQUEST).header(EXCEPTION_HEADER, e.getMessage()).build();
+//        }
+//    }
 
 
     private String getTempDirPath()

@@ -31,10 +31,10 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getChangedFiles( @PathParam( "template1" ) String template1, @PathParam( "template2" ) String template2 );
 
-    @GET
-    @Path( "file_diff/{template1}/{template2}/{file_id}" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getFileDiff( @PathParam( "template1" ) String template1, @PathParam( "template2" ) String template2, @PathParam( "file_id" ) String fileId );
+//    @GET
+//    @Path( "file_diff/{template1}/{template2}/{file_id}" )
+//    @Produces( { MediaType.APPLICATION_JSON } )
+//    public Response getFileDiff( @PathParam( "template1" ) String template1, @PathParam( "template2" ) String template2, @PathParam( "file_id" ) String fileId );
 
     @POST
     @Path( "templates/import" )

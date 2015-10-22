@@ -20,6 +20,7 @@
     <module>environment-manager-cli</module>
     <module>environment-manager-ui</module>
     <module>environment-manager-rest</module>
+    <module>environment-manager-rest-ui</module>
   </modules>
 
 </project>
