@@ -27,7 +27,7 @@ public interface RestService
 
     @POST
     @Path( "blueprint" )
-    @Produces( { MediaType.TEXT_PLAIN } )
+    @Produces( { MediaType.APPLICATION_JSON } )
     public Response saveBlueprint( @FormParam( "blueprint_json" ) String content);
 
     @GET
@@ -37,7 +37,7 @@ public interface RestService
 
     @GET
     @Path( "container/{containerId}" )
-    @Produces( { MediaType.TEXT_PLAIN } )
+    @Produces( { MediaType.APPLICATION_JSON } )
     public Response getContainerEnvironmentId( @PathParam( "containerId" ) String containerId );
 
 
