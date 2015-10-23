@@ -25,6 +25,9 @@ public interface RestService
     @Produces( { MediaType.TEXT_PLAIN } )
     public Response getDefaultDomainName();
 
+    @POST
+    public Response saveBlueprint( @FormParam( "blueprint_json" ) String content);
+
     @GET
     @Path( "container/{containerId}" )
     @Produces( { MediaType.TEXT_PLAIN } )

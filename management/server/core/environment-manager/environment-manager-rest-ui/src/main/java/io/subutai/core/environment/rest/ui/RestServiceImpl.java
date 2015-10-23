@@ -3,9 +3,12 @@ package io.subutai.core.environment.rest.ui;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
+import io.subutai.common.environment.*;
+import io.subutai.common.util.CollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,12 +16,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.environment.ContainerHostNotFoundException;
-import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.EnvironmentModificationException;
-import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.environment.NodeGroup;
-import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -53,6 +50,78 @@ public class RestServiceImpl implements RestService
         this.environmentManager = environmentManager;
         this.peerManager = peerManager;
         this.templateRegistry = templateRegistry;
+    }
+
+    @Override
+    public Response saveBlueprint(final String content)
+    {
+        if ( content.length() > 0 )
+        {
+            try
+            {
+                Blueprint blueprint = JsonUtil.fromJson( content, Blueprint.class );
+
+                if ( Strings.isNullOrEmpty( blueprint.getName() ) )
+                {
+                    return Response.status( Response.Status.BAD_REQUEST )
+                            .entity(JsonUtil.toJson(ERROR_KEY, "Invalid blueprint name")).build();
+                }
+                else if ( CollectionUtil.isCollectionEmpty(blueprint.getNodeGroups()) )
+                {
+                    return Response.status( Response.Status.BAD_REQUEST )
+                            .entity(JsonUtil.toJson(ERROR_KEY, "Invalid node group set")).build();
+                }
+                else
+                {
+                    for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
+                    {
+                        if ( Strings.isNullOrEmpty( nodeGroup.getName() ) )
+                        {
+                            return Response.status( Response.Status.BAD_REQUEST )
+                                    .entity( JsonUtil.toJson( ERROR_KEY, "Invalid node group name" ) ).build();
+                        }
+                        else if ( nodeGroup.getNumberOfContainers() <= 0 )
+                        {
+                            return Response.status( Response.Status.BAD_REQUEST )
+                                    .entity(JsonUtil.toJson(ERROR_KEY, "Invalid number of containers")).build();
+                        }
+                        else if ( Strings.isNullOrEmpty( nodeGroup.getTemplateName() ) )
+                        {
+                            return Response.status( Response.Status.BAD_REQUEST )
+                                    .entity(JsonUtil.toJson(ERROR_KEY, "Invalid templateName")).build();
+                        }
+                        else if ( templateRegistry.getTemplate( nodeGroup.getTemplateName() ) == null )
+                        {
+                            return Response.status( Response.Status.BAD_REQUEST )
+                                    .entity(JsonUtil.toJson(ERROR_KEY, String.format(
+                                            "Template %s does not exist", nodeGroup.getTemplateName()
+                                    ))).build();
+                        }
+                        else if ( nodeGroup.getContainerPlacementStrategy() == null )
+                        {
+                            return Response.status( Response.Status.BAD_REQUEST )
+                                    .entity(JsonUtil.toJson(ERROR_KEY, "Invalid node container placement strategy")).build();
+                        }
+                    }
+
+                    blueprint.setId( UUID.randomUUID() );
+
+                    environmentManager.saveBlueprint( blueprint );
+
+                    return Response.ok(JsonUtil.toJson(blueprint)).build();
+                }
+            } catch ( Exception e )
+            {
+                LOG.error( "Error validating blueprint", e );
+                return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
+                        .build();
+            }
+        }
+        else
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                    .entity(JsonUtil.toJson(ERROR_KEY, "Empty request")).build();
+        }
     }
 
 
