@@ -11,6 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.UUID;
 
 
 public interface RestService
@@ -25,15 +26,19 @@ public interface RestService
     @Produces( { MediaType.TEXT_PLAIN } )
     public Response getDefaultDomainName();
 
+    @GET
+    @Path( "blueprint" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    public Response getBlueprints();
+
     @POST
     @Path( "blueprint" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response saveBlueprint( @FormParam( "blueprint_json" ) String content);
 
-    @GET
-    @Path( "blueprint" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    public Response getBlueprints();
+    @DELETE
+    @Path( "blueprint/{blueprintId}" )
+    public Response deleteBlueprint( @PathParam( "blueprintId" ) UUID blueprintId );
 
     @GET
     @Path( "container/{containerId}" )

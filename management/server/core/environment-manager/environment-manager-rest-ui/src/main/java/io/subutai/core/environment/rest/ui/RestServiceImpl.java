@@ -67,6 +67,20 @@ public class RestServiceImpl implements RestService
     }
 
     @Override
+    public Response deleteBlueprint(final UUID blueprintId)
+    {
+        try {
+            environmentManager.removeBlueprint( blueprintId );
+            return Response.ok().build();
+        }
+        catch (EnvironmentManagerException e )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                    .entity(JsonUtil.toJson(ERROR_KEY, "Error deleting blueprint " + blueprintId)).build();
+        }
+    }
+
+    @Override
     public Response saveBlueprint(final String content)
     {
         if ( content.length() > 0 )
