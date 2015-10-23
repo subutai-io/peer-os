@@ -9,6 +9,7 @@ import javax.ws.rs.core.Response;
 
 import io.subutai.common.environment.*;
 import io.subutai.common.util.CollectionUtil;
+import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +51,19 @@ public class RestServiceImpl implements RestService
         this.environmentManager = environmentManager;
         this.peerManager = peerManager;
         this.templateRegistry = templateRegistry;
+    }
+
+    @Override
+    public Response getBlueprints()
+    {
+        try {
+            return Response.ok( JsonUtil.toJson( environmentManager.getBlueprints() ) ).build();
+        }
+        catch (EnvironmentManagerException e )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                    .entity(JsonUtil.toJson(ERROR_KEY, "Error loading blueprints")).build();
+        }
     }
 
     @Override
