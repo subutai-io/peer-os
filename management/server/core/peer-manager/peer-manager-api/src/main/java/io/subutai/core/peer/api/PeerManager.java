@@ -4,6 +4,8 @@ package io.subutai.core.peer.api;
 import java.util.List;
 import java.util.Set;
 
+import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
@@ -96,4 +98,12 @@ public interface PeerManager
 
     @Deprecated
     boolean register( PeerInfo remotePeerInfo ) throws PeerException;
+
+    void startContainer( ContainerId containerId ) throws PeerException;
+
+    void stopContainer( ContainerId containerId ) throws PeerException;
+
+    void destroyContainer( ContainerId containerId ) throws PeerException;
+
+    ContainerHostState getContainerState( ContainerId containerId );
 }

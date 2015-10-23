@@ -183,7 +183,7 @@ public class ContainerHostEntityTest
     {
         containerHostEntity.dispose();
 
-        verify( peer ).destroyContainer( containerHostEntity );
+        verify( peer ).destroyContainer( containerHostEntity.getContainerId() );
     }
 
 
@@ -192,7 +192,7 @@ public class ContainerHostEntityTest
     {
         containerHostEntity.start();
 
-        verify( peer ).startContainer( containerHostEntity );
+        verify( peer ).startContainer( containerHostEntity.getContainerId() );
     }
 
 
@@ -201,7 +201,7 @@ public class ContainerHostEntityTest
     {
         containerHostEntity.stop();
 
-        verify( peer ).stopContainer( containerHostEntity );
+        verify( peer ).stopContainer( containerHostEntity.getContainerId() );
     }
 
 

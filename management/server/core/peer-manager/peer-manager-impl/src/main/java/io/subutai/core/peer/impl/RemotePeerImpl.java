@@ -26,17 +26,19 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.exception.HTTPException;
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Host;
-import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.N2NConfig;
@@ -177,16 +179,46 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public PeerInfo check() throws PeerException
+    {
+        String path = "/info";
+
+
+        WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
+                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, provider );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+
+        //*********construct Secure Header ****************************
+        client.getHeaders().add( Common.HEADER_SPECIAL, "ENC" );
+        client.getHeaders().add( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
+        client.getHeaders().add( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
+
+        PeerInfo response = client.get( PeerInfo.class );
+        if ( !peerInfo.getId().equals( response.getId() ) )
+        {
+            throw new PeerException( String.format(
+                    "Remote peer check failed. Id of the remote peer %s changed. Please verify the remote peer.",
+                    peerInfo.getId() ) );
+        }
+
+        return response;
+    }
+
+
+    @Override
     public boolean isOnline() throws PeerException
     {
-        //TODO: implement ping
-        if ( peerInfo.getId().equals( getPeerInfo().getId() ) )
+        try
         {
+            check();
             return true;
         }
-        else
+        catch ( PeerException e )
         {
-            throw new PeerException( "Invalid peer ID." );
+            LOG.error( e.getMessage(), e );
+            return false;
         }
     }
 
@@ -215,21 +247,6 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public PeerInfo getPeerInfo()
     {
-        //        String path = String.format( "/%s/info", localPeer.getId() );
-        //
-        //
-        //        WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
-        //                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, provider );
-        //
-        //        client.type( MediaType.APPLICATION_JSON );
-        //        client.accept( MediaType.APPLICATION_JSON );
-        //
-        //        //*********construct Secure Header ****************************
-        //        client.getHeaders().add( Common.HEADER_SPECIAL, "ENC" );
-        //        client.getHeaders().add( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
-        //        client.getHeaders().add( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
-        //
-        //        return client.get( PeerInfo.class );
         return peerInfo;
     }
 
@@ -272,32 +289,31 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void startContainer( final ContainerHost containerHost ) throws PeerException
+    public void startContainer( final ContainerId containerId ) throws PeerException
     {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+        Preconditions.checkNotNull( containerId, "Container id is null" );
 
-        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "/container/start";
-
-        Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + containerId.getEnvironmentId().getId();
+        String envHeaderTarget = peerInfo.getId() + "-" + containerId.getEnvironmentId().getId();
 
         headers.put( Common.HEADER_SPECIAL, "ENC" );
         headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
         headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
+        WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
+                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, provider );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-            post( path, alias, params, headers );
+            client.post( containerId );
         }
         catch ( Exception e )
         {
@@ -307,72 +323,70 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void stopContainer( final ContainerHost containerHost ) throws PeerException
+    public void stopContainer( final ContainerId containerId ) throws PeerException
     {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
-
-        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
+        Preconditions.checkNotNull( containerId, "Container id is null" );
 
         String path = "/container/stop";
-
-        Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + containerId.getEnvironmentId().getId();
+        String envHeaderTarget = peerInfo.getId() + "-" + containerId.getEnvironmentId().getId();
 
         headers.put( Common.HEADER_SPECIAL, "ENC" );
         headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
         headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
+        WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
+                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, provider );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-            post( path, alias, params, headers );
+            client.post( containerId );
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error stopping container", e );
+            throw new PeerException( "Error starting container", e );
         }
     }
 
 
     @Override
-    public void destroyContainer( final ContainerHost containerHost ) throws PeerException
+    public void destroyContainer( final ContainerId containerId ) throws PeerException
     {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+        Preconditions.checkNotNull( containerId, "Container id is null" );
 
-        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "/container/destroy";
 
-        Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + containerId.getEnvironmentId().getId();
+        String envHeaderTarget = peerInfo.getId() + "-" + containerId.getEnvironmentId().getId();
 
         headers.put( Common.HEADER_SPECIAL, "ENC" );
         headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
         headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
+        WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
+                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, provider );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-            post( path, alias, params, headers );
+            client.post( containerId );
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error destroying container", e );
+            throw new PeerException( "Error starting container", e );
         }
     }
 
@@ -471,41 +485,18 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public boolean isConnected( final Host containerHost )
+    public boolean isConnected( final HostId hostId )
     {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+        Preconditions.checkNotNull( hostId, "Host id is null" );
 
-        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        String path = "/container/isconnected";
-
-        Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId() );
-
-
-        //*********construct Secure Header ****************************
-        Map<String, String> headers = Maps.newHashMap();
-
-        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
-        //*************************************************************
-
-
-        try
+        if ( hostId instanceof ContainerId )
         {
-            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-
-            return jsonUtil.from( post( path, alias, params, headers ), Boolean.class );
+            return ContainerHostState.RUNNING.equals( getContainerState( ( ContainerId ) hostId ) );
         }
-        catch ( Exception e )
+        else
         {
-            LOG.error( "Error checking container connection", e );
+            return false;
         }
-        return false;
     }
 
 
@@ -549,38 +540,35 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public ContainerHostState getContainerHostState( final ContainerHost containerHost ) throws PeerException
+    public ContainerHostState getContainerState( final ContainerId containerId )
     {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+        Preconditions.checkNotNull( containerId, "Container id is null" );
 
-        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         String path = "/container/state";
-
-        Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId() );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
 
-        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
+        String envHeaderSource = localPeer.getId() + "-" + containerId.getEnvironmentId().getId();
+        String envHeaderTarget = peerInfo.getId() + "-" + containerId.getEnvironmentId().getId();
 
         headers.put( Common.HEADER_SPECIAL, "ENC" );
         headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
         headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
+        WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
+                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, provider );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-            String response = get( path, alias, params, headers );
-
-            return jsonUtil.from( response, ContainerHostState.class );
+            return client.post( containerId, ContainerHostState.class );
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error obtaining container state", e );
+            return ContainerHostState.UNKNOWN;
         }
     }
 

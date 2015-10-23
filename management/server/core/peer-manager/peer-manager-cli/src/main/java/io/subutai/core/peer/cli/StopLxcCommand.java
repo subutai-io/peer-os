@@ -35,7 +35,7 @@ public class StopLxcCommand extends SubutaiShellCommandSupport
 
         ContainerHost host = localPeer.getContainerHostByName( hostname );
 
-        localPeer.stopContainer( host );
+        localPeer.stopContainer( host.getContainerId() );
         System.out.println( "Container stopped successfully" );
 
         return null;

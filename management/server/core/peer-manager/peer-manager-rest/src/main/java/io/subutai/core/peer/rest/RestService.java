@@ -16,8 +16,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.N2NConfig;
 
@@ -121,29 +123,29 @@ public interface RestService
     //    public Response doRegistrationRequest( @PathParam( "peerIp" ) String peerIp );
 
 
-//    @DELETE
-//    @Path( "unregister" )
-//    @Produces( { MediaType.APPLICATION_JSON } )
-//    public Response unregisterPeer( @QueryParam( "peerId" ) String peerId );
-//
-//
-//    @PUT
-//    @Path( "reject" )
-//    @Produces( { MediaType.APPLICATION_JSON } )
-//    public Response rejectForRegistrationRequest( @FormParam( "rejectedPeerId" ) String rejectedPeerId );
-//
-//
-//    @DELETE
-//    @Path( "remove" )
-//    @Produces( { MediaType.APPLICATION_JSON } )
-//    public Response removeRegistrationRequest( @QueryParam( "rejectedPeerId" ) String rejectedPeerId );
-//
-//
-//    @PUT
-//    @Path( "approve" )
-//    @Produces( { MediaType.APPLICATION_JSON } )
-//    public Response approveForRegistrationRequest( @FormParam( "approvedPeer" ) String approvedPeer,
-//                                                   @FormParam( "cert" ) String certHEX );
+    //    @DELETE
+    //    @Path( "unregister" )
+    //    @Produces( { MediaType.APPLICATION_JSON } )
+    //    public Response unregisterPeer( @QueryParam( "peerId" ) String peerId );
+    //
+    //
+    //    @PUT
+    //    @Path( "reject" )
+    //    @Produces( { MediaType.APPLICATION_JSON } )
+    //    public Response rejectForRegistrationRequest( @FormParam( "rejectedPeerId" ) String rejectedPeerId );
+    //
+    //
+    //    @DELETE
+    //    @Path( "remove" )
+    //    @Produces( { MediaType.APPLICATION_JSON } )
+    //    public Response removeRegistrationRequest( @QueryParam( "rejectedPeerId" ) String rejectedPeerId );
+    //
+    //
+    //    @PUT
+    //    @Path( "approve" )
+    //    @Produces( { MediaType.APPLICATION_JSON } )
+    //    public Response approveForRegistrationRequest( @FormParam( "approvedPeer" ) String approvedPeer,
+    //                                                   @FormParam( "cert" ) String certHEX );
 
 
     @PUT
@@ -159,28 +161,27 @@ public interface RestService
 
     @POST
     @Path( "container/destroy" )
+    @Consumes( MediaType.APPLICATION_JSON )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response destroyContainer( @FormParam( "containerId" ) String containerId );
+    public void destroyContainer( ContainerId containerId );
 
     @POST
     @Path( "container/start" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response startContainer( @FormParam( "containerId" ) String containerId );
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    public void startContainer( ContainerId containerId );
 
     @POST
     @Path( "container/stop" )
+    @Consumes( MediaType.APPLICATION_JSON )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response stopContainer( @FormParam( "containerId" ) String containerId );
+    public void stopContainer( ContainerId containerId );
 
     @POST
-    @Path( "container/isconnected" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response isContainerConnected( @FormParam( "containerId" ) String containerId );
-
-    @GET
     @Path( "container/state" )
+    @Consumes( MediaType.APPLICATION_JSON )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getContainerState( @QueryParam( "containerId" ) String containerId );
+    public ContainerHostState getContainerState( ContainerId containerId );
 
 
     @GET

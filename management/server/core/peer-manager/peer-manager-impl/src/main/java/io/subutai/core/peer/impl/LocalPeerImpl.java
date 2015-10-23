@@ -41,8 +41,8 @@ import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
-import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.HostInterface;
@@ -55,6 +55,7 @@ import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
@@ -139,7 +140,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public LocalPeerImpl( DaoManager daoManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
                           StrategyManager strategyManager, CommandExecutor commandExecutor, HostRegistry hostRegistry,
                           Monitor monitor, SecurityManager securityManager )
-
     {
         this.strategyManager = strategyManager;
         this.daoManager = daoManager;
@@ -319,18 +319,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public ContainerHostState getContainerHostState( final ContainerHost host ) throws PeerException
+    public ContainerHostState getContainerState( final ContainerId containerId )
     {
-        Host ahost = bindHost( host.getId() );
-
-        if ( ahost instanceof ContainerHost )
+        try
         {
-            ContainerHost containerHost = ( ContainerHost ) ahost;
+            ContainerHost containerHost = bindHost( containerId );
             return containerHost.getStatus();
         }
-        else
+        catch ( Exception e )
         {
-            throw new UnsupportedOperationException();
+            return ContainerHostState.UNKNOWN;
         }
     }
 
@@ -698,12 +696,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @Override
-    public void startContainer( final ContainerHost host ) throws PeerException
+    public ContainerHostEntity bindHost( final ContainerId containerId ) throws HostNotFoundException
     {
-        Preconditions.checkNotNull( host, "Check container host object" );
+        return ( ContainerHostEntity ) bindHost( containerId.getId() );
+    }
 
-        ContainerHostEntity containerHost = ( ContainerHostEntity ) bindHost( host.getId() );
+
+    @Override
+    public void startContainer( final ContainerId containerId ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
+
+        ContainerHostEntity containerHost = bindHost( containerId );
         ResourceHost resourceHost = containerHost.getParent();
         try
         {
@@ -717,11 +721,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void stopContainer( final ContainerHost host ) throws PeerException
+    public void stopContainer( final ContainerId containerId ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Cannot operate on null container host" );
+        Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
 
-        ContainerHostEntity containerHost = ( ContainerHostEntity ) bindHost( host.getId() );
+        ContainerHostEntity containerHost = bindHost( containerId );
         ResourceHost resourceHost = containerHost.getParent();
         try
         {
@@ -735,22 +739,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void destroyContainer( final ContainerHost host ) throws PeerException
+    public void destroyContainer( final ContainerId containerId ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Container host is already null" );
-        ContainerHostEntity entity = ( ContainerHostEntity ) bindHost( host.getId() );
-        ResourceHost resourceHost = entity.getParent();
+        Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
+        ContainerHostEntity host = bindHost( containerId );
+        ResourceHost resourceHost = host.getParent();
 
         try
         {
             resourceHost.destroyContainerHost( host );
-            ( ( ResourceHostEntity ) entity.getParent() ).removeContainerHost( entity );
-
-            //            cleanupEnvironmentNetworkSettings( host.getEnvironmentId() );
         }
         catch ( ResourceHostException e )
         {
-
             String errMsg = String.format( "Could not destroy container [%s]", host.getHostname() );
             LOG.error( errMsg, e );
             throw new PeerException( errMsg, e.toString() );
@@ -799,15 +799,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public boolean isConnected( final Host host )
+    public boolean isConnected( final HostId hostId )
     {
-        Preconditions.checkNotNull( host, "Host is null" );
+        Preconditions.checkNotNull( hostId, "Host id null" );
 
         try
         {
-            HostInfo hostInfo = hostRegistry.getHostInfoById( host.getId() );
-            return !( hostInfo instanceof ContainerHostInfo ) || ContainerHostState.RUNNING
-                    .equals( ( ( ContainerHostInfo ) hostInfo ).getStatus() );
+            HostInfo hostInfo = hostRegistry.getHostInfoById( hostId.getId() );
+            return hostInfo.getId().equals( hostId.getId() );
         }
         catch ( HostDisconnectedException e )
         {

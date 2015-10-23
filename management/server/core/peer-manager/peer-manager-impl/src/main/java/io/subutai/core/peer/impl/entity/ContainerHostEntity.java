@@ -23,8 +23,11 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.CpuQuotaInfo;
@@ -209,7 +212,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     public void dispose() throws PeerException
     {
-        getPeer().destroyContainer( this );
+        getPeer().destroyContainer( getContainerId() );
     }
 
 
@@ -217,7 +220,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public void start() throws PeerException
     {
         Peer peer = getPeer();
-        peer.startContainer( this );
+        peer.startContainer( getContainerId() );
     }
 
 
@@ -225,7 +228,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public void stop() throws PeerException
     {
         Peer peer = getPeer();
-        peer.stopContainer( this );
+        peer.stopContainer( getContainerId() );
     }
 
 
@@ -343,5 +346,19 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public DiskQuota getAvailableDiskQuota( final DiskPartition diskPartition ) throws PeerException
     {
         return getPeer().getAvailableDiskQuota( this, diskPartition );
+    }
+
+
+    @Override
+    public boolean isConnected()
+    {
+        return ContainerHostState.RUNNING.equals( getStatus() );
+    }
+
+
+    public ContainerId getContainerId()
+    {
+
+        return new ContainerId( getId(), new PeerId( getPeerId() ), new EnvironmentId( getEnvironmentId() ) );
     }
 }

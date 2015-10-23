@@ -293,39 +293,39 @@ public class RemotePeerImplTest
     @Test( expected = PeerException.class )
     public void testStartContainer() throws Exception
     {
-        remotePeer.startContainer( containerHost );
+        remotePeer.startContainer( containerHost.getContainerId() );
 
         //verify( localPeer ).getId();
 
         throwException();
 
-        remotePeer.startContainer( containerHost );
+        remotePeer.startContainer( containerHost.getContainerId() );
     }
 
 
     @Test( expected = PeerException.class )
     public void testStopContainer() throws Exception
     {
-        remotePeer.stopContainer( containerHost );
+        remotePeer.stopContainer( containerHost.getContainerId() );
 
         //verify( localPeer ).getId();
 
         throwException();
 
-        remotePeer.stopContainer( containerHost );
+        remotePeer.stopContainer( containerHost.getContainerId() );
     }
 
 
     @Test( expected = PeerException.class )
     public void testDestroyContainer() throws Exception
     {
-        remotePeer.destroyContainer( containerHost );
+        remotePeer.destroyContainer( containerHost.getContainerId() );
 
         //verify( localPeer ).getId();
 
         throwException();
 
-        remotePeer.destroyContainer( containerHost );
+        remotePeer.destroyContainer( containerHost.getContainerId() );
     }
 
 
@@ -347,7 +347,7 @@ public class RemotePeerImplTest
     {
         when( jsonUtil.from( anyString(), eq( Boolean.class ) ) ).thenReturn( true );
 
-        assertTrue( remotePeer.isConnected( containerHost ) );
+        assertTrue( remotePeer.isConnected( containerHost.getContainerId() ) );
 
         throwException();
 
@@ -371,13 +371,13 @@ public class RemotePeerImplTest
     @Test( expected = PeerException.class )
     public void testGetContainerHostState() throws Exception
     {
-        remotePeer.getContainerHostState( containerHost );
+        remotePeer.getContainerState( containerHost.getContainerId() );
 
         //verify( localPeer ).getId();
 
         throwException();
 
-        remotePeer.getContainerHostState( containerHost );
+        remotePeer.getContainerState( containerHost.getContainerId() );
     }
 
 

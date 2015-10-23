@@ -32,6 +32,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.host.HostId;
 import io.subutai.common.host.Interface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.mdc.SubutaiExecutors;
@@ -586,5 +587,12 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         {
             throw new PeerException( "Unable remove host from n2n tunnel.", e );
         }
+    }
+
+
+    @Override
+    public boolean isConnected()
+    {
+        return getPeer().isConnected( new HostId( getId() ) );
     }
 }

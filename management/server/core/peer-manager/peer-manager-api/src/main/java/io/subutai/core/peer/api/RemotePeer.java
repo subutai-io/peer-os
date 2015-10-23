@@ -2,13 +2,14 @@ package io.subutai.core.peer.api;
 
 
 import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerInfo;
 
 
 /**
- * Remote peer implementation
+ * Remote peer interface
  */
 public interface RemotePeer extends Peer
 {
-    //    public String getRemoteId() throws PeerException;
-
+    PeerInfo check() throws PeerException;
 }

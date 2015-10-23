@@ -35,6 +35,6 @@ public class DestroyContainerWrapperTaskTest
     {
         task.call();
 
-        verify( localPeer ).destroyContainer( containerHost );
+        verify( localPeer ).destroyContainer( containerHost.getContainerId() );
     }
 }

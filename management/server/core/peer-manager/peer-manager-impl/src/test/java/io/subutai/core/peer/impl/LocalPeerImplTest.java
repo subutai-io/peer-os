@@ -24,11 +24,12 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
-import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
@@ -147,6 +148,8 @@ public class LocalPeerImplTest
     @Mock
     PeerInfo peerInfo;
     @Mock
+    ContainerId containerId;
+    @Mock
     ContainerHostEntity containerHost;
     @Mock
     ContainerHostInfo containerHostInfo;
@@ -204,6 +207,8 @@ public class LocalPeerImplTest
         when( managementHost.getId() ).thenReturn( MANAGEMENT_HOST_ID );
         when( resourceHost.getId() ).thenReturn( RESOURCE_HOST_ID );
         when( containerHost.getId() ).thenReturn( CONTAINER_HOST_ID );
+        when( containerHost.getContainerId() ).thenReturn( containerId );
+        when( containerId.getId() ).thenReturn( CONTAINER_HOST_ID );
         when( resourceHost.getContainerHostById( CONTAINER_HOST_ID ) ).thenReturn( containerHost );
         when( resourceHost.getHostname() ).thenReturn( RESOURCE_HOST_NAME );
         when( localPeer.getPeerInfo() ).thenReturn( peerInfo );
@@ -303,7 +308,7 @@ public class LocalPeerImplTest
     @Test
     public void testGetContainerHostState() throws Exception
     {
-        localPeer.getContainerHostState( containerHost );
+        localPeer.getContainerState( containerHost.getContainerId() );
 
         verify( containerHost ).getStatus();
     }
@@ -452,7 +457,7 @@ public class LocalPeerImplTest
     @Test( expected = PeerException.class )
     public void testStartContainer() throws Exception
     {
-        localPeer.startContainer( containerHost );
+        localPeer.startContainer( containerHost.getContainerId() );
 
         verify( resourceHost ).startContainerHost( containerHost );
 
@@ -460,14 +465,14 @@ public class LocalPeerImplTest
 
         doThrow( cause ).when( resourceHost ).startContainerHost( containerHost );
 
-        localPeer.startContainer( containerHost );
+        localPeer.startContainer( containerHost.getContainerId() );
     }
 
 
     @Test( expected = PeerException.class )
     public void testStopContainer() throws Exception
     {
-        localPeer.stopContainer( containerHost );
+        localPeer.stopContainer( containerHost.getContainerId() );
 
         verify( resourceHost ).stopContainerHost( containerHost );
 
@@ -475,28 +480,28 @@ public class LocalPeerImplTest
 
         doThrow( cause ).when( resourceHost ).stopContainerHost( containerHost );
 
-        localPeer.stopContainer( containerHost );
+        localPeer.stopContainer( containerHost.getContainerId() );
     }
 
 
     @Test
     public void testDestroyContainer() throws Exception
     {
-        localPeer.destroyContainer( containerHost );
+        localPeer.destroyContainer( containerHost.getContainerId() );
 
         //        verify( containerGroupDataService ).remove( ENVIRONMENT_ID.toString() );
 
         //        when( containerGroup.getContainerIds() )
         //                .thenReturn( Sets.newHashSet( CONTAINER_HOST_ID, UUID.randomUUID().toString() ) );
 
-        localPeer.destroyContainer( containerHost );
+        localPeer.destroyContainer( containerHost.getContainerId() );
 
         //        verify( containerGroupDataService ).update( containerGroup );
 
         //        ContainerGroupNotFoundException exception = mock( ContainerGroupNotFoundException.class );
         //        doThrow( exception ).when( localPeer ).findContainerGroupByContainerId( CONTAINER_HOST_ID );
 
-        localPeer.destroyContainer( containerHost );
+        localPeer.destroyContainer( containerHost.getContainerId() );
 
         //        verify( exception ).printStackTrace( any( PrintStream.class ) );
 
@@ -504,7 +509,7 @@ public class LocalPeerImplTest
 
         try
         {
-            localPeer.destroyContainer( containerHost );
+            localPeer.destroyContainer( containerHost.getContainerId() );
             fail( "Expected PeerException" );
         }
         catch ( PeerException e )
@@ -535,17 +540,17 @@ public class LocalPeerImplTest
     @Test
     public void testIsConnected() throws Exception
     {
-        assertTrue( localPeer.isConnected( containerHost ) );
+        assertTrue( localPeer.isConnected( containerHost.getContainerId() ) );
 
         when( hostRegistry.getHostInfoById( CONTAINER_HOST_ID ) ).thenReturn( hostInfo );
 
-        TestCase.assertTrue( localPeer.isConnected( containerHost ) );
+        TestCase.assertTrue( localPeer.isConnected( containerHost.getContainerId() ) );
 
         HostDisconnectedException hostDisconnectedException = mock( HostDisconnectedException.class );
 
         doThrow( hostDisconnectedException ).when( hostRegistry ).getHostInfoById( CONTAINER_HOST_ID );
 
-        assertFalse( localPeer.isConnected( containerHost ) );
+        assertFalse( localPeer.isConnected( containerHost.getContainerId() ) );
 
         //        verify( hostDisconnectedException ).printStackTrace( any( PrintStream.class ) );
     }

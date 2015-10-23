@@ -10,6 +10,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.HostInterfaces;
@@ -70,17 +71,17 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /**
      * Start container on the peer
      */
-    public void startContainer( ContainerHost containerHost ) throws PeerException;
+    public void startContainer( ContainerId containerId ) throws PeerException;
 
     /**
      * Stops container on the peer
      */
-    public void stopContainer( ContainerHost containerHost ) throws PeerException;
+    public void stopContainer( ContainerId containerId ) throws PeerException;
 
     /**
      * Destroys container on the peer
      */
-    public void destroyContainer( ContainerHost containerHost ) throws PeerException;
+    public void destroyContainer( ContainerId containerId ) throws PeerException;
 
     /**
      * Sets default gateway for the container
@@ -96,8 +97,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /**
      * Returns true of the host is connected, false otherwise
      */
-    public boolean isConnected( Host host );
-
+    public boolean isConnected( HostId hostId );
 
     /**
      * Executes command on the container
@@ -197,7 +197,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /**
      * Returns state of container
      */
-    public ContainerHostState getContainerHostState( ContainerHost host ) throws PeerException;
+    public ContainerHostState getContainerState( ContainerId containerId );
 
     //******** Quota functions ***********
 
@@ -404,5 +404,4 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     void removeEnvironmentKeyPair( String environmentId ) throws PeerException;
 
     ResourceHostMetrics getResourceHostMetrics();
-
 }

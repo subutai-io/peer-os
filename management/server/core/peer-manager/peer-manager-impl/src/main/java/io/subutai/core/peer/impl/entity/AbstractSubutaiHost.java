@@ -169,10 +169,11 @@ public abstract class AbstractSubutaiHost implements Host
 
 
     @Override
-    public boolean isConnected()
-    {
-        return getPeer().isConnected( this );
-    }
+    public abstract boolean isConnected();
+    //    {
+    //        return getPeer().isConnected( this );
+    //    }
+    //
 
 
     public long getLastHeartbeat()

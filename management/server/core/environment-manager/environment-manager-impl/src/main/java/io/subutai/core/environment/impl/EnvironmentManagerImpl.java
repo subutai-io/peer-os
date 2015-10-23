@@ -286,7 +286,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
             else
             {
-                Set<EnvironmentContainerHost> newContainers = Sets.newHashSet( environment.getContainerHosts() );
+                Set<EnvironmentContainerHost> newContainers =
+                        Sets.newHashSet( loadEnvironment( environment.getId() ).getContainerHosts() );
                 newContainers.removeAll( oldContainers );
                 return newContainers;
             }

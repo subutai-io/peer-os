@@ -28,9 +28,11 @@ import org.apache.commons.net.util.SubnetUtils;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Interface;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
@@ -476,9 +478,8 @@ public class PeerManagerImpl implements PeerManager
     {
         RegistrationClient registrationClient = new RegistrationClientImpl( provider );
 
-        RegistrationData result =
-                registrationClient.sendInitRequest( destinationHost, buildRegistrationData( keyPhrase,
-                        RegistrationStatus.REQUESTED ) );
+        RegistrationData result = registrationClient
+                .sendInitRequest( destinationHost, buildRegistrationData( keyPhrase, RegistrationStatus.REQUESTED ) );
 
         addRequest( result );
     }
@@ -589,6 +590,34 @@ public class PeerManagerImpl implements PeerManager
     public void removeRequestListener( RequestListener listener )
     {
         localPeer.removeRequestListener( listener );
+    }
+
+
+    @Override
+    public void startContainer( final ContainerId containerId ) throws PeerException
+    {
+        localPeer.startContainer( containerId );
+    }
+
+
+    @Override
+    public void stopContainer( final ContainerId containerId ) throws PeerException
+    {
+        localPeer.stopContainer( containerId );
+    }
+
+
+    @Override
+    public void destroyContainer( final ContainerId containerId ) throws PeerException
+    {
+        localPeer.destroyContainer( containerId );
+    }
+
+
+    @Override
+    public ContainerHostState getContainerState( ContainerId containerId )
+    {
+        return localPeer.getContainerState( containerId );
     }
 }
 
