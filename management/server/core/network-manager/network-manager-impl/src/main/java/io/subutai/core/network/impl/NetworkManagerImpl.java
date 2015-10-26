@@ -20,6 +20,7 @@ import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
@@ -121,7 +122,7 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void cleanupEnvironmentNetworkSettings( final String environmentId ) throws NetworkManagerException
+    public void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
@@ -129,7 +130,7 @@ public class NetworkManagerImpl implements NetworkManager
 
         for ( Vni vni : reservedVnis )
         {
-            if ( vni.getEnvironmentId().equals( environmentId ) )
+            if ( vni.getEnvironmentId().equals( environmentId.getId() ) )
             {
                 execute( getManagementHost(), commands.getCleanupEnvironmentNetworkSettingsCommand( vni.getVlan() ) );
                 break;

@@ -40,6 +40,7 @@ import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.N2NConfig;
@@ -264,9 +265,9 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    public void cleanupEnvironmentNetworkSettings( final String environmentId ) throws PeerException
+    public void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         try
         {

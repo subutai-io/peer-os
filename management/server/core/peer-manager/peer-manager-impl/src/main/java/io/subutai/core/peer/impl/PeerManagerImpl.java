@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,6 +26,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.net.util.SubnetUtils;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
@@ -618,6 +620,30 @@ public class PeerManagerImpl implements PeerManager
     public ContainerHostState getContainerState( ContainerId containerId )
     {
         return localPeer.getContainerState( containerId );
+    }
+
+
+    @Override
+    public String getPeerIdByIp( final String ip ) throws PeerException
+    {
+        Preconditions.checkNotNull( ip );
+
+        String result = null;
+
+        for ( Iterator<PeerInfo> i = getPeerInfos().iterator(); result == null && i.hasNext(); )
+        {
+            PeerInfo peerInfo = i.next();
+            if ( ip.equals( peerInfo.getIp() ) )
+            {
+                result = peerInfo.getId();
+            }
+        }
+
+        if ( result == null )
+        {
+            throw new PeerException( "Peer not found by IP: " + ip );
+        }
+        return result;
     }
 }
 

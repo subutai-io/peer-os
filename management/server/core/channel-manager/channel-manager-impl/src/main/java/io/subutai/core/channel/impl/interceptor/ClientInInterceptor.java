@@ -1,18 +1,20 @@
 package io.subutai.core.channel.impl.interceptor;
 
+
 import java.net.URL;
-import javax.ws.rs.core.HttpHeaders;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
+
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import com.google.common.base.Strings;
+
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.ChannelSettings;
-import io.subutai.common.settings.Common;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.MessageContentUtil;
+import io.subutai.core.peer.api.PeerManager;
 
 
 /**
@@ -23,12 +25,15 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
 
     private static final Logger LOG = LoggerFactory.getLogger( ClientInInterceptor.class );
     private ChannelManagerImpl channelManagerImpl = null;
+    private PeerManager peerManager;
+
 
     //******************************************************************
-    public ClientInInterceptor( ChannelManagerImpl channelManagerImpl )
+    public ClientInInterceptor( ChannelManagerImpl channelManagerImpl, PeerManager peerManager )
     {
-        super( Phase.RECEIVE);
+        super( Phase.RECEIVE );
         this.channelManagerImpl = channelManagerImpl;
+        this.peerManager = peerManager;
     }
     //******************************************************************
 
@@ -47,38 +52,69 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
                 if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
                 {
 
-                    LOG.info( " *** URL:" + url.getPath());
+                    LOG.info( " *** URL:" + url.getPath() );
 
-                    HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getOutMessage());
-
-                    String spHeader = headers.getHeaderString( Common.HEADER_SPECIAL );
-
-                    if(!Strings.isNullOrEmpty( spHeader ))
+                    String path = url.getPath();
+                    String ip = url.getHost();
+                    if ( path.startsWith( "/rest/v1/peer" ) )
                     {
-                        String envIdSource = headers.getHeaderString( Common.HEADER_ENV_ID_SOURCE );
-                        String envIdTarget = headers.getHeaderString( Common.HEADER_ENV_ID_TARGET );
-
-                        String peerIdSource = headers.getHeaderString( Common.HEADER_PEER_ID_SOURCE );
-                        String peerIdTarget = headers.getHeaderString( Common.HEADER_PEER_ID_TARGET );
-
-                        if ( !Strings.isNullOrEmpty( envIdSource ) )
+                        handlePeerMessage( ip, message );
+                        LOG.debug( "Path handled by peer crypto handler: " + path );
+                    }
+                    else
+                    {
+                        final String prefix = "/rest/v1/env";
+                        if ( path.startsWith( prefix ) )
                         {
-                            MessageContentUtil.decryptContent( channelManagerImpl.getSecurityManager(), message,envIdSource,
-                                    envIdTarget );
+                            String s = path.substring( prefix.length() );
+                            String environmentId = s.substring( 0, s.indexOf( "/" ) );
+                            handleEnvironmentMessage( ip, environmentId, message );
+                            LOG.debug( "Path handled by environment crypto handler: " + path );
                         }
-                        else if ( !Strings.isNullOrEmpty( peerIdSource ) )
+                        else
                         {
-                            MessageContentUtil.decryptContent( channelManagerImpl.getSecurityManager(), message,peerIdSource,
-                                    peerIdTarget );
+                            LOG.warn( "Path is not handled by crypto handler: " + path );
                         }
                     }
-
                 }
             }
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
 
+        }
+    }
+
+
+    private void handlePeerMessage( final String ip, final Message message )
+    {
+        try
+        {
+            String targetId = peerManager.getPeerIdByIp( ip );
+            String sourceId = peerManager.getLocalPeerInfo().getId();
+            MessageContentUtil
+                    .decryptContent( channelManagerImpl.getSecurityManager(), message, sourceId, targetId );
+        }
+        catch ( PeerException e )
+        {
+            LOG.warn( e.getMessage() );
+        }
+    }
+
+
+    private void handleEnvironmentMessage( final String ip, final String environmentId, final Message message )
+    {
+        try
+        {
+            String targetId = peerManager.getPeerIdByIp( ip ) + "-" + environmentId;
+            String sourceId = peerManager.getLocalPeerInfo().getId() + "-" + environmentId;
+
+            MessageContentUtil
+                    .decryptContent( channelManagerImpl.getSecurityManager(), message, sourceId, targetId );
+        }
+        catch ( PeerException e )
+        {
+            LOG.warn( e.getMessage() );
         }
     }
 }

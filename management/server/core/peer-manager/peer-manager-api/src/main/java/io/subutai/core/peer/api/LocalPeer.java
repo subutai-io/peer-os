@@ -28,6 +28,8 @@ public interface LocalPeer extends Peer
      */
     public Host bindHost( String id ) throws HostNotFoundException;
 
+    public Host bindHost( ContainerId id ) throws HostNotFoundException;
+
 //    ContainerHost bindHost( ContainerId containerId ) throws HostNotFoundException;
 
     /**

@@ -107,6 +107,9 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Transient
     private EnvironmentManager environmentManager;
 
+    @Transient
+    private ContainerId containerId;
+
 
     protected EnvironmentContainerImpl()
     {
@@ -600,7 +603,12 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public ContainerId getContainerId()
     {
-        return new ContainerId( getId(), new PeerId( getPeerId() ), new EnvironmentId( getEnvironmentId() ) );
+        if ( containerId == null )
+        {
+            containerId =
+                    new ContainerId( getId(), new PeerId( getPeerId() ), new EnvironmentId( getEnvironmentId() ) );
+        }
+        return containerId;
     }
 
 

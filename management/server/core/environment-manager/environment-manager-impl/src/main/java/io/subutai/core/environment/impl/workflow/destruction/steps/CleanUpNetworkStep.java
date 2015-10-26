@@ -31,7 +31,7 @@ public class CleanUpNetworkStep
 
         for ( final Peer peer : peers )
         {
-            peer.cleanupEnvironmentNetworkSettings( environment.getId() );
+            peer.cleanupEnvironmentNetworkSettings( environment.getEnvironmentId() );
         }
     }
 }

@@ -2,10 +2,10 @@ package io.subutai.core.channel.impl.util;
 
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.bouncycastle.openpgp.PGPException;
@@ -14,8 +14,8 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 
@@ -73,6 +73,7 @@ public class MessageContentUtil
         InputStream is = message.getContent( InputStream.class );
         CachedOutputStream os = new CachedOutputStream();
 
+        LOG.debug( String.format( "Decrypting IDs: %s -> %s", hostIdSource, hostIdTarget ) );
         try
         {
             IOUtils.copyAndCloseInput( is, os );
@@ -119,28 +120,31 @@ public class MessageContentUtil
                 KeyManager keyMan = securityManager.getKeyManager();
                 PGPSecretKeyRing secKey = keyMan.getSecretKeyRing( hostIdSource );
 
-                if(secKey!=null)
+                if ( secKey != null )
                 {
-                    LOG.debug( " ****** Decrypting with: " + hostIdSource + " ****** ");
+                    LOG.debug( " ****** Decrypting with: " + hostIdSource + " ****** " );
                     byte[] outData = encTool.decrypt( data, secKey, "" );
                     //byte[] outData = encTool.decryptAndVerify();
                     return outData;
                 }
                 else
                 {
-                    LOG.debug( String.format( " ****** Decryption error. Could not find Secret key : %s ****** ", hostIdSource ) );
-                    throw new PGPException("Cannot find Secret Key");
+                    LOG.debug( String.format( " ****** Decryption error. Could not find Secret key : %s ****** ",
+                            hostIdSource ) );
+                    throw new PGPException( "Cannot find Secret Key" );
                 }
-
-
-
-
             }
         }
         catch ( Exception ex )
         {
             throw new PGPException( ex.toString() );
         }
+    }
+
+
+    private static URL getURL( final Message message ) throws MalformedURLException
+    {
+        return new URL( ( String ) message.getExchange().getOutMessage().get( Message.ENDPOINT_ADDRESS ) );
     }
 
 
@@ -156,6 +160,7 @@ public class MessageContentUtil
         message.setContent( OutputStream.class, cs );
 
         message.getInterceptorChain().doIntercept( message );
+        LOG.debug( String.format( "Encrypting IDs: %s -> %s", hostIdSource, hostIdTarget ) );
 
         try
         {
@@ -198,6 +203,8 @@ public class MessageContentUtil
     /* ******************************************************
      *
      */
+
+
     private static byte[] encryptData( SecurityManager securityManager, String hostIdSource, String hostIdTarget,
                                        String ip, byte[] data ) throws PGPException
     {
@@ -213,7 +220,7 @@ public class MessageContentUtil
                 KeyManager keyMan = securityManager.getKeyManager();
                 PGPPublicKey pubKey = keyMan.getRemoteHostPublicKey( hostIdTarget, ip );
 
-                if(pubKey != null)
+                if ( pubKey != null )
                 {
                     LOG.debug( String.format( " ****** Encrypting with %s ****** ", hostIdTarget ) );
                     byte[] outData = encTool.encrypt( data, pubKey, true );
@@ -222,8 +229,9 @@ public class MessageContentUtil
                 }
                 else
                 {
-                    LOG.debug( String.format( " ****** Encryption error. Could not find Public key : %s ****** ", hostIdTarget ) );
-                    throw new PGPException("Cannot find Public Key");
+                    LOG.debug( String.format( " ****** Encryption error. Could not find Public key : %s ****** ",
+                            hostIdTarget ) );
+                    throw new PGPException( "Cannot find Public Key" );
                 }
             }
         }

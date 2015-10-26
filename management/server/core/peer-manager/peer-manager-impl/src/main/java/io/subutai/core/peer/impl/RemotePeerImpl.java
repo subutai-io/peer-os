@@ -38,6 +38,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
@@ -458,9 +459,9 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void cleanupEnvironmentNetworkSettings( final String environmentId ) throws PeerException
+    public void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         String path = String.format( "/network/%s", environmentId );
 

@@ -20,6 +20,7 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.N2NConfig;
 
@@ -29,10 +30,11 @@ import io.subutai.common.protocol.N2NConfig;
 
 public interface RestService
 {
-    //    @GET
-    //    @Path( "me" )
-    //    @Produces( { MediaType.APPLICATION_JSON } )
-    //    public Response getLocalPeerInfo();
+    @Deprecated
+    @GET
+    @Path( "me" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getLocalPeerInfo();
 
     @GET
     @Path( "/info" )
@@ -103,7 +105,7 @@ public interface RestService
 
     @DELETE
     @Path( "network/{environmentId}" )
-    Response cleanupNetwork( @PathParam( "environmentId" ) String environmentId );
+    void cleanupNetwork( @PathParam( "environmentId" ) EnvironmentId environmentId );
 
     //*************** Peer Registration Handshake REST - BEGIN ***************************
 
@@ -274,6 +276,7 @@ public interface RestService
 
     @GET
     @Path( "resources" )
+    @Consumes( { MediaType.APPLICATION_JSON } )
     @Produces( { MediaType.APPLICATION_JSON } )
     ResourceHostMetrics getResources();
 
@@ -289,11 +292,11 @@ public interface RestService
     @Path( "n2ntunnel" )
     @Produces( { MediaType.APPLICATION_JSON } )
     @Consumes( { MediaType.APPLICATION_JSON } )
-    Response addToTunnel( N2NConfig config );
+    void addToTunnel( N2NConfig config );
 
     @DELETE
     @Path( "n2ntunnel/{interfaceName}/{communityName}" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response removeN2NConnection( @PathParam( "interfaceName" ) String interfaceName,
+    void removeN2NConnection( @PathParam( "interfaceName" ) String interfaceName,
                                   @PathParam( "communityName" ) String communityName );
 }

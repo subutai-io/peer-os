@@ -24,8 +24,8 @@
 
   <bean id="peerRestServiceImpl" class="io.subutai.core.peer.rest.RestServiceImpl">
     <argument ref="peerManager" />
-    <argument ref="httpContextManager" />
-    <argument ref="securityManager" />
+    <!--    <argument ref="httpContextManager" />
+        <argument ref="securityManager" />-->
     <!--<argument ref="jsonProvider" />-->
   </bean>
 

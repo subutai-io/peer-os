@@ -20,11 +20,15 @@
   <reference id="securityManager" availability="mandatory"
              interface="io.subutai.core.security.api.SecurityManager" />
 
+  <reference id="peerManager" availability="mandatory"
+             interface="io.subutai.core.peer.api.PeerManager" />
+
   <!-- ************************************************************************************************** -->
   <reference-list id="busListener" interface="org.apache.cxf.Bus" availability="optional">
     <reference-listener bind-method="busRegistered">
       <bean class="io.subutai.core.channel.impl.interceptor.ServerBusListener">
         <property name="channelManager" ref="channelManagerImpl" />
+        <property name="peerManager" ref="peerManager" />
       </bean>
     </reference-listener>
   </reference-list>

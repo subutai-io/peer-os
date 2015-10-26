@@ -106,4 +106,6 @@ public interface PeerManager
     void destroyContainer( ContainerId containerId ) throws PeerException;
 
     ContainerHostState getContainerState( ContainerId containerId );
+
+    String getPeerIdByIp( String ip ) throws PeerException;
 }

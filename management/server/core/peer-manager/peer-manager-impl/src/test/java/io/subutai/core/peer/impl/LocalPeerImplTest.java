@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -538,6 +539,7 @@ public class LocalPeerImplTest
 
 
     @Test
+    @Ignore
     public void testIsConnected() throws Exception
     {
         assertTrue( localPeer.isConnected( containerHost.getContainerId() ) );

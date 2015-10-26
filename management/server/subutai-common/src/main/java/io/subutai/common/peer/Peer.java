@@ -92,7 +92,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      * Cleans up environment networking settings. This method is called when an environment is being destroyed to clean
      * up its settings on the local peer.
      */
-    void cleanupEnvironmentNetworkSettings( final String environmentId ) throws PeerException;
+    void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException;
 
     /**
      * Returns true of the host is connected, false otherwise

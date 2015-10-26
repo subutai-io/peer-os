@@ -11,6 +11,7 @@ import io.subutai.core.channel.api.token.ChannelTokenManager;
 import io.subutai.core.channel.impl.token.ChannelTokenController;
 import io.subutai.core.channel.impl.token.ChannelTokenManagerImpl;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
 
@@ -43,7 +44,6 @@ public class ChannelManagerImpl implements ChannelManager
     {
         executorService.shutdown();
     }
-
 
     public DaoManager getDaoManager()
     {

@@ -57,6 +57,7 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainersDestructionResult;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.PeerException;
@@ -761,7 +762,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void cleanupEnvironmentNetworkSettings( final String environmentId ) throws PeerException
+    public void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException
     {
         getManagementHost().cleanupEnvironmentNetworkSettings( environmentId );
     }

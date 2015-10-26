@@ -9,6 +9,7 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.N2NConfig;
@@ -73,7 +74,7 @@ public interface ManagementHost extends Host, HostInfo
      * Cleans up environment networking settings. This method is called when an environment is being destroyed to clean
      * up its settings on the local peer.
      */
-    void cleanupEnvironmentNetworkSettings( final String environmentId ) throws PeerException;
+    void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException;
 
     /**
      * Removes a tunnel to remote peer

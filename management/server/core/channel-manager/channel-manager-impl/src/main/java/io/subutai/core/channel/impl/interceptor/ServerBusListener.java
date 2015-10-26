@@ -8,6 +8,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.feature.AbstractFeature;
 
 import io.subutai.core.channel.impl.ChannelManagerImpl;
+import io.subutai.core.peer.api.PeerManager;
 
 
 /**
@@ -17,6 +18,7 @@ public class ServerBusListener extends AbstractFeature
 {
     private final static Logger LOG = LoggerFactory.getLogger( ServerBusListener.class );
     private ChannelManagerImpl channelManagerImpl = null;
+    private PeerManager peerManager;
 
 
     public void busRegistered( Bus bus )
@@ -31,16 +33,16 @@ public class ServerBusListener extends AbstractFeature
         // initialise the feature on the bus, which will add the interceptors
 
         //***** PRE_STREAM **********************************
-        bus.getOutInterceptors().add( new ClientOutInterceptor(channelManagerImpl) );
+        bus.getOutInterceptors().add( new ClientOutInterceptor(channelManagerImpl, peerManager) );
 
         //***** RECEIVE    **********************************
-        bus.getInInterceptors().add( new ServerInInterceptor(channelManagerImpl) );
+        bus.getInInterceptors().add( new ServerInInterceptor(channelManagerImpl, peerManager) );
 
         //***** PRE_STREAM **********************************
-        bus.getOutInterceptors().add( new ServerOutInterceptor(channelManagerImpl) );
+        bus.getOutInterceptors().add( new ServerOutInterceptor(channelManagerImpl, peerManager) );
 
         //***** RECEIVE    **********************************
-        bus.getInInterceptors().add( new ClientInInterceptor(channelManagerImpl) );
+        bus.getInInterceptors().add( new ClientInInterceptor(channelManagerImpl, peerManager) );
 
         LOG.info( "Successfully added LoggingFeature interceptor on bus: " + bus );
     }
@@ -55,5 +57,11 @@ public class ServerBusListener extends AbstractFeature
     public void setChannelManager( final ChannelManagerImpl channelManagerImpl )
     {
         this.channelManagerImpl = channelManagerImpl;
+    }
+
+
+    public void setPeerManager( final PeerManager peerManager )
+    {
+        this.peerManager = peerManager;
     }
 }

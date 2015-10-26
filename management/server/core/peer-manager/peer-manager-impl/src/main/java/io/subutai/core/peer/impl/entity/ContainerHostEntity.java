@@ -67,6 +67,9 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Transient
     private volatile ContainerHostState state = ContainerHostState.STOPPED;
 
+    @Transient
+    private ContainerId containerId;
+
 
     protected ContainerHostEntity()
     {
@@ -358,7 +361,11 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     public ContainerId getContainerId()
     {
-
-        return new ContainerId( getId(), new PeerId( getPeerId() ), new EnvironmentId( getEnvironmentId() ) );
+        if ( containerId == null )
+        {
+            containerId =
+                    new ContainerId( getId(), new PeerId( getPeerId() ), new EnvironmentId( getEnvironmentId() ) );
+        }
+        return containerId;
     }
 }
