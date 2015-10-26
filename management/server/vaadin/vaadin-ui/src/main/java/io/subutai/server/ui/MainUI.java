@@ -232,7 +232,7 @@ public class MainUI extends UI implements ViewChangeListener
         }
         if ( currentFragment == null || "".equals( currentFragment ) || "/".equals( currentFragment ) )
         {
-            nav.navigateTo( "/modules" );
+            nav.navigateTo( "/core" );
             menu.getComponent( 0 ).addStyleName( "selected" );
             helpManager.showHelpFor( ModulesView.class );
         }

@@ -176,11 +176,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 String.format( "Creating environment %s ", environment.getId() ) );
 
         //launch environment creation workflow
-        EnvironmentCreationWorkflow environmentCreationWorkflow =
+        final EnvironmentCreationWorkflow environmentCreationWorkflow =
                 getEnvironmentCreationWorkflow( environment, topology, sshKey, operationTracker );
 
         //start environment creation workflow
-        environmentCreationWorkflow.start();
+        executor.execute( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                environmentCreationWorkflow.start();
+            }
+        } );
 
         //notify environment event listeners
         environmentCreationWorkflow.onStop( new Runnable()
@@ -249,11 +256,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
         //launch environment growing workflow
-        EnvironmentGrowingWorkflow environmentGrowingWorkflow =
+        final EnvironmentGrowingWorkflow environmentGrowingWorkflow =
                 getEnvironmentGrowingWorkflow( environment, topology, environment.getSshKey(), operationTracker );
 
         //start environment growing workflow
-        environmentGrowingWorkflow.start();
+        executor.execute( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                environmentGrowingWorkflow.start();
+            }
+        } );
 
         //notify environment event listeners
         environmentGrowingWorkflow.onStop( new Runnable()
@@ -318,10 +332,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, checkAccess );
 
-        SshKeyModificationWorkflow sshKeyModificationWorkflow =
+        final SshKeyModificationWorkflow sshKeyModificationWorkflow =
                 getSshKeyModificationWorkflow( environment, sshKey, networkManager, operationTracker );
 
-        sshKeyModificationWorkflow.start();
+        executor.execute( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                sshKeyModificationWorkflow.start();
+            }
+        } );
 
         //wait
         if ( !async )
@@ -366,11 +387,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     String.format( "Environment status is %s", environment.getStatus() ) );
         }
 
-        EnvironmentDestructionWorkflow environmentDestructionWorkflow =
+        final EnvironmentDestructionWorkflow environmentDestructionWorkflow =
                 getEnvironmentDestructionWorkflow( peerManager, this, environment, forceMetadataRemoval,
                         operationTracker );
 
-        environmentDestructionWorkflow.start();
+        executor.execute( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                environmentDestructionWorkflow.start();
+            }
+        } );
 
         environmentDestructionWorkflow.onStop( new Runnable()
         {
@@ -449,11 +477,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
 
 
-        ContainerDestructionWorkflow containerDestructionWorkflow =
+        final ContainerDestructionWorkflow containerDestructionWorkflow =
                 getContainerDestructionWorkflow( this, environment, environmentContainer, forceMetadataRemoval,
                         operationTracker );
 
-        containerDestructionWorkflow.start();
+        executor.execute( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                containerDestructionWorkflow.start();
+            }
+        } );
 
         //wait
         if ( !async )
