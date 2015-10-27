@@ -3,7 +3,6 @@ package io.subutai.core.peer.rest;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
@@ -348,8 +347,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
 
-            UUID id = UUID.fromString( peerId );
-            peerManager.unregister( id.toString() );
+            peerManager.unregister( peerId );
             return Response.status( Response.Status.NO_CONTENT ).build();
         }
         catch ( Exception e )

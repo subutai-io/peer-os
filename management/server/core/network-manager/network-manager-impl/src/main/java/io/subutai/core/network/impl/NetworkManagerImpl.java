@@ -303,7 +303,7 @@ public class NetworkManagerImpl implements NetworkManager
 
     @Override
     public void setVlanDomain( final int vLanId, final String domain,
-                               final DomainLoadBalanceStrategy domainLoadBalanceStrategy )
+                               final DomainLoadBalanceStrategy domainLoadBalanceStrategy, final String sslCertPath )
             throws NetworkManagerException
     {
         Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
@@ -311,7 +311,7 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( domain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
         Preconditions.checkNotNull( domainLoadBalanceStrategy );
 
-        execute( getManagementHost(), commands.getSetVlanDomainCommand( vLanId, domain, domainLoadBalanceStrategy ) );
+        execute( getManagementHost(), commands.getSetVlanDomainCommand( vLanId, domain, domainLoadBalanceStrategy, sslCertPath ) );
     }
 
 

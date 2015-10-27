@@ -26,12 +26,12 @@ import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.Interface;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
-import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
@@ -176,11 +176,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 String.format( "Creating environment %s ", environment.getId() ) );
 
         //launch environment creation workflow
-        EnvironmentCreationWorkflow environmentCreationWorkflow =
+        final EnvironmentCreationWorkflow environmentCreationWorkflow =
                 getEnvironmentCreationWorkflow( environment, topology, sshKey, operationTracker );
 
         //start environment creation workflow
-        environmentCreationWorkflow.start();
+        executor.execute( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                environmentCreationWorkflow.start();
+            }
+        } );
 
         //notify environment event listeners
         environmentCreationWorkflow.onStop( new Runnable()
@@ -249,11 +256,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
         //launch environment growing workflow
-        EnvironmentGrowingWorkflow environmentGrowingWorkflow =
+        final EnvironmentGrowingWorkflow environmentGrowingWorkflow =
                 getEnvironmentGrowingWorkflow( environment, topology, environment.getSshKey(), operationTracker );
 
         //start environment growing workflow
-        environmentGrowingWorkflow.start();
+        executor.execute( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                environmentGrowingWorkflow.start();
+            }
+        } );
 
         //notify environment event listeners
         environmentGrowingWorkflow.onStop( new Runnable()
@@ -286,7 +300,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
             else
             {
-                Set<EnvironmentContainerHost> newContainers = Sets.newHashSet( environment.getContainerHosts() );
+                Set<EnvironmentContainerHost> newContainers =
+                        Sets.newHashSet( loadEnvironment( environment.getId() ).getContainerHosts() );
                 newContainers.removeAll( oldContainers );
                 return newContainers;
             }
@@ -317,10 +332,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, checkAccess );
 
-        SshKeyModificationWorkflow sshKeyModificationWorkflow =
+        final SshKeyModificationWorkflow sshKeyModificationWorkflow =
                 getSshKeyModificationWorkflow( environment, sshKey, networkManager, operationTracker );
 
-        sshKeyModificationWorkflow.start();
+        executor.execute( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                sshKeyModificationWorkflow.start();
+            }
+        } );
 
         //wait
         if ( !async )
@@ -365,11 +387,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     String.format( "Environment status is %s", environment.getStatus() ) );
         }
 
-        EnvironmentDestructionWorkflow environmentDestructionWorkflow =
+        final EnvironmentDestructionWorkflow environmentDestructionWorkflow =
                 getEnvironmentDestructionWorkflow( peerManager, this, environment, forceMetadataRemoval,
                         operationTracker );
 
-        environmentDestructionWorkflow.start();
+        executor.execute( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                environmentDestructionWorkflow.start();
+            }
+        } );
 
         environmentDestructionWorkflow.onStop( new Runnable()
         {
@@ -448,11 +477,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
 
 
-        ContainerDestructionWorkflow containerDestructionWorkflow =
+        final ContainerDestructionWorkflow containerDestructionWorkflow =
                 getContainerDestructionWorkflow( this, environment, environmentContainer, forceMetadataRemoval,
                         operationTracker );
 
-        containerDestructionWorkflow.start();
+        executor.execute( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                containerDestructionWorkflow.start();
+            }
+        } );
 
         //wait
         if ( !async )
@@ -595,7 +631,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     @Override
     public void assignEnvironmentDomain( final String environmentId, final String newDomain,
-                                         final DomainLoadBalanceStrategy domainLoadBalanceStrategy )
+                                         final DomainLoadBalanceStrategy domainLoadBalanceStrategy,
+                                         final String sslCertPath )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
@@ -606,7 +643,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
                 String.format( "Assigning environment %s domain", environmentId ) );
 
-        modifyEnvironmentDomain( environmentId, newDomain, domainLoadBalanceStrategy, operationTracker, true );
+        modifyEnvironmentDomain( environmentId, newDomain, domainLoadBalanceStrategy, operationTracker, true,
+                sslCertPath );
     }
 
 
@@ -619,13 +657,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
                 String.format( "Removing environment %s domain", environmentId ) );
 
-        modifyEnvironmentDomain( environmentId, null, null, operationTracker, true );
+        modifyEnvironmentDomain( environmentId, null, null, operationTracker, true, null );
     }
 
 
     public void modifyEnvironmentDomain( final String environmentId, final String domain,
                                          final DomainLoadBalanceStrategy domainLoadBalanceStrategy,
-                                         final TrackerOperation operationTracker, boolean checkAccess )
+                                         final TrackerOperation operationTracker, boolean checkAccess,
+                                         final String sslCertPath )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
@@ -641,7 +680,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
             else
             {
-                peerManager.getLocalPeer().setVniDomain( environment.getVni(), domain, domainLoadBalanceStrategy );
+                peerManager.getLocalPeer()
+                           .setVniDomain( environment.getVni(), domain, domainLoadBalanceStrategy, sslCertPath );
             }
 
             operationTracker.addLogDone( "Environment domain modified" );

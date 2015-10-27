@@ -109,9 +109,10 @@ public interface ManagementHost extends Host, HostInfo
      * @param vlan - vlan id
      * @param domain - domain to assign
      * @param domainLoadBalanceStrategy - strategy to load balance requests to the domain
+     * @param sslCertPath - path to SSL certificate to enable HTTPS access to domai only, null if not needed
      */
-    void setVlanDomain( int vlan, String domain, DomainLoadBalanceStrategy domainLoadBalanceStrategy )
-            throws PeerException;
+    void setVlanDomain( int vlan, String domain, DomainLoadBalanceStrategy domainLoadBalanceStrategy,
+                        String sslCertPath ) throws PeerException;
 
     /**
      * Returns true if hostIp is added to reverse proxy environment domain  by vni
