@@ -50,6 +50,7 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Interface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
+import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
@@ -1725,7 +1726,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             if ( resourceHost.isConnected() )
             {
-                result.addMetric( resourceHost.getHostMetric() );
+
+                final ResourceHostMetric hostMetric = resourceHost.getHostMetric();
+                //TODO: please remove following 2 lines after implementation of host metric script: subutai stats system [hostname]
+                hostMetric.setHostName( resourceHost.getHostname() );
+                hostMetric.setHostId( resourceHost.getId() );
+                result.addMetric( hostMetric );
             }
         }
 

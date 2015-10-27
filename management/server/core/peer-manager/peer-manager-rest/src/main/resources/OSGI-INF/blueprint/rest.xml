@@ -20,14 +20,14 @@
     </jaxrs:providers>
   </jaxrs:server>
 
-  <!--<bean id="jsonProvider" class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />-->
-
-  <bean id="peerRestServiceImpl" class="io.subutai.core.peer.rest.RestServiceImpl">
-    <argument ref="peerManager" />
-    <!--    <argument ref="httpContextManager" />
-        <argument ref="securityManager" />-->
-    <!--<argument ref="jsonProvider" />-->
-  </bean>
+  <jaxrs:server address="/v1/env" id="environmentRestService">
+    <jaxrs:serviceBeans>
+      <ref component-id="environmentRestServiceImpl" />
+    </jaxrs:serviceBeans>
+    <jaxrs:providers>
+      <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
+    </jaxrs:providers>
+  </jaxrs:server>
 
   <jaxrs:server address="/v1/registration" id="registrationService">
     <jaxrs:serviceBeans>
@@ -38,6 +38,16 @@
     </jaxrs:providers>
   </jaxrs:server>
 
+  <!--<bean id="jsonProvider" class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />-->
+
+  <bean id="peerRestServiceImpl" class="io.subutai.core.peer.rest.RestServiceImpl">
+    <argument ref="peerManager" />
+  </bean>
+
+  <bean id="environmentRestServiceImpl" class="io.subutai.core.peer.rest.EnvironmentRestServiceImpl">
+    <argument ref="peerManager" />
+  </bean>
+
   <bean id="registrationServiceImpl" class="io.subutai.core.peer.rest.RegistrationServiceImpl">
     <argument ref="peerManager" />
   </bean>
@@ -45,10 +55,10 @@
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
 
-  <reference id="httpContextManager" availability="mandatory"
+<!--  <reference id="httpContextManager" availability="mandatory"
              interface="io.subutai.core.http.manager.api.HttpContextManager" />
 
   <reference id="securityManager" availability="mandatory"
-             interface="io.subutai.core.security.api.SecurityManager" />
+             interface="io.subutai.core.security.api.SecurityManager" />-->
 
 </blueprint>

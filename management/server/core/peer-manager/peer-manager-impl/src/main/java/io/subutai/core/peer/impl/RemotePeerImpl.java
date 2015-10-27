@@ -293,32 +293,15 @@ public class RemotePeerImpl implements RemotePeer
     public void startContainer( final ContainerId containerId ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
-        String path = "/container/start";
-
-        //*********construct Secure Header ****************************
-        Map<String, String> headers = Maps.newHashMap();
-
-        String envHeaderSource = localPeer.getId() + "-" + containerId.getEnvironmentId().getId();
-        String envHeaderTarget = peerInfo.getId() + "-" + containerId.getEnvironmentId().getId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
-        //*************************************************************
-
-        WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
-                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-        try
+        if ( containerId.getEnvironmentId() == null )
         {
-            client.post( containerId );
+            new PeerClient( provider ).startContainer( peerInfo.getIp(), containerId );
         }
-        catch ( Exception e )
+        else
         {
-            throw new PeerException( "Error starting container", e );
+            new EnvironmentClient( provider ).startContainer( peerInfo.getIp(), containerId );
         }
     }
 
@@ -327,32 +310,15 @@ public class RemotePeerImpl implements RemotePeer
     public void stopContainer( final ContainerId containerId ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
-        String path = "/container/stop";
-
-        //*********construct Secure Header ****************************
-        Map<String, String> headers = Maps.newHashMap();
-
-        String envHeaderSource = localPeer.getId() + "-" + containerId.getEnvironmentId().getId();
-        String envHeaderTarget = peerInfo.getId() + "-" + containerId.getEnvironmentId().getId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
-        //*************************************************************
-
-        WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
-                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-        try
+        if ( containerId.getEnvironmentId() == null )
         {
-            client.post( containerId );
+            new PeerClient( provider ).stopContainer( peerInfo.getIp(), containerId );
         }
-        catch ( Exception e )
+        else
         {
-            throw new PeerException( "Error starting container", e );
+            new EnvironmentClient( provider ).stopContainer( peerInfo.getIp(), containerId );
         }
     }
 

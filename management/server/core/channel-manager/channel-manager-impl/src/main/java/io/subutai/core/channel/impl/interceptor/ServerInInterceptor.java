@@ -123,7 +123,7 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
                             final String prefix = "/rest/v1/env";
                             if ( path.startsWith( prefix ) )
                             {
-                                String s = path.substring( prefix.length() );
+                                String s = path.substring( prefix.length() + 1 );
                                 String environmentId = s.substring( 0, s.indexOf( "/" ) );
                                 handleEnvironmentMessage( remoteAddress, environmentId, message );
                                 LOG.debug( "Path handled by environment crypto handler: " + path );

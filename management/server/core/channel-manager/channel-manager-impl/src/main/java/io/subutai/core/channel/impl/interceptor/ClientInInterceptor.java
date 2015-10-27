@@ -66,7 +66,7 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
                         final String prefix = "/rest/v1/env";
                         if ( path.startsWith( prefix ) )
                         {
-                            String s = path.substring( prefix.length() );
+                            String s = path.substring( prefix.length() + 1 );
                             String environmentId = s.substring( 0, s.indexOf( "/" ) );
                             handleEnvironmentMessage( ip, environmentId, message );
                             LOG.debug( "Path handled by environment crypto handler: " + path );
@@ -92,8 +92,7 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
         {
             String targetId = peerManager.getPeerIdByIp( ip );
             String sourceId = peerManager.getLocalPeerInfo().getId();
-            MessageContentUtil
-                    .decryptContent( channelManagerImpl.getSecurityManager(), message, sourceId, targetId );
+            MessageContentUtil.decryptContent( channelManagerImpl.getSecurityManager(), message, sourceId, targetId );
         }
         catch ( PeerException e )
         {
@@ -109,8 +108,7 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
             String targetId = peerManager.getPeerIdByIp( ip ) + "-" + environmentId;
             String sourceId = peerManager.getLocalPeerInfo().getId() + "-" + environmentId;
 
-            MessageContentUtil
-                    .decryptContent( channelManagerImpl.getSecurityManager(), message, sourceId, targetId );
+            MessageContentUtil.decryptContent( channelManagerImpl.getSecurityManager(), message, sourceId, targetId );
         }
         catch ( PeerException e )
         {

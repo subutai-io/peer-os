@@ -6,7 +6,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.core.channel.impl.ChannelManagerImpl;
+import io.subutai.core.peer.api.PeerManager;
 
 import org.apache.cxf.message.Message;
 
@@ -23,14 +25,17 @@ public class ServerInInterceptorTest
     @Mock
     ChannelManagerImpl channelManager;
     @Mock
+    PeerManager peerManager;
+    @Mock
     Message message;
     @Mock
     Object object;
 
+
     @Before
     public void setUp() throws Exception
     {
-        cxfInterceptor = new ServerInInterceptor( channelManager );
+        cxfInterceptor = new ServerInInterceptor( channelManager, peerManager );
     }
 
 
@@ -40,12 +45,12 @@ public class ServerInInterceptorTest
         cxfInterceptor.handleMessage( message );
     }
 
+
     @Test
     public void testHandleMessage() throws Exception
     {
-        when(message.get( any(Message.class) )).thenReturn( "http://example.com/pages/" );
+        when( message.get( any( Message.class ) ) ).thenReturn( "http://example.com/pages/" );
 
         //cxfInterceptor.handleMessage( message );
     }
-
 }
