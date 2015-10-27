@@ -165,7 +165,7 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    @RolesAllowed( "admin" )
+//    @RolesAllowed( "admin" )
     public List<Peer> getPeers()
     {
         List<PeerInfo> peerInfoList = peerDAO.getInfo( SOURCE_REMOTE_PEER, PeerInfo.class );

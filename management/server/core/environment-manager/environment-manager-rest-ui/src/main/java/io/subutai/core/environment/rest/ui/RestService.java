@@ -26,6 +26,8 @@ public interface RestService
     @Produces( { MediaType.TEXT_PLAIN } )
     public Response getDefaultDomainName();
 
+    // blueprint
+
     @GET
     @Path( "blueprint" )
     @Produces( { MediaType.TEXT_PLAIN } )
@@ -40,11 +42,33 @@ public interface RestService
     @Path( "blueprint/{blueprintId}" )
     public Response deleteBlueprint( @PathParam( "blueprintId" ) UUID blueprintId );
 
+    // container
+
     @GET
     @Path( "container/{containerId}" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getContainerEnvironmentId( @PathParam( "containerId" ) String containerId );
 
+    @DELETE
+    @Path( "container/{containerId}" )
+    public Response destroyContainer( @PathParam( "containerId" ) String containerId );
+
+    @GET
+    @Path( "container/{containerId}/state" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getContainerState( @PathParam( "containerId" ) String containerId );
+
+    @POST
+    @Path( "container/{containerId}/start" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response startContainer( @PathParam( "containerId" ) String containerId );
+
+    @POST
+    @Path( "container/{containerId}/stop" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response stopContainer( @PathParam( "containerId" ) String containerId );
+
+    // environment
 
     @GET
     @Path( "{environmentId}" )
@@ -74,22 +98,9 @@ public interface RestService
     @Path( "{environmentId}" )
     public Response destroyEnvironment( @PathParam( "environmentId" ) String environmentId );
 
-    @DELETE
-    @Path( "container/{containerId}" )
-    public Response destroyContainer( @PathParam( "containerId" ) String containerId );
 
+    // Peers
     @GET
-    @Path( "container/{containerId}/state" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getContainerState( @PathParam( "containerId" ) String containerId );
-
-    @POST
-    @Path( "container/{containerId}/start" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response startContainer( @PathParam( "containerId" ) String containerId );
-
-    @POST
-    @Path( "container/{containerId}/stop" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response stopContainer( @PathParam( "containerId" ) String containerId );
+    @Path( "peers" )
+    public Response getPeers();
 }

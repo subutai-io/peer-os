@@ -1,6 +1,8 @@
 package io.subutai.core.environment.rest.ui;
 
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -15,7 +17,10 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.peer.ContainerHost;
@@ -56,7 +61,8 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getBlueprints()
     {
-        try {
+        try
+        {
             return Response.ok( JsonUtil.toJson( environmentManager.getBlueprints() ) ).build();
         }
         catch (EnvironmentManagerException e )
@@ -69,7 +75,8 @@ public class RestServiceImpl implements RestService
     @Override
     public Response deleteBlueprint(final UUID blueprintId)
     {
-        try {
+        try
+        {
             environmentManager.removeBlueprint( blueprintId );
             return Response.ok().build();
         }
@@ -157,14 +164,15 @@ public class RestServiceImpl implements RestService
     public Response createEnvironment( final String environmentName, final String topologyJsonString,
                                        final String subnetCidr, final String sshKey )
     {
-        TopologyJson topologyJson;
+        TopologyJson topologyJson = new TopologyJson();
 
         //validate params
         try
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentName ), "Invalid environment name" );
             Preconditions.checkArgument( !Strings.isNullOrEmpty( subnetCidr ), "Invalid subnet cidr" );
-            topologyJson = JsonUtil.fromJson( topologyJsonString, TopologyJson.class );
+
+            topologyJson.setNodeGroupPlacement((Map<String, Set<NodeGroup>>) JsonUtil.fromJson( topologyJsonString, new TypeToken<Map<String, Set<NodeGroup>>>(){}.getType()));
             checkTopology( topologyJson );
         }
         catch ( Exception e )
@@ -419,11 +427,11 @@ public class RestServiceImpl implements RestService
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
         }
 
-        TopologyJson topologyJson;
+        TopologyJson topologyJson = new TopologyJson();
 
         try
         {
-            topologyJson = JsonUtil.fromJson( topologyJsonString, TopologyJson.class );
+            topologyJson.setNodeGroupPlacement((Map<String, Set<NodeGroup>>) JsonUtil.fromJson( topologyJsonString, new TypeToken<Map<String, Set<NodeGroup>>>(){}.getType()));
             checkTopology( topologyJson );
         }
         catch ( Exception e )
@@ -643,5 +651,19 @@ public class RestServiceImpl implements RestService
                     containerHost.getTemplateName() ) );
         }
         return jsonSet;
+    }
+
+    @Override
+    public Response getPeers()
+    {
+        List<Peer> peers = peerManager.getPeers();
+        Map<String, String> peerNames = Maps.newHashMap();
+
+        for( Peer peer : peers )
+        {
+            peerNames.put( peer.getId(), peer.getName() );
+        }
+
+        return Response.ok().entity( JsonUtil.toJson( peerNames ) ).build();
     }
 }

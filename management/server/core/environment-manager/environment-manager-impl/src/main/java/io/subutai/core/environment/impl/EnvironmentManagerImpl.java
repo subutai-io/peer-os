@@ -994,7 +994,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     protected User getUser()
     {
-        User user = identityManager.getUser();
+        User user = identityManager.getUser( "admin" );
 
         if ( user == null )
         {
