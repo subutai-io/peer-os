@@ -3,26 +3,31 @@ package io.subutai.server.ui.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.naming.NamingException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
 
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.server.ui.api.PortalModule;
 import io.subutai.server.ui.api.PortalModuleListener;
 import io.subutai.server.ui.api.PortalModuleService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Strings;
 
 
 public class PortalModuleServiceImpl implements PortalModuleService
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( PortalModuleServiceImpl.class.getName() );
-    private List<PortalModule> modules = Collections.synchronizedList( new ArrayList<PortalModule>() );
+    private Set<PortalModule> modules =
+            Collections.synchronizedSet( new TreeSet<>( new ModuleNameComparator() ) );
 
     private List<PortalModuleListener> listeners =
             Collections.synchronizedList( new ArrayList<PortalModuleListener>() );
@@ -30,21 +35,28 @@ public class PortalModuleServiceImpl implements PortalModuleService
     private ServiceLocator serviceLocator = new ServiceLocator();
 
 
+    class ModuleNameComparator implements Comparator<PortalModule>
+    {
+        @Override
+        public int compare( final PortalModule o1, final PortalModule o2 )
+        {
+            return o1.getName().compareTo( o2.getName() );
+        }
+    }
+
+
     public synchronized void registerModule( PortalModule module )
     {
         if ( module != null )
         {
-            //TODO place to filter out modules
-
             try
             {
                 IdentityManager identityManager = serviceLocator.getService( IdentityManager.class );
 
-                if(identityManager != null)
+                if ( identityManager != null )
                 {
                     identityManager.updateUserPortalModule( module.getId(), module.getName() );
                 }
-
             }
             catch ( NamingException e )
             {
