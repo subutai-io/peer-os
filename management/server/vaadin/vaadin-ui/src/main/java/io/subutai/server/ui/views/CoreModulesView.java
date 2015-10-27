@@ -9,15 +9,6 @@ import javax.naming.NamingException;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
-import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.PortalModuleScope;
-import io.subutai.core.identity.api.Role;
-import io.subutai.core.identity.api.User;
-import io.subutai.server.ui.MainUI;
-import io.subutai.server.ui.api.PortalModule;
-import io.subutai.server.ui.api.PortalModuleListener;
-import io.subutai.server.ui.api.PortalModuleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +22,16 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
+import io.subutai.common.util.ServiceLocator;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.PortalModuleScope;
+import io.subutai.core.identity.api.Role;
+import io.subutai.core.identity.api.User;
+import io.subutai.server.ui.MainUI;
+import io.subutai.server.ui.api.PortalModule;
+import io.subutai.server.ui.api.PortalModuleListener;
+import io.subutai.server.ui.api.PortalModuleService;
+
 
 public class CoreModulesView extends VerticalLayout implements View, PortalModuleListener
 {
@@ -41,7 +42,6 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
     private HashMap<String, PortalModule> modules = new HashMap<>();
     private HashMap<String, AbstractLayout> moduleViews = new HashMap<>();
     private static PortalModuleService portalModuleService = null;
-    private static final ServiceLocator serviceLocator = new ServiceLocator();
 
 
     public CoreModulesView()
@@ -147,7 +147,6 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
                 if ( serviceReference != null )
                 {
                     portalModuleService = PortalModuleService.class.cast( ctx.getService( serviceReference ) );
-                    //                    return PortalModuleService.class.cast( ctx.getService( serviceReference ) );
                 }
             }
         }
@@ -171,7 +170,7 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
             }
         } );
         moduleViews.put( module.getId(), moduleView );
-        modulesLayout.addComponent( moduleView );
+        modulesLayout.addComponent( moduleView, getPortalModuleService().getCoreModules().indexOf( module ) );
     }
 
 
