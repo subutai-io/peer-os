@@ -79,7 +79,7 @@ public interface ManagementHost extends Host, HostInfo
     /**
      * Removes a tunnel to remote peer
      */
-    void removeTunnel( String tunnelIp ) throws PeerException;
+    void removeTunnel( String tunnelIp ) ;
 
     /**
      * Returns external IP of mgmt host
@@ -139,7 +139,7 @@ public interface ManagementHost extends Host, HostInfo
      */
     void removeIpFromVlanDomain( String hostIp, int vlan ) throws PeerException;
 
-    void removeN2NConnection( N2NConfig config ) throws PeerException;
+    void removeN2NConnection( N2NConfig config );
 
     int findTunnel( String tunnelIp, Set<Tunnel> tunnels );
 

@@ -1675,14 +1675,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         for ( TunnelEntity tunnel : tunnels )
         {
-            N2NConfig config =
-                    new N2NConfig( tunnel.getTunnelAddress(), tunnel.getInterfaceName(), tunnel.getCommunityName() );
+            try
+            {
+                N2NConfig config = new N2NConfig( tunnel.getTunnelAddress(), tunnel.getInterfaceName(),
+                        tunnel.getCommunityName() );
 
-            LOG.debug( String.format( "Removing peer from n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
-                    config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
-            getManagementHost().removeN2NConnection( config );
-            getManagementHost().removeTunnel( config.getAddress() );
-            tunnelDataService.remove( tunnel.getId() );
+                LOG.debug( String.format( "Removing peer from n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
+                        config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(),
+                        config.getAddress() ) );
+                getManagementHost().removeN2NConnection( config );
+                getManagementHost().removeTunnel( config.getAddress() );
+                tunnelDataService.remove( tunnel.getId() );
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( e.getMessage(), e );
+            }
         }
     }
 

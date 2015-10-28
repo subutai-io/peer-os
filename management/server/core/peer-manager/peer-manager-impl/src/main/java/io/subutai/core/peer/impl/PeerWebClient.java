@@ -310,7 +310,7 @@ public class PeerWebClient
 
         try
         {
-            final Collection<? extends Vni> response = client.getCollection( Vni.class );
+            final Collection response = client.getCollection( Vni.class );
             return new HashSet<>( response );
         }
         catch ( Exception e )

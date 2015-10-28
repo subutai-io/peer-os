@@ -295,7 +295,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
-    public void removeTunnel( final String tunnelIp ) throws PeerException
+    public void removeTunnel( final String tunnelIp )
     {
         try
         {
@@ -311,9 +311,9 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
                 }
             }
         }
-        catch ( NetworkManagerException e )
+        catch ( PeerException | NetworkManagerException e )
         {
-            throw new PeerException( "Error removing tunnel", e );
+            LOG.warn( "Error removing tunnel", e );
         }
     }
 
@@ -578,15 +578,15 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
-    public void removeN2NConnection( final N2NConfig config ) throws PeerException
+    public void removeN2NConnection( final N2NConfig config )
     {
         try
         {
             getNetworkManager().removeN2NConnection( config.getInterfaceName(), config.getCommunityName() );
         }
-        catch ( NetworkManagerException e )
+        catch ( PeerException | NetworkManagerException e )
         {
-            throw new PeerException( "Unable remove host from n2n tunnel.", e );
+            LOG.warn( "Unable remove host from n2n tunnel.", e );
         }
     }
 

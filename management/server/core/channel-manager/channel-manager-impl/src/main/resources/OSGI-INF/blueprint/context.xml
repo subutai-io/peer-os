@@ -13,7 +13,7 @@
 
   <cm:property-placeholder persistent-id="peer" update-strategy="none">
     <cm:default-properties>
-      <cm:property name="encryptionEnabled" value="false" />
+      <cm:property name="restEncryptionEnabled" value="false" />
     </cm:default-properties>
   </cm:property-placeholder>
   <!-- ************************************************************************************************* -->
@@ -49,7 +49,7 @@
     <property name="daoManager" ref="daoManagerChannel" />
     <property name="identityManager" ref="identityManager" />
     <property name="securityManager" ref="securityManager" />
-    <property name="encryptionEnabled" value="${encryptionEnabled}" />
+    <property name="encryptionEnabled" value="${restEncryptionEnabled}" />
   </bean>
 
   <service ref="channelManagerImpl"
