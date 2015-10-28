@@ -58,7 +58,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>identity-manager-impl</artifactId>
+      <artifactId>identity-manager-api</artifactId>
     </dependency>
     <!-- Vaadin dependencies -->
     <dependency>

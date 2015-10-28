@@ -4,6 +4,16 @@
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
     >
 
+
+  <!--*****************************************************************-->
+  <jaas:config name="karaf" rank="1">
+    <jaas:module flags="required" name="Subutai"
+                 className="io.subutai.core.identity.impl.ShiroLoginModule">
+    </jaas:module>
+  </jaas:config>
+  <!--*****************************************************************-->
+
+
   <!--*****************************************************************-->
   <bean id="daoManagerSecurity" init-method="init" activation="eager" scope="singleton"
         class="io.subutai.common.dao.DaoManager">
@@ -11,22 +21,18 @@
   </bean>
   <!--*****************************************************************-->
 
+
   <bean id="identityManager" scope="singleton" activation="eager"
         init-method="init" depends-on="daoManagerSecurity"
         class="io.subutai.core.identity.impl.IdentityManagerImpl">
     <argument ref="daoManagerSecurity" />
   </bean>
 
+  <!--*****************************************************************-->
   <service ref="identityManager" activation="eager"
            interface="io.subutai.core.identity.api.IdentityManager" />
+  <!--*****************************************************************-->
 
-  <jaas:config name="karaf" rank="5">
-    <jaas:module flags="required" name="Subutai"
-                 className="io.subutai.core.identity.impl.ShiroLoginModule">
-    </jaas:module>
-  </jaas:config>
 
-  <service ref="identityManager"
-           interface="org.apache.felix.gogo.api.CommandSessionListener" />
 
   </blueprint>

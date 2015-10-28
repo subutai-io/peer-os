@@ -1,21 +1,24 @@
 package io.subutai.core.identity.impl.model;
 
 
-import java.util.Set;
-
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
-import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.impl.model.PermissionEntity;
 
 
 /**
@@ -27,9 +30,9 @@ import io.subutai.core.identity.api.model.User;
 public class RoleEntity implements Role
 {
     @Id
-    @GeneratedValue
+    @GeneratedValue( strategy = GenerationType.IDENTITY )
     @Column( name = "id" )
-    private Long id;
+    private long id;
 
     @Column( name = "name" )
     private String name;
@@ -37,14 +40,14 @@ public class RoleEntity implements Role
     @Column( name = "type" )
     private Short type = 1;
 
-    //*********************************************
-    @ManyToMany
-    @JoinTable( name = "AssignedUsers",
-            joinColumns = { @JoinColumn( name = "role_id", referencedColumnName = "id" ) },
-            inverseJoinColumns = { @JoinColumn( name = "user_id", referencedColumnName = "id" ) } )
-    private Set<User> assignedUsers;
-    //*********************************************
 
+    //*********************************************
+    @ManyToMany(targetEntity=PermissionEntity.class,fetch = FetchType.EAGER)
+    @JoinTable( name = "role_permissions",
+            joinColumns = { @JoinColumn( name = "role_id", referencedColumnName = "id" ) },
+            inverseJoinColumns = { @JoinColumn( name = "permission_id", referencedColumnName = "id" ) })
+    private List<Permission> permissions = new ArrayList<>();
+    //*********************************************
 
     @Override
     public Long getId()
@@ -89,15 +92,17 @@ public class RoleEntity implements Role
 
 
     @Override
-    public Set<User> getAssignedUsers()
+    public List<Permission> getPermissions()
     {
-        return assignedUsers;
+        return permissions;
     }
 
 
     @Override
-    public void setAssignedUsers( final Set<User> assignedUsers )
+    public void setPermissions( List<Permission> permissions )
     {
-        this.assignedUsers = assignedUsers;
+        this.permissions = permissions;
     }
+
+
 }

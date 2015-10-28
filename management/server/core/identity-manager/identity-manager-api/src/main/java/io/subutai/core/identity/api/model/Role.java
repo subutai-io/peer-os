@@ -1,25 +1,28 @@
 package io.subutai.core.identity.api.model;
 
+import java.util.List;
 
-import java.io.Serializable;
-import java.util.Set;
+import io.subutai.core.identity.api.model.Permission;
 
 
-public interface Role extends Serializable
+public interface Role
 {
-    Long getId();
 
-    void setId( Long id );
+    public abstract void setType( final Short type );
 
-    String getName();
+    public abstract Short getType();
 
-    void setName( String name );
+    public abstract void setName( final String name );
 
-    Short getType();
+    public abstract String getName();
 
-    void setType( Short type );
+    public abstract void setId( final Long id );
 
-    Set<User> getAssignedUsers();
+    public abstract Long getId();
 
-    void setAssignedUsers( Set<User> assignedUsers );
+    List<Permission> getPermissions();
+
+    void setPermissions( List<Permission> permissions );
+
 }
+

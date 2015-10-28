@@ -22,15 +22,33 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          id="vaadin-portal" version="2.5">
   <display-name>Vaadin Web Application</display-name>
+  <welcome-file-list>
+    <welcome-file>login.jsp</welcome-file>
+    <welcome-file>login.htm</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
   <context-param>
     <description>Vaadin production mode</description>
     <param-name>productionMode</param-name>
     <param-value>false</param-value>
   </context-param>
   <session-config>
-    <session-timeout>30</session-timeout>
-    <!-- 1 minute -->
+    <session-timeout>30</session-timeout><!-- 30 minute -->
   </session-config>
+
+  <!-- **********Authorization Filter *******************************-->
+  <filter>
+    <filter-name>authfilter</filter-name>
+    <filter-class>io.subutai.server.ui.web.filter.AuthFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>authfilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <!-- ***************************************************************-->
+
   <servlet>
     <servlet-name>Portal Vaadin App</servlet-name>
     <servlet-class>io.subutai.server.ui.SubutaiVaadinServlet</servlet-class>
@@ -43,6 +61,6 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>Portal Vaadin App</servlet-name>
-    <url-pattern>/*</url-pattern>
+    <url-pattern>/vui/*</url-pattern>
   </servlet-mapping>
 </web-app>

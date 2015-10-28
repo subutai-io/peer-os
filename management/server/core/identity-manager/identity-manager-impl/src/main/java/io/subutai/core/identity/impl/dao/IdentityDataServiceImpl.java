@@ -49,8 +49,28 @@ public class IdentityDataServiceImpl implements IdentityDataService
     }
 
 
-    /* ******User *************************************
+    /*
+     *  ******User *************************************
+     */
+    @Override
+    public User getUserByUsername( final String userName )
+    {
+        return userDAOService.findByUsername( userName );
+    }
+
+
+    /* *************************************************
      *
+     */
+    @Override
+    public void assignUserRole( long userId, Role role)
+    {
+        User user = userDAOService.find( userId );
+        user.getRoles().add( role );
+        userDAOService.update( user );
+    }
+
+    /* *************************************************
      */
     @Override
     public List<User> getAllUsers()
@@ -60,7 +80,6 @@ public class IdentityDataServiceImpl implements IdentityDataService
 
 
     /* *************************************************
-     *
      */
     @Override
     public void persistUser( final User item )
@@ -70,7 +89,6 @@ public class IdentityDataServiceImpl implements IdentityDataService
 
 
     /* *************************************************
-     *
      */
     @Override
     public void removeUser( final long id )
@@ -80,7 +98,6 @@ public class IdentityDataServiceImpl implements IdentityDataService
 
 
     /* *************************************************
-     *
      */
     @Override
     public void updateUser( final User item )
@@ -90,7 +107,6 @@ public class IdentityDataServiceImpl implements IdentityDataService
 
 
     /* *************************************************
-     *
      */
     @Override
     public List<Role> getAllRoles()
@@ -100,7 +116,6 @@ public class IdentityDataServiceImpl implements IdentityDataService
 
 
     /* *************************************************
-     *
      */
     @Override
     public void persistRole( final Role item )
@@ -110,7 +125,6 @@ public class IdentityDataServiceImpl implements IdentityDataService
 
 
     /* *************************************************
-     *
      */
     @Override
     public void removeRole( final long id )
@@ -120,7 +134,6 @@ public class IdentityDataServiceImpl implements IdentityDataService
 
 
     /* *************************************************
-     *
      */
     @Override
     public void updateRole( final Role item )
@@ -129,8 +142,20 @@ public class IdentityDataServiceImpl implements IdentityDataService
     }
 
 
-    /* ******Permission*********************************
+    /* *************************************************
      *
+     */
+    @Override
+    public void assignRolePermission( long roleId, Permission permission)
+    {
+        Role role = roleDAOService.find( roleId );
+        role.getPermissions().add( permission );
+        roleDAOService.update( role );
+    }
+
+
+    /*
+     * ******Permission*********************************
      */
     @Override
     public List<Permission> getAllPermissions()
@@ -140,7 +165,6 @@ public class IdentityDataServiceImpl implements IdentityDataService
 
 
     /* *************************************************
-     *
      */
     @Override
     public void persistPermission( final Permission item )
@@ -150,7 +174,6 @@ public class IdentityDataServiceImpl implements IdentityDataService
 
 
     /* *************************************************
-     *
      */
     @Override
     public void removePermission( final long id )
@@ -160,7 +183,6 @@ public class IdentityDataServiceImpl implements IdentityDataService
 
 
     /* *************************************************
-     *
      */
     @Override
     public void updatePermission( final Permission item )

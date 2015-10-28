@@ -41,6 +41,7 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
 
+
 public class ModulesView extends VerticalLayout implements View, PortalModuleListener
 {
 
@@ -159,7 +160,6 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
                 if ( serviceReference != null )
                 {
                     portalModuleService = PortalModuleService.class.cast( ctx.getService( serviceReference ) );
-                    //                    return PortalModuleService.class.cast( ctx.getService( serviceReference ) );
                 }
             }
         }
@@ -188,7 +188,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
                 }
             } );
             moduleViews.put( module.getId(), moduleView );
-            modulesLayout.addComponent( moduleView );
+            modulesLayout.addComponent( moduleView, getPortalModuleService().getModules().indexOf( module ) );
         }
     }
 

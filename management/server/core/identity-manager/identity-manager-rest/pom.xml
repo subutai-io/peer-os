@@ -25,10 +25,7 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>identity-manager-api</artifactId>
     </dependency>
-<<<<<<< HEAD
-=======
 
->>>>>>> master
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>

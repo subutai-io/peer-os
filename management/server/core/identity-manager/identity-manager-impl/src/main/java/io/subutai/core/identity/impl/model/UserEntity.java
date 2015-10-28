@@ -1,17 +1,14 @@
-package io.subutai.core.identity.impl.model;
-
+package impl.model;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -20,6 +17,7 @@ import javax.persistence.Table;
 
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.impl.model.RoleEntity;
 
 
 /**
@@ -31,9 +29,9 @@ import io.subutai.core.identity.api.model.User;
 public class UserEntity implements User
 {
     @Id
-    @GeneratedValue
+    @GeneratedValue( strategy = GenerationType.IDENTITY )
     @Column( name = "id" )
-    private Long id;
+    private long id;
 
     @Column( name = "user_name", unique = true )
     private String userName;
@@ -50,10 +48,14 @@ public class UserEntity implements User
     @Column( name = "email" )
     private String email;
 
-    //****************************************
-    @ManyToMany(mappedBy="assignedUsers")
-    private List<Role> roles = new ArrayList<Role>();
-    //****************************************
+
+    //*********************************************
+    @ManyToMany (targetEntity=RoleEntity.class,fetch = FetchType.EAGER)
+    @JoinTable( name = "user_roles",
+            joinColumns = { @JoinColumn( name = "user_id", referencedColumnName = "id" ) },
+            inverseJoinColumns = { @JoinColumn( name = "role_id", referencedColumnName = "id" ) })
+    private List<Role> roles = new ArrayList<>();
+    //*********************************************
 
 
     @Override
