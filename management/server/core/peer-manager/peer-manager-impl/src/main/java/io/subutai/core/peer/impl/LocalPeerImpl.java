@@ -93,16 +93,19 @@ import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.Payload;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.RequestListener;
+import io.subutai.core.peer.api.Tunnel;
 import io.subutai.core.peer.impl.container.ContainersDestructionResultImpl;
 import io.subutai.core.peer.impl.container.CreateContainerWrapperTask;
 import io.subutai.core.peer.impl.container.DestroyContainerWrapperTask;
 import io.subutai.core.peer.impl.dao.ManagementHostDataService;
 import io.subutai.core.peer.impl.dao.PeerDAO;
 import io.subutai.core.peer.impl.dao.ResourceHostDataService;
+import io.subutai.core.peer.impl.dao.TunnelDataService;
 import io.subutai.core.peer.impl.entity.AbstractSubutaiHost;
 import io.subutai.core.peer.impl.entity.ContainerHostEntity;
 import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.entity.ResourceHostEntity;
+import io.subutai.core.peer.impl.entity.TunnelEntity;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -129,6 +132,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private Monitor monitor;
     protected ManagementHostDataService managementHostDataService;
     protected ResourceHostDataService resourceHostDataService;
+    protected TunnelDataService tunnelDataService;
     private HostRegistry hostRegistry;
     protected CommandUtil commandUtil = new CommandUtil();
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
@@ -168,6 +172,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         PeerDAO peerDAO;
         try
         {
+
+            tunnelDataService = createTunnelDataService();
+
             peerDAO = new PeerDAO( daoManager );
 
 
@@ -181,7 +188,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 peerInfo = result.get( 0 );
             }
 
-            managementHostDataService = getManagementHostDataService();
+            managementHostDataService = createManagementHostDataService();
             Collection<ManagementHostEntity> allManagementHostEntity = managementHostDataService.getAll();
             if ( allManagementHostEntity != null && !allManagementHostEntity.isEmpty() )
             {
@@ -190,7 +197,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 managementHost.init();
             }
 
-            resourceHostDataService = getResourceHostDataService();
+            resourceHostDataService = createResourceHostDataService();
             resourceHosts.clear();
             synchronized ( resourceHosts )
             {
@@ -218,15 +225,21 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected ManagementHostDataService getManagementHostDataService()
+    protected ManagementHostDataService createManagementHostDataService()
     {
         return new ManagementHostDataService( daoManager.getEntityManagerFactory() );
     }
 
 
-    protected ResourceHostDataService getResourceHostDataService()
+    protected ResourceHostDataService createResourceHostDataService()
     {
         return new ResourceHostDataService( daoManager.getEntityManagerFactory() );
+    }
+
+
+    protected TunnelDataService createTunnelDataService()
+    {
+        return new TunnelDataService( daoManager.getEntityManagerFactory() );
     }
 
 
@@ -790,8 +803,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
-                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder(
+                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
+                    bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -1091,16 +1105,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public ProcessResourceUsage getProcessResourceUsage( final ContainerHost host, final int processPid )
-            throws PeerException
+    public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException
     {
-        Preconditions.checkNotNull( host, "Invalid container host" );
-        Preconditions.checkArgument( processPid > 0, "Process pid must be greater than 0" );
+        Preconditions.checkNotNull( containerId );
+        Preconditions.checkArgument( pid > 0, "Process pid must be greater than 0" );
 
         try
         {
-            Host c = bindHost( host.getId() );
-            return monitor.getProcessResourceUsage( ( ContainerHost ) c, processPid );
+            return monitor.getProcessResourceUsage( containerId, pid );
         }
         catch ( MonitorException e )
         {
@@ -1626,57 +1638,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //    private Set<Interface> getInterfacesByIp( final String pattern )
-    //    {
-    //        LOG.debug( pattern );
-    //        Set<Interface> result = new HashSet<>();
-    //        try
-    //        {
-    //            result = Sets.filter( getManagementHost().getInterfaces(), new Predicate<Interface>()
-    //            {
-    //                @Override
-    //                public boolean apply( final Interface anInterface )
-    //                {
-    //                    if ( LOG.isDebugEnabled() )
-    //                    {
-    //                        LOG.debug( String.format( "%s matches %s = %s", anInterface.getIp(), pattern,
-    //                                anInterface.getIp().matches( pattern ) ) );
-    //                    }
-    //                    return anInterface.getIp().matches( pattern );
-    //                }
-    //            } );
-    //        }
-    //        catch ( HostNotFoundException e )
-    //        {
-    //            LOG.error( e.getMessage(), e );
-    //        }
-    //        return Collections.unmodifiableSet( result );
-    //    }
-    //
-    //
-    //    private Set<Interface> getInterfacesByName( final String pattern )
-    //    {
-    //        LOG.debug( pattern );
-    //        Set<Interface> result = new HashSet<>();
-    //        try
-    //        {
-    //            result = Sets.filter( getManagementHost().getInterfaces(), new Predicate<Interface>()
-    //            {
-    //                @Override
-    //                public boolean apply( final Interface anInterface )
-    //                {
-    //                    return anInterface.getName().matches( pattern );
-    //                }
-    //            } );
-    //        }
-    //        catch ( HostNotFoundException e )
-    //        {
-    //            LOG.error( e.getMessage(), e );
-    //        }
-    //        return result;
-    //    }
-
-
     @Override
     public HostInterfaces getInterfaces()
     {
@@ -1695,18 +1656,34 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         LOG.debug( String.format( "Adding local peer to n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
                 config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
 
-
         getManagementHost().setupN2NConnection( config );
+
+        TunnelEntity tunnel = new TunnelEntity();
+
+        tunnel.setEnvironmentId( config.getEnvironmentId() );
+        tunnel.setCommunityName( config.getCommunityName() );
+        tunnel.setInterfaceName( config.getInterfaceName() );
+        tunnel.setTunnelAddress( config.getAddress() );
+        tunnelDataService.saveOrUpdate( tunnel );
     }
 
 
     @Override
-    public void removeN2NConnection( final N2NConfig config ) throws PeerException
+    public void removeN2NConnection( final EnvironmentId environmentId ) throws PeerException
     {
-        LOG.debug( String.format( "Removing peer from n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
-                config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
-        getManagementHost().removeN2NConnection( config );
-        getManagementHost().removeTunnel( config.getAddress() );
+        Collection<TunnelEntity> tunnels = tunnelDataService.findByEnvironmentId( environmentId );
+
+        for ( TunnelEntity tunnel : tunnels )
+        {
+            N2NConfig config =
+                    new N2NConfig( tunnel.getTunnelAddress(), tunnel.getInterfaceName(), tunnel.getCommunityName() );
+
+            LOG.debug( String.format( "Removing peer from n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
+                    config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
+            getManagementHost().removeN2NConnection( config );
+            getManagementHost().removeTunnel( config.getAddress() );
+            tunnelDataService.remove( tunnel.getId() );
+        }
     }
 
 
@@ -1728,7 +1705,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
 
                 final ResourceHostMetric hostMetric = resourceHost.getHostMetric();
-                //TODO: please remove following 2 lines after implementation of host metric script: subutai stats system [hostname]
+                //TODO: please remove following 2 lines after implementation of host metric script: subutai stats
+                // system [hostname]
                 hostMetric.setHostName( resourceHost.getHostname() );
                 hostMetric.setHostId( resourceHost.getId() );
                 result.addMetric( hostMetric );

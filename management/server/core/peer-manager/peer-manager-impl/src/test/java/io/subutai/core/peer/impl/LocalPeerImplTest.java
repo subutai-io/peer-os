@@ -245,8 +245,8 @@ public class LocalPeerImplTest
     @Test
     public void testInit() throws Exception
     {
-        doReturn( managementHostDataService ).when( localPeer ).getManagementHostDataService();
-        doReturn( resourceHostDataService ).when( localPeer ).getResourceHostDataService();
+        doReturn( managementHostDataService ).when( localPeer ).createManagementHostDataService();
+        doReturn( resourceHostDataService ).when( localPeer ).createResourceHostDataService();
         doNothing().when( localPeer ).initPeerInfo( any( PeerDAO.class ) );
 
         localPeer.init();
@@ -256,14 +256,14 @@ public class LocalPeerImplTest
     @Test
     public void testGetManagementHostDataService() throws Exception
     {
-        assertNotNull( localPeer.getManagementHostDataService() );
+        assertNotNull( localPeer.createManagementHostDataService() );
     }
 
 
     @Test
     public void testGetResourceHostDataService() throws Exception
     {
-        assertNotNull( localPeer.getResourceHostDataService() );
+        assertNotNull( localPeer.createResourceHostDataService() );
     }
 
 

@@ -468,40 +468,18 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public ProcessResourceUsage getProcessResourceUsage( final ContainerHost containerHost, final int processPid )
-            throws PeerException
+    public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException
     {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+        Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkArgument( pid > 0, "Process pid must be greater than 0" );
 
-        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        Preconditions.checkArgument( processPid > 0, "Process pid must be greater than 0" );
-
-        String path = "/container/resource/usage";
-
-        Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId() );
-        params.put( "processPid", String.valueOf( processPid ) );
-
-        //*********construct Secure Header ****************************
-        Map<String, String> headers = Maps.newHashMap();
-        String envheader = localPeer.getId() + "-" + host.getEnvironmentId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envheader );
-        //*************************************************************
-
-        try
+        if ( containerId.getEnvironmentId() == null )
         {
-            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-            String response = get( path, alias, params, headers );
-
-            return jsonUtil.from( response, new TypeToken<ProcessResourceUsage>()
-            {}.getType() );
+            return new PeerClient( provider ).getProcessResourceUsage( peerInfo.getIp(), containerId, pid );
         }
-        catch ( Exception e )
+        else
         {
-            throw new PeerException( "Error obtaining resource usage", e );
+            return new EnvironmentClient( provider ).getProcessResourceUsage( peerInfo.getIp(), containerId, pid );
         }
     }
 
@@ -510,32 +488,15 @@ public class RemotePeerImpl implements RemotePeer
     public ContainerHostState getContainerState( final ContainerId containerId )
     {
         Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
-        String path = "/container/state";
-
-        //*********construct Secure Header ****************************
-        Map<String, String> headers = Maps.newHashMap();
-
-        String envHeaderSource = localPeer.getId() + "-" + containerId.getEnvironmentId().getId();
-        String envHeaderTarget = peerInfo.getId() + "-" + containerId.getEnvironmentId().getId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
-        //*************************************************************
-
-        WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
-                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-        try
+        if ( containerId.getEnvironmentId() == null )
         {
-            return client.post( containerId, ContainerHostState.class );
+            return new PeerClient( provider ).getState( peerInfo.getIp(), containerId );
         }
-        catch ( Exception e )
+        else
         {
-            return ContainerHostState.UNKNOWN;
+            return new EnvironmentClient( provider ).getState( peerInfo.getIp(), containerId );
         }
     }
 
@@ -1615,13 +1576,13 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void removeN2NConnection( final N2NConfig config ) throws PeerException
+    public void removeN2NConnection( final EnvironmentId environmentId ) throws PeerException
     {
-        LOG.debug( String.format( "Removing remote peer from n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
-                config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
 
-        String path = String.format( "/n2ntunnel/%s/%s", config.getInterfaceName(), config.getCommunityName() );
-        LOG.debug( String.format( "%s %s %s", peerInfo.getIp(), peerInfo.getPort(), baseUrl ) );
+
+        LOG.debug( String.format( "Removing remote peer from n2n community: %s", environmentId.getId() ) );
+
+        String path = String.format( "/n2ntunnel/%s", environmentId.getId() );
 
         WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
                 SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, provider );

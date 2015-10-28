@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -19,7 +20,7 @@ import io.subutai.core.peer.api.PeerManager;
  */
 public class EnvironmentRestServiceImpl implements EnvironmentRestService
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( EnvironmentRestServiceImpl.class );
+    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentRestServiceImpl.class );
 
     private PeerManager peerManager;
 
@@ -40,7 +41,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error destroying container #destroyContainer", e );
+            LOG.error( "Error destroying container #destroyContainer", e );
             Response response = Response.serverError().entity( e.toString() ).build();
             throw new WebApplicationException( response );
         }
@@ -57,7 +58,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error starting container #startContainer", e );
+            LOG.error( "Error starting container #startContainer", e );
             Response response = Response.serverError().entity( e.toString() ).build();
             throw new WebApplicationException( response );
         }
@@ -74,7 +75,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error stopping container #stopContainer", e );
+            LOG.error( "Error stopping container #stopContainer", e );
             Response response = Response.serverError().entity( e.toString() ).build();
             throw new WebApplicationException( response );
         }
@@ -86,5 +87,24 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
     {
         Preconditions.checkNotNull( containerId );
         return peerManager.getContainerState( containerId );
+    }
+
+
+    @Override
+    public ProcessResourceUsage getProcessResourceUsage( ContainerId containerId, int pid )
+    {
+        Preconditions.checkNotNull( containerId );
+        Preconditions.checkArgument( pid > 0 );
+
+        try
+        {
+            return peerManager.getProcessResourceUsage( containerId, pid );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error getting processing resource usage #getProcessResourceUsage", e );
+            throw new WebApplicationException(
+                    Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build() );
+        }
     }
 }

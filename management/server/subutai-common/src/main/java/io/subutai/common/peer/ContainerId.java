@@ -12,14 +12,21 @@ import io.subutai.common.host.HostId;
  */
 public class ContainerId extends HostId
 {
-    @JsonProperty("peerId")
+    @JsonProperty( "peerId" )
     private PeerId peerId;
-    @JsonProperty("environmentId")
+    @JsonProperty( "environmentId" )
     private EnvironmentId environmentId;
 
 
+    public ContainerId( final String id )
+    {
+        super( id );
+    }
+
+
     @JsonCreator()
-    public ContainerId( @JsonProperty("id")final String id, @JsonProperty("peerId")final PeerId peerId, @JsonProperty("environmentId")final EnvironmentId environmentId )
+    public ContainerId( @JsonProperty( "id" ) final String id, @JsonProperty( "peerId" ) final PeerId peerId,
+                        @JsonProperty( "environmentId" ) final EnvironmentId environmentId )
     {
         super( id );
         this.peerId = peerId;

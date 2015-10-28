@@ -204,10 +204,10 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /**
      * Returns resource usage of process on container by its PID
      *
-     * @param host - target container
-     * @param processPid - pid of process
+     * @param containerId - target container
+     * @param pid - pid of process
      */
-    public ProcessResourceUsage getProcessResourceUsage( ContainerHost host, int processPid ) throws PeerException;
+    public ProcessResourceUsage getProcessResourceUsage(  final ContainerId containerId, int pid ) throws PeerException;
 
     /**
      * Returns available RAM quota on container in megabytes
@@ -397,7 +397,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
 
     void setupN2NConnection( N2NConfig config ) throws PeerException;
 
-    void removeN2NConnection( N2NConfig config ) throws PeerException;
+    void removeN2NConnection( EnvironmentId environmentId ) throws PeerException;
 
     void createGateway( String environmentGatewayIp, int vlan ) throws PeerException;
 

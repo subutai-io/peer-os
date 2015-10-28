@@ -86,7 +86,7 @@ public class SetupN2NStep
             List<N2NConfig> result = new ArrayList<>( peers.size() );
             for ( Peer peer : peers )
             {
-                N2NConfig config = new N2NConfig( peer.getId(), env.getSuperNode(), env.getSuperNodePort(),
+                N2NConfig config = new N2NConfig( peer.getId(), env.getId(), env.getSuperNode(), env.getSuperNodePort(),
                         env.getTunnelInterfaceName(), env.getTunnelCommunityName(), addresses[counter], sharedKey );
                 n2nCompletionService.submit( new SetupN2NConnectionTask( peer, config ) );
                 counter++;

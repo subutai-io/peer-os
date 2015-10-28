@@ -198,7 +198,7 @@ public class ContainersWindow extends Window
             } );
             containersTable.addItem( new Object[] {
                     containerHost.getId().toString(), containerHost.getTemplateName(), containerHost.getHostname(),
-                    containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ), tagsBtn, domainBtn,
+                    containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(), tagsBtn, domainBtn,
                     startBtn, stopBtn, destroyBtn
             }, null );
             boolean isContainerConnected = containerHost.isConnected();

@@ -284,21 +284,20 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getProcessResourceUsage( final String containerId, final int processPid )
+    public ProcessResourceUsage getProcessResourceUsage( ContainerId containerId, int pid )
     {
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
+            Preconditions.checkNotNull( containerId );
+            Preconditions.checkArgument( pid > 0 );
 
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            ProcessResourceUsage processResourceUsage =
-                    localPeer.getContainerHostById( containerId ).getProcessResourceUsage( processPid );
-            return Response.ok( jsonUtil.to( processResourceUsage ) ).build();
+            return peerManager.getProcessResourceUsage( containerId, pid );
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error getting processing resource usage #getProcessResourceUsage", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            throw new WebApplicationException(
+                    Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build() );
         }
     }
 
@@ -725,13 +724,12 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public void removeN2NConnection( final String interfaceName, final String communityName )
+    public void removeN2NConnection( final EnvironmentId environmentId )
     {
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            String address = interfaceName.replace( "n2n_", "" ).replace( "_", "." );
-            localPeer.removeN2NConnection( new N2NConfig( address, interfaceName, communityName ) );
+            localPeer.removeN2NConnection( environmentId );
         }
         catch ( Exception e )
         {

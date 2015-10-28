@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -75,7 +76,7 @@ public interface PeerManager
      */
     public LocalPeer getLocalPeer();
 
-    List<N2NConfig> setupN2NConnection( final Set<Peer> peers ) throws PeerException;
+    List<N2NConfig> setupN2NConnection( final String environmentId, final Set<Peer> peers ) throws PeerException;
 
 
     void doRegistrationRequest( String destinationHost, String keyPhrase ) throws PeerException;
@@ -108,4 +109,6 @@ public interface PeerManager
     ContainerHostState getContainerState( ContainerId containerId );
 
     String getPeerIdByIp( String ip ) throws PeerException;
+
+    ProcessResourceUsage getProcessResourceUsage( ContainerId containerId, int pid ) throws PeerException;
 }

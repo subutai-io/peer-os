@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
@@ -33,29 +34,29 @@ public interface RestService
     @Deprecated
     @GET
     @Path( "me" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
     public Response getLocalPeerInfo();
 
     @GET
     @Path( "/info" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
     public PeerInfo getPeerInfo();
 
     @GET
     @Path( "registered_peers" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
     public List<PeerInfo> getRegisteredPeers();
 
 
     @GET
     @Path( "peer_policy" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
     public Response getPeerPolicy( @QueryParam( "peerId" ) String peerId );
 
 
     //todo check why is this endpoint used
     //    @Path( "/" )
-    //    @Produces( { MediaType.APPLICATION_JSON } )
+    //    @Produces(     MediaType.APPLICATION_JSON  )
     //    @Deprecated
     //    public Response getRegisteredPeerInfo( @QueryParam( "peerId" ) String peerId );
     //
@@ -65,12 +66,12 @@ public interface RestService
 
     @GET
     @Path( "template/get" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
     public Response getTemplate( @FormParam( "templateName" ) String templateName );
 
     @GET
     @Path( "vni" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
     Response getReservedVnis();
 
     @POST
@@ -80,7 +81,7 @@ public interface RestService
 
     @GET
     @Path( "gateways" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
     Response getGateways();
 
     @POST
@@ -114,45 +115,45 @@ public interface RestService
     // PeerRegistrationUI and RestServiceImpl
     //    @POST
     //    @Path( "register" )
-    //    @Consumes( { MediaType.APPLICATION_JSON } )
-    //    @Produces( { MediaType.APPLICATION_JSON } )
+    //    @Consumes(     MediaType.APPLICATION_JSON  )
+    //    @Produces(     MediaType.APPLICATION_JSON  )
     //    public Response processRegistrationRequest( RegistrationRequest registrationRequest );
 
     //
     //    @POST
     //    @Path( "register/{peerIp}" )
-    //    @Produces( { MediaType.APPLICATION_JSON } )
+    //    @Produces(     MediaType.APPLICATION_JSON  )
     //    public Response doRegistrationRequest( @PathParam( "peerIp" ) String peerIp );
 
 
     //    @DELETE
     //    @Path( "unregister" )
-    //    @Produces( { MediaType.APPLICATION_JSON } )
+    //    @Produces(     MediaType.APPLICATION_JSON  )
     //    public Response unregisterPeer( @QueryParam( "peerId" ) String peerId );
     //
     //
     //    @PUT
     //    @Path( "reject" )
-    //    @Produces( { MediaType.APPLICATION_JSON } )
+    //    @Produces(     MediaType.APPLICATION_JSON  )
     //    public Response rejectForRegistrationRequest( @FormParam( "rejectedPeerId" ) String rejectedPeerId );
     //
     //
     //    @DELETE
     //    @Path( "remove" )
-    //    @Produces( { MediaType.APPLICATION_JSON } )
+    //    @Produces(     MediaType.APPLICATION_JSON  )
     //    public Response removeRegistrationRequest( @QueryParam( "rejectedPeerId" ) String rejectedPeerId );
     //
     //
     //    @PUT
     //    @Path( "approve" )
-    //    @Produces( { MediaType.APPLICATION_JSON } )
+    //    @Produces(     MediaType.APPLICATION_JSON  )
     //    public Response approveForRegistrationRequest( @FormParam( "approvedPeer" ) String approvedPeer,
     //                                                   @FormParam( "cert" ) String certHEX );
 
 
     @PUT
     @Path( "update" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
     public Response updatePeer( @FormParam( "peer" ) String peer );
 
     //*************** Peer Registration Handshake REST - END ***************************
@@ -164,7 +165,7 @@ public interface RestService
     @POST
     @Path( "container/destroy" )
     @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
     public void destroyContainer( ContainerId containerId );
 
     @POST
@@ -176,48 +177,49 @@ public interface RestService
     @POST
     @Path( "container/stop" )
     @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
     public void stopContainer( ContainerId containerId );
 
     @POST
     @Path( "container/state" )
     @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
     public ContainerHostState getContainerState( ContainerId containerId );
 
 
     @GET
-    @Path( "container/resource/usage" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response getProcessResourceUsage( @QueryParam( "containerId" ) String containerId,
-                                      @QueryParam( "processId" ) int processPid );
+    @Path( "container/{id}/usage/{pid}" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    ProcessResourceUsage getProcessResourceUsage( @PathParam( "id" ) ContainerId containerId,
+                                                  @PathParam( "pid" ) int pid );
 
     @GET
     @Path( "container/quota/ram/available" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
     Response getAvailableRamQuota( @QueryParam( "containerId" ) String containerId );
 
     @GET
     @Path( "container/quota/cpu/available" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
     Response getAvailableCpuQuota( @QueryParam( "containerId" ) String containerId );
 
     @GET
     @Path( "container/quota/disk/available" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
     Response getAvailableDiskQuota( @QueryParam( "containerId" ) String containerId,
                                     @QueryParam( "diskPartition" ) String diskPartition );
 
 
     @GET
     @Path( "container/quota/ram" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
     Response getRamQuota( @QueryParam( "containerId" ) String containerId );
 
 
     @GET
     @Path( "container/quota/ram/info" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
     Response getRamQuotaInfo( @QueryParam( "containerId" ) String containerId );
 
     @POST
@@ -230,13 +232,13 @@ public interface RestService
 
     @GET
     @Path( "container/quota/cpu" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
     Response getCpuQuota( @QueryParam( "containerId" ) String containerId );
 
 
     @GET
     @Path( "container/quota/cpu/info" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
     Response getCpuQuotaInfo( @QueryParam( "containerId" ) String containerId );
 
 
@@ -246,7 +248,7 @@ public interface RestService
 
     @GET
     @Path( "container/quota/cpuset" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
     Response getCpuSet( @QueryParam( "containerId" ) String containerId );
 
     @POST
@@ -255,7 +257,7 @@ public interface RestService
 
     @GET
     @Path( "container/quota/disk" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
     Response getDiskQuota( @QueryParam( "containerId" ) String containerId,
                            @QueryParam( "diskPartition" ) String diskPartition );
 
@@ -276,27 +278,27 @@ public interface RestService
 
     @GET
     @Path( "resources" )
-    @Consumes( { MediaType.APPLICATION_JSON } )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
     ResourceHostMetrics getResources();
 
     //*********** Environment Specific REST - END ***************
 
     @GET
     @Path( "interfaces" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    @Consumes( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
+    @Consumes( MediaType.APPLICATION_JSON )
     HostInterfaces getNetworkInterfaces();
 
     @POST
     @Path( "n2ntunnel" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    @Consumes( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
+    @Consumes( MediaType.APPLICATION_JSON )
     void addToTunnel( N2NConfig config );
 
     @DELETE
-    @Path( "n2ntunnel/{interfaceName}/{communityName}" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    void removeN2NConnection( @PathParam( "interfaceName" ) String interfaceName,
-                                  @PathParam( "communityName" ) String communityName );
+    @Path( "n2ntunnel/{environmentId}" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    void removeN2NConnection( @PathParam( "environmentId" ) EnvironmentId environmentId );
 }

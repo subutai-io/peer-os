@@ -36,6 +36,7 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
+import io.subutai.common.host.NullInterface;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -412,8 +413,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public Interface getInterfaceByName( final String interfaceName )
     {
-        Interface result = null;
-        for ( Iterator<Interface> i = getInterfaces().iterator(); result == null && i.hasNext(); )
+        Interface result = NullInterface.getInstance();
+        for ( Iterator<Interface> i = getInterfaces().iterator(); result instanceof NullInterface && i.hasNext(); )
         {
             Interface n = i.next();
             if ( n.getName().equalsIgnoreCase( interfaceName ) )
@@ -436,7 +437,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public ProcessResourceUsage getProcessResourceUsage( final int processPid ) throws PeerException
     {
-        return getPeer().getProcessResourceUsage( this, processPid );
+        return getPeer().getProcessResourceUsage( getContainerId(), processPid );
     }
 
 

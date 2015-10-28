@@ -34,6 +34,7 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Interface;
+import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -312,7 +313,7 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public List<N2NConfig> setupN2NConnection( final Set<Peer> peers ) throws PeerException
+    public List<N2NConfig> setupN2NConnection( final String environmentId, final Set<Peer> peers ) throws PeerException
     {
         Set<String> usedN2NSubnets = getN2NSubnets( peers );
         LOG.debug( String.format( "Found %d n2n subnets:", usedN2NSubnets.size() ) );
@@ -347,8 +348,9 @@ public class PeerManagerImpl implements PeerManager
             List<N2NConfig> result = new ArrayList<>( peers.size() );
             for ( Peer peer : peers )
             {
-                N2NConfig config = new N2NConfig( peer.getId(), superNodeIp, N2N_PORT, interfaceName, communityName,
-                        addresses[counter], sharedKey );
+                N2NConfig config =
+                        new N2NConfig( peer.getId(), environmentId, superNodeIp, N2N_PORT, interfaceName, communityName,
+                                addresses[counter], sharedKey );
                 executorCompletionService.submit( new SetupN2NConnectionTask( peer, config ) );
                 counter++;
             }
@@ -644,6 +646,13 @@ public class PeerManagerImpl implements PeerManager
             throw new PeerException( "Peer not found by IP: " + ip );
         }
         return result;
+    }
+
+
+    @Override
+    public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException
+    {
+        return localPeer.getProcessResourceUsage( containerId, pid );
     }
 }
 
