@@ -116,8 +116,10 @@ public class TerminalForm extends CustomComponent implements Disposable
 
         controls.addComponent( requestTypeCombo );
         Button clearBtn = new Button( "Clear" );
+        clearBtn.setId( "terminal_clear" );
         controls.addComponent( clearBtn );
         final Button sendBtn = new Button( "Send" );
+        sendBtn.setId( "terminal_send" );
         controls.addComponent( sendBtn );
 
         daemonChk = new CheckBox( "Daemon" );

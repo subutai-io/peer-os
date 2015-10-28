@@ -89,8 +89,10 @@ public class TerminalForm extends CustomComponent
         controls.addComponent( timeoutLbl );
         controls.addComponent( timeoutTxtFld );
         Button clearBtn = new Button( "Clear" );
+        clearBtn.setId( "env_terminal_clear" );
         controls.addComponent( clearBtn );
         final Button sendBtn = new Button( "Send" );
+        sendBtn.setId( "env_terminal_send" );
         controls.addComponent( sendBtn );
         daemonChk = new CheckBox( "Daemon" );
         daemonChk.setId( "env_terminal_daemon" );
