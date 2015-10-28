@@ -17,7 +17,7 @@ public class Vni
     @JsonProperty( "environmentId" )
     private final String environmentId;
     @JsonProperty( "vlan" )
-    private int vlan = Common.MIN_VLAN_ID - 1;
+    private int vlan = Common.MIN_VLAN_ID;
 
 
     public Vni( @JsonProperty( "vni" ) final long vni, @JsonProperty( "vlan" ) final int vlan,
@@ -32,7 +32,7 @@ public class Vni
     }
 
 
-    public Vni( @JsonProperty( "vni" ) final long vni, @JsonProperty( "environmentId" ) final String environmentId )
+    public Vni( final long vni, final String environmentId )
     {
         Preconditions.checkArgument( NumUtil.isLongBetween( vni, Common.MIN_VNI_ID, Common.MAX_VNI_ID ),
                 String.format( "Vni id must be in range %d - %d", Common.MIN_VNI_ID, Common.MAX_VNI_ID ) );
