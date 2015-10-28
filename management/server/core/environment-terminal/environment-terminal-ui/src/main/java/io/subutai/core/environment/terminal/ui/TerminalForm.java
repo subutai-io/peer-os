@@ -96,7 +96,7 @@ public class TerminalForm extends CustomComponent
         daemonChk.setId( "env_terminal_daemon" );
         controls.addComponent( daemonChk );
         indicator = new Label();
-        indicator.setId( "terminal_indicator" );
+        indicator.setId( "env_terminal_indicator" );
         indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
         indicator.setContentMode( ContentMode.HTML );
         indicator.setHeight( 11, Unit.PIXELS );
