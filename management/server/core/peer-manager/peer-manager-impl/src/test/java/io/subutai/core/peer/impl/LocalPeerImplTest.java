@@ -28,11 +28,13 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.network.Vni;
+import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
@@ -89,6 +91,7 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class LocalPeerImplTest
 {
+    private static final String PEER_ID = UUID.randomUUID().toString();
     private static final String ENVIRONMENT_ID = UUID.randomUUID().toString();
     private static final String LOCAL_PEER_ID = UUID.randomUUID().toString();
     private static final String OWNER_ID = UUID.randomUUID().toString();
@@ -151,6 +154,8 @@ public class LocalPeerImplTest
     @Mock
     ContainerId containerId;
     @Mock
+    PeerId peerId;
+    @Mock
     ContainerHostEntity containerHost;
     @Mock
     ContainerHostInfo containerHostInfo;
@@ -184,6 +189,8 @@ public class LocalPeerImplTest
 
     @Mock
     EntityManagerFactoryImpl entityManagerFactory;
+    @Mock
+    private ContainerGateway containerGateway;
 
 
     @Before
@@ -204,12 +211,18 @@ public class LocalPeerImplTest
         localPeer.exceptionUtil = exceptionUtil;
         localPeer.managementHost = managementHost;
         localPeer.requestListeners = Sets.newHashSet( requestListener );
+        when( containerGateway.getContainerId() ).thenReturn( containerId );
+        //        when(containerGateway.getGateway()).thenReturn(  );
+
         when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
         when( managementHost.getId() ).thenReturn( MANAGEMENT_HOST_ID );
         when( resourceHost.getId() ).thenReturn( RESOURCE_HOST_ID );
         when( containerHost.getId() ).thenReturn( CONTAINER_HOST_ID );
         when( containerHost.getContainerId() ).thenReturn( containerId );
+
+        when( peerId.getId() ).thenReturn( PEER_ID );
         when( containerId.getId() ).thenReturn( CONTAINER_HOST_ID );
+        when( containerId.getPeerId() ).thenReturn( peerId );
         when( resourceHost.getContainerHostById( CONTAINER_HOST_ID ) ).thenReturn( containerHost );
         when( resourceHost.getHostname() ).thenReturn( RESOURCE_HOST_NAME );
         when( localPeer.getPeerInfo() ).thenReturn( peerInfo );
@@ -528,13 +541,13 @@ public class LocalPeerImplTest
     @Test( expected = PeerException.class )
     public void testSetDefaultGateway() throws Exception
     {
-        localPeer.setDefaultGateway( containerHost, IP );
+        localPeer.setDefaultGateway( containerGateway );
 
         verify( commandUtil ).execute( any( RequestBuilder.class ), eq( containerHost ) );
 
         throwCommandException();
 
-        localPeer.setDefaultGateway( containerHost, IP );
+        localPeer.setDefaultGateway( containerGateway );
     }
 
 

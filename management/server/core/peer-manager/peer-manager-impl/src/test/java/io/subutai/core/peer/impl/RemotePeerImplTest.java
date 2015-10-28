@@ -25,6 +25,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.exception.HTTPException;
 import io.subutai.common.network.Vni;
+import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
@@ -141,6 +142,8 @@ public class RemotePeerImplTest
 
     @Mock
     private EnvironmentId environmentId;
+    @Mock
+    private ContainerGateway containerGateway;
 
 
     @Before
@@ -364,13 +367,13 @@ public class RemotePeerImplTest
     @Test( expected = PeerException.class )
     public void testSetDefaultGateway() throws Exception
     {
-        remotePeer.setDefaultGateway( containerHost, IP );
+        remotePeer.setDefaultGateway( containerGateway );
 
         //verify( localPeer ).getId();
 
         throwException();
 
-        remotePeer.setDefaultGateway( containerHost, IP );
+        remotePeer.setDefaultGateway( containerGateway );
     }
 
 

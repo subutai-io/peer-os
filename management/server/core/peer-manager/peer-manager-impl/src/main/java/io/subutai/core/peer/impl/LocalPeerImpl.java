@@ -722,7 +722,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void startContainer( final ContainerId containerId ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
-        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
         ContainerHostEntity containerHost = bindHost( containerId );
         ResourceHost resourceHost = containerHost.getParent();
@@ -741,7 +740,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void stopContainer( final ContainerId containerId ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
-        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
         ContainerHostEntity containerHost = bindHost( containerId );
         ResourceHost resourceHost = containerHost.getParent();
@@ -760,7 +758,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void destroyContainer( final ContainerId containerId ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
-        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
         ContainerHostEntity host = bindHost( containerId );
         ResourceHost resourceHost = host.getParent();

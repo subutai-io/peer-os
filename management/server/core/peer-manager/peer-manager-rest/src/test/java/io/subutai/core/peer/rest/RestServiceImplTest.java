@@ -16,6 +16,7 @@ import org.apache.cxf.jaxrs.ext.form.Form;
 
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.network.Vni;
+import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Peer;
@@ -97,6 +98,12 @@ public class RestServiceImplTest
     @Mock
     ContainerId containerId;
 
+    @Mock
+    private ContainerGateway containerGateway;
+
+    @Mock
+    Vni vni;
+
 
     @Before
     public void setUp() throws Exception
@@ -105,6 +112,7 @@ public class RestServiceImplTest
         restService.jsonUtil = jsonUtil;
         restService.restUtil = restUtil;
         when( containerId.getId() ).thenReturn( CONTAINER_ID );
+        when( containerGateway.getContainerId() ).thenReturn( containerId );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
         when( localPeer.getId() ).thenReturn( PEER_ID );
         when( localPeer.getPeerInfo() ).thenReturn( peerInfo );
@@ -372,7 +380,6 @@ public class RestServiceImplTest
         restService.getProcessResourceUsage( containerId, PID );
 
         verify( peerManager ).getProcessResourceUsage( containerId, PID );
-
     }
 
 
@@ -544,15 +551,13 @@ public class RestServiceImplTest
     @Test
     public void testSetDefaultGateway() throws Exception
     {
-        restService.setDefaultGateway( CONTAINER_ID.toString(), IP );
+        restService.setDefaultGateway( containerGateway );
 
-        verify( containerHost ).setDefaultGateway( IP );
+        verify( peerManager ).setDefaultGateway( containerGateway );
 
         doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
 
-        Response response1 = restService.setDefaultGateway( CONTAINER_ID.toString(), IP );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+        restService.setDefaultGateway( containerGateway );
     }
 
 
@@ -576,13 +581,11 @@ public class RestServiceImplTest
     {
         restService.getReservedVnis();
 
-        verify( localPeer ).getReservedVnis();
+        verify( peerManager ).getReservedVnis();
 
         doThrow( exception ).when( peerManager ).getLocalPeer();
 
-        Response response1 = restService.getReservedVnis();
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+        restService.getReservedVnis();
     }
 
 
@@ -591,27 +594,24 @@ public class RestServiceImplTest
     {
         restService.getGateways();
 
-        verify( localPeer ).getGateways();
+        verify( peerManager ).getGateways();
 
         doThrow( exception ).when( peerManager ).getLocalPeer();
 
-        Response response1 = restService.getGateways();
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+        restService.getGateways();
     }
 
 
     @Test
     public void testReserveVni() throws Exception
     {
-        restService.reserveVni( JSON );
+        restService.reserveVni( vni );
 
-        verify( localPeer ).reserveVni( any( Vni.class ) );
+        verify( peerManager ).reserveVni( any( Vni.class ) );
 
         doThrow( exception ).when( peerManager ).getLocalPeer();
 
-        Response response1 = restService.reserveVni( JSON );
+        restService.reserveVni( vni );
 
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
     }
 }

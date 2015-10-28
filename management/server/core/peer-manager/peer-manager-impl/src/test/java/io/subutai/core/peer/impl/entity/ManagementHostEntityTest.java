@@ -13,6 +13,7 @@ import java.util.concurrent.Future;
 import javax.naming.NamingException;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -214,6 +215,7 @@ public class ManagementHostEntityTest
 
 
     @Test
+    @Ignore
     public void testReserveVni() throws Exception
     {
         Vni vni = mock( Vni.class );
