@@ -98,7 +98,8 @@ public class EnvironmentTree extends ConcurrentComponent
                 Item item = tree.getItem( itemId );
                 if ( item != null && item.getItemProperty( VALUE_PROPERTY ) != null )
                 {
-                    EnvironmentContainerHost  ec = ( EnvironmentContainerHost ) item.getItemProperty( VALUE_PROPERTY ).getValue();
+                    EnvironmentContainerHost ec =
+                            ( EnvironmentContainerHost ) item.getItemProperty( VALUE_PROPERTY ).getValue();
                     if ( ec != null )
                     {
                         description = "Hostname: " + ec.getHostname() + "<br>" + "Peer ID: " + ec.getPeerId() + "<br>"
@@ -108,6 +109,30 @@ public class EnvironmentTree extends ConcurrentComponent
                 return description;
             }
         } );
+
+
+        //added this to insert static CSS ids to tree items since we can not set HTML element ids for them
+        tree.setItemStyleGenerator( new Tree.ItemStyleGenerator()
+        {
+
+            public String getStyle( Tree tree, Object itemId )
+            {
+
+                Item item = tree.getItem( itemId );
+                if ( item != null && item.getItemProperty( VALUE_PROPERTY ) != null )
+                {
+                    EnvironmentContainerHost ec =
+                            ( EnvironmentContainerHost ) item.getItemProperty( VALUE_PROPERTY ).getValue();
+                    if ( ec != null )
+                    {
+                        return "hostname_" + ec.getHostname();
+                    }
+                }
+
+                return null;
+            }
+        } );
+
         tree.setMultiSelect( true );
         tree.setImmediate( true );
         tree.addValueChangeListener( new Property.ValueChangeListener()
