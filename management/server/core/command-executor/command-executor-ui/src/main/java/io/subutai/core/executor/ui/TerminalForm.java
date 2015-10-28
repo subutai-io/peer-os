@@ -9,12 +9,6 @@ package io.subutai.core.executor.ui;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.subutai.common.command.RequestType;
-import io.subutai.common.protocol.Disposable;
-import io.subutai.core.executor.api.CommandExecutor;
-import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.server.ui.component.HostTree;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.vaadin.event.ShortcutAction;
@@ -31,6 +25,12 @@ import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
+
+import io.subutai.common.command.RequestType;
+import io.subutai.common.protocol.Disposable;
+import io.subutai.core.executor.api.CommandExecutor;
+import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.server.ui.component.HostTree;
 
 
 /**
@@ -72,6 +72,7 @@ public class TerminalForm extends CustomComponent implements Disposable
         commandOutputTxtArea.setSizeFull();
         commandOutputTxtArea.setImmediate( true );
         commandOutputTxtArea.setWordwrap( false );
+        commandOutputTxtArea.setId( "terminal_output" );
         grid.addComponent( commandOutputTxtArea, 0, 0, 19, 8 );
 
         HorizontalLayout controls = new HorizontalLayout();
@@ -80,22 +81,26 @@ public class TerminalForm extends CustomComponent implements Disposable
         programTxtFld = new TextField();
         programTxtFld.setValue( "pwd" );
         programTxtFld.setWidth( 300, Unit.PIXELS );
+        programTxtFld.setId( "terminal_command" );
         controls.addComponent( programLbl );
         controls.addComponent( programTxtFld );
         Label workDirLbl = new Label( "Cwd" );
         workDirTxtFld = new TextField();
         workDirTxtFld.setValue( "/" );
+        workDirTxtFld.setId( "terminal_workdir" );
         controls.addComponent( workDirLbl );
         controls.addComponent( workDirTxtFld );
         Label runAsLbl = new Label( "Run As" );
         runAsTxtFld = new TextField();
         runAsTxtFld.setValue( "root" );
+        runAsTxtFld.setId( "terminal_runas" );
         controls.addComponent( runAsLbl );
         controls.addComponent( runAsTxtFld );
         Label timeoutLbl = new Label( "Timeout" );
         timeoutTxtFld = new TextField();
         timeoutTxtFld.setValue( "30" );
         timeoutTxtFld.setWidth( 30, Unit.PIXELS );
+        timeoutTxtFld.setId( "terminal_timeout" );
         controls.addComponent( timeoutLbl );
         controls.addComponent( timeoutTxtFld );
         Label requestTypeLabel = new Label( "Req Type" );
@@ -107,6 +112,8 @@ public class TerminalForm extends CustomComponent implements Disposable
         requestTypeCombo.setNullSelectionAllowed( false );
         requestTypeCombo.setValue( RequestType.EXECUTE_REQUEST );
         requestTypeCombo.setWidth( 150, Unit.PIXELS );
+        requestTypeCombo.setId( "terminal_reqtype" );
+
         controls.addComponent( requestTypeCombo );
         Button clearBtn = new Button( "Clear" );
         controls.addComponent( clearBtn );
@@ -114,6 +121,7 @@ public class TerminalForm extends CustomComponent implements Disposable
         controls.addComponent( sendBtn );
 
         daemonChk = new CheckBox( "Daemon" );
+        daemonChk.setId( "terminal_daemon" );
         controls.addComponent( daemonChk );
 
         indicator = new Label();

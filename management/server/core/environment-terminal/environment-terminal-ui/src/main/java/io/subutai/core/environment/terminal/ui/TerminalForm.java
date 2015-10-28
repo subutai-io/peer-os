@@ -63,25 +63,29 @@ public class TerminalForm extends CustomComponent
         commandOutputTxtArea.setSizeFull();
         commandOutputTxtArea.setImmediate( true );
         commandOutputTxtArea.setWordwrap( false );
+        commandOutputTxtArea.setId( "env_terminal_output" );
         grid.addComponent( commandOutputTxtArea, 0, 0, 19, 8 );
 
         HorizontalLayout controls = new HorizontalLayout();
         controls.setSpacing( true );
-        Label programLbl = new Label( "Program" );
+        Label programLbl = new Label( "Command" );
         programTxtFld = new TextField();
         programTxtFld.setValue( "pwd" );
         programTxtFld.setWidth( 300, Unit.PIXELS );
+        programTxtFld.setId( "env_terminal_command" );
         controls.addComponent( programLbl );
         controls.addComponent( programTxtFld );
         Label workDirLbl = new Label( "Cwd" );
         workDirTxtFld = new TextField();
         workDirTxtFld.setValue( "/" );
+        workDirTxtFld.setId( "env_terminal_workdir" );
         controls.addComponent( workDirLbl );
         controls.addComponent( workDirTxtFld );
         Label timeoutLbl = new Label( "Timeout" );
         timeoutTxtFld = new TextField();
         timeoutTxtFld.setValue( "30" );
         timeoutTxtFld.setWidth( 30, Unit.PIXELS );
+        timeoutTxtFld.setId( "env_terminal_timeout" );
         controls.addComponent( timeoutLbl );
         controls.addComponent( timeoutTxtFld );
         Button clearBtn = new Button( "Clear" );
@@ -89,6 +93,7 @@ public class TerminalForm extends CustomComponent
         final Button sendBtn = new Button( "Send" );
         controls.addComponent( sendBtn );
         daemonChk = new CheckBox( "Daemon" );
+        daemonChk.setId( "env_terminal_daemon" );
         controls.addComponent( daemonChk );
         indicator = new Label();
         indicator.setId( "terminal_indicator" );
