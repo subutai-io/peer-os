@@ -788,13 +788,13 @@ public class LocalPeerImplTest
     @Test( expected = PeerException.class )
     public void testGetProcessResourceUsage() throws Exception
     {
-        localPeer.getProcessResourceUsage( containerHost, PID );
+        localPeer.getProcessResourceUsage( containerHost.getContainerId(), PID );
 
-        verify( monitor ).getProcessResourceUsage( containerHost, PID );
+        verify( monitor ).getProcessResourceUsage( containerHost.getContainerId(), PID );
 
-        doThrow( new MonitorException( "" ) ).when( monitor ).getProcessResourceUsage( containerHost, PID );
+        doThrow( new MonitorException( "" ) ).when( monitor ).getProcessResourceUsage( containerId, PID );
 
-        localPeer.getProcessResourceUsage( containerHost, PID );
+        localPeer.getProcessResourceUsage( containerHost.getContainerId(), PID );
     }
 
 

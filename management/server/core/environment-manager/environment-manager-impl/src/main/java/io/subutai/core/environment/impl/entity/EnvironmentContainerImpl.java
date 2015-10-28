@@ -35,12 +35,13 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.Interface;
 import io.subutai.common.host.NullInterface;
 import io.subutai.common.metric.ProcessResourceUsage;
+import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentContainerHost;
-import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -192,7 +193,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public void setDefaultGateway( final String gatewayIp ) throws PeerException
     {
-        getPeer().setDefaultGateway( this, gatewayIp );
+        getPeer().setDefaultGateway( new ContainerGateway( getContainerId(), gatewayIp ) );
     }
 
 

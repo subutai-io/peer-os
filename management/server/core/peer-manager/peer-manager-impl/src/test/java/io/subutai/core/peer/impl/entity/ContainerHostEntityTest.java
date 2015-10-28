@@ -219,7 +219,7 @@ public class ContainerHostEntityTest
     {
         containerHostEntity.getProcessResourceUsage( PID );
 
-        verify( peer ).getProcessResourceUsage( containerHostEntity, PID );
+        verify( peer ).getProcessResourceUsage( containerHostEntity.getContainerId(), PID );
     }
 
 

@@ -411,12 +411,12 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
-    public int reserveVni( final Vni vni ) throws PeerException
+    public Vni reserveVni( final Vni vni ) throws PeerException
     {
         Preconditions.checkNotNull( vni, "Invalid vni" );
 
         //need to execute sequentially since other parallel executions can take the same VNI
-        Future<Integer> future = queueSequentialTask( new ReserveVniTask( getNetworkManager(), vni, this ) );
+        Future<Vni> future = queueSequentialTask( new ReserveVniTask( getNetworkManager(), vni, this ) );
 
         try
         {

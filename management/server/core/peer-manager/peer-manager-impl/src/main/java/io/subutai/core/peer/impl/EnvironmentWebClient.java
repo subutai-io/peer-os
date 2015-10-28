@@ -12,21 +12,19 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.settings.SecuritySettings;
-import io.subutai.common.util.RestUtil;
+import io.subutai.common.security.WebClientBuilder;
 
 
 /**
- * Peer REST client
+ * Environment REST client
  */
-public class PeerClient
+public class EnvironmentWebClient
 {
-    private static final Logger LOG = LoggerFactory.getLogger( PeerClient.class );
-
+    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentWebClient.class );
     private Object provider;
 
 
-    public PeerClient( final Object provider )
+    public EnvironmentWebClient( final Object provider )
     {
         this.provider = provider;
     }
@@ -34,15 +32,15 @@ public class PeerClient
 
     void startContainer( String host, ContainerId containerId ) throws PeerException
     {
-
-        String path = "/container/start";
-        WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
+        String path =
+                String.format( "/%s/container/%s/start", containerId.getEnvironmentId().getId(), containerId.getId() );
+        WebClient client = WebClientBuilder.buildEnvironmentWebClient( host, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            client.post( containerId );
+            client.get();
         }
         catch ( Exception e )
         {
@@ -53,8 +51,8 @@ public class PeerClient
 
     void stopContainer( String host, ContainerId containerId ) throws PeerException
     {
-        String path = "/container/stop";
-        WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
+        String path = String.format( "/%s/container/stop", containerId.getEnvironmentId().getId() );
+        WebClient client = WebClientBuilder.buildEnvironmentWebClient( host, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -69,10 +67,28 @@ public class PeerClient
     }
 
 
+    public void destroyContainer( final String host, final ContainerId containerId ) throws PeerException
+    {
+        String path = String.format( "/%s/container/destroy", containerId.getEnvironmentId().getId() );
+        WebClient client = WebClientBuilder.buildEnvironmentWebClient( host, path, provider );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+        try
+        {
+            client.post( containerId );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error destroying container", e );
+        }
+    }
+
+
     public ContainerHostState getState( final String host, final ContainerId containerId )
     {
-        String path = "/container/state";
-        WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
+        String path = String.format( "/%s/container/state", containerId.getEnvironmentId().getId() );
+        WebClient client = WebClientBuilder.buildEnvironmentWebClient( host, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -91,8 +107,10 @@ public class PeerClient
     public ProcessResourceUsage getProcessResourceUsage( final String host, final ContainerId containerId, int pid )
             throws PeerException
     {
-        String path = String.format( "/container/%s/usage/%d", containerId.getId(), pid );
-        WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
+        String path =
+                String.format( "/%s/container/%s/usage/%d", containerId.getEnvironmentId().getId(), containerId.getId(),
+                        pid );
+        WebClient client = WebClientBuilder.buildEnvironmentWebClient( host, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );

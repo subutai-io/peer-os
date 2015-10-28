@@ -35,7 +35,11 @@ import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Interface;
 import io.subutai.common.metric.ProcessResourceUsage;
+import io.subutai.common.network.Gateway;
+import io.subutai.common.network.Vni;
+import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
@@ -43,6 +47,7 @@ import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.N2NUtil;
 import io.subutai.core.messenger.api.Messenger;
@@ -653,6 +658,48 @@ public class PeerManagerImpl implements PeerManager
     public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException
     {
         return localPeer.getProcessResourceUsage( containerId, pid );
+    }
+
+
+    @Override
+    public PublicKeyContainer createEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
+    {
+        return localPeer.createEnvironmentKeyPair( environmentId );
+    }
+
+
+    @Override
+    public void removeEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
+    {
+        localPeer.removeEnvironmentKeyPair( environmentId );
+    }
+
+
+    @Override
+    public Set<Gateway> getGateways() throws PeerException
+    {
+        return localPeer.getGateways();
+    }
+
+
+    @Override
+    public void setDefaultGateway( final ContainerGateway gateway ) throws PeerException
+    {
+        localPeer.setDefaultGateway( gateway );
+    }
+
+
+    @Override
+    public Set<Vni> getReservedVnis() throws PeerException
+    {
+        return localPeer.getReservedVnis();
+    }
+
+
+    @Override
+    public Vni reserveVni( final Vni vni ) throws PeerException
+    {
+        return localPeer.reserveVni( vni );
     }
 }
 

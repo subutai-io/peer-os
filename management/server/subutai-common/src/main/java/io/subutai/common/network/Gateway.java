@@ -1,13 +1,18 @@
 package io.subutai.common.network;
 
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
+
 public class Gateway
 {
+    @JsonProperty( "vlan" )
     private int vlan;
+    @JsonProperty( "ip" )
     private String ip;
 
 
-    public Gateway( final int vlan, final String ip )
+    public Gateway( @JsonProperty( "vlan" ) final int vlan, @JsonProperty( "ip" ) final String ip )
     {
         this.vlan = vlan;
         this.ip = ip;

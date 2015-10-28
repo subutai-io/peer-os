@@ -25,7 +25,7 @@ public class ChannelManagerImpl implements ChannelManager
     private IdentityManager identityManager = null;
     private SecurityManager securityManager = null;
     private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-
+    private boolean encryptionEnabled;
 
     public void init()
     {
@@ -60,6 +60,12 @@ public class ChannelManagerImpl implements ChannelManager
     }
 
 
+    public void setEncryptionEnabled( final boolean encryptionEnabled )
+    {
+        this.encryptionEnabled = encryptionEnabled;
+    }
+
+
     public ChannelTokenManager getChannelTokenManager()
     {
         return channelTokenManager;
@@ -69,6 +75,13 @@ public class ChannelManagerImpl implements ChannelManager
     public void setChannelTokenManager( final ChannelTokenManager channelTokenManager )
     {
         this.channelTokenManager = channelTokenManager;
+    }
+
+
+    @Override
+    public boolean isEncryptionEnabled()
+    {
+        return encryptionEnabled;
     }
 
 

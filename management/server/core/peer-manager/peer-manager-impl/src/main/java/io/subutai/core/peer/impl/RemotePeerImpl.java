@@ -5,13 +5,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -34,6 +29,7 @@ import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
+import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainersDestructionResult;
@@ -50,6 +46,7 @@ import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.QuotaInfo;
 import io.subutai.common.quota.QuotaType;
 import io.subutai.common.quota.RamQuota;
+import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
@@ -182,21 +179,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public PeerInfo check() throws PeerException
     {
-        String path = "/info";
-
-
-        WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
-                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-
-        //*********construct Secure Header ****************************
-        client.getHeaders().add( Common.HEADER_SPECIAL, "ENC" );
-        client.getHeaders().add( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
-        client.getHeaders().add( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
-
-        PeerInfo response = client.get( PeerInfo.class );
+        PeerInfo response = new PeerWebClient( peerInfo.getIp(), provider ).getInfo();
         if ( !peerInfo.getId().equals( response.getId() ) )
         {
             throw new PeerException( String.format(
@@ -297,11 +280,11 @@ public class RemotePeerImpl implements RemotePeer
 
         if ( containerId.getEnvironmentId() == null )
         {
-            new PeerClient( provider ).startContainer( peerInfo.getIp(), containerId );
+            new PeerWebClient( peerInfo.getIp(), provider ).startContainer( containerId );
         }
         else
         {
-            new EnvironmentClient( provider ).startContainer( peerInfo.getIp(), containerId );
+            new EnvironmentWebClient( provider ).startContainer( peerInfo.getIp(), containerId );
         }
     }
 
@@ -314,11 +297,11 @@ public class RemotePeerImpl implements RemotePeer
 
         if ( containerId.getEnvironmentId() == null )
         {
-            new PeerClient( provider ).stopContainer( peerInfo.getIp(), containerId );
+            new PeerWebClient( peerInfo.getIp(), provider ).stopContainer( containerId );
         }
         else
         {
-            new EnvironmentClient( provider ).stopContainer( peerInfo.getIp(), containerId );
+            new EnvironmentWebClient( provider ).stopContainer( peerInfo.getIp(), containerId );
         }
     }
 
@@ -326,101 +309,22 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public void destroyContainer( final ContainerId containerId ) throws PeerException
     {
-        Preconditions.checkNotNull( containerId, "Container id is null" );
 
-        String path = "/container/destroy";
-
-
-        //*********construct Secure Header ****************************
-        Map<String, String> headers = Maps.newHashMap();
-
-        String envHeaderSource = localPeer.getId() + "-" + containerId.getEnvironmentId().getId();
-        String envHeaderTarget = peerInfo.getId() + "-" + containerId.getEnvironmentId().getId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
-        //*************************************************************
-
-        WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
-                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-        try
+        if ( containerId.getEnvironmentId() == null )
         {
-            client.post( containerId );
+            new PeerWebClient( peerInfo.getIp(), provider ).destroyContainer( containerId );
         }
-        catch ( Exception e )
+        else
         {
-            throw new PeerException( "Error starting container", e );
+            new EnvironmentWebClient( provider ).destroyContainer( peerInfo.getIp(), containerId );
         }
     }
 
 
     @Override
-    public void setDefaultGateway( final ContainerHost containerHost, final String gatewayIp ) throws PeerException
+    public void removeEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
     {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
-
-        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( gatewayIp ) && gatewayIp.matches( Common.IP_REGEX ),
-                "Invalid gateway IP" );
-
-        String path = "/container/gateway";
-
-        Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId() );
-        params.put( "gatewayIp", gatewayIp );
-
-        //*********construct Secure Header ****************************
-        Map<String, String> headers = Maps.newHashMap();
-
-        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
-        //*************************************************************
-
-        try
-        {
-            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-            post( path, alias, params, headers );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error setting container gateway ip", e );
-        }
-    }
-
-
-    @Override
-    public void removeEnvironmentKeyPair( final String environmentId ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
-
-        String path = String.format( "/pek/%s", environmentId );
-
-        try
-        {
-            //*********construct Secure Header ****************************
-            Map<String, String> headers = Maps.newHashMap();
-
-            headers.put( Common.HEADER_SPECIAL, "ENC" );
-            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
-            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
-            //*************************************************************
-
-
-            delete( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, headers );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( String.format( "Error removing PEK on peer %s", getName() ), e );
-        }
+        new PeerWebClient( peerInfo.getIp(), provider ).removeEnvironmentKeyPair( environmentId );
     }
 
 
@@ -429,25 +333,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        String path = String.format( "/network/%s", environmentId );
-
-        try
-        {
-            //*********construct Secure Header ****************************
-            Map<String, String> headers = Maps.newHashMap();
-
-            headers.put( Common.HEADER_SPECIAL, "ENC" );
-            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
-            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
-            //*************************************************************
-
-
-            delete( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, headers );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( String.format( "Error cleaning up network on peer %s", getName() ), e );
-        }
+        new PeerWebClient( peerInfo.getIp(), provider ).cleanupEnvironmentNetworkSettings( environmentId );
     }
 
 
@@ -475,11 +361,11 @@ public class RemotePeerImpl implements RemotePeer
 
         if ( containerId.getEnvironmentId() == null )
         {
-            return new PeerClient( provider ).getProcessResourceUsage( peerInfo.getIp(), containerId, pid );
+            return new PeerWebClient( peerInfo.getIp(), provider ).getProcessResourceUsage( containerId, pid );
         }
         else
         {
-            return new EnvironmentClient( provider ).getProcessResourceUsage( peerInfo.getIp(), containerId, pid );
+            return new EnvironmentWebClient( provider ).getProcessResourceUsage( peerInfo.getIp(), containerId, pid );
         }
     }
 
@@ -492,11 +378,11 @@ public class RemotePeerImpl implements RemotePeer
 
         if ( containerId.getEnvironmentId() == null )
         {
-            return new PeerClient( provider ).getState( peerInfo.getIp(), containerId );
+            return new PeerWebClient( peerInfo.getIp(), provider ).getState( containerId );
         }
         else
         {
-            return new EnvironmentClient( provider ).getState( peerInfo.getIp(), containerId );
+            return new EnvironmentWebClient( provider ).getState( peerInfo.getIp(), containerId );
         }
     }
 
@@ -1378,8 +1264,6 @@ public class RemotePeerImpl implements RemotePeer
 
 
     //networking
-
-
     @Override
     public int setupTunnels( final Map<String, String> peerIps, final String environmentId ) throws PeerException
     {
@@ -1415,35 +1299,11 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public int reserveVni( final Vni vni ) throws PeerException
+    public Vni reserveVni( final Vni vni ) throws PeerException
     {
         Preconditions.checkNotNull( vni, "Invalid vni" );
 
-        String path = "/vni";
-
-        try
-        {
-            //*********construct Secure Header ****************************
-            Map<String, String> headers = Maps.newHashMap();
-
-            headers.put( Common.HEADER_SPECIAL, "ENC" );
-            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
-            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
-
-            //*************************************************************
-
-            Map<String, String> params = Maps.newHashMap();
-
-            params.put( "vni", jsonUtil.to( vni ) );
-
-            String response = post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
-
-            return Integer.parseInt( response );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( String.format( "Error reserving vni %s on peer %s", vni, getName() ), e );
-        }
+        return new PeerWebClient( peerInfo.getIp(), provider ).reserveVni( vni );
     }
     //************ END ENVIRONMENT SPECIFIC REST
 
@@ -1454,18 +1314,7 @@ public class RemotePeerImpl implements RemotePeer
         String path = "/gateways";
         try
         {
-            //*********construct Secure Header ****************************
-            Map<String, String> headers = Maps.newHashMap();
-
-            headers.put( Common.HEADER_SPECIAL, "ENC" );
-            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
-            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
-            //*************************************************************
-
-            String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, headers );
-
-            return jsonUtil.from( response, new TypeToken<Set<Gateway>>()
-            {}.getType() );
+            return new PeerWebClient( peerInfo.getIp(), provider ).getGateways();
         }
         catch ( Exception e )
         {
@@ -1475,123 +1324,60 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public Set<Vni> getReservedVnis() throws PeerException
+    public void setDefaultGateway( final ContainerGateway gateway ) throws PeerException
     {
-        String path = "/vni";
+        Preconditions.checkNotNull( gateway, "Gateway is null" );
+
+        String path = "/container/gateway";
 
         try
         {
-            //*********construct Secure Header ****************************
-            Map<String, String> headers = Maps.newHashMap();
-
-            headers.put( Common.HEADER_SPECIAL, "ENC" );
-            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
-            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
-            //*************************************************************
-
-            String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, headers );
-
-            return jsonUtil.from( response, new TypeToken<Set<Vni>>()
-            {}.getType() );
+            new PeerWebClient( peerInfo.getIp(), provider ).setDefaultGateway( gateway );
         }
         catch ( Exception e )
         {
-            throw new PeerException( String.format( "Error obtaining reserved VNIs from peer %s", getName() ), e );
+            throw new PeerException( "Error setting container gateway ip", e );
         }
     }
 
 
-    /* ***************************************************
-     *
-     */
     @Override
-    public String createEnvironmentKeyPair( String environmentId ) throws PeerException
+    public Set<Vni> getReservedVnis() throws PeerException
+    {
+        return new PeerWebClient( peerInfo.getIp(), provider ).getReservedVnis();
+    }
+
+
+    @Override
+    public PublicKeyContainer createEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environmentId" );
 
-        String path = String.format( "/pek/%s", environmentId );
-
-        try
-        {
-            //*********construct Secure Header ****************************
-            Map<String, String> headers = Maps.newHashMap();
-
-            headers.put( Common.HEADER_SPECIAL, "ENC" );
-            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
-            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
-            //*************************************************************
-
-            return post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, null, headers );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( String.format( "Error creating PEK on peer %s", getName() ), e );
-        }
-    }
-
-
-    /* ***************************************************
-     *
-     */
-    private String buildPath( String path )
-    {
-        return String.format( "%s/%s", baseUrl, path.startsWith( "/" ) ? path.substring( 1 ) : path );
+        return new PeerWebClient( peerInfo.getIp(), provider ).createEnvironmentKeyPair( environmentId );
     }
 
 
     @Override
     public HostInterfaces getInterfaces()
     {
-        String path = buildPath( "/interfaces" );
-
-        WebClient client =
-                restUtil.createTrustedWebClientWithAuthAndProviders( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS,
-                        provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-
-        return client.get( HostInterfaces.class );
+        return new PeerWebClient( peerInfo.getIp(), provider ).getInterfaces();
     }
 
 
     @Override
     public void setupN2NConnection( final N2NConfig config )
     {
-        LOG.debug( String.format( "Adding remote peer to n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
-                config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
+        Preconditions.checkNotNull( config, "Invalid n2n config" );
 
-        String path = "/n2ntunnel";
-        LOG.debug( String.format( "%s %s %s", peerInfo.getIp(), peerInfo.getPort(), baseUrl ) );
-
-
-        WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
-                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-
-        client.post( config );
+        new PeerWebClient( peerInfo.getIp(), provider ).setupN2NConnection( config );
     }
 
 
     @Override
     public void removeN2NConnection( final EnvironmentId environmentId ) throws PeerException
     {
-
-
-        LOG.debug( String.format( "Removing remote peer from n2n community: %s", environmentId.getId() ) );
-
-        String path = String.format( "/n2ntunnel/%s", environmentId.getId() );
-
-        WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
-                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-
-        Response response = client.delete();
-        LOG.debug( String.format( "%s", response ) );
+        Preconditions.checkNotNull( environmentId, "Invalid environment ID" );
+        new PeerWebClient( peerInfo.getIp(), provider ).removeN2NConnection( environmentId );
     }
 
 
@@ -1628,22 +1414,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public ResourceHostMetrics getResourceHostMetrics()
     {
-        String path = String.format( "/resources" );
-
-
-        WebClient client = restUtil.createTrustedWebClientWithAuthAndProviders( buildPath( path ),
-                SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-
-        //*********construct Secure Header ****************************
-        client.getHeaders().add( Common.HEADER_SPECIAL, "ENC" );
-        client.getHeaders().add( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
-        client.getHeaders().add( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
-
-        ResourceHostMetrics result = client.get( ResourceHostMetrics.class );
-        return result;
+        return new PeerWebClient( peerInfo.getIp(), provider ).getResourceHostMetrics();
     }
 
 

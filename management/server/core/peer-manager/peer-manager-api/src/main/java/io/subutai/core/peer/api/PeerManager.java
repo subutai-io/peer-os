@@ -1,17 +1,23 @@
 package io.subutai.core.peer.api;
 
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.metric.ProcessResourceUsage;
+import io.subutai.common.network.Gateway;
+import io.subutai.common.network.Vni;
+import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.security.PublicKeyContainer;
 
 
 public interface PeerManager
@@ -111,4 +117,16 @@ public interface PeerManager
     String getPeerIdByIp( String ip ) throws PeerException;
 
     ProcessResourceUsage getProcessResourceUsage( ContainerId containerId, int pid ) throws PeerException;
+
+    void removeEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
+
+    PublicKeyContainer createEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
+
+    Set<Gateway> getGateways() throws PeerException;
+
+    void setDefaultGateway( ContainerGateway gateway ) throws PeerException;
+
+    Set<Vni> getReservedVnis() throws PeerException;
+
+    Vni reserveVni( Vni vni ) throws PeerException;
 }

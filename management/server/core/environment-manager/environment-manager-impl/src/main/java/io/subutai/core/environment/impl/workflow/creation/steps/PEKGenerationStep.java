@@ -11,6 +11,7 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.peer.api.LocalPeer;
 
@@ -35,15 +36,14 @@ public class PEKGenerationStep
 
     public Map<Peer, String> execute() throws PeerException
     {
-        Set<Peer> peers = Sets.newHashSet(topology.getAllPeers());
+        Set<Peer> peers = Sets.newHashSet( topology.getAllPeers() );
         peers.add( localPeer );
 
         Map<Peer, String> peerPekPubKeys = Maps.newHashMap();
 
         for ( final Peer peer : peers )
         {
-            peerPekPubKeys.put( peer,
-                    peer.createEnvironmentKeyPair( String.format( "%s-%s", peer.getId(), environment.getId() ) ) );
+            peerPekPubKeys.put( peer, peer.createEnvironmentKeyPair( environment.getEnvironmentId() ).getKey() );
         }
 
         return peerPekPubKeys;

@@ -54,6 +54,11 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
     @Override
     public void handleMessage( final Message message )
     {
+        if ( !channelManagerImpl.isEncryptionEnabled() )
+        {
+            return;
+        }
+
         try
         {
             if ( InterceptorState.SERVER_IN.isActive( message ) )

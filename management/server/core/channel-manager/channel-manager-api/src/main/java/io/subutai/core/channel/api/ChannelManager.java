@@ -16,7 +16,8 @@ public interface ChannelManager
     public void setDaoManager( DaoManager daoManager );
 
     public ChannelTokenManager getChannelTokenManager();
+
     public void setChannelTokenManager( final ChannelTokenManager channelTokenManager );
 
-
+    boolean isEncryptionEnabled();
 }

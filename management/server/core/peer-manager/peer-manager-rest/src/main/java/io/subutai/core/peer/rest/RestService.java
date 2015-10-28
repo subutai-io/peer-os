@@ -1,6 +1,7 @@
 package io.subutai.core.peer.rest;
 
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -20,10 +21,14 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
+import io.subutai.common.network.Gateway;
+import io.subutai.common.network.Vni;
+import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.security.PublicKeyContainer;
 
 //todo please check all endpoints for returned media type, do we return correct type if we just return response code
 // then no need to indicate it at all!!!
@@ -72,17 +77,26 @@ public interface RestService
     @GET
     @Path( "vni" )
     @Produces( MediaType.APPLICATION_JSON )
-    Response getReservedVnis();
+    Collection<Vni> getReservedVnis();
 
     @POST
     @Path( "vni" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    Response reserveVni( @FormParam( "vni" ) String vni );
+    @Produces( MediaType.APPLICATION_JSON )
+    @Consumes( MediaType.APPLICATION_JSON )
+    Vni reserveVni( Vni vni );
 
     @GET
     @Path( "gateways" )
+    @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    Response getGateways();
+    Collection<Gateway> getGateways();
+
+
+    @POST
+    @Path( "container/gateway" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    void setDefaultGateway( ContainerGateway gateway );
 
     @POST
     @Path( "gateways" )
@@ -94,15 +108,15 @@ public interface RestService
     @Produces( { MediaType.TEXT_PLAIN } )
     Response setupTunnels( @FormParam( "peerIps" ) String peerIps, @FormParam( "environmentId" ) String environmentId );
 
-    //todo remove verbs from urls, http method type should be descriptive say DELETE means remove
     @POST
-    @Path( "pek/{environmentId}" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    Response createEnvironmentKeyPair( @PathParam( "environmentId" ) String environmentId );
+    @Path( "pek" )
+    @Produces( MediaType.APPLICATION_JSON )
+    @Consumes( MediaType.APPLICATION_JSON )
+    PublicKeyContainer createEnvironmentKeyPair( EnvironmentId environmentId );
 
     @DELETE
     @Path( "pek/{environmentId}" )
-    Response removeEnvironmentKeyPair( @PathParam( "environmentId" ) String environmentId );
+    void removeEnvironmentKeyPair( @PathParam( "environmentId" ) EnvironmentId environmentId );
 
     @DELETE
     @Path( "network/{environmentId}" )
@@ -264,12 +278,6 @@ public interface RestService
     @POST
     @Path( "container/quota/disk" )
     Response setDiskQuota( @FormParam( "containerId" ) String containerId, @FormParam( "diskQuota" ) String diskQuota );
-
-    @POST
-    @Path( "container/gateway" )
-    Response setDefaultGateway( @FormParam( "containerId" ) String containerId,
-                                @FormParam( "gatewayIp" ) String gatewayIp );
-
 
     @GET
     @Path( "container/info" )

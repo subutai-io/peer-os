@@ -388,13 +388,13 @@ public class RemotePeerImplTest
     @Test( expected = PeerException.class )
     public void testGetProcessResourceUsage() throws Exception
     {
-        remotePeer.getProcessResourceUsage( containerHost, PID );
+        remotePeer.getProcessResourceUsage( containerHost.getContainerId(), PID );
 
         //verify( localPeer ).getId();
 
         throwException();
 
-        remotePeer.getProcessResourceUsage( containerHost, PID );
+        remotePeer.getProcessResourceUsage( containerHost.getContainerId(), PID );
     }
 
 

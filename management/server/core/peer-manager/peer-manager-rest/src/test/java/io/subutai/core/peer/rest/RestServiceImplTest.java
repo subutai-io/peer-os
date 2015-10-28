@@ -1,14 +1,11 @@
 package io.subutai.core.peer.rest;
 
 
-import java.io.PrintStream;
-import java.lang.reflect.Type;
 import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -25,7 +22,6 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
-import io.subutai.common.peer.PeerStatus;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
@@ -40,7 +36,6 @@ import io.subutai.core.security.api.SecurityManager;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNull;
-import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anySet;
@@ -54,7 +49,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-@Ignore
 @RunWith( MockitoJUnitRunner.class )
 public class RestServiceImplTest
 {
@@ -239,7 +233,7 @@ public class RestServiceImplTest
     {
         restService.destroyContainer( containerId );
 
-        verify( containerHost ).dispose();
+        verify( peerManager ).destroyContainer( containerId );
 
         doThrow( exception ).when( localPeer ).bindHost( containerId );
 
@@ -252,7 +246,7 @@ public class RestServiceImplTest
     {
         restService.startContainer( containerId );
 
-        verify( containerHost ).start();
+        verify( peerManager ).startContainer( containerId );
 
         doThrow( exception ).when( localPeer ).bindHost( containerId );
 
@@ -265,7 +259,8 @@ public class RestServiceImplTest
     {
         restService.stopContainer( containerId );
 
-        verify( containerHost ).stop();
+        verify( peerManager ).stopContainer( containerId );
+
 
         doThrow( exception ).when( localPeer ).bindHost( containerId );
 
@@ -297,7 +292,7 @@ public class RestServiceImplTest
 
         restService.getContainerState( containerId );
 
-        verify( jsonUtil ).to( ContainerHostState.RUNNING );
+        verify( peerManager ).getContainerState( containerId );
 
         doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
 
@@ -374,9 +369,10 @@ public class RestServiceImplTest
     @Test
     public void testGetProcessResourceUsage() throws Exception
     {
-        restService.getProcessResourceUsage( CONTAINER_ID.toString(), PID );
+        restService.getProcessResourceUsage( containerId, PID );
 
-        verify( containerHost ).getProcessResourceUsage( PID );
+        verify( peerManager ).getProcessResourceUsage( containerId, PID );
+
     }
 
 

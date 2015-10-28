@@ -1,6 +1,7 @@
 package io.subutai.core.peer.rest;
 
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +25,9 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
+import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
+import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerInfo;
@@ -34,32 +37,24 @@ import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.RamQuota;
+import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
-import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.security.api.SecurityManager;
 
 
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
     private PeerManager peerManager;
-    //    private HttpContextManager httpContextManager;
     protected JsonUtil jsonUtil = new JsonUtil();
     protected RestUtil restUtil = new RestUtil();
-    //    private SecurityManager securityManager;
-    //    private Object provider;
 
 
-    public RestServiceImpl( final PeerManager peerManager/*, HttpContextManager httpContextManager,
-                            SecurityManager securityManager, Object provider*/ )
+    public RestServiceImpl( final PeerManager peerManager )
     {
         this.peerManager = peerManager;
-        //        this.httpContextManager = httpContextManager;
-        //        this.securityManager = securityManager;
-        //        this.provider = provider;
     }
 
 
@@ -514,20 +509,18 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setDefaultGateway( final String containerId, final String gatewayIp )
+    public void setDefaultGateway( final ContainerGateway gateway )
     {
+        Preconditions.checkNotNull( gateway, "Gateway is null" );
+
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            localPeer.getContainerHostById( containerId ).setDefaultGateway( gatewayIp );
-            return Response.ok().build();
+            peerManager.setDefaultGateway( gateway );
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error setting default gateway #setDefaultGateway", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            throw new WebApplicationException( e );
         }
     }
 
@@ -553,33 +546,31 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getReservedVnis()
+    public Collection<Vni> getReservedVnis()
     {
         try
         {
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            return Response.ok( jsonUtil.to( localPeer.getReservedVnis() ) ).build();
+            return peerManager.getReservedVnis();
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error getting reserved vnis #getReservedVnis", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            throw new WebApplicationException( e );
         }
     }
 
 
     @Override
-    public Response getGateways()
+    public Collection<Gateway> getGateways()
     {
         try
         {
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            return Response.ok( jsonUtil.to( localPeer.getGateways() ) ).build();
+            return peerManager.getGateways();
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error getting gateways #getGateways", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            throw new WebApplicationException( e );
         }
     }
 
@@ -602,32 +593,27 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response createEnvironmentKeyPair( final String environmentId )
+    public PublicKeyContainer createEnvironmentKeyPair( final EnvironmentId environmentId )
     {
+        Preconditions.checkNotNull( environmentId );
+
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
-
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            String pekPubKey = localPeer.createEnvironmentKeyPair( environmentId );
-
-            return Response.ok( pekPubKey ).status( Response.Status.CREATED ).build();
+            return peerManager.createEnvironmentKeyPair( environmentId );
         }
         catch ( Exception ex )
         {
-            return Response.status( Response.Status.NOT_FOUND ).build();
+            throw new WebApplicationException( ex );
         }
     }
 
 
     @Override
-    public Response removeEnvironmentKeyPair( final String environmentId )
+    public void removeEnvironmentKeyPair( final EnvironmentId environmentId )
     {
-        LocalPeer localPeer = peerManager.getLocalPeer();
         try
         {
-            localPeer.removeEnvironmentKeyPair( environmentId );
-            return Response.ok().build();
+            peerManager.removeEnvironmentKeyPair( environmentId );
         }
         catch ( Exception e )
         {
@@ -637,23 +623,16 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response reserveVni( final String vni )
+    public Vni reserveVni( final Vni vni )
     {
         try
         {
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            int vlan = localPeer.reserveVni( jsonUtil.from( vni, Vni.class ) );
-
-            //***********CREATE PEK *************************************
-
-            //***********************************************************
-
-            return Response.ok( vlan ).build();
+            return peerManager.reserveVni( vni );
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error reserving vni #reserveVni", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            throw new WebApplicationException( e );
         }
     }
 

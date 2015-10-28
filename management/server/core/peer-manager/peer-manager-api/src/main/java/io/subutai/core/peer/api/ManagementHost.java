@@ -53,7 +53,7 @@ public interface ManagementHost extends Host, HostInfo
     /**
      * Reserves VNI
      */
-    int reserveVni( Vni vni ) throws PeerException;
+    Vni reserveVni( Vni vni ) throws PeerException;
 
     /**
      * Returns all existing gateways

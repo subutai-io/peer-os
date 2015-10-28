@@ -55,6 +55,7 @@ import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
+import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainersDestructionResult;
@@ -75,6 +76,7 @@ import io.subutai.common.quota.QuotaException;
 import io.subutai.common.quota.QuotaInfo;
 import io.subutai.common.quota.QuotaType;
 import io.subutai.common.quota.RamQuota;
+import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.settings.Common;
@@ -93,7 +95,6 @@ import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.Payload;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.RequestListener;
-import io.subutai.core.peer.api.Tunnel;
 import io.subutai.core.peer.impl.container.ContainersDestructionResultImpl;
 import io.subutai.core.peer.impl.container.CreateContainerWrapperTask;
 import io.subutai.core.peer.impl.container.DestroyContainerWrapperTask;
@@ -721,6 +722,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void startContainer( final ContainerId containerId ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
+        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
         ContainerHostEntity containerHost = bindHost( containerId );
         ResourceHost resourceHost = containerHost.getParent();
@@ -739,6 +741,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void stopContainer( final ContainerId containerId ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
+        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
         ContainerHostEntity containerHost = bindHost( containerId );
         ResourceHost resourceHost = containerHost.getParent();
@@ -757,6 +760,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void destroyContainer( final ContainerId containerId ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
+        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
+
         ContainerHostEntity host = bindHost( containerId );
         ResourceHost resourceHost = host.getParent();
 
@@ -778,34 +783,31 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException
     {
+        Preconditions.checkNotNull( environmentId );
         getManagementHost().cleanupEnvironmentNetworkSettings( environmentId );
     }
 
 
     @Override
-    public void removeEnvironmentKeyPair( final String environmentId ) throws PeerException
+    public void removeEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
+        Preconditions.checkNotNull( environmentId );
 
         KeyManager keyManager = securityManager.getKeyManager();
 
-        keyManager.removeKeyRings( environmentId );
+        keyManager.removeKeyRings( environmentId.getId() );
     }
 
 
     @Override
-    public void setDefaultGateway( final ContainerHost host, final String gatewayIp ) throws PeerException
+    public void setDefaultGateway( final ContainerGateway gateway ) throws PeerException
     {
-
-        Preconditions.checkNotNull( host, "Invalid container host" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( gatewayIp ) && gatewayIp.matches( Common.IP_REGEX ),
-                "Invalid gateway IP" );
+        Preconditions.checkNotNull( gateway, "Invalid gateway" );
 
         try
         {
-            commandUtil.execute( new RequestBuilder(
-                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
-                    bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gateway.getGateway(),
+                    Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( gateway.getContainerId() ) );
         }
         catch ( CommandException e )
         {
@@ -1427,7 +1429,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public int reserveVni( final Vni vni ) throws PeerException
+    public Vni reserveVni( final Vni vni ) throws PeerException
     {
         Preconditions.checkNotNull( vni, "Invalid vni" );
 
@@ -1606,15 +1608,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public String createEnvironmentKeyPair( String environmentId ) throws PeerException
+    public PublicKeyContainer createEnvironmentKeyPair( EnvironmentId envId ) throws PeerException
     {
         KeyManager keyManager = securityManager.getKeyManager();
         EncryptionTool encTool = securityManager.getEncryptionTool();
-
+        String pairId = String.format( "%s-%s", getId(), envId.getId() );
         try
         {
 
-            KeyPair keyPair = keyManager.generateKeyPair( environmentId, false );
+            KeyPair keyPair = keyManager.generateKeyPair( pairId, false );
 
 
             //**********************************************************************************
@@ -1626,10 +1628,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             pubRing = encTool.signPublicKey( pubRing, getId(), peerSecRing.getSecretKey(), "" );
 
             //***************Save Keys *********************************************************
-            keyManager.saveSecretKeyRing( environmentId, ( short ) 2, secRing );
-            keyManager.savePublicKeyRing( environmentId, ( short ) 2, pubRing );
+            keyManager.saveSecretKeyRing( pairId, ( short ) 2, secRing );
+            keyManager.savePublicKeyRing( pairId, ( short ) 2, pubRing );
 
-            return encTool.armorByteArrayToString( pubRing.getEncoded() );
+            return new PublicKeyContainer( getId(), pubRing.getPublicKey().getFingerprint(),
+                    encTool.armorByteArrayToString( pubRing.getEncoded() ) );
         }
         catch ( IOException | PGPException ex )
         {
