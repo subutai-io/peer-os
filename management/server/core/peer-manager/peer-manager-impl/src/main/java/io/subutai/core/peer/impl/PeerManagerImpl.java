@@ -35,6 +35,7 @@ import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Interface;
 import io.subutai.common.metric.ProcessResourceUsage;
+import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerGateway;
@@ -700,6 +701,41 @@ public class PeerManagerImpl implements PeerManager
     public Vni reserveVni( final Vni vni ) throws PeerException
     {
         return localPeer.reserveVni( vni );
+    }
+
+
+    @Override
+    public void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException
+    {
+        localPeer.cleanupEnvironmentNetworkSettings( environmentId );
+    }
+
+
+    @Override
+    public void removeN2NConnection( final EnvironmentId environmentId ) throws PeerException
+    {
+        localPeer.cleanupEnvironmentNetworkSettings( environmentId );
+    }
+
+
+    @Override
+    public void addToTunnel( final N2NConfig config ) throws PeerException
+    {
+        localPeer.setupN2NConnection( config );
+    }
+
+
+    @Override
+    public ResourceHostMetrics getResourceHostMetrics()
+    {
+        return localPeer.getResourceHostMetrics();
+    }
+
+
+    @Override
+    public HostInterfaces getInterfaces()
+    {
+        return localPeer.getInterfaces();
     }
 }
 

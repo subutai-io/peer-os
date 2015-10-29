@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Set;
 
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
+import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerGateway;
@@ -129,4 +131,14 @@ public interface PeerManager
     Set<Vni> getReservedVnis() throws PeerException;
 
     Vni reserveVni( Vni vni ) throws PeerException;
+
+    void cleanupEnvironmentNetworkSettings( EnvironmentId environmentId ) throws PeerException;
+
+    void removeN2NConnection( EnvironmentId environmentId ) throws PeerException;
+
+    void addToTunnel( N2NConfig config ) throws PeerException;
+
+    ResourceHostMetrics getResourceHostMetrics();
+
+    HostInterfaces getInterfaces();
 }

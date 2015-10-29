@@ -164,7 +164,7 @@ public class NetworkManagerImpl implements NetworkManager
             if ( m.find() && m.groupCount() == 2 )
             {
                 LOG.debug( String.format( "Adding new tunnel: %s %s", m.group( 1 ), m.group( 2 ) ) );
-                tunnels.add( new TunnelImpl( m.group( 1 ), m.group( 2 ) ) );
+                tunnels.add( new Tunnel( m.group( 1 ), m.group( 2 ) ) );
             }
         }
 
@@ -312,7 +312,8 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( domain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
         Preconditions.checkNotNull( domainLoadBalanceStrategy );
 
-        execute( getManagementHost(), commands.getSetVlanDomainCommand( vLanId, domain, domainLoadBalanceStrategy, sslCertPath ) );
+        execute( getManagementHost(),
+                commands.getSetVlanDomainCommand( vLanId, domain, domainLoadBalanceStrategy, sslCertPath ) );
     }
 
 

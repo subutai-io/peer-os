@@ -781,7 +781,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId );
-        getManagementHost().cleanupEnvironmentNetworkSettings( environmentId );
+        try
+        {
+            getManagementHost().cleanupEnvironmentNetworkSettings( environmentId );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error on cleaning up network settings.", e );
+        }
     }
 
 
