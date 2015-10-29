@@ -94,7 +94,6 @@ public class BrokerImpl implements Broker
         this.truststore = String.format( "%s/%s", Common.SUBUTAI_APP_CERTS_PATH, truststore );
         this.truststorePassword = truststorePassword;
         this.caCertificate = String.format( "%s/%s", Common.SUBUTAI_APP_CERTS_PATH, caCertificate );
-        ;
     }
 
 
