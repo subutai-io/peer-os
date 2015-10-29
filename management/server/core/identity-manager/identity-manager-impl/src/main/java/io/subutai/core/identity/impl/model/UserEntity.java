@@ -1,4 +1,4 @@
-package impl.model;
+package io.subutai.core.identity.impl.model;
 
 import java.util.ArrayList;
 import java.util.List;

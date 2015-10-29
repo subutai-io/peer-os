@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.UUID;
 
 import io.subutai.core.channel.api.ChannelManager;
-import io.subutai.core.channel.api.entity.IUserChannelToken;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.server.ui.component.ConfirmationDialog;
@@ -113,7 +112,7 @@ public class UserTokenManager extends Panel
             {
                 Timestamp datetime = new Timestamp( System.currentTimeMillis() );
                 String uuid = UUID.randomUUID().toString();
-
+                /*
                 IUserChannelToken userChannelToken = channelManager.getChannelTokenManager().createUserChannelToken();
 
                 userChannelToken.setUserId( userId );
@@ -128,6 +127,7 @@ public class UserTokenManager extends Panel
                 channelManager.getChannelTokenManager().saveUserChannelToken( userChannelToken );
 
                 setUserChannelList();
+                */
             }
         } );
 
@@ -258,15 +258,9 @@ public class UserTokenManager extends Panel
     }
 
 
-    private void setValues( IUserChannelToken userChannelToken )
-    {
-        //ignore
-    }
-
-
     private void openEditWindow( final Button.ClickEvent clickEvent )
     {
-        final IUserChannelToken userChannelToken = ( IUserChannelToken ) clickEvent.getButton().getData();
+        //final IUserChannelToken userChannelToken = ( IUserChannelToken ) clickEvent.getButton().getData();
 
         subWindow = new Window();
 
@@ -278,6 +272,7 @@ public class UserTokenManager extends Panel
         VerticalLayout content = new VerticalLayout();
         content.setMargin( true );
 
+        /*
         editTokenTxtFld.setValue( userChannelToken.getTokenName() );
         editIpRangeStartTxtFld.setValue( userChannelToken.getIpRangeStart() );
         editIpRangeEndTxtFld.setValue( userChannelToken.getIpRangeEnd() );
@@ -322,23 +317,23 @@ public class UserTokenManager extends Panel
         subWindow.setModal( true );
         subWindow.setImmediate( true );
         subWindow.setContent( content );
-        UI.getCurrent().addWindow( subWindow );
+        UI.getCurrent().addWindow( subWindow );*/
     }
 
 
     private void setUserChannelList()
     {
-        List<IUserChannelToken> userChannelTokenList = null;
+
 
         //if ( user.isAdmin() )
         {
-            userChannelTokenList = channelManager.getChannelTokenManager().getAllUserChannelTokenData();
+            //userChannelTokenList = channelManager.getChannelTokenManager().getAllUserChannelTokenData();
         }
         //else
         {
             //userChannelTokenList = channelManager.getChannelTokenManager().getUserChannelTokenData( user.getId() );
         }
-
+        /*
         if ( userChannelTokenList != null )
         {
             tokenTable.removeAllItems();
@@ -398,6 +393,6 @@ public class UserTokenManager extends Panel
                         editBtn, removeBtn
                 }, userChannelToken);
             }
-        }
+        }*/
     }
 }

@@ -86,8 +86,7 @@
 
     <vaadin-version>7.3.3</vaadin-version>
 
-    <!-- apache shiro -->
-    <org.apache.shiro.version>1.2.3</org.apache.shiro.version>
+    <!-- bouncycastle -->
     <org.bouncycastle.version>1.52</org.bouncycastle.version>
 
     <!-- JWT lib -->
@@ -847,6 +846,14 @@
         <version>3.1.0</version>
       </dependency>
 
+      <!-- ~~~~~~~~Security Annotation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <dependency>
+        <groupId>javax.annotation</groupId>
+        <artifactId>javax.annotation-api</artifactId>
+        <version>1.2</version>
+      </dependency>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- subutai-common -->
       <dependency>
@@ -1026,16 +1033,6 @@
         <version>1.9.13</version>
       </dependency>
 
-      <dependency>
-        <groupId>org.apache.shiro</groupId>
-        <artifactId>shiro-core</artifactId>
-        <version>${org.apache.shiro.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.shiro</groupId>
-        <artifactId>shiro-web</artifactId>
-        <version>${org.apache.shiro.version}</version>
-      </dependency>
       <dependency>
         <groupId>com.nimbusds</groupId>
         <artifactId>nimbus-jose-jwt</artifactId>

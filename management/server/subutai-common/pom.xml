@@ -128,11 +128,16 @@
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-ext-jdk15on</artifactId>
     </dependency>
+    <dependency>
+      <groupId>javax.annotation</groupId>
+      <artifactId>javax.annotation-api</artifactId>
+      <version>1.2</version>
+    </dependency>
 
     <dependency>
-    	<groupId>org.apache.aries.blueprint</groupId>
-    	<artifactId>org.apache.aries.blueprint.authz</artifactId>
-    	<version>1.0.1-SNAPSHOT</version>
+      <groupId>org.apache.aries.blueprint</groupId>
+      <artifactId>org.apache.aries.blueprint.authz</artifactId>
+      <version>1.0.1-SNAPSHOT</version>
     </dependency>
 
   </dependencies>

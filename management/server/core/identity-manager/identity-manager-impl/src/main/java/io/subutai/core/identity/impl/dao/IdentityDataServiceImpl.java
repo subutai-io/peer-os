@@ -26,6 +26,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
     private RoleDAO roleDAOService = null;
     private SessionDAO sessionDAOService = null;
     private PermissionDAO permissionDAOService = null;
+    private UserTokenDAO userTokenDAOService = null;
 
 
     /* *************************************************
@@ -41,6 +42,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
             roleDAOService = new RoleDAO( daoManager );
             sessionDAOService = new SessionDAO( daoManager );
             permissionDAOService = new PermissionDAO( daoManager );
+            userTokenDAOService = new UserTokenDAO( daoManager );
         }
         else
         {

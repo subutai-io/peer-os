@@ -31,18 +31,22 @@
       <version>1.2</version>
     </dependency>
 
+    <!--******** Karaf Libraries ****************-->
     <dependency>
       <groupId>org.apache.karaf.jaas</groupId>
       <artifactId>org.apache.karaf.jaas.modules</artifactId>
+      <version>${karaf.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.karaf.jaas</groupId>
       <artifactId>org.apache.karaf.jaas.config</artifactId>
+      <version>${karaf.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.karaf.jaas</groupId>
       <artifactId>org.apache.karaf.jaas.boot</artifactId>
+      <version>${karaf.version}</version>
       <scope>provided</scope>
     </dependency>
 

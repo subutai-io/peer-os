@@ -39,66 +39,74 @@ public class SessionEntity implements Session
     @Column(name="end_date")
     private Date endDate;
 
-
     @ManyToOne
     @JoinColumn( name = "user_id", referencedColumnName = "id" )
     private User user;
 
-
+    @Override
     public Long getId()
     {
         return id;
     }
 
 
+    @Override
     public void setId( final Long id )
     {
         this.id = id;
     }
 
 
+    @Override
     public User getUser()
     {
         return user;
     }
 
 
+    @Override
     public void setUser( final User user )
     {
         this.user = user;
     }
 
 
+    @Override
     public boolean isActive()
     {
         return active;
     }
 
 
+    @Override
     public void setActive( final boolean active )
     {
         this.active = active;
     }
 
 
+    @Override
     public Date getStartDate()
     {
         return startDate;
     }
 
 
+    @Override
     public void setStartDate( final Date startDate )
     {
         this.startDate = startDate;
     }
 
 
+    @Override
     public Date getEndDate()
     {
         return endDate;
     }
 
 
+    @Override
     public void setEndDate( final Date endDate )
     {
         this.endDate = endDate;

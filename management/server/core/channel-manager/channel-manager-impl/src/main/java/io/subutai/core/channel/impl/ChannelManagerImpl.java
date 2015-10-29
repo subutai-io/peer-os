@@ -3,13 +3,9 @@ package io.subutai.core.channel.impl;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.channel.api.ChannelManager;
-import io.subutai.core.channel.api.token.ChannelTokenManager;
-import io.subutai.core.channel.impl.token.ChannelTokenController;
-import io.subutai.core.channel.impl.token.ChannelTokenManagerImpl;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.security.api.SecurityManager;
 
@@ -19,8 +15,6 @@ import io.subutai.core.security.api.SecurityManager;
  */
 public class ChannelManagerImpl implements ChannelManager
 {
-    private DaoManager daoManager = null;
-    private ChannelTokenManager channelTokenManager = null;
     private IdentityManager identityManager = null;
     private SecurityManager securityManager = null;
     private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
@@ -28,14 +22,6 @@ public class ChannelManagerImpl implements ChannelManager
 
     public void init()
     {
-        channelTokenManager = new ChannelTokenManagerImpl();
-        channelTokenManager.setEntityManagerFactory( daoManager.getEntityManagerFactory() );
-
-        executorService
-                .scheduleWithFixedDelay( new ChannelTokenController( channelTokenManager ), 1, 1, TimeUnit.HOURS );
-        //-------------------------------------------------------------
-        //        new Thread( new ChannelTokenController( channelTokenManager ) ).start();
-        //-------------------------------------------------------------
     }
 
 
@@ -45,38 +31,10 @@ public class ChannelManagerImpl implements ChannelManager
     }
 
 
-    public DaoManager getDaoManager()
-    {
-
-        return daoManager;
-    }
-
-
-    public void setDaoManager( DaoManager daoManager )
-    {
-
-
-        this.daoManager = daoManager;
-    }
-
-
-    public ChannelTokenManager getChannelTokenManager()
-    {
-        return channelTokenManager;
-    }
-
-
-    public void setChannelTokenManager( final ChannelTokenManager channelTokenManager )
-    {
-        this.channelTokenManager = channelTokenManager;
-    }
-
-
     public IdentityManager getIdentityManager()
     {
         return identityManager;
     }
-
 
     public void setIdentityManager( final IdentityManager identityManager )
     {

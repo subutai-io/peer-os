@@ -1,12 +1,6 @@
 package io.subutai.server.ui.views;
 
 
-import java.io.Serializable;
-
-import javax.servlet.http.Cookie;
-
-import io.subutai.common.security.SubutaiLoginContext;
-import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.server.ui.MainUI;
@@ -17,7 +11,6 @@ import com.vaadin.event.ShortcutListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinService;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;

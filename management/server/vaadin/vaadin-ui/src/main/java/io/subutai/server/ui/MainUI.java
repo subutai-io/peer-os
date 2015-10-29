@@ -21,17 +21,11 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.naming.NamingException;
 import javax.servlet.http.Cookie;
 
-import io.subutai.common.security.NullSubutaiLoginContext;
-import io.subutai.common.security.SubutaiLoginContext;
 import io.subutai.common.settings.Common;
-import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.identity.api.model.User;
 import io.subutai.server.ui.util.HelpManager;
 import io.subutai.server.ui.util.HelpOverlay;
-import io.subutai.server.ui.util.SubutaiVaadinUtils;
 import io.subutai.server.ui.views.CoreModulesView;
 import io.subutai.server.ui.views.ModulesView;
 import io.subutai.server.ui.views.LoginView;
@@ -133,13 +127,13 @@ public class MainUI extends UI implements ViewChangeListener
     public boolean beforeViewChange( final ViewChangeListener.ViewChangeEvent event )
     {
         helpManager.closeAll();
-        SubutaiLoginContext loginContext = SubutaiVaadinUtils.getSubutaiLoginContext();
-        LOG.debug( String.format( "Current subutai login context: %s", loginContext ) );
+
+
         LOG.debug( String.format( "View: %s", event.getViewName() ) );
 
         boolean isAuthenticated = false;
 
-        if ( !( loginContext instanceof NullSubutaiLoginContext ) )
+        //if ( !( loginContext instanceof NullSubutaiLoginContext ) )
         {
             try
             {
@@ -312,19 +306,6 @@ public class MainUI extends UI implements ViewChangeListener
 
                 try
                 {
-                    /*
-                    IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-                    if ( identityManager != null )
-                    {
-                        identityManager.logout( SubutaiVaadinUtils.getSubutaiLoginContext().getSessionId() );
-                    }*/
-
-                    VaadinService.getCurrentRequest().getWrappedSession()
-                                 .removeAttribute( SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME );
-                    Cookie removeCookie = new Cookie( SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME, null );
-                    removeCookie.setMaxAge( 0 );
-                    VaadinService.getCurrentResponse().addCookie( removeCookie );
-                    VaadinSession.getCurrent().close();
                 }
                 catch ( Exception e )
                 {

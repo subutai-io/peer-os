@@ -435,6 +435,11 @@ html, body {
 	clear: both;
 }
 
+.error {
+  color: red;
+}
+
+
 .b-login-layout {
 	position: relative;
 	height: 100%;

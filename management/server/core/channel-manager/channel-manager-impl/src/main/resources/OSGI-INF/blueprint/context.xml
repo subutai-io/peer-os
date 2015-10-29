@@ -7,12 +7,6 @@
             http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0">
 
   <!-- ************************************************************************************************* -->
-
-  <bean id="daoManagerChannel" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
-    <jpa:unit unitname="channelManagerPUnit" property="entityManagerFactory" />
-  </bean>
-
-  <!-- ************************************************************************************************** -->
   <reference id="identityManager" availability="mandatory"
              interface="io.subutai.core.identity.api.IdentityManager" />
 
@@ -32,7 +26,6 @@
 
   <bean id="channelManagerImpl" scope="singleton" init-method="init" destroy-method="destroy"
         class="io.subutai.core.channel.impl.ChannelManagerImpl">
-    <property name="daoManager" ref="daoManagerChannel" />
     <property name="identityManager" ref="identityManager" />
     <property name="securityManager" ref="securityManager" />
   </bean>

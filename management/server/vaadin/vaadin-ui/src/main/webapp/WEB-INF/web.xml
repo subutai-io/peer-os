@@ -49,6 +49,18 @@
   </filter-mapping>
   <!-- ***************************************************************-->
 
+  <!-- ***************************************************************-->
+  <servlet>
+    <servlet-name>UserController</servlet-name>
+    <servlet-class>io.subutai.server.ui.web.controller.UserController</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>UserController</servlet-name>
+    <url-pattern>/usercontrol</url-pattern>
+  </servlet-mapping>
+  <!-- ***************************************************************-->
+
   <servlet>
     <servlet-name>Portal Vaadin App</servlet-name>
     <servlet-class>io.subutai.server.ui.SubutaiVaadinServlet</servlet-class>

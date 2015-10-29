@@ -25,11 +25,22 @@
 					<div class="b-login-title__progect-name">
 						Subutai
 					</div>
-					<div class="clear"></div>
+					<div class="clear">
+						<%
+              //****************************************************
+							if(request.getAttribute( "error" )!=null)
+							{
+								String error = (String)request.getAttribute( "error" );
+                out.print("<label class=\"error\">asdasd Username</label>");
+							}
+              //****************************************************
+						%>
+
+					</div>
 				</div>
 			</div>
 			<div class="b-login__form">
-				<form action="post">
+				<form action="/usercontrol" method="post">
 					<div class="b-login-form">
 						<div class="b-login-form__item">
 							<label for="login">Username</label>

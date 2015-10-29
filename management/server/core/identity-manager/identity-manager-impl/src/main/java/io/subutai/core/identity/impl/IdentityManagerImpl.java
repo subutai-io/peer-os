@@ -1,13 +1,12 @@
-package impl;
+package io.subutai.core.identity.impl;
 
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.core.identity.api.token.UserTokenManager;
 import io.subutai.core.identity.impl.dao.IdentityDataServiceImpl;
 import io.subutai.core.identity.impl.model.PermissionEntity;
 import io.subutai.core.identity.impl.model.RoleEntity;
@@ -47,6 +46,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     private IdentityDataService identityDataService = null;
     private DaoManager daoManager = null;
+    private UserTokenManager tokenManager;
 
     public IdentityManagerImpl()
     {
@@ -125,6 +125,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    @PermitAll
     @Override
     public Subject login( String userName, String password )
     {
@@ -146,6 +147,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    @PermitAll
     @Override
     public void logout()
     {
@@ -155,6 +157,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    @PermitAll
     @Override
     public User authenticateUser( String userName, String password )
     {
@@ -180,6 +183,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    @PermitAll
     @Override
     public List<User> getAllUsers()
     {
@@ -191,6 +195,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    @RolesAllowed( "Identity-Management|A|Write" )
     @Override
     public void assignUserRole( long userId, Role role )
     {
@@ -200,6 +205,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    @RolesAllowed( "Identity-Management|A|Write" )
     @Override
     public User createUser( String userName, String password, String fullName, String email )
     {
@@ -217,6 +223,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    @RolesAllowed( "Identity-Management|A|Delete" )
     @Override
     public void removeUser( long userId )
     {
@@ -226,6 +233,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    @RolesAllowed( "Identity-Management|A|Write" )
     @Override
     public Role createRole( String roleName, short roleType )
     {
@@ -241,6 +249,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    @RolesAllowed( "Identity-Management|A|Delete" )
     @Override
     public void removeRole( long roleId )
     {
@@ -250,6 +259,8 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    @RolesAllowed( "Identity-Management|A|Write" )
+    @Override
     public Permission createPermission( int objectId, int scope, boolean read, boolean write, boolean update,
                                         boolean delete )
     {
@@ -269,6 +280,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    @RolesAllowed( "Identity-Management|A|Write" )
     @Override
     public void assignRolePermission( long roleId, Permission permission )
     {
@@ -278,12 +290,21 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    @RolesAllowed( "Identity-Management|A|Delete" )
     @Override
     public void removePermission( long permissionId )
     {
         identityDataService.removePermission( permissionId );
     }
 
+
+    /* *************************************************
+     */
+    @Override
+    public IdentityDataService getIdentityDataService()
+    {
+        return identityDataService;
+    }
 
     /* *************************************************
      */
@@ -300,4 +321,19 @@ public class IdentityManagerImpl implements IdentityManager
         this.daoManager = daoManager;
     }
 
+
+    /* *************************************************
+     */
+    public UserTokenManager getTokenManager()
+    {
+        return tokenManager;
+    }
+
+
+    /* *************************************************
+    */
+    public void setTokenManager( final UserTokenManager tokenManager )
+    {
+        this.tokenManager = tokenManager;
+    }
 }
