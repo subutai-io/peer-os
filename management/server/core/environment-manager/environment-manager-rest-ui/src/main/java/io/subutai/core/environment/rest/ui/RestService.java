@@ -103,4 +103,39 @@ public interface RestService
     @GET
     @Path( "peers" )
     public Response getPeers();
+
+
+    //Quota
+    @GET
+    @Path( "container/{containerId}/quota" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getContainerQuota( @PathParam( "containerId" ) String containerId );
+
+    @GET
+    @Path( "container/{containerId}/quota/ram" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getRamQuota( @PathParam( "containerId" ) String containerId );
+
+    @POST
+    @Path( "container/{containerId}/quota/ram" )
+    Response setRamQuota( @PathParam( "containerId" ) String containerId, @FormParam( "ram" ) int ram );
+
+    @GET
+    @Path( "container/{containerId}/quota/cpu" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getCpuQuota( @PathParam( "containerId" ) String containerId );
+
+    @POST
+    @Path( "container/{containerId}/quota/cpu" )
+    Response setCpuQuota( @PathParam( "containerId" ) String containerId, @FormParam( "cpu" ) int cpu );
+
+    @GET
+    @Path( "container/{containerId}/quota/disk/{diskPartition}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getDiskQuota( @PathParam( "containerId" ) String containerId,
+                           @PathParam( "diskPartition" ) String diskPartition );
+
+    @POST
+    @Path( "container/{containerId}/quota/disk" )
+    Response setDiskQuota( @PathParam( "containerId" ) String containerId, @FormParam( "diskQuota" ) String diskQuota );
 }

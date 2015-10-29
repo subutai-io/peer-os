@@ -103,7 +103,7 @@ public class EnvironmentContainersQuotaTab extends CustomComponent
 
     public EnvironmentContainersQuotaTab( final EnvironmentManagerComponent environmentComponent )
     {
-        this.environmentComponent = environmentComponent;
+    this.environmentComponent = environmentComponent;
         init();
     }
 
@@ -196,7 +196,7 @@ public class EnvironmentContainersQuotaTab extends CustomComponent
                 @Override
                 public void run()
                 {
-                    indicator.setVisible( false );
+            indicator.setVisible( false );
                 }
             } );
         }

@@ -10,8 +10,11 @@ import java.util.UUID;
 import javax.ws.rs.core.Response;
 
 import io.subutai.common.environment.*;
+import io.subutai.common.quota.DiskPartition;
+import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
+import io.subutai.core.peer.api.LocalPeer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -665,5 +668,137 @@ public class RestServiceImpl implements RestService
         }
 
         return Response.ok().entity( JsonUtil.toJson( peerNames ) ).build();
+    }
+
+    //Quota
+    @Override
+    public Response getContainerQuota( final String containerId )
+    {
+        try
+        {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
+
+            LocalPeer localPeer = peerManager.getLocalPeer();
+
+            return Response.ok( String.format("{%s,%s}",
+                    localPeer.getContainerHostById( containerId ).getCpuQuota(),
+                    localPeer.getContainerHostById( containerId ).getRamQuota()
+            ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error getting container quota #getContainerQuota", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+    @Override
+    public Response getCpuQuota( final String containerId )
+    {
+        try
+        {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
+
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            return Response.ok( localPeer.getContainerHostById( containerId ).getCpuQuota() ).build();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error getting cpu quota #getCpuQuota", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response setCpuQuota( final String containerId, final int cpu )
+    {
+        try
+        {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
+
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            localPeer.getContainerHostById( containerId ).setCpuQuota( cpu );
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error setting cpu quota #setCpuQuota", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+    @Override
+    public Response getDiskQuota( final String containerId, final String diskPartition )
+    {
+        try
+        {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
+
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            return Response.ok( JsonUtil.toJson(localPeer.getContainerHostById(containerId).getDiskQuota(
+                    JsonUtil.<DiskPartition>fromJson(diskPartition, new TypeToken<DiskPartition>() {
+                    }.getType()))) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error getting disk quota #getDiskQuota", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response setDiskQuota( final String containerId, final String diskQuota )
+    {
+        try
+        {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
+
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            localPeer.getContainerHostById( containerId )
+                    .setDiskQuota( JsonUtil.<DiskQuota>fromJson(diskQuota, new TypeToken<DiskQuota>() {
+                    }.getType()) );
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error setting disk quota #setDiskQuota", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+    @Override
+    public Response getRamQuota( final String containerId )
+    {
+        try
+        {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
+
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            return Response.ok( localPeer.getContainerHostById( containerId ).getRamQuota() ).build();
+        } catch (Exception e) {
+            LOG.error( "Error getting ram quota #getRamQuota", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response setRamQuota( final String containerId, final int ram )
+    {
+        try
+        {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
+
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            localPeer.getContainerHostById( containerId ).setRamQuota( ram );
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error setting ram quota #setRamQuota", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
     }
 }
