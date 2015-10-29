@@ -680,9 +680,29 @@ public class RestServiceImpl implements RestService
 
             LocalPeer localPeer = peerManager.getLocalPeer();
 
-            return Response.ok( String.format("{%s,%s}",
+            return Response.ok( String.format("{\"cpu\": %s, \"ram\": %s, \"disk\": {\"HOME\": %s, \"VAR\": %s, \"ROOT_FS\": %s, \"OPT\": %s}}",
                     localPeer.getContainerHostById( containerId ).getCpuQuota(),
-                    localPeer.getContainerHostById( containerId ).getRamQuota()
+                    localPeer.getContainerHostById( containerId ).getRamQuota(),
+                    JsonUtil.toJson(
+                            localPeer.getContainerHostById(containerId).getDiskQuota(
+                                    JsonUtil.<DiskPartition>fromJson("HOME", new TypeToken<DiskPartition>() {}.getType())
+                            )
+                    ),
+                    JsonUtil.toJson(
+                            localPeer.getContainerHostById(containerId).getDiskQuota(
+                                    JsonUtil.<DiskPartition>fromJson("VAR", new TypeToken<DiskPartition>() {}.getType())
+                            )
+                    ),
+                    JsonUtil.toJson(
+                            localPeer.getContainerHostById(containerId).getDiskQuota(
+                                    JsonUtil.<DiskPartition>fromJson("ROOT_FS", new TypeToken<DiskPartition>() {}.getType())
+                            )
+                    ),
+                    JsonUtil.toJson(
+                            localPeer.getContainerHostById(containerId).getDiskQuota(
+                                    JsonUtil.<DiskPartition>fromJson("OPT", new TypeToken<DiskPartition>() {}.getType())
+                            )
+                    )
             ) ).build();
         }
         catch ( Exception e )
