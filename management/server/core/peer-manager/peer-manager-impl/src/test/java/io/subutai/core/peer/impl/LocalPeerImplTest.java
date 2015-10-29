@@ -62,6 +62,7 @@ import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.entity.ResourceHostEntity;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.strategy.api.StrategyManager;
 import junit.framework.TestCase;
 
@@ -73,6 +74,7 @@ import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anySet;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -173,6 +175,8 @@ public class LocalPeerImplTest
 
     @Mock
     SecurityManager securityManager;
+    @Mock
+    KeyManager keyManager;
 
     LocalPeerImpl localPeer;
 
@@ -207,6 +211,7 @@ public class LocalPeerImplTest
         when( resourceHost.getContainerHostById( CONTAINER_HOST_ID ) ).thenReturn( containerHost );
         when( resourceHost.getHostname() ).thenReturn( RESOURCE_HOST_NAME );
         when( localPeer.getPeerInfo() ).thenReturn( peerInfo );
+        when( securityManager.getKeyManager() ).thenReturn( keyManager );
         localPeer.peerInfo = peerInfo;
         when( peerInfo.getId() ).thenReturn( LOCAL_PEER_ID );
         when( peerInfo.getName() ).thenReturn( LOCAL_PEER_NAME );
@@ -742,7 +747,7 @@ public class LocalPeerImplTest
 
         verify( resourceHost ).updateHostInfo( resourceHostInfo );
 
-        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).getResourceHostByName( RESOURCE_HOST_NAME );
+        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).getResourceHostById( anyString() );
 
         localPeer.onHeartbeat( resourceHostInfo );
 
