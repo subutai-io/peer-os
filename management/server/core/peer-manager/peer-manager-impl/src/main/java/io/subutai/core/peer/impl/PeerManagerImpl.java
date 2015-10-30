@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
 import org.slf4j.Logger;
@@ -52,6 +53,7 @@ import io.subutai.core.security.api.SecurityManager;
 /**
  * PeerManager implementation
  */
+@PermitAll
 public class PeerManagerImpl implements PeerManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class );
@@ -111,6 +113,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    @RolesAllowed( "Peer-Management|A|Write" )
     @Override
     public boolean register( final PeerInfo peerInfo ) throws PeerException
     {
@@ -118,6 +121,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    @RolesAllowed( "Peer-Management|A|Write" )
     @Override
     public boolean unregister( final String remotePeerId ) throws PeerException
     {
@@ -164,8 +168,8 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+
     @Override
-    @RolesAllowed( "admin" )
     public List<Peer> getPeers()
     {
         List<PeerInfo> peerInfoList = peerDAO.getInfo( SOURCE_REMOTE_PEER, PeerInfo.class );

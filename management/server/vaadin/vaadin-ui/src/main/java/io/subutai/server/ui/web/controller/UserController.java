@@ -55,13 +55,15 @@ public class UserController extends HttpServlet
 
             if( !Strings.isNullOrEmpty(username))
             {
+                request.getSession().setAttribute( "userSessionData", username);
 
                 IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
                 User user = identityManager.authenticateUser( username, password  );
 
-                if(user == null)
+                if(user != null)
                 {
                     request.getSession().setAttribute( "userSessionData", user);
+                    //request.getRequestDispatcher( "vui/"  ).include( request, response );
                     response.sendRedirect( "vui" );
                 }
                 else

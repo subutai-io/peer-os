@@ -3,6 +3,7 @@ package io.subutai.server.ui.views;
 
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.server.ui.MainUI;
 import io.subutai.server.ui.util.HelpManager;
 
@@ -11,6 +12,7 @@ import com.vaadin.event.ShortcutListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinService;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
@@ -115,26 +117,19 @@ public class LoginView extends VerticalLayout implements View
                 try
                 {
                     IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-                    //Serializable sessionId = identityManager.login( username.getValue(), password.getValue() );
-                    identityManager.login( username.getValue(), password.getValue() );
+                    User user = identityManager.authenticateUser(  username.getValue(), password.getValue() );
 
-                    VaadinRequest request = VaadinService.getCurrentRequest();
-
-                    //has to save login context because karaf has own thread context
-                    /*
-                    SubutaiLoginContext loginContext =
-                            new SubutaiLoginContext( sessionId.toString(), username.getValue(),
-                                    request.getRemoteAddr() );
-                    request.getWrappedSession()
-                           .setAttribute( SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME, loginContext );
-                    VaadinResponse response = VaadinService.getCurrentResponse();
-                    response.addCookie( new Cookie( SubutaiLoginContext.SUBUTAI_LOGIN_CONTEXT_NAME,
-                            JsonUtil.toJson( loginContext ) ) );
-
-                    mainUI.getUsername().setValue( username.getValue() );
-                    VaadinService.reinitializeSession( request );
-                    getUI().getNavigator().navigateTo( "/core" );
-                    */
+                    if(user!=null)
+                    {
+                        VaadinRequest request = VaadinService.getCurrentRequest();
+                        request.getWrappedSession().setAttribute( "userSessionData",user );
+                        mainUI.getUsername().setValue( username.getValue() );
+                        getUI().getNavigator().navigateTo( "/core" );
+                    }
+                    else
+                    {
+                        error.setValue( "Wrong username or password. <span>Hint: admin:secret</span>" );
+                    }
                 }
                 catch ( Exception e )
                 {

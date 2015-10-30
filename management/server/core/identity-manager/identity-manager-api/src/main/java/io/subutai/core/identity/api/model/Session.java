@@ -3,6 +3,8 @@ package io.subutai.core.identity.api.model;
 
 import java.util.Date;
 
+import javax.security.auth.Subject;
+
 
 /**
  *
@@ -28,4 +30,8 @@ public interface Session
     Date getEndDate();
 
     void setEndDate( Date endDate );
+
+    Subject getSubject();
+
+    void setSubject( Subject subject );
 }

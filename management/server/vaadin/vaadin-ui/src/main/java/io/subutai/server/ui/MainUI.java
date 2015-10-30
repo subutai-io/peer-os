@@ -24,6 +24,7 @@ import java.util.Map;
 import javax.servlet.http.Cookie;
 
 import io.subutai.common.settings.Common;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.server.ui.util.HelpManager;
 import io.subutai.server.ui.util.HelpOverlay;
 import io.subutai.server.ui.views.CoreModulesView;
@@ -133,12 +134,15 @@ public class MainUI extends UI implements ViewChangeListener
 
         boolean isAuthenticated = false;
 
-        //if ( !( loginContext instanceof NullSubutaiLoginContext ) )
+        VaadinRequest request = VaadinService.getCurrentRequest();
+        User user;
+
+        if ( request.getWrappedSession().getAttribute( "userSessionData")!=null )
         {
             try
             {
-                //IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-                //isAuthenticated = identityManager != null && identityManager.isAuthenticated();
+                user = (User) request.getWrappedSession().getAttribute( "userSessionData");
+                isAuthenticated = true;
             }
             catch ( Exception e )
             {

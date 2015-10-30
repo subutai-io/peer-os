@@ -4,14 +4,9 @@ package io.subutai.server.ui.views;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.naming.NamingException;
-
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
-import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.identity.api.model.Role;
-import io.subutai.core.identity.api.model.User;
 import io.subutai.server.ui.MainUI;
 import io.subutai.server.ui.api.PortalModule;
 import io.subutai.server.ui.api.PortalModuleListener;
@@ -62,24 +57,10 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
                 AbstractLayout layout = moduleViews.get( entry.getKey() );
                 if ( layout != null )
                 {
-                    layout.setVisible( false );
+                    layout.setVisible( true );
                 }
             }
 
-            /*
-            IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-            User user = identityManager.getUser();
-            for ( final Role role : user.getRoles() )
-            {
-                for ( final PortalModuleScope module : role.getAccessibleModules() )
-                {
-                    AbstractLayout layout = moduleViews.get( module.getModuleKey() );
-                    if ( layout != null )
-                    {
-                        layout.setVisible( true );
-                    }
-                }
-            }*/
         }
         catch ( Exception e )
         {

@@ -11,7 +11,7 @@
 
   <artifactId>identity-manager-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Identity Manager</name>
+  <name>Subutai Identity Manager Impl</name>
   <description>Subutai Identity Manager Impl</description>
 
   <dependencies>

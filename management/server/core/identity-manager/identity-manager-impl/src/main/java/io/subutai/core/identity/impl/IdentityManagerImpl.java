@@ -50,6 +50,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     public IdentityManagerImpl()
     {
+
     }
 
 

@@ -8,10 +8,13 @@ import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.security.auth.Subject;
 
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
@@ -26,9 +29,9 @@ import io.subutai.core.identity.api.model.User;
 public class SessionEntity implements Session
 {
     @Id
-    @GeneratedValue
+    @GeneratedValue( strategy = GenerationType.IDENTITY )
     @Column( name = "id" )
-    private Long id;
+    private long id;
 
     @Column(name="active")
     private boolean active;
@@ -39,9 +42,17 @@ public class SessionEntity implements Session
     @Column(name="end_date")
     private Date endDate;
 
+    //************************************
     @ManyToOne
-    @JoinColumn( name = "user_id", referencedColumnName = "id" )
+    @JoinColumn( name = "user_id" )
     private User user;
+    //************************************
+
+
+    //************************************
+    @Transient
+    private Subject subject;
+    //************************************
 
     @Override
     public Long getId()
@@ -110,5 +121,19 @@ public class SessionEntity implements Session
     public void setEndDate( final Date endDate )
     {
         this.endDate = endDate;
+    }
+
+
+    @Override
+    public Subject getSubject()
+    {
+        return subject;
+    }
+
+
+    @Override
+    public void setSubject( final Subject subject )
+    {
+        this.subject = subject;
     }
 }

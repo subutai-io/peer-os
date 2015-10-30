@@ -65,6 +65,8 @@
       <type>xml</type>
       <scope>runtime</scope>
     </dependency>
+
+
   </dependencies>
 
   <build>
@@ -108,6 +110,15 @@
             </goals>
             <configuration>
               <artifactItems>
+
+                <artifactItem>
+                  <groupId>org.apache.aries.blueprint</groupId>
+                  <artifactId>org.apache.aries.blueprint.authz</artifactId>
+                  <version>1.0.1-SNAPSHOT</version>
+                  <destFileName>org.apache.aries.blueprint.authz-1.0.1-SNAPSHOT.jar</destFileName>
+                  <outputDirectory>target/assembly/deploy</outputDirectory>
+                </artifactItem>
+
                 <artifactItem>
                   <groupId>${project.groupId}</groupId>
                   <artifactId>vaadin-ui</artifactId>
@@ -138,6 +149,7 @@
             <feature>jndi</feature>
             <feature>transaction</feature>
             <feature>jdbc</feature>
+
           </bootFeatures>
         </configuration>
         <executions>
@@ -155,7 +167,6 @@
                 <descriptor>mvn:org.apache.karaf.features/spring/${karaf.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.cxf.karaf/apache-cxf/${org.apache.cxf.version}/xml/features</descriptor>
                 <descriptor>mvn:${project.groupId}/subutai-application/${project.version}/xml/features</descriptor>
-                <descriptor>mvn:org.apache.aries.blueprint/org.apache.aries.blueprint.authz/1.0.0</descriptor>
               </descriptors>
               <features>
                 <feature>standard</feature>
