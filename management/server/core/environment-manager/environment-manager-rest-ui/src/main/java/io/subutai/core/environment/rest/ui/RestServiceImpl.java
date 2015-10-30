@@ -723,15 +723,28 @@ public class RestServiceImpl implements RestService
 
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.getContainerHostById( containerId ).setCpuQuota( cpu );
+
             localPeer.getContainerHostById( containerId ).setRamQuota( ram );
-            DiskQuota homeDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.MB, diskHome);
-            DiskQuota varDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.MB, diskVar);
-            DiskQuota rootDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.MB, diskRoot);
-            DiskQuota optDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.MB, diskOpt);
-            localPeer.getContainerHostById( containerId ).setDiskQuota(homeDiskQuota);
-            localPeer.getContainerHostById( containerId ).setDiskQuota(varDiskQuota);
-            localPeer.getContainerHostById( containerId ).setDiskQuota(rootDiskQuota);
-            localPeer.getContainerHostById( containerId ).setDiskQuota( optDiskQuota );
+
+            if(diskHome > 0) {
+                DiskQuota homeDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.MB, diskHome);
+                localPeer.getContainerHostById(containerId).setDiskQuota(homeDiskQuota);
+            }
+
+            if(diskVar > 0) {
+                DiskQuota varDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.MB, diskVar);
+                localPeer.getContainerHostById(containerId).setDiskQuota(varDiskQuota);
+            }
+
+            if(diskRoot > 0) {
+                DiskQuota rootDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.MB, diskRoot);
+                localPeer.getContainerHostById(containerId).setDiskQuota(rootDiskQuota);
+            }
+
+            if(diskOpt > 0) {
+                DiskQuota optDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.MB, diskOpt);
+                localPeer.getContainerHostById(containerId).setDiskQuota(optDiskQuota);
+            }
             return Response.ok().build();
         }
         catch ( Exception e )
