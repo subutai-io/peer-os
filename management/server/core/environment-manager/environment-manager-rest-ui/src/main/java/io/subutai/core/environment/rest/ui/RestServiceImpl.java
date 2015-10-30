@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response;
 import io.subutai.common.environment.*;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
+import io.subutai.common.quota.DiskQuotaUnit;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.peer.api.LocalPeer;
@@ -713,8 +714,8 @@ public class RestServiceImpl implements RestService
     }
 
     @Override
-    public Response setContainerQuota( final String containerId, final int cpu, final int ram, final String diskHome,
-                                       final String diskVar, final String diskRoot, final String diskOpt )
+    public Response setContainerQuota( final String containerId, final int cpu, final int ram, final Double diskHome,
+                                       final Double diskVar, final Double diskRoot, final Double diskOpt )
     {
         try
         {
@@ -723,18 +724,14 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             localPeer.getContainerHostById( containerId ).setCpuQuota( cpu );
             localPeer.getContainerHostById( containerId ).setRamQuota( ram );
-            localPeer.getContainerHostById( containerId )
-                    .setDiskQuota( JsonUtil.<DiskQuota>fromJson(diskHome, new TypeToken<DiskQuota>() {
-                    }.getType()) );
-            localPeer.getContainerHostById( containerId )
-                    .setDiskQuota( JsonUtil.<DiskQuota>fromJson(diskVar, new TypeToken<DiskQuota>() {
-                    }.getType()) );
-            localPeer.getContainerHostById( containerId )
-                    .setDiskQuota( JsonUtil.<DiskQuota>fromJson(diskRoot, new TypeToken<DiskQuota>() {
-                    }.getType()) );
-            localPeer.getContainerHostById( containerId )
-                    .setDiskQuota( JsonUtil.<DiskQuota>fromJson(diskOpt, new TypeToken<DiskQuota>() {
-                    }.getType()) );
+            DiskQuota homeDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.MB, diskHome);
+            DiskQuota varDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.MB, diskVar);
+            DiskQuota rootDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.MB, diskRoot);
+            DiskQuota optDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.MB, diskOpt);
+            localPeer.getContainerHostById( containerId ).setDiskQuota(homeDiskQuota);
+            localPeer.getContainerHostById( containerId ).setDiskQuota(varDiskQuota);
+            localPeer.getContainerHostById( containerId ).setDiskQuota(rootDiskQuota);
+            localPeer.getContainerHostById( containerId ).setDiskQuota( optDiskQuota );
             return Response.ok().build();
         }
         catch ( Exception e )

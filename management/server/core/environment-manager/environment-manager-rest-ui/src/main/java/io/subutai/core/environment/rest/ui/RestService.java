@@ -117,10 +117,10 @@ public interface RestService
     Response setContainerQuota( @PathParam( "containerId" ) String containerId,
                                 @FormParam( "cpu" ) int cpu,
                                 @FormParam( "ram" ) int ram,
-                                @FormParam( "disk_home" ) String diskHome,
-                                @FormParam( "disk_var" ) String diskVar,
-                                @FormParam( "disk_root" ) String diskRoot,
-                                @FormParam( "disk_opt" ) String diskOpt);
+                                @FormParam( "disk_home" ) Double diskHome,
+                                @FormParam( "disk_var" ) Double diskVar,
+                                @FormParam( "disk_root" ) Double diskRoot,
+                                @FormParam( "disk_opt" ) Double diskOpt);
 
     @GET
     @Path( "container/{containerId}/quota/ram" )
