@@ -684,30 +684,62 @@ public class RestServiceImpl implements RestService
                     localPeer.getContainerHostById( containerId ).getCpuQuota(),
                     localPeer.getContainerHostById( containerId ).getRamQuota(),
                     JsonUtil.toJson(
-                            localPeer.getContainerHostById(containerId).getDiskQuota(
-                                    JsonUtil.<DiskPartition>fromJson("HOME", new TypeToken<DiskPartition>() {}.getType())
-                            )
+                        localPeer.getContainerHostById(containerId).getDiskQuota(
+                            JsonUtil.<DiskPartition>fromJson("HOME", new TypeToken<DiskPartition>() {}.getType())
+                        )
                     ),
                     JsonUtil.toJson(
-                            localPeer.getContainerHostById(containerId).getDiskQuota(
-                                    JsonUtil.<DiskPartition>fromJson("VAR", new TypeToken<DiskPartition>() {}.getType())
-                            )
+                        localPeer.getContainerHostById(containerId).getDiskQuota(
+                            JsonUtil.<DiskPartition>fromJson("VAR", new TypeToken<DiskPartition>() {}.getType())
+                        )
                     ),
                     JsonUtil.toJson(
-                            localPeer.getContainerHostById(containerId).getDiskQuota(
-                                    JsonUtil.<DiskPartition>fromJson("ROOT_FS", new TypeToken<DiskPartition>() {}.getType())
-                            )
+                        localPeer.getContainerHostById(containerId).getDiskQuota(
+                            JsonUtil.<DiskPartition>fromJson("ROOT_FS", new TypeToken<DiskPartition>() {}.getType())
+                        )
                     ),
                     JsonUtil.toJson(
-                            localPeer.getContainerHostById(containerId).getDiskQuota(
-                                    JsonUtil.<DiskPartition>fromJson("OPT", new TypeToken<DiskPartition>() {}.getType())
-                            )
+                        localPeer.getContainerHostById(containerId).getDiskQuota(
+                            JsonUtil.<DiskPartition>fromJson("OPT", new TypeToken<DiskPartition>() {}.getType())
+                        )
                     )
             ) ).build();
         }
         catch ( Exception e )
         {
             LOG.error( "Error getting container quota #getContainerQuota", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+    @Override
+    public Response setContainerQuota( final String containerId, final int cpu, final int ram, final String diskHome,
+                                       final String diskVar, final String diskRoot, final String diskOpt )
+    {
+        try
+        {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
+
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            localPeer.getContainerHostById( containerId ).setCpuQuota( cpu );
+            localPeer.getContainerHostById( containerId ).setRamQuota( ram );
+            localPeer.getContainerHostById( containerId )
+                    .setDiskQuota( JsonUtil.<DiskQuota>fromJson(diskHome, new TypeToken<DiskQuota>() {
+                    }.getType()) );
+            localPeer.getContainerHostById( containerId )
+                    .setDiskQuota( JsonUtil.<DiskQuota>fromJson(diskVar, new TypeToken<DiskQuota>() {
+                    }.getType()) );
+            localPeer.getContainerHostById( containerId )
+                    .setDiskQuota( JsonUtil.<DiskQuota>fromJson(diskRoot, new TypeToken<DiskQuota>() {
+                    }.getType()) );
+            localPeer.getContainerHostById( containerId )
+                    .setDiskQuota( JsonUtil.<DiskQuota>fromJson(diskOpt, new TypeToken<DiskQuota>() {
+                    }.getType()) );
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error setting container quota #setContainerQuota", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
