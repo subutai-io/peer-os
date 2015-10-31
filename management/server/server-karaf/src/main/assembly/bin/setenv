@@ -51,3 +51,4 @@
 #export SUBUTAI_APP_DATA_PATH="/apps/subutai-mng/current"
 export SUBUTAI_APP_DATA_PATH="/var/lib/subutai"
 export SUBUTAI_APP_KEYSTORE_PATH="${SUBUTAI_APP_DATA_PATH}/keystores"
+export SUBUTAI_APP_CERTS_PATH="${SUBUTAI_APP_DATA_PATH}/certs"

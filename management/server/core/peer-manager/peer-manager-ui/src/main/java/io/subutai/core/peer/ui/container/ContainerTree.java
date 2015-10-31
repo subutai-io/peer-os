@@ -203,6 +203,11 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
         {
             LOG.warn( "Error accessing management host" );
         }
+
+        for ( ResourceHost rh : localPeer.getResourceHosts() )
+        {
+            tree.expandItem( rh.getId() );
+        }
     }
 
 
@@ -299,6 +304,7 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                 containerHostItem.getItemProperty( VALUE_PROPERTY ).setValue( ch );
                 container.setParent( ch.getId(), rh.getId() );
             }
+            tree.expandItem( rh.getId() );
         }
         else
         {

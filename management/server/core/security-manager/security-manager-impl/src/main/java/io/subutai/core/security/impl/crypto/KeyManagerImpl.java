@@ -339,9 +339,30 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
+    @Override
+    public String getFingerprint( String hostId )
+    {
+
+        if ( Strings.isNullOrEmpty( hostId ) )
+        {
+            hostId = keyData.getManHostId();
+        }
+
+        try
+        {
+            return securityManagerDAO.getPublicKeyFingerprint( hostId );
+        }
+        catch ( Exception ex )
+        {
+            LOG.error( "Error getting public key fingerprint", ex );
+            return null;
+        }
+    }
+
+
     /* *****************************
-     *
-     */
+         *
+         */
     @Override
     public PGPSecretKeyRing getSecretKeyRing( String hostId )
     {

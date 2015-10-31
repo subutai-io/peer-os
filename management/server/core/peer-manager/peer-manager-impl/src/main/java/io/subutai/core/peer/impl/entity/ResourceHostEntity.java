@@ -146,6 +146,13 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
+    public void setHostname( String hostname )
+    {
+        Preconditions.checkNotNull( hostname );
+        this.hostname = hostname;
+    }
+
+
     @Override
     public ContainerHostState getContainerHostState( final ContainerHost containerHost ) throws ResourceHostException
     {

@@ -141,6 +141,11 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
         addComponent( tree );
 
         hostRegistry.addHostListener( this );
+
+        for ( ResourceHostInfo hostInfo : hostRegistry.getResourceHostsInfo() )
+        {
+            tree.expandItem( hostInfo.getId() );
+        }
     }
 
 
@@ -294,6 +299,7 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
 
                             presentHosts.add( containerHostInfo );
                         }
+                        tree.expandItem( resourceHostInfo.getId() );
                     }
                     else
                     {
