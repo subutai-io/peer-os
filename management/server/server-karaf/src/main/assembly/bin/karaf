@@ -195,7 +195,7 @@ locateEtc() {
             die "KARAF_ETC is not valid: $KARAF_ETC"
         fi
     else
-        KARAF_ETC=$KARAF_BASE/etc
+        KARAF_ETC=$KARAF_BASE/etc/subutai-mng
     fi
 }
 
