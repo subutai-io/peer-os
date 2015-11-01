@@ -42,6 +42,7 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.Tunnel;
 
 
 public class RestServiceImpl implements RestService

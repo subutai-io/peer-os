@@ -50,45 +50,4 @@ public class Tunnel
     {
         return tunnelId;
     }
-
-
-    @Override
-    public boolean equals( final Object o )
-    {
-        if ( this == o )
-        {
-            return true;
-        }
-        if ( !( o instanceof Tunnel ) )
-        {
-            return false;
-        }
-
-        final Tunnel tunnel = ( Tunnel ) o;
-
-        if ( tunnelId != tunnel.tunnelId )
-        {
-            return false;
-        }
-        if ( !peerId.equals( tunnel.peerId ) )
-        {
-            return false;
-        }
-        if ( !tunnelName.equals( tunnel.tunnelName ) )
-        {
-            return false;
-        }
-        return tunnelIp.equals( tunnel.tunnelIp );
-    }
-
-
-    @Override
-    public int hashCode()
-    {
-        int result = peerId.hashCode();
-        result = 31 * result + tunnelName.hashCode();
-        result = 31 * result + tunnelIp.hashCode();
-        result = 31 * result + tunnelId;
-        return result;
-    }
 }

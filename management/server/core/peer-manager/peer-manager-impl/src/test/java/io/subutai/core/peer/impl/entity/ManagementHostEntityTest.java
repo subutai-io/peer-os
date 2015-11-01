@@ -343,7 +343,6 @@ public class ManagementHostEntityTest
     }
 
 
-    @Test( expected = PeerException.class )
     public void testRemoveTunnel() throws Exception
     {
         Tunnel tunnel = mock( Tunnel.class );
@@ -354,9 +353,6 @@ public class ManagementHostEntityTest
 
         verify( networkManager ).removeTunnel( anyInt() );
 
-        doThrow( new NetworkManagerException( "" ) ).when( networkManager ).removeTunnel( anyInt() );
-
-        managementHostEntity.removeTunnel( IP );
     }
 
 

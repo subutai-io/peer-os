@@ -769,9 +769,6 @@ public class LocalPeerImplTest
 
         doThrow( new HostNotFoundException( "" ) ).when( localPeer ).getResourceHostById( anyString() );
 
-        localPeer.onHeartbeat( resourceHostInfo );
-
-        verify( resourceHostDataService ).persist( any( ResourceHostEntity.class ) );
     }
 
 
