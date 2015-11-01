@@ -3,12 +3,8 @@ package io.subutai.server.ui.web.controller;
 
 
 import java.io.IOException;
-import java.security.AccessControlContext;
-import java.security.AccessController;
-import java.security.Principal;
-import java.util.List;
-import java.util.Set;
-import javax.security.auth.Subject;
+import java.util.Random;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -55,16 +51,14 @@ public class UserController extends HttpServlet
 
             if( !Strings.isNullOrEmpty(username))
             {
-                request.getSession().setAttribute( "userSessionData", username);
-
                 IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-                User user = identityManager.authenticateUser( username, password  );
+                User user = identityManager.login( username, password  );
 
                 if(user != null)
                 {
+                    Random r = new Random();
                     request.getSession().setAttribute( "userSessionData", user);
-                    //request.getRequestDispatcher( "vui/"  ).include( request, response );
-                    response.sendRedirect( "vui" );
+                    response.sendRedirect( "vui/?" + r.nextInt(100));
                 }
                 else
                 {
@@ -81,8 +75,6 @@ public class UserController extends HttpServlet
         }
         catch ( Exception ex )
         {
-            //request.setAttribute( "error", ex.toString() );
-            //request.getRequestDispatcher( "error.jsp" ).forward( request, response );
         }
 
     }

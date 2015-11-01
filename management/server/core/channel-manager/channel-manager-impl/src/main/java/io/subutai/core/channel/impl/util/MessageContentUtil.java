@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.charset.Charset;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
@@ -18,6 +21,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -32,6 +36,27 @@ public class MessageContentUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger( MessageContentUtil.class );
 
+
+    public static void abortChain(Message message,int errorStatus, String error)
+    {
+        HttpServletResponse response = ( HttpServletResponse ) message.getExchange().getInMessage()
+                                                                      .get( AbstractHTTPDestination
+                                                                              .HTTP_RESPONSE );
+        try
+        {
+            response.setStatus( errorStatus );
+            response.getOutputStream().write( error.getBytes( Charset.forName( "UTF-8" ) ) );
+            response.getOutputStream().flush();
+            LOG.warn( error );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error writing to response: " + e.toString(), e );
+        }
+
+        message.getInterceptorChain().abort();
+
+    }
 
     public static int checkUrlAccessibility( final int currentStatus, final URL url, final String basePath )
     {

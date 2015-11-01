@@ -74,26 +74,10 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
                 AbstractLayout layout = moduleViews.get( entry.getKey() );
                 if ( layout != null )
                 {
-                    layout.setVisible( false );
+                    layout.setVisible( true );
                 }
             }
 
-            /*
-
-            IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-            User user = identityManager.getUser();
-            for ( final Role role : user.getRoles() )
-            {
-                for ( final PortalModuleScope module : role.getAccessibleModules() )
-                {
-                    AbstractLayout layout = moduleViews.get( module.getModuleKey() );
-                    if ( layout != null )
-                    {
-                        layout.setVisible( true );
-                    }
-                }
-            }
-            */
         }
         catch ( Exception e )
         {

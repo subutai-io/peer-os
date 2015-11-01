@@ -90,7 +90,7 @@
     <org.bouncycastle.version>1.52</org.bouncycastle.version>
 
     <!-- JWT lib -->
-    <nimbus.jwt.version>4.2</nimbus.jwt.version>
+    <nimbus.jwt.version>4.3.1</nimbus.jwt.version>
     <!-- Jackson JSON lib lib -->
     <jackson.version>2.6.1</jackson.version>
     <jackson-jaxrs.version>1.9.13</jackson-jaxrs.version>

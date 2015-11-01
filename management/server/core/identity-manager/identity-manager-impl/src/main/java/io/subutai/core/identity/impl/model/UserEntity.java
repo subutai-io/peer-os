@@ -14,10 +14,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.security.auth.Subject;
 
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
-import io.subutai.core.identity.impl.model.RoleEntity;
 
 
 /**
@@ -48,6 +49,17 @@ public class UserEntity implements User
     @Column( name = "email" )
     private String email;
 
+    @Column(name = "type")
+    private int type = 2; // System User
+
+    @Column(name = "status")
+    private int status = 1; // Active
+
+
+    //************************************
+    @Transient
+    private Subject subject;
+    //************************************
 
     //*********************************************
     @ManyToMany (targetEntity=RoleEntity.class,fetch = FetchType.EAGER)
@@ -154,5 +166,52 @@ public class UserEntity implements User
     public void setRoles( final List<Role> roles )
     {
         this.roles = roles;
+    }
+
+    @Override
+    public Subject getSubject()
+    {
+        return subject;
+    }
+
+
+    @Override
+    public void setSubject( final Subject subject )
+    {
+        this.subject = subject;
+    }
+
+
+    @Override
+    public int getType()
+    {
+        return type;
+    }
+
+
+    @Override
+    public void setType( final int type )
+    {
+        this.type = type;
+    }
+
+
+    @Override
+    public int getStatus()
+    {
+        return status;
+    }
+
+
+    @Override
+    public void setStatus( final int status )
+    {
+        this.status = status;
+    }
+
+
+    public void setId( final long id )
+    {
+        this.id = id;
     }
 }

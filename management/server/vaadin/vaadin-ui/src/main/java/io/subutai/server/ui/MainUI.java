@@ -27,7 +27,9 @@ import io.subutai.common.settings.Common;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.server.ui.util.HelpManager;
 import io.subutai.server.ui.util.HelpOverlay;
+import io.subutai.server.ui.util.SystemErrorHandler;
 import io.subutai.server.ui.views.CoreModulesView;
+import io.subutai.server.ui.views.ErrorView;
 import io.subutai.server.ui.views.ModulesView;
 import io.subutai.server.ui.views.LoginView;
 import org.slf4j.Logger;
@@ -65,6 +67,7 @@ import com.vaadin.ui.VerticalLayout;
 public class MainUI extends UI implements ViewChangeListener
 {
 
+    private User user;
     private static final Logger LOG = LoggerFactory.getLogger( MainUI.class.getName() );
     private static final ThreadLocal<MainUI> THREAD_LOCAL = new ThreadLocal<>();
 
@@ -97,6 +100,7 @@ public class MainUI extends UI implements ViewChangeListener
     {
         setInstance( this );
         helpManager = new HelpManager( this );
+        setErrorHandler( new SystemErrorHandler(this) );
 
         setLocale( Locale.US );
 
@@ -135,7 +139,6 @@ public class MainUI extends UI implements ViewChangeListener
         boolean isAuthenticated = false;
 
         VaadinRequest request = VaadinService.getCurrentRequest();
-        User user;
 
         if ( request.getWrappedSession().getAttribute( "userSessionData")!=null )
         {
@@ -183,6 +186,7 @@ public class MainUI extends UI implements ViewChangeListener
         nav = new Navigator( this, content );
         nav.addViewChangeListener( this );
         nav.addView( "/login", new LoginView( this, helpManager ) );
+
         for ( String route : routes.keySet() )
         {
             nav.addView( route, routes.get( route ) );
@@ -264,25 +268,17 @@ public class MainUI extends UI implements ViewChangeListener
         username.setSizeUndefined();
         userLayout.addComponent( username );
 
-        try
+        if ( user == null )
         {
-            /*
-            IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+            VaadinRequest request = VaadinService.getCurrentRequest();
 
-            if ( identityManager != null )
+            if ( request.getWrappedSession().getAttribute( "userSessionData")!=null )
             {
-                User user = identityManager.getUser();
+                user = (User) request.getWrappedSession().getAttribute( "userSessionData");
+            }
+        }
 
-                if ( user != null )
-                {
-                    username.setValue( user.getUsername() );
-                }
-            }*/
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error getting username #buildMainLayout", e );
-        }
+        username.setValue( user.getUserName());
 
         MenuBar.Command cmd = new MenuBar.Command()
         {

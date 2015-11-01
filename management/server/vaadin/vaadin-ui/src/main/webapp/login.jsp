@@ -51,7 +51,7 @@
 							<input type="password" name="password" value="secret">
 						</div>
 						<div class="b-login-form__item b-login-form__item_no-label b-login-form__item_last">
-							<button class="b-button">Sign In</button>
+							<button class="b-button"  type="submit">Sign In</button>
 						</div>
 						<div class="clear"></div>
 					</div>

@@ -34,10 +34,10 @@ public class SessionEntity implements Session
     private long id;
 
     @Column(name="active")
-    private boolean active;
+    private boolean active = true;
 
     @Column(name="start_date")
-    private Date startDate;
+    private Date startDate = new Date(System.currentTimeMillis());
 
     @Column(name="end_date")
     private Date endDate;

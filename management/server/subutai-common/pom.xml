@@ -134,6 +134,14 @@
       <version>1.2</version>
     </dependency>
 
+
+    <!--******** WT Library ****************-->
+    <dependency>
+      <groupId>com.nimbusds</groupId>
+      <artifactId>nimbus-jose-jwt</artifactId>
+    </dependency>
+    <!--************************************-->
+
   </dependencies>
 
   <build>

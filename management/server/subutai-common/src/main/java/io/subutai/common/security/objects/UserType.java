@@ -4,18 +4,16 @@ package io.subutai.common.security.objects;
 /**
  *
  */
-public enum RoleType
+public enum UserType
 {
-    Internal(1,"Internal System Manager"),
-    KarafManager(2,"Karaf-Manager"),
-    Administrator(3,"Administrator"),
-    Manager(4,"Manager");
+    Internal(1,"Internal"),
+    System(2,"System");
 
     private String name;
     private int id;
 
 
-    private RoleType(  int id, String name)
+    private UserType(  int id, String name)
     {
         this.id = id;
         this.name = name;

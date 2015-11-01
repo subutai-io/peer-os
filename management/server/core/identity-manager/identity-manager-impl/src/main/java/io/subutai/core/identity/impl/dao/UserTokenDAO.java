@@ -4,6 +4,7 @@ package io.subutai.core.identity.impl.dao;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import com.google.common.collect.Lists;
 
@@ -53,6 +54,7 @@ public class UserTokenDAO
         }
         return result;
     }
+
 
 
     /* *************************************************
@@ -149,4 +151,33 @@ public class UserTokenDAO
     }
 
 
+    /* *************************************************
+     *
+     */
+    public UserToken findByUserId( final long userId )
+    {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+        UserToken tk = null;
+        try
+        {
+            List<UserToken> result = null;
+            Query qr = em.createQuery( "select h from UserTokenEntity h where h.user.id=:userId", UserToken.class );
+            qr.setParameter( "userId",userId );
+            result = qr.getResultList();
+
+            if(result!=null)
+            {
+                tk = result.get( 0 );
+            }
+        }
+        catch ( Exception e )
+        {
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+
+        return tk;
+    }
 }

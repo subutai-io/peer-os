@@ -47,6 +47,29 @@ class SessionDAO
         return result;
     }
 
+    /* *************************************************
+     *
+     */
+    public Session getByUserId( final long userId )
+    {
+        Session result = null;
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+        try
+        {
+            List<Session> resuls = em.createQuery( "select h from SessionEntity h" ).getResultList();
+
+            result = resuls.get( 0 );
+        }
+        catch ( Exception e )
+        {
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+        return result;
+    }
+
 
     /* *************************************************
      *

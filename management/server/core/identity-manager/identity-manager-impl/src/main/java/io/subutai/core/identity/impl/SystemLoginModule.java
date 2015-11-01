@@ -23,6 +23,7 @@ import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
+import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
 
 
@@ -30,6 +31,7 @@ public class SystemLoginModule extends AbstractKarafLoginModule
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( SystemLoginModule.class.getName() );
 
+    @Override
     public void initialize( Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
                             Map<String, ?> options )
     {
@@ -47,6 +49,7 @@ public class SystemLoginModule extends AbstractKarafLoginModule
     }
 
 
+    @Override
     public boolean login() throws LoginException
     {
         LOGGER.debug( "Invoking login." );
@@ -61,7 +64,7 @@ public class SystemLoginModule extends AbstractKarafLoginModule
         {
             // **************************************
             callbackHandler.handle( callbacks );
-            String user = ( (NameCallback) callbacks[0] ).getName();
+            user = ( (NameCallback) callbacks[0] ).getName();
 
             char[] tmpPassword = ( (PasswordCallback) callbacks[1] ).getPassword();
             if ( tmpPassword == null )
@@ -73,8 +76,11 @@ public class SystemLoginModule extends AbstractKarafLoginModule
 
             // **************************************
             IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-            User loggedUser = identityManager.authenticateUser( user, password );
+            User loggedUser     = identityManager.authenticateUser( user, password );
+            //Session userSession = identityManager.startSession(loggedUser);
+            //userSession.setSubject( subject );
             // **************************************
+
 
             if ( loggedUser != null )
             {
@@ -104,6 +110,7 @@ public class SystemLoginModule extends AbstractKarafLoginModule
                 }
                 principals.add( new RolePrincipal( "webconsole" ) );
                 subject.getPrincipals().addAll( principals );
+                subject.getPrivateCredentials().add( loggedUser );
                 //******************************************
 
                 LOGGER.debug( "Finish login." );
@@ -175,4 +182,5 @@ public class SystemLoginModule extends AbstractKarafLoginModule
         LOGGER.debug( "Invoking checkPassword." );
         return super.checkPassword( plain, encrypted );
     }
+
 }

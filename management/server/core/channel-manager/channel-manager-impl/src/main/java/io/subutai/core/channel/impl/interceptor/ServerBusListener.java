@@ -31,6 +31,9 @@ public class ServerBusListener extends AbstractFeature
 
         // initialise the feature on the bus, which will add the interceptors
 
+        //***** RECEIVE    **********************************
+        bus.getInInterceptors().add( new AccessControlInterceptor(channelManagerImpl) );
+
         //***** PRE_STREAM **********************************
         bus.getOutInterceptors().add( new ClientOutInterceptor(channelManagerImpl) );
 

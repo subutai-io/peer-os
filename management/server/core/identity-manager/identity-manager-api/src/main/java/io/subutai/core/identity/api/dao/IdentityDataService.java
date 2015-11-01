@@ -7,6 +7,7 @@ import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserToken;
 
 
 /**
@@ -14,11 +15,17 @@ import io.subutai.core.identity.api.model.User;
  */
 public interface IdentityDataService
 {
+
     /* ******User *************************************
      *
      */
     User getUserByUsername( String userName );
 
+
+    /* *************************************************
+     *
+     */
+    User getUser( long userId );
 
     /* *************************************************
      *
@@ -50,6 +57,10 @@ public interface IdentityDataService
     void updateUser( User item );
 
 
+    /* ***********Roles ********************************
+     */
+    Role getRole( long roleId );
+
     /* *************************************************
      *
      */
@@ -80,6 +91,12 @@ public interface IdentityDataService
     void assignRolePermission( long roleId, Permission permission );
 
 
+    /*
+     * ******Permission*********************************
+     */
+    Permission getPermission( long permissionId );
+
+
     /* *************************************************
      *
      */
@@ -107,7 +124,18 @@ public interface IdentityDataService
     /* ******Session************************
      *
      */
-    List<Session> getAllSession();
+    List<Session> getAllSessions();
+
+
+    /* *************************************************
+     */
+    Session getSession( long sessionId );
+
+
+    /* *************************************************
+     */
+    Session getSessionByUserId( long userId );
+
 
     /* *************************************************
      *
@@ -125,4 +153,38 @@ public interface IdentityDataService
      *
      */
     void updateSession( Session item );
+
+    /* ******UserToken *********************************
+    *
+    */
+    List<UserToken> getAllUserTokens();
+
+
+    /* *************************************************
+     *
+     */
+    UserToken getUserToken( String token );
+
+
+    /* *************************************************
+     *
+     */
+    UserToken getUserToken( long userId );
+
+    /* *************************************************
+     *
+     */
+    void persistUserToken( UserToken item );
+
+
+    /* *************************************************
+     *
+     */
+    void removeUserToken( String token );
+
+
+    /* *************************************************
+     *
+     */
+    void updateUserToken( UserToken item );
 }

@@ -1,4 +1,4 @@
-package io.subutai.core.channel.impl.interceptor;
+package io.subutai.core.channel.impl.util;
 
 
 import org.apache.cxf.message.Message;

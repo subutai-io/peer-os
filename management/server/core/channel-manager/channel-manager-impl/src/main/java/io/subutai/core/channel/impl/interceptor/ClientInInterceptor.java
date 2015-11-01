@@ -12,6 +12,7 @@ import com.google.common.base.Strings;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.Common;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
+import io.subutai.core.channel.impl.util.InterceptorState;
 import io.subutai.core.channel.impl.util.MessageContentUtil;
 
 
@@ -27,7 +28,7 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
     //******************************************************************
     public ClientInInterceptor( ChannelManagerImpl channelManagerImpl )
     {
-        super( Phase.RECEIVE);
+        super( Phase.PRE_STREAM);
         this.channelManagerImpl = channelManagerImpl;
     }
     //******************************************************************
