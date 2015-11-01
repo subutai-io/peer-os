@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -189,6 +190,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 managementHost = allManagementHostEntity.iterator().next();
                 managementHost.setPeer( this );
                 managementHost.init();
+                if ( !Objects.equals( managementHost.getId(), getPeerFingerprint() ) )
+                {
+                    //todo: update MH id if peer key fingerprint has changed once we fully migrate to snappy
+                    //update id in cached MH
+                    //update id in db
+                }
             }
 
             resourceHostDataService = getResourceHostDataService();
@@ -216,6 +223,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             throw new PeerInitializationError( "Failed to init Local Peer", e );
         }
+    }
+
+
+    protected String getPeerFingerprint()
+    {
+        return securityManager.getKeyManager().getFingerprint( null );
     }
 
 
@@ -791,8 +804,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
-                            Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
+            commandUtil.execute( new RequestBuilder(
+                    String.format( "route add default gw %s %s", gatewayIp, Common.DEFAULT_CONTAINER_INTERFACE ) ),
+                    bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {
@@ -877,6 +891,17 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         synchronized ( resourceHosts )
         {
             resourceHosts.add( host );
+        }
+    }
+
+
+    public void removeResourceHost( final ResourceHost host )
+    {
+        Preconditions.checkNotNull( host, "Resource host could not be null." );
+
+        synchronized ( resourceHosts )
+        {
+            resourceHosts.remove( host );
         }
     }
 
@@ -1069,25 +1094,47 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 ResourceHostEntity host;
                 try
                 {
-                    host = ( ResourceHostEntity ) getResourceHostByName( resourceHostInfo.getHostname() );
+                    host = ( ResourceHostEntity ) getResourceHostById( resourceHostInfo.getId() );
+                    if ( !Objects.equals( host.getHostname(), resourceHostInfo.getHostname() ) )
+                    {
+                        //remove other RH with the same hostname if any
+                        removeResourceHostByHostname( resourceHostInfo.getHostname() );
+                        //update hostname
+                        host.setHostname( resourceHostInfo.getHostname() );
+                    }
                 }
                 catch ( HostNotFoundException e )
                 {
                     LOG.debug( "Host not found in #onHeartbeat", e );
+                    removeResourceHostByHostname( resourceHostInfo.getHostname() );
                     host = new ResourceHostEntity( getId(), resourceHostInfo );
                     host.init();
                     resourceHostDataService.persist( host );
                     addResourceHost( host );
-                    Set<ResourceHost> a = Sets.newHashSet();
-                    a.add( host );
-                    setResourceHostTransientFields( a );
+                    setResourceHostTransientFields( Sets.<ResourceHost>newHashSet( host ) );
                 }
+
                 if ( host.updateHostInfo( resourceHostInfo ) )
                 {
                     resourceHostDataService.update( host );
                     LOG.debug( String.format( "Resource host %s updated.", host.getId() ) );
                 }
             }
+        }
+    }
+
+
+    protected void removeResourceHostByHostname( String hostname )
+    {
+        try
+        {
+            ResourceHostEntity otherRh = ( ResourceHostEntity ) getResourceHostByName( hostname );
+            removeResourceHost( otherRh );
+            resourceHostDataService.remove( otherRh.getId() );
+        }
+        catch ( HostNotFoundException ex )
+        {
+            //ignore
         }
     }
 

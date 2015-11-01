@@ -34,6 +34,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
+import io.subutai.common.peer.PeerStatus;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.util.N2NUtil;
 import io.subutai.core.messenger.api.Messenger;
@@ -177,7 +178,10 @@ public class PeerManagerImpl implements PeerManager
         result.add( getLocalPeer() );
         for ( PeerInfo info : peerInfoList )
         {
-            result.add( getPeer( info.getId() ) );
+            if ( PeerStatus.APPROVED == info.getStatus() )
+            {
+                result.add( getPeer( info.getId() ) );
+            }
         }
 
         return result;

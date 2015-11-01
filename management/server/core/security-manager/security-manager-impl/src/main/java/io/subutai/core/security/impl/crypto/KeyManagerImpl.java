@@ -337,9 +337,30 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
+    @Override
+    public String getFingerprint( String hostId )
+    {
+
+        if ( Strings.isNullOrEmpty( hostId ) )
+        {
+            hostId = keyData.getManHostId();
+        }
+
+        try
+        {
+            return securityManagerDAO.getPublicKeyFingerprint( hostId );
+        }
+        catch ( Exception ex )
+        {
+            LOG.error( "Error getting public key fingerprint", ex );
+            return null;
+        }
+    }
+
+
     /* *****************************
-     *
-     */
+         *
+         */
     @Override
     public PGPSecretKeyRing getSecretKeyRing( String hostId )
     {
@@ -353,14 +374,15 @@ public class KeyManagerImpl implements KeyManager
             PGPSecretKeyRing secretKeyRing;
             String fingerprint = securityManagerDAO.getSecretKeyFingerprint( hostId );
 
-            if(Strings.isNullOrEmpty( fingerprint ))
+            if ( Strings.isNullOrEmpty( fingerprint ) )
             {
                 LOG.error( "Object not found with fprint:" + fingerprint );
                 return null;
             }
             else
             {
-                secretKeyRing = PGPKeyUtil.readSecretKeyRing( secretKeyStoreDAO.getSecretKeyData( fingerprint ).getData() );
+                secretKeyRing =
+                        PGPKeyUtil.readSecretKeyRing( secretKeyStoreDAO.getSecretKeyData( fingerprint ).getData() );
 
                 if ( secretKeyRing != null )
                 {

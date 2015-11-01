@@ -6,7 +6,7 @@
   <parent>
     <artifactId>lxc-quota-manager-parent</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.0-RC2</version>
+    <version>4.0.0-RC3</version>
   </parent>
 
   <artifactId>lxc-quota-manager-api</artifactId>

@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.subutai</groupId>
   <artifactId>mgmt-parent</artifactId>
-  <version>4.0.0-RC2</version>
+  <version>4.0.0-RC3</version>
 
   <name>Subutai Server Project Parent</name>
 
@@ -172,11 +172,6 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>node-registration-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>node-registration-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

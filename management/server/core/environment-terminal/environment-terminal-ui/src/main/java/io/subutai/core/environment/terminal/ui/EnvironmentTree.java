@@ -434,6 +434,8 @@ public class EnvironmentTree extends ConcurrentComponent
                     item.getItemProperty( ICON_PROPERTY ).setValue( new ThemeResource(
                             ec.isConnected() ? "img/lxc/virtual.png" : "img/lxc/virtual_offline.png" ) );
                 }
+
+                tree.expandItemsRecursively( peerId );
             }
         }
     }

@@ -2,9 +2,9 @@ package io.subutai.core.security.rest;
 
 
 import javax.ws.rs.core.Response;
+
 import org.bouncycastle.openpgp.PGPPublicKey;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Strings;
 
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
@@ -17,15 +17,15 @@ import io.subutai.core.security.api.SecurityManager;
 public class SecurityManagerRestImpl implements SecurityManagerRest
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( SecurityManagerRestImpl.class.getName() );
 
     // SecurityManager service
     private SecurityManager securityManager;
 
+
     /* ******************************
      *
      */
-    public SecurityManagerRestImpl(SecurityManager securityManager)
+    public SecurityManagerRestImpl( SecurityManager securityManager )
     {
         this.securityManager = securityManager;
     }
@@ -35,9 +35,9 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
      *
      */
     @Override
-    public Response addPublicKeyRing( final String hostId,final String keyText )
+    public Response addPublicKeyRing( final String hostId, final String keyText )
     {
-        securityManager.getKeyManager().savePublicKeyRing( hostId, (short)3, keyText );
+        securityManager.getKeyManager().savePublicKeyRing( hostId, ( short ) 3, keyText );
 
         return Response.ok().build();
     }
@@ -69,7 +69,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
         }
         else
         {
-            return Response.ok( key).build();
+            return Response.ok( key ).build();
         }
     }
 
@@ -80,7 +80,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     @Override
     public Response getPublicKeyId( final String hostId )
     {
-        PGPPublicKey key = securityManager.getKeyManager().getPublicKeyRing( hostId).getPublicKey();
+        PGPPublicKey key = securityManager.getKeyManager().getPublicKeyRing( hostId ).getPublicKey();
 
         if ( key == null )
         {
@@ -88,7 +88,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
         }
         else
         {
-            return Response.ok( PGPKeyUtil.encodeNumericKeyId( key.getKeyID())).build();
+            return Response.ok( PGPKeyUtil.encodeNumericKeyId( key.getKeyID() ) ).build();
         }
     }
 
@@ -99,15 +99,15 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     @Override
     public Response getPublicKeyFingerprint( final String hostId )
     {
-        PGPPublicKey key = securityManager.getKeyManager().getPublicKeyRing( hostId).getPublicKey();
+        String fingerprint = securityManager.getKeyManager().getFingerprint( hostId );
 
-        if ( key == null )
+        if ( fingerprint == null )
         {
             return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
         }
         else
         {
-            return Response.ok( PGPKeyUtil.getFingerprint( key.getFingerprint())).build();
+            return Response.ok( fingerprint ).build();
         }
     }
 }
