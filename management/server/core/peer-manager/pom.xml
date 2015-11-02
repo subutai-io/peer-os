@@ -19,6 +19,7 @@
     <module>peer-manager-impl</module>
     <module>peer-manager-cli</module>
     <module>peer-manager-rest</module>
+    <module>peer-manager-rest-ui</module>
   </modules>
 
 </project>
