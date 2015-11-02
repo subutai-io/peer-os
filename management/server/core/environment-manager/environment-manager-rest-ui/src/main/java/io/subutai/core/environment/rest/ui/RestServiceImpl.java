@@ -725,22 +725,22 @@ public class RestServiceImpl implements RestService
             localPeer.getContainerHostById( containerId ).setRamQuota( ram );
 
             if(diskHome > 0) {
-                DiskQuota homeDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.MB, diskHome);
+                DiskQuota homeDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.GB, diskHome);
                 localPeer.getContainerHostById(containerId).setDiskQuota(homeDiskQuota);
             }
 
             if(diskVar > 0) {
-                DiskQuota varDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.MB, diskVar);
+                DiskQuota varDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.GB, diskVar);
                 localPeer.getContainerHostById(containerId).setDiskQuota(varDiskQuota);
             }
 
             if(diskRoot > 0) {
-                DiskQuota rootDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.MB, diskRoot);
+                DiskQuota rootDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.GB, diskRoot);
                 localPeer.getContainerHostById(containerId).setDiskQuota(rootDiskQuota);
             }
 
             if(diskOpt > 0) {
-                DiskQuota optDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.MB, diskOpt);
+                DiskQuota optDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.GB, diskOpt);
                 localPeer.getContainerHostById(containerId).setDiskQuota(optDiskQuota);
             }
             return Response.ok().build();
