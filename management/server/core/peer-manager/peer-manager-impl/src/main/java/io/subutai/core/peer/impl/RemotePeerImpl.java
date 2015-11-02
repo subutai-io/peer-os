@@ -51,7 +51,6 @@ import io.subutai.common.quota.QuotaType;
 import io.subutai.common.quota.RamQuota;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.settings.ChannelSettings;
-import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
@@ -253,10 +252,6 @@ public class RemotePeerImpl implements RemotePeer
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
-        headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
         //*************************************************************
 
 
@@ -411,13 +406,6 @@ public class RemotePeerImpl implements RemotePeer
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-
-        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
         try
         {
@@ -447,13 +435,6 @@ public class RemotePeerImpl implements RemotePeer
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-
-        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -488,13 +469,6 @@ public class RemotePeerImpl implements RemotePeer
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-
-        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
         try
         {
@@ -522,13 +496,6 @@ public class RemotePeerImpl implements RemotePeer
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-
-        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
         try
         {
@@ -558,13 +525,6 @@ public class RemotePeerImpl implements RemotePeer
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-
-        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
         try
         {
@@ -597,13 +557,6 @@ public class RemotePeerImpl implements RemotePeer
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-
-        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //**************************************************************
 
         try
@@ -632,13 +585,6 @@ public class RemotePeerImpl implements RemotePeer
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-
-        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -674,13 +620,6 @@ public class RemotePeerImpl implements RemotePeer
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-
-        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -714,13 +653,6 @@ public class RemotePeerImpl implements RemotePeer
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-
-        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -756,13 +688,6 @@ public class RemotePeerImpl implements RemotePeer
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-
-        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -795,13 +720,6 @@ public class RemotePeerImpl implements RemotePeer
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-
-        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -830,13 +748,6 @@ public class RemotePeerImpl implements RemotePeer
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-
-        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
         try
         {
@@ -866,13 +777,6 @@ public class RemotePeerImpl implements RemotePeer
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-
-        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -907,13 +811,6 @@ public class RemotePeerImpl implements RemotePeer
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-
-        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -948,13 +845,6 @@ public class RemotePeerImpl implements RemotePeer
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-
-        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -990,13 +880,6 @@ public class RemotePeerImpl implements RemotePeer
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-
-        String envHeaderSource = localPeer.getId() + "-" + host.getEnvironmentId();
-        String envHeaderTarget = peerInfo.getId() + "-" + host.getEnvironmentId();
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //*************************************************************
 
         try
@@ -1020,14 +903,6 @@ public class RemotePeerImpl implements RemotePeer
         {
             //*********construct Secure Header ****************************
             Map<String, String> headers = Maps.newHashMap();
-            String envId = ( ( EnvironmentContainerHost ) localPeer.getContainerHostById( containerHostId ) )
-                    .getEnvironmentId();
-            String envHeaderSource = localPeer.getId() + "-" + envId;
-            String envHeaderTarget = peerInfo.getId() + "-" + envId;
-
-            headers.put( Common.HEADER_SPECIAL, "ENC" );
-            headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-            headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
             //*************************************************************
 
             Map<String, String> params = Maps.newHashMap();
@@ -1121,12 +996,6 @@ public class RemotePeerImpl implements RemotePeer
         {
             //*********construct Secure Header ****************************
             Map<String, String> headers = Maps.newHashMap();
-            String envHeaderSource = localPeer.getId() + "-" + environmentId;
-            String envHeaderTarget = peerInfo.getId() + "-" + environmentId;
-
-            headers.put( Common.HEADER_SPECIAL, "ENC" );
-            headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-            headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
             //************************************************************************
 
 
@@ -1220,13 +1089,6 @@ public class RemotePeerImpl implements RemotePeer
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-        String envId = request.getEnvironmentId();
-        String envHeaderSource = localPeer.getId() + "-" + envId;
-        String envHeaderTarget = peerInfo.getId() + "-" + envId;
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //************************************************************************
 
         CreateEnvironmentContainerGroupResponse response =
@@ -1254,12 +1116,6 @@ public class RemotePeerImpl implements RemotePeer
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
-        String envHeaderSource = localPeer.getId() + "-" + environmentId;
-        String envHeaderTarget = peerInfo.getId() + "-" + environmentId;
-
-        headers.put( Common.HEADER_SPECIAL, "ENC" );
-        headers.put( Common.HEADER_ENV_ID_SOURCE, envHeaderSource );
-        headers.put( Common.HEADER_ENV_ID_TARGET, envHeaderTarget );
         //**************************************************************************
 
 
@@ -1297,10 +1153,10 @@ public class RemotePeerImpl implements RemotePeer
         {
             //*********construct Secure Header ****************************
             Map<String, String> headers = Maps.newHashMap();
-
-            headers.put( Common.HEADER_SPECIAL, "ENC" );
-            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
-            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
+//
+//            headers.put( Common.HEADER_SPECIAL, "ENC" );
+//            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
+//            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
             //*************************************************************
             Map<String, String> params = Maps.newHashMap();
             params.put( "peerIps", jsonUtil.to( peerIps ) );
@@ -1415,11 +1271,8 @@ public class RemotePeerImpl implements RemotePeer
         {
             //*********construct Secure Header ****************************
             Map<String, String> headers = Maps.newHashMap();
-
-            headers.put( Common.HEADER_SPECIAL, "ENC" );
-            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
-            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
             //*************************************************************
+
             Map<String, String> params = Maps.newHashMap();
             params.put( "gatewayIp", environmentGatewayIp );
             params.put( "vlan", String.valueOf( vlan ) );

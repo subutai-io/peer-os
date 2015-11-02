@@ -105,7 +105,7 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
                     if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
                     {
                         HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
-                        String spHeader = headers.getHeaderString( Common.HEADER_SPECIAL );
+                        //String spHeader = headers.getHeaderString( Common.HEADER_SPECIAL );
                         LOG.info( " *** URL:" + url.getPath() );
                         HttpServletRequest request = ( HttpServletRequest ) message.getExchange().getInMessage()
                                                                                    .get( AbstractHTTPDestination

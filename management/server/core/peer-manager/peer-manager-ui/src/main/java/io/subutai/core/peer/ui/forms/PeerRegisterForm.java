@@ -515,9 +515,9 @@ public class PeerRegisterForm extends CustomComponent
         WebClient client = RestUtil.createTrustedWebClientWithAuth( baseUrl, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS );
 
         //*********construct Secure Header ****************************
-        client.header( Common.HEADER_SPECIAL, "ENC" );
-        client.header( Common.HEADER_PEER_ID_TARGET, remotePeerInfo.getId().toString() );
-        client.header( Common.HEADER_PEER_ID_SOURCE, peerToUnregister.getId().toString() );
+        //client.header( Common.HEADER_SPECIAL, "ENC" );
+        //client.header( Common.HEADER_PEER_ID_TARGET, remotePeerInfo.getId().toString() );
+        //client.header( Common.HEADER_PEER_ID_SOURCE, peerToUnregister.getId().toString() );
         //*************************************************************
 
         try

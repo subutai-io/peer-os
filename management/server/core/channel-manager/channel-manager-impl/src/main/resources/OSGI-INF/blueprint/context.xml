@@ -17,10 +17,10 @@
     </cm:default-properties>
   </cm:property-placeholder>
   <!-- ************************************************************************************************* -->
+
   <reference id="identityManager" availability="mandatory"
              interface="io.subutai.core.identity.api.IdentityManager" />
 
-  <!-- ************************************************************************************************** -->
   <reference id="securityManager" availability="mandatory"
              interface="io.subutai.core.security.api.SecurityManager" />
 

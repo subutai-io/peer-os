@@ -218,13 +218,6 @@ public class MonitorImpl implements Monitor
 
             //*********construct Secure Header ****************************
             Map<String, String> headers = Maps.newHashMap();
-            String envId = environmentId.toString();
-            String envheaderTarget = peer.getId() + "-" + envId;
-            String envheaderSource = peerManager.getLocalPeer().getId() + "-" + envId;
-
-            headers.put( Common.HEADER_SPECIAL, "ENC" );
-            headers.put( Common.HEADER_ENV_ID_TARGET, envheaderTarget );
-            headers.put( Common.HEADER_ENV_ID_SOURCE, envheaderSource );
             //*************************************************************
 
             //send request and obtain metrics
@@ -547,13 +540,6 @@ public class MonitorImpl implements Monitor
         {
             //*********construct Secure Header ****************************
             Map<String, String> headers = Maps.newHashMap();
-            String envId = environmentId;
-            String envheaderTarget = peer.getId() + "-" + envId;
-            String envheaderSource = peerManager.getLocalPeer().getId() + "-" + envId;
-
-            headers.put( Common.HEADER_SPECIAL, "ENC" );
-            headers.put( Common.HEADER_ENV_ID_TARGET, envheaderTarget );
-            headers.put( Common.HEADER_ENV_ID_SOURCE, envheaderSource );
             //*************************************************************
 
             peer.sendRequest( new MonitoringActivationRequest( containerHosts, monitoringSettings ),
@@ -737,13 +723,6 @@ public class MonitorImpl implements Monitor
 
                 //*********construct Secure Header ****************************
                 Map<String, String> headers = Maps.newHashMap();
-                String envId = containerHost.getEnvironmentId().toString();
-                String envheaderTarget = creatorPeer.getId() + "-" + envId;
-                String envheaderSource = peerManager.getLocalPeer().getId() + "-" + envId;
-
-                headers.put( Common.HEADER_SPECIAL, "ENC" );
-                headers.put( Common.HEADER_ENV_ID_TARGET, envheaderTarget );
-                headers.put( Common.HEADER_ENV_ID_SOURCE, envheaderSource );
                 //*************************************************************
 
 

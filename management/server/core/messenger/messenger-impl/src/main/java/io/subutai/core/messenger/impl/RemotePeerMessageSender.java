@@ -97,9 +97,9 @@ public class RemotePeerMessageSender implements Callable<Boolean>
                 //*********construct Secure Header ****************************
                 Map<String, String> headers = Maps.newHashMap();
 
-                headers.put( Common.HEADER_SPECIAL, "ENC" );
-                headers.put( Common.HEADER_PEER_ID_SOURCE, localPeerId );
-                headers.put( Common.HEADER_PEER_ID_TARGET, targetPeer.getId() );
+//                headers.put( Common.HEADER_SPECIAL, "ENC" );
+//                headers.put( Common.HEADER_PEER_ID_SOURCE, localPeerId );
+//                headers.put( Common.HEADER_PEER_ID_TARGET, targetPeer.getId() );
                 //*************************************************************
 
                 switch ( port )
