@@ -9,7 +9,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>subutai-cli-rbac</artifactId>
+  <artifactId>cli-controller</artifactId>
   <name>Subutai CLI RBAC</name>
 
   <dependencies>

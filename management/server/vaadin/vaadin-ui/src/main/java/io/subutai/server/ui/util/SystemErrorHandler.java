@@ -30,28 +30,28 @@ public class SystemErrorHandler implements ErrorHandler
     @Override
     public void error( final ErrorEvent event )
     {
-        String message= "";
+        String message= "",errorMessage="";
 
         try
         {
-            Throwable t = event.getThrowable();
-            LOG.error("***** Error:", t.toString());
-
-            for ( ;t != null; t = t.getCause())
+            for (Throwable t = event.getThrowable();t != null; t = t.getCause())
             {
                 if ( t.getCause() == null )
                 {
                     if(t.getClass()  ==  AccessControlException.class)
                     {
                         message = "Access Denied! You don't have permission to access resource";
+                        errorMessage = t.toString();
                     }
                     else
                     {
                         message = "System error Please check log files.";
+                        errorMessage = t.toString();
                     }
                 }
             }
 
+            LOG.error("***** Error:"+errorMessage);
             ErrorView errorView = new ErrorView(mainUI,null);
             errorView.setErrorMessage( message );
 

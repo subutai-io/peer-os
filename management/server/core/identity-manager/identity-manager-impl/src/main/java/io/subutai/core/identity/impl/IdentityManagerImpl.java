@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.security.objects.UserStatus;
 import io.subutai.common.security.objects.UserType;
 import io.subutai.common.security.token.TokenUtil;
 import io.subutai.core.identity.api.model.Session;
@@ -87,7 +88,7 @@ public class IdentityManagerImpl implements IdentityManager
         {
 
             //***Create User ********************************************
-            User internal = createUser( "internal", "", "Internal User", "internal@subutai.io" ,1);
+            User internal = createUser( "internal", "internal", "Internal User", "internal@subutai.io" ,1);
             User admin    = createUser( "admin", "secret", "Administrator", "admin@subutai.io" ,2);
             User manager  = createUser( "manager","manager", "Manager", "manager@subutai.io" ,2);
             User karaf    = createUser( "karaf", "karaf", "Karaf Manager", "karaf@subutai.io" ,2);
@@ -125,7 +126,7 @@ public class IdentityManagerImpl implements IdentityManager
                     assignUserRole( admin.getId(), role );
 
                     //*********************************************
-                    for ( int a = 0; a < permsp.length; x++ )
+                    for ( int a = 0; a < permsp.length; a++ )
                     {
                         Permission per = createPermission( permsp[a].getId(), 1, true, true, true, true );
 
@@ -138,7 +139,7 @@ public class IdentityManagerImpl implements IdentityManager
                     assignUserRole( manager.getId(), role );
 
                     //*********************************************
-                    for ( int a = 0; a < permsp.length; x++ )
+                    for ( int a = 0; a < permsp.length; a++ )
                     {
                         if(permsp[a] != PermissionObject.IdentityManagement ||
                                 permsp[a] != PermissionObject.KarafServerAdministration ||
@@ -157,7 +158,7 @@ public class IdentityManagerImpl implements IdentityManager
                     assignUserRole( internal.getId(), role );
 
                     //*********************************************
-                    for ( int a = 0; a < permsp.length; x++ )
+                    for ( int a = 0; a < permsp.length; a++ )
                     {
                         if(permsp[a] != PermissionObject.IdentityManagement ||
                                 permsp[a] != PermissionObject.KarafServerAdministration ||
@@ -279,7 +280,7 @@ public class IdentityManagerImpl implements IdentityManager
             if( Strings.isNullOrEmpty(issuer))
                 issuer =  "io.subutai";
             if( Strings.isNullOrEmpty(secret))
-                secret =  Integer.toString( ( new Random() ).nextInt() );
+                secret =  UUID.randomUUID().toString();
 
             userToken.setToken(token );
             userToken.setType( "JWT" );
@@ -346,7 +347,7 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public User authenticateByToken( String token )
     {
-        String subject = TokenUtil.parseToken(token);
+        String subject = TokenUtil.getSubject( token);
 
         UserToken userToken = identityDataService.getUserToken( subject );
 
@@ -385,7 +386,8 @@ public class IdentityManagerImpl implements IdentityManager
 
             if ( user != null )
             {
-                if ( !user.getPassword().equals( password ) )
+                if ( !user.getPassword().equals( password )
+                        || user.getStatus() == UserStatus.Disabled.getId() )
                 {
                     return null;
                 }
@@ -427,7 +429,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         if(Strings.isNullOrEmpty( password ))
         {
-            password = Long.toString( ( new Random() ).nextLong() );
+            password = Integer.toString( ( new Random() ).nextInt());
         }
 
         User user = new UserEntity();
@@ -489,6 +491,16 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    @PermitAll
+    @Override
+    public List<Role> getAllRoles()
+    {
+        return identityDataService.getAllRoles();
+    }
+
+
+    /* *************************************************
+     */
     @RolesAllowed( "Identity-Management|A|Delete" )
     @Override
     public void removeRole( long roleId )
@@ -544,6 +556,16 @@ public class IdentityManagerImpl implements IdentityManager
     public void removePermission( long permissionId )
     {
         identityDataService.removePermission( permissionId );
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public List<Permission> getAllPermissions()
+    {
+        return identityDataService.getAllPermissions();
     }
 
 

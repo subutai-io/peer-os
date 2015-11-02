@@ -7,7 +7,7 @@ package io.subutai.common.security.objects;
 public enum UserStatus
 {
     Active(1,"Active"),
-    Diabled(2,"Disabled");
+    Disabled(2,"Disabled");
 
     private String name;
     private int id;

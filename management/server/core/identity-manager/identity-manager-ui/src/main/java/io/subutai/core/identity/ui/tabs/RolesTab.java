@@ -51,8 +51,8 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
         // Add some beans to it
         beans = new BeanItemContainer<>( Role.class );
 
-        //beans.addAll( identityManager.getAllRoles() );
-        //        beans.addNestedContainerProperty( "permissionGroup.name" );
+        beans.addAll( identityManager.getAllRoles() );
+        //beans.addNestedContainerProperty( "permissionGroup.name" );
 
         // A layout for the table and form
         HorizontalLayout layout = new HorizontalLayout();
@@ -66,9 +66,7 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
 
         // Create a form for editing a selected or new item.
         // It is invisible until actually used.
-        //form = new RoleForm( this, Sets.newHashSet( identityManager.getAllPermissions() ),
-                //identityManager.getAllPortalModules(), identityManager.getAllRestEndpoints(),
-                //identityManager.getAllCliCommands() );
+        form = new RoleForm( this, Sets.newHashSet( identityManager.getAllPermissions() ));
         form.setVisible( false );
 
         // When the user selects an item, show it in the form

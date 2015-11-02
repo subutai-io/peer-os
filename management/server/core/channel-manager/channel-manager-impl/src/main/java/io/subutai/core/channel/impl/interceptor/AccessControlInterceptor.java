@@ -3,17 +3,15 @@ package io.subutai.core.channel.impl.interceptor;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.security.PrivilegedAction;
 
 import javax.security.auth.Subject;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -22,8 +20,6 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import com.google.common.base.Strings;
 
-import io.subutai.common.settings.ChannelSettings;
-import io.subutai.common.settings.Common;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.MessageContentUtil;
 import io.subutai.core.identity.api.model.User;
@@ -83,8 +79,9 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
             }
             else
             {
-
-                User user = channelManagerImpl.getIdentityManager().login( "admin","secret");
+                //**********************************************
+                User user = authenticateAccess( message );
+                //**********************************************
 
                 if(user!=null)
                 {
@@ -99,7 +96,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
                             }
                             catch(Exception ex)
                             {
-                                MessageContentUtil.abortChain(message,403,"Access Denied");
+                                MessageContentUtil.abortChain(message,403,"Access Denied to the resource");
                             }
                             return null;
                         }
@@ -107,7 +104,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
                 }
                 else
                 {
-                    MessageContentUtil.abortChain( message, 403, "Access Denied" );
+                    MessageContentUtil.abortChain( message, 403, "Access Denied to the resource" );
                 }
             }
             //-----------------------------------------------------------------------------------------------
@@ -118,6 +115,33 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
         }
     }
 
+    //******************************************************************
+    private User authenticateAccess(Message message)
+    {
+        HttpServletRequest req = ( HttpServletRequest ) message.getExchange().getInMessage()
+                                                               .get( AbstractHTTPDestination
+                                                                       .HTTP_REQUEST );
 
+        String sptoken = req.getParameter( "sptoken" );
+
+        if( Strings.isNullOrEmpty(sptoken))
+        {
+            HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
+            sptoken = headers.getHeaderString( "sptoken" );
+
+            if(Strings.isNullOrEmpty( sptoken ))
+            {
+                return channelManagerImpl.getIdentityManager().login( "internal","internal");
+            }
+            else
+            {
+                return channelManagerImpl.getIdentityManager().login( "token",sptoken);
+            }
+        }
+        else
+        {
+            return channelManagerImpl.getIdentityManager().login( "token",sptoken);
+        }
+    }
     //******************************************************************
 }

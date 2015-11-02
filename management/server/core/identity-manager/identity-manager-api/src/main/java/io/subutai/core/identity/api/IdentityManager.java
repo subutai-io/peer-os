@@ -20,8 +20,13 @@ import io.subutai.core.identity.api.model.UserToken;
 public interface IdentityManager
 {
     /* *************************************************
-     *
      */
+    @PermitAll
+    List<Permission> getAllPermissions();
+
+    /* *************************************************
+         *
+         */
     public IdentityDataService getIdentityDataService();
 
 
@@ -84,6 +89,11 @@ public interface IdentityManager
 
     /* *************************************************
      */
+    @PermitAll
+    List<Role> getAllRoles();
+
+    /* *************************************************
+         */
     void removeRole( long roleId );
 
     /* *************************************************

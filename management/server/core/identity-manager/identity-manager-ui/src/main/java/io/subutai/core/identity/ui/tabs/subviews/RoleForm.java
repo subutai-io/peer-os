@@ -49,8 +49,6 @@ public class RoleForm extends VerticalLayout
 
 
     public RoleForm( TabCallback<BeanItem<Role>> callback, Set<Permission> permissions)
-                     //final Set<PortalModuleScope> allPortalModules, final Set<RestEndpointScope> allRestEndpoints,
-                     //final List<CliCommand> allCliCommands )
     {
         init();
         /*

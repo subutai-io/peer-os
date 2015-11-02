@@ -4,6 +4,7 @@ package io.subutai.core.identity.ui;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.ui.tabs.RolesTab;
+import io.subutai.core.identity.ui.tabs.TokensTab;
 import io.subutai.core.identity.ui.tabs.UsersTab;
 
 import com.vaadin.ui.CustomComponent;
@@ -30,6 +31,7 @@ public class IdentityManagerComponent extends CustomComponent implements Disposa
         //      PermissionsTab permissionsTab = new PermissionsTab( identityManager );
         UsersTab usersTab = new UsersTab( identityManager );
         RolesTab rolesTab = new RolesTab( identityManager );
+        TokensTab tokensTab = new TokensTab( identityManager );
 
         sheet.addTab( usersTab, "User management space." ).setId( "UsersTab" );
 

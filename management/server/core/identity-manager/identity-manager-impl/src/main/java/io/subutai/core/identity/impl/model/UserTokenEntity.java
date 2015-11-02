@@ -11,6 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 import io.subutai.core.identity.api.model.User;
@@ -44,8 +45,8 @@ public class UserTokenEntity implements UserToken
     @Column( name = "valid_date")
     private Date validDate;
 
-    @OneToOne(cascade= CascadeType.ALL)
-    @JoinColumn(name="user_id", nullable=true, insertable=true, updatable=true)
+    @OneToOne(cascade= CascadeType.ALL, targetEntity = UserEntity.class)
+    @JoinColumn(name="user_id", nullable=true, insertable=true, updatable=true )
     private User user;
 
 

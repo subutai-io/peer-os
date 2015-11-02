@@ -23,7 +23,6 @@ import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
-import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
 
 
@@ -84,9 +83,6 @@ public class SystemLoginModule extends AbstractKarafLoginModule
 
             if ( loggedUser != null )
             {
-                LOGGER.debug( "User found." );
-
-
                 //******************************************
                 principals = new HashSet<>();
                 principals.add( new UserPrincipal( user ) );
@@ -113,7 +109,7 @@ public class SystemLoginModule extends AbstractKarafLoginModule
                 subject.getPrivateCredentials().add( loggedUser );
                 //******************************************
 
-                LOGGER.debug( "Finish login." );
+                LOGGER.debug( "Successful login." );
             }
         }
         catch ( IOException ioException )
@@ -138,7 +134,6 @@ public class SystemLoginModule extends AbstractKarafLoginModule
     @Override
     public boolean commit() throws LoginException
     {
-        LOGGER.debug( "Invoking commit." );
         return super.commit();
     }
 
@@ -146,7 +141,6 @@ public class SystemLoginModule extends AbstractKarafLoginModule
     @Override
     public boolean abort()
     {
-        LOGGER.debug( "Invoking abort." );
         return true;
     }
 

@@ -4,7 +4,6 @@ package io.subutai.core.channel.impl;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import io.subutai.common.dao.DaoManager;
 import io.subutai.core.channel.api.ChannelManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.security.api.SecurityManager;

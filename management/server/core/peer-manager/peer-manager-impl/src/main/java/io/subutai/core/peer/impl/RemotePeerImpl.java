@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -77,6 +79,7 @@ import io.subutai.core.peer.impl.request.MessageResponseListener;
 /**
  * Remote Peer implementation
  */
+@PermitAll
 public class RemotePeerImpl implements RemotePeer
 {
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerImpl.class );
@@ -258,6 +261,7 @@ public class RemotePeerImpl implements RemotePeer
     //********** ENVIRONMENT SPECIFIC REST *************************************
 
 
+    @RolesAllowed( "Environment-Management|A|Update" )
     @Override
     public void startContainer( final ContainerHost containerHost ) throws PeerException
     {
@@ -293,6 +297,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Update" )
     @Override
     public void stopContainer( final ContainerHost containerHost ) throws PeerException
     {
@@ -329,6 +334,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Delete" )
     @Override
     public void destroyContainer( final ContainerHost containerHost ) throws PeerException
     {
@@ -362,6 +368,7 @@ public class RemotePeerImpl implements RemotePeer
             throw new PeerException( "Error destroying container", e );
         }
     }
+
 
 
     @Override
@@ -402,7 +409,7 @@ public class RemotePeerImpl implements RemotePeer
         }
     }
 
-
+    @RolesAllowed( "Environment-Management|A|Delete" )
     @Override
     public void removeEnvironmentKeyPair( final String environmentId ) throws PeerException
     {
@@ -430,6 +437,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Delete" )
     @Override
     public void cleanupEnvironmentNetworkSettings( final String environmentId ) throws PeerException
     {
@@ -457,6 +465,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @PermitAll
     @Override
     public boolean isConnected( final Host containerHost )
     {
@@ -496,6 +505,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @PermitAll
     @Override
     public ProcessResourceUsage getProcessResourceUsage( final ContainerHost containerHost, final int processPid )
             throws PeerException
@@ -645,6 +655,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Update" )
     @Override
     public void setRamQuota( final ContainerHost containerHost, final int ramInMb ) throws PeerException
     {
@@ -753,7 +764,7 @@ public class RemotePeerImpl implements RemotePeer
         }
     }
 
-
+    @RolesAllowed( "Environment-Management|A|Update" )
     @Override
     public void setCpuQuota( final ContainerHost containerHost, final int cpuPercent ) throws PeerException
     {
@@ -830,6 +841,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Update" )
     @Override
     public void setCpuSet( final ContainerHost containerHost, final Set<Integer> cpuSet ) throws PeerException
     {
@@ -911,6 +923,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Update" )
     @Override
     public void setDiskQuota( final ContainerHost containerHost, final DiskQuota diskQuota ) throws PeerException
     {
@@ -949,6 +962,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Update" )
     @Override
     public void setRamQuota( final ContainerHost containerHost, final RamQuota ramQuota ) throws PeerException
     {
@@ -1143,6 +1157,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Update" )
     @Override
     public void setQuota( final ContainerHost containerHost, final QuotaInfo quotaInfo ) throws PeerException
     {
@@ -1181,6 +1196,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @PermitAll
     @Override
     public HostInfo getContainerHostInfoById( final String containerHostId ) throws PeerException
     {
@@ -1379,6 +1395,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Write" )
     @Override
     public Set<HostInfoModel> createEnvironmentContainerGroup( final CreateEnvironmentContainerGroupRequest request )
             throws PeerException
@@ -1413,6 +1430,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Delete" )
     @Override
     public ContainersDestructionResult destroyContainersByEnvironment( final String environmentId ) throws PeerException
     {
@@ -1450,7 +1468,7 @@ public class RemotePeerImpl implements RemotePeer
 
     //networking
 
-
+    @RolesAllowed( "Environment-Management|A|Write" )
     @Override
     public int setupTunnels( final Map<String, String> peerIps, final String environmentId ) throws PeerException
     {
@@ -1485,6 +1503,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Write" )
     @Override
     public int reserveVni( final Vni vni ) throws PeerException
     {
@@ -1519,6 +1538,7 @@ public class RemotePeerImpl implements RemotePeer
     //************ END ENVIRONMENT SPECIFIC REST
 
 
+    @RolesAllowed( "Environment-Management|A|Read" )
     @Override
     public Set<Gateway> getGateways() throws PeerException
     {
@@ -1545,6 +1565,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Read" )
     @Override
     public Set<Vni> getReservedVnis() throws PeerException
     {

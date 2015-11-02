@@ -132,7 +132,7 @@
 
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>subutai-cli-rbac</artifactId>
+        <artifactId>cli-controller</artifactId>
         <version>${project.version}</version>
       </dependency>
 

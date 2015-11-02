@@ -1,7 +1,6 @@
 package io.subutai.common.security.token;
 
 
-import com.google.gson.JsonObject;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.JWSSigner;
@@ -11,8 +10,8 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import io.subutai.common.util.JsonUtil;
 
+import net.minidev.json.JSONObject;
 
 /**
  *
@@ -59,21 +58,20 @@ public class TokenUtil
     }
 
 
-    public static String parseToken(String token)
+    public static Payload parseToken(String token)
     {
-        String payloadJSON = "";
+        Payload payload = null;
         try
         {
             JWSObject jwsObject = JWSObject.parse( token );
-            Payload payload = jwsObject.getPayload();
-            payloadJSON  = payload.toString();
+            payload = jwsObject.getPayload();
         }
         catch ( Exception ex )
         {
             return null;
         }
 
-        return payloadJSON;
+        return payload;
     }
 
 
@@ -81,8 +79,8 @@ public class TokenUtil
     {
         try
         {
-            String claim   = parseToken(token);
-            JsonObject obj = JsonUtil.fromJson(claim,JsonObject.class);
+            Payload payload   = parseToken(token);
+            JSONObject obj = payload.toJSONObject();
             return obj.get( "sub" ).toString();
         }
         catch ( Exception ex )

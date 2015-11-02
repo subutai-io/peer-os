@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import io.subutai.common.security.objects.UserStatus;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
@@ -30,7 +31,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
-
+import com.vaadin.ui.ComboBox;
 
 public class UserForm extends VerticalLayout
 {
@@ -47,7 +48,7 @@ public class UserForm extends VerticalLayout
     private boolean newValue;
 
     private Button removeButton;
-    private TextField username;
+    private TextField userName;
     private TextField fullName;
     private TextField email;
     private PasswordField password;
@@ -62,7 +63,7 @@ public class UserForm extends VerticalLayout
         this.identityManager = identityManager;
         permissionsContainer = new BeanContainer<>( Role.class );
         permissionsContainer.setBeanIdProperty( "name" );
-        //        permissionsContainer.addAll( roles );
+        //permissionsContainer.addAll( roles );
         rolesSelector.setContainerDataSource( permissionsContainer );
         rolesSelector.setItemCaptionPropertyId( "name" );
 
@@ -132,7 +133,7 @@ public class UserForm extends VerticalLayout
         buttons.setSpacing( true );
 
         form = new FormLayout();
-        form.addComponents( username, fullName, email, password, confirmPassword, rolesSelector );
+        form.addComponents( userName, fullName, email, password, confirmPassword, rolesSelector );
 
         addComponents( form, buttons );
 
@@ -155,11 +156,11 @@ public class UserForm extends VerticalLayout
             }
         } );
 
-        username = new TextField( "Username" );
-        username.setRequired( true );
-        username.setInputPrompt( "Username" );
-        username.setRequiredError( "Please enter username." );
-        username.setEnabled( false );
+        userName = new TextField( "Username" );
+        userName.setRequired( true );
+        userName.setInputPrompt( "Username" );
+        userName.setRequiredError( "Please enter username." );
+        userName.setEnabled( false );
 
         fullName = new TextField( "Full name" );
         fullName.setRequired( true );
@@ -192,6 +193,13 @@ public class UserForm extends VerticalLayout
         confirmPassword.setInputPrompt( "Confirm password" );
 
 
+        ComboBox cbUserStatus = new ComboBox("Some caption");
+        cbUserStatus.setNullSelectionAllowed(false);
+
+        cbUserStatus.addItem( UserStatus.Active.getName());
+        cbUserStatus.addItem(UserStatus.Disabled.getName());
+
+
         rolesSelector = new TwinColSelect( "User roles" )
         {
             {
@@ -208,16 +216,16 @@ public class UserForm extends VerticalLayout
         this.newValue = newValue;
         if ( user != null )
         {
-            //List<Role> roles = identityManager.getAllRoles();
+            List<Role> roles = identityManager.getAllRoles();
             permissionsContainer.removeAllItems();
-            //permissionsContainer.addAll( roles );
+            permissionsContainer.addAll( roles );
             userFieldGroup.setItemDataSource( user );
 
-            userFieldGroup.bind( username, "username" );
-            userFieldGroup.bind( fullName, "fullname" );
+            userFieldGroup.bind( userName, "userName" );
+            userFieldGroup.bind( fullName, "fullName" );
             userFieldGroup.bind( email, "email" );
             userFieldGroup.bind( password, "password" );
-            //confirmPassword.setValue( user.getBean().getPassword() );
+            confirmPassword.setValue( user.getBean().getPassword() );
 
             if ( newValue )
             {
@@ -227,20 +235,20 @@ public class UserForm extends VerticalLayout
             // Pre-select user roles
             User userBean = user.getBean();
             Set<String> roleNames = new HashSet<>();
-            //for ( final Role role : userBean.getRoles() )
+            for ( final Role role : userBean.getRoles() )
             {
-                //roleNames.add( role.getName() );
+                roleNames.add( role.getName() );
             }
             rolesSelector.setValue( roleNames );
 
             if ( !newValue )
             {
-                username.setReadOnly( true );
+                userName.setReadOnly( true );
                 removeButton.setVisible( true );
             }
             else
             {
-                username.setReadOnly( false );
+                userName.setReadOnly( false );
                 removeButton.setVisible( false );
             }
         }

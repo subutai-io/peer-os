@@ -1,6 +1,7 @@
 package io.subutai.core.identity.ui.tabs;
 
 
+import io.subutai.common.security.objects.UserType;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.ui.tabs.subviews.UserForm;
@@ -54,18 +55,20 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
         // Create a container for such beans
         // Add some beans to it
         beans = new BeanItemContainer<>( User.class );
-        //beans.addAll( identityManager.getAllUsers() );
+        beans.addAll( identityManager.getAllUsers() );
 
         // A layout for the table and form
         HorizontalLayout layout = new HorizontalLayout();
 
         // Bind a table to it
         usersTable = new Table( "Users", beans );
-        usersTable.setVisibleColumns( new Object[] { "username", "fullname", "email" } );
+        usersTable.setVisibleColumns( new Object[] { "userName", "fullName", "email", "typeName" ,"statusName" } );
         usersTable.setPageLength( 7 );
-        usersTable.setColumnHeader( "username", "Username" );
-        usersTable.setColumnHeader( "fullname", "Full name" );
+        usersTable.setColumnHeader( "userName", "Username" );
+        usersTable.setColumnHeader( "fullName", "Full name" );
         usersTable.setColumnHeader( "email", "Email" );
+        usersTable.setColumnHeader( "typeName", "Type" );
+        usersTable.setColumnHeader( "statusName", "Status" );
         usersTable.setBuffered( false );
 
         // Create a form for editing a selected or new item.

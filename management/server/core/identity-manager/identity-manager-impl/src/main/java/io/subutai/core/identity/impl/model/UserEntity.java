@@ -17,6 +17,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.security.auth.Subject;
 
+import io.subutai.common.security.objects.UserStatus;
+import io.subutai.common.security.objects.UserType;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
 
@@ -213,5 +215,18 @@ public class UserEntity implements User
     public void setId( final long id )
     {
         this.id = id;
+    }
+
+
+    @Override
+    public String getStatusName()
+    {
+        return UserStatus.values()[status-1].getName();
+    }
+
+    @Override
+    public String getTypeName()
+    {
+        return UserType.values()[type-1].getName();
     }
 }

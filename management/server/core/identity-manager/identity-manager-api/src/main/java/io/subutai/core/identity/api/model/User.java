@@ -48,4 +48,8 @@ public interface User
     int getStatus();
 
     void setStatus( int status );
+
+    String getStatusName();
+
+    String getTypeName();
 }

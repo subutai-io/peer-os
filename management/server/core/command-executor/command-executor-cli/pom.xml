@@ -49,7 +49,7 @@
 
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>subutai-cli-rbac</artifactId>
+      <artifactId>cli-controller</artifactId>
     </dependency>
 
   </dependencies>
