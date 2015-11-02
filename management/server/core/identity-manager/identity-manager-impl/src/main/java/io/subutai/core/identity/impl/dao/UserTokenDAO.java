@@ -1,6 +1,7 @@
 package io.subutai.core.identity.impl.dao;
 
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -52,6 +53,29 @@ public class UserTokenDAO
         {
             daoManager.closeEntityManager( em );
         }
+        return result;
+    }
+
+
+    /* *************************************************
+     *
+     */
+    public UserToken findValid( String token )
+    {
+        UserToken result = find( token );
+        try
+        {
+            if(result!=null)
+            {
+                Date curDate = new Date(System.currentTimeMillis());
+                if(!result.getValidDate().after( curDate ))
+                    return null;
+            }
+        }
+        catch ( Exception e )
+        {
+        }
+
         return result;
     }
 
@@ -163,6 +187,37 @@ public class UserTokenDAO
             List<UserToken> result = null;
             Query qr = em.createQuery( "select h from UserTokenEntity h where h.user.id=:userId", UserToken.class );
             qr.setParameter( "userId",userId );
+            result = qr.getResultList();
+
+            if(result!=null)
+            {
+                tk = result.get( 0 );
+            }
+        }
+        catch ( Exception e )
+        {
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+
+        return tk;
+    }
+
+    /* *************************************************
+     *
+     */
+    public UserToken findValidByUserId( final long userId )
+    {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+        UserToken tk = null;
+        try
+        {
+            List<UserToken> result = null;
+            Query qr = em.createQuery( "select h from UserTokenEntity h where h.user.id=:userId and h.validDate>=:validDate", UserToken.class );
+            qr.setParameter( "userId",userId );
+            qr.setParameter( "validDate",new Date(System.currentTimeMillis()));
             result = qr.getResultList();
 
             if(result!=null)

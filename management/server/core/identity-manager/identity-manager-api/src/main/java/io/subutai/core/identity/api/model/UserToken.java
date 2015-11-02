@@ -16,6 +16,9 @@ public interface UserToken
     String getClaims();
 
     //***********************************
+    String getFullToken();
+
+    //***********************************
     String getToken();
 
     //***********************************

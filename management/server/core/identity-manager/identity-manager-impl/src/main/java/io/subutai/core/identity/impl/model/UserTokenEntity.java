@@ -14,6 +14,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
+import io.subutai.common.security.token.TokenUtil;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
 
@@ -75,7 +76,12 @@ public class UserTokenEntity implements UserToken
         return str;
     }
 
-
+    //***********************************
+    @Override
+    public String getFullToken()
+    {
+        return TokenUtil.createToken(getHeader(),getClaims(),secret );
+    }
     //***********************************
 
 

@@ -1,11 +1,15 @@
 package io.subutai.core.identity.api;
 
 
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
+import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.common.security.objects.PermissionOperation;
+import io.subutai.common.security.objects.PermissionScope;
 import io.subutai.core.identity.api.dao.IdentityDataService;
 import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
@@ -65,8 +69,13 @@ public interface IdentityManager
 
 
     /* *************************************************
-     *
      */
+    @PermitAll
+    User getLoggedUser();
+
+    /* *************************************************
+         *
+         */
     User createUser( String userName, String password, String fullName, String email, int type );
 
 
@@ -76,8 +85,14 @@ public interface IdentityManager
 
 
     /* *************************************************
-     *
      */
+    @RolesAllowed( "Identity-Management|A|Delete" )
+    boolean isUserPermitted( User user, PermissionObject permObj, PermissionScope permScope,
+                             PermissionOperation permOp );
+
+    /* *************************************************
+         *
+         */
     Role createRole( String roleName, short roleType );
 
 
@@ -110,6 +125,6 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    UserToken createUserToken( User user, String token, String secret, String issuer);
+    UserToken createUserToken( User user, String token, String secret, String issuer,Date validDate);
 
 }

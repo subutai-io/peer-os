@@ -299,6 +299,15 @@ public class IdentityDataServiceImpl implements IdentityDataService
         return userTokenDAOService.find ( token );
     }
 
+    /* *************************************************
+     *
+     */
+    @Override
+    public UserToken getValidUserToken( String token )
+    {
+        return userTokenDAOService.findValid ( token );
+    }
+
 
     /* *************************************************
      *
@@ -307,6 +316,16 @@ public class IdentityDataServiceImpl implements IdentityDataService
     public UserToken getUserToken( long userId )
     {
         return userTokenDAOService.findByUserId ( userId );
+    }
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public UserToken getValidUserToken( long userId )
+    {
+        return userTokenDAOService.findValidByUserId( userId );
     }
 
     /* *************************************************

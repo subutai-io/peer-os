@@ -169,11 +169,21 @@ public interface IdentityDataService
     /* *************************************************
      *
      */
+    UserToken getValidUserToken( String token );
+
+    /* *************************************************
+         *
+         */
     UserToken getUserToken( long userId );
 
     /* *************************************************
      *
      */
+    UserToken getValidUserToken( long userId );
+
+    /* *************************************************
+         *
+         */
     void persistUserToken( UserToken item );
 
 

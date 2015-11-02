@@ -16,7 +16,7 @@ public interface Permission
 
     public  void setWrite( boolean write );
 
-    public  boolean Write();
+    public  boolean isWrite();
 
     public  void setRead( boolean read );
 

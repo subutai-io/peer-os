@@ -1,14 +1,20 @@
 package io.subutai.core.identity.impl;
 
 
+import java.awt.SystemColor;
 import java.io.IOException;
+import java.security.AccessControlContext;
 import java.security.AccessControlException;
+import java.security.AccessController;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.security.objects.PermissionOperation;
+import io.subutai.common.security.objects.PermissionScope;
 import io.subutai.common.security.objects.UserStatus;
 import io.subutai.common.security.objects.UserType;
 import io.subutai.common.security.token.TokenUtil;
@@ -32,6 +38,8 @@ import javax.security.auth.login.LoginContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.commons.lang.time.DateUtils;
 
 import com.google.common.base.Strings;
 
@@ -95,7 +103,7 @@ public class IdentityManagerImpl implements IdentityManager
             //***********************************************************
 
             //***Create Token *******************************************
-            createUserToken( internal ,"" ,"" ,"");
+            createUserToken( internal ,"" ,"" ,"",null);
             //***********************************************************
 
             //***********************************************************
@@ -269,7 +277,7 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @RolesAllowed( "Identity-Management|A|Write" )
     @Override
-    public UserToken createUserToken( User user, String token, String secret, String issuer)
+    public UserToken createUserToken( User user, String token, String secret, String issuer, Date validDate)
     {
         try
         {
@@ -281,6 +289,8 @@ public class IdentityManagerImpl implements IdentityManager
                 issuer =  "io.subutai";
             if( Strings.isNullOrEmpty(secret))
                 secret =  UUID.randomUUID().toString();
+            if(validDate == null)
+                validDate = DateUtils.addHours( new Date(System.currentTimeMillis()),2);
 
             userToken.setToken(token );
             userToken.setType( "JWT" );
@@ -288,6 +298,7 @@ public class IdentityManagerImpl implements IdentityManager
             userToken.setIssuer( issuer );
             userToken.setSecret(secret);
             userToken.setUser( user );
+            userToken.setValidDate( validDate );
 
             identityDataService.persistUserToken( userToken );
 
@@ -331,10 +342,12 @@ public class IdentityManagerImpl implements IdentityManager
         {
             UserToken uToken = identityDataService.getUserToken( user.getId() );
 
-            if(uToken!=null)
+            if(uToken == null)
             {
-                token = TokenUtil.createToken( uToken.getHeader(),uToken.getClaims(),uToken.getSecret() );
+                uToken = createUserToken( user, "", "", "" ,null);
             }
+
+            token = uToken.getFullToken();
         }
 
         return token;
@@ -349,7 +362,7 @@ public class IdentityManagerImpl implements IdentityManager
     {
         String subject = TokenUtil.getSubject( token);
 
-        UserToken userToken = identityDataService.getUserToken( subject );
+        UserToken userToken = identityDataService.getValidUserToken( subject );
 
         if(userToken!=null)
         {
@@ -414,6 +427,52 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public User getLoggedUser()
+    {
+        User user = null;
+        try
+        {
+            AccessControlContext acc =  AccessController.getContext();
+            if  (acc == null)
+            {
+                throw  new  RuntimeException("access control context is null");
+            }
+
+            Subject  subject=  Subject.getSubject(acc);
+            if  (subject == null)
+            {
+                throw  new  RuntimeException("subject is null");
+            }
+
+            while(subject.getPrivateCredentials().iterator().hasNext())
+            {
+                Object obj = subject.getPrivateCredentials().iterator().next();
+
+                if(obj instanceof UserEntity)
+                {
+                    user = (User)obj;
+                    user.setSubject( subject );
+                    break;
+                }
+            }
+
+            return user;
+        }
+        catch(RuntimeException ex)
+        {
+            return null;
+        }
+        catch(Exception ex)
+        {
+            return null;
+        }
+    }
+
     /* *************************************************
      */
     @RolesAllowed( "Identity-Management|A|Write" )
@@ -470,6 +529,41 @@ public class IdentityManagerImpl implements IdentityManager
         //***********************************************
 
         identityDataService.removeUser( userId );
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public boolean isUserPermitted( User user ,PermissionObject permObj, PermissionScope permScope, PermissionOperation permOp )
+    {
+        boolean isPermitted = false;
+
+        List<Role> roles = user.getRoles();
+
+        for(Role role:roles)
+        {
+            for(Permission permission:role.getPermissions())
+            {
+                if(permission.getId() == permObj.getId() && permission.getScope() == permScope.getId())
+                {
+                    switch ( permOp )
+                    {
+                        case Read:
+                            return permission.isRead();
+                        case Write:
+                            return permission.isWrite() ;
+                        case Update:
+                            return permission.isUpdate();
+                        case Delete:
+                            return permission.isDelete();
+                    }
+                }
+            }
+        }
+
+        return isPermitted;
     }
 
 

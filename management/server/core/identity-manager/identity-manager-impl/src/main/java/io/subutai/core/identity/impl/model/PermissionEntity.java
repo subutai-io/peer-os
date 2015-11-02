@@ -105,7 +105,7 @@ public class PermissionEntity implements Permission
 
 
     @Override
-    public boolean Write()
+    public boolean isWrite()
     {
         return write;
     }
