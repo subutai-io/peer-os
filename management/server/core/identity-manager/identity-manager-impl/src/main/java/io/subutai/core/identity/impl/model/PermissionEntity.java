@@ -145,6 +145,11 @@ public class PermissionEntity implements Permission
         this.delete = delete;
     }
 
+    @Override
+    public String getObjectName()
+    {
+        return PermissionObject.values()[object-1].getName();
+    }
 
     @Override
     public List<String> asString()

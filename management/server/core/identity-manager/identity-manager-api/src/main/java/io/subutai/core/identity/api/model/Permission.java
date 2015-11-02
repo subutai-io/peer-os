@@ -34,6 +34,8 @@ public interface Permission
 
     public  Long getId();
 
+    String getObjectName();
+
     List<String> asString();
 
 }
