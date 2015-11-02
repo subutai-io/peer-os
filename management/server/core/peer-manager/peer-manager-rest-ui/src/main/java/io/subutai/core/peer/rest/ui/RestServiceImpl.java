@@ -85,35 +85,29 @@ public class RestServiceImpl implements RestService
 
             //************************************************
 
-            if ( peerManager.getPeerInfo( p.getId() ) != null )
+
+            PeerInfo localPeer = peerManager.getLocalPeerInfo();
+
+            if ( pkey != null )
             {
-                return Response.status( Response.Status.CONFLICT )
-                        .entity(String.format("%s already registered", p.getName())).build();
+                localPeer.setKeyPhrase( p.getKeyPhrase() );
+                String jsonData = jsonUtil.to( localPeer );
+                byte[] data = encTool.encrypt( jsonData.getBytes(), pkey, false );
+
+                // Save to DB
+                p.setStatus( PeerStatus.REQUESTED );
+                p.setName( String.format( "Peer %s", p.getId() ) );
+                peerManager.register( p );
+
+                return Response.ok( HexUtil.byteArrayToHexString( data ) ).build();
             }
-            else
-            {
-                PeerInfo localPeer = peerManager.getLocalPeerInfo();
-
-                if ( pkey != null )
-                {
-                    localPeer.setKeyPhrase( p.getKeyPhrase() );
-                    String jsonData = jsonUtil.to( localPeer );
-                    byte[] data = encTool.encrypt( jsonData.getBytes(), pkey, false );
-
-                    // Save to DB
-                    p.setStatus( PeerStatus.REQUESTED );
-                    p.setName( String.format( "Peer %s", p.getId() ) );
-                    peerManager.register( p );
-
-                    return Response.ok( HexUtil.byteArrayToHexString( data ) ).build();
-                }
-            }
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error processing register request #processRegisterRequest", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
+
+        return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
     }
 }
