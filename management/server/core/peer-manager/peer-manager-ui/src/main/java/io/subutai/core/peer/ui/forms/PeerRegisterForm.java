@@ -463,7 +463,7 @@ public class PeerRegisterForm extends CustomComponent
     {
         int relationExists = relationExist;
         for ( final Iterator<ResourceHost> itResource =
-              module.getPeerManager().getLocalPeer().getResourceHosts().iterator();
+                      module.getPeerManager().getLocalPeer().getResourceHosts().iterator();
               itResource.hasNext() && relationExists == 0; )
         {
             ResourceHost resourceHost = itResource.next();
@@ -471,21 +471,12 @@ public class PeerRegisterForm extends CustomComponent
                   itContainer.hasNext() && relationExists == 0; )
             {
                 ContainerHost containerHost = itContainer.next();
-                //                try
-                //                {
-                //                    ContainerGroup containerGroup = module.getPeerManager().getLocalPeer()
-                //                                                          .findContainerGroupByContainerId(
-                // containerHost.getId() );
 
-                if ( containerHost.getInitiatorPeerId().equals( remotePeerInfo.getId() ) )
+                if ( remotePeerInfo.getId().equals( containerHost.getInitiatorPeerId() ) )
                 {
                     relationExists = 2;
                 }
-                //                }
-                //                catch ( ContainerGroupNotFoundException ignore )
-                //                {
-                //                    //ignore
-                //                }
+
             }
         }
         return relationExists;
