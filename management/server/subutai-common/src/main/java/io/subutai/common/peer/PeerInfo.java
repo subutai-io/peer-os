@@ -1,6 +1,7 @@
 package io.subutai.common.peer;
 
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -13,7 +14,7 @@ import io.subutai.common.settings.ChannelSettings;
 /**
  * Holds info about peer
  */
-public class PeerInfo
+public class PeerInfo implements Serializable
 {
     @JsonProperty
     private String ip = "127.0.0.1";

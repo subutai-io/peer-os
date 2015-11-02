@@ -1,6 +1,11 @@
 package io.subutai.common.peer;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import io.subutai.common.serialize.Serializable;
+
+
 /**
  * Registration DTO
  */
@@ -10,6 +15,7 @@ public class RegistrationData
     private String keyPhrase;
     private String cert;
     private RegistrationStatus status;
+    private Encrypted data;
 
 
     public RegistrationData()
@@ -70,5 +76,17 @@ public class RegistrationData
     public void setStatus( final RegistrationStatus status )
     {
         this.status = status;
+    }
+
+
+    public Encrypted getData()
+    {
+        return data;
+    }
+
+
+    public void setData( final Encrypted data )
+    {
+        this.data = data;
     }
 }

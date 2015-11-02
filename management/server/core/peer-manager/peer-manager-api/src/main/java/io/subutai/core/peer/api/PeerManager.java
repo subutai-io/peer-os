@@ -58,6 +58,9 @@ public interface PeerManager
      */
     public PeerInfo getPeerInfo( String id );
 
+
+    void register( String keyPhrase, RegistrationData registrationData ) throws PeerException;
+
     /**
      * Unregisters peer
      */
@@ -89,7 +92,7 @@ public interface PeerManager
 
     void doRegistrationRequest( String destinationHost, String keyPhrase ) throws PeerException;
 
-    void doApproveRequest( RegistrationData request ) throws PeerException;
+    void doApproveRequest( String keyPhrase, RegistrationData request ) throws PeerException;
 
     void doRejectRequest( RegistrationData request ) throws PeerException;
 

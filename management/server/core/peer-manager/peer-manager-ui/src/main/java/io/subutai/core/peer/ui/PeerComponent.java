@@ -41,8 +41,8 @@ public class PeerComponent extends CustomComponent implements Disposable
         {
             LOG.error( "Could not create container component.", e );
         }
-        sheet.addTab( new PeerRegisterForm( peerManagerPortalModule ), "Registration" );
-        sheet.addTab( new RegistrationForm( peerManagerPortalModule ), "New Registration" );
+//        sheet.addTab( new PeerRegisterForm( peerManagerPortalModule ), "Registration" );
+        sheet.addTab( new RegistrationForm( peerManagerPortalModule ), "Registration" );
 
         verticalLayout.addComponent( sheet );
 
