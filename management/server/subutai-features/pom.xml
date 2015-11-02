@@ -265,10 +265,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>command-executor-cli</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>${project.groupId}</groupId>-->
-      <!--<artifactId>command-executor-rest</artifactId>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>command-executor-rest-ui</artifactId>
+    </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- monitor -->

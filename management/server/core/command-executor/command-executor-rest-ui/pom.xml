@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <artifactId>environment-manager</artifactId>
+    <artifactId>command-executor</artifactId>
     <groupId>io.subutai</groupId>
     <version>4.0.0-RC2</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>environment-manager-rest-ui</artifactId>
+  <artifactId>command-executor-rest-ui</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Environment Manager REST UI</name>
-  <description>Subutai Environment Manager REST UI</description>
+  <name>Subutai Command Executor REST UI</name>
+  <description>Subutai Command Executor REST UI</description>
 
   <dependencies>
     <dependency>
@@ -21,19 +21,20 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>environment-manager-api</artifactId>
+      <artifactId>command-executor-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>peer-manager-api</artifactId>
+      <artifactId>host-registry-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.subutai</groupId>
+      <artifactId>environment-manager-api</artifactId>
+      <version>4.0.0-RC2</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>security-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>template-registry-api</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -64,7 +65,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.core.environment.rest.ui</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.executor.rest.ui</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
