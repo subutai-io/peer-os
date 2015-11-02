@@ -3,8 +3,6 @@ package io.subutai.core.peer.ui.forms;
 
 import java.util.Iterator;
 
-import javax.swing.JInternalFrame;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +59,6 @@ public class RegistrationForm extends CustomComponent
     private Table requestsTable;
 
     private PeerManagerPortalModule module;
-    private ApproveWindow approveWindow;
 
 
     /**
@@ -73,7 +70,6 @@ public class RegistrationForm extends CustomComponent
         VerticalLayout layout = buildLayout();
         setCompositionRoot( layout );
 
-        approveWindow = new ApproveWindow( module.getPeerManager() );
         this.module = module;
         updateRequestsTable();
         //        showPeersButton.click();
