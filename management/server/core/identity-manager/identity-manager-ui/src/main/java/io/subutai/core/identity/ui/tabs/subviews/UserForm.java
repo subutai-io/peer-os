@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.vaadin.data.Item;
 import io.subutai.common.security.objects.UserStatus;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Role;
@@ -53,6 +54,7 @@ public class UserForm extends VerticalLayout
     private TextField email;
     private PasswordField password;
     private PasswordField confirmPassword;
+    private ComboBox status = new ComboBox ("Status");;
     private TwinColSelect rolesSelector;
     private final BeanContainer<String, Role> permissionsContainer;
 
@@ -129,11 +131,29 @@ public class UserForm extends VerticalLayout
         final Button cancelButton = new Button( "Cancel", cancelListener );
         saveButton.setStyleName( Reindeer.BUTTON_DEFAULT );
 
+		for (int i = 1; i < 3; ++i)
+		{
+			status.addItem (i);
+			switch (i)
+			{
+				case (1):
+				{
+					status.setItemCaption (1, "Active");
+					break;
+				}
+				case (2):
+				{
+					status.setItemCaption (2, "Disabled");
+					break;
+				}
+			}
+		}
+
         HorizontalLayout buttons = new HorizontalLayout( saveButton, cancelButton, removeButton );
         buttons.setSpacing( true );
 
         form = new FormLayout();
-        form.addComponents( userName, fullName, email, password, confirmPassword, rolesSelector );
+        form.addComponents( userName, fullName, email, password, confirmPassword, status, rolesSelector );
 
         addComponents( form, buttons );
 
@@ -192,6 +212,8 @@ public class UserForm extends VerticalLayout
         confirmPassword.setRequiredError( "Please enter password confirm." );
         confirmPassword.setInputPrompt( "Confirm password" );
 
+		status.setNullSelectionAllowed (false);
+		status.setTextInputAllowed (false);
 
         ComboBox cbUserStatus = new ComboBox("Some caption");
         cbUserStatus.setNullSelectionAllowed(false);
@@ -206,7 +228,9 @@ public class UserForm extends VerticalLayout
                 setSpacing( true );
             }
         };
-        rolesSelector.setItemCaptionMode( AbstractSelect.ItemCaptionMode.PROPERTY );
+        rolesSelector.setWidth ("500px");
+        rolesSelector.setHeight ("300px");
+        rolesSelector.setItemCaptionMode(AbstractSelect.ItemCaptionMode.PROPERTY);
         rolesSelector.setItemCaptionPropertyId( "name" );
     }
 
@@ -226,7 +250,7 @@ public class UserForm extends VerticalLayout
             userFieldGroup.bind( email, "email" );
             userFieldGroup.bind( password, "password" );
             confirmPassword.setValue( user.getBean().getPassword() );
-
+			status.setValue (user.getBean().getStatus());
             if ( newValue )
             {
                 password.setValue( "" );
