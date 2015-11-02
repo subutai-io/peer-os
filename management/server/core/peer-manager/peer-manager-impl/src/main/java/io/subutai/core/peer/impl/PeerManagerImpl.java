@@ -1,14 +1,19 @@
 package io.subutai.core.peer.impl;
 
 
+import java.security.MessageDigest;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,23 +29,38 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.net.util.SubnetUtils;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Interface;
+import io.subutai.common.metric.ProcessResourceUsage;
+import io.subutai.common.metric.ResourceHostMetrics;
+import io.subutai.common.network.Gateway;
+import io.subutai.common.network.Vni;
+import io.subutai.common.peer.ContainerGateway;
+import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.Encrypted;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
-import io.subutai.common.peer.PeerStatus;
+import io.subutai.common.peer.RegistrationData;
+import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.security.PublicKeyContainer;
+import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.N2NUtil;
+import io.subutai.common.util.SecurityUtilities;
 import io.subutai.core.messenger.api.Messenger;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.peer.api.RegistrationClient;
 import io.subutai.core.peer.api.RequestListener;
 import io.subutai.core.peer.impl.command.CommandRequestListener;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
@@ -49,6 +69,7 @@ import io.subutai.core.peer.impl.container.DestroyEnvironmentContainerGroupReque
 import io.subutai.core.peer.impl.dao.PeerDAO;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.security.api.SecurityManager;
+import sun.security.krb5.internal.EncTGSRepPart;
 
 
 /**
@@ -70,6 +91,7 @@ public class PeerManagerImpl implements PeerManager
     private DaoManager daoManager;
     private SecurityManager securityManager;
     private Object provider;
+    private Map<String, RegistrationData> registrationRequests = new ConcurrentHashMap<>();
 
 
     public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
@@ -116,7 +138,7 @@ public class PeerManagerImpl implements PeerManager
 
     @RolesAllowed( "Peer-Management|A|Write" )
     @Override
-    public boolean register( final PeerInfo peerInfo ) throws PeerException
+    public boolean register( final PeerInfo peerInfo )
     {
         return peerDAO.saveInfo( SOURCE_REMOTE_PEER, peerInfo.getId(), peerInfo );
     }
@@ -124,13 +146,49 @@ public class PeerManagerImpl implements PeerManager
 
     @RolesAllowed( "Peer-Management|A|Write" )
     @Override
-    public boolean unregister( final String remotePeerId ) throws PeerException
+    public void register( final String keyPhrase, final RegistrationData registrationData ) throws PeerException
+    {
+        Preconditions.checkNotNull( keyPhrase, "Key phrase could not be null." );
+        Preconditions.checkArgument( !keyPhrase.isEmpty(), "Key phrase could not be empty" );
+        //        registrationData.getPeerInfo().setKeyPhrase( registrationData.getKeyPhrase() );
+
+
+        Encrypted encryptedData = registrationData.getData();
+        String rootCertPx2 = registrationData.getCert();
+        try
+        {
+            byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
+            String decryptedCert = encryptedData.decrypt( key, String.class );
+            LOG.info( String.format( "Certs are equals: %s", rootCertPx2.equals( decryptedCert ) ) );
+            securityManager.getKeyStoreManager()
+                           .importCertAsTrusted( ChannelSettings.SECURE_PORT_X2, registrationData.getPeerInfo().getId(),
+                                   rootCertPx2 );
+
+            peerDAO.saveInfo( SOURCE_REMOTE_PEER, registrationData.getPeerInfo().getId(),
+                    registrationData.getPeerInfo() );
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( e.getMessage(), e );
+            throw new PeerException( "Could not register peer." );
+        }
+    }
+
+
+    @Override
+    public boolean unregister( final PeerInfo peerInfo, String keyPhrase ) throws PeerException
     {
         ManagementHost mgmHost = getLocalPeer().getManagementHost();
-        PeerInfo p = getPeerInfo( remotePeerId );
+        PeerInfo p = getPeerInfo( peerInfo.getId() );
+
+        if ( !p.getKeyPhrase().equals( keyPhrase ) )
+        {
+            return false;
+        }
+
         mgmHost.removeRepository( p.getId(), p.getIp() );
 
-        PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( remotePeerId );
+        PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( p.getId() );
         // Remove peer policy of the target remote peer from the local peer
         if ( peerPolicy != null )
         {
@@ -139,10 +197,66 @@ public class PeerManagerImpl implements PeerManager
         }
 
         //*********Remove Security Relationship  ****************************
-        securityManager.getKeyManager().removePublicKeyRing( remotePeerId );
+        securityManager.getKeyManager().removePublicKeyRing( p.getId() );
+        //*******************************************************************
+        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, p.getId() );
+    }
+
+
+    @Override
+    public boolean unregister( final String id ) throws PeerException
+    {
+        ManagementHost mgmHost = getLocalPeer().getManagementHost();
+        PeerInfo p = getPeerInfo( id );
+
+        mgmHost.removeRepository( p.getId(), p.getIp() );
+
+        PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( p.getId() );
+        // Remove peer policy of the target remote peer from the local peer
+        if ( peerPolicy != null )
+        {
+            localPeer.getPeerInfo().getPeerPolicies().remove( peerPolicy );
+            peerDAO.saveInfo( SOURCE_LOCAL_PEER, localPeer.getId(), localPeer );
+        }
+
+        //*********Remove Security Relationship  ****************************
+        securityManager.getKeyManager().removePublicKeyRing( p.getId() );
+        //*******************************************************************
+        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, p.getId() );
+    }
+
+
+    public boolean unregister( final RegistrationData registrationData ) throws PeerException
+    {
+        ManagementHost mgmHost = getLocalPeer().getManagementHost();
+        PeerInfo p = getPeerInfo( registrationData.getPeerInfo().getId() );
+        //
+        //        if ( !p.getKeyPhrase().equals( registrationRequest.getPeerInfo().getKeyPhrase() ) )
+        //        {
+        //            return false;
+        //        }
+
+        try
+        {
+            mgmHost.removeRepository( p.getId(), p.getIp() );
+        }
+        catch ( Exception ignore )
+        {
+            // ignore
+        }
+        PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( p.getId() );
+        // Remove peer policy of the target remote peer from the local peer
+        if ( peerPolicy != null )
+        {
+            localPeer.getPeerInfo().getPeerPolicies().remove( peerPolicy );
+            peerDAO.saveInfo( SOURCE_LOCAL_PEER, localPeer.getId(), localPeer );
+        }
+
+        //*********Remove Security Relationship  ****************************
+        securityManager.getKeyManager().removePublicKeyRing( p.getId() );
         //*******************************************************************
 
-        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, remotePeerId );
+        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, p.getId() );
     }
 
 
@@ -178,10 +292,7 @@ public class PeerManagerImpl implements PeerManager
         result.add( getLocalPeer() );
         for ( PeerInfo info : peerInfoList )
         {
-            if ( PeerStatus.APPROVED == info.getStatus() )
-            {
-                result.add( getPeer( info.getId() ) );
-            }
+            result.add( getPeer( info.getId() ) );
         }
 
         return result;
@@ -231,7 +342,7 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public List<N2NConfig> setupN2NConnection( final Set<Peer> peers ) throws PeerException
+    public List<N2NConfig> setupN2NConnection( final String environmentId, final Set<Peer> peers ) throws PeerException
     {
         Set<String> usedN2NSubnets = getN2NSubnets( peers );
         LOG.debug( String.format( "Found %d n2n subnets:", usedN2NSubnets.size() ) );
@@ -266,8 +377,9 @@ public class PeerManagerImpl implements PeerManager
             List<N2NConfig> result = new ArrayList<>( peers.size() );
             for ( Peer peer : peers )
             {
-                N2NConfig config = new N2NConfig( peer.getId(), superNodeIp, N2N_PORT, interfaceName, communityName,
-                        addresses[counter], sharedKey );
+                N2NConfig config =
+                        new N2NConfig( peer.getId(), environmentId, superNodeIp, N2N_PORT, interfaceName, communityName,
+                                addresses[counter], sharedKey );
                 executorCompletionService.submit( new SetupN2NConnectionTask( peer, config ) );
                 counter++;
             }
@@ -326,6 +438,171 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    private RegistrationData getRequest( final String id )
+    {
+        return this.registrationRequests.get( id );
+    }
+
+
+    private void addRequest( final RegistrationData registrationData )
+    {
+        this.registrationRequests.put( registrationData.getPeerInfo().getId(), registrationData );
+    }
+
+
+    private void removeRequest( final String id )
+    {
+        this.registrationRequests.remove( id );
+    }
+
+
+    @Override
+    public RegistrationData processRegistrationRequest( final RegistrationData registrationData ) throws PeerException
+    {
+        addRequest( registrationData );
+        return new RegistrationData( getLocalPeerInfo(), registrationData.getKeyPhrase(), RegistrationStatus.WAIT );
+    }
+
+
+    @Override
+    public void processUnregisterRequest( final RegistrationData registrationData ) throws PeerException
+    {
+        removeRequest( registrationData.getPeerInfo().getId() );
+        unregister( registrationData );
+    }
+
+
+    @Override
+    public void processRejectRequest( final RegistrationData registrationData ) throws PeerException
+    {
+        removeRequest( registrationData.getPeerInfo().getId() );
+    }
+
+
+    @Override
+    public void processCancelRequest( final RegistrationData registrationData ) throws PeerException
+    {
+        removeRequest( registrationData.getPeerInfo().getId() );
+    }
+
+
+    @Override
+    public RegistrationData processApproveRequest( final RegistrationData registrationData ) throws PeerException
+    {
+        RegistrationData initRequest = getRequest( registrationData.getPeerInfo().getId() );
+        register( initRequest.getKeyPhrase(), registrationData );
+        removeRequest( registrationData.getPeerInfo().getId() );
+        return buildRegistrationData( registrationData.getKeyPhrase(), RegistrationStatus.APPROVED );
+    }
+
+
+    private RegistrationData buildRegistrationData( final String keyPhrase, RegistrationStatus status )
+    {
+        RegistrationData result = new RegistrationData( getLocalPeerInfo(), keyPhrase, status );
+        switch ( status )
+        {
+            case REQUESTED:
+            case APPROVED:
+                String cert =
+                        securityManager.getKeyStoreManager().exportCertificate( ChannelSettings.SECURE_PORT_X2, "" );
+
+                try
+                {
+                    byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
+                    Encrypted encryptedData = new Encrypted( cert, key );
+                    result.setData( encryptedData );
+                }
+                catch ( Exception e )
+                {
+                    LOG.warn( e.getMessage(), e );
+                }
+                result.setCert( cert );
+                break;
+        }
+        return result;
+    }
+
+
+    @Override
+    public void doRegistrationRequest( final String destinationHost, final String keyPhrase ) throws PeerException
+    {
+        RegistrationClient registrationClient = new RegistrationClientImpl( provider );
+
+        RegistrationData result = registrationClient
+                .sendInitRequest( destinationHost, buildRegistrationData( keyPhrase, RegistrationStatus.REQUESTED ) );
+
+        addRequest( result );
+    }
+
+
+    @Override
+    public void doCancelRequest( final RegistrationData request ) throws PeerException
+    {
+        RegistrationClient registrationClient = new RegistrationClientImpl( provider );
+
+        registrationClient.sendCancelRequest( request.getPeerInfo().getIp(),
+                buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.CANCELLED ) );
+
+        removeRequest( request.getPeerInfo().getId() );
+    }
+
+
+    @Override
+    public void doApproveRequest( final String keyPhrase, final RegistrationData request ) throws PeerException
+    {
+        register( keyPhrase, request );
+
+        RegistrationClient registrationClient = new RegistrationClientImpl( provider );
+
+        registrationClient.sendApproveRequest( request.getPeerInfo().getIp(),
+                buildRegistrationData( keyPhrase, RegistrationStatus.APPROVED ) );
+
+        removeRequest( request.getPeerInfo().getId() );
+    }
+
+
+    @Override
+    public void doRejectRequest( final RegistrationData request ) throws PeerException
+    {
+        RegistrationClient registrationClient = new RegistrationClientImpl( provider );
+
+        registrationClient.sendRejectRequest( request.getPeerInfo().getIp(),
+                buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.REJECTED ) );
+
+        removeRequest( request.getPeerInfo().getId() );
+    }
+
+
+    @Override
+    public void doUnregisterRequest( final RegistrationData request ) throws PeerException
+    {
+        RegistrationClient registrationClient = new RegistrationClientImpl( provider );
+        registrationClient.sendUnregisterRequest( request.getPeerInfo().getIp(),
+                buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.UNREGISTERED ) );
+
+        unregister( request );
+
+        removeRequest( request.getPeerInfo().getId() );
+    }
+
+
+    @Override
+    public List<RegistrationData> getRegistrationRequests()
+    {
+        List<RegistrationData> r = new ArrayList<>( registrationRequests.values() );
+        for ( Peer peer : getPeers() )
+        {
+            if ( !peer.getId().equals( getLocalPeerInfo().getId() ) )
+            {
+                r.add( new RegistrationData( peer.getPeerInfo(), peer.getPeerInfo().getKeyPhrase(),
+                        RegistrationStatus.APPROVED ) );
+            }
+        }
+
+        return r;
+    }
+
+
     private class SetupN2NConnectionTask implements Callable<N2NConfig>
     {
         private Peer peer;
@@ -364,6 +641,142 @@ public class PeerManagerImpl implements PeerManager
     public void removeRequestListener( RequestListener listener )
     {
         localPeer.removeRequestListener( listener );
+    }
+
+
+    @Override
+    public void startContainer( final ContainerId containerId ) throws PeerException
+    {
+        localPeer.startContainer( containerId );
+    }
+
+
+    @Override
+    public void stopContainer( final ContainerId containerId ) throws PeerException
+    {
+        localPeer.stopContainer( containerId );
+    }
+
+
+    @Override
+    public void destroyContainer( final ContainerId containerId ) throws PeerException
+    {
+        localPeer.destroyContainer( containerId );
+    }
+
+
+    @Override
+    public ContainerHostState getContainerState( ContainerId containerId )
+    {
+        return localPeer.getContainerState( containerId );
+    }
+
+
+    @Override
+    public String getPeerIdByIp( final String ip ) throws PeerException
+    {
+        Preconditions.checkNotNull( ip );
+
+        String result = null;
+
+        for ( Iterator<PeerInfo> i = getPeerInfos().iterator(); result == null && i.hasNext(); )
+        {
+            PeerInfo peerInfo = i.next();
+            if ( ip.equals( peerInfo.getIp() ) )
+            {
+                result = peerInfo.getId();
+            }
+        }
+
+        if ( result == null )
+        {
+            throw new PeerException( "Peer not found by IP: " + ip );
+        }
+        return result;
+    }
+
+
+    @Override
+    public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException
+    {
+        return localPeer.getProcessResourceUsage( containerId, pid );
+    }
+
+
+    @Override
+    public PublicKeyContainer createEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
+    {
+        return localPeer.createEnvironmentKeyPair( environmentId );
+    }
+
+
+    @Override
+    public void removeEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
+    {
+        localPeer.removeEnvironmentKeyPair( environmentId );
+    }
+
+
+    @Override
+    public Set<Gateway> getGateways() throws PeerException
+    {
+        return localPeer.getGateways();
+    }
+
+
+    @Override
+    public void setDefaultGateway( final ContainerGateway gateway ) throws PeerException
+    {
+        localPeer.setDefaultGateway( gateway );
+    }
+
+
+    @Override
+    public Set<Vni> getReservedVnis() throws PeerException
+    {
+        return localPeer.getReservedVnis();
+    }
+
+
+    @Override
+    public Vni reserveVni( final Vni vni ) throws PeerException
+    {
+        return localPeer.reserveVni( vni );
+    }
+
+
+    @Override
+    public void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException
+    {
+        localPeer.cleanupEnvironmentNetworkSettings( environmentId );
+    }
+
+
+    @Override
+    public void removeN2NConnection( final EnvironmentId environmentId ) throws PeerException
+    {
+        localPeer.cleanupEnvironmentNetworkSettings( environmentId );
+    }
+
+
+    @Override
+    public void addToTunnel( final N2NConfig config ) throws PeerException
+    {
+        localPeer.setupN2NConnection( config );
+    }
+
+
+    @Override
+    public ResourceHostMetrics getResourceHostMetrics()
+    {
+        return localPeer.getResourceHostMetrics();
+    }
+
+
+    @Override
+    public HostInterfaces getInterfaces()
+    {
+        return localPeer.getInterfaces();
     }
 }
 

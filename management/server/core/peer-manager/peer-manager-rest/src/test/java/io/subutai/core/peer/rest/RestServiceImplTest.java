@@ -1,14 +1,11 @@
 package io.subutai.core.peer.rest;
 
 
-import java.io.PrintStream;
-import java.lang.reflect.Type;
 import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -19,12 +16,13 @@ import org.apache.cxf.jaxrs.ext.form.Form;
 
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.network.Vni;
+import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
-import io.subutai.common.peer.PeerStatus;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
@@ -39,7 +37,6 @@ import io.subutai.core.security.api.SecurityManager;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNull;
-import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anySet;
@@ -53,7 +50,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-@Ignore
 @RunWith( MockitoJUnitRunner.class )
 public class RestServiceImplTest
 {
@@ -99,13 +95,24 @@ public class RestServiceImplTest
 
     RestServiceImpl restService;
 
+    @Mock
+    ContainerId containerId;
+
+    @Mock
+    private ContainerGateway containerGateway;
+
+    @Mock
+    Vni vni;
+
 
     @Before
     public void setUp() throws Exception
     {
-        restService = spy( new RestServiceImpl( peerManager, httpContextManager, securityManager ) );
+        restService = spy( new RestServiceImpl( peerManager/*, httpContextManager, securityManager*/ ) );
         restService.jsonUtil = jsonUtil;
         restService.restUtil = restUtil;
+        when( containerId.getId() ).thenReturn( CONTAINER_ID );
+        when( containerGateway.getContainerId() ).thenReturn( containerId );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
         when( localPeer.getId() ).thenReturn( PEER_ID );
         when( localPeer.getPeerInfo() ).thenReturn( peerInfo );
@@ -115,7 +122,7 @@ public class RestServiceImplTest
         when( peer.getPeerInfo() ).thenReturn( peerInfo );
         when( peerInfo.getId() ).thenReturn( PEER_ID );
         when( peerManager.getPeerInfo( PEER_ID ) ).thenReturn( peerInfo );
-        when( restUtil.getTrustedWebClient( anyString() ) ).thenReturn( webClient );
+        when( restUtil.getTrustedWebClient( anyString(), any() ) ).thenReturn( webClient );
         when( webClient.type( anyString() ) ).thenReturn( webClient );
         when( peerManager.getLocalPeerInfo() ).thenReturn( peerInfo );
         when( jsonUtil.to( anyObject() ) ).thenReturn( JSON );
@@ -130,23 +137,23 @@ public class RestServiceImplTest
         when( localPeer.getManagementHost() ).thenReturn( managementHost );
     }
 
+    //
+    //    @Test
+    //    public void testGetSelfPeerInfo() throws Exception
+    //    {
+    //        restService.getLocalPeerInfo();
+    //
+    //        verify( peerManager ).getLocalPeerInfo();
+    //    }
 
-    @Test
-    public void testGetSelfPeerInfo() throws Exception
-    {
-        restService.getLocalPeerInfo();
 
-        verify( peerManager ).getLocalPeerInfo();
-    }
-
-
-    @Test
-    public void testGetId() throws Exception
-    {
-        restService.getId();
-
-        verify( localPeer ).getId();
-    }
+    //    @Test
+    //    public void testGetId() throws Exception
+    //    {
+    //        restService.getInfo();
+    //
+    //        verify( localPeer ).getId();
+    //    }
 
 
     @Test
@@ -177,137 +184,24 @@ public class RestServiceImplTest
         assertNull( response.getEntity() );
     }
 
-
-    @Test
-    public void testGetRegisteredPeerInfo() throws Exception
-    {
-        restService.getRegisteredPeerInfo( PEER_ID.toString() );
-
-        verify( jsonUtil ).to( peerInfo );
-    }
-
-
-    @Test
-    public void testPing() throws Exception
-    {
-        Response response = restService.ping();
-
-        assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
-    }
+    //
+    //    @Test
+    //    public void testGetRegisteredPeerInfo() throws Exception
+    //    {
+    //        restService.getRegisteredPeerInfo( PEER_ID.toString() );
+    //
+    //        verify( jsonUtil ).to( peerInfo );
+    //    }
 
 
-    @Test
-    public void testProcessRegisterRequest() throws Exception
-    {
-
-        Response response = restService.processRegisterRequest( JSON );
-
-        assertEquals( Response.Status.CONFLICT.getStatusCode(), response.getStatus() );
-
-        when( peerManager.getPeerInfo( PEER_ID ) ).thenReturn( null );
-
-        restService.processRegisterRequest( JSON );
-
-        verify( peerManager ).register( peerInfo );
-
-        doThrow( peerException ).when( peerManager ).register( peerInfo );
-
-        response = restService.processRegisterRequest( JSON );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus() );
-    }
-
-
-    @Test
-    public void testSendRegistrationRequest() throws Exception
-    {
-        restService.sendRegistrationRequest( IP );
-
-        verify( restService ).registerPeerCert( response );
-
-        when( response.getStatus() ).thenReturn( Response.Status.CONFLICT.getStatusCode() );
-
-        Response response1 = restService.sendRegistrationRequest( IP );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-        assertEquals( ENTITY, response1.getEntity() );
-
-        when( response.getStatus() ).thenReturn( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() );
-
-        response1 = restService.sendRegistrationRequest( IP );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-
-        doThrow( exception ).when( webClient ).path( anyString() );
-
-        response1 = restService.sendRegistrationRequest( IP );
-
-        assertEquals( exception.toString(), response1.getEntity() );
-    }
-
-
-    @Test
-    public void testRegisterPeerCert() throws Exception
-    {
-        doReturn( peerInfo ).when( jsonUtil ).from( anyString(), any( Type.class ) );
-
-        restService.registerPeerCert( response );
-
-        verify( peerManager ).register( peerInfo );
-
-        doThrow( peerException ).when( peerManager ).register( peerInfo );
-
-        restService.registerPeerCert( response );
-
-        verify( peerException ).printStackTrace( any( PrintStream.class ) );
-    }
-
-
-    @Test
-    public void testUnregisterPeer() throws Exception
-    {
-        when( peerManager.unregister( PEER_ID.toString() ) ).thenReturn( true );
-
-        restService.unregisterPeer( PEER_ID.toString() );
-
-        //verify( httpContextManager ).reloadTrustStore();
-
-        when( peerManager.unregister( PEER_ID.toString() ) ).thenReturn( false );
-
-        Response response1 = restService.unregisterPeer( PEER_ID.toString() );
-
-        assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response1.getStatus() );
-
-        doThrow( peerException ).when( peerManager ).unregister( PEER_ID.toString() );
-
-        response1 = restService.unregisterPeer( PEER_ID.toString() );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-    }
-
-
-    @Test
-    public void testRejectForRegistrationRequest() throws Exception
-    {
-        restService.rejectForRegistrationRequest( PEER_ID.toString() );
-
-        verify( peerManager ).update( peerInfo );
-    }
-
-
-    @Test
-    public void testRemoveRegistrationRequest() throws Exception
-    {
-        restService.removeRegistrationRequest( PEER_ID.toString() );
-
-        verify( peerManager ).unregister( PEER_ID.toString() );
-
-        doThrow( peerException ).when( peerManager ).unregister( PEER_ID.toString() );
-
-        Response response1 = restService.unregisterPeer( PEER_ID.toString() );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-    }
+    //    @Test
+    //    public void testPing() throws Exception
+    //    {
+    //        Response response = restService.ping();
+    //
+    //        assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
+    //    }
+    //
 
 
     @Test
@@ -322,28 +216,6 @@ public class RestServiceImplTest
         //Response response1 = restService.approveForRegistrationRequest( JSON, CERT );
 
         //assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-    }
-
-
-    @Test
-    public void testApproveForRegistrationRequest2() throws Exception
-    {
-        Response response1 = restService.approveForRegistrationRequest( PEER_ID.toString(), "HEXSTR" );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-
-        when( peerInfo.getStatus() ).thenReturn( PeerStatus.REQUESTED );
-        when( webClient.put( anyObject() ) ).thenReturn( response );
-
-        restService.approveForRegistrationRequest( PEER_ID.toString(), "HEXSTR" );
-
-        //verify( httpContextManager ).reloadTrustStore();
-
-        doThrow( exception ).when( peerManager ).update( peerInfo );
-
-        response1 = restService.approveForRegistrationRequest( PEER_ID.toString(), "HEXSTR" );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
     }
 
 
@@ -367,63 +239,58 @@ public class RestServiceImplTest
     @Test
     public void testDestroyContainer() throws Exception
     {
-        restService.destroyContainer( CONTAINER_ID.toString() );
+        restService.destroyContainer( containerId );
 
-        verify( containerHost ).dispose();
+        verify( peerManager ).destroyContainer( containerId );
 
-        doThrow( exception ).when( localPeer ).bindHost( CONTAINER_ID.toString() );
+        doThrow( exception ).when( localPeer ).bindHost( containerId );
 
-        Response response1 = restService.destroyContainer( CONTAINER_ID.toString() );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+        restService.destroyContainer( containerId );
     }
 
 
     @Test
     public void testStartContainer() throws Exception
     {
-        restService.startContainer( CONTAINER_ID.toString() );
+        restService.startContainer( containerId );
 
-        verify( containerHost ).start();
+        verify( peerManager ).startContainer( containerId );
 
-        doThrow( exception ).when( localPeer ).bindHost( CONTAINER_ID.toString() );
+        doThrow( exception ).when( localPeer ).bindHost( containerId );
 
-        Response response1 = restService.startContainer( CONTAINER_ID.toString() );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+        restService.startContainer( containerId );
     }
 
 
     @Test
     public void testStopContainer() throws Exception
     {
-        restService.stopContainer( CONTAINER_ID.toString() );
+        restService.stopContainer( containerId );
 
-        verify( containerHost ).stop();
+        verify( peerManager ).stopContainer( containerId );
 
-        doThrow( exception ).when( localPeer ).bindHost( CONTAINER_ID.toString() );
 
-        Response response1 = restService.stopContainer( CONTAINER_ID.toString() );
+        doThrow( exception ).when( localPeer ).bindHost( containerId );
 
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+        restService.stopContainer( containerId );
     }
 
 
-    @Test
-    public void testIsContainerConnected() throws Exception
-    {
-        when( containerHost.isConnected() ).thenReturn( true );
-
-        Response response1 = restService.isContainerConnected( CONTAINER_ID.toString() );
-
-        assertTrue( Boolean.valueOf( response1.readEntity( String.class ) ) );
-
-        doThrow( exception ).when( localPeer ).bindHost( CONTAINER_ID.toString() );
-
-        response1 = restService.isContainerConnected( CONTAINER_ID.toString() );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-    }
+    //    @Test
+    //    public void testIsContainerConnected() throws Exception
+    //    {
+    //        when( containerHost.isConnected() ).thenReturn( true );
+    //
+    //        Response response1 = restService.isConnected( CONTAINER_ID.toString() );
+    //
+    //        assertTrue( Boolean.valueOf( response1.readEntity( String.class ) ) );
+    //
+    //        doThrow( exception ).when( localPeer ).bindHost( CONTAINER_ID.toString() );
+    //
+    //        response1 = restService.getContainerState( containerId ) isContainerConnected( CONTAINER_ID.toString() );
+    //
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //    }
 
 
     @Test
@@ -431,13 +298,13 @@ public class RestServiceImplTest
     {
         when( containerHost.getStatus() ).thenReturn( ContainerHostState.RUNNING );
 
-        restService.getContainerState( CONTAINER_ID.toString() );
+        restService.getContainerState( containerId );
 
-        verify( jsonUtil ).to( ContainerHostState.RUNNING );
+        verify( peerManager ).getContainerState( containerId );
 
         doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
 
-        Response response1 = restService.getContainerState( CONTAINER_ID.toString() );
+        restService.getContainerState( containerId );
 
         //assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
     }
@@ -510,9 +377,9 @@ public class RestServiceImplTest
     @Test
     public void testGetProcessResourceUsage() throws Exception
     {
-        restService.getProcessResourceUsage( CONTAINER_ID.toString(), PID );
+        restService.getProcessResourceUsage( containerId, PID );
 
-        verify( containerHost ).getProcessResourceUsage( PID );
+        verify( peerManager ).getProcessResourceUsage( containerId, PID );
     }
 
 
@@ -684,15 +551,13 @@ public class RestServiceImplTest
     @Test
     public void testSetDefaultGateway() throws Exception
     {
-        restService.setDefaultGateway( CONTAINER_ID.toString(), IP );
+        restService.setDefaultGateway( containerGateway );
 
-        verify( containerHost ).setDefaultGateway( IP );
+        verify( peerManager ).setDefaultGateway( containerGateway );
 
         doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
 
-        Response response1 = restService.setDefaultGateway( CONTAINER_ID.toString(), IP );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+        restService.setDefaultGateway( containerGateway );
     }
 
 
@@ -716,13 +581,11 @@ public class RestServiceImplTest
     {
         restService.getReservedVnis();
 
-        verify( localPeer ).getReservedVnis();
+        verify( peerManager ).getReservedVnis();
 
         doThrow( exception ).when( peerManager ).getLocalPeer();
 
-        Response response1 = restService.getReservedVnis();
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+        restService.getReservedVnis();
     }
 
 
@@ -731,27 +594,24 @@ public class RestServiceImplTest
     {
         restService.getGateways();
 
-        verify( localPeer ).getGateways();
+        verify( peerManager ).getGateways();
 
         doThrow( exception ).when( peerManager ).getLocalPeer();
 
-        Response response1 = restService.getGateways();
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+        restService.getGateways();
     }
 
 
     @Test
     public void testReserveVni() throws Exception
     {
-        restService.reserveVni( JSON );
+        restService.reserveVni( vni );
 
-        verify( localPeer ).reserveVni( any( Vni.class ) );
+        verify( peerManager ).reserveVni( any( Vni.class ) );
 
         doThrow( exception ).when( peerManager ).getLocalPeer();
 
-        Response response1 = restService.reserveVni( JSON );
+        restService.reserveVni( vni );
 
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
     }
 }

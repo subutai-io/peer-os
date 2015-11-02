@@ -14,6 +14,7 @@ import io.subutai.common.metric.OwnerResourceUsage;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.ResourceHost;
 
@@ -99,14 +100,13 @@ public interface Monitor
     /**
      * Returns process resource usage on a given container host
      *
-     * @param containerHost - container
-     * @param processPid - pid of process
+     * @param containerId - container ID
+     * @param pid - process ID
      *
      * @return - {@code ProcessResourceUsage}
      */
-    public ProcessResourceUsage getProcessResourceUsage( ContainerHost containerHost, int processPid )
-            throws MonitorException;
 
+    ProcessResourceUsage getProcessResourceUsage( ContainerId containerId, int pid ) throws MonitorException;
 
     /**
      * Returns total owner resource usage on local peer

@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 
 
@@ -138,4 +139,6 @@ public interface Environment
     String getTunnelInterfaceName();
 
     String getTunnelCommunityName();
+
+    EnvironmentId getEnvironmentId();
 }

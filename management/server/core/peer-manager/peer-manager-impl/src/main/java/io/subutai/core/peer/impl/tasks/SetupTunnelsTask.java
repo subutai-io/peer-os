@@ -82,4 +82,53 @@ public class SetupTunnelsTask implements Callable<Integer>
 
         return environmentVni.getVlan();
     }
+
+
+    public Integer callOld() throws Exception
+    {
+        //fail if vni is not reserved
+        Vni environmentVni = managementHost.findVniByEnvironmentId( environmentId );
+
+        if ( environmentVni == null )
+        {
+            throw new PeerException(
+                    String.format( "Error setting up tunnels: No reserved vni found for environment %s",
+                            environmentId ) );
+        }
+
+        for ( String peerIp : peerIps.keySet() )
+        {
+            if ( peerIp.equals( managementHost.getPeerId() ) )
+            {
+                LOG.debug( "Skiping local peer." );
+                continue;
+            }
+
+            LOG.debug( String.format( "Setting up tunnel on : %s", peerIp ) );
+
+            //setup tunnels to each remote peer
+            Set<Tunnel> tunnels = networkManager.listTunnels();
+
+            String tunnelIp = peerIps.get( peerIp );
+            int tunnelId = managementHost.findTunnel( tunnelIp, tunnels );
+            //tunnel not found, create new one
+            if ( tunnelId == -1 )
+            {
+                //calculate tunnel id
+                tunnelId = managementHost.calculateNextTunnelId( tunnels );
+
+
+                LOG.debug( String.format( "Setting up tunnel: %s %s", tunnelId, tunnelIp ) );
+                //create tunnel
+                networkManager.setupTunnel( tunnelId, tunnelIp );
+            }
+
+            //create vni-vlan mapping
+            LOG.debug( String.format( "Setting up tunnel for %s: %s", peerIp, environmentVni ) );
+            managementHost.setupVniVlanMapping( tunnelId, environmentVni.getVni(), environmentVni.getVlan(),
+                    environmentVni.getEnvironmentId() );
+        }
+
+        return environmentVni.getVlan();
+    }
 }

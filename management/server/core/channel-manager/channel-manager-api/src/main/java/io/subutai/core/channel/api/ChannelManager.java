@@ -1,7 +1,6 @@
 package io.subutai.core.channel.api;
 
 
-import io.subutai.common.dao.DaoManager;
 
 
 /**
@@ -9,5 +8,5 @@ import io.subutai.common.dao.DaoManager;
  */
 public interface ChannelManager
 {
-
+    boolean isEncryptionEnabled();
 }

@@ -2,10 +2,20 @@
 <blueprint default-activation="eager"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
            xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
             http://www.w3.org/2001/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance
             http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0">
 
+  <!-- Allow the use of system properties -->
+  <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
+
+  <cm:property-placeholder persistent-id="peer" update-strategy="none">
+    <cm:default-properties>
+      <cm:property name="restEncryptionEnabled" value="false" />
+    </cm:default-properties>
+  </cm:property-placeholder>
   <!-- ************************************************************************************************* -->
   <reference id="identityManager" availability="mandatory"
              interface="io.subutai.core.identity.api.IdentityManager" />
@@ -14,11 +24,15 @@
   <reference id="securityManager" availability="mandatory"
              interface="io.subutai.core.security.api.SecurityManager" />
 
+  <reference id="peerManager" availability="mandatory"
+             interface="io.subutai.core.peer.api.PeerManager" />
+
   <!-- ************************************************************************************************** -->
   <reference-list id="busListener" interface="org.apache.cxf.Bus" availability="optional">
     <reference-listener bind-method="busRegistered">
       <bean class="io.subutai.core.channel.impl.interceptor.ServerBusListener">
         <property name="channelManager" ref="channelManagerImpl" />
+        <property name="peerManager" ref="peerManager" />
       </bean>
     </reference-listener>
   </reference-list>
@@ -28,6 +42,7 @@
         class="io.subutai.core.channel.impl.ChannelManagerImpl">
     <property name="identityManager" ref="identityManager" />
     <property name="securityManager" ref="securityManager" />
+    <property name="encryptionEnabled" value="${restEncryptionEnabled}" />
   </bean>
 
   <service ref="channelManagerImpl"

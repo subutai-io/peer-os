@@ -1,20 +1,18 @@
 package io.subutai.core.peer.rest;
 
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
@@ -27,48 +25,37 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
+import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.Host;
-import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.ContainerGateway;
+import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
-import io.subutai.common.peer.PeerStatus;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.RamQuota;
-import io.subutai.common.security.utils.io.HexUtil;
-import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
-import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.security.api.SecurityManager;
-import io.subutai.core.security.api.crypto.EncryptionTool;
-import io.subutai.core.security.api.crypto.KeyManager;
+import io.subutai.core.peer.api.Tunnel;
 
 
 public class RestServiceImpl implements RestService
 {
-
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
     private PeerManager peerManager;
-    private HttpContextManager httpContextManager;
     protected JsonUtil jsonUtil = new JsonUtil();
     protected RestUtil restUtil = new RestUtil();
-    private SecurityManager securityManager;
 
 
-    public RestServiceImpl( final PeerManager peerManager, HttpContextManager httpContextManager,
-                            SecurityManager securityManager )
+    public RestServiceImpl( final PeerManager peerManager )
     {
         this.peerManager = peerManager;
-        this.httpContextManager = httpContextManager;
-        this.securityManager = securityManager;
     }
 
 
@@ -89,33 +76,16 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public String getId()
+    public PeerInfo getPeerInfo()
     {
-        try
-        {
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            return localPeer.getId();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error getting local peer id#getId", e );
-            return "ERROR";
-        }
+        return peerManager.getLocalPeer().getPeerInfo();
     }
 
 
     @Override
-    public Response getRegisteredPeers()
+    public List<PeerInfo> getRegisteredPeers()
     {
-        try
-        {
-            return Response.ok( jsonUtil.to( peerManager.getPeerInfos() ) ).build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error getting registered peers #getRegisteredPeers", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
+        return peerManager.getPeerInfos();
     }
 
 
@@ -140,310 +110,6 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error getting peer policy #getPeerPolicy", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
-
-
-    @Override
-    public Response getRegisteredPeerInfo( final String peerId )
-    {
-        try
-        {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
-
-            PeerInfo peerInfo = peerManager.getPeer( peerId ).getPeerInfo();
-            return Response.ok( jsonUtil.to( peerInfo ) ).build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error getting peer info #getRegisteredPeerInfo", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
-
-
-    @Override
-    public Response ping()
-    {
-        return Response.ok().build();
-    }
-
-
-    @Override
-    public Response processRegisterRequest( String peer )
-    {
-        try
-        {
-            // ******* Convert HexString to Byte Array ****** Decrypt data
-            EncryptionTool encTool = securityManager.getEncryptionTool();
-            KeyManager keyManager = securityManager.getKeyManager();
-
-            byte[] data = HexUtil.hexStringToByteArray( peer );
-            data = encTool.decrypt( data );
-            //************************************************
-
-            PeerInfo p = jsonUtil.from( new String( data ), PeerInfo.class );
-            LOGGER.debug( peer );
-
-            if ( peerManager.getPeerInfo( p.getId() ) != null )
-            {
-                return Response.status( Response.Status.CONFLICT )
-                               .entity( String.format( "%s already registered", p.getName() ) ).build();
-            }
-            else
-            {
-                //Encrypt Local Peer
-                PGPPublicKey pkey = keyManager.getRemoteHostPublicKey( p.getId(), p.getIp() );
-                PeerInfo localPeer = peerManager.getLocalPeerInfo();
-
-                if ( pkey != null )
-                {
-                    localPeer.setKeyPhrase( p.getKeyPhrase() );
-                    String jsonData = jsonUtil.to( localPeer );
-                    data = encTool.encrypt( jsonData.getBytes(), pkey, false );
-
-                    // Save to DB
-                    p.setStatus( PeerStatus.REQUESTED );
-                    p.setName( String.format( "Peer %s", p.getId() ) );
-                    peerManager.register( p );
-
-                    return Response.ok( HexUtil.byteArrayToHexString( data ) ).build();
-                }
-                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-            }
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error processing register request #processRegisterRequest", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
-
-
-    @Override
-    public Response sendRegistrationRequest( final String peerIp )
-    {
-        try
-        {
-            String baseUrl = String.format( "https://%s:%s/cxf", peerIp, ChannelSettings.SECURE_PORT_X1 );
-            WebClient client = restUtil.getTrustedWebClient( baseUrl );
-            client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
-            Form form = new Form();
-            form.set( "peer", jsonUtil.to( peerManager.getLocalPeerInfo() ) );
-
-
-            Response response = client.path( "peer/register" ).form( form );
-            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
-            {
-                return registerPeerCert( response );
-            }
-            else if ( response.getStatus() == Response.Status.CONFLICT.getStatusCode() )
-            {
-                String reason = response.readEntity( String.class );
-                LOGGER.warn( reason );
-                return Response.serverError().entity( reason ).build();
-            }
-            else
-            {
-                LOGGER.warn( "Response for registering peer: " + response.toString() );
-                return Response.serverError().build();
-            }
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "error sending request", e );
-            return Response.serverError().entity( e.toString() ).build();
-        }
-    }
-
-
-    protected Response registerPeerCert( final Response response )
-    {
-        try
-        {
-            String responseString = response.readEntity( String.class );
-            LOGGER.info( response.toString() );
-            PeerInfo remotePeerInfo = jsonUtil.from( responseString, new TypeToken<PeerInfo>()
-            {}.getType() );
-            if ( remotePeerInfo != null )
-            {
-                remotePeerInfo.setStatus( PeerStatus.REQUEST_SENT );
-                try
-                {
-                    peerManager.register( remotePeerInfo );
-                }
-                catch ( PeerException e )
-                {
-                    LOGGER.error( "Couldn't register peer", e );
-                }
-            }
-            return Response.ok().build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error registering peer certificate #registerPeerCert", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
-
-
-    @Override
-    public Response unregisterPeer( String peerId )
-    {
-        try
-        {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
-
-            boolean result = peerManager.unregister( peerId );
-            if ( result )
-            {
-                //************ Delete Trust SSL Cert **************************************
-                securityManager.getKeyStoreManager().removeCertFromTrusted( ChannelSettings.SECURE_PORT_X2, peerId );
-                httpContextManager.reloadTrustStore();
-                //***********************************************************************
-
-
-                return Response.ok( "Successfully unregistered peer: " + peerId ).build();
-            }
-            else
-            {
-                return Response.status( Response.Status.NOT_FOUND ).build();
-            }
-        }
-        catch ( Exception pe )
-        {
-            LOGGER.error( "Error unregistering peer #unregisterPeer", pe );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( pe.toString() ).build();
-        }
-    }
-
-
-    @Override
-    public Response rejectForRegistrationRequest( final String peerId )
-    {
-        try
-        {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
-
-            PeerInfo p = peerManager.getPeerInfo( peerId );
-            p.setStatus( PeerStatus.REJECTED );
-            peerManager.update( p );
-
-            return Response.noContent().build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error rejecting registration request #rejectForRegistrationRequest", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
-
-
-    @Override
-    public Response removeRegistrationRequest( final String peerId )
-    {
-        try
-        {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
-
-            peerManager.unregister( peerId );
-            return Response.status( Response.Status.NO_CONTENT ).build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error removing registration request #removeRegistrationRequest", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-        }
-    }
-
-
-    /* *************************************************************
-     * Get Public key and save it in the local KeyServer
-     *
-     * TODO remove this method if not used
-     */
-    private String getRemotePeerPublicKey( String peerId, final String ip )
-    {
-        String baseUrl = String.format( "https://%s:%s/cxf", ip, ChannelSettings.SECURE_PORT_X1 );
-        WebClient client = RestUtil.createTrustedWebClient( baseUrl );
-        client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
-
-        try
-        {
-            Response response = client.path( "security/keyman/getpublickeyring" ).query( "hostid", "" ).get();
-
-            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
-            {
-                // Get Remote peer Public Key and save in the local keystore
-                String publicKeyring = response.readEntity( String.class );
-
-                securityManager.getKeyManager().savePublicKeyRing( peerId, ( short ) 3, publicKeyring );
-            }
-            return peerId;
-        }
-        catch ( Exception ex )
-        {
-            return "";
-        }
-    }
-
-
-    @Override
-    public Response approveForRegistrationRequest( final String approvedPeer, final String certHEX )
-    {
-        try
-        {
-            // ******* Convert HexString to Byte Array ****** Decrypt data
-            EncryptionTool encTool = securityManager.getEncryptionTool();
-            KeyManager keyManager = securityManager.getKeyManager();
-
-            byte data[] = HexUtil.hexStringToByteArray( approvedPeer );
-            byte cert[] = HexUtil.hexStringToByteArray( certHEX );
-
-            data = encTool.decrypt( data );
-            cert = encTool.decrypt( cert );
-            //*************************************************************
-
-            PeerInfo p = jsonUtil.from( new String( data ), PeerInfo.class );
-
-            if ( p.getKeyPhrase().equals( ( peerManager.getPeerInfo( p.getId() ).getKeyPhrase() ) ) )
-            {
-                p.setStatus( PeerStatus.APPROVED );
-                peerManager.update( p );
-
-                //adding remote repository
-                ManagementHost managementHost = peerManager.getLocalPeer().getManagementHost();
-                managementHost.addRepository( p.getIp() );
-
-                //************ Save Trust SSL Cert **************************************
-                String rootCertPx2 = new String( cert );
-
-                securityManager.getKeyStoreManager()
-                               .importCertAsTrusted( ChannelSettings.SECURE_PORT_X2, p.getId(), rootCertPx2 );
-                //***********************************************************************
-
-                //************ Export Current Cert **************************************
-                String localPeerCert =
-                        securityManager.getKeyStoreManager().exportCertificate( ChannelSettings.SECURE_PORT_X2, "" );
-
-                httpContextManager.reloadTrustStore();
-                //***********************************************************************
-
-
-                PGPPublicKey pkey = keyManager.getPublicKey( p.getId() ); //Get PublicKey from KeyServer
-                byte certRes[] = encTool.encrypt( localPeerCert.getBytes(), pkey, false );
-
-                return Response.ok( HexUtil.byteArrayToHexString( certRes ) ).build();
-            }
-            else
-            {
-                return Response.status( Response.Status.FORBIDDEN ).build();
-            }
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error approving registration request #approveForRegistrationRequest", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -479,117 +145,61 @@ public class RestServiceImpl implements RestService
 
     //*************************************************************************************
     @Override
-    public Response destroyContainer( final String containerId )
+    public void destroyContainer( final ContainerId containerId )
     {
+        Preconditions.checkNotNull( containerId );
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            Host host = localPeer.bindHost( containerId );
-            if ( host instanceof ContainerHost )
-            {
-                ( ( ContainerHost ) host ).dispose();
-            }
-
-            //****** No ENC *******************
-            return Response.ok().build();
+            peerManager.destroyContainer( containerId );
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error destroying container #destroyContainer", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            Response response = Response.serverError().entity( e.toString() ).build();
+            throw new WebApplicationException( response );
         }
     }
 
 
     @Override
-    public Response startContainer( final String containerId )
+    public void startContainer( final ContainerId containerId )
     {
+        Preconditions.checkNotNull( containerId );
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            Host host = localPeer.bindHost( containerId );
-            if ( host instanceof ContainerHost )
-            {
-                ( ( ContainerHost ) host ).start();
-            }
-            //****** No ENC *******************
-            return Response.ok().build();
+            peerManager.startContainer( containerId );
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error starting container #startContainer", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            Response response = Response.serverError().entity( e.toString() ).build();
+            throw new WebApplicationException( response );
         }
     }
 
 
     @Override
-    public Response stopContainer( final String containerId )
+    public void stopContainer( final ContainerId containerId )
     {
+        Preconditions.checkNotNull( containerId );
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            Host host = localPeer.bindHost( containerId );
-            if ( host instanceof ContainerHost )
-            {
-                ( ( ContainerHost ) host ).stop();
-            }
-            //****** No ENC *******************
-            return Response.ok().build();
+            peerManager.stopContainer( containerId );
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error stopping cotnainer #stopContainer", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( "Error stopping container #stopContainer", e );
+            Response response = Response.serverError().entity( e.toString() ).build();
+            throw new WebApplicationException( response );
         }
     }
 
 
     @Override
-    public Response isContainerConnected( final String containerId )
+    public ContainerHostState getContainerState( final ContainerId containerId )
     {
-        try
-        {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            Boolean result = localPeer.bindHost( containerId ).isConnected();
-
-            return Response.ok( result.toString() ).build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error getting container status #isContainerConnected", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
-
-
-    @Override
-    public Response getContainerState( final String containerId )
-    {
-        try
-        {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            ContainerHostState containerHostState = localPeer.getContainerHostById( containerId ).getStatus();
-
-            String jsonData = jsonUtil.to( containerHostState );
-
-            return Response.ok( jsonData ).build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error getting container state #getContainerState", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
+        Preconditions.checkNotNull( containerId );
+        return peerManager.getContainerState( containerId );
     }
 
 
@@ -670,21 +280,20 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getProcessResourceUsage( final String containerId, final int processPid )
+    public ProcessResourceUsage getProcessResourceUsage( ContainerId containerId, int pid )
     {
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
+            Preconditions.checkNotNull( containerId );
+            Preconditions.checkArgument( pid > 0 );
 
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            ProcessResourceUsage processResourceUsage =
-                    localPeer.getContainerHostById( containerId ).getProcessResourceUsage( processPid );
-            return Response.ok( jsonUtil.to( processResourceUsage ) ).build();
+            return peerManager.getProcessResourceUsage( containerId, pid );
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error getting processing resource usage #getProcessResourceUsage", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            throw new WebApplicationException(
+                    Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build() );
         }
     }
 
@@ -901,20 +510,18 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setDefaultGateway( final String containerId, final String gatewayIp )
+    public void setDefaultGateway( final ContainerGateway gateway )
     {
+        Preconditions.checkNotNull( gateway, "Gateway is null" );
+
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            localPeer.getContainerHostById( containerId ).setDefaultGateway( gatewayIp );
-            return Response.ok().build();
+            peerManager.setDefaultGateway( gateway );
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error setting default gateway #setDefaultGateway", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            throw new WebApplicationException( e );
         }
     }
 
@@ -940,33 +547,31 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getReservedVnis()
+    public Collection<Vni> getReservedVnis()
     {
         try
         {
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            return Response.ok( jsonUtil.to( localPeer.getReservedVnis() ) ).build();
+            return peerManager.getReservedVnis();
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error getting reserved vnis #getReservedVnis", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            throw new WebApplicationException( e );
         }
     }
 
 
     @Override
-    public Response getGateways()
+    public Collection<Gateway> getGateways()
     {
         try
         {
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            return Response.ok( jsonUtil.to( localPeer.getGateways() ) ).build();
+            return peerManager.getGateways();
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error getting gateways #getGateways", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            throw new WebApplicationException( e );
         }
     }
 
@@ -989,32 +594,27 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response createEnvironmentKeyPair( final String environmentId )
+    public PublicKeyContainer createEnvironmentKeyPair( final EnvironmentId environmentId )
     {
+        Preconditions.checkNotNull( environmentId );
+
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
-
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            String pekPubKey = localPeer.createEnvironmentKeyPair( environmentId );
-
-            return Response.ok( pekPubKey ).status( Response.Status.CREATED ).build();
+            return peerManager.createEnvironmentKeyPair( environmentId );
         }
         catch ( Exception ex )
         {
-            return Response.status( Response.Status.NOT_FOUND ).build();
+            throw new WebApplicationException( ex );
         }
     }
 
 
     @Override
-    public Response removeEnvironmentKeyPair( final String environmentId )
+    public void removeEnvironmentKeyPair( final EnvironmentId environmentId )
     {
-        LocalPeer localPeer = peerManager.getLocalPeer();
         try
         {
-            localPeer.removeEnvironmentKeyPair( environmentId );
-            return Response.ok().build();
+            peerManager.removeEnvironmentKeyPair( environmentId );
         }
         catch ( Exception e )
         {
@@ -1024,23 +624,16 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response reserveVni( final String vni )
+    public Vni reserveVni( final Vni vni )
     {
         try
         {
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            int vlan = localPeer.reserveVni( jsonUtil.from( vni, Vni.class ) );
-
-            //***********CREATE PEK *************************************
-
-            //***********************************************************
-
-            return Response.ok( vlan ).build();
+            return peerManager.reserveVni( vni );
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error reserving vni #reserveVni", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            throw new WebApplicationException( e );
         }
     }
 
@@ -1068,10 +661,9 @@ public class RestServiceImpl implements RestService
     @Override
     public HostInterfaces getNetworkInterfaces()
     {
-        LocalPeer localPeer = peerManager.getLocalPeer();
         try
         {
-            return localPeer.getInterfaces();
+            return peerManager.getInterfaces();
         }
         catch ( Exception e )
         {
@@ -1083,10 +675,9 @@ public class RestServiceImpl implements RestService
     @Override
     public ResourceHostMetrics getResources()
     {
-        LocalPeer localPeer = peerManager.getLocalPeer();
         try
         {
-            return localPeer.getResourceHostMetrics();
+            return peerManager.getResourceHostMetrics();
         }
         catch ( Exception e )
         {
@@ -1096,13 +687,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response addToTunnel( final N2NConfig config )
+    public void addToTunnel( final N2NConfig config )
     {
-        LocalPeer localPeer = peerManager.getLocalPeer();
         try
         {
-            localPeer.setupN2NConnection( config );
-            return Response.ok().build();
+            peerManager.addToTunnel( config );
         }
         catch ( Exception e )
         {
@@ -1112,14 +701,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response removeN2NConnection( final String interfaceName, final String communityName )
+    public void removeN2NConnection( final EnvironmentId environmentId )
     {
-        LocalPeer localPeer = peerManager.getLocalPeer();
         try
         {
-            String address = interfaceName.replace( "n2n_", "" ).replace( "_", "." );
-            localPeer.removeN2NConnection( new N2NConfig( address, interfaceName, communityName ) );
-            return Response.ok().build();
+            peerManager.removeN2NConnection( environmentId );
         }
         catch ( Exception e )
         {
@@ -1129,17 +715,106 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response cleanupNetwork( final String environmentId )
+    public void cleanupNetwork( final EnvironmentId environmentId )
     {
-        LocalPeer localPeer = peerManager.getLocalPeer();
         try
         {
-            localPeer.cleanupEnvironmentNetworkSettings( environmentId );
-            return Response.ok().build();
+            peerManager.cleanupEnvironmentNetworkSettings( environmentId );
         }
         catch ( Exception e )
         {
             throw new WebApplicationException( e );
         }
     }
+
+    /* *************************************************************
+     * Get Public key and save it in the local KeyServer
+     *
+     * TODO remove this method if not used
+     */
+    //    private String getRemotePeerPublicKey( String peerId, final String ip )
+    //    {
+    //        String baseUrl = String.format( "https://%s:%s/cxf", ip, ChannelSettings.SECURE_PORT_X1 );
+    //        WebClient client = RestUtil.createTrustedWebClient( baseUrl, provider );
+    //        client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
+    //
+    //        try
+    //        {
+    //            Response response = client.path( "security/keyman/getpublickeyring" ).query( "hostid", "" ).get();
+    //
+    //            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+    //            {
+    //                // Get Remote peer Public Key and save in the local keystore
+    //                String publicKeyring = response.readEntity( String.class );
+    //
+    //                securityManager.getKeyManager().savePublicKeyRing( peerId, ( short ) 3, publicKeyring );
+    //            }
+    //            return peerId;
+    //        }
+    //        catch ( Exception ex )
+    //        {
+    //            return "";
+    //        }
+    //    }
+
+
+    //    @Override
+    //    public Response approveForRegistrationRequest( final String approvedPeer, final String certHEX )
+    //    {
+    //        try
+    //        {
+    //            // ******* Convert HexString to Byte Array ****** Decrypt data
+    //            EncryptionTool encTool = securityManager.getEncryptionTool();
+    //            KeyManager keyManager = securityManager.getKeyManager();
+    //
+    //            byte data[] = HexUtil.hexStringToByteArray( approvedPeer );
+    //            byte cert[] = HexUtil.hexStringToByteArray( certHEX );
+    //
+    //            data = encTool.decrypt( data );
+    //            cert = encTool.decrypt( cert );
+    //            //*************************************************************
+    //
+    //            PeerInfo p = jsonUtil.from( new String( data ), PeerInfo.class );
+    //
+    //            if ( p.getKeyPhrase().equals( ( peerManager.getPeerInfo( p.getId() ).getKeyPhrase() ) ) )
+    //            {
+    //                p.setStatus( PeerStatus.APPROVED );
+    //                peerManager.update( p );
+    //
+    //                //adding remote repository
+    //                ManagementHost managementHost = peerManager.getLocalPeer().getManagementHost();
+    //                managementHost.addRepository( p.getIp() );
+    //
+    //                //************ Save Trust SSL Cert **************************************
+    //                String rootCertPx2 = new String( cert );
+    //
+    //                securityManager.getKeyStoreManager()
+    //                               .importCertAsTrusted( ChannelSettings.SECURE_PORT_X2, p.getId(), rootCertPx2 );
+    //                //***********************************************************************
+    //
+    //                //************ Export Current Cert **************************************
+    //                String localPeerCert =
+    //                        securityManager.getKeyStoreManager().exportCertificate( ChannelSettings.SECURE_PORT_X2,
+    // "" );
+    //
+    //                httpContextManager.reloadTrustStore();
+    //                //***********************************************************************
+    //
+    //
+    //                PGPPublicKey pkey = keyManager.getPublicKey( p.getId() ); //Get PublicKey from KeyServer
+    //                byte certRes[] = encTool.encrypt( localPeerCert.getBytes(), pkey, false );
+    //
+    //                return Response.ok( HexUtil.byteArrayToHexString( certRes ) ).build();
+    //            }
+    //            else
+    //            {
+    //                return Response.status( Response.Status.FORBIDDEN ).build();
+    //            }
+    //        }
+    //        catch ( Exception e )
+    //        {
+    //            LOGGER.error( "Error approving registration request #approveForRegistrationRequest", e );
+    //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+    //        }
+    //    }
 }

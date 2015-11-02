@@ -28,9 +28,8 @@
       <artifactId>identity-manager-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.jaas</artifactId>
-      <version>0.0.2</version>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>peer-manager-api</artifactId>
     </dependency>
 
 

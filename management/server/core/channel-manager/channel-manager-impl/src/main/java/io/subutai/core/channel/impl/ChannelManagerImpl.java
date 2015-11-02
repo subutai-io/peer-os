@@ -1,9 +1,5 @@
 package io.subutai.core.channel.impl;
 
-
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-
 import io.subutai.core.channel.api.ChannelManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.security.api.SecurityManager;
@@ -16,8 +12,7 @@ public class ChannelManagerImpl implements ChannelManager
 {
     private IdentityManager identityManager = null;
     private SecurityManager securityManager = null;
-    private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-
+    private boolean encryptionEnabled;
 
     public void init()
     {
@@ -26,9 +21,20 @@ public class ChannelManagerImpl implements ChannelManager
 
     public void destroy()
     {
-        executorService.shutdown();
+     }
+
+
+
+    public void setEncryptionEnabled( final boolean encryptionEnabled )
+    {
+        this.encryptionEnabled = encryptionEnabled;
     }
 
+    @Override
+    public boolean isEncryptionEnabled()
+    {
+        return encryptionEnabled;
+    }
 
     public IdentityManager getIdentityManager()
     {
@@ -53,15 +59,5 @@ public class ChannelManagerImpl implements ChannelManager
     }
 
 
-    public ScheduledExecutorService getExecutorService()
-    {
-        return executorService;
-    }
-
-
-    public void setExecutorService( final ScheduledExecutorService executorService )
-    {
-        this.executorService = executorService;
-    }
 }
 

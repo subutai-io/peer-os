@@ -5,6 +5,7 @@ import java.util.Set;
 
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
@@ -27,6 +28,9 @@ public interface LocalPeer extends Peer
      */
     public Host bindHost( String id ) throws HostNotFoundException;
 
+    public Host bindHost( ContainerId id ) throws HostNotFoundException;
+
+//    ContainerHost bindHost( ContainerId containerId ) throws HostNotFoundException;
 
     /**
      * Returns implementation of ResourceHost interface.

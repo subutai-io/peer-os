@@ -35,6 +35,7 @@ import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ResourceHostMetric;
@@ -324,6 +325,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         {
             throw new ResourceHostException( "Error destroying container", e );
         }
+
+        removeContainerHost( containerHost );
     }
 
 
@@ -346,7 +349,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    public void removeContainerHost( final ContainerHostEntity containerHost )
+    public void removeContainerHost( final ContainerHost containerHost )
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
 
@@ -355,7 +358,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             synchronized ( containersHosts )
             {
                 containersHosts.remove( containerHost );
-                containerHost.setParent( null );
+                ( ( ContainerHostEntity ) containerHost ).setParent( null );
             }
         }
     }
@@ -509,6 +512,13 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
         }
         return result;
+    }
+
+
+    @Override
+    public boolean isConnected()
+    {
+        return getPeer().isConnected( new HostId( getId() ) );
     }
 
 

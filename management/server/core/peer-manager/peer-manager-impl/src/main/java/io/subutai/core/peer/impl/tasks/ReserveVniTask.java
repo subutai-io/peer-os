@@ -8,7 +8,7 @@ import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 
 
-public class ReserveVniTask implements Callable<Integer>
+public class ReserveVniTask implements Callable<Vni>
 {
     private final NetworkManager networkManager;
     private final Vni vni;
@@ -25,22 +25,23 @@ public class ReserveVniTask implements Callable<Integer>
 
 
     @Override
-    public Integer call() throws Exception
+    public Vni call() throws Exception
     {
 
         //check if vni is already reserved
         Vni existingVni = managementHost.findVniByEnvironmentId( vni.getEnvironmentId() );
         if ( existingVni != null )
         {
-            return existingVni.getVlan();
+            return existingVni;
         }
 
         //figure out available vlan
         int vlan = managementHost.findAvailableVlanId();
 
         //reserve vni & vlan for environment
-        networkManager.reserveVni( new Vni( vni.getVni(), vlan, vni.getEnvironmentId() ) );
+        final Vni result = new Vni( this.vni.getVni(), vlan, this.vni.getEnvironmentId() );
+        networkManager.reserveVni( result );
 
-        return vlan;
+        return result;
     }
 }

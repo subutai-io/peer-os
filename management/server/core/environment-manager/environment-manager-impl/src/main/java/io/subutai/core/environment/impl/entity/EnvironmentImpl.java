@@ -39,6 +39,7 @@ import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.N2NUtil;
@@ -113,6 +114,9 @@ public class EnvironmentImpl implements Environment, Serializable
 
     @Column( name = "user_id" )
     private Long userId;
+
+    @Transient
+    private EnvironmentId envId;
 
 
     protected EnvironmentImpl()
@@ -529,5 +533,16 @@ public class EnvironmentImpl implements Environment, Serializable
                 + ", superNode='" + superNode + '\'' + ", vni=" + vni + ", lastUsedIpIndex=" + lastUsedIpIndex
                 + ", subnetCidr='" + subnetCidr + '\'' + ", creationTimestamp=" + creationTimestamp + ", name='" + name
                 + '\'' + ", peerId='" + peerId + '\'' + ", environmentId='" + environmentId + '\'' + '}';
+    }
+
+
+    @Override
+    public EnvironmentId getEnvironmentId()
+    {
+        if ( envId == null )
+        {
+            envId = new EnvironmentId( environmentId );
+        }
+        return envId;
     }
 }

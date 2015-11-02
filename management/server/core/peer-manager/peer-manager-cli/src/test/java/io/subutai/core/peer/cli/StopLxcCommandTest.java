@@ -43,6 +43,6 @@ public class StopLxcCommandTest
     {
         command.doExecute();
 
-        verify( localPeer ).stopContainer( containerHost );
+        verify( localPeer ).stopContainer( containerHost.getContainerId() );
     }
 }

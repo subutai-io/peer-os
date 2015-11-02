@@ -51,8 +51,6 @@ public class ReserveVniTaskTest
     {
         task.call();
 
-        verify( vni ).getVlan();
-
         when( managementHostEntity.findVniByEnvironmentId( ENV_ID ) ).thenReturn( null );
 
         task.call();
