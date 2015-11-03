@@ -275,7 +275,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Write" )
+    @PermitAll
     @Override
     public UserToken createUserToken( User user, String token, String secret, String issuer, Date validDate)
     {

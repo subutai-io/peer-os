@@ -16,6 +16,7 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>blueprint-authz</module>
     <module>file-tracker</module>
     <module>environment-terminal</module>
     <module>git-manager</module>

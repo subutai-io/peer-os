@@ -66,6 +66,15 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!-- ***********************************************
+    <dependency>
+      <groupId>org.apache.aries.blueprint</groupId>
+      <artifactId>org.apache.aries.blueprint.authz</artifactId>
+      <version>1.0.1-SNAPSHOT</version>
+      <systemPath</systemPath>
+      <scope>system</scope>
+    </dependency>
+     *********************************************** -->
 
   </dependencies>
 
@@ -147,15 +156,6 @@
             </goals>
             <configuration>
               <artifactItems>
-
-                <artifactItem>
-                  <groupId>org.apache.aries.blueprint</groupId>
-                  <artifactId>org.apache.aries.blueprint.authz</artifactId>
-                  <version>1.0.1-SNAPSHOT</version>
-                  <destFileName>org.apache.aries.blueprint.authz-1.0.1-SNAPSHOT.jar</destFileName>
-                  <outputDirectory>target/assembly/deploy</outputDirectory>
-                </artifactItem>
-
                 <artifactItem>
                   <groupId>${project.groupId}</groupId>
                   <artifactId>vaadin-ui</artifactId>

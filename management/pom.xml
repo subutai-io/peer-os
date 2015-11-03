@@ -109,6 +109,12 @@
   <dependencyManagement>
     <dependencies>
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- blueprint-authz -->
+      <dependency>
+        <groupId>org.apache.aries.blueprint</groupId>
+        <artifactId>org.apache.aries.blueprint.authz</artifactId>
+        <version>1.0.1-CUSTOM</version>
+      </dependency>
       <!-- subutai-common -->
       <dependency>
         <groupId>${project.groupId}</groupId>
