@@ -29,8 +29,8 @@ public class RegistrationClientImpl implements RegistrationClient
 
 
     @Override
-    public RegistrationData sendInitRequest( final String destinationHost,
-                                                final RegistrationData registrationData ) throws PeerException
+    public RegistrationData sendInitRequest( final String destinationHost, final RegistrationData registrationData )
+            throws PeerException
     {
         WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "/register" ), provider );
 
@@ -95,15 +95,15 @@ public class RegistrationClientImpl implements RegistrationClient
 
 
     @Override
-    public RegistrationData sendApproveRequest( String destinationHost,
-                                                   final RegistrationData registrationData ) throws PeerException
+    public void sendApproveRequest( String destinationHost, final RegistrationData registrationData )
+            throws PeerException
     {
         WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "/approve" ), provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        return client.post( registrationData, RegistrationData.class );
+        client.post( registrationData );
     }
 
 

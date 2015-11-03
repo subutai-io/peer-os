@@ -3,11 +3,6 @@ package io.subutai.core.peer.ui;
 
 import javax.naming.NamingException;
 
-import io.subutai.common.protocol.Disposable;
-import io.subutai.core.peer.ui.container.ContainerComponent;
-import io.subutai.core.peer.ui.forms.PeerRegisterForm;
-import io.subutai.core.peer.ui.forms.RegistrationForm;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +10,10 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
+
+import io.subutai.common.protocol.Disposable;
+import io.subutai.core.peer.ui.container.ContainerComponent;
+import io.subutai.core.peer.ui.forms.RegistrationForm;
 
 
 public class PeerComponent extends CustomComponent implements Disposable

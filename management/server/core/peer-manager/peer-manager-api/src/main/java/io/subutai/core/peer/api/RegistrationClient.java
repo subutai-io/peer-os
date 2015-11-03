@@ -11,8 +11,7 @@ import io.subutai.common.peer.RegistrationData;
 public interface RegistrationClient
 {
 
-    RegistrationData sendInitRequest( String destinationHost, RegistrationData registrationData )
-            throws PeerException;
+    RegistrationData sendInitRequest( String destinationHost, RegistrationData registrationData ) throws PeerException;
 
     void sendCancelRequest( String destinationHost, RegistrationData request ) throws PeerException;
 
@@ -20,6 +19,5 @@ public interface RegistrationClient
 
     void sendUnregisterRequest( String destinationHost, RegistrationData request ) throws PeerException;
 
-    RegistrationData sendApproveRequest( String destinationHost, RegistrationData registrationData )
-            throws PeerException;
+    void sendApproveRequest( String destinationHost, RegistrationData registrationData ) throws PeerException;
 }

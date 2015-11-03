@@ -1,10 +1,9 @@
 package io.subutai.core.peer.impl;
 
 
-import java.security.MessageDigest;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -69,7 +68,6 @@ import io.subutai.core.peer.impl.container.DestroyEnvironmentContainerGroupReque
 import io.subutai.core.peer.impl.dao.PeerDAO;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.security.api.SecurityManager;
-import sun.security.krb5.internal.EncTGSRepPart;
 
 
 /**
@@ -143,27 +141,22 @@ public class PeerManagerImpl implements PeerManager
         return peerDAO.saveInfo( SOURCE_REMOTE_PEER, peerInfo.getId(), peerInfo );
     }
 
-
-    @RolesAllowed( "Peer-Management|A|Write" )
-    @Override
-    public void register( final String keyPhrase, final RegistrationData registrationData ) throws PeerException
+    private void register( final String keyPhrase, final RegistrationData registrationData ) throws PeerException
     {
         Preconditions.checkNotNull( keyPhrase, "Key phrase could not be null." );
         Preconditions.checkArgument( !keyPhrase.isEmpty(), "Key phrase could not be empty" );
-        //        registrationData.getPeerInfo().setKeyPhrase( registrationData.getKeyPhrase() );
 
 
         Encrypted encryptedData = registrationData.getData();
-        String rootCertPx2 = registrationData.getCert();
         try
         {
             byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
             String decryptedCert = encryptedData.decrypt( key, String.class );
-            LOG.info( String.format( "Certs are equals: %s", rootCertPx2.equals( decryptedCert ) ) );
             securityManager.getKeyStoreManager()
                            .importCertAsTrusted( ChannelSettings.SECURE_PORT_X2, registrationData.getPeerInfo().getId(),
-                                   rootCertPx2 );
+                                   decryptedCert );
 
+            registrationData.getPeerInfo().setKeyPhrase( keyPhrase );
             peerDAO.saveInfo( SOURCE_REMOTE_PEER, registrationData.getPeerInfo().getId(),
                     registrationData.getPeerInfo() );
         }
@@ -175,66 +168,61 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @Override
-    public boolean unregister( final PeerInfo peerInfo, String keyPhrase ) throws PeerException
-    {
-        ManagementHost mgmHost = getLocalPeer().getManagementHost();
-        PeerInfo p = getPeerInfo( peerInfo.getId() );
+//    @Override
+//    public boolean unregister( final PeerInfo peerInfo, String keyPhrase ) throws PeerException
+//    {
+//        ManagementHost mgmHost = getLocalPeer().getManagementHost();
+//        PeerInfo p = getPeerInfo( peerInfo.getId() );
+//
+//        if ( !p.getKeyPhrase().equals( keyPhrase ) )
+//        {
+//            return false;
+//        }
+//
+//        mgmHost.removeRepository( p.getId(), p.getIp() );
+//
+//        PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( p.getId() );
+//        // Remove peer policy of the target remote peer from the local peer
+//        if ( peerPolicy != null )
+//        {
+//            localPeer.getPeerInfo().getPeerPolicies().remove( peerPolicy );
+//            peerDAO.saveInfo( SOURCE_LOCAL_PEER, localPeer.getId(), localPeer );
+//        }
+//
+//        //*********Remove Security Relationship  ****************************
+//        securityManager.getKeyManager().removePublicKeyRing( p.getId() );
+//        //*******************************************************************
+//        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, p.getId() );
+//    }
 
-        if ( !p.getKeyPhrase().equals( keyPhrase ) )
-        {
-            return false;
-        }
-
-        mgmHost.removeRepository( p.getId(), p.getIp() );
-
-        PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( p.getId() );
-        // Remove peer policy of the target remote peer from the local peer
-        if ( peerPolicy != null )
-        {
-            localPeer.getPeerInfo().getPeerPolicies().remove( peerPolicy );
-            peerDAO.saveInfo( SOURCE_LOCAL_PEER, localPeer.getId(), localPeer );
-        }
-
-        //*********Remove Security Relationship  ****************************
-        securityManager.getKeyManager().removePublicKeyRing( p.getId() );
-        //*******************************************************************
-        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, p.getId() );
-    }
-
-
-    @Override
-    public boolean unregister( final String id ) throws PeerException
-    {
-        ManagementHost mgmHost = getLocalPeer().getManagementHost();
-        PeerInfo p = getPeerInfo( id );
-
-        mgmHost.removeRepository( p.getId(), p.getIp() );
-
-        PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( p.getId() );
-        // Remove peer policy of the target remote peer from the local peer
-        if ( peerPolicy != null )
-        {
-            localPeer.getPeerInfo().getPeerPolicies().remove( peerPolicy );
-            peerDAO.saveInfo( SOURCE_LOCAL_PEER, localPeer.getId(), localPeer );
-        }
-
-        //*********Remove Security Relationship  ****************************
-        securityManager.getKeyManager().removePublicKeyRing( p.getId() );
-        //*******************************************************************
-        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, p.getId() );
-    }
+//
+//    @Override
+//    public boolean unregister( final String id ) throws PeerException
+//    {
+//        ManagementHost mgmHost = getLocalPeer().getManagementHost();
+//        PeerInfo p = getPeerInfo( id );
+//
+//        mgmHost.removeRepository( p.getId(), p.getIp() );
+//
+//        PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( p.getId() );
+//        // Remove peer policy of the target remote peer from the local peer
+//        if ( peerPolicy != null )
+//        {
+//            localPeer.getPeerInfo().getPeerPolicies().remove( peerPolicy );
+//            peerDAO.saveInfo( SOURCE_LOCAL_PEER, localPeer.getId(), localPeer );
+//        }
+//
+//        //*********Remove Security Relationship  ****************************
+//        securityManager.getKeyManager().removePublicKeyRing( p.getId() );
+//        //*******************************************************************
+//        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, p.getId() );
+//    }
 
 
-    public boolean unregister( final RegistrationData registrationData ) throws PeerException
+    private boolean unregister( final RegistrationData registrationData ) throws PeerException
     {
         ManagementHost mgmHost = getLocalPeer().getManagementHost();
         PeerInfo p = getPeerInfo( registrationData.getPeerInfo().getId() );
-        //
-        //        if ( !p.getKeyPhrase().equals( registrationRequest.getPeerInfo().getKeyPhrase() ) )
-        //        {
-        //            return false;
-        //        }
 
         try
         {
@@ -467,8 +455,25 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void processUnregisterRequest( final RegistrationData registrationData ) throws PeerException
     {
-        removeRequest( registrationData.getPeerInfo().getId() );
-        unregister( registrationData );
+        PeerInfo p = getPeerInfo( registrationData.getPeerInfo().getId() );
+
+        Encrypted encryptedData = registrationData.getData();
+        try
+        {
+            final String keyPhrase = p.getKeyPhrase();
+            byte[] decrypted = encryptedData.decrypt( SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) ) );
+            if ( !keyPhrase.equals( new String( decrypted, "UTF-8" ) ) )
+            {
+                throw new PeerException( "Could not unregister peer." );
+            }
+
+            removeRequest( registrationData.getPeerInfo().getId() );
+            unregister( registrationData );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Could not unregister peer." );
+        }
     }
 
 
@@ -487,12 +492,11 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public RegistrationData processApproveRequest( final RegistrationData registrationData ) throws PeerException
+    public void processApproveRequest( final RegistrationData registrationData ) throws PeerException
     {
         RegistrationData initRequest = getRequest( registrationData.getPeerInfo().getId() );
         register( initRequest.getKeyPhrase(), registrationData );
         removeRequest( registrationData.getPeerInfo().getId() );
-        return buildRegistrationData( registrationData.getKeyPhrase(), RegistrationStatus.APPROVED );
     }
 
 
@@ -505,7 +509,6 @@ public class PeerManagerImpl implements PeerManager
             case APPROVED:
                 String cert =
                         securityManager.getKeyStoreManager().exportCertificate( ChannelSettings.SECURE_PORT_X2, "" );
-
                 try
                 {
                     byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
@@ -516,7 +519,21 @@ public class PeerManagerImpl implements PeerManager
                 {
                     LOG.warn( e.getMessage(), e );
                 }
-                result.setCert( cert );
+                break;
+            case UNREGISTERED:
+                String ip =
+                        securityManager.getKeyStoreManager().exportCertificate( ChannelSettings.SECURE_PORT_X2, "" );
+                try
+                {
+                    byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
+                    Encrypted encryptedData = new Encrypted( keyPhrase, key );
+                    result.setData( encryptedData );
+                }
+                catch ( Exception e )
+                {
+                    LOG.warn( e.getMessage(), e );
+                }
+                //                result.setCert( cert );
                 break;
         }
         return result;
@@ -531,6 +548,7 @@ public class PeerManagerImpl implements PeerManager
         RegistrationData result = registrationClient
                 .sendInitRequest( destinationHost, buildRegistrationData( keyPhrase, RegistrationStatus.REQUESTED ) );
 
+        result.setKeyPhrase( keyPhrase );
         addRequest( result );
     }
 
@@ -578,7 +596,7 @@ public class PeerManagerImpl implements PeerManager
     {
         RegistrationClient registrationClient = new RegistrationClientImpl( provider );
         registrationClient.sendUnregisterRequest( request.getPeerInfo().getIp(),
-                buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.UNREGISTERED ) );
+                buildRegistrationData( request.getPeerInfo().getKeyPhrase(), RegistrationStatus.UNREGISTERED ) );
 
         unregister( request );
 
@@ -594,7 +612,7 @@ public class PeerManagerImpl implements PeerManager
         {
             if ( !peer.getId().equals( getLocalPeerInfo().getId() ) )
             {
-                r.add( new RegistrationData( peer.getPeerInfo(), peer.getPeerInfo().getKeyPhrase(),
+                r.add( new RegistrationData( peer.getPeerInfo(), /*peer.getPeerInfo().getKeyPhrase(),*/
                         RegistrationStatus.APPROVED ) );
             }
         }

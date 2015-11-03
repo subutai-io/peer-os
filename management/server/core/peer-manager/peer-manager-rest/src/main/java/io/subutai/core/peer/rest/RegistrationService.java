@@ -37,7 +37,7 @@ public interface RegistrationService
     @POST
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    RegistrationData processApproveRequest( RegistrationData registrationData );
+    void processApproveRequest( RegistrationData registrationData );
 
     @Path( "/unregister" )
     @POST
