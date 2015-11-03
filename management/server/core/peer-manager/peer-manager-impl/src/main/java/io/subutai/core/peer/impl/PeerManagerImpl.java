@@ -141,6 +141,7 @@ public class PeerManagerImpl implements PeerManager
         return peerDAO.saveInfo( SOURCE_REMOTE_PEER, peerInfo.getId(), peerInfo );
     }
 
+
     private void register( final String keyPhrase, final RegistrationData registrationData ) throws PeerException
     {
         Preconditions.checkNotNull( keyPhrase, "Key phrase could not be null." );
@@ -168,55 +169,55 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-//    @Override
-//    public boolean unregister( final PeerInfo peerInfo, String keyPhrase ) throws PeerException
-//    {
-//        ManagementHost mgmHost = getLocalPeer().getManagementHost();
-//        PeerInfo p = getPeerInfo( peerInfo.getId() );
-//
-//        if ( !p.getKeyPhrase().equals( keyPhrase ) )
-//        {
-//            return false;
-//        }
-//
-//        mgmHost.removeRepository( p.getId(), p.getIp() );
-//
-//        PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( p.getId() );
-//        // Remove peer policy of the target remote peer from the local peer
-//        if ( peerPolicy != null )
-//        {
-//            localPeer.getPeerInfo().getPeerPolicies().remove( peerPolicy );
-//            peerDAO.saveInfo( SOURCE_LOCAL_PEER, localPeer.getId(), localPeer );
-//        }
-//
-//        //*********Remove Security Relationship  ****************************
-//        securityManager.getKeyManager().removePublicKeyRing( p.getId() );
-//        //*******************************************************************
-//        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, p.getId() );
-//    }
+    //    @Override
+    //    public boolean unregister( final PeerInfo peerInfo, String keyPhrase ) throws PeerException
+    //    {
+    //        ManagementHost mgmHost = getLocalPeer().getManagementHost();
+    //        PeerInfo p = getPeerInfo( peerInfo.getId() );
+    //
+    //        if ( !p.getKeyPhrase().equals( keyPhrase ) )
+    //        {
+    //            return false;
+    //        }
+    //
+    //        mgmHost.removeRepository( p.getId(), p.getIp() );
+    //
+    //        PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( p.getId() );
+    //        // Remove peer policy of the target remote peer from the local peer
+    //        if ( peerPolicy != null )
+    //        {
+    //            localPeer.getPeerInfo().getPeerPolicies().remove( peerPolicy );
+    //            peerDAO.saveInfo( SOURCE_LOCAL_PEER, localPeer.getId(), localPeer );
+    //        }
+    //
+    //        //*********Remove Security Relationship  ****************************
+    //        securityManager.getKeyManager().removePublicKeyRing( p.getId() );
+    //        //*******************************************************************
+    //        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, p.getId() );
+    //    }
 
-//
-//    @Override
-//    public boolean unregister( final String id ) throws PeerException
-//    {
-//        ManagementHost mgmHost = getLocalPeer().getManagementHost();
-//        PeerInfo p = getPeerInfo( id );
-//
-//        mgmHost.removeRepository( p.getId(), p.getIp() );
-//
-//        PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( p.getId() );
-//        // Remove peer policy of the target remote peer from the local peer
-//        if ( peerPolicy != null )
-//        {
-//            localPeer.getPeerInfo().getPeerPolicies().remove( peerPolicy );
-//            peerDAO.saveInfo( SOURCE_LOCAL_PEER, localPeer.getId(), localPeer );
-//        }
-//
-//        //*********Remove Security Relationship  ****************************
-//        securityManager.getKeyManager().removePublicKeyRing( p.getId() );
-//        //*******************************************************************
-//        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, p.getId() );
-//    }
+    //
+    //    @Override
+    //    public boolean unregister( final String id ) throws PeerException
+    //    {
+    //        ManagementHost mgmHost = getLocalPeer().getManagementHost();
+    //        PeerInfo p = getPeerInfo( id );
+    //
+    //        mgmHost.removeRepository( p.getId(), p.getIp() );
+    //
+    //        PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( p.getId() );
+    //        // Remove peer policy of the target remote peer from the local peer
+    //        if ( peerPolicy != null )
+    //        {
+    //            localPeer.getPeerInfo().getPeerPolicies().remove( peerPolicy );
+    //            peerDAO.saveInfo( SOURCE_LOCAL_PEER, localPeer.getId(), localPeer );
+    //        }
+    //
+    //        //*********Remove Security Relationship  ****************************
+    //        securityManager.getKeyManager().removePublicKeyRing( p.getId() );
+    //        //*******************************************************************
+    //        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, p.getId() );
+    //    }
 
 
     private boolean unregister( final RegistrationData registrationData ) throws PeerException
@@ -269,7 +270,6 @@ public class PeerManagerImpl implements PeerManager
     {
         return peerDAO.getInfo( SOURCE_REMOTE_PEER, PeerInfo.class );
     }
-
 
 
     @Override
@@ -773,7 +773,7 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void removeN2NConnection( final EnvironmentId environmentId ) throws PeerException
     {
-        localPeer.cleanupEnvironmentNetworkSettings( environmentId );
+        localPeer.removeN2NConnection( environmentId );
     }
 
 
