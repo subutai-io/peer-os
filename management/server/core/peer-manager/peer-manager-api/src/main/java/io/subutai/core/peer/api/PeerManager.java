@@ -1,7 +1,6 @@
 package io.subutai.core.peer.api;
 
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -59,17 +58,17 @@ public interface PeerManager
     public PeerInfo getPeerInfo( String id );
 
 
-    void register( String keyPhrase, RegistrationData registrationData ) throws PeerException;
+    //    void register( String keyPhrase, RegistrationData registrationData ) throws PeerException;
 
-    /**
-     * Unregisters peer
-     */
-    @Deprecated
-    boolean unregister( PeerInfo peerInfo, String keyPhrase ) throws PeerException;
-
+    //    /**
+    //     * Unregisters peer
+    //     */
+    //    @Deprecated
+    //    boolean unregister( PeerInfo peerInfo, String keyPhrase ) throws PeerException;
     //
-    @Deprecated
-    boolean unregister( String id ) throws PeerException;
+    //    //
+    //    @Deprecated
+    //    boolean unregister( String id ) throws PeerException;
 
     /**
      * Returns peer instance by peer id
@@ -100,7 +99,7 @@ public interface PeerManager
 
     void processCancelRequest( RegistrationData registrationData ) throws PeerException;
 
-    RegistrationData processApproveRequest( RegistrationData registrationData ) throws PeerException;
+    void processApproveRequest( RegistrationData registrationData ) throws PeerException;
 
     RegistrationData processRegistrationRequest( RegistrationData registrationData ) throws PeerException;
 

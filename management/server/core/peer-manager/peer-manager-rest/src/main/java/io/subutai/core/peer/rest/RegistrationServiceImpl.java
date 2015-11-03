@@ -77,11 +77,11 @@ public class RegistrationServiceImpl implements RegistrationService
 
 
     @Override
-    public RegistrationData processApproveRequest( final RegistrationData registrationData )
+    public void processApproveRequest( final RegistrationData registrationData )
     {
         try
         {
-            return peerManager.processApproveRequest( registrationData );
+            peerManager.processApproveRequest( registrationData );
         }
         catch ( PeerException e )
         {
@@ -106,7 +106,6 @@ public class RegistrationServiceImpl implements RegistrationService
             throw new WebApplicationException( response );
         }
     }
-
 
 
     //    @Override

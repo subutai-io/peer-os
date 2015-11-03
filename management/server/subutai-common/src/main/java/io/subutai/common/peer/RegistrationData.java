@@ -1,9 +1,7 @@
 package io.subutai.common.peer;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import io.subutai.common.serialize.Serializable;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 
 /**
@@ -12,8 +10,9 @@ import io.subutai.common.serialize.Serializable;
 public class RegistrationData
 {
     private PeerInfo peerInfo;
+    @JsonIgnore
     private String keyPhrase;
-    private String cert;
+//    private String cert;
     private RegistrationStatus status;
     private Encrypted data;
 
@@ -27,6 +26,13 @@ public class RegistrationData
     {
         this.peerInfo = peerInfo;
         this.keyPhrase = keyPhrase;
+        this.status = status;
+    }
+
+
+    public RegistrationData( final PeerInfo peerInfo, final RegistrationStatus status )
+    {
+        this.peerInfo = peerInfo;
         this.status = status;
     }
 
@@ -49,22 +55,22 @@ public class RegistrationData
     }
 
 
-    public void setKeyPhrase( final String keyPhrase )
-    {
-        this.keyPhrase = keyPhrase;
-    }
+//    public void setKeyPhrase( final String keyPhrase )
+//    {
+//        this.keyPhrase = keyPhrase;
+//    }
 
 
-    public void setCert( final String cert )
-    {
-        this.cert = cert;
-    }
-
-
-    public String getCert()
-    {
-        return cert;
-    }
+//    public void setCert( final String cert )
+//    {
+//        this.cert = cert;
+//    }
+//
+//
+//    public String getCert()
+//    {
+//        return cert;
+//    }
 
 
     public RegistrationStatus getStatus()
@@ -88,5 +94,11 @@ public class RegistrationData
     public void setData( final Encrypted data )
     {
         this.data = data;
+    }
+
+
+    public void setKeyPhrase( final String keyPhrase )
+    {
+        this.keyPhrase = keyPhrase;
     }
 }

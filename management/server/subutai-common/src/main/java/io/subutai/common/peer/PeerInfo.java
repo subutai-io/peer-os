@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import io.subutai.common.settings.ChannelSettings;
@@ -19,6 +20,7 @@ public class PeerInfo implements Serializable
     @JsonProperty
     private String ip = "127.0.0.1";
     private String gatewayIp;
+    @JsonIgnore
     private String keyPhrase = "";
     @JsonProperty
     private PeerStatus status;
