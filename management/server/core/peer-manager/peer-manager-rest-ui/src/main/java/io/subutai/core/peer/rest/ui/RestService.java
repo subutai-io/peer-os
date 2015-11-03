@@ -19,4 +19,22 @@ public interface RestService
     @Produces( { MediaType.TEXT_PLAIN } )
     public Response processRegisterRequest( @FormParam( "ip" ) String ip, @FormParam( "key_phrase" ) String KeyPhrase );
     //public Response processRegisterRequest( @FormParam( "peer" ) String peer );
+
+    @GET
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getRegisteredPeers();
+
+    @PUT
+    @Path( "reject" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response rejectForRegistrationRequest( @FormParam( "rejectedPeerId" ) String rejectedPeerId );
+
+    @PUT
+    @Path( "approve" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response approveForRegistrationRequest( @FormParam( "approvePeerId" ) String approvePeerId );
+
+    @GET
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getRegisteredPeerInfo( @QueryParam( "peerId" ) String peerId );
 }

@@ -81,7 +81,7 @@ public class RestServiceImpl implements RestService
 
             PeerInfo p = peerManager.getLocalPeerInfo();
             p.setKeyPhrase( KeyPhrase );
-            PGPPublicKey pkey = keyManager.getRemoteHostPublicKey( null, ip );
+            PGPPublicKey pkey = keyManager.getRemoteHostPublicKey( p.getId(), ip );
 
             //************************************************
 
@@ -110,4 +110,112 @@ public class RestServiceImpl implements RestService
 
         return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
     }
+
+    @Override
+    public Response getRegisteredPeers()
+    {
+        try
+        {
+            return Response.ok( jsonUtil.to( peerManager.getPeerInfos() ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error getting registered peers #getRegisteredPeers", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+    @Override
+    public Response rejectForRegistrationRequest( final String peerId )
+    {
+        try
+        {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+
+            PeerInfo p = peerManager.getPeerInfo( peerId );
+            p.setStatus( PeerStatus.REJECTED );
+            peerManager.update( p );
+
+            return Response.noContent().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error rejecting registration request #rejectForRegistrationRequest", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+    @Override
+    public Response approveForRegistrationRequest( final String peerId )
+    {
+        try
+        {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+
+            PeerInfo p = peerManager.getPeerInfo( peerId );
+            //PeerInfo selfPeer = peerManager.getLocalPeerInfo();
+            String cert = securityManager.getKeyStoreManager()
+                    .exportCertificate( ChannelSettings.SECURE_PORT_X2, "" );
+
+            EncryptionTool encTool = securityManager.getEncryptionTool();
+            KeyManager keyManager = securityManager.getKeyManager();
+
+            if ( p.getKeyPhrase().equals( ( peerManager.getPeerInfo( p.getId() ).getKeyPhrase() ) ) )
+            {
+                p.setStatus( PeerStatus.APPROVED );
+                peerManager.update( p );
+
+                //adding remote repository
+                ManagementHost managementHost = peerManager.getLocalPeer().getManagementHost();
+                managementHost.addRepository( p.getIp() );
+
+                //************ Save Trust SSL Cert **************************************
+                String rootCertPx2 = new String( cert );
+
+                securityManager.getKeyStoreManager()
+                        .importCertAsTrusted( ChannelSettings.SECURE_PORT_X2, p.getId(), rootCertPx2 );
+                //***********************************************************************
+
+                //************ Export Current Cert **************************************
+                String localPeerCert =
+                        securityManager.getKeyStoreManager().exportCertificate( ChannelSettings.SECURE_PORT_X2, "" );
+
+                httpContextManager.reloadTrustStore();
+                //***********************************************************************
+
+
+                PGPPublicKey pkey = keyManager.getPublicKey( p.getId() ); //Get PublicKey from KeyServer
+                byte certRes[] = encTool.encrypt( localPeerCert.getBytes(), pkey, false );
+
+                return Response.ok( HexUtil.byteArrayToHexString( certRes ) ).build();
+            }
+            else
+            {
+                return Response.status( Response.Status.FORBIDDEN ).build();
+            }
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error approving registration request #approveForRegistrationRequest", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+    @Override
+    public Response getRegisteredPeerInfo( final String peerId )
+    {
+        try
+        {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+
+            PeerInfo peerInfo = peerManager.getPeer( peerId ).getPeerInfo();
+            return Response.ok( jsonUtil.to( peerInfo ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error getting peer info #getRegisteredPeerInfo", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
 }
