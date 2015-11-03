@@ -31,10 +31,10 @@ public interface UserToken
     void setSecret( String secret );
 
     //***********************************
-    String getType();
+    int getType();
 
     //***********************************
-    void setType( String type );
+    void setType( int type );
 
     //***********************************
     String getHashAlgorithm();
@@ -59,4 +59,6 @@ public interface UserToken
 
     //***********************************
     void setUser( User user );
+
+    String getTypeName();
 }

@@ -1,7 +1,6 @@
 package io.subutai.core.identity.impl;
 
 
-import java.awt.SystemColor;
 import java.io.IOException;
 import java.security.AccessControlContext;
 import java.security.AccessControlException;
@@ -15,6 +14,7 @@ import java.util.UUID;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.objects.PermissionScope;
+import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.security.objects.UserStatus;
 import io.subutai.common.security.objects.UserType;
 import io.subutai.common.security.token.TokenUtil;
@@ -103,7 +103,7 @@ public class IdentityManagerImpl implements IdentityManager
             //***********************************************************
 
             //***Create Token *******************************************
-            createUserToken( internal ,"" ,"" ,"",null);
+            createUserToken( internal ,"" ,"" ,"", TokenType.Session,null);
             //***********************************************************
 
             //***********************************************************
@@ -277,7 +277,7 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @PermitAll
     @Override
-    public UserToken createUserToken( User user, String token, String secret, String issuer, Date validDate)
+    public UserToken createUserToken( User user, String token, String secret, String issuer,int tokenType ,Date validDate)
     {
         try
         {
@@ -293,11 +293,11 @@ public class IdentityManagerImpl implements IdentityManager
                 validDate = DateUtils.addHours( new Date(System.currentTimeMillis()),2);
 
             userToken.setToken(token );
-            userToken.setType( "JWT" );
             userToken.setHashAlgorithm( "HS256" );
             userToken.setIssuer( issuer );
             userToken.setSecret(secret);
             userToken.setUser( user );
+            userToken.setType( tokenType );
             userToken.setValidDate( validDate );
 
             identityDataService.persistUserToken( userToken );
