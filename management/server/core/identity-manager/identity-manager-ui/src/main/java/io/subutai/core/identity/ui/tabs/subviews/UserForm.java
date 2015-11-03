@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.vaadin.data.Item;
+import com.vaadin.ui.*;
 import io.subutai.common.security.objects.UserStatus;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Role;
@@ -22,19 +23,9 @@ import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.validator.AbstractStringValidator;
 import com.vaadin.data.validator.EmailValidator;
-import com.vaadin.ui.AbstractSelect;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.PasswordField;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.TwinColSelect;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
-import com.vaadin.ui.ComboBox;
 
-public class UserForm extends VerticalLayout
+public class UserForm extends Window
 {
 
     private final IdentityManager identityManager;
@@ -61,6 +52,9 @@ public class UserForm extends VerticalLayout
 
     public UserForm( TabCallback<BeanItem<User>> callback, IdentityManager identityManager )
     {
+		this.setClosable (false);
+		this.addStyleName ("default");
+		this.center();
         init();
         this.identityManager = identityManager;
         permissionsContainer = new BeanContainer<>( Role.class );
@@ -155,9 +149,12 @@ public class UserForm extends VerticalLayout
         form = new FormLayout();
         form.addComponents( userName, fullName, email, password, confirmPassword, status, rolesSelector );
 
-        addComponents( form, buttons );
+		VerticalLayout content = new VerticalLayout();
+		content.setSpacing (true);
+		content.setMargin (true);
+        content.addComponents(buttons, form);
 
-        setSpacing( true );
+		this.setContent (content);
     }
 
 
@@ -222,14 +219,9 @@ public class UserForm extends VerticalLayout
         cbUserStatus.addItem(UserStatus.Disabled.getName());
 
 
-        rolesSelector = new TwinColSelect( "User roles" )
-        {
-            {
-                setSpacing( true );
-            }
-        };
+        rolesSelector = new TwinColSelect( "User roles" );
         rolesSelector.setWidth ("500px");
-        rolesSelector.setHeight ("300px");
+        rolesSelector.setHeight ("200px");
         rolesSelector.setItemCaptionMode(AbstractSelect.ItemCaptionMode.PROPERTY);
         rolesSelector.setItemCaptionPropertyId( "name" );
     }
