@@ -1,7 +1,6 @@
 package io.subutai.core.identity.impl;
 
 
-import java.awt.SystemColor;
 import java.io.IOException;
 import java.security.AccessControlContext;
 import java.security.AccessControlException;
@@ -15,6 +14,7 @@ import java.util.UUID;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.objects.PermissionScope;
+import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.security.objects.UserStatus;
 import io.subutai.common.security.objects.UserType;
 import io.subutai.common.security.token.TokenUtil;
@@ -103,7 +103,7 @@ public class IdentityManagerImpl implements IdentityManager
             //***********************************************************
 
             //***Create Token *******************************************
-            createUserToken( internal ,"" ,"" ,"",null);
+            createUserToken( internal ,"" ,"" ,"", TokenType.Permanent.getId(),null);
             //***********************************************************
 
             //***********************************************************
@@ -149,13 +149,13 @@ public class IdentityManagerImpl implements IdentityManager
                     //*********************************************
                     for ( int a = 0; a < permsp.length; a++ )
                     {
-                        if(permsp[a] != PermissionObject.IdentityManagement ||
-                                permsp[a] != PermissionObject.KarafServerAdministration ||
-                                permsp[a] != PermissionObject.KarafServerManagement    ||
-                                permsp[a] != PermissionObject.PeerManagement ||
+                        if(permsp[a] != PermissionObject.IdentityManagement &&
+                                permsp[a] != PermissionObject.KarafServerAdministration &&
+                                permsp[a] != PermissionObject.KarafServerManagement    &&
+                                permsp[a] != PermissionObject.PeerManagement &&
                                 permsp[a] != PermissionObject.ResourceManagement     )
                         {
-                            Permission per = createPermission( permsp[a].getId(), 1, true, true, true, true );
+                            Permission per = createPermission( permsp[a].getId(), 3, true, true, true, true );
                             assignRolePermission( role.getId(), per );
                         }
                     }
@@ -168,8 +168,8 @@ public class IdentityManagerImpl implements IdentityManager
                     //*********************************************
                     for ( int a = 0; a < permsp.length; a++ )
                     {
-                        if(permsp[a] != PermissionObject.IdentityManagement ||
-                                permsp[a] != PermissionObject.KarafServerAdministration ||
+                        if(permsp[a] != PermissionObject.IdentityManagement &&
+                                permsp[a] != PermissionObject.KarafServerAdministration &&
                                 permsp[a] != PermissionObject.KarafServerManagement     )
                         {
                             Permission per = createPermission( permsp[a].getId(), 1, true, true, true, true );
@@ -277,7 +277,7 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @RolesAllowed( "Identity-Management|A|Write" )
     @Override
-    public UserToken createUserToken( User user, String token, String secret, String issuer, Date validDate)
+    public UserToken createUserToken( User user, String token, String secret, String issuer,int tokenType ,Date validDate)
     {
         try
         {
@@ -290,14 +290,14 @@ public class IdentityManagerImpl implements IdentityManager
             if( Strings.isNullOrEmpty(secret))
                 secret =  UUID.randomUUID().toString();
             if(validDate == null)
-                validDate = DateUtils.addHours( new Date(System.currentTimeMillis()),2);
+                validDate = DateUtils.addHours( new Date(System.currentTimeMillis()),1);
 
             userToken.setToken(token );
-            userToken.setType( "JWT" );
             userToken.setHashAlgorithm( "HS256" );
             userToken.setIssuer( issuer );
             userToken.setSecret(secret);
             userToken.setUser( user );
+            userToken.setType( tokenType );
             userToken.setValidDate( validDate );
 
             identityDataService.persistUserToken( userToken );
@@ -344,7 +344,7 @@ public class IdentityManagerImpl implements IdentityManager
 
             if(uToken == null)
             {
-                uToken = createUserToken( user, "", "", "" ,null);
+                uToken = createUserToken( user, "", "", "" ,TokenType.Session.getId(),null);
             }
 
             token = uToken.getFullToken();

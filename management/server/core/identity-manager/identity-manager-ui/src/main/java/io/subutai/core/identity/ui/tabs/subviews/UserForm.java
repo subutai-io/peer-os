@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.vaadin.data.Item;
 import com.vaadin.ui.*;
 import io.subutai.common.security.objects.UserStatus;
 import io.subutai.core.identity.api.IdentityManager;
@@ -122,7 +121,7 @@ public class UserForm extends Window
         };
 
         final Button saveButton = new Button( "Save user", saveListener );
-        final Button cancelButton = new Button( "Cancel", cancelListener );
+        final Button cancelButton = new Button( "Close", cancelListener );
         saveButton.setStyleName( Reindeer.BUTTON_DEFAULT );
 
 		for (int i = 1; i < 3; ++i)
