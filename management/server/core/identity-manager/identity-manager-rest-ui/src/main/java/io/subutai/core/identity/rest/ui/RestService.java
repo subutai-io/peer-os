@@ -14,9 +14,15 @@ public interface RestService
     @POST
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response setUser( @FormParam( "username" ) String username,
-                                   @FormParam( "full_name" ) String fullName,
-                                   @FormParam( "password" ) String password,
-                                   @FormParam( "email" ) String email);
+                             @FormParam( "full_name" ) String fullName,
+                             @FormParam( "password" ) String password,
+                             @FormParam( "email" ) String email,
+                             @FormParam( "roles" ) String roles,
+                             @FormParam( "user_id" ) Long userId );
+
+    @DELETE
+    @Path( "/{userId}" )
+    public Response deleteUser( @PathParam( "userId" ) Long userId );
 
     @GET
     @Path( "roles" )
